@@ -84,13 +84,13 @@ export default function Admissions() {
   const getStatusBadge = (status: string) => {
     switch(status.toLowerCase()) {
       case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">Pending</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">In afwachting</Badge>;
       case 'approved':
-        return <Badge className="bg-green-100 text-green-800 border-green-200">Approved</Badge>;
+        return <Badge className="bg-green-100 text-green-800 border-green-200">Goedgekeurd</Badge>;
       case 'rejected':
-        return <Badge className="bg-red-100 text-red-800 border-red-200">Rejected</Badge>;
+        return <Badge className="bg-red-100 text-red-800 border-red-200">Afgewezen</Badge>;
       case 'enrolled':
-        return <Badge className="bg-blue-100 text-blue-800 border-blue-200">Enrolled</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 border-blue-200">Ingeschreven</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
@@ -100,15 +100,15 @@ export default function Admissions() {
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Admission Management</h1>
+          <h1 className="text-2xl font-bold">Toelatingsbeheer</h1>
           <p className="text-gray-500 mt-1">
-            Review and process student applications and admissions
+            Beoordeel en verwerk studentaanmeldingen en toelatingen
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={handleAddApplicant} className="flex items-center">
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>New Application</span>
+            <span>Nieuwe Aanmelding</span>
           </Button>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default function Admissions() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Total Applications</p>
+                <p className="text-sm font-medium text-gray-500">Totaal Aanmeldingen</p>
                 <p className="text-2xl font-bold">{stats.totalApplications}</p>
               </div>
               <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">

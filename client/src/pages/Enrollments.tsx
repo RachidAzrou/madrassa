@@ -19,47 +19,9 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 
-export default function Enrollments() {
+// ActionButtons Component voor de consistency in enrollment-lijsten
+function EnrollmentActionButtons({ id }: { id: string }) {
   const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [program, setProgram] = useState('all');
-  const [course, setCourse] = useState('all');
-  const [status, setStatus] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState('student-enrollments');
-
-  // Fetch enrollments with filters
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['/api/enrollments', { searchTerm, program, course, status, page: currentPage, type: activeTab }],
-    staleTime: 30000,
-  });
-
-  // Fetch programs for filter
-  const { data: programsData } = useQuery({
-    queryKey: ['/api/programs'],
-  });
-
-  // Fetch courses for filter
-  const { data: coursesData } = useQuery({
-    queryKey: ['/api/courses'],
-  });
-
-  const enrollments = data?.enrollments || [];
-  const totalEnrollments = data?.totalCount || 0;
-  const totalPages = Math.ceil(totalEnrollments / 10);
-  
-  const programs = programsData?.programs || [];
-  const courses = coursesData?.courses || [];
-
-  const handleAddEnrollment = async () => {
-    // Implementatie voor het toevoegen van een inschrijving
-    console.log('Add enrollment clicked');
-    toast({
-      title: "Functie in ontwikkeling",
-      description: "De functie voor het toevoegen van nieuwe inschrijvingen is momenteel in ontwikkeling.",
-      variant: "default",
-    });
-  };
   
   const handleViewEnrollment = (id: string) => {
     console.log(`Viewing enrollment with ID: ${id}`);
@@ -105,6 +67,78 @@ export default function Enrollments() {
           });
         });
     }
+  };
+
+  return (
+    <div className="flex justify-end space-x-2">
+      <Button 
+        variant="ghost" 
+        size="icon"
+        onClick={() => handleViewEnrollment(id)}
+      >
+        <Eye className="h-4 w-4 text-gray-500" />
+        <span className="sr-only">Bekijken</span>
+      </Button>
+      <Button 
+        variant="ghost" 
+        size="icon"
+        onClick={() => handleEditEnrollment(id)}
+      >
+        <Edit className="h-4 w-4 text-blue-500" />
+        <span className="sr-only">Bewerken</span>
+      </Button>
+      <Button 
+        variant="ghost" 
+        size="icon"
+        onClick={() => handleDeleteEnrollment(id)}
+      >
+        <Trash2 className="h-4 w-4 text-red-500" />
+        <span className="sr-only">Verwijderen</span>
+      </Button>
+    </div>
+  );
+}
+
+export default function Enrollments() {
+  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [program, setProgram] = useState('all');
+  const [course, setCourse] = useState('all');
+  const [status, setStatus] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState('student-enrollments');
+
+  // Fetch enrollments with filters
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['/api/enrollments', { searchTerm, program, course, status, page: currentPage, type: activeTab }],
+    staleTime: 30000,
+  });
+
+  // Fetch programs for filter
+  const { data: programsData } = useQuery({
+    queryKey: ['/api/programs'],
+  });
+
+  // Fetch courses for filter
+  const { data: coursesData } = useQuery({
+    queryKey: ['/api/courses'],
+  });
+
+  const enrollments = data?.enrollments || [];
+  const totalEnrollments = data?.totalCount || 0;
+  const totalPages = Math.ceil(totalEnrollments / 10);
+  
+  const programs = programsData?.programs || [];
+  const courses = coursesData?.courses || [];
+
+  const handleAddEnrollment = async () => {
+    // Implementatie voor het toevoegen van een inschrijving
+    console.log('Add enrollment clicked');
+    toast({
+      title: "Functie in ontwikkeling",
+      description: "De functie voor het toevoegen van nieuwe inschrijvingen is momenteel in ontwikkeling.",
+      variant: "default",
+    });
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -395,20 +429,7 @@ export default function Enrollments() {
                           {getStatusBadge('Active')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Bewerken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Verwijderen</span>
-                            </Button>
-                          </div>
+                          <EnrollmentActionButtons id="ENR001" />
                         </td>
                       </tr>
                       

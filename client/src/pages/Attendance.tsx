@@ -270,13 +270,13 @@ export default function Attendance() {
                           onValueChange={(value) => handleStatusChange(student.id, value)}
                         >
                           <SelectTrigger className="w-[120px]">
-                            <SelectValue placeholder="Select status" />
+                            <SelectValue placeholder="Selecteer status" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="present">Present</SelectItem>
-                            <SelectItem value="absent">Absent</SelectItem>
-                            <SelectItem value="late">Late</SelectItem>
-                            <SelectItem value="excused">Excused</SelectItem>
+                            <SelectItem value="present">Aanwezig</SelectItem>
+                            <SelectItem value="absent">Afwezig</SelectItem>
+                            <SelectItem value="late">Te Laat</SelectItem>
+                            <SelectItem value="excused">Geëxcuseerd</SelectItem>
                           </SelectContent>
                         </Select>
                       </td>
@@ -341,7 +341,7 @@ export default function Attendance() {
                 ) : (
                   <Save className="mr-2 h-4 w-4" />
                 )}
-                Save Attendance
+                Aanwezigheid Opslaan
               </Button>
             </div>
           </>

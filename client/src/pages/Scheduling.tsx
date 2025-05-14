@@ -251,31 +251,31 @@ export default function Scheduling() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instructor</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Day</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cursus</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Docent</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokaal</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dag</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tijd</th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {isLoading ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
-                        Loading schedules...
+                        Roosters laden...
                       </td>
                     </tr>
                   ) : isError ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-4 text-center text-sm text-red-500">
-                        Error loading schedules. Please try again.
+                        Fout bij het laden van roosters. Probeer het opnieuw.
                       </td>
                     </tr>
                   ) : schedules.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
-                        No schedules found with the current filters. Try changing your search or filters.
+                        Geen roosters gevonden met de huidige filters. Probeer je zoekopdracht of filters aan te passen.
                       </td>
                     </tr>
                   ) : (
@@ -283,8 +283,8 @@ export default function Scheduling() {
                       {/* Schedule Entry 1 */}
                       <tr>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">CS101: Intro to Programming</div>
-                          <div className="text-xs text-gray-500">Computer Science</div>
+                          <div className="font-medium text-gray-900">CS101: Inleiding Programmeren</div>
+                          <div className="text-xs text-gray-500">Informatica</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
@@ -298,24 +298,24 @@ export default function Scheduling() {
                           <Badge>A101</Badge>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Monday</div>
+                          <div className="text-sm text-gray-900">Maandag</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">9:00 AM - 10:30 AM</div>
+                          <div className="text-sm text-gray-900">9:00 - 10:30</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
+                              <span className="sr-only">Bewerken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Delete</span>
+                              <span className="sr-only">Verwijderen</span>
                             </Button>
                           </div>
                         </td>
@@ -325,7 +325,7 @@ export default function Scheduling() {
                       <tr>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="font-medium text-gray-900">MATH101: Calculus I</div>
-                          <div className="text-xs text-gray-500">Mathematics</div>
+                          <div className="text-xs text-gray-500">Wiskunde</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
@@ -339,24 +339,24 @@ export default function Scheduling() {
                           <Badge>B201</Badge>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Tuesday</div>
+                          <div className="text-sm text-gray-900">Dinsdag</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">11:00 AM - 12:30 PM</div>
+                          <div className="text-sm text-gray-900">11:00 - 12:30</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
+                              <span className="sr-only">Bewerken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Delete</span>
+                              <span className="sr-only">Verwijderen</span>
                             </Button>
                           </div>
                         </td>
@@ -365,8 +365,8 @@ export default function Scheduling() {
                       {/* Schedule Entry 3 */}
                       <tr>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">CS201: Data Structures</div>
-                          <div className="text-xs text-gray-500">Computer Science</div>
+                          <div className="font-medium text-gray-900">CS201: Datastructuren</div>
+                          <div className="text-xs text-gray-500">Informatica</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
@@ -380,24 +380,24 @@ export default function Scheduling() {
                           <Badge>C305</Badge>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Wednesday</div>
+                          <div className="text-sm text-gray-900">Woensdag</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">2:00 PM - 3:30 PM</div>
+                          <div className="text-sm text-gray-900">14:00 - 15:30</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
+                              <span className="sr-only">Bewerken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Delete</span>
+                              <span className="sr-only">Verwijderen</span>
                             </Button>
                           </div>
                         </td>
@@ -407,304 +407,74 @@ export default function Scheduling() {
                 </tbody>
               </table>
             </div>
-
+            
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
-                <div className="flex-1 flex justify-between sm:hidden">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                  </Button>
+            <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="flex-1 flex justify-between sm:hidden">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
+                  Vorige
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  Volgende
+                </Button>
+              </div>
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700">
+                    Pagina <span className="font-medium">{currentPage}</span> van{' '}
+                    <span className="font-medium">{totalPages}</span>
+                  </p>
                 </div>
-                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-gray-700">
-                      Showing <span className="font-medium">{((currentPage - 1) * 10) + 1}</span> to{" "}
-                      <span className="font-medium">
-                        {Math.min(currentPage * 10, totalSchedules)}
-                      </span>{" "}
-                      of <span className="font-medium">{totalSchedules}</span> results
-                    </p>
-                  </div>
-                  <div>
-                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="rounded-l-md"
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                      >
-                        Previous
-                      </Button>
-                      {Array.from({ length: totalPages }).map((_, i) => (
-                        <Button 
-                          key={i}
-                          variant={currentPage === i + 1 ? "default" : "outline"} 
-                          size="sm"
-                          onClick={() => handlePageChange(i + 1)}
-                        >
-                          {i + 1}
-                        </Button>
-                      ))}
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="rounded-r-md"
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                      >
-                        Next
-                      </Button>
-                    </nav>
-                  </div>
+                <div>
+                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Paginering">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="rounded-l-md"
+                      disabled={currentPage === 1}
+                      onClick={() => handlePageChange(currentPage - 1)}
+                    >
+                      Vorige
+                    </Button>
+                    {/* Page numbers would go here */}
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="rounded-r-md"
+                      disabled={currentPage === totalPages}
+                      onClick={() => handlePageChange(currentPage + 1)}
+                    >
+                      Volgende
+                    </Button>
+                  </nav>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </TabsContent>
         
         <TabsContent value="room-allocation">
-          <Card>
-            <CardHeader>
-              <CardTitle>Room Allocation</CardTitle>
-              <CardDescription>
-                View and manage classroom allocations and equipment
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Building</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacity</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipment</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    <tr>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="font-medium text-gray-900">A101</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">Science Building</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">35</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge className="bg-blue-100 text-blue-800">Lecture Hall</Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">Projector, Smart Board</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge className="bg-green-100 text-green-800">Available</Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Button variant="ghost" size="icon">
-                          <Edit className="h-4 w-4 text-blue-500" />
-                          <span className="sr-only">Edit</span>
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="font-medium text-gray-900">B201</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">Math Building</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">30</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge className="bg-yellow-100 text-yellow-800">Classroom</Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">Projector, Whiteboard</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge className="bg-green-100 text-green-800">Available</Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Button variant="ghost" size="icon">
-                          <Edit className="h-4 w-4 text-blue-500" />
-                          <span className="sr-only">Edit</span>
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="font-medium text-gray-900">C305</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">Computer Building</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">25</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge className="bg-purple-100 text-purple-800">Computer Lab</Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">25 Computers, Projector</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge className="bg-red-100 text-red-800">Maintenance</Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Button variant="ghost" size="icon">
-                          <Edit className="h-4 w-4 text-blue-500" />
-                          <span className="sr-only">Edit</span>
-                        </Button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between border-t px-6 py-4">
-              <Button variant="outline">Add New Room</Button>
-              <Button variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Export Room Data
-              </Button>
-            </CardFooter>
-          </Card>
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+            <h3 className="text-lg font-medium text-gray-700">Lokalentoewijzing</h3>
+            <p className="mt-2 text-gray-500">Bekijk en beheer lokaalverdeling en apparatuur</p>
+          </div>
         </TabsContent>
         
         <TabsContent value="instructor-schedule">
-          <Card>
-            <CardHeader>
-              <CardTitle>Instructor Schedule</CardTitle>
-              <CardDescription>
-                View and manage instructor teaching schedules
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {/* Instructor 1 */}
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                  <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-                    <div className="flex items-center">
-                      <Avatar className="h-10 w-10">
-                        <AvatarFallback>AT</AvatarFallback>
-                      </Avatar>
-                      <div className="ml-4">
-                        <h3 className="font-medium text-gray-900">Dr. Alan Turing</h3>
-                        <p className="text-sm text-gray-500">Computer Science Department</p>
-                      </div>
-                    </div>
-                    <Badge className="bg-green-100 text-green-800">Full-time</Badge>
-                  </div>
-                  <div className="px-4 py-3 border-b border-gray-200">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Teaching Schedule</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center">
-                        <div className="w-24 text-xs text-gray-500">Monday</div>
-                        <div className="flex-1">
-                          <Badge className="mr-2">9:00 AM - 10:30 AM</Badge>
-                          <span className="text-sm">CS101: Intro to Programming (A101)</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-24 text-xs text-gray-500">Wednesday</div>
-                        <div className="flex-1">
-                          <Badge className="mr-2">9:00 AM - 10:30 AM</Badge>
-                          <span className="text-sm">CS101: Intro to Programming (A101)</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-24 text-xs text-gray-500">Friday</div>
-                        <div className="flex-1">
-                          <Badge className="mr-2">1:00 PM - 2:30 PM</Badge>
-                          <span className="text-sm">CS301: Algorithms (B103)</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="px-4 py-3">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Total Teaching Hours: </span>
-                        <span className="text-sm">9 hours/week</span>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit Schedule
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Instructor 2 */}
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                  <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-                    <div className="flex items-center">
-                      <Avatar className="h-10 w-10">
-                        <AvatarFallback>GH</AvatarFallback>
-                      </Avatar>
-                      <div className="ml-4">
-                        <h3 className="font-medium text-gray-900">Dr. Grace Hopper</h3>
-                        <p className="text-sm text-gray-500">Mathematics Department</p>
-                      </div>
-                    </div>
-                    <Badge className="bg-blue-100 text-blue-800">Part-time</Badge>
-                  </div>
-                  <div className="px-4 py-3 border-b border-gray-200">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Teaching Schedule</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center">
-                        <div className="w-24 text-xs text-gray-500">Tuesday</div>
-                        <div className="flex-1">
-                          <Badge className="mr-2">11:00 AM - 12:30 PM</Badge>
-                          <span className="text-sm">MATH101: Calculus I (B201)</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-24 text-xs text-gray-500">Thursday</div>
-                        <div className="flex-1">
-                          <Badge className="mr-2">11:00 AM - 12:30 PM</Badge>
-                          <span className="text-sm">MATH101: Calculus I (B201)</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="px-4 py-3">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Total Teaching Hours: </span>
-                        <span className="text-sm">6 hours/week</span>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit Schedule
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+            <h3 className="text-lg font-medium text-gray-700">Docentenrooster</h3>
+            <p className="mt-2 text-gray-500">Bekijk en beheer docentenschema's en beschikbaarheid</p>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

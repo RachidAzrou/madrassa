@@ -115,6 +115,8 @@ export const grades = pgTable("grades", {
   maxScore: integer("max_score").notNull(),
   weight: integer("weight").notNull(), // percentage weight in final grade
   date: date("date").notNull(),
+  remark: text("remark"), // feedback or comments
+  outOf: integer("out_of"), // alternative to maxScore for some assessment types
 });
 
 export const insertGradeSchema = createInsertSchema(grades).omit({

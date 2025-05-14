@@ -617,6 +617,431 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admissions API
+  apiRouter.get("/api/admissions/applicants", async (req, res) => {
+    try {
+      // Get query parameters for filtering
+      const { searchTerm, program, status, academicYear, page } = req.query;
+      
+      // Mock implementation using students as applicants
+      const students = await storage.getStudents();
+      
+      // Apply filters if provided
+      let filteredApplicants = students.map(student => ({
+        id: student.id,
+        name: `${student.firstName} ${student.lastName}`,
+        email: student.email,
+        programId: student.programId,
+        status: ['pending', 'approved', 'rejected', 'waitlisted'][Math.floor(Math.random() * 4)],
+        academicYear: '2023-2024',
+        applicationDate: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString().split('T')[0],
+        lastUpdate: new Date(Date.now() - Math.floor(Math.random() * 1000000000)).toISOString().split('T')[0],
+      }));
+      
+      if (searchTerm) {
+        const term = String(searchTerm).toLowerCase();
+        filteredApplicants = filteredApplicants.filter(
+          app => app.name.toLowerCase().includes(term) || app.email.toLowerCase().includes(term)
+        );
+      }
+      
+      if (program && program !== 'all') {
+        filteredApplicants = filteredApplicants.filter(app => String(app.programId) === program);
+      }
+      
+      if (status && status !== 'all') {
+        filteredApplicants = filteredApplicants.filter(app => app.status === status);
+      }
+      
+      if (academicYear && academicYear !== 'all') {
+        filteredApplicants = filteredApplicants.filter(app => app.academicYear === academicYear);
+      }
+      
+      // Pagination
+      const pageSize = 10;
+      const currentPage = page ? parseInt(String(page)) : 1;
+      const startIndex = (currentPage - 1) * pageSize;
+      const paginatedApplicants = filteredApplicants.slice(startIndex, startIndex + pageSize);
+      
+      res.json({
+        applicants: paginatedApplicants,
+        totalCount: filteredApplicants.length,
+        totalPages: Math.ceil(filteredApplicants.length / pageSize),
+        currentPage
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching applicants" });
+    }
+  });
+
+  apiRouter.get("/api/admissions/stats", async (req, res) => {
+    try {
+      // Mock admission stats
+      res.json({
+        totalApplications: 182,
+        newApplications: 24,
+        approved: 76,
+        rejected: 15,
+        pending: 68,
+        waitlisted: 23,
+        conversionRate: 78.5,
+        applicationsByProgram: [
+          { program: "Informatica", count: 56 },
+          { program: "Wiskunde", count: 32 },
+          { program: "Economie", count: 48 },
+          { program: "Psychologie", count: 46 }
+        ],
+        applicationTrend: [
+          { month: "Jan", count: 12 },
+          { month: "Feb", count: 18 },
+          { month: "Mar", count: 22 },
+          { month: "Apr", count: 15 },
+          { month: "Mei", count: 28 },
+          { month: "Jun", count: 35 },
+          { month: "Jul", count: 42 },
+          { month: "Aug", count: 10 }
+        ]
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching admission stats" });
+    }
+  });
+
+  // Academic Years API
+  apiRouter.get("/api/academic-years", async (req, res) => {
+    try {
+      // Mock academic years data
+      res.json([
+        { id: 1, name: "2021-2022" },
+        { id: 2, name: "2022-2023" },
+        { id: 3, name: "2023-2024" },
+        { id: 4, name: "2024-2025" }
+      ]);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching academic years" });
+    }
+  });
+
+  // Dashboard API
+  apiRouter.get("/api/dashboard/stats", async (req, res) => {
+    try {
+      const students = await storage.getStudents();
+      const courses = await storage.getCourses();
+      const programs = await storage.getPrograms();
+      const attendance = await storage.getAttendanceRecords();
+      
+      const totalAttendance = attendance.length;
+      const presentAttendance = attendance.filter(a => a.status === 'present').length;
+      const attendanceRate = totalAttendance > 0 ? (presentAttendance / totalAttendance) * 100 : 0;
+      
+      res.json({
+        totalStudents: students.length,
+        activeCourses: courses.length,
+        programs: programs.length,
+        attendanceRate: Math.round(attendanceRate)
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching dashboard stats" });
+    }
+  });
+
+  apiRouter.get("/api/dashboard/enrollment", async (req, res) => {
+    try {
+      // Mock enrollment trend data
+      res.json({
+        enrollmentTrend: [
+          { month: "Jan", count: 85 },
+          { month: "Feb", count: 90 },
+          { month: "Mar", count: 92 },
+          { month: "Apr", count: 95 },
+          { month: "Mei", count: 100 },
+          { month: "Jun", count: 110 },
+          { month: "Jul", count: 115 },
+          { month: "Aug", count: 120 }
+        ]
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching enrollment data" });
+    }
+  });
+
+  apiRouter.get("/api/dashboard/events", async (req, res) => {
+    try {
+      const events = await storage.getEvents();
+      
+      // Get upcoming events (next 7 days)
+      const now = new Date();
+      const nextWeek = new Date(now);
+      nextWeek.setDate(now.getDate() + 7);
+      
+      const upcomingEvents = events.filter(event => {
+        const eventDate = new Date(event.startDate);
+        return eventDate >= now && eventDate <= nextWeek;
+      }).slice(0, 5);
+      
+      res.json(upcomingEvents);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching events" });
+    }
+  });
+
+  apiRouter.get("/api/dashboard/recent-students", async (req, res) => {
+    try {
+      const students = await storage.getStudents();
+      
+      // Sort by ID (assuming higher ID = more recent) and take 5
+      const recentStudents = [...students]
+        .sort((a, b) => b.id - a.id)
+        .slice(0, 5);
+      
+      res.json(recentStudents);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching recent students" });
+    }
+  });
+
+  // Fees API for stats
+  apiRouter.get("/api/fees/stats", async (req, res) => {
+    try {
+      // Mock fees statistics
+      res.json({
+        totalCollected: 256780.50,
+        pendingAmount: 45320.75,
+        overdueAmount: 12340.25,
+        collectionRate: 85.2,
+        paymentsByMonth: [
+          { month: "Jan", amount: 32450.75 },
+          { month: "Feb", amount: 28750.50 },
+          { month: "Mar", amount: 36540.25 },
+          { month: "Apr", amount: 30120.00 },
+          { month: "Mei", amount: 38750.25 },
+          { month: "Jun", amount: 42150.75 },
+          { month: "Jul", amount: 35230.50 },
+          { month: "Aug", amount: 12750.50 }
+        ]
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching fees stats" });
+    }
+  });
+
+  apiRouter.get("/api/fees", async (req, res) => {
+    try {
+      const students = await storage.getStudents();
+      
+      // Create mock fee records for each student
+      const feeRecords = students.map(student => {
+        const semesterFee = 1250 + Math.floor(Math.random() * 750);
+        const materialsFee = 180 + Math.floor(Math.random() * 120);
+        const totalAmount = semesterFee + materialsFee;
+        const paidAmount = Math.random() > 0.3 ? totalAmount : Math.floor(Math.random() * totalAmount);
+        
+        return {
+          id: student.id,
+          studentId: student.id,
+          studentName: `${student.firstName} ${student.lastName}`,
+          invoiceNumber: `INV-${new Date().getFullYear()}-${student.id.toString().padStart(4, '0')}`,
+          feeType: 'Collegegeld',
+          totalAmount: totalAmount,
+          paidAmount: paidAmount,
+          dueDate: new Date(Date.now() + Math.floor(Math.random() * 5000000000)).toISOString().split('T')[0],
+          status: paidAmount >= totalAmount ? 'Betaald' : (Math.random() > 0.5 ? 'In afwachting' : 'Te laat'),
+          lastPaymentDate: paidAmount > 0 ? new Date(Date.now() - Math.floor(Math.random() * 1000000000)).toISOString().split('T')[0] : null
+        };
+      });
+      
+      res.json(feeRecords);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching fee records" });
+    }
+  });
+
+  // Calendar API
+  apiRouter.get("/api/calendar/events", async (req, res) => {
+    try {
+      const { year, month, view, filter } = req.query;
+      
+      // Get events from storage
+      const allEvents = await storage.getEvents();
+      
+      // Filter by date range based on view
+      const startDate = new Date(Number(year), Number(month) - 1, 1);
+      let endDate;
+      
+      if (view === 'month') {
+        endDate = new Date(Number(year), Number(month), 0); // Last day of the month
+      } else if (view === 'week') {
+        const tempDate = new Date(startDate);
+        tempDate.setDate(tempDate.getDate() + 7);
+        endDate = tempDate;
+      } else { // day view
+        endDate = new Date(startDate);
+        endDate.setHours(23, 59, 59);
+      }
+      
+      // Filter events in the date range
+      const filteredEvents = allEvents.filter(event => {
+        const eventStartDate = new Date(event.startDate);
+        return eventStartDate >= startDate && eventStartDate <= endDate;
+      });
+      
+      // Format events for calendar display
+      const formattedEvents = filteredEvents.map(event => {
+        const eventDate = new Date(event.startDate);
+        const endDate = new Date(event.endDate);
+        
+        return {
+          id: String(event.id),
+          title: event.title,
+          date: new Date(event.startDate).toISOString().split('T')[0],
+          startTime: new Date(event.startDate).toLocaleTimeString('nl-NL', {hour: '2-digit', minute: '2-digit'}),
+          endTime: new Date(event.endDate).toLocaleTimeString('nl-NL', {hour: '2-digit', minute: '2-digit'}),
+          location: event.location || '',
+          type: 'event',
+          description: event.description
+        };
+      });
+      
+      res.json({ events: formattedEvents });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching calendar events" });
+    }
+  });
+
+  // Courses API with list endpoint
+  apiRouter.get("/api/courses/list", async (req, res) => {
+    try {
+      const courses = await storage.getCourses();
+      res.json({ courses });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching courses list" });
+    }
+  });
+
+  // Assessments API
+  apiRouter.get("/api/assessments", async (req, res) => {
+    try {
+      const { courseId } = req.query;
+      
+      if (!courseId) {
+        return res.status(400).json({ message: "Course ID is required" });
+      }
+      
+      // Mock assessments for the course
+      const assessments = [
+        { id: 1, name: "Tentamen", type: "examen", date: "2023-12-15", maxScore: 100, weight: 60 },
+        { id: 2, name: "Opdracht", type: "opdracht", date: "2023-11-20", maxScore: 50, weight: 20 },
+        { id: 3, name: "Presentatie", type: "presentatie", date: "2023-10-30", maxScore: 25, weight: 10 },
+        { id: 4, name: "Deelname", type: "participatie", date: "2023-12-01", maxScore: 10, weight: 10 }
+      ];
+      
+      res.json({ assessments });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching assessments" });
+    }
+  });
+
+  // Grades API
+  apiRouter.get("/api/grades", async (req, res) => {
+    try {
+      const { courseId, assessmentId } = req.query;
+      
+      if (!courseId || !assessmentId) {
+        return res.status(400).json({ message: "Course ID and Assessment ID are required" });
+      }
+      
+      // Get students for this course using enrollments
+      const enrollments = await storage.getEnrollmentsByCourse(Number(courseId));
+      const studentIds = enrollments.map(e => e.studentId);
+      
+      // Get all students
+      const allStudents = await storage.getStudents();
+      
+      // Filter students by enrolled students
+      const enrolledStudents = allStudents.filter(s => studentIds.includes(s.id));
+      
+      // Format student data for response
+      const students = enrolledStudents.map(student => ({
+        id: student.id,
+        name: `${student.firstName} ${student.lastName}`,
+        studentId: student.studentId,
+        email: student.email
+      }));
+      
+      // Get grades for these students for this assessment
+      const allGrades = await storage.getGrades();
+      
+      // Filter grades by course and assessment
+      const filteredGrades = allGrades.filter(
+        g => g.courseId === Number(courseId) && g.assessmentType === `assessment-${assessmentId}`
+      );
+      
+      // Format grades as a lookup object by student ID
+      const grades = {};
+      filteredGrades.forEach(grade => {
+        grades[grade.studentId] = {
+          score: grade.score,
+          feedback: grade.remark || ""
+        };
+      });
+      
+      res.json({ students, grades });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching grades" });
+    }
+  });
+
+  // Save grades
+  apiRouter.post("/api/grades/save", async (req, res) => {
+    try {
+      const { courseId, assessmentId, grades } = req.body;
+      
+      if (!courseId || !assessmentId || !grades) {
+        return res.status(400).json({ message: "Missing required data" });
+      }
+      
+      // Process each grade update
+      const results = await Promise.all(
+        Object.entries(grades).map(async ([studentId, gradeData]) => {
+          const { score, feedback } = gradeData as { score: number, feedback: string };
+          
+          // Check if grade already exists
+          const allGrades = await storage.getGrades();
+          const existingGrade = allGrades.find(
+            g => g.studentId === Number(studentId) && 
+                 g.courseId === Number(courseId) && 
+                 g.assessmentType === `assessment-${assessmentId}`
+          );
+          
+          if (existingGrade) {
+            // Update existing grade
+            const updatedGrade = await storage.updateGrade(existingGrade.id, {
+              score,
+              remark: feedback
+            });
+            return updatedGrade;
+          } else {
+            // Create new grade
+            const newGrade = await storage.createGrade({
+              studentId: Number(studentId),
+              courseId: Number(courseId),
+              assessmentType: `assessment-${assessmentId}`,
+              score,
+              outOf: 100, // Assuming max score is 100
+              date: new Date().toISOString(),
+              remark: feedback
+            });
+            return newGrade;
+          }
+        })
+      );
+      
+      res.json({ success: true, message: "Cijfers succesvol opgeslagen", updatedCount: results.length });
+    } catch (error) {
+      res.status(500).json({ message: "Error saving grades" });
+    }
+  });
+
   // Create HTTP server
   const httpServer = createServer(app);
 

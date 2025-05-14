@@ -302,7 +302,7 @@ export default function Fees() {
                           <div className="text-sm text-gray-900">15 jan 2025</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {getStatusBadge('Paid')}
+                          {getStatusBadge('Betaald')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">
@@ -349,7 +349,7 @@ export default function Fees() {
                           <div className="text-sm text-gray-900">15 jan 2025</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {getStatusBadge('Pending')}
+                          {getStatusBadge('In behandeling')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">

@@ -246,16 +246,16 @@ export default function Admissions() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
               <div className="text-sm text-gray-500">
-                {isLoading ? 'Loading...' : `Showing ${applicants.length} of ${totalApplicants} applications`}
+                {isLoading ? 'Laden...' : `Tonen van ${applicants.length} van ${totalApplicants} aanmeldingen`}
               </div>
               <div className="flex space-x-2">
                 <Button variant="outline" size="sm">
                   <Filter className="mr-2 h-4 w-4" />
-                  Filter
+                  Filteren
                 </Button>
                 <Button variant="outline" size="sm">
                   <Download className="mr-2 h-4 w-4" />
-                  Export
+                  Exporteren
                 </Button>
               </div>
             </div>
@@ -269,32 +269,32 @@ export default function Admissions() {
                           type="checkbox" 
                           className="rounded border-gray-300 text-primary focus:ring-primary mr-3"
                         />
-                        Applicant
+                        Aanmelder
                       </div>
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Applied</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Programma</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aanmelddatum</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {isLoading ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                        Loading applicants...
+                        Aanmelders laden...
                       </td>
                     </tr>
                   ) : isError ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-4 text-center text-sm text-red-500">
-                        Error loading applicants. Please try again.
+                        Fout bij het laden van aanmelders. Probeer het opnieuw.
                       </td>
                     </tr>
                   ) : applicants.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                        No applicants found with the current filters. Try changing your search or filters.
+                        Geen aanmelders gevonden met de huidige filters. Probeer uw zoekopdracht of filters aan te passen.
                       </td>
                     </tr>
                   ) : (
@@ -486,11 +486,11 @@ export default function Admissions() {
         <TabsContent value="admission-programs">
           <Card>
             <CardHeader>
-              <CardTitle>Admission Programs</CardTitle>
+              <CardTitle>Toelatingsprogramma's</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-500 mb-4">
-                Configure admission programs, requirements, and application forms for different academic years.
+                Configureer toelatingsprogramma's, vereisten en aanmeldformulieren voor verschillende academische jaren.
               </p>
               
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -498,24 +498,24 @@ export default function Admissions() {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program Name</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Academic Year</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Date</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Programmanaam</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Academisch Jaar</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Startdatum</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Einddatum</th>
                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       <tr>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">Undergraduate Admissions</div>
+                          <div className="font-medium text-gray-900">Bachelor Toelating</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">2024-2025</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">01 Jan, 2024</div>
+                          <div className="text-sm text-gray-900">01 jan 2024</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">30 Jun, 2024</div>

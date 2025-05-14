@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { apiRequest } from '@/lib/queryClient';
 
 export default function Students() {
@@ -14,6 +16,11 @@ export default function Students() {
   const [status, setStatus] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [currentPage, setCurrentPage] = useState(1);
+  
+  // Dialog state
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogType, setDialogType] = useState<'add' | 'edit' | 'view'>('add');
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
 
   // Fetch students with filters
   const { data, isLoading, isError } = useQuery({
@@ -26,8 +33,40 @@ export default function Students() {
   const totalPages = Math.ceil(totalStudents / 10); // Assuming 10 students per page
 
   const handleAddStudent = async () => {
-    // Implementation will be added for student creation
-    console.log('Add student clicked');
+    setDialogType('add');
+    setSelectedStudent(null);
+    setDialogOpen(true);
+  };
+
+  const handleViewStudent = (id: string) => {
+    console.log(`Viewing student with ID: ${id}`);
+    // Toon een eenvoudig bericht of alert
+    alert(`Student bekijken met ID: ${id}`);
+  };
+
+  const handleEditStudent = (id: string) => {
+    console.log(`Editing student with ID: ${id}`);
+    // Toon een eenvoudig bericht of alert
+    alert(`Student bewerken met ID: ${id}`);
+  };
+
+  const handleDeleteStudent = (id: string) => {
+    console.log(`Deleting student with ID: ${id}`);
+    // In de toekomst: bevestigingsmodaal tonen en verwijderingslogica implementeren
+    if (confirm(`Weet je zeker dat je student met ID: ${id} wilt verwijderen?`)) {
+      // Daadwerkelijke API-aanroep zou hier worden gedaan
+      // Het zou er ongeveer zo uitzien:
+      /*
+      apiRequest(`/api/students/${id}`, { 
+        method: 'DELETE' 
+      }).then(() => {
+        // Invalidate cache om de lijst te vernieuwen
+        queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      });
+      */
+      
+      alert(`Student met ID: ${id} is verwijderd`);
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,11 +191,27 @@ export default function Students() {
             {isLoading ? 'Laden...' : `Tonen van ${students.length} van de ${totalStudents} studenten`}
           </div>
           <div className="flex space-x-2">
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                // Toon of verberg geavanceerde filteropties
+                alert('Geavanceerde filteropties worden hier weergegeven');
+              }}
+            >
               <Filter className="mr-2 h-4 w-4" />
-              Filter
+              Filteren
             </Button>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                // Exporteer studentengegevens als CSV
+                console.log('Exporteren van studentengegevens');
+                alert('Studentengegevens worden geëxporteerd als CSV...');
+                // Hier API-aanroep voor downloaden implementeren
+              }}
+            >
               <Download className="mr-2 h-4 w-4" />
               Exporteren
             </Button>
@@ -239,14 +294,32 @@ export default function Students() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Button variant="ghost" size="sm" className="text-primary hover:text-primary-dark">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-primary hover:text-primary-dark"
+                        onClick={() => handleViewStudent(student.id)}
+                      >
                         <Eye className="h-4 w-4" />
+                        <span className="sr-only">Bekijken</span>
                       </Button>
-                      <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-gray-500 hover:text-gray-700"
+                        onClick={() => handleEditStudent(student.id)}
+                      >
                         <Edit className="h-4 w-4" />
+                        <span className="sr-only">Bewerken</span>
                       </Button>
-                      <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => handleDeleteStudent(student.id)}
+                      >
                         <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Verwijderen</span>
                       </Button>
                     </td>
                   </tr>

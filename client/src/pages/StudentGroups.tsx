@@ -206,7 +206,7 @@ export default function StudentGroups() {
                     </div>
                   </div>
                   <div className="mt-4">
-                    <p className="text-xs text-gray-500 mb-1">Students</p>
+                    <p className="text-xs text-gray-500 mb-1">Studenten</p>
                     <div className="flex -space-x-2">
                       <Avatar className="h-8 w-8 border-2 border-white">
                         <AvatarFallback>JD</AvatarFallback>
@@ -267,7 +267,7 @@ export default function StudentGroups() {
                     </div>
                   </div>
                   <div className="mt-4">
-                    <p className="text-xs text-gray-500 mb-1">Students</p>
+                    <p className="text-xs text-gray-500 mb-1">Studenten</p>
                     <div className="flex -space-x-2">
                       <Avatar className="h-8 w-8 border-2 border-white">
                         <AvatarFallback>TJ</AvatarFallback>
@@ -325,7 +325,7 @@ export default function StudentGroups() {
                     </div>
                   </div>
                   <div className="mt-4">
-                    <p className="text-xs text-gray-500 mb-1">Students</p>
+                    <p className="text-xs text-gray-500 mb-1">Studenten</p>
                     <div className="flex -space-x-2">
                       <Avatar className="h-8 w-8 border-2 border-white">
                         <AvatarFallback>RB</AvatarFallback>
@@ -453,7 +453,7 @@ export default function StudentGroups() {
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
@@ -486,7 +486,7 @@ export default function StudentGroups() {
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
@@ -519,7 +519,7 @@ export default function StudentGroups() {
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />

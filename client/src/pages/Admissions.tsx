@@ -454,7 +454,7 @@ export default function Admissions() {
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
                       >
-                        Previous
+                        Vorige
                       </Button>
                       {Array.from({ length: totalPages }).map((_, i) => (
                         <Button 
@@ -473,7 +473,7 @@ export default function Admissions() {
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
                       >
-                        Next
+                        Volgende
                       </Button>
                     </nav>
                   </div>
@@ -605,36 +605,36 @@ export default function Admissions() {
         <TabsContent value="settings">
           <Card>
             <CardHeader>
-              <CardTitle>Admission Settings</CardTitle>
+              <CardTitle>Toelatingsinstelling</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-500 mb-6">
-                Configure global settings for the admission process, including application forms, requirements, and workflows.
+                Configureer globale instellingen voor het toelatingsproces, inclusief aanmeldformulieren, vereisten en werkstromen.
               </p>
               
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Application Form Settings</h3>
+                  <h3 className="text-lg font-medium mb-2">Aanmeldformulier Instellingen</h3>
                   <p className="text-sm text-gray-500 mb-4">
-                    Configure the fields and sections that appear in the application form.
+                    Configureer de velden en secties die in het aanmeldformulier verschijnen.
                   </p>
-                  <Button variant="outline">Customize Application Form</Button>
+                  <Button variant="outline">Aanmeldformulier Aanpassen</Button>
                 </div>
                 
                 <div className="border-t pt-6">
-                  <h3 className="text-lg font-medium mb-2">Document Requirements</h3>
+                  <h3 className="text-lg font-medium mb-2">Documentvereisten</h3>
                   <p className="text-sm text-gray-500 mb-4">
-                    Specify the required documents for different programs and applicant types.
+                    Specificeer de vereiste documenten voor verschillende programma's en aanmelderstypes.
                   </p>
-                  <Button variant="outline">Manage Document Requirements</Button>
+                  <Button variant="outline">Documentvereisten Beheren</Button>
                 </div>
                 
                 <div className="border-t pt-6">
-                  <h3 className="text-lg font-medium mb-2">Approval Workflow</h3>
+                  <h3 className="text-lg font-medium mb-2">Goedkeuringsproces</h3>
                   <p className="text-sm text-gray-500 mb-4">
-                    Define the approval process and notification settings for applications.
+                    Definieer het goedkeuringsproces en notificatie-instellingen voor aanmeldingen.
                   </p>
-                  <Button variant="outline">Configure Approval Workflow</Button>
+                  <Button variant="outline">Goedkeuringsproces Configureren</Button>
                 </div>
                 
                 <div className="border-t pt-6">

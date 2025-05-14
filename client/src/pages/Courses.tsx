@@ -52,8 +52,8 @@ export default function Courses() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900/60 to-gray-900/30 flex items-center">
           <div className="px-6 md:px-10">
-            <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Course Management</h1>
-            <p className="text-gray-200 max-w-xl">Manage your institution's course catalog, enrollments, and schedules in one place.</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Cursusbeheer</h1>
+            <p className="text-gray-200 max-w-xl">Beheer de cursuscatalogus, inschrijvingen en roosters van uw instelling op één plek.</p>
           </div>
         </div>
       </div>
@@ -64,7 +64,7 @@ export default function Courses() {
           <div className="relative">
             <Input
               type="text"
-              placeholder="Search courses..."
+              placeholder="Zoek cursussen..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full md:w-64 pl-10"
@@ -73,20 +73,20 @@ export default function Courses() {
           </div>
           <Select value={department} onValueChange={handleDepartmentChange}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All Departments" />
+              <SelectValue placeholder="Alle Afdelingen" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              <SelectItem value="cs">Computer Science</SelectItem>
-              <SelectItem value="bus">Business</SelectItem>
-              <SelectItem value="eng">Engineering</SelectItem>
-              <SelectItem value="arts">Arts</SelectItem>
+              <SelectItem value="all">Alle Afdelingen</SelectItem>
+              <SelectItem value="cs">Informatica</SelectItem>
+              <SelectItem value="bus">Bedrijfskunde</SelectItem>
+              <SelectItem value="eng">Techniek</SelectItem>
+              <SelectItem value="arts">Kunst</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <Button onClick={handleAddCourse} className="flex items-center">
           <PlusCircle className="mr-2 h-4 w-4" />
-          <span>Add New Course</span>
+          <span>Nieuwe Cursus Toevoegen</span>
         </Button>
       </div>
 
@@ -98,11 +98,11 @@ export default function Courses() {
           </div>
         ) : isError ? (
           <div className="col-span-full text-center py-8 text-red-500">
-            Error loading courses. Please try again.
+            Fout bij het laden van cursussen. Probeer het opnieuw.
           </div>
         ) : courses.length === 0 ? (
           <div className="col-span-full text-center py-8 text-gray-500">
-            No courses found. Try adjusting your filters.
+            Geen cursussen gevonden. Pas uw filters aan.
           </div>
         ) : (
           courses.map((course: any) => (
@@ -111,7 +111,7 @@ export default function Courses() {
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-semibold text-lg text-gray-800">{course.title}</h3>
-                    <p className="text-gray-500 text-sm mt-1">{course.courseCode} • {course.credits} Credits</p>
+                    <p className="text-gray-500 text-sm mt-1">{course.courseCode} • {course.credits} Studiepunten</p>
                   </div>
                   <span className="bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded">{course.department}</span>
                 </div>

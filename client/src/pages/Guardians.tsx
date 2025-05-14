@@ -46,7 +46,7 @@ export default function Guardians() {
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Guardian Management</h1>
+          <h1 className="text-2xl font-bold">Voogdenbeheer</h1>
           <p className="text-gray-500 mt-1">
             Manage guardians, parents and their relations with students
           </p>

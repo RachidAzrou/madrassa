@@ -44,9 +44,9 @@ export default function Dashboard() {
   const enrollmentTrends = isEnrollmentLoading ? [] : enrollmentData || [
     { month: "Jan", value: 65 },
     { month: "Feb", value: 85 },
-    { month: "Mar", value: 75 },
+    { month: "Mrt", value: 75 },
     { month: "Apr", value: 90 },
-    { month: "May", value: 95 },
+    { month: "Mei", value: 95 },
     { month: "Jun", value: 70 },
     { month: "Jul", value: 60 },
     { month: "Aug", value: 80 },
@@ -68,7 +68,7 @@ export default function Dashboard() {
     <div className="p-4 md:p-6 space-y-6">
       {/* Page Title */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Overzicht</h1>
       </div>
 
       {/* Stats Overview */}

@@ -9,9 +9,9 @@ import { apiRequest } from '@/lib/queryClient';
 
 export default function Students() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [program, setProgram] = useState('');
-  const [year, setYear] = useState('');
-  const [status, setStatus] = useState('');
+  const [program, setProgram] = useState('all');
+  const [year, setYear] = useState('all');
+  const [status, setStatus] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -91,7 +91,7 @@ export default function Students() {
                 <SelectValue placeholder="All Programs" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Programs</SelectItem>
+                <SelectItem value="all">All Programs</SelectItem>
                 <SelectItem value="cs">Computer Science</SelectItem>
                 <SelectItem value="bus">Business Administration</SelectItem>
                 <SelectItem value="eng">Engineering</SelectItem>
@@ -106,7 +106,7 @@ export default function Students() {
                 <SelectValue placeholder="All Years" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Years</SelectItem>
+                <SelectItem value="all">All Years</SelectItem>
                 <SelectItem value="1">Year 1</SelectItem>
                 <SelectItem value="2">Year 2</SelectItem>
                 <SelectItem value="3">Year 3</SelectItem>
@@ -121,7 +121,7 @@ export default function Students() {
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="inactive">Inactive</SelectItem>

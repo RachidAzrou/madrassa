@@ -138,62 +138,62 @@ export class MemStorage implements IStorage {
 
     // Add some programs
     this.createProgram({
-      name: 'Computer Science',
+      name: 'Informatica',
       code: 'CS',
-      description: 'Bachelor of Science in Computer Science',
+      description: 'Bachelor of Science in Informatica',
       duration: 4,
-      department: 'Engineering',
+      department: 'Techniek',
       isActive: true
     });
     
     this.createProgram({
-      name: 'Business Administration',
+      name: 'Bedrijfskunde',
       code: 'BUS',
-      description: 'Bachelor of Business Administration',
+      description: 'Bachelor Bedrijfskunde',
       duration: 4,
-      department: 'Business',
+      department: 'Economie',
       isActive: true
     });
     
     this.createProgram({
-      name: 'Engineering',
+      name: 'Techniek',
       code: 'ENG',
-      description: 'Bachelor of Engineering',
+      description: 'Bachelor Techniek',
       duration: 4,
-      department: 'Engineering',
+      department: 'Techniek',
       isActive: true
     });
 
     // Add some courses
     this.createCourse({
-      name: 'Introduction to Computer Science',
+      name: 'Inleiding tot Informatica',
       code: 'CS101',
-      description: 'Fundamentals of computer programming, algorithms, and problem-solving techniques.',
+      description: 'Fundamenten van computerprogrammering, algoritmen en probleemoplossende technieken.',
       credits: 3,
-      programId: 1, // Computer Science
-      instructor: 'Dr. John Smith',
+      programId: 1, // Informatica
+      instructor: 'Dr. Jan Smit',
       maxStudents: 50,
       isActive: true
     });
     
     this.createCourse({
-      name: 'Business Ethics',
+      name: 'Bedrijfsethiek',
       code: 'BUS205',
-      description: 'Ethical principles and moral issues in business decision-making and corporate social responsibility.',
+      description: 'Ethische principes en morele kwesties bij zakelijke besluitvorming en maatschappelijk verantwoord ondernemen.',
       credits: 4,
-      programId: 2, // Business Administration
-      instructor: 'Dr. Emma Davis',
+      programId: 2, // Bedrijfskunde
+      instructor: 'Dr. Emma de Vries',
       maxStudents: 35,
       isActive: true
     });
     
     this.createCourse({
-      name: 'Structural Engineering',
+      name: 'Constructieleer',
       code: 'ENG302',
-      description: 'Analysis and design of structures under various load conditions, with focus on building safety.',
+      description: 'Analyse en ontwerp van constructies onder verschillende belastingcondities, met focus op gebouwveiligheid.',
       credits: 4,
-      programId: 3, // Engineering
-      instructor: 'Prof. Michael Lee',
+      programId: 3, // Techniek
+      instructor: 'Prof. Michael van Leeuwen',
       maxStudents: 30,
       isActive: true
     });
@@ -202,43 +202,43 @@ export class MemStorage implements IStorage {
     this.createStudent({
       studentId: 'STU000123',
       firstName: 'Emma',
-      lastName: 'Wilson',
+      lastName: 'Willems',
       email: 'emma.w@example.com',
       phone: '123-456-7890',
-      dateOfBirth: new Date('1998-05-12'),
-      address: '123 Campus Drive, University City',
-      programId: 1, // Computer Science
+      dateOfBirth: '1998-05-12',
+      address: 'Campuslaan 123, Universiteitsstad',
+      programId: 1, // Informatica
       yearLevel: 2,
       status: 'active',
-      enrollmentDate: new Date('2021-09-01')
+      enrollmentDate: '2021-09-01'
     });
     
     this.createStudent({
       studentId: 'STU000124',
-      firstName: 'James',
-      lastName: 'Rodriguez',
-      email: 'james.r@example.com',
+      firstName: 'Jaap',
+      lastName: 'Rodenburg',
+      email: 'jaap.r@example.com',
       phone: '123-456-7891',
-      dateOfBirth: new Date('1997-08-24'),
-      address: '456 College Ave, University City',
-      programId: 2, // Business Administration
+      dateOfBirth: '1997-08-24',
+      address: 'Collegelaan 456, Universiteitsstad',
+      programId: 2, // Bedrijfskunde
       yearLevel: 3,
       status: 'active',
-      enrollmentDate: new Date('2020-09-01')
+      enrollmentDate: '2020-09-01'
     });
     
     this.createStudent({
       studentId: 'STU000125',
-      firstName: 'Sarah',
-      lastName: 'Johnson',
-      email: 'sarah.j@example.com',
+      firstName: 'Sara',
+      lastName: 'Jansen',
+      email: 'sara.j@example.com',
       phone: '123-456-7892',
-      dateOfBirth: new Date('2000-02-10'),
-      address: '789 University Blvd, University City',
-      programId: 3, // Engineering
+      dateOfBirth: '2000-02-10',
+      address: 'Universiteitslaan 789, Universiteitsstad',
+      programId: 3, // Techniek
       yearLevel: 1,
       status: 'pending',
-      enrollmentDate: new Date('2022-09-01')
+      enrollmentDate: '2022-09-01'
     });
 
     // Add some enrollments

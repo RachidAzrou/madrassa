@@ -43,11 +43,11 @@ export default function Courses() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      {/* Campus image showing classroom */}
+      {/* Campus afbeelding met collegezaal */}
       <div className="relative rounded-xl overflow-hidden h-48 md:h-64">
         <img 
           src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&h=500" 
-          alt="University classroom" 
+          alt="Universiteitslokaal" 
           className="w-full h-full object-cover" 
         />
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900/60 to-gray-900/30 flex items-center">
@@ -132,11 +132,11 @@ export default function Courses() {
                     <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                     </svg>
-                    <span>{course.enrolledStudents} students enrolled</span>
+                    <span>{course.enrolledStudents} studenten ingeschreven</span>
                   </div>
                   <div className="flex space-x-2">
-                    <button className="text-primary hover:text-primary-dark text-sm">Edit</button>
-                    <button className="text-gray-500 hover:text-gray-700 text-sm">View</button>
+                    <button className="text-primary hover:text-primary-dark text-sm">Bewerken</button>
+                    <button className="text-gray-500 hover:text-gray-700 text-sm">Bekijken</button>
                   </div>
                 </div>
               </div>
@@ -154,7 +154,7 @@ export default function Courses() {
               disabled={currentPage === 1}
               className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
             >
-              <span className="sr-only">Previous</span>
+              <span className="sr-only">Vorige</span>
               &larr;
             </button>
             {[...Array(totalPages)].map((_, i) => (
@@ -175,7 +175,7 @@ export default function Courses() {
               disabled={currentPage === totalPages}
               className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
             >
-              <span className="sr-only">Next</span>
+              <span className="sr-only">Volgende</span>
               &rarr;
             </button>
           </nav>

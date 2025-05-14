@@ -343,7 +343,7 @@ export default function Grading() {
       {/* Class Performance Overview */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow-sm p-5 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Grade Distribution</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Cijferverdeling</h3>
           <div className="space-y-4">
             <div>
               <div className="flex justify-between mb-1">
@@ -393,14 +393,14 @@ export default function Grading() {
           </div>
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-600">Class Average: <span className="font-semibold">82.7%</span></p>
-              <p className="text-sm text-gray-600">Median: <span className="font-semibold">84%</span></p>
+              <p className="text-sm text-gray-600">Klasgemiddelde: <span className="font-semibold">82,7%</span></p>
+              <p className="text-sm text-gray-600">Mediaan: <span className="font-semibold">84%</span></p>
             </div>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-5 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Assessment Performance</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Beoordelingsprestaties</h3>
           <div className="space-y-4">
             <div>
               <div className="flex justify-between mb-1">

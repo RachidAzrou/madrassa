@@ -327,7 +327,7 @@ export default function Admissions() {
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <CheckCircle className="h-4 w-4 text-green-500" />
@@ -367,11 +367,11 @@ export default function Admissions() {
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
+                              <span className="sr-only">Bewerken</span>
                             </Button>
                           </div>
                         </td>
@@ -403,7 +403,7 @@ export default function Admissions() {
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                           </div>
                         </td>
@@ -518,78 +518,78 @@ export default function Admissions() {
                           <div className="text-sm text-gray-900">01 jan 2024</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">30 Jun, 2024</div>
+                          <div className="text-sm text-gray-900">30 jun 2024</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge className="bg-green-100 text-green-800 border-green-200">Active</Badge>
+                          <Badge className="bg-green-100 text-green-800 border-green-200">Actief</Badge>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
+                              <span className="sr-only">Bewerken</span>
                             </Button>
                           </div>
                         </td>
                       </tr>
                       <tr>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">Graduate Admissions</div>
+                          <div className="font-medium text-gray-900">Master Toelating</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">2024-2025</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">01 Feb, 2024</div>
+                          <div className="text-sm text-gray-900">01 feb 2024</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">31 Jul, 2024</div>
+                          <div className="text-sm text-gray-900">31 jul 2024</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge className="bg-green-100 text-green-800 border-green-200">Active</Badge>
+                          <Badge className="bg-green-100 text-green-800 border-green-200">Actief</Badge>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
+                              <span className="sr-only">Bewerken</span>
                             </Button>
                           </div>
                         </td>
                       </tr>
                       <tr>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">Transfer Students</div>
+                          <div className="font-medium text-gray-900">Overstapstudenten</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">2024-2025</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">15 Jan, 2024</div>
+                          <div className="text-sm text-gray-900">15 jan 2024</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">15 Jul, 2024</div>
+                          <div className="text-sm text-gray-900">15 jul 2024</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge className="bg-green-100 text-green-800 border-green-200">Active</Badge>
+                          <Badge className="bg-green-100 text-green-800 border-green-200">Actief</Badge>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
+                              <span className="sr-only">Bewerken</span>
                             </Button>
                           </div>
                         </td>

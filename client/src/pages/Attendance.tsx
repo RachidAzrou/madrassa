@@ -35,11 +35,11 @@ export default function Attendance() {
 
   // Fetch courses for dropdown
   const { data: coursesData } = useQuery({
-    queryKey: ['/api/courses/list'],
+    queryKey: ['/api/courses'],
     staleTime: 300000,
   });
 
-  const courses = coursesData?.courses || [];
+  const courses = coursesData || [];
 
   // Fetch attendance data for selected course and date
   const { data, isLoading, isError, refetch } = useQuery({

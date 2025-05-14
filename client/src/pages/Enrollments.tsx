@@ -99,15 +99,15 @@ export default function Enrollments() {
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Enrollment Management</h1>
+          <h1 className="text-2xl font-bold">Inschrijvingenbeheer</h1>
           <p className="text-gray-500 mt-1">
-            Manage student program and course enrollments
+            Beheer inschrijvingen voor programma's en cursussen
           </p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
             <Input
-              placeholder="Search enrollments..."
+              placeholder="Zoek inschrijvingen..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full md:w-64 pl-10"
@@ -116,7 +116,7 @@ export default function Enrollments() {
           </div>
           <Button onClick={handleAddEnrollment} className="flex items-center">
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>New Enrollment</span>
+            <span>Nieuwe Inschrijving</span>
           </Button>
         </div>
       </div>
@@ -126,13 +126,13 @@ export default function Enrollments() {
         <Card>
           <CardContent className="p-4">
             <div className="flex flex-col">
-              <p className="text-sm font-medium text-gray-500">Total Enrollments</p>
+              <p className="text-sm font-medium text-gray-500">Totaal Inschrijvingen</p>
               <div className="mt-1 flex items-baseline">
-                <p className="text-2xl font-semibold">1,248</p>
-                <p className="ml-2 text-sm text-green-600">+5.4%</p>
+                <p className="text-2xl font-semibold">1.248</p>
+                <p className="ml-2 text-sm text-green-600">+5,4%</p>
               </div>
               <div className="mt-4">
-                <p className="text-xs text-gray-500">Compared to last semester</p>
+                <p className="text-xs text-gray-500">Vergeleken met vorig semester</p>
                 <Progress value={65} className="h-1 mt-1" />
               </div>
             </div>
@@ -141,13 +141,13 @@ export default function Enrollments() {
         <Card>
           <CardContent className="p-4">
             <div className="flex flex-col">
-              <p className="text-sm font-medium text-gray-500">Active Enrollments</p>
+              <p className="text-sm font-medium text-gray-500">Actieve Inschrijvingen</p>
               <div className="mt-1 flex items-baseline">
                 <p className="text-2xl font-semibold">865</p>
-                <p className="ml-2 text-sm text-green-600">+3.2%</p>
+                <p className="ml-2 text-sm text-green-600">+3,2%</p>
               </div>
               <div className="mt-4">
-                <p className="text-xs text-gray-500">69% of total enrollments</p>
+                <p className="text-xs text-gray-500">69% van totale inschrijvingen</p>
                 <Progress value={69} className="h-1 mt-1" />
               </div>
             </div>
@@ -156,13 +156,13 @@ export default function Enrollments() {
         <Card>
           <CardContent className="p-4">
             <div className="flex flex-col">
-              <p className="text-sm font-medium text-gray-500">Programs with Enrollments</p>
+              <p className="text-sm font-medium text-gray-500">Programma's met Inschrijvingen</p>
               <div className="mt-1 flex items-baseline">
                 <p className="text-2xl font-semibold">12</p>
-                <p className="ml-2 text-sm text-gray-600">of 15</p>
+                <p className="ml-2 text-sm text-gray-600">van 15</p>
               </div>
               <div className="mt-4">
-                <p className="text-xs text-gray-500">80% coverage</p>
+                <p className="text-xs text-gray-500">80% dekking</p>
                 <Progress value={80} className="h-1 mt-1" />
               </div>
             </div>
@@ -171,13 +171,13 @@ export default function Enrollments() {
         <Card>
           <CardContent className="p-4">
             <div className="flex flex-col">
-              <p className="text-sm font-medium text-gray-500">Average Courses per Student</p>
+              <p className="text-sm font-medium text-gray-500">Gemiddeld Aantal Cursussen per Student</p>
               <div className="mt-1 flex items-baseline">
-                <p className="text-2xl font-semibold">4.2</p>
-                <p className="ml-2 text-sm text-red-600">-0.3</p>
+                <p className="text-2xl font-semibold">4,2</p>
+                <p className="ml-2 text-sm text-red-600">-0,3</p>
               </div>
               <div className="mt-4">
-                <p className="text-xs text-gray-500">Compared to last semester</p>
+                <p className="text-xs text-gray-500">Vergeleken met vorig semester</p>
                 <Progress value={84} className="h-1 mt-1" />
               </div>
             </div>
@@ -187,9 +187,9 @@ export default function Enrollments() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
-          <TabsTrigger value="student-enrollments">Student Enrollments</TabsTrigger>
-          <TabsTrigger value="course-enrollments">Course Enrollments</TabsTrigger>
-          <TabsTrigger value="program-enrollments">Program Enrollments</TabsTrigger>
+          <TabsTrigger value="student-enrollments">Studentinschrijvingen</TabsTrigger>
+          <TabsTrigger value="course-enrollments">Cursusinschrijvingen</TabsTrigger>
+          <TabsTrigger value="program-enrollments">Programma-inschrijvingen</TabsTrigger>
         </TabsList>
         
         <TabsContent value="student-enrollments" className="space-y-4">
@@ -197,17 +197,17 @@ export default function Enrollments() {
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Program</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Programma</label>
                 <Select value={program} onValueChange={handleProgramChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Programs" />
+                    <SelectValue placeholder="Alle Programma's" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Programs</SelectItem>
-                    <SelectItem value="cs">Computer Science</SelectItem>
-                    <SelectItem value="bus">Business Administration</SelectItem>
-                    <SelectItem value="eng">Engineering</SelectItem>
-                    <SelectItem value="arts">Arts</SelectItem>
+                    <SelectItem value="all">Alle Programma's</SelectItem>
+                    <SelectItem value="cs">Informatica</SelectItem>
+                    <SelectItem value="bus">Bedrijfskunde</SelectItem>
+                    <SelectItem value="eng">Techniek</SelectItem>
+                    <SelectItem value="arts">Kunsten</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

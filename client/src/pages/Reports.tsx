@@ -361,7 +361,7 @@ export default function Reports() {
                   </div>
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Thursday</span>
+                      <span className="text-sm font-medium">Donderdag</span>
                       <span className="text-sm text-gray-500">86%</span>
                     </div>
                     <div className="w-full h-2 bg-gray-100 rounded-full">
@@ -370,7 +370,7 @@ export default function Reports() {
                   </div>
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Friday</span>
+                      <span className="text-sm font-medium">Vrijdag</span>
                       <span className="text-sm text-gray-500">80%</span>
                     </div>
                     <div className="w-full h-2 bg-gray-100 rounded-full">
@@ -384,8 +384,8 @@ export default function Reports() {
             {/* Course Completion */}
             <Card>
               <CardHeader>
-                <CardTitle>Course Completion</CardTitle>
-                <CardDescription>Pass rate by department</CardDescription>
+                <CardTitle>Cursusafronding</CardTitle>
+                <CardDescription>Slagingspercentage per afdeling</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -393,7 +393,7 @@ export default function Reports() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                        <span className="text-sm">Computer Science</span>
+                        <span className="text-sm">Informatica</span>
                       </div>
                       <span className="text-sm font-medium">94%</span>
                     </div>
@@ -403,7 +403,7 @@ export default function Reports() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                        <span className="text-sm">Business</span>
+                        <span className="text-sm">Bedrijfskunde</span>
                       </div>
                       <span className="text-sm font-medium">91%</span>
                     </div>
@@ -413,7 +413,7 @@ export default function Reports() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                        <span className="text-sm">Engineering</span>
+                        <span className="text-sm">Techniek</span>
                       </div>
                       <span className="text-sm font-medium">89%</span>
                     </div>
@@ -423,7 +423,7 @@ export default function Reports() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
-                        <span className="text-sm">Medicine</span>
+                        <span className="text-sm">Geneeskunde</span>
                       </div>
                       <span className="text-sm font-medium">86%</span>
                     </div>
@@ -433,7 +433,7 @@ export default function Reports() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
-                        <span className="text-sm">Arts</span>
+                        <span className="text-sm">Kunst</span>
                       </div>
                       <span className="text-sm font-medium">88%</span>
                     </div>
@@ -446,8 +446,8 @@ export default function Reports() {
             {/* Student Success Metrics */}
             <Card>
               <CardHeader>
-                <CardTitle>Success Metrics</CardTitle>
-                <CardDescription>Key performance indicators</CardDescription>
+                <CardTitle>Succesindicatoren</CardTitle>
+                <CardDescription>Belangrijke prestatie-indicatoren</CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-4">
@@ -455,47 +455,47 @@ export default function Reports() {
                     <div className="flex items-start">
                       <CircleCheck className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium">Retention Rate</p>
-                        <p className="text-xs text-gray-500">Current academic year</p>
+                        <p className="text-sm font-medium">Retentiepercentage</p>
+                        <p className="text-xs text-gray-500">Huidig academisch jaar</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium">92.3%</p>
-                      <p className="text-xs text-green-500">+2.1%</p>
+                      <p className="text-sm font-medium">92,3%</p>
+                      <p className="text-xs text-green-500">+2,1%</p>
                     </div>
                   </li>
                   <li className="flex justify-between items-center pb-2 border-b border-gray-100">
                     <div className="flex items-start">
                       <CircleCheck className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium">Graduation Rate</p>
-                        <p className="text-xs text-gray-500">4-year completion</p>
+                        <p className="text-sm font-medium">Slagingspercentage</p>
+                        <p className="text-xs text-gray-500">4-jarige afronding</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium">87.5%</p>
-                      <p className="text-xs text-green-500">+1.5%</p>
+                      <p className="text-sm font-medium">87,5%</p>
+                      <p className="text-xs text-green-500">+1,5%</p>
                     </div>
                   </li>
                   <li className="flex justify-between items-center pb-2 border-b border-gray-100">
                     <div className="flex items-start">
                       <CircleCheck className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium">Course Success Rate</p>
-                        <p className="text-xs text-gray-500">Grade C or better</p>
+                        <p className="text-sm font-medium">Slagingspercentage Cursussen</p>
+                        <p className="text-xs text-gray-500">Cijfer 6 of hoger</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium">85.2%</p>
-                      <p className="text-xs text-green-500">+0.8%</p>
+                      <p className="text-sm font-medium">85,2%</p>
+                      <p className="text-xs text-green-500">+0,8%</p>
                     </div>
                   </li>
                   <li className="flex justify-between items-center pb-2 border-b border-gray-100">
                     <div className="flex items-start">
                       <CircleCheck className="h-5 w-5 text-yellow-500 mr-2 mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium">First-Year Persistence</p>
-                        <p className="text-xs text-gray-500">Freshman to sophomore</p>
+                        <p className="text-sm font-medium">Eerstejaars Doorstroom</p>
+                        <p className="text-xs text-gray-500">Van eerste naar tweede jaar</p>
                       </div>
                     </div>
                     <div className="text-right">

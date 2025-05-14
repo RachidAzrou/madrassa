@@ -463,20 +463,7 @@ export default function Enrollments() {
                           {getStatusBadge('Pending')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Bewerken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Verwijderen</span>
-                            </Button>
-                          </div>
+                          <EnrollmentActionButtons id="ENR002" />
                         </td>
                       </tr>
                       
@@ -510,16 +497,7 @@ export default function Enrollments() {
                           {getStatusBadge('Completed')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Bewerken</span>
-                            </Button>
-                          </div>
+                          <EnrollmentActionButtons id="ENR003" />
                         </td>
                       </tr>
                     </>

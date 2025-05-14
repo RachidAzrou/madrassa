@@ -48,13 +48,13 @@ export default function Guardians() {
         <div>
           <h1 className="text-2xl font-bold">Voogdenbeheer</h1>
           <p className="text-gray-500 mt-1">
-            Manage guardians, parents and their relations with students
+            Beheer voogden, ouders en hun relaties met studenten
           </p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
             <Input
-              placeholder="Search guardians..."
+              placeholder="Zoek voogden..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full md:w-64 pl-10"
@@ -63,7 +63,7 @@ export default function Guardians() {
           </div>
           <Button onClick={handleAddGuardian} className="flex items-center">
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Add Guardian</span>
+            <span>Voogd Toevoegen</span>
           </Button>
         </div>
       </div>
@@ -72,16 +72,16 @@ export default function Guardians() {
       <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Relation</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Relatie</label>
             <Select value={relation} onValueChange={handleRelationChange}>
               <SelectTrigger>
-                <SelectValue placeholder="All Relations" />
+                <SelectValue placeholder="Alle Relaties" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Relations</SelectItem>
-                <SelectItem value="parent">Parent</SelectItem>
-                <SelectItem value="guardian">Guardian</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                <SelectItem value="all">Alle Relaties</SelectItem>
+                <SelectItem value="parent">Ouder</SelectItem>
+                <SelectItem value="guardian">Voogd</SelectItem>
+                <SelectItem value="other">Overig</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -92,16 +92,16 @@ export default function Guardians() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <div className="text-sm text-gray-500">
-            {isLoading ? 'Loading...' : `Showing ${guardians.length} of ${totalGuardians} guardians`}
+            {isLoading ? 'Laden...' : `Toont ${guardians.length} van ${totalGuardians} voogden`}
           </div>
           <div className="flex space-x-2">
             <Button variant="outline" size="sm">
               <Filter className="mr-2 h-4 w-4" />
-              Filter
+              Filteren
             </Button>
             <Button variant="outline" size="sm">
               <Download className="mr-2 h-4 w-4" />
-              Export
+              Exporteren
             </Button>
           </div>
         </div>

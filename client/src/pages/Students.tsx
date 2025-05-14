@@ -1,395 +1,328 @@
-import React, { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import PageHeader from "@/components/common/PageHeader";
-import SearchFilter from "@/components/common/SearchFilter";
-import DataTable from "@/components/common/DataTable";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Avatar,
-  AvatarFallback,
-} from "@/components/ui/avatar";
-import StudentForm from "@/components/students/StudentForm";
-import { Eye, MoreHorizontal, Pencil, Trash2, UserPlus } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2 } from 'lucide-react';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { apiRequest } from '@/lib/queryClient';
 
-const Students = () => {
-  const { toast } = useToast();
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filters, setFilters] = useState({
-    program: "",
-    year: "",
-    status: "",
+export default function Students() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [program, setProgram] = useState('');
+  const [year, setYear] = useState('');
+  const [status, setStatus] = useState('');
+  const [sortBy, setSortBy] = useState('name');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Fetch students with filters
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['/api/students', { searchTerm, program, year, status, sortBy, page: currentPage }],
+    staleTime: 30000,
   });
 
-  // Fetch students data
-  const {
-    data: students = [],
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["/api/students"],
-  });
+  const students = data?.students || [];
+  const totalStudents = data?.totalCount || 0;
+  const totalPages = Math.ceil(totalStudents / 10); // Assuming 10 students per page
 
-  // Fetch programs for filtering
-  const { data: programs = [] } = useQuery({
-    queryKey: ["/api/programs"],
-  });
-
-  // Create student mutation
-  const createStudent = useMutation({
-    mutationFn: async (data: any) => {
-      return apiRequest("POST", "/api/students", data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/students"] });
-      toast({
-        title: "Success",
-        description: "Student created successfully",
-      });
-      setIsFormOpen(false);
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: `Failed to create student: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Update student mutation
-  const updateStudent = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      return apiRequest("PUT", `/api/students/${id}`, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/students"] });
-      toast({
-        title: "Success",
-        description: "Student updated successfully",
-      });
-      setIsFormOpen(false);
-      setSelectedStudent(null);
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: `Failed to update student: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Delete student mutation
-  const deleteStudent = useMutation({
-    mutationFn: async (id: number) => {
-      return apiRequest("DELETE", `/api/students/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/students"] });
-      toast({
-        title: "Success",
-        description: "Student deleted successfully",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: `Failed to delete student: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleAddStudent = () => {
-    setSelectedStudent(null);
-    setIsFormOpen(true);
+  const handleAddStudent = async () => {
+    // Implementation will be added for student creation
+    console.log('Add student clicked');
   };
 
-  const handleEditStudent = (student: any) => {
-    setSelectedStudent(student);
-    setIsFormOpen(true);
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when search changes
   };
 
-  const handleDeleteStudent = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this student?")) {
-      deleteStudent.mutate(id);
-    }
+  const handleProgramChange = (value: string) => {
+    setProgram(value);
+    setCurrentPage(1);
   };
 
-  const handleFormSubmit = (data: any) => {
-    if (selectedStudent) {
-      updateStudent.mutate({ id: selectedStudent.id, data });
-    } else {
-      createStudent.mutate(data);
-    }
+  const handleYearChange = (value: string) => {
+    setYear(value);
+    setCurrentPage(1);
   };
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
+  const handleStatusChange = (value: string) => {
+    setStatus(value);
+    setCurrentPage(1);
   };
 
-  const handleFilterChange = (filterName: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [filterName]: value }));
+  const handleSortChange = (value: string) => {
+    setSortBy(value);
   };
 
-  // Apply filters and search to students data
-  const filteredStudents = React.useMemo(() => {
-    return students.filter((student: any) => {
-      // Search by name or email
-      const matchesSearch = searchQuery === "" 
-        || `${student.firstName} ${student.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
-        || student.email.toLowerCase().includes(searchQuery.toLowerCase())
-        || student.studentId.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      // Apply filters
-      const matchesProgram = filters.program === "" || student.programId === parseInt(filters.program);
-      const matchesYear = filters.year === "" || student.year === parseInt(filters.year);
-      const matchesStatus = filters.status === "" || student.status === filters.status;
-      
-      return matchesSearch && matchesProgram && matchesYear && matchesStatus;
-    });
-  }, [students, searchQuery, filters]);
-
-  // Get program name by id
-  const getProgramName = (programId: number) => {
-    const program = programs.find((p: any) => p.id === programId);
-    return program ? program.name : "Unknown Program";
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
-
-  // Define table columns
-  const columns = [
-    {
-      header: "Student",
-      accessor: (student: any) => (
-        <div className="flex items-center space-x-3">
-          <Avatar className="h-9 w-9">
-            <AvatarFallback className="bg-primary/10">
-              {student.firstName.charAt(0)}
-              {student.lastName.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="font-medium">{`${student.firstName} ${student.lastName}`}</div>
-            <div className="text-sm text-muted-foreground">{student.email}</div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      header: "ID",
-      accessor: "studentId",
-    },
-    {
-      header: "Program",
-      accessor: (student: any) => getProgramName(student.programId),
-    },
-    {
-      header: "Year",
-      accessor: (student: any) => `Year ${student.year}`,
-    },
-    {
-      header: "Status",
-      accessor: (student: any) => {
-        const statusStyles = {
-          active: "bg-green-100 text-green-800 hover:bg-green-200",
-          inactive: "bg-gray-100 text-gray-800 hover:bg-gray-200",
-          pending: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-        };
-        
-        return (
-          <Badge 
-            variant="outline" 
-            className={cn(
-              "font-normal",
-              statusStyles[student.status as keyof typeof statusStyles]
-            )}
-          >
-            {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
-          </Badge>
-        );
-      },
-    },
-  ];
-
-  // Define filter options
-  const filterOptions = [
-    {
-      label: "Program",
-      value: "program",
-      options: [
-        { label: "All Programs", value: "" },
-        ...programs.map((program: any) => ({
-          label: program.name,
-          value: program.id.toString(),
-        })),
-      ],
-    },
-    {
-      label: "Year",
-      value: "year",
-      options: [
-        { label: "All Years", value: "" },
-        { label: "Year 1", value: "1" },
-        { label: "Year 2", value: "2" },
-        { label: "Year 3", value: "3" },
-        { label: "Year 4", value: "4" },
-        { label: "Year 5", value: "5" },
-        { label: "Year 6", value: "6" },
-      ],
-    },
-    {
-      label: "Status",
-      value: "status",
-      options: [
-        { label: "All Statuses", value: "" },
-        { label: "Active", value: "active" },
-        { label: "Inactive", value: "inactive" },
-        { label: "Pending", value: "pending" },
-      ],
-    },
-  ];
-
-  if (isError) {
-    return (
-      <div className="p-4 bg-red-50 text-red-800 rounded-md">
-        Error loading students: {(error as Error).message}
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Student Management"
-        description="View and manage all students"
-        action={{
-          label: "Add Student",
-          onClick: handleAddStudent,
-          icon: <UserPlus className="h-4 w-4 mr-2" />,
-        }}
-      />
+    <div className="p-4 md:p-6 space-y-6">
+      {/* Page Title */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h1 className="text-2xl font-bold text-gray-800">Student Management</h1>
+        <div className="flex flex-col md:flex-row gap-3">
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Search students..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="w-full md:w-64 pl-10"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          </div>
+          <Button onClick={handleAddStudent} className="flex items-center">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            <span>Add Student</span>
+          </Button>
+        </div>
+      </div>
 
-      <SearchFilter
-        placeholder="Search by name, email or ID..."
-        filters={filterOptions}
-        onSearch={handleSearch}
-        onFilterChange={handleFilterChange}
-        exportButton
-        onExport={() => alert("Export functionality would go here")}
-        refreshButton
-        onRefresh={() => queryClient.invalidateQueries({ queryKey: ["/api/students"] })}
-      />
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Program</label>
+            <Select value={program} onValueChange={handleProgramChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Programs" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Programs</SelectItem>
+                <SelectItem value="cs">Computer Science</SelectItem>
+                <SelectItem value="bus">Business Administration</SelectItem>
+                <SelectItem value="eng">Engineering</SelectItem>
+                <SelectItem value="arts">Fine Arts</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+            <Select value={year} onValueChange={handleYearChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Years" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Years</SelectItem>
+                <SelectItem value="1">Year 1</SelectItem>
+                <SelectItem value="2">Year 2</SelectItem>
+                <SelectItem value="3">Year 3</SelectItem>
+                <SelectItem value="4">Year 4</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <Select value={status} onValueChange={handleStatusChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+            <Select value={sortBy} onValueChange={handleSortChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Name" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name">Name</SelectItem>
+                <SelectItem value="id">ID</SelectItem>
+                <SelectItem value="program">Program</SelectItem>
+                <SelectItem value="date">Registration Date</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
 
-      <DataTable
-        columns={columns}
-        data={filteredStudents}
-        loading={isLoading}
-        selectable
-        pagination={{
-          currentPage: 1,
-          pageSize: 10,
-          totalItems: filteredStudents.length,
-          onPageChange: (page) => console.log(`Page changed to ${page}`),
-        }}
-        actions={(student) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Actions</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => alert(`View student ${student.id}`)}>
-                <Eye className="h-4 w-4 mr-2" />
-                View Details
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleEditStudent(student)}>
-                <Pencil className="h-4 w-4 mr-2" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleDeleteStudent(student.id)} className="text-red-600">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      />
+      {/* Student List Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+          <div className="text-sm text-gray-500">
+            {isLoading ? 'Loading...' : `Showing ${students.length} of ${totalStudents} students`}
+          </div>
+          <div className="flex space-x-2">
+            <Button variant="outline" size="sm">
+              <Filter className="mr-2 h-4 w-4" />
+              Filter
+            </Button>
+            <Button variant="outline" size="sm">
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center">
+                    <input 
+                      type="checkbox" 
+                      className="rounded border-gray-300 text-primary focus:ring-primary mr-3"
+                    />
+                    Student
+                  </div>
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-4 text-center">
+                    <div className="flex justify-center">
+                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  </td>
+                </tr>
+              ) : isError ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-4 text-center text-red-500">
+                    Error loading students. Please try again.
+                  </td>
+                </tr>
+              ) : students.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                    No students found. Try adjusting your filters.
+                  </td>
+                </tr>
+              ) : (
+                students.map((student: any) => (
+                  <tr key={student.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-gray-300 text-primary focus:ring-primary mr-3"
+                        />
+                        <Avatar 
+                          initials={`${student.firstName.charAt(0)}${student.lastName.charAt(0)}`} 
+                          size="md" 
+                        />
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{student.firstName} {student.lastName}</div>
+                          <div className="text-sm text-gray-500">{student.email}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.studentId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.program}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Year {student.year}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        student.status === 'active' ? 'bg-green-100 text-green-800' : 
+                        student.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <Button variant="ghost" size="sm" className="text-primary hover:text-primary-dark">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Pagination */}
+        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700">
+                Showing <span className="font-medium">{students.length > 0 ? (currentPage - 1) * 10 + 1 : 0}</span> to <span className="font-medium">{Math.min(currentPage * 10, totalStudents)}</span> of <span className="font-medium">{totalStudents}</span> results
+              </p>
+            </div>
+            <div>
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <button
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <span className="sr-only">Previous</span>
+                  &larr;
+                </button>
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
+                      currentPage === i + 1
+                        ? 'bg-primary text-white'
+                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <span className="sr-only">Next</span>
+                  &rarr;
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      {/* Student Form Dialog */}
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>
-              {selectedStudent ? "Edit Student" : "Add New Student"}
-            </DialogTitle>
-            <DialogDescription>
-              {selectedStudent
-                ? "Update student information in the form below"
-                : "Fill in the student details to add a new record"}
-            </DialogDescription>
-          </DialogHeader>
-          <StudentForm
-            initialValues={selectedStudent}
-            onSubmit={handleFormSubmit}
-            isSubmitting={createStudent.isPending || updateStudent.isPending}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Campus life images */}
+      {/* Student Life Images */}
       <div className="mt-6">
-        <h2 className="text-lg font-semibold mb-4">Student Life</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Student Life</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <img 
             src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
             alt="Students studying together" 
-            className="rounded-lg shadow-sm h-48 w-full object-cover"
+            className="rounded-lg shadow-sm h-48 w-full object-cover" 
           />
           <img 
-            src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
+            src="https://pixabay.com/get/g5ce301cea77c986decbe6332e3e27b75a70717da74d0bf7c4bfe2ec8dbb3dbd496461b8b2ab7f06b0624f2fe10a4e01a485f2136242a2b6dac2359ccb793d32c_1280.jpg" 
             alt="Students collaborating" 
-            className="rounded-lg shadow-sm h-48 w-full object-cover"
+            className="rounded-lg shadow-sm h-48 w-full object-cover" 
           />
           <img 
             src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
             alt="Student studying outdoors" 
-            className="rounded-lg shadow-sm h-48 w-full object-cover"
+            className="rounded-lg shadow-sm h-48 w-full object-cover" 
           />
           <img 
-            src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
+            src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
             alt="Graduation celebration" 
-            className="rounded-lg shadow-sm h-48 w-full object-cover"
+            className="rounded-lg shadow-sm h-48 w-full object-cover" 
           />
         </div>
       </div>
     </div>
   );
-};
-
-export default Students;
+}

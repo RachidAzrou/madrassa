@@ -1,153 +1,121 @@
-import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import {
-  GraduationCap,
-  LayoutDashboard,
-  Users,
-  BookOpen,
-  ListChecks,
-  Calendar,
-  FileText,
-  BarChart2,
-  FileBarChart,
-  LogOut,
-  Menu,
-  User,
-} from "lucide-react";
+import useSidebar from "@/hooks/use-sidebar";
 
-interface SidebarProps {
-  collapsed?: boolean;
+interface NavItemProps {
+  to: string;
+  icon: string;
+  label: string;
+  isActive: boolean;
 }
 
-const Sidebar = ({ collapsed = false }: SidebarProps) => {
-  const [location, setLocation] = useLocation();
+const NavItem = ({ to, icon, label, isActive }: NavItemProps) => {
+  return (
+    <Link href={to}>
+      <a
+        className={`flex items-center px-4 py-3 text-sm font-medium rounded-md cursor-pointer ${
+          isActive
+            ? "bg-primary-700 text-white"
+            : "text-white/70 hover:bg-primary-700 hover:text-white"
+        }`}
+      >
+        <i className={`${icon} mr-3 text-lg`}></i>
+        {label}
+      </a>
+    </Link>
+  );
+};
 
-  const navigation = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
-    { name: "Students", href: "/students", icon: Users },
-    { name: "Courses", href: "/courses", icon: BookOpen },
-    { name: "Programs", href: "/programs", icon: ListChecks },
-    { name: "Calendar", href: "/calendar", icon: Calendar },
-    { name: "Attendance", href: "/attendance", icon: FileText },
-    { name: "Grading", href: "/grading", icon: BarChart2 },
-    { name: "Reports", href: "/reports", icon: FileBarChart },
-  ];
-
-  const NavItem = ({ item }: { item: typeof navigation[0] }) => {
-    const isActive = location === item.href;
-
-    return (
-      <li>
-        {collapsed ? (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link href={item.href}>
-                  <Button
-                    variant={isActive ? "secondary" : "ghost"}
-                    size="icon"
-                    className={cn(
-                      "w-full justify-start",
-                      isActive
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                    )}
-                  >
-                    <item.icon className="h-5 w-5" />
-                  </Button>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">{item.name}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ) : (
-          <Link href={item.href}>
-            <Button
-              variant={isActive ? "secondary" : "ghost"}
-              size="sm"
-              className={cn(
-                "w-full justify-start",
-                isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-              )}
-            >
-              <item.icon className="mr-2 h-5 w-5" />
-              {item.name}
-            </Button>
-          </Link>
-        )}
-      </li>
-    );
-  };
+export default function Sidebar() {
+  const { isOpen, toggle } = useSidebar();
+  const [location] = useLocation();
 
   return (
     <div
-      className={cn(
-        "sidebar transition-all duration-300 ease-in-out",
-        collapsed && "sidebar-collapsed"
-      )}
+      className={`fixed inset-y-0 left-0 z-50 w-64 bg-primary-600 text-white transform lg:relative transition-transform duration-300 ${
+        isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      }`}
     >
-      <div className="flex h-14 items-center border-b border-sidebar-border px-4">
-        <div className="flex items-center gap-2">
-          <GraduationCap className="h-6 w-6 text-sidebar-foreground" />
-          {!collapsed && (
-            <span className="text-xl font-semibold text-sidebar-foreground">
-              EduManage
-            </span>
-          )}
+      <div className="flex flex-col h-full">
+        {/* Logo */}
+        <div className="px-4 py-6 flex items-center justify-between border-b border-primary-700">
+          <div className="flex items-center space-x-2">
+            <i className="ri-graduation-cap-fill text-2xl"></i>
+            <span className="text-xl font-semibold">EduManage</span>
+          </div>
+          <button
+            onClick={toggle}
+            className="lg:hidden text-white"
+            aria-label="Close sidebar"
+          >
+            <i className="ri-close-line text-xl"></i>
+          </button>
         </div>
-      </div>
 
-      <div
-        className={cn(
-          "flex flex-col justify-between h-[calc(100vh-3.5rem)]",
-          "overflow-y-auto py-4"
-        )}
-      >
-        <nav className="space-y-1 px-2">
-          <ul className="space-y-1">
-            {navigation.map((item) => (
-              <NavItem key={item.name} item={item} />
-            ))}
-          </ul>
+        {/* Navigation */}
+        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+          <NavItem
+            to="/"
+            icon="ri-dashboard-line"
+            label="Dashboard"
+            isActive={location === "/" || location === ""}
+          />
+          <NavItem
+            to="/students"
+            icon="ri-user-line"
+            label="Students"
+            isActive={location === "/students"}
+          />
+          <NavItem
+            to="/courses"
+            icon="ri-book-open-line"
+            label="Courses"
+            isActive={location === "/courses"}
+          />
+          <NavItem
+            to="/programs"
+            icon="ri-building-line"
+            label="Programs"
+            isActive={location === "/programs"}
+          />
+          <NavItem
+            to="/calendar"
+            icon="ri-calendar-line"
+            label="Calendar"
+            isActive={location === "/calendar"}
+          />
+          <NavItem
+            to="/attendance"
+            icon="ri-checkbox-circle-line"
+            label="Attendance"
+            isActive={location === "/attendance"}
+          />
+          <NavItem
+            to="/grading"
+            icon="ri-medal-line"
+            label="Grading"
+            isActive={location === "/grading"}
+          />
+          <NavItem
+            to="/reports"
+            icon="ri-bar-chart-line"
+            label="Reports"
+            isActive={location === "/reports"}
+          />
         </nav>
 
-        <div className="px-2 pb-4">
-          <div className={cn(
-            "flex items-center border-t border-sidebar-border pt-4",
-            collapsed ? "justify-center" : "justify-start px-2"
-          )}>
-            {collapsed ? (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground">
-                      <User className="h-5 w-5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">Admin User</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            ) : (
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-full bg-sidebar-accent/50 flex items-center justify-center">
-                  <span className="text-sidebar-accent-foreground font-medium text-sm">AU</span>
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-sidebar-foreground">Admin User</div>
-                  <div className="text-xs text-sidebar-foreground/70">admin@edumanage.com</div>
-                </div>
-              </div>
-            )}
+        {/* User Profile */}
+        <div className="p-4 border-t border-primary-700">
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-full bg-primary-700 flex items-center justify-center">
+              <span className="text-white font-semibold">JD</span>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-white">John Doe</p>
+              <p className="text-xs text-white/70">Administrator</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Sidebar;
+}

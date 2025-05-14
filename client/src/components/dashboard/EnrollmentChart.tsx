@@ -1,96 +1,53 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from 'react';
 
-interface EnrollmentChartProps {
-  className?: string;
+interface ChartDataPoint {
+  month: string;
+  value: number;
 }
 
-type PeriodType = "monthly" | "quarterly" | "yearly";
+interface EnrollmentChartProps {
+  data: ChartDataPoint[];
+}
 
-export default function EnrollmentChart({ className }: EnrollmentChartProps) {
-  const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>("monthly");
-  const [animateChart, setAnimateChart] = useState(false);
+export function EnrollmentChart({ data }: EnrollmentChartProps) {
+  const [animated, setAnimated] = useState(false);
 
-  // Chart data for different periods - in a real app, this would come from an API
-  const chartData = {
-    monthly: [65, 85, 75, 90, 95, 70, 60, 80, 85],
-    quarterly: [70, 85, 92, 78],
-    yearly: [60, 75, 82, 88, 90],
-  };
-
-  // Labels for different periods
-  const chartLabels = {
-    monthly: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"],
-    quarterly: ["Q1", "Q2", "Q3", "Q4"],
-    yearly: ["2019", "2020", "2021", "2022", "2023"],
-  };
-
-  const currentData = chartData[selectedPeriod];
-  const currentLabels = chartLabels[selectedPeriod];
-
-  // Animate chart when data changes
   useEffect(() => {
-    setAnimateChart(false);
-    const timer = setTimeout(() => setAnimateChart(true), 50);
+    // Trigger animation after component mounts
+    const timer = setTimeout(() => {
+      setAnimated(true);
+    }, 300);
+
     return () => clearTimeout(timer);
-  }, [selectedPeriod]);
+  }, []);
 
   return (
-    <Card className={className}>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold">Enrollment Trends</CardTitle>
-          <div className="flex items-center space-x-2">
-            <Button 
-              variant={selectedPeriod === "monthly" ? "secondary" : "outline"} 
-              size="sm"
-              onClick={() => setSelectedPeriod("monthly")}
-            >
-              Monthly
-            </Button>
-            <Button 
-              variant={selectedPeriod === "quarterly" ? "secondary" : "outline"} 
-              size="sm"
-              onClick={() => setSelectedPeriod("quarterly")}
-            >
-              Quarterly
-            </Button>
-            <Button 
-              variant={selectedPeriod === "yearly" ? "secondary" : "outline"} 
-              size="sm"
-              onClick={() => setSelectedPeriod("yearly")}
-            >
-              Yearly
-            </Button>
-          </div>
+    <div className="bg-white rounded-lg shadow-sm p-5 border border-gray-200 col-span-1 lg:col-span-2">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="font-semibold text-gray-800">Enrollment Trends</h2>
+        <div className="flex items-center space-x-2">
+          <button className="text-xs text-gray-600 hover:text-primary px-2 py-1 rounded border border-gray-200">Monthly</button>
+          <button className="text-xs text-gray-600 hover:text-primary px-2 py-1 rounded border border-gray-200 bg-gray-100">Quarterly</button>
+          <button className="text-xs text-gray-600 hover:text-primary px-2 py-1 rounded border border-gray-200">Yearly</button>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="h-[200px] relative">
-          {currentData.map((value, index) => (
-            <div
-              key={index}
-              className="chart-bar absolute bottom-0 bg-primary rounded-t-md transition-all duration-700 ease-out"
-              style={{
-                left: `${(index / currentData.length) * 100}%`,
-                width: `${80 / currentData.length}%`,
-                height: animateChart ? `${value}%` : "0%",
-              }}
-            />
-          ))}
-        </div>
-        <div 
-          className="grid text-xs text-muted-foreground mt-2"
-          style={{ 
-            gridTemplateColumns: `repeat(${currentLabels.length}, 1fr)` 
-          }}
-        >
-          {currentLabels.map((label, index) => (
-            <div key={index} className="text-center">{label}</div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div className="chart-container relative">
+        {data.map((item, index) => (
+          <div 
+            key={index} 
+            className="chart-bar" 
+            style={{
+              left: `${(index / data.length * 80) + 5}%`, 
+              height: animated ? `${item.value}%` : '0'
+            }}
+          />
+        ))}
+      </div>
+      <div className={`grid grid-cols-${data.length} text-xs text-gray-500 mt-2`}>
+        {data.map((item, index) => (
+          <div key={index} className="text-center">{item.month}</div>
+        ))}
+      </div>
+    </div>
   );
 }

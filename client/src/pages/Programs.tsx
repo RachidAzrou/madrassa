@@ -1,394 +1,200 @@
-import React, { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import PageHeader from "@/components/common/PageHeader";
-import SearchFilter from "@/components/common/SearchFilter";
-import DataTable from "@/components/common/DataTable";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import ProgramForm from "@/components/programs/ProgramForm";
-import { Edit, Eye, ListPlus, MoreHorizontal, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { apiRequest } from '@/lib/queryClient';
 
-const Programs = () => {
-  const { toast } = useToast();
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedProgram, setSelectedProgram] = useState<any>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filters, setFilters] = useState({
-    department: "",
-    status: "",
+interface Program {
+  id: string;
+  name: string;
+  code: string;
+  department: string;
+  description: string;
+  duration: number;
+  totalCredits: number;
+  students: number;
+  startDate: string;
+  courses: {
+    id: string;
+    name: string;
+    code: string;
+    credits: number;
+    semester: number;
+  }[];
+}
+
+export default function Programs() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [expandedProgram, setExpandedProgram] = useState<string | null>(null);
+
+  // Fetch programs
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['/api/programs', { searchTerm }],
+    staleTime: 30000,
   });
 
-  // Fetch programs data
-  const {
-    data: programs = [],
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["/api/programs"],
-  });
+  const programs = data?.programs || [];
 
-  // Fetch courses data for program stats
-  const { data: courses = [] } = useQuery({
-    queryKey: ["/api/courses"],
-  });
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
 
-  // Fetch students data for program stats
-  const { data: students = [] } = useQuery({
-    queryKey: ["/api/students"],
-  });
-
-  // Create program mutation
-  const createProgram = useMutation({
-    mutationFn: async (data: any) => {
-      return apiRequest("POST", "/api/programs", data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
-      toast({
-        title: "Success",
-        description: "Program created successfully",
-      });
-      setIsFormOpen(false);
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: `Failed to create program: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Update program mutation
-  const updateProgram = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      return apiRequest("PUT", `/api/programs/${id}`, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
-      toast({
-        title: "Success",
-        description: "Program updated successfully",
-      });
-      setIsFormOpen(false);
-      setSelectedProgram(null);
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: `Failed to update program: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Delete program mutation
-  const deleteProgram = useMutation({
-    mutationFn: async (id: number) => {
-      return apiRequest("DELETE", `/api/programs/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
-      toast({
-        title: "Success",
-        description: "Program deleted successfully",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: `Failed to delete program: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
+  const toggleExpand = (programId: string) => {
+    if (expandedProgram === programId) {
+      setExpandedProgram(null);
+    } else {
+      setExpandedProgram(programId);
+    }
+  };
 
   const handleAddProgram = () => {
-    setSelectedProgram(null);
-    setIsFormOpen(true);
+    // Implementation will be added for program creation
+    console.log('Add program clicked');
   };
-
-  const handleEditProgram = (program: any) => {
-    setSelectedProgram(program);
-    setIsFormOpen(true);
-  };
-
-  const handleDeleteProgram = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this program?")) {
-      deleteProgram.mutate(id);
-    }
-  };
-
-  const handleFormSubmit = (data: any) => {
-    if (selectedProgram) {
-      updateProgram.mutate({ id: selectedProgram.id, data });
-    } else {
-      createProgram.mutate(data);
-    }
-  };
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
-
-  const handleFilterChange = (filterName: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [filterName]: value }));
-  };
-
-  // Get course count for a program
-  const getCourseCount = (programId: number) => {
-    return courses.filter((course: any) => course.programId === programId).length;
-  };
-
-  // Get student count for a program
-  const getStudentCount = (programId: number) => {
-    return students.filter((student: any) => student.programId === programId).length;
-  };
-
-  // Apply filters and search to programs data
-  const filteredPrograms = React.useMemo(() => {
-    return programs.filter((program: any) => {
-      // Search by name or code
-      const matchesSearch = searchQuery === "" 
-        || program.name.toLowerCase().includes(searchQuery.toLowerCase())
-        || program.code.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      // Apply filters
-      const matchesDepartment = filters.department === "" || program.departments.toLowerCase().includes(filters.department.toLowerCase());
-      const matchesStatus = filters.status === "" || program.status === filters.status;
-      
-      return matchesSearch && matchesDepartment && matchesStatus;
-    });
-  }, [programs, searchQuery, filters]);
-
-  // Extract unique departments for filtering
-  const departments = React.useMemo(() => {
-    const allDepartments: string[] = [];
-    programs.forEach((program: any) => {
-      if (program.departments) {
-        program.departments.split(',').forEach((dept: string) => {
-          const trimmed = dept.trim();
-          if (trimmed && !allDepartments.includes(trimmed)) {
-            allDepartments.push(trimmed);
-          }
-        });
-      }
-    });
-    return allDepartments.map(dept => ({
-      label: dept,
-      value: dept
-    }));
-  }, [programs]);
-
-  // Define table columns
-  const columns = [
-    {
-      header: "Program Name",
-      accessor: "name",
-    },
-    {
-      header: "Code",
-      accessor: "code",
-    },
-    {
-      header: "Duration",
-      accessor: (program: any) => `${program.duration} Years`,
-    },
-    {
-      header: "Departments",
-      accessor: "departments",
-    },
-    {
-      header: "Courses",
-      accessor: (program: any) => getCourseCount(program.id),
-    },
-    {
-      header: "Students",
-      accessor: (program: any) => getStudentCount(program.id),
-    },
-    {
-      header: "Status",
-      accessor: (program: any) => {
-        const statusStyles = {
-          active: "bg-green-100 text-green-800 hover:bg-green-200",
-          inactive: "bg-gray-100 text-gray-800 hover:bg-gray-200",
-          pending: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-        };
-        
-        return (
-          <Badge 
-            variant="outline" 
-            className={cn(
-              "font-normal",
-              statusStyles[program.status as keyof typeof statusStyles]
-            )}
-          >
-            {program.status.charAt(0).toUpperCase() + program.status.slice(1)}
-          </Badge>
-        );
-      },
-    },
-  ];
-
-  // Define filter options
-  const filterOptions = [
-    {
-      label: "Department",
-      value: "department",
-      options: [
-        { label: "All Departments", value: "" },
-        ...departments,
-      ],
-    },
-    {
-      label: "Status",
-      value: "status",
-      options: [
-        { label: "All Statuses", value: "" },
-        { label: "Active", value: "active" },
-        { label: "Inactive", value: "inactive" },
-        { label: "Pending", value: "pending" },
-      ],
-    },
-  ];
-
-  if (isError) {
-    return (
-      <div className="p-4 bg-red-50 text-red-800 rounded-md">
-        Error loading programs: {(error as Error).message}
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Program Management"
-        description="View and manage academic programs"
-        action={{
-          label: "Add Program",
-          onClick: handleAddProgram,
-          icon: <ListPlus className="h-4 w-4 mr-2" />,
-        }}
-      />
-
-      <SearchFilter
-        placeholder="Search programs by name or code..."
-        filters={filterOptions}
-        onSearch={handleSearch}
-        onFilterChange={handleFilterChange}
-        exportButton
-        onExport={() => alert("Export functionality would go here")}
-        refreshButton
-        onRefresh={() => queryClient.invalidateQueries({ queryKey: ["/api/programs"] })}
-      />
-
-      <DataTable
-        columns={columns}
-        data={filteredPrograms}
-        loading={isLoading}
-        pagination={{
-          currentPage: 1,
-          pageSize: 10,
-          totalItems: filteredPrograms.length,
-          onPageChange: (page) => console.log(`Page changed to ${page}`),
-        }}
-        actions={(program) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Actions</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => alert(`View program ${program.id}`)}>
-                <Eye className="h-4 w-4 mr-2" />
-                View Details
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleEditProgram(program)}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleDeleteProgram(program.id)} className="text-red-600">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      />
-
-      {/* Program Form Dialog */}
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>
-              {selectedProgram ? "Edit Program" : "Add New Program"}
-            </DialogTitle>
-            <DialogDescription>
-              {selectedProgram
-                ? "Update program information in the form below"
-                : "Fill in the program details to add a new record"}
-            </DialogDescription>
-          </DialogHeader>
-          <ProgramForm
-            initialValues={selectedProgram}
-            onSubmit={handleFormSubmit}
-            isSubmitting={createProgram.isPending || updateProgram.isPending}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Campus Image */}
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold mb-4">Our Campus</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <img 
-            src="https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&h=500" 
-            alt="Campus building" 
-            className="rounded-lg shadow-sm h-48 w-full object-cover"
-          />
-          <img 
-            src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&h=500" 
-            alt="Modern campus architecture" 
-            className="rounded-lg shadow-sm h-48 w-full object-cover"
-          />
-          <img 
-            src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&h=500" 
-            alt="Campus park" 
-            className="rounded-lg shadow-sm h-48 w-full object-cover"
-          />
-          <img 
-            src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&h=500" 
-            alt="Campus library" 
-            className="rounded-lg shadow-sm h-48 w-full object-cover"
-          />
+    <div className="p-4 md:p-6 space-y-6">
+      {/* Page header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h1 className="text-2xl font-bold text-gray-800">Program Management</h1>
+        <div className="flex flex-col md:flex-row gap-3">
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Search programs..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="w-full md:w-64 pl-10"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          </div>
+          <Button onClick={handleAddProgram} className="flex items-center">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            <span>Add Program</span>
+          </Button>
         </div>
+      </div>
+
+      {/* Program list */}
+      <div className="space-y-4">
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : isError ? (
+          <div className="text-center py-8 text-red-500">
+            Error loading programs. Please try again.
+          </div>
+        ) : programs.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No programs found. Try adjusting your search or add a new program.
+          </div>
+        ) : (
+          programs.map((program: Program) => (
+            <div key={program.id} className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+              <div 
+                className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50"
+                onClick={() => toggleExpand(program.id)}
+              >
+                <div className="flex-1">
+                  <div className="flex items-center">
+                    <h3 className="text-lg font-medium text-gray-800">{program.name}</h3>
+                    <span className="ml-3 bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded">{program.code}</span>
+                  </div>
+                  <p className="text-gray-500 text-sm mt-1">{program.department}</p>
+                </div>
+                <div className="flex items-center space-x-6">
+                  <div className="text-center hidden md:block">
+                    <span className="text-gray-500 text-xs block">Duration</span>
+                    <span className="text-gray-800 font-medium">{program.duration} years</span>
+                  </div>
+                  <div className="text-center hidden md:block">
+                    <span className="text-gray-500 text-xs block">Total Credits</span>
+                    <span className="text-gray-800 font-medium">{program.totalCredits}</span>
+                  </div>
+                  <div className="text-center hidden md:block">
+                    <span className="text-gray-500 text-xs block">Students</span>
+                    <span className="text-gray-800 font-medium">{program.students}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="ghost" size="sm" className="text-gray-500">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="text-red-500">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    {expandedProgram === program.id ? (
+                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                    )}
+                  </div>
+                </div>
+              </div>
+              {expandedProgram === program.id && (
+                <div className="border-t border-gray-200 bg-gray-50 p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">
+                      <Clock className="h-5 w-5 text-primary mr-3" />
+                      <div>
+                        <span className="text-xs text-gray-500 block">Duration</span>
+                        <span className="text-sm font-medium">{program.duration} years ({program.totalCredits} credits)</span>
+                      </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">
+                      <Users className="h-5 w-5 text-primary mr-3" />
+                      <div>
+                        <span className="text-xs text-gray-500 block">Enrolled Students</span>
+                        <span className="text-sm font-medium">{program.students} students</span>
+                      </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">
+                      <Calendar className="h-5 w-5 text-primary mr-3" />
+                      <div>
+                        <span className="text-xs text-gray-500 block">Next Start Date</span>
+                        <span className="text-sm font-medium">{program.startDate}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg border border-gray-200 p-4">
+                    <h4 className="text-md font-medium text-gray-800 mb-3 flex items-center">
+                      <BookOpen className="h-5 w-5 text-primary mr-2" />
+                      Course Structure
+                    </h4>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course Code</th>
+                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course Name</th>
+                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Credits</th>
+                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Semester</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {program.courses.map((course) => (
+                            <tr key={course.id} className="hover:bg-gray-50">
+                              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{course.code}</td>
+                              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{course.name}</td>
+                              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{course.credits}</td>
+                              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{course.semester}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <h4 className="text-md font-medium text-gray-800 mb-2">Description</h4>
+                    <p className="text-sm text-gray-600">{program.description}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
-};
-
-export default Programs;
+}

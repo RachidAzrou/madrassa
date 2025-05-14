@@ -1,86 +1,48 @@
-import React from "react";
-import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Menu, Bell, Search } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useCallback } from 'react';
+import useSidebar from '@/hooks/use-sidebar';
 
-interface HeaderProps {
-  toggleSidebar: () => void;
-}
+export default function Header() {
+  const { toggle } = useSidebar();
 
-const Header = ({ toggleSidebar }: HeaderProps) => {
-  const [location] = useLocation();
-  
-  // Get the title based on the current route
-  const getTitle = () => {
-    switch (location) {
-      case "/":
-        return "Dashboard";
-      case "/students":
-        return "Student Management";
-      case "/courses":
-        return "Course Management";
-      case "/programs":
-        return "Program Management";
-      case "/calendar":
-        return "Academic Calendar";
-      case "/attendance":
-        return "Attendance Tracking";
-      case "/grading":
-        return "Grading System";
-      case "/reports":
-        return "Reports";
-      default:
-        return "EduManage";
-    }
-  };
-  
   return (
-    <header className="sticky top-0 z-40 border-b bg-background">
-      <div className="flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            onClick={toggleSidebar}
-          >
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle menu</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hidden lg:flex"
-            onClick={toggleSidebar}
-          >
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle menu</span>
-          </Button>
-          <h1 className="text-xl font-semibold">{getTitle()}</h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="relative hidden md:block">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search..."
-              className="pl-8 w-[200px] lg:w-[300px]"
-            />
+    <header className="bg-white shadow-sm z-10">
+      <div className="px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <button
+              onClick={toggle}
+              className="text-gray-500 focus:outline-none focus:text-gray-600 lg:hidden"
+              aria-label="Toggle sidebar"
+            >
+              <i className="ri-menu-line text-2xl"></i>
+            </button>
+            <h1 className="ml-4 text-lg sm:text-xl font-semibold text-gray-800 capitalize">
+              {window.location.pathname.split('/')[1] || 'Dashboard'}
+            </h1>
           </div>
-          <Button variant="ghost" size="icon">
-            <Bell className="h-5 w-5" />
-            <span className="sr-only">Notifications</span>
-          </Button>
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Search className="h-5 w-5" />
-            <span className="sr-only">Search</span>
-          </Button>
+
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full py-2 pl-10 pr-4 text-sm text-gray-700 bg-gray-100 rounded-md focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary-600"
+              />
+              <div className="absolute left-3 top-2.5 text-gray-400">
+                <i className="ri-search-line"></i>
+              </div>
+            </div>
+
+            <button className="p-1 text-gray-500 rounded-full hover:text-gray-600" aria-label="Notifications">
+              <i className="ri-notification-3-line text-xl"></i>
+            </button>
+
+            <button className="p-1 text-gray-500 rounded-full hover:text-gray-600" aria-label="Settings">
+              <i className="ri-settings-3-line text-xl"></i>
+            </button>
+          </div>
         </div>
       </div>
     </header>
   );
-};
-
-export default Header;
+}

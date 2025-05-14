@@ -1,480 +1,292 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { studentFormSchema } from "@shared/schema";
-
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { z } from "zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { insertStudentSchema } from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+
+// Extend the schema with validation rules
+const studentFormSchema = insertStudentSchema.extend({
+  email: z.string().email("Invalid email address"),
+  phoneNumber: z.string().optional(),
+  dateOfBirth: z.string().optional(),
+});
+
+type StudentFormValues = z.infer<typeof studentFormSchema>;
 
 interface StudentFormProps {
-  studentId?: number;
-  onSuccess?: () => void;
+  onCancel: () => void;
+  onSubmit: () => void;
+  studentToEdit?: StudentFormValues;
 }
 
-export default function StudentForm({ studentId, onSuccess }: StudentFormProps) {
+export default function StudentForm({ onCancel, onSubmit, studentToEdit }: StudentFormProps) {
   const { toast } = useToast();
-  const isEditMode = !!studentId;
+  const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: programs } = useQuery({
-    queryKey: ["/api/programs"],
+  // Fetch programs for the select dropdown
+  const { data: programs = [] } = useQuery({
+    queryKey: ['/api/programs'],
   });
 
-  const { data: studentData, isLoading: isLoadingStudent } = useQuery({
-    queryKey: ["/api/students", studentId],
-    enabled: isEditMode,
-  });
-
-  const form = useForm({
+  // Use react-hook-form with zod validation
+  const form = useForm<StudentFormValues>({
     resolver: zodResolver(studentFormSchema),
-    defaultValues: {
+    defaultValues: studentToEdit || {
+      studentId: "",
       firstName: "",
       lastName: "",
       email: "",
-      username: "",
-      password: "",
-      studentId: "",
-      programId: 0,
-      enrollmentYear: new Date().getFullYear(),
-      currentYear: 1,
-      status: "active",
-      dateOfBirth: undefined as Date | undefined,
+      dateOfBirth: "",
       gender: "",
       address: "",
-      phone: "",
+      phoneNumber: "",
+      status: "active",
+      enrollmentDate: new Date().toISOString().split('T')[0],
     },
   });
 
-  // Set form values when editing
-  React.useEffect(() => {
-    if (isEditMode && studentData) {
-      form.reset({
-        firstName: studentData.user.firstName,
-        lastName: studentData.user.lastName,
-        email: studentData.user.email,
-        username: studentData.user.username,
-        password: "", // Don't populate password field for security
-        studentId: studentData.studentId,
-        programId: studentData.programId,
-        enrollmentYear: studentData.enrollmentYear,
-        currentYear: studentData.currentYear,
-        status: studentData.status,
-        dateOfBirth: studentData.dateOfBirth ? new Date(studentData.dateOfBirth) : undefined,
-        gender: studentData.gender || "",
-        address: studentData.address || "",
-        phone: studentData.phone || "",
-      });
-    }
-  }, [isEditMode, studentData, form]);
-
+  // Create mutation for adding students
   const createStudent = useMutation({
-    mutationFn: async (data: typeof studentFormSchema._type) => {
-      const response = await apiRequest("POST", "/api/students", data);
-      return response.json();
-    },
+    mutationFn: (data: StudentFormValues) => 
+      apiRequest("POST", "/api/students", data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/students"] });
+      // Invalidate queries to refetch data
+      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
       toast({
         title: "Success",
-        description: "Student created successfully",
+        description: "Student has been added successfully",
       });
-      if (onSuccess) onSuccess();
-      form.reset();
+      onSubmit();
     },
     onError: (error) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create student",
+        description: `Failed to add student: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       });
+      setIsSubmitting(false);
     },
   });
 
-  const updateStudent = useMutation({
-    mutationFn: async (data: typeof studentFormSchema._type) => {
-      const response = await apiRequest("PUT", `/api/students/${studentId}`, data);
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/students"] });
-      toast({
-        title: "Success",
-        description: "Student updated successfully",
-      });
-      if (onSuccess) onSuccess();
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update student",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const onSubmit = (data: typeof studentFormSchema._type) => {
-    if (isEditMode) {
-      updateStudent.mutate(data);
-    } else {
-      createStudent.mutate(data);
-    }
+  // Handle form submission
+  const handleFormSubmit = (data: StudentFormValues) => {
+    setIsSubmitting(true);
+    createStudent.mutate(data);
   };
 
-  if (isEditMode && isLoadingStudent) {
-    return <div>Loading student data...</div>;
-  }
-
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="First name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+    <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="studentId">
+              Student ID*
+            </label>
+            <Input
+              id="studentId"
+              {...form.register("studentId")}
+              placeholder="Enter student ID"
+            />
+            {form.formState.errors.studentId && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.studentId.message}</p>
             )}
-          />
-          <FormField
-            control={form.control}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Last name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="firstName">
+              First Name*
+            </label>
+            <Input
+              id="firstName"
+              {...form.register("firstName")}
+              placeholder="Enter first name"
+            />
+            {form.formState.errors.firstName && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.firstName.message}</p>
             )}
-          />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="lastName">
+              Last Name*
+            </label>
+            <Input
+              id="lastName"
+              {...form.register("lastName")}
+              placeholder="Enter last name"
+            />
+            {form.formState.errors.lastName && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.lastName.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="email">
+              Email*
+            </label>
+            <Input
+              id="email"
+              type="email"
+              {...form.register("email")}
+              placeholder="Enter email address"
+            />
+            {form.formState.errors.email && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.email.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="dateOfBirth">
+              Date of Birth
+            </label>
+            <Input
+              id="dateOfBirth"
+              type="date"
+              {...form.register("dateOfBirth")}
+            />
+            {form.formState.errors.dateOfBirth && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.dateOfBirth.message}</p>
+            )}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="email@example.com" type="email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="+1 234 567 8900" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="gender">
+              Gender
+            </label>
+            <Select 
+              value={form.watch("gender")} 
+              onValueChange={(value) => form.setValue("gender", value)}
+            >
+              <SelectTrigger id="gender">
+                <SelectValue placeholder="Select gender" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="male">Male</SelectItem>
+                <SelectItem value="female">Female</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder="username" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{isEditMode ? "New Password (leave empty to keep current)" : "Password"}</FormLabel>
-                <FormControl>
-                  <Input placeholder="••••••••" type="password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="phoneNumber">
+              Phone Number
+            </label>
+            <Input
+              id="phoneNumber"
+              {...form.register("phoneNumber")}
+              placeholder="Enter phone number"
+            />
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="studentId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Student ID</FormLabel>
-                <FormControl>
-                  <Input placeholder="STU000123" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="programId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Program</FormLabel>
-                <Select
-                  value={field.value.toString()}
-                  onValueChange={(value) => field.onChange(parseInt(value))}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a program" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {programs?.map((program) => (
-                      <SelectItem key={program.id} value={program.id.toString()}>
-                        {program.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="address">
+              Address
+            </label>
+            <Input
+              id="address"
+              {...form.register("address")}
+              placeholder="Enter address"
+            />
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <FormField
-            control={form.control}
-            name="enrollmentYear"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Enrollment Year</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min={2000}
-                    max={new Date().getFullYear()}
-                    {...field}
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="currentYear"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Current Year</FormLabel>
-                <Select
-                  value={field.value.toString()}
-                  onValueChange={(value) => field.onChange(parseInt(value))}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select year" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="1">Year 1</SelectItem>
-                    <SelectItem value="2">Year 2</SelectItem>
-                    <SelectItem value="3">Year 3</SelectItem>
-                    <SelectItem value="4">Year 4</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <Select
-                  value={field.value}
-                  onValueChange={field.onChange}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="programId">
+              Program
+            </label>
+            <Select 
+              value={form.watch("programId")?.toString()} 
+              onValueChange={(value) => form.setValue("programId", parseInt(value))}
+            >
+              <SelectTrigger id="programId">
+                <SelectValue placeholder="Select program" />
+              </SelectTrigger>
+              <SelectContent>
+                {programs.map((program) => (
+                  <SelectItem key={program.id} value={program.id.toString()}>
+                    {program.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="dateOfBirth"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date of Birth</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="gender"
-            render={({ field }) => (
-              <FormItem className="space-y-3">
-                <FormLabel>Gender</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    className="flex space-x-4"
-                  >
-                    <FormItem className="flex items-center space-x-2 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="male" />
-                      </FormControl>
-                      <FormLabel className="font-normal">Male</FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-2 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="female" />
-                      </FormControl>
-                      <FormLabel className="font-normal">Female</FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-2 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="other" />
-                      </FormControl>
-                      <FormLabel className="font-normal">Other</FormLabel>
-                    </FormItem>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="yearLevel">
+              Year Level
+            </label>
+            <Select 
+              value={form.watch("yearLevel")?.toString()} 
+              onValueChange={(value) => form.setValue("yearLevel", parseInt(value))}
+            >
+              <SelectTrigger id="yearLevel">
+                <SelectValue placeholder="Select year level" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">Year 1</SelectItem>
+                <SelectItem value="2">Year 2</SelectItem>
+                <SelectItem value="3">Year 3</SelectItem>
+                <SelectItem value="4">Year 4</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Address</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Enter student's address"
-                  {...field}
-                  rows={3}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex justify-end space-x-2">
-          {onSuccess && (
-            <Button variant="outline" type="button" onClick={onSuccess}>
-              Cancel
-            </Button>
-          )}
-          <Button 
-            type="submit" 
-            disabled={createStudent.isPending || updateStudent.isPending}
-          >
-            {createStudent.isPending || updateStudent.isPending ? (
-              "Saving..."
-            ) : isEditMode ? (
-              "Update Student"
-            ) : (
-              "Create Student"
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="status">
+              Status*
+            </label>
+            <Select 
+              value={form.watch("status")} 
+              onValueChange={(value) => form.setValue("status", value)}
+            >
+              <SelectTrigger id="status">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="graduated">Graduated</SelectItem>
+              </SelectContent>
+            </Select>
+            {form.formState.errors.status && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.status.message}</p>
             )}
-          </Button>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="enrollmentDate">
+              Enrollment Date*
+            </label>
+            <Input
+              id="enrollmentDate"
+              type="date"
+              {...form.register("enrollmentDate")}
+            />
+            {form.formState.errors.enrollmentDate && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.enrollmentDate.message}</p>
+            )}
+          </div>
         </div>
-      </form>
-    </Form>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4 border-t">
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Saving..." : "Save Student"}
+        </Button>
+      </div>
+    </form>
   );
 }

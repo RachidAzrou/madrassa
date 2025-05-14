@@ -1,343 +1,510 @@
-import React, { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { addDays, format, subDays } from "date-fns";
-import PageHeader from "@/components/common/PageHeader";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import AttendanceTable, { Student } from "@/components/attendance/AttendanceTable";
-import { AlertCircle, ArrowLeft, ArrowRight, Download, FileText } from "lucide-react";
+import { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { Search, Download, Filter, CheckCircle, XCircle, Clock, ArrowLeft, ArrowRight, Save } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
+import { Avatar } from '@/components/ui/Avatar';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
-const Attendance = () => {
+// Define types
+interface Student {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  studentId: string;
+  attendanceRate: number;
+  lastStatus: string;
+}
+
+interface AttendanceSession {
+  id: string;
+  courseId: string;
+  courseName: string;
+  date: string;
+}
+
+export default function Attendance() {
   const { toast } = useToast();
-  const [selectedCourse, setSelectedCourse] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [attendanceData, setAttendanceData] = useState<Record<number, string>>({});
+  
+  const [selectedCourse, setSelectedCourse] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [attendanceData, setAttendanceData] = useState<Record<string, string>>({});
 
-  // Fetch courses data
-  const { data: courses = [], isLoading: loadingCourses } = useQuery({
-    queryKey: ["/api/courses"],
+  // Fetch courses for dropdown
+  const { data: coursesData } = useQuery({
+    queryKey: ['/api/courses/list'],
+    staleTime: 300000,
   });
 
-  // Fetch students data for selected course
-  const { data: students = [], isLoading: loadingStudents } = useQuery({
-    queryKey: ["/api/students"],
-  });
+  const courses = coursesData?.courses || [];
 
-  // Fetch attendance records for selected course and date
-  const {
-    data: attendanceRecords = [],
-    isLoading: loadingAttendance,
-    refetch: refetchAttendance,
-  } = useQuery({
-    queryKey: [
-      "/api/attendance/course/date",
-      { courseId: selectedCourse, date: format(selectedDate, "yyyy-MM-dd") },
-    ],
+  // Fetch attendance data for selected course and date
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['/api/attendance', { courseId: selectedCourse, date: selectedDate }],
+    staleTime: 60000,
     enabled: !!selectedCourse,
-    queryFn: async ({ queryKey }) => {
-      const [_, params] = queryKey;
-      // In a real app, we'd fetch attendance records for the selected course and date
-      // This is a placeholder implementation
-      return [];
-    },
   });
 
-  // Create attendance records mutation
-  const saveAttendance = useMutation({
-    mutationFn: async (data: any) => {
-      return apiRequest("POST", "/api/attendance", data);
+  const students: Student[] = data?.students || [];
+  const session: AttendanceSession | null = data?.session || null;
+
+  // Mutation for saving attendance
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('POST', '/api/attendance/save', {
+        sessionId: session?.id,
+        courseId: selectedCourse,
+        date: selectedDate,
+        attendance: attendanceData,
+      });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: ["/api/attendance/course/date"] 
-      });
       toast({
-        title: "Success",
-        description: "Attendance saved successfully",
+        title: 'Attendance saved',
+        description: 'Attendance records have been successfully updated.',
+        variant: 'default',
       });
+      queryClient.invalidateQueries({ queryKey: ['/api/attendance'] });
     },
     onError: (error) => {
       toast({
-        title: "Error",
-        description: `Failed to save attendance: ${error.message}`,
-        variant: "destructive",
+        title: 'Error saving attendance',
+        description: error.message || 'Something went wrong. Please try again.',
+        variant: 'destructive',
       });
     },
   });
 
-  const handlePreviousDay = () => {
-    setSelectedDate(subDays(selectedDate, 1));
-  };
-
-  const handleNextDay = () => {
-    setSelectedDate(addDays(selectedDate, 1));
-  };
-
   const handleCourseChange = (value: string) => {
     setSelectedCourse(value);
-    // Reset attendance data when course changes
     setAttendanceData({});
   };
 
-  const handleStatusChange = (studentId: number, status: string) => {
+  const handleDateChange = (increment: number) => {
+    const current = new Date(selectedDate);
+    current.setDate(current.getDate() + increment);
+    setSelectedDate(current.toISOString().split('T')[0]);
+    setAttendanceData({});
+  };
+
+  const handleStatusChange = (studentId: string, status: string) => {
     setAttendanceData(prev => ({
       ...prev,
-      [studentId]: status,
+      [studentId]: status
     }));
+  };
+
+  const handleMarkAll = (status: string) => {
+    const newData: Record<string, string> = {};
+    students.forEach(student => {
+      newData[student.id] = status;
+    });
+    setAttendanceData(newData);
   };
 
   const handleSaveAttendance = () => {
-    // Prepare the data for submission
-    const records = Object.entries(attendanceData).map(([studentId, status]) => ({
-      studentId: parseInt(studentId),
-      courseId: parseInt(selectedCourse),
-      date: format(selectedDate, "yyyy-MM-dd"),
-      status,
-      remarks: "",
-    }));
+    saveMutation.mutate();
+  };
 
-    if (records.length === 0) {
-      toast({
-        title: "Warning",
-        description: "No attendance data to save",
-        variant: "destructive",
-      });
-      return;
+  // Format date as "Month Day, Year"
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  };
+
+  // Load initial attendance data when it becomes available
+  useState(() => {
+    if (data?.attendance && Object.keys(attendanceData).length === 0) {
+      setAttendanceData(data.attendance);
     }
-
-    // For simplicity, we'll save each record separately
-    // In a real app, you might want to batch these
-    records.forEach(record => {
-      saveAttendance.mutate(record);
-    });
-  };
-
-  // Calculate attendance statistics
-  const calculateStats = () => {
-    const total = students.length;
-    const present = Object.values(attendanceData).filter(status => status === "present").length;
-    const absent = Object.values(attendanceData).filter(status => status === "absent").length;
-    const late = Object.values(attendanceData).filter(status => status === "late").length;
-    const excused = Object.values(attendanceData).filter(status => status === "excused").length;
-    
-    return {
-      total,
-      present,
-      absent,
-      late,
-      excused,
-      presentPercentage: total > 0 ? (present / total) * 100 : 0,
-      absentPercentage: total > 0 ? (absent / total) * 100 : 0,
-      latePercentage: total > 0 ? (late / total) * 100 : 0,
-      excusedPercentage: total > 0 ? (excused / total) * 100 : 0,
-    };
-  };
-
-  const stats = calculateStats();
-
-  // Prepare student data for the attendance table
-  const studentsWithAttendance: Student[] = students.map((student: any) => {
-    const attendanceRate = Math.floor(Math.random() * 30) + 70; // Random 70-100% for demo
-    return {
-      ...student,
-      attendanceRate,
-      lastStatus: attendanceData[student.id] || "present", // Default to present
-    };
   });
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Attendance Tracking"
-        description="Record and monitor student attendance"
-        action={{
-          label: "Export Report",
-          onClick: () => alert("Export functionality would go here"),
-          icon: <Download className="h-4 w-4 mr-2" />,
-        }}
-      />
-
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="flex-1">
-          <Select
-            value={selectedCourse}
-            onValueChange={handleCourseChange}
-            disabled={loadingCourses}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a course" />
-            </SelectTrigger>
-            <SelectContent>
-              {courses.map((course: any) => (
-                <SelectItem key={course.id} value={course.id.toString()}>
-                  {course.name} ({course.code})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="icon" onClick={handlePreviousDay}>
-            <ArrowLeft className="h-4 w-4" />
+    <div className="p-4 md:p-6 space-y-6">
+      {/* Page header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h1 className="text-2xl font-bold text-gray-800">Attendance Tracking</h1>
+        <div className="flex items-center space-x-3">
+          <Button variant="outline" className="flex items-center">
+            <Download className="mr-2 h-4 w-4" />
+            Export Report
           </Button>
-          <div className="font-medium">{format(selectedDate, "EEEE, MMMM d, yyyy")}</div>
-          <Button variant="outline" size="icon" onClick={handleNextDay}>
-            <ArrowRight className="h-4 w-4" />
+          <Button className="flex items-center">
+            <CheckCircle className="mr-2 h-4 w-4" />
+            New Session
           </Button>
         </div>
       </div>
-      
-      {!selectedCourse ? (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-yellow-700">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <AlertCircle className="h-5 w-5 text-yellow-400" />
+
+      {/* Course and date selector */}
+      <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <Select value={selectedCourse} onValueChange={handleCourseChange}>
+              <SelectTrigger className="w-full sm:w-[300px]">
+                <SelectValue placeholder="Select a course" />
+              </SelectTrigger>
+              <SelectContent>
+                {courses.length === 0 ? (
+                  <SelectItem value="loading" disabled>Loading courses...</SelectItem>
+                ) : (
+                  courses.map((course: any) => (
+                    <SelectItem key={course.id} value={course.id}>
+                      {course.title} ({course.courseCode})
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+            
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleDateChange(-1)}
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-medium">{formatDate(selectedDate)}</span>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleDateChange(1)}
+              >
+                <ArrowRight className="h-4 w-4" />
+              </Button>
             </div>
-            <div className="ml-3">
-              <p className="text-sm">Please select a course to view and record attendance.</p>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+              onClick={() => handleMarkAll('present')}
+            >
+              <CheckCircle className="mr-1.5 h-4 w-4" />
+              Mark All Present
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+              onClick={() => handleMarkAll('absent')}
+            >
+              <XCircle className="mr-1.5 h-4 w-4" />
+              Mark All Absent
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Attendance table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        {!selectedCourse ? (
+          <div className="p-8 text-center">
+            <h3 className="text-gray-500 text-lg font-medium">Please select a course to view attendance</h3>
+          </div>
+        ) : isLoading ? (
+          <div className="flex justify-center py-12">
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : isError ? (
+          <div className="text-center py-12 text-red-500">
+            Error loading attendance data. Please try again.
+          </div>
+        ) : students.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            No students enrolled in this course.
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Student
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      ID
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Attendance Rate
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Last Class
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {students.map((student) => (
+                    <tr key={student.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Avatar 
+                            initials={`${student.firstName.charAt(0)}${student.lastName.charAt(0)}`} 
+                            size="md" 
+                          />
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{student.firstName} {student.lastName}</div>
+                            <div className="text-sm text-gray-500">{student.email}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {student.studentId}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Select 
+                          value={attendanceData[student.id] || ''} 
+                          onValueChange={(value) => handleStatusChange(student.id, value)}
+                        >
+                          <SelectTrigger className="w-[120px]">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="present">Present</SelectItem>
+                            <SelectItem value="absent">Absent</SelectItem>
+                            <SelectItem value="late">Late</SelectItem>
+                            <SelectItem value="excused">Excused</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Progress 
+                            value={student.attendanceRate} 
+                            className="w-16 mr-2"
+                            indicatorColor={
+                              student.attendanceRate >= 90 ? 'bg-green-500' :
+                              student.attendanceRate >= 75 ? 'bg-yellow-500' :
+                              'bg-red-500'
+                            }
+                          />
+                          <span className="text-sm text-gray-500">{student.attendanceRate}%</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {student.lastStatus.charAt(0).toUpperCase() + student.lastStatus.slice(1)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-primary hover:text-primary-dark"
+                        >
+                          View History
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-4">
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-1">Session Summary</h4>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    Present: {Object.values(attendanceData).filter(v => v === 'present').length}
+                  </span>
+                  <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                    Absent: {Object.values(attendanceData).filter(v => v === 'absent').length}
+                  </span>
+                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                    Late: {Object.values(attendanceData).filter(v => v === 'late').length}
+                  </span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    Excused: {Object.values(attendanceData).filter(v => v === 'excused').length}
+                  </span>
+                </div>
+              </div>
+              
+              <Button 
+                onClick={handleSaveAttendance} 
+                disabled={saveMutation.isPending}
+                className="flex items-center"
+              >
+                {saveMutation.isPending ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                Save Attendance
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Attendance Overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+          <div className="p-6 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-800">Attendance Overview</h3>
+            <p className="text-sm text-gray-500 mt-1">Current semester attendance statistics</p>
+          </div>
+          <div className="p-6">
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-sm font-medium text-gray-700">Overall Attendance Rate</h4>
+                <span className="text-sm font-medium text-gray-700">85%</span>
+              </div>
+              <div className="relative w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div className="absolute top-0 left-0 h-full bg-primary rounded-full" style={{ width: '85%' }}></div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm text-gray-800">Computer Science</p>
+                  <span className="text-sm text-gray-700">92%</span>
+                </div>
+                <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="absolute top-0 left-0 h-full bg-green-500 rounded-full" style={{ width: '92%' }}></div>
+                </div>
+              </div>
+              
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm text-gray-800">Business Management</p>
+                  <span className="text-sm text-gray-700">78%</span>
+                </div>
+                <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="absolute top-0 left-0 h-full bg-yellow-500 rounded-full" style={{ width: '78%' }}></div>
+                </div>
+              </div>
+              
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm text-gray-800">Engineering</p>
+                  <span className="text-sm text-gray-700">85%</span>
+                </div>
+                <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="absolute top-0 left-0 h-full bg-green-500 rounded-full" style={{ width: '85%' }}></div>
+                </div>
+              </div>
+              
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm text-gray-800">Medicine</p>
+                  <span className="text-sm text-gray-700">95%</span>
+                </div>
+                <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="absolute top-0 left-0 h-full bg-green-500 rounded-full" style={{ width: '95%' }}></div>
+                </div>
+              </div>
+              
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm text-gray-800">Psychology</p>
+                  <span className="text-sm text-gray-700">75%</span>
+                </div>
+                <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="absolute top-0 left-0 h-full bg-yellow-500 rounded-full" style={{ width: '75%' }}></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Present</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.present} / {stats.total}</div>
-                <Progress 
-                  value={stats.presentPercentage} 
-                  className="h-2 mt-2"
-                  indicatorClassName="bg-green-500"
-                />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Absent</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.absent} / {stats.total}</div>
-                <Progress 
-                  value={stats.absentPercentage} 
-                  className="h-2 mt-2"
-                  indicatorClassName="bg-red-500"
-                />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Late</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.late} / {stats.total}</div>
-                <Progress 
-                  value={stats.latePercentage} 
-                  className="h-2 mt-2"
-                  indicatorClassName="bg-yellow-500"
-                />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Excused</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.excused} / {stats.total}</div>
-                <Progress 
-                  value={stats.excusedPercentage} 
-                  className="h-2 mt-2"
-                  indicatorClassName="bg-blue-500"
-                />
-              </CardContent>
-            </Card>
+        
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+          <div className="p-6 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-800">Low Attendance Alerts</h3>
+            <p className="text-sm text-gray-500 mt-1">Students with attendance concerns</p>
           </div>
-          
-          <AttendanceTable
-            students={studentsWithAttendance}
-            onStatusChange={handleStatusChange}
-            onSave={handleSaveAttendance}
-            loading={loadingStudents || loadingAttendance || saveAttendance.isPending}
-            date={selectedDate}
-            courseId={parseInt(selectedCourse)}
-          />
-          
-          <div className="mt-10">
-            <h2 className="text-lg font-semibold mb-4">Attendance Overview</h2>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-medium">Overall Attendance Rate</h4>
-                    <span className="text-sm font-medium">85%</span>
-                  </div>
-                  <Progress value={85} className="h-3" />
+          <div className="p-6">
+            <ul className="divide-y divide-gray-200">
+              <li className="py-3 flex items-start">
+                <div className="flex-shrink-0 mt-1">
+                  <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-red-100 text-red-600">
+                    <XCircle className="h-4 w-4" />
+                  </span>
                 </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm">Computer Science</p>
-                      <span className="text-sm">92%</span>
-                    </div>
-                    <Progress value={92} className="h-2" indicatorClassName="bg-green-500" />
+                <div className="ml-3 flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-gray-900">James Kim</p>
+                    <p className="text-sm text-gray-500">Business Management</p>
                   </div>
-                  
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm">Business Management</p>
-                      <span className="text-sm">78%</span>
-                    </div>
-                    <Progress value={78} className="h-2" indicatorClassName="bg-yellow-500" />
+                  <div className="mt-1 flex justify-between">
+                    <p className="text-sm text-gray-500">Missed 5 out of last 10 classes</p>
+                    <p className="text-sm font-medium text-red-600">58% Attendance</p>
                   </div>
-                  
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm">Engineering</p>
-                      <span className="text-sm">85%</span>
-                    </div>
-                    <Progress value={85} className="h-2" indicatorClassName="bg-green-500" />
-                  </div>
-                  
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm">Medicine</p>
-                      <span className="text-sm">95%</span>
-                    </div>
-                    <Progress value={95} className="h-2" indicatorClassName="bg-green-500" />
-                  </div>
-                  
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm">Psychology</p>
-                      <span className="text-sm">75%</span>
-                    </div>
-                    <Progress value={75} className="h-2" indicatorClassName="bg-yellow-500" />
+                  <div className="mt-2">
+                    <Button variant="link" size="sm" className="text-primary hover:text-primary-dark p-0 h-auto">
+                      Send Reminder
+                    </Button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </li>
+              
+              <li className="py-3 flex items-start">
+                <div className="flex-shrink-0 mt-1">
+                  <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-yellow-100 text-yellow-600">
+                    <Clock className="h-4 w-4" />
+                  </span>
+                </div>
+                <div className="ml-3 flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-gray-900">Aisha Thompson</p>
+                    <p className="text-sm text-gray-500">Psychology</p>
+                  </div>
+                  <div className="mt-1 flex justify-between">
+                    <p className="text-sm text-gray-500">Missed 3 out of last 10 classes</p>
+                    <p className="text-sm font-medium text-yellow-600">70% Attendance</p>
+                  </div>
+                  <div className="mt-2">
+                    <Button variant="link" size="sm" className="text-primary hover:text-primary-dark p-0 h-auto">
+                      Send Reminder
+                    </Button>
+                  </div>
+                </div>
+              </li>
+              
+              <li className="py-3 flex items-start">
+                <div className="flex-shrink-0 mt-1">
+                  <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-yellow-100 text-yellow-600">
+                    <Clock className="h-4 w-4" />
+                  </span>
+                </div>
+                <div className="ml-3 flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-gray-900">Daniel Lee</p>
+                    <p className="text-sm text-gray-500">Computer Science</p>
+                  </div>
+                  <div className="mt-1 flex justify-between">
+                    <p className="text-sm text-gray-500">Missed 2 out of last 10 classes</p>
+                    <p className="text-sm font-medium text-yellow-600">75% Attendance</p>
+                  </div>
+                  <div className="mt-2">
+                    <Button variant="link" size="sm" className="text-primary hover:text-primary-dark p-0 h-auto">
+                      Send Reminder
+                    </Button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            
+            <div className="mt-4">
+              <Button variant="link" className="text-primary hover:text-primary-dark p-0 h-auto">
+                View all attendance issues
+              </Button>
+            </div>
           </div>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
-};
-
-export default Attendance;
+}

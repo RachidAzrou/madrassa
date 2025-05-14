@@ -1,338 +1,228 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { courseFormSchema } from "@shared/schema";
-
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { z } from "zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { insertCourseSchema } from "@shared/schema";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+
+// Extend the schema with validation rules
+const courseFormSchema = insertCourseSchema.extend({
+  credits: z.coerce.number().int().min(1, "Credits must be at least 1"),
+  maxCapacity: z.coerce.number().int().min(1, "Max capacity must be at least 1").optional(),
+});
+
+type CourseFormValues = z.infer<typeof courseFormSchema>;
 
 interface CourseFormProps {
-  courseId?: number;
-  onSuccess?: () => void;
+  onCancel: () => void;
+  onSubmit: () => void;
+  courseToEdit?: CourseFormValues;
 }
 
-export default function CourseForm({ courseId, onSuccess }: CourseFormProps) {
+export default function CourseForm({ onCancel, onSubmit, courseToEdit }: CourseFormProps) {
   const { toast } = useToast();
-  const isEditMode = !!courseId;
+  const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: programs } = useQuery({
-    queryKey: ["/api/programs"],
+  // Fetch programs for the select dropdown
+  const { data: programs = [] } = useQuery({
+    queryKey: ['/api/programs'],
   });
 
-  const { data: users } = useQuery({
-    queryKey: ["/api/users"],
-    // In a real app, we would have a route to get all instructors
-    // For now, we'll mock this as the backend route isn't implemented
-    enabled: false,
-  });
-
-  const { data: courseData, isLoading: isLoadingCourse } = useQuery({
-    queryKey: ["/api/courses", courseId],
-    enabled: isEditMode,
-  });
-
-  const form = useForm({
+  // Use react-hook-form with zod validation
+  const form = useForm<CourseFormValues>({
     resolver: zodResolver(courseFormSchema),
-    defaultValues: {
+    defaultValues: courseToEdit || {
       name: "",
       code: "",
       description: "",
       credits: 3,
-      programId: 0,
-      instructorId: 0,
-      capacity: 30,
-      enrolled: 0,
+      programId: undefined,
+      instructor: "",
+      maxCapacity: 30,
+      status: "active",
     },
   });
 
-  // Set form values when editing
-  React.useEffect(() => {
-    if (isEditMode && courseData) {
-      form.reset({
-        name: courseData.name,
-        code: courseData.code,
-        description: courseData.description || "",
-        credits: courseData.credits,
-        programId: courseData.programId || 0,
-        instructorId: courseData.instructorId || 0,
-        capacity: courseData.capacity,
-        enrolled: courseData.enrolled,
-      });
-    }
-  }, [isEditMode, courseData, form]);
-
+  // Create mutation for adding courses
   const createCourse = useMutation({
-    mutationFn: async (data: typeof courseFormSchema._type) => {
-      const response = await apiRequest("POST", "/api/courses", data);
-      return response.json();
-    },
+    mutationFn: (data: CourseFormValues) => 
+      apiRequest("POST", "/api/courses", data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/courses"] });
+      // Invalidate queries to refetch data
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
       toast({
         title: "Success",
-        description: "Course created successfully",
+        description: "Course has been added successfully",
       });
-      if (onSuccess) onSuccess();
-      form.reset();
+      onSubmit();
     },
     onError: (error) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create course",
+        description: `Failed to add course: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       });
+      setIsSubmitting(false);
     },
   });
 
-  const updateCourse = useMutation({
-    mutationFn: async (data: typeof courseFormSchema._type) => {
-      const response = await apiRequest("PUT", `/api/courses/${courseId}`, data);
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/courses"] });
-      toast({
-        title: "Success",
-        description: "Course updated successfully",
-      });
-      if (onSuccess) onSuccess();
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update course",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const onSubmit = (data: typeof courseFormSchema._type) => {
-    if (isEditMode) {
-      updateCourse.mutate(data);
-    } else {
-      createCourse.mutate(data);
-    }
+  // Handle form submission
+  const handleFormSubmit = (data: CourseFormValues) => {
+    setIsSubmitting(true);
+    createCourse.mutate(data);
   };
 
-  if (isEditMode && isLoadingCourse) {
-    return <div>Loading course data...</div>;
-  }
-
-  // For the instructors demo data
-  const instructors = [
-    { id: 1, firstName: "John", lastName: "Smith", role: "instructor" },
-    { id: 2, firstName: "Emma", lastName: "Davis", role: "instructor" },
-  ];
-
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Course Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Introduction to Computer Science" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Course Code</FormLabel>
-                <FormControl>
-                  <Input placeholder="CS101" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Enter course description"
-                  {...field}
-                  rows={3}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <FormField
-            control={form.control}
-            name="credits"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Credits</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={10}
-                    {...field}
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="capacity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Capacity</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={200}
-                    {...field}
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {isEditMode && (
-            <FormField
-              control={form.control}
-              name="enrolled"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Enrolled Students</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={form.getValues("capacity")}
-                      {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+    <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="name">
+              Course Name*
+            </label>
+            <Input
+              id="name"
+              {...form.register("name")}
+              placeholder="Enter course name"
             />
-          )}
+            {form.formState.errors.name && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.name.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="code">
+              Course Code*
+            </label>
+            <Input
+              id="code"
+              {...form.register("code")}
+              placeholder="e.g. CS101"
+            />
+            {form.formState.errors.code && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.code.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="description">
+              Description
+            </label>
+            <Textarea
+              id="description"
+              {...form.register("description")}
+              placeholder="Enter course description"
+              rows={4}
+            />
+            {form.formState.errors.description && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.description.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="credits">
+              Credits*
+            </label>
+            <Input
+              id="credits"
+              type="number"
+              min="1"
+              {...form.register("credits")}
+            />
+            {form.formState.errors.credits && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.credits.message}</p>
+            )}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="programId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Program</FormLabel>
-                <Select
-                  value={field.value ? field.value.toString() : ""}
-                  onValueChange={(value) => field.onChange(parseInt(value) || 0)}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a program" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="">None</SelectItem>
-                    {programs?.map((program) => (
-                      <SelectItem key={program.id} value={program.id.toString()}>
-                        {program.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="instructorId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Instructor</FormLabel>
-                <Select
-                  value={field.value ? field.value.toString() : ""}
-                  onValueChange={(value) => field.onChange(parseInt(value) || 0)}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select an instructor" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="">None</SelectItem>
-                    {instructors.map((instructor) => (
-                      <SelectItem key={instructor.id} value={instructor.id.toString()}>
-                        {instructor.firstName} {instructor.lastName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="programId">
+              Program
+            </label>
+            <Select 
+              value={form.watch("programId")?.toString()} 
+              onValueChange={(value) => form.setValue("programId", value ? parseInt(value) : undefined)}
+            >
+              <SelectTrigger id="programId">
+                <SelectValue placeholder="Select program" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">None</SelectItem>
+                {programs.map((program) => (
+                  <SelectItem key={program.id} value={program.id.toString()}>
+                    {program.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="flex justify-end space-x-2">
-          {onSuccess && (
-            <Button variant="outline" type="button" onClick={onSuccess}>
-              Cancel
-            </Button>
-          )}
-          <Button 
-            type="submit" 
-            disabled={createCourse.isPending || updateCourse.isPending}
-          >
-            {createCourse.isPending || updateCourse.isPending ? (
-              "Saving..."
-            ) : isEditMode ? (
-              "Update Course"
-            ) : (
-              "Create Course"
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="instructor">
+              Instructor
+            </label>
+            <Input
+              id="instructor"
+              {...form.register("instructor")}
+              placeholder="Enter instructor name"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="maxCapacity">
+              Maximum Capacity
+            </label>
+            <Input
+              id="maxCapacity"
+              type="number"
+              min="1"
+              {...form.register("maxCapacity")}
+            />
+            {form.formState.errors.maxCapacity && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.maxCapacity.message}</p>
             )}
-          </Button>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="status">
+              Status*
+            </label>
+            <Select 
+              value={form.watch("status")} 
+              onValueChange={(value) => form.setValue("status", value)}
+            >
+              <SelectTrigger id="status">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="upcoming">Upcoming</SelectItem>
+              </SelectContent>
+            </Select>
+            {form.formState.errors.status && (
+              <p className="text-sm text-red-500 mt-1">{form.formState.errors.status.message}</p>
+            )}
+          </div>
         </div>
-      </form>
-    </Form>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4 border-t">
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Saving..." : "Save Course"}
+        </Button>
+      </div>
+    </form>
   );
 }

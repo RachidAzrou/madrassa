@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 interface Program {
   id: string;
@@ -25,6 +26,7 @@ interface Program {
 }
 
 export default function Programs() {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedProgram, setExpandedProgram] = useState<string | null>(null);
 
@@ -49,8 +51,50 @@ export default function Programs() {
   };
 
   const handleAddProgram = () => {
-    // Implementation will be added for program creation
+    // Implementatie voor het toevoegen van een programma
     console.log('Add program clicked');
+    toast({
+      title: "Functie in ontwikkeling",
+      description: "De functie voor het toevoegen van nieuwe programma's is momenteel in ontwikkeling.",
+      variant: "default",
+    });
+  };
+  
+  const handleEditProgram = (id: string) => {
+    console.log(`Editing program with ID: ${id}`);
+    toast({
+      title: "Programma bewerken",
+      description: `Bewerkingsformulier laden voor programma met ID: ${id}`,
+      variant: "default",
+    });
+  };
+  
+  const handleDeleteProgram = (id: string) => {
+    console.log(`Deleting program with ID: ${id}`);
+    
+    if (confirm(`Weet je zeker dat je het programma met ID: ${id} wilt verwijderen?`)) {
+      // Implementeer de werkelijke verwijdering via API
+      apiRequest('DELETE', `/api/programs/${id}`)
+        .then(() => {
+          // Toon succesmelding
+          toast({
+            title: "Programma verwijderd",
+            description: `Programma met ID ${id} is succesvol verwijderd.`,
+            variant: "default",
+          });
+          
+          // Invalidate cache om de lijst te vernieuwen
+          queryClient.invalidateQueries({ queryKey: ['/api/programs'] });
+        })
+        .catch((error) => {
+          // Toon foutmelding bij mislukken
+          toast({
+            title: "Fout bij verwijderen",
+            description: error.message || "Er is een fout opgetreden bij het verwijderen van het programma.",
+            variant: "destructive",
+          });
+        });
+    }
   };
 
   return (
@@ -118,11 +162,29 @@ export default function Programs() {
                     <span className="text-gray-800 font-medium">{program.students}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm" className="text-gray-500">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-gray-500 hover:text-gray-700"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Voorkom dat de program toggle wordt geactiveerd
+                        handleEditProgram(program.id);
+                      }}
+                    >
                       <Edit className="h-4 w-4" />
+                      <span className="sr-only">Bewerken</span>
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-red-500">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-red-500 hover:text-red-700"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Voorkom dat de program toggle wordt geactiveerd
+                        handleDeleteProgram(program.id);
+                      }}
+                    >
                       <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Verwijderen</span>
                     </Button>
                     {expandedProgram === program.id ? (
                       <ChevronUp className="h-5 w-5 text-gray-400" />

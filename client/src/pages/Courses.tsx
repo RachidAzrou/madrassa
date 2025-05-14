@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Courses() {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [department, setDepartment] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,8 +25,59 @@ export default function Courses() {
   const totalPages = Math.ceil(totalCourses / 10); // Assuming 10 courses per page
 
   const handleAddCourse = async () => {
-    // Implementation will be added for course creation
+    // Implementatie voor het toevoegen van een cursus
     console.log('Add course clicked');
+    toast({
+      title: "Functie in ontwikkeling",
+      description: "De functie voor het toevoegen van nieuwe cursussen is momenteel in ontwikkeling.",
+      variant: "default",
+    });
+  };
+  
+  const handleEditCourse = (id: string) => {
+    console.log(`Editing course with ID: ${id}`);
+    toast({
+      title: "Cursus bewerken",
+      description: `Bewerkingsformulier laden voor cursus met ID: ${id}`,
+      variant: "default",
+    });
+  };
+  
+  const handleViewCourse = (id: string) => {
+    console.log(`Viewing course with ID: ${id}`);
+    toast({
+      title: "Cursus details",
+      description: `Details bekijken voor cursus met ID: ${id}`,
+      variant: "default",
+    });
+  };
+  
+  const handleDeleteCourse = (id: string) => {
+    console.log(`Deleting course with ID: ${id}`);
+    
+    if (confirm(`Weet je zeker dat je de cursus met ID: ${id} wilt verwijderen?`)) {
+      // Implementeer de werkelijke verwijdering via API
+      apiRequest('DELETE', `/api/courses/${id}`)
+        .then(() => {
+          // Toon succesmelding
+          toast({
+            title: "Cursus verwijderd",
+            description: `Cursus met ID ${id} is succesvol verwijderd.`,
+            variant: "default",
+          });
+          
+          // Invalidate cache om de lijst te vernieuwen
+          queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+        })
+        .catch((error) => {
+          // Toon foutmelding bij mislukken
+          toast({
+            title: "Fout bij verwijderen",
+            description: error.message || "Er is een fout opgetreden bij het verwijderen van de cursus.",
+            variant: "destructive",
+          });
+        });
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,8 +188,33 @@ export default function Courses() {
                     <span>{course.enrolledStudents} studenten ingeschreven</span>
                   </div>
                   <div className="flex space-x-2">
-                    <button className="text-primary hover:text-primary-dark text-sm">Bewerken</button>
-                    <button className="text-gray-500 hover:text-gray-700 text-sm">Bekijken</button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-primary hover:text-primary-dark"
+                      onClick={() => handleEditCourse(course.id)}
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      <span>Bewerken</span>
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-gray-500 hover:text-gray-700"
+                      onClick={() => handleViewCourse(course.id)}
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
+                      <span>Bekijken</span>
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-red-500 hover:text-red-700"
+                      onClick={() => handleDeleteCourse(course.id)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      <span className="sr-only">Verwijderen</span>
+                    </Button>
                   </div>
                 </div>
               </div>

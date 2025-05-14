@@ -17,10 +17,8 @@ export default function Students() {
   const [sortBy, setSortBy] = useState('name');
   const [currentPage, setCurrentPage] = useState(1);
   
-  // Dialog state
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogType, setDialogType] = useState<'add' | 'edit' | 'view'>('add');
-  const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  // State voor latere dialogimplementatie
+  // (tijdelijk verwijderd vanwege technische problemen)
 
   // Fetch students with filters
   const { data, isLoading, isError } = useQuery({
@@ -33,9 +31,8 @@ export default function Students() {
   const totalPages = Math.ceil(totalStudents / 10); // Assuming 10 students per page
 
   const handleAddStudent = async () => {
-    setDialogType('add');
-    setSelectedStudent(null);
-    setDialogOpen(true);
+    // Tijdelijke eenvoudige implementatie
+    alert("Nieuwe student toevoegen functie wordt binnenkort geïmplementeerd!");
   };
 
   const handleViewStudent = (id: string) => {

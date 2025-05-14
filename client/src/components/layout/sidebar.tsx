@@ -27,10 +27,10 @@ type SidebarLinkProps = {
 const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps) => {
   return (
     <Link href={href}>
-      <a
+      <div
         onClick={onClick}
         className={cn(
-          "flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors",
+          "flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer",
           isActive
             ? "bg-primary text-white"
             : "text-gray-600 hover:text-primary hover:bg-gray-100"
@@ -38,7 +38,7 @@ const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps)
       >
         {icon}
         <span>{label}</span>
-      </a>
+      </div>
     </Link>
   );
 };

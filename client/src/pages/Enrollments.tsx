@@ -15,10 +15,12 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 
 export default function Enrollments() {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [program, setProgram] = useState('all');
   const [course, setCourse] = useState('all');
@@ -50,8 +52,59 @@ export default function Enrollments() {
   const courses = coursesData?.courses || [];
 
   const handleAddEnrollment = async () => {
-    // Implementation will be added for enrollment creation
+    // Implementatie voor het toevoegen van een inschrijving
     console.log('Add enrollment clicked');
+    toast({
+      title: "Functie in ontwikkeling",
+      description: "De functie voor het toevoegen van nieuwe inschrijvingen is momenteel in ontwikkeling.",
+      variant: "default",
+    });
+  };
+  
+  const handleViewEnrollment = (id: string) => {
+    console.log(`Viewing enrollment with ID: ${id}`);
+    toast({
+      title: "Inschrijving details",
+      description: `Details bekijken voor inschrijving met ID: ${id}`,
+      variant: "default",
+    });
+  };
+  
+  const handleEditEnrollment = (id: string) => {
+    console.log(`Editing enrollment with ID: ${id}`);
+    toast({
+      title: "Inschrijving bewerken",
+      description: `Bewerkingsformulier laden voor inschrijving met ID: ${id}`,
+      variant: "default",
+    });
+  };
+  
+  const handleDeleteEnrollment = (id: string) => {
+    console.log(`Deleting enrollment with ID: ${id}`);
+    
+    if (confirm(`Weet je zeker dat je de inschrijving met ID: ${id} wilt verwijderen?`)) {
+      // Implementeer de werkelijke verwijdering via API
+      apiRequest('DELETE', `/api/enrollments/${id}`)
+        .then(() => {
+          // Toon succesmelding
+          toast({
+            title: "Inschrijving verwijderd",
+            description: `Inschrijving met ID ${id} is succesvol verwijderd.`,
+            variant: "default",
+          });
+          
+          // Invalidate cache om de lijst te vernieuwen
+          queryClient.invalidateQueries({ queryKey: ['/api/enrollments'] });
+        })
+        .catch((error) => {
+          // Toon foutmelding bij mislukken
+          toast({
+            title: "Fout bij verwijderen",
+            description: error.message || "Er is een fout opgetreden bij het verwijderen van de inschrijving.",
+            variant: "destructive",
+          });
+        });
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

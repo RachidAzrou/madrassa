@@ -243,8 +243,8 @@ export default function Reports() {
                   </div>
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Medicine</span>
-                      <span className="text-sm text-gray-500">3.72 GPA</span>
+                      <span className="text-sm font-medium">Geneeskunde</span>
+                      <span className="text-sm text-gray-500">8,1</span>
                     </div>
                     <div className="w-full h-2 bg-gray-100 rounded-full">
                       <div className="h-full bg-primary rounded-full" style={{ width: '93%' }}></div>
@@ -252,8 +252,8 @@ export default function Reports() {
                   </div>
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Arts</span>
-                      <span className="text-sm text-gray-500">3.51 GPA</span>
+                      <span className="text-sm font-medium">Kunst</span>
+                      <span className="text-sm text-gray-500">7,6</span>
                     </div>
                     <div className="w-full h-2 bg-gray-100 rounded-full">
                       <div className="h-full bg-primary rounded-full" style={{ width: '88%' }}></div>
@@ -266,54 +266,54 @@ export default function Reports() {
             {/* Enrollment Trends */}
             <Card>
               <CardHeader>
-                <CardTitle>Enrollment Trends</CardTitle>
-                <CardDescription>Year over year comparison</CardDescription>
+                <CardTitle>Inschrijvingstrends</CardTitle>
+                <CardDescription>Vergelijking van jaar tot jaar</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-8">
                   <div className="flex items-center">
-                    <div className="w-20 text-sm text-gray-500">First Year</div>
+                    <div className="w-20 text-sm text-gray-500">Eerste Jaar</div>
                     <div className="flex-1 space-y-2">
                       <div className="flex text-sm">
                         <div className="font-medium">2023-2024</div>
-                        <div className="ml-auto">485 students</div>
+                        <div className="ml-auto">485 studenten</div>
                       </div>
                       <div className="h-2 bg-primary rounded-full" style={{ width: '100%' }}></div>
                       <div className="flex text-sm">
                         <div className="text-gray-500">2022-2023</div>
-                        <div className="ml-auto text-gray-500">425 students</div>
+                        <div className="ml-auto text-gray-500">425 studenten</div>
                       </div>
                       <div className="h-2 bg-gray-300 rounded-full" style={{ width: '88%' }}></div>
                     </div>
                   </div>
 
                   <div className="flex items-center">
-                    <div className="w-20 text-sm text-gray-500">Second Year</div>
+                    <div className="w-20 text-sm text-gray-500">Tweede Jaar</div>
                     <div className="flex-1 space-y-2">
                       <div className="flex text-sm">
                         <div className="font-medium">2023-2024</div>
-                        <div className="ml-auto">412 students</div>
+                        <div className="ml-auto">412 studenten</div>
                       </div>
                       <div className="h-2 bg-primary rounded-full" style={{ width: '85%' }}></div>
                       <div className="flex text-sm">
                         <div className="text-gray-500">2022-2023</div>
-                        <div className="ml-auto text-gray-500">402 students</div>
+                        <div className="ml-auto text-gray-500">402 studenten</div>
                       </div>
                       <div className="h-2 bg-gray-300 rounded-full" style={{ width: '83%' }}></div>
                     </div>
                   </div>
 
                   <div className="flex items-center">
-                    <div className="w-20 text-sm text-gray-500">Third Year</div>
+                    <div className="w-20 text-sm text-gray-500">Derde Jaar</div>
                     <div className="flex-1 space-y-2">
                       <div className="flex text-sm">
                         <div className="font-medium">2023-2024</div>
-                        <div className="ml-auto">360 students</div>
+                        <div className="ml-auto">360 studenten</div>
                       </div>
                       <div className="h-2 bg-primary rounded-full" style={{ width: '74%' }}></div>
                       <div className="flex text-sm">
                         <div className="text-gray-500">2022-2023</div>
-                        <div className="ml-auto text-gray-500">358 students</div>
+                        <div className="ml-auto text-gray-500">358 studenten</div>
                       </div>
                       <div className="h-2 bg-gray-300 rounded-full" style={{ width: '74%' }}></div>
                     </div>
@@ -327,14 +327,14 @@ export default function Reports() {
             {/* Attendance Insights */}
             <Card>
               <CardHeader>
-                <CardTitle>Attendance Insights</CardTitle>
-                <CardDescription>By day of week</CardDescription>
+                <CardTitle>Aanwezigheidsinzichten</CardTitle>
+                <CardDescription>Per dag van de week</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Monday</span>
+                      <span className="text-sm font-medium">Maandag</span>
                       <span className="text-sm text-gray-500">92%</span>
                     </div>
                     <div className="w-full h-2 bg-gray-100 rounded-full">
@@ -343,7 +343,7 @@ export default function Reports() {
                   </div>
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Tuesday</span>
+                      <span className="text-sm font-medium">Dinsdag</span>
                       <span className="text-sm text-gray-500">90%</span>
                     </div>
                     <div className="w-full h-2 bg-gray-100 rounded-full">
@@ -352,7 +352,7 @@ export default function Reports() {
                   </div>
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Wednesday</span>
+                      <span className="text-sm font-medium">Woensdag</span>
                       <span className="text-sm text-gray-500">88%</span>
                     </div>
                     <div className="w-full h-2 bg-gray-100 rounded-full">

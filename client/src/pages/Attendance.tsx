@@ -444,7 +444,7 @@ export default function Attendance() {
                   </div>
                   <div className="mt-2">
                     <Button variant="link" size="sm" className="text-primary hover:text-primary-dark p-0 h-auto">
-                      Send Reminder
+                      Herinnering Versturen
                     </Button>
                   </div>
                 </div>
@@ -459,15 +459,15 @@ export default function Attendance() {
                 <div className="ml-3 flex-1">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-gray-900">Aisha Thompson</p>
-                    <p className="text-sm text-gray-500">Psychology</p>
+                    <p className="text-sm text-gray-500">Psychologie</p>
                   </div>
                   <div className="mt-1 flex justify-between">
-                    <p className="text-sm text-gray-500">Missed 3 out of last 10 classes</p>
-                    <p className="text-sm font-medium text-yellow-600">70% Attendance</p>
+                    <p className="text-sm text-gray-500">3 van de laatste 10 lessen gemist</p>
+                    <p className="text-sm font-medium text-yellow-600">70% Aanwezigheid</p>
                   </div>
                   <div className="mt-2">
                     <Button variant="link" size="sm" className="text-primary hover:text-primary-dark p-0 h-auto">
-                      Send Reminder
+                      Herinnering Versturen
                     </Button>
                   </div>
                 </div>
@@ -482,15 +482,15 @@ export default function Attendance() {
                 <div className="ml-3 flex-1">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-gray-900">Daniel Lee</p>
-                    <p className="text-sm text-gray-500">Computer Science</p>
+                    <p className="text-sm text-gray-500">Informatica</p>
                   </div>
                   <div className="mt-1 flex justify-between">
-                    <p className="text-sm text-gray-500">Missed 2 out of last 10 classes</p>
-                    <p className="text-sm font-medium text-yellow-600">75% Attendance</p>
+                    <p className="text-sm text-gray-500">2 van de laatste 10 lessen gemist</p>
+                    <p className="text-sm font-medium text-yellow-600">75% Aanwezigheid</p>
                   </div>
                   <div className="mt-2">
                     <Button variant="link" size="sm" className="text-primary hover:text-primary-dark p-0 h-auto">
-                      Send Reminder
+                      Herinnering Versturen
                     </Button>
                   </div>
                 </div>

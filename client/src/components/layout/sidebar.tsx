@@ -14,6 +14,12 @@ import {
   LogOut,
   Menu,
   X,
+  CreditCard,
+  UserPlus,
+  Settings,
+  School,
+  FileText,
+  Clock,
 } from "lucide-react";
 
 type SidebarLinkProps = {

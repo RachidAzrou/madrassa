@@ -132,7 +132,7 @@ export default function Admissions() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Pending Review</p>
+                <p className="text-sm font-medium text-gray-500">Wachtend op Beoordeling</p>
                 <p className="text-2xl font-bold">{stats.pendingReview}</p>
               </div>
               <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
@@ -145,7 +145,7 @@ export default function Admissions() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Approved</p>
+                <p className="text-sm font-medium text-gray-500">Goedgekeurd</p>
                 <p className="text-2xl font-bold">{stats.approved}</p>
               </div>
               <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
@@ -158,7 +158,7 @@ export default function Admissions() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Enrollment Rate</p>
+                <p className="text-sm font-medium text-gray-500">Inschrijvingsgraad</p>
                 <div className="flex items-center">
                   <p className="text-2xl font-bold">{stats.enrollmentRate}%</p>
                 </div>
@@ -174,9 +174,9 @@ export default function Admissions() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
-          <TabsTrigger value="applications">Applications</TabsTrigger>
-          <TabsTrigger value="admission-programs">Admission Programs</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="applications">Aanmeldingen</TabsTrigger>
+          <TabsTrigger value="admission-programs">Toelatingsprogramma's</TabsTrigger>
+          <TabsTrigger value="settings">Instellingen</TabsTrigger>
         </TabsList>
         
         <TabsContent value="applications" className="space-y-4">
@@ -184,10 +184,10 @@ export default function Admissions() {
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Zoeken</label>
                 <div className="relative">
                   <Input
-                    placeholder="Search applicants..."
+                    placeholder="Zoek aanmeldingen..."
                     value={searchTerm}
                     onChange={handleSearchChange}
                     className="pl-10"
@@ -196,17 +196,17 @@ export default function Admissions() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Program</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Programma</label>
                 <Select value={program} onValueChange={handleProgramChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Programs" />
+                    <SelectValue placeholder="Alle Programma's" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Programs</SelectItem>
-                    <SelectItem value="cs">Computer Science</SelectItem>
-                    <SelectItem value="bus">Business Administration</SelectItem>
-                    <SelectItem value="eng">Engineering</SelectItem>
-                    <SelectItem value="arts">Fine Arts</SelectItem>
+                    <SelectItem value="all">Alle Programma's</SelectItem>
+                    <SelectItem value="cs">Informatica</SelectItem>
+                    <SelectItem value="bus">Bedrijfskunde</SelectItem>
+                    <SelectItem value="eng">Techniek</SelectItem>
+                    <SelectItem value="arts">Kunst</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -214,25 +214,25 @@ export default function Admissions() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <Select value={status} onValueChange={handleStatusChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Statuses" />
+                    <SelectValue placeholder="Alle Statussen" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="approved">Approved</SelectItem>
-                    <SelectItem value="rejected">Rejected</SelectItem>
-                    <SelectItem value="enrolled">Enrolled</SelectItem>
+                    <SelectItem value="all">Alle Statussen</SelectItem>
+                    <SelectItem value="pending">In afwachting</SelectItem>
+                    <SelectItem value="approved">Goedgekeurd</SelectItem>
+                    <SelectItem value="rejected">Afgewezen</SelectItem>
+                    <SelectItem value="enrolled">Ingeschreven</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Academisch Jaar</label>
                 <Select value={academicYear} onValueChange={handleAcademicYearChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Years" />
+                    <SelectValue placeholder="Alle Jaren" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Years</SelectItem>
+                    <SelectItem value="all">Alle Jaren</SelectItem>
                     <SelectItem value="2025-2026">2025-2026</SelectItem>
                     <SelectItem value="2024-2025">2024-2025</SelectItem>
                     <SelectItem value="2023-2024">2023-2024</SelectItem>

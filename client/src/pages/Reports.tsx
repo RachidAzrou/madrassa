@@ -20,7 +20,7 @@ import { apiRequest } from '@/lib/queryClient';
 
 export default function Reports() {
   const [academicYear, setAcademicYear] = useState('2023-2024');
-  const [department, setDepartment] = useState('');
+  const [department, setDepartment] = useState('all');
   const [reportType, setReportType] = useState('overview');
 
   // Fetch report data
@@ -96,7 +96,7 @@ export default function Reports() {
                 <SelectValue placeholder="All Departments" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Departments</SelectItem>
+                <SelectItem value="all">All Departments</SelectItem>
                 <SelectItem value="computer-science">Computer Science</SelectItem>
                 <SelectItem value="business">Business Administration</SelectItem>
                 <SelectItem value="engineering">Engineering</SelectItem>
@@ -427,7 +427,7 @@ export default function Reports() {
                       </div>
                       <span className="text-sm font-medium">86%</span>
                     </div>
-                    <Progress value={86} className="h-2 mt-2" indicatorColor="bg-yellow-500" />
+                    <Progress value={86} className="h-2 mt-2" />
                   </div>
                   <div>
                     <div className="flex items-center justify-between">

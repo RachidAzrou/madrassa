@@ -57,12 +57,12 @@ export default function Programs() {
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">Program Management</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Programmabeheer</h1>
         <div className="flex flex-col md:flex-row gap-3">
           <div className="relative">
             <Input
               type="text"
-              placeholder="Search programs..."
+              placeholder="Zoek programma's..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full md:w-64 pl-10"
@@ -71,7 +71,7 @@ export default function Programs() {
           </div>
           <Button onClick={handleAddProgram} className="flex items-center">
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Add Program</span>
+            <span>Programma Toevoegen</span>
           </Button>
         </div>
       </div>
@@ -84,11 +84,11 @@ export default function Programs() {
           </div>
         ) : isError ? (
           <div className="text-center py-8 text-red-500">
-            Error loading programs. Please try again.
+            Fout bij het laden van programma's. Probeer het opnieuw.
           </div>
         ) : programs.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            No programs found. Try adjusting your search or add a new program.
+            Geen programma's gevonden. Pas je zoekopdracht aan of voeg een nieuw programma toe.
           </div>
         ) : (
           programs.map((program: Program) => (

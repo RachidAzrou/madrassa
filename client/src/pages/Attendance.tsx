@@ -63,16 +63,16 @@ export default function Attendance() {
     },
     onSuccess: () => {
       toast({
-        title: 'Attendance saved',
-        description: 'Attendance records have been successfully updated.',
+        title: 'Aanwezigheid opgeslagen',
+        description: 'Aanwezigheidsregistraties zijn succesvol bijgewerkt.',
         variant: 'default',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/attendance'] });
     },
     onError: (error) => {
       toast({
-        title: 'Error saving attendance',
-        description: error.message || 'Something went wrong. Please try again.',
+        title: 'Fout bij opslaan aanwezigheid',
+        description: error.message || 'Er is iets misgegaan. Probeer het opnieuw.',
         variant: 'destructive',
       });
     },

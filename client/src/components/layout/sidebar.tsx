@@ -94,7 +94,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
           <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
             <GraduationCap className="text-white h-5 w-5" />
           </div>
-          <span className="text-xl font-semibold text-gray-800">EduManage</span>
+          <span className="text-xl font-semibold text-gray-800">Onderwijs Beheer</span>
         </div>
         {isMobile && (
           <button 
@@ -121,34 +121,34 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
 
           <div className="pt-2">
             <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Student Management
+              Studentenbeheer
             </p>
             <div className="space-y-1.5">
               <SidebarLink
                 href="/students"
                 icon={<Users className="h-5 w-5" />}
-                label="Students"
+                label="Studenten"
                 isActive={location.startsWith("/students")}
                 onClick={handleLinkClick}
               />
               <SidebarLink
                 href="/guardians"
                 icon={<UserPlus className="h-5 w-5" />}
-                label="Guardians"
+                label="Verzorgers"
                 isActive={location.startsWith("/guardians")}
                 onClick={handleLinkClick}
               />
               <SidebarLink
                 href="/admissions"
                 icon={<FileText className="h-5 w-5" />}
-                label="Admissions"
+                label="Aanmeldingen"
                 isActive={location.startsWith("/admissions")}
                 onClick={handleLinkClick}
               />
               <SidebarLink
                 href="/student-groups"
                 icon={<Users className="h-5 w-5" />}
-                label="Student Groups"
+                label="Studentengroepen"
                 isActive={location.startsWith("/student-groups")}
                 onClick={handleLinkClick}
               />
@@ -157,41 +157,41 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
 
           <div className="pt-2">
             <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Academic
+              Academisch
             </p>
             <div className="space-y-1.5">
               <SidebarLink
                 href="/courses"
                 icon={<BookOpen className="h-5 w-5" />}
-                label="Courses"
+                label="Cursussen"
                 isActive={location.startsWith("/courses")}
                 onClick={handleLinkClick}
               />
               <SidebarLink
                 href="/programs"
                 icon={<Building className="h-5 w-5" />}
-                label="Programs"
+                label="Programma's"
                 isActive={location.startsWith("/programs")}
                 onClick={handleLinkClick}
               />
               <SidebarLink
                 href="/enrollments"
                 icon={<School className="h-5 w-5" />}
-                label="Enrollments"
+                label="Inschrijvingen"
                 isActive={location.startsWith("/enrollments")}
                 onClick={handleLinkClick}
               />
               <SidebarLink
                 href="/scheduling"
                 icon={<Clock className="h-5 w-5" />}
-                label="Scheduling"
+                label="Roostering"
                 isActive={location.startsWith("/scheduling")}
                 onClick={handleLinkClick}
               />
               <SidebarLink
                 href="/calendar"
                 icon={<Calendar className="h-5 w-5" />}
-                label="Calendar"
+                label="Kalender"
                 isActive={location.startsWith("/calendar")}
                 onClick={handleLinkClick}
               />
@@ -200,27 +200,27 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
 
           <div className="pt-2">
             <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Tools
+              Hulpmiddelen
             </p>
             <div className="space-y-1.5">
               <SidebarLink
                 href="/attendance"
                 icon={<ClipboardCheck className="h-5 w-5" />}
-                label="Attendance"
+                label="Aanwezigheid"
                 isActive={location.startsWith("/attendance")}
                 onClick={handleLinkClick}
               />
               <SidebarLink
                 href="/grading"
                 icon={<Medal className="h-5 w-5" />}
-                label="Assessment"
+                label="Beoordeling"
                 isActive={location.startsWith("/grading")}
                 onClick={handleLinkClick}
               />
               <SidebarLink
                 href="/fees"
                 icon={<CreditCard className="h-5 w-5" />}
-                label="Fee Management"
+                label="Betalingsbeheer"
                 isActive={location.startsWith("/fees")}
                 onClick={handleLinkClick}
               />
@@ -229,13 +229,13 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
 
           <div className="pt-2">
             <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Reports
+              Rapportages
             </p>
             <div className="space-y-1.5">
               <SidebarLink
                 href="/reports"
                 icon={<BarChart3 className="h-5 w-5" />}
-                label="Analytics"
+                label="Analyses"
                 isActive={location.startsWith("/reports")}
                 onClick={handleLinkClick}
               />
@@ -244,13 +244,13 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
 
           <div className="pt-2">
             <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              System
+              Systeem
             </p>
             <div className="space-y-1.5">
               <SidebarLink
                 href="/settings"
                 icon={<Settings className="h-5 w-5" />}
-                label="Settings"
+                label="Instellingen"
                 isActive={location.startsWith("/settings")}
                 onClick={handleLinkClick}
               />
@@ -266,8 +266,8 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
             <span className="font-semibold">JD</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-800 truncate">Admin User</p>
-            <p className="text-xs text-gray-500 truncate">admin@edumanage.com</p>
+            <p className="text-sm font-medium text-gray-800 truncate">Beheerder</p>
+            <p className="text-xs text-gray-500 truncate">admin@onderwijsbeheer.nl</p>
           </div>
           <button className="p-1.5 rounded text-gray-500 hover:bg-gray-100">
             <LogOut className="h-4 w-4" />

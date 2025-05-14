@@ -19,6 +19,7 @@ import StudentGroups from "@/pages/StudentGroups";
 import Enrollments from "@/pages/Enrollments";
 import Scheduling from "@/pages/Scheduling";
 import Fees from "@/pages/Fees";
+import Settings from "@/pages/Settings";
 
 function Router() {
   return (
@@ -38,6 +39,7 @@ function Router() {
         <Route path="/grading" component={Grading} />
         <Route path="/fees" component={Fees} />
         <Route path="/reports" component={Reports} />
+        <Route path="/settings" component={Settings} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>

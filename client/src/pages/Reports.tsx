@@ -499,21 +499,21 @@ export default function Reports() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium">78.9%</p>
-                      <p className="text-xs text-red-500">-1.2%</p>
+                      <p className="text-sm font-medium">78,9%</p>
+                      <p className="text-xs text-red-500">-1,2%</p>
                     </div>
                   </li>
                   <li className="flex justify-between items-center">
                     <div className="flex items-start">
                       <CircleCheck className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium">Academic Standing</p>
-                        <p className="text-xs text-gray-500">Good standing</p>
+                        <p className="text-sm font-medium">Academische Status</p>
+                        <p className="text-xs text-gray-500">Goede voortgang</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium">93.1%</p>
-                      <p className="text-xs text-green-500">+0.5%</p>
+                      <p className="text-sm font-medium">93,1%</p>
+                      <p className="text-xs text-green-500">+0,5%</p>
                     </div>
                   </li>
                 </ul>

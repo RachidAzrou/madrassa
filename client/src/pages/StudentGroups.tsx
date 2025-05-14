@@ -61,15 +61,15 @@ export default function StudentGroups() {
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Student Groups</h1>
+          <h1 className="text-2xl font-bold">Studentengroepen</h1>
           <p className="text-gray-500 mt-1">
-            Manage student batches, sections, and activity groups
+            Beheer studentengroepen, secties en activiteitengroepen
           </p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
             <Input
-              placeholder="Search groups..."
+              placeholder="Zoek groepen..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full md:w-64 pl-10"

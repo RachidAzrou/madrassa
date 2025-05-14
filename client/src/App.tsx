@@ -36,6 +36,7 @@ function Router() {
         <Route path="/calendar" component={Calendar} />
         <Route path="/attendance" component={Attendance} />
         <Route path="/grading" component={Grading} />
+        <Route path="/fees" component={Fees} />
         <Route path="/reports" component={Reports} />
         <Route component={NotFound} />
       </Switch>

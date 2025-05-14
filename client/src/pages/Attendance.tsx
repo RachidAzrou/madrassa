@@ -206,7 +206,7 @@ export default function Attendance() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         {!selectedCourse ? (
           <div className="p-8 text-center">
-            <h3 className="text-gray-500 text-lg font-medium">Please select a course to view attendance</h3>
+            <h3 className="text-gray-500 text-lg font-medium">Selecteer een cursus om aanwezigheid te bekijken</h3>
           </div>
         ) : isLoading ? (
           <div className="flex justify-center py-12">
@@ -214,11 +214,11 @@ export default function Attendance() {
           </div>
         ) : isError ? (
           <div className="text-center py-12 text-red-500">
-            Error loading attendance data. Please try again.
+            Fout bij het laden van aanwezigheidsgegevens. Probeer het opnieuw.
           </div>
         ) : students.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
-            No students enrolled in this course.
+            Geen studenten ingeschreven voor deze cursus.
           </div>
         ) : (
           <>
@@ -236,13 +236,13 @@ export default function Attendance() {
                       Status
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Attendance Rate
+                      Aanwezigheidspercentage
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Last Class
+                      Laatste Les
                     </th>
                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      Acties
                     </th>
                   </tr>
                 </thead>
@@ -303,7 +303,7 @@ export default function Attendance() {
                           size="sm" 
                           className="text-primary hover:text-primary-dark"
                         >
-                          View History
+                          Bekijk Geschiedenis
                         </Button>
                       </td>
                     </tr>
@@ -314,19 +314,19 @@ export default function Attendance() {
             
             <div className="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-4">
               <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-1">Session Summary</h4>
+                <h4 className="text-sm font-medium text-gray-700 mb-1">Sessie Samenvatting</h4>
                 <div className="flex flex-wrap gap-2">
                   <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                    Present: {Object.values(attendanceData).filter(v => v === 'present').length}
+                    Aanwezig: {Object.values(attendanceData).filter(v => v === 'present').length}
                   </span>
                   <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                    Absent: {Object.values(attendanceData).filter(v => v === 'absent').length}
+                    Afwezig: {Object.values(attendanceData).filter(v => v === 'absent').length}
                   </span>
                   <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                    Late: {Object.values(attendanceData).filter(v => v === 'late').length}
+                    Te Laat: {Object.values(attendanceData).filter(v => v === 'late').length}
                   </span>
                   <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                    Excused: {Object.values(attendanceData).filter(v => v === 'excused').length}
+                    Geëxcuseerd: {Object.values(attendanceData).filter(v => v === 'excused').length}
                   </span>
                 </div>
               </div>

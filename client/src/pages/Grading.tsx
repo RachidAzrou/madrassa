@@ -159,12 +159,12 @@ export default function Grading() {
               disabled={!selectedCourse}
             >
               <SelectTrigger className="w-full sm:w-[300px]">
-                <SelectValue placeholder="Select assessment" />
+                <SelectValue placeholder="Selecteer beoordeling" />
               </SelectTrigger>
               <SelectContent>
                 {assessments.length === 0 ? (
                   <SelectItem value="loading" disabled>
-                    {!selectedCourse ? "Select a course first" : "No assessments found"}
+                    {!selectedCourse ? "Selecteer eerst een cursus" : "Geen beoordelingen gevonden"}
                   </SelectItem>
                 ) : (
                   assessments.map((assessment: any) => (

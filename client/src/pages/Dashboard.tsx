@@ -74,25 +74,25 @@ export default function Dashboard() {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Total Students"
+          title="Totaal Studenten"
           value={stats?.totalStudents.value || 0}
           icon={<Users className="h-5 w-5" />}
           changeValue={stats?.totalStudents.change || 0}
         />
         <StatCard
-          title="Active Courses"
+          title="Actieve Cursussen"
           value={stats?.activeCourses.value || 0}
           icon={<BookOpen className="h-5 w-5" />}
           changeValue={stats?.activeCourses.change || 0}
         />
         <StatCard
-          title="Programs"
+          title="Programma's"
           value={stats?.programs.value || 0}
           icon={<ListChecks className="h-5 w-5" />}
           changeValue={stats?.programs.change || 0}
         />
         <StatCard
-          title="Attendance Rate"
+          title="Aanwezigheid"
           value={`${stats?.attendanceRate.value || 0}%`}
           icon={<ClipboardList className="h-5 w-5" />}
           changeValue={stats?.attendanceRate.change || 0}
@@ -108,12 +108,12 @@ export default function Dashboard() {
       {/* Recent Students */}
       <div className="bg-white rounded-lg shadow-sm p-5 border border-gray-200 lg:col-span-2">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-semibold text-gray-800">Recently Enrolled Students</h2>
+          <h2 className="font-semibold text-gray-800">Recent Ingeschreven Studenten</h2>
           <button 
             onClick={navigateToStudents}
             className="text-primary text-sm hover:underline"
           >
-            View All
+            Bekijk Alles
           </button>
         </div>
         <div className="overflow-x-auto">
@@ -122,16 +122,16 @@ export default function Dashboard() {
               <tr>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Programma</th>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {recentStudents.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-3 py-4 text-center text-sm text-gray-500">
-                    No recent students found
+                    Geen recente studenten gevonden
                   </td>
                 </tr>
               ) : (
@@ -157,7 +157,9 @@ export default function Dashboard() {
                         student.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
                         'bg-gray-100 text-gray-800'
                       }`}>
-                        {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
+                        {student.status === 'active' ? 'Actief' : 
+                         student.status === 'pending' ? 'In afwachting' : 
+                         student.status.charAt(0).toUpperCase() + student.status.slice(1)}
                       </span>
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap text-right text-sm">
@@ -165,10 +167,10 @@ export default function Dashboard() {
                         onClick={() => setLocation(`/students/${student.id}`)}
                         className="text-primary hover:text-primary-dark mr-3"
                       >
-                        View
+                        Bekijken
                       </button>
                       <button className="text-gray-500 hover:text-gray-700">
-                        Edit
+                        Bewerken
                       </button>
                     </td>
                   </tr>
@@ -181,26 +183,26 @@ export default function Dashboard() {
 
       {/* Campus Images Section */}
       <div className="mt-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Our Campus</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Onze Campus</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <img 
             src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
-            alt="Modern university building" 
+            alt="Modern onderwijsgebouw" 
             className="rounded-lg shadow-sm h-48 w-full object-cover" 
           />
           <img 
             src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
-            alt="University library" 
+            alt="Bibliotheek" 
             className="rounded-lg shadow-sm h-48 w-full object-cover" 
           />
           <img 
             src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
-            alt="Campus quad" 
+            alt="Campus plein" 
             className="rounded-lg shadow-sm h-48 w-full object-cover" 
           />
           <img 
             src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
-            alt="Modern lecture hall" 
+            alt="Moderne collegezaal" 
             className="rounded-lg shadow-sm h-48 w-full object-cover" 
           />
         </div>

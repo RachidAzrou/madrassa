@@ -115,32 +115,32 @@ export default function Guardians() {
                       type="checkbox" 
                       className="rounded border-gray-300 text-primary focus:ring-primary mr-3"
                     />
-                    Guardian
+                    Voogd
                   </div>
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relation</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relatie</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Students</th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Studenten</th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                    Loading guardians...
+                    Voogden laden...
                   </td>
                 </tr>
               ) : isError ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-4 text-center text-sm text-red-500">
-                    Error loading guardians. Please try again.
+                    Fout bij het laden van voogden. Probeer het opnieuw.
                   </td>
                 </tr>
               ) : guardians.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                    No guardians found with the current filters. Try changing your search or filters.
+                    Geen voogden gevonden met de huidige filters. Pas uw zoekterm of filters aan.
                   </td>
                 </tr>
               ) : (
@@ -263,7 +263,7 @@ export default function Guardians() {
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
               >
-                Previous
+                Vorige
               </Button>
               <Button 
                 variant="outline" 
@@ -271,17 +271,17 @@ export default function Guardians() {
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                Next
+                Volgende
               </Button>
             </div>
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">{((currentPage - 1) * 10) + 1}</span> to{" "}
+                  Tonen <span className="font-medium">{((currentPage - 1) * 10) + 1}</span> tot{" "}
                   <span className="font-medium">
                     {Math.min(currentPage * 10, totalGuardians)}
                   </span>{" "}
-                  of <span className="font-medium">{totalGuardians}</span> results
+                  van <span className="font-medium">{totalGuardians}</span> resultaten
                 </p>
               </div>
               <div>

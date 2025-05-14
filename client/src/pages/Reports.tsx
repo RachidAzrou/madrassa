@@ -77,10 +77,10 @@ export default function Reports() {
       <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Academisch Jaar</label>
             <Select value={academicYear} onValueChange={setAcademicYear}>
               <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Academic Year" />
+                <SelectValue placeholder="Academisch Jaar" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="2023-2024">2023-2024</SelectItem>
@@ -90,18 +90,18 @@ export default function Reports() {
             </Select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Afdeling</label>
             <Select value={department} onValueChange={setDepartment}>
               <SelectTrigger className="w-full md:w-[200px]">
-                <SelectValue placeholder="All Departments" />
+                <SelectValue placeholder="Alle Afdelingen" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
-                <SelectItem value="computer-science">Computer Science</SelectItem>
-                <SelectItem value="business">Business Administration</SelectItem>
-                <SelectItem value="engineering">Engineering</SelectItem>
-                <SelectItem value="medicine">Medicine</SelectItem>
-                <SelectItem value="arts">Arts</SelectItem>
+                <SelectItem value="all">Alle Afdelingen</SelectItem>
+                <SelectItem value="computer-science">Informatica</SelectItem>
+                <SelectItem value="business">Bedrijfskunde</SelectItem>
+                <SelectItem value="engineering">Techniek</SelectItem>
+                <SelectItem value="medicine">Geneeskunde</SelectItem>
+                <SelectItem value="arts">Kunst</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -229,22 +229,22 @@ export default function Grading() {
                       ID
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Midterm
+                      Tussentoets
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Assignments
+                      Opdrachten
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Projects
+                      Projecten
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Final
+                      Eindtoets
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Overall
+                      Eindcijfer
                     </th>
                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      Acties
                     </th>
                   </tr>
                 </thead>
@@ -333,7 +333,7 @@ export default function Grading() {
                 ) : (
                   <Save className="mr-2 h-4 w-4" />
                 )}
-                Save Grades
+                Cijfers Opslaan
               </Button>
             </div>
           </>

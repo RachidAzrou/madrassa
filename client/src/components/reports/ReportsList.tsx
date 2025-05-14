@@ -26,8 +26,8 @@ import { Printer, Download, FileDown, BarChart } from "lucide-react";
 
 export default function ReportsList() {
   const [reportType, setReportType] = useState<string>("student-performance");
-  const [selectedProgram, setSelectedProgram] = useState<string>("");
-  const [selectedCourse, setSelectedCourse] = useState<string>("");
+  const [selectedProgram, setSelectedProgram] = useState<string>("all");
+  const [selectedCourse, setSelectedCourse] = useState<string>("all");
   const [selectedPeriod, setSelectedPeriod] = useState<string>("semester");
 
   // Fetch programs for filter
@@ -368,7 +368,7 @@ export default function ReportsList() {
                   <SelectValue placeholder="All Programs" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Programs</SelectItem>
+                  <SelectItem value="all">All Programs</SelectItem>
                   {programs?.map((program: any) => (
                     <SelectItem key={program.id} value={program.id.toString()}>
                       {program.name}
@@ -386,7 +386,7 @@ export default function ReportsList() {
                   <SelectValue placeholder="All Courses" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Courses</SelectItem>
+                  <SelectItem value="all">All Courses</SelectItem>
                   {courses?.map((course: any) => (
                     <SelectItem key={course.id} value={course.id.toString()}>
                       {course.name} ({course.code})

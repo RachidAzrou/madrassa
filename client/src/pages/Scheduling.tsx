@@ -101,7 +101,7 @@ export default function Scheduling() {
         <div className="flex items-center gap-2">
           <div className="relative">
             <Input
-              placeholder="Search schedules..."
+              placeholder="Zoek roosters..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full md:w-64 pl-10"
@@ -110,7 +110,7 @@ export default function Scheduling() {
           </div>
           <Button onClick={handleAddSchedule} className="flex items-center">
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Add Schedule</span>
+            <span>Rooster Toevoegen</span>
           </Button>
         </div>
       </div>
@@ -124,7 +124,7 @@ export default function Scheduling() {
                 <Calendar className="h-6 w-6 text-blue-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Total Classes</p>
+                <p className="text-sm font-medium text-gray-500">Totaal Lessen</p>
                 <p className="text-2xl font-semibold">458</p>
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function Scheduling() {
                 <Users className="h-6 w-6 text-green-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Active Rooms</p>
+                <p className="text-sm font-medium text-gray-500">Actieve Lokalen</p>
                 <p className="text-2xl font-semibold">24</p>
               </div>
             </div>
@@ -150,7 +150,7 @@ export default function Scheduling() {
                 <Repeat className="h-6 w-6 text-purple-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Weekly Classes</p>
+                <p className="text-sm font-medium text-gray-500">Wekelijkse Lessen</p>
                 <p className="text-2xl font-semibold">187</p>
               </div>
             </div>
@@ -160,9 +160,9 @@ export default function Scheduling() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
-          <TabsTrigger value="course-schedule">Course Schedule</TabsTrigger>
-          <TabsTrigger value="room-allocation">Room Allocation</TabsTrigger>
-          <TabsTrigger value="instructor-schedule">Instructor Schedule</TabsTrigger>
+          <TabsTrigger value="course-schedule">Cursusrooster</TabsTrigger>
+          <TabsTrigger value="room-allocation">Lokalenverdeling</TabsTrigger>
+          <TabsTrigger value="instructor-schedule">Docentenrooster</TabsTrigger>
         </TabsList>
         
         <TabsContent value="course-schedule" className="space-y-4">
@@ -170,27 +170,27 @@ export default function Scheduling() {
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Course</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Cursus</label>
                 <Select value={course} onValueChange={handleCourseChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Courses" />
+                    <SelectValue placeholder="Alle Cursussen" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Courses</SelectItem>
-                    <SelectItem value="cs101">CS101: Intro to Programming</SelectItem>
-                    <SelectItem value="cs201">CS201: Data Structures</SelectItem>
+                    <SelectItem value="all">Alle Cursussen</SelectItem>
+                    <SelectItem value="cs101">CS101: Inleiding Programmeren</SelectItem>
+                    <SelectItem value="cs201">CS201: Datastructuren</SelectItem>
                     <SelectItem value="math101">MATH101: Calculus I</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Instructor</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Docent</label>
                 <Select value={instructor} onValueChange={handleInstructorChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Instructors" />
+                    <SelectValue placeholder="Alle Docenten" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Instructors</SelectItem>
+                    <SelectItem value="all">Alle Docenten</SelectItem>
                     <SelectItem value="prof1">Dr. Alan Turing</SelectItem>
                     <SelectItem value="prof2">Dr. Grace Hopper</SelectItem>
                     <SelectItem value="prof3">Dr. John von Neumann</SelectItem>
@@ -198,13 +198,13 @@ export default function Scheduling() {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Room</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Lokaal</label>
                 <Select value={room} onValueChange={handleRoomChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Rooms" />
+                    <SelectValue placeholder="Alle Lokalen" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Rooms</SelectItem>
+                    <SelectItem value="all">Alle Lokalen</SelectItem>
                     <SelectItem value="a101">A101</SelectItem>
                     <SelectItem value="b201">B201</SelectItem>
                     <SelectItem value="c305">C305</SelectItem>
@@ -212,18 +212,18 @@ export default function Scheduling() {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Day</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Dag</label>
                 <Select value={day} onValueChange={handleDayChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Days" />
+                    <SelectValue placeholder="Alle Dagen" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Days</SelectItem>
-                    <SelectItem value="monday">Monday</SelectItem>
-                    <SelectItem value="tuesday">Tuesday</SelectItem>
-                    <SelectItem value="wednesday">Wednesday</SelectItem>
-                    <SelectItem value="thursday">Thursday</SelectItem>
-                    <SelectItem value="friday">Friday</SelectItem>
+                    <SelectItem value="all">Alle Dagen</SelectItem>
+                    <SelectItem value="monday">Maandag</SelectItem>
+                    <SelectItem value="tuesday">Dinsdag</SelectItem>
+                    <SelectItem value="wednesday">Woensdag</SelectItem>
+                    <SelectItem value="thursday">Donderdag</SelectItem>
+                    <SelectItem value="friday">Vrijdag</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -234,16 +234,16 @@ export default function Scheduling() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
               <div className="text-sm text-gray-500">
-                {isLoading ? 'Loading...' : `Showing ${schedules.length} of ${totalSchedules} schedules`}
+                {isLoading ? 'Laden...' : `Toont ${schedules.length} van ${totalSchedules} roosters`}
               </div>
               <div className="flex space-x-2">
                 <Button variant="outline" size="sm">
                   <Filter className="mr-2 h-4 w-4" />
-                  Filter
+                  Filteren
                 </Button>
                 <Button variant="outline" size="sm">
                   <Download className="mr-2 h-4 w-4" />
-                  Export
+                  Exporteren
                 </Button>
               </div>
             </div>

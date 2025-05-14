@@ -78,19 +78,19 @@ export default function Fees() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(amount);
   };
 
   const getStatusBadge = (status: string) => {
     switch(status.toLowerCase()) {
       case 'paid':
-        return <Badge className="bg-green-100 text-green-800 border-green-200">Paid</Badge>;
+        return <Badge className="bg-green-100 text-green-800 border-green-200">Betaald</Badge>;
       case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">Pending</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">In behandeling</Badge>;
       case 'overdue':
-        return <Badge className="bg-red-100 text-red-800 border-red-200">Overdue</Badge>;
+        return <Badge className="bg-red-100 text-red-800 border-red-200">Te laat</Badge>;
       case 'partial':
-        return <Badge className="bg-blue-100 text-blue-800 border-blue-200">Partial</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 border-blue-200">Gedeeltelijk</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
@@ -100,15 +100,15 @@ export default function Fees() {
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Fee Management</h1>
+          <h1 className="text-2xl font-bold">Betalingenbeheer</h1>
           <p className="text-gray-500 mt-1">
-            Manage student fees, payments, and scholarships
+            Beheer van collegegelden, betalingen en beurzen
           </p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
             <Input
-              placeholder="Search fee records..."
+              placeholder="Zoek betalingsrecords..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full md:w-64 pl-10"
@@ -117,7 +117,7 @@ export default function Fees() {
           </div>
           <Button onClick={handleAddFeeRecord} className="flex items-center">
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Add Fee Record</span>
+            <span>Betalingsrecord Toevoegen</span>
           </Button>
         </div>
       </div>
@@ -131,7 +131,7 @@ export default function Fees() {
                 <DollarSign className="h-6 w-6 text-green-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Total Collected</p>
+                <p className="text-sm font-medium text-gray-500">Totaal Geïnd</p>
                 <p className="text-2xl font-semibold">{formatCurrency(482500)}</p>
               </div>
             </div>
@@ -144,7 +144,7 @@ export default function Fees() {
                 <CreditCard className="h-6 w-6 text-yellow-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Pending Amount</p>
+                <p className="text-sm font-medium text-gray-500">Openstaand Bedrag</p>
                 <p className="text-2xl font-semibold">{formatCurrency(68500)}</p>
               </div>
             </div>
@@ -157,9 +157,9 @@ export default function Fees() {
                 <CheckCircle className="h-6 w-6 text-blue-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Completion Rate</p>
+                <p className="text-sm font-medium text-gray-500">Voltooiingsgraad</p>
                 <div className="flex items-center">
-                  <p className="text-2xl font-semibold">87.5%</p>
+                  <p className="text-2xl font-semibold">87,5%</p>
                 </div>
                 <Progress value={87.5} className="h-1.5 mt-1.5 w-32" />
               </div>
@@ -173,7 +173,7 @@ export default function Fees() {
                 <Users className="h-6 w-6 text-purple-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Students Paying</p>
+                <p className="text-sm font-medium text-gray-500">Betalende Studenten</p>
                 <p className="text-2xl font-semibold">845</p>
               </div>
             </div>
@@ -183,9 +183,9 @@ export default function Fees() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
-          <TabsTrigger value="fee-records">Fee Records</TabsTrigger>
-          <TabsTrigger value="fee-structure">Fee Structure</TabsTrigger>
-          <TabsTrigger value="scholarships">Scholarships</TabsTrigger>
+          <TabsTrigger value="fee-records">Betalingsrecords</TabsTrigger>
+          <TabsTrigger value="fee-structure">Tariefstructuur</TabsTrigger>
+          <TabsTrigger value="scholarships">Beurzen</TabsTrigger>
         </TabsList>
         
         <TabsContent value="fee-records" className="space-y-4">
@@ -193,16 +193,16 @@ export default function Fees() {
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Program</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Programma</label>
                 <Select value={program} onValueChange={handleProgramChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Programs" />
+                    <SelectValue placeholder="Alle Programma's" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Programs</SelectItem>
-                    <SelectItem value="cs">Computer Science</SelectItem>
-                    <SelectItem value="bus">Business Administration</SelectItem>
-                    <SelectItem value="eng">Engineering</SelectItem>
+                    <SelectItem value="all">Alle Programma's</SelectItem>
+                    <SelectItem value="cs">Informatica</SelectItem>
+                    <SelectItem value="bus">Bedrijfskunde</SelectItem>
+                    <SelectItem value="eng">Techniek</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -210,14 +210,14 @@ export default function Fees() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <Select value={status} onValueChange={handleStatusChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Statuses" />
+                    <SelectValue placeholder="Alle Statussen" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="overdue">Overdue</SelectItem>
-                    <SelectItem value="partial">Partially Paid</SelectItem>
+                    <SelectItem value="all">Alle Statussen</SelectItem>
+                    <SelectItem value="paid">Betaald</SelectItem>
+                    <SelectItem value="pending">In behandeling</SelectItem>
+                    <SelectItem value="overdue">Te laat</SelectItem>
+                    <SelectItem value="partial">Gedeeltelijk betaald</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -228,7 +228,7 @@ export default function Fees() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
               <div className="text-sm text-gray-500">
-                {isLoading ? 'Loading...' : `Showing ${feeRecords.length} of ${totalRecords} fee records`}
+                {isLoading ? 'Laden...' : `Tonen van ${feeRecords.length} van ${totalRecords} betalingsrecords`}
               </div>
               <div className="flex space-x-2">
                 <Button variant="outline" size="sm">
@@ -237,7 +237,7 @@ export default function Fees() {
                 </Button>
                 <Button variant="outline" size="sm">
                   <Download className="mr-2 h-4 w-4" />
-                  Export
+                  Exporteren
                 </Button>
               </div>
             </div>
@@ -246,31 +246,31 @@ export default function Fees() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice ID</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factuur ID</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Omschrijving</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bedrag</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vervaldatum</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {isLoading ? (
                     <tr>
                       <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
-                        Loading fee records...
+                        Betalingsrecords laden...
                       </td>
                     </tr>
                   ) : isError ? (
                     <tr>
                       <td colSpan={7} className="px-6 py-4 text-center text-sm text-red-500">
-                        Error loading fee records. Please try again.
+                        Fout bij het laden van betalingsrecords. Probeer het opnieuw.
                       </td>
                     </tr>
                   ) : feeRecords.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
-                        No fee records found with the current filters. Try changing your search or filters.
+                        Geen betalingsrecords gevonden met de huidige filters. Probeer je zoekopdracht of filters aan te passen.
                       </td>
                     </tr>
                   ) : (

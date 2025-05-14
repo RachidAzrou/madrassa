@@ -9,7 +9,7 @@ import { apiRequest } from '@/lib/queryClient';
 
 export default function Courses() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [department, setDepartment] = useState('');
+  const [department, setDepartment] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
 
   // Fetch courses with filters
@@ -76,7 +76,7 @@ export default function Courses() {
               <SelectValue placeholder="All Departments" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Departments</SelectItem>
+              <SelectItem value="all">All Departments</SelectItem>
               <SelectItem value="cs">Computer Science</SelectItem>
               <SelectItem value="bus">Business</SelectItem>
               <SelectItem value="eng">Engineering</SelectItem>
@@ -117,10 +117,11 @@ export default function Courses() {
                 </div>
                 <p className="mt-3 text-gray-600 text-sm">{course.description}</p>
                 <div className="mt-4 flex items-center">
-                  <Avatar 
-                    initials={`${course.instructor.firstName.charAt(0)}${course.instructor.lastName.charAt(0)}`}
-                    size="sm"
-                  />
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>
+                      {course.instructor.firstName.charAt(0)}{course.instructor.lastName.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
                   <div className="ml-2">
                     <p className="text-xs font-medium text-gray-800">{course.instructor.title} {course.instructor.firstName} {course.instructor.lastName}</p>
                     <p className="text-xs text-gray-500">{course.instructor.position}</p>

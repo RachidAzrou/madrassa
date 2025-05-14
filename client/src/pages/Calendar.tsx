@@ -166,19 +166,19 @@ export default function Calendar() {
         <div className="flex items-center space-x-3">
           <Select value={filter} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Filter Events" />
+              <SelectValue placeholder="Filter Evenementen" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Events</SelectItem>
-              <SelectItem value="exam">Exams</SelectItem>
-              <SelectItem value="class">Classes</SelectItem>
-              <SelectItem value="holiday">Holidays</SelectItem>
-              <SelectItem value="event">Events</SelectItem>
+              <SelectItem value="all">Alle Evenementen</SelectItem>
+              <SelectItem value="exam">Examens</SelectItem>
+              <SelectItem value="class">Lessen</SelectItem>
+              <SelectItem value="holiday">Vakanties</SelectItem>
+              <SelectItem value="event">Activiteiten</SelectItem>
             </SelectContent>
           </Select>
           <Button onClick={handleAddEvent} className="flex items-center">
             <Plus className="mr-2 h-4 w-4" />
-            <span>Add Event</span>
+            <span>Evenement Toevoegen</span>
           </Button>
         </div>
       </div>
@@ -209,13 +209,13 @@ export default function Calendar() {
         </div>
       ) : isError ? (
         <div className="text-center py-12 text-red-500">
-          Error loading calendar events. Please try again.
+          Fout bij het laden van agenda evenementen. Probeer het opnieuw.
         </div>
       ) : view === 'month' ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           {/* Week days header */}
           <div className="grid grid-cols-7 border-b border-gray-200">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+            {['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'].map((day) => (
               <div key={day} className="py-2 text-center text-gray-500 text-sm font-medium">
                 {day}
               </div>
@@ -254,9 +254,9 @@ export default function Calendar() {
       ) : (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
           <CalendarIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">Coming Soon</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">Binnenkort Beschikbaar</h3>
           <p className="mt-1 text-sm text-gray-500">
-            Week and day views are under development. Please use the month view for now.
+            Week- en dagweergaven zijn in ontwikkeling. Gebruik voorlopig de maandweergave.
           </p>
         </div>
       )}
@@ -266,19 +266,19 @@ export default function Calendar() {
         <div className="flex flex-wrap gap-3">
           <div className="flex items-center">
             <span className="w-3 h-3 bg-red-100 border border-red-200 rounded-sm mr-1.5"></span>
-            <span className="text-xs text-gray-600">Exams</span>
+            <span className="text-xs text-gray-600">Examens</span>
           </div>
           <div className="flex items-center">
             <span className="w-3 h-3 bg-blue-100 border border-blue-200 rounded-sm mr-1.5"></span>
-            <span className="text-xs text-gray-600">Classes</span>
+            <span className="text-xs text-gray-600">Lessen</span>
           </div>
           <div className="flex items-center">
             <span className="w-3 h-3 bg-purple-100 border border-purple-200 rounded-sm mr-1.5"></span>
-            <span className="text-xs text-gray-600">Holidays</span>
+            <span className="text-xs text-gray-600">Vakanties</span>
           </div>
           <div className="flex items-center">
             <span className="w-3 h-3 bg-green-100 border border-green-200 rounded-sm mr-1.5"></span>
-            <span className="text-xs text-gray-600">Events</span>
+            <span className="text-xs text-gray-600">Activiteiten</span>
           </div>
         </div>
       </div>

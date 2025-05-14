@@ -109,10 +109,10 @@ export default function Attendance() {
     saveMutation.mutate();
   };
 
-  // Format date as "Month Day, Year"
+  // Format date as "Day Month Year" in Dutch format
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
   // Load initial attendance data when it becomes available
@@ -126,15 +126,15 @@ export default function Attendance() {
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">Attendance Tracking</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Aanwezigheidsregistratie</h1>
         <div className="flex items-center space-x-3">
           <Button variant="outline" className="flex items-center">
             <Download className="mr-2 h-4 w-4" />
-            Export Report
+            Rapport Exporteren
           </Button>
           <Button className="flex items-center">
             <CheckCircle className="mr-2 h-4 w-4" />
-            New Session
+            Nieuwe Sessie
           </Button>
         </div>
       </div>
@@ -145,11 +145,11 @@ export default function Attendance() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <Select value={selectedCourse} onValueChange={handleCourseChange}>
               <SelectTrigger className="w-full sm:w-[300px]">
-                <SelectValue placeholder="Select a course" />
+                <SelectValue placeholder="Selecteer een cursus" />
               </SelectTrigger>
               <SelectContent>
                 {courses.length === 0 ? (
-                  <SelectItem value="loading" disabled>Loading courses...</SelectItem>
+                  <SelectItem value="loading" disabled>Cursussen laden...</SelectItem>
                 ) : (
                   courses.map((course: any) => (
                     <SelectItem key={course.id} value={course.id}>
@@ -187,7 +187,7 @@ export default function Attendance() {
               onClick={() => handleMarkAll('present')}
             >
               <CheckCircle className="mr-1.5 h-4 w-4" />
-              Mark All Present
+              Allen Aanwezig
             </Button>
             <Button 
               variant="outline" 
@@ -196,7 +196,7 @@ export default function Attendance() {
               onClick={() => handleMarkAll('absent')}
             >
               <XCircle className="mr-1.5 h-4 w-4" />
-              Mark All Absent
+              Allen Afwezig
             </Button>
           </div>
         </div>

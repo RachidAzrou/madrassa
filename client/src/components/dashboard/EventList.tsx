@@ -31,13 +31,13 @@ export function EventList({ events, onViewCalendar }: EventListProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm p-5 border border-gray-200">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-gray-800">Upcoming Events</h2>
+        <h2 className="font-semibold text-gray-800">Aankomende Evenementen</h2>
         <button 
           onClick={onViewCalendar}
           className="text-primary text-sm hover:underline flex items-center"
         >
           <CalendarIcon className="mr-1 h-4 w-4" />
-          View Calendar
+          Bekijk Kalender
         </button>
       </div>
       <div className="space-y-4">

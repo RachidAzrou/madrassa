@@ -138,11 +138,11 @@ export default function Grading() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <Select value={selectedCourse} onValueChange={handleCourseChange}>
               <SelectTrigger className="w-full sm:w-[300px]">
-                <SelectValue placeholder="Select a course" />
+                <SelectValue placeholder="Selecteer een cursus" />
               </SelectTrigger>
               <SelectContent>
                 {courses.length === 0 ? (
-                  <SelectItem value="loading" disabled>Loading courses...</SelectItem>
+                  <SelectItem value="loading" disabled>Cursussen laden...</SelectItem>
                 ) : (
                   courses.map((course: any) => (
                     <SelectItem key={course.id} value={course.id}>

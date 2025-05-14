@@ -977,7 +977,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       
       // Format grades as a lookup object by student ID
-      const grades = {};
+      const grades: Record<number, {score: number, feedback: string}> = {};
       filteredGrades.forEach(grade => {
         grades[grade.studentId] = {
           score: grade.score,
@@ -1026,10 +1026,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               studentId: Number(studentId),
               courseId: Number(courseId),
               assessmentType: `assessment-${assessmentId}`,
+              assessmentName: `Beoordeling ${assessmentId}`,
               score,
-              outOf: 100, // Assuming max score is 100
+              maxScore: 100,
+              weight: 50, // Default weight
               date: new Date().toISOString(),
-              remark: feedback
+              remark: feedback,
+              outOf: 100
             });
             return newGrade;
           }

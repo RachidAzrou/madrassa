@@ -134,7 +134,7 @@ export default function Reports() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Total Students</CardDescription>
+                <CardDescription>Totaal Aantal Studenten</CardDescription>
                 <CardTitle className="text-2xl flex items-center">
                   {formatNumber(1257)}
                   <span className="ml-2 text-sm text-green-500">
@@ -145,61 +145,61 @@ export default function Reports() {
               <CardContent>
                 <div className="flex items-center">
                   <Users className="h-4 w-4 text-primary mr-2" />
-                  <span className="text-sm text-gray-500">Active enrollment</span>
+                  <span className="text-sm text-gray-500">Actieve inschrijvingen</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Graduation Rate</CardDescription>
+                <CardDescription>Slagingspercentage</CardDescription>
                 <CardTitle className="text-2xl flex items-center">
-                  92.5%
+                  92,5%
                   <span className="ml-2 text-sm text-green-500">
-                    +2.1%
+                    +2,1%
                   </span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center">
                   <GraduationCap className="h-4 w-4 text-primary mr-2" />
-                  <span className="text-sm text-gray-500">Last academic year</span>
+                  <span className="text-sm text-gray-500">Afgelopen academisch jaar</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Average GPA</CardDescription>
+                <CardDescription>Gemiddeld Cijfer</CardDescription>
                 <CardTitle className="text-2xl flex items-center">
-                  3.42
+                  7,4
                   <span className="ml-2 text-sm text-green-500">
-                    +0.08
+                    +0,2
                   </span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center">
                   <BarChart className="h-4 w-4 text-primary mr-2" />
-                  <span className="text-sm text-gray-500">Across all programs</span>
+                  <span className="text-sm text-gray-500">Over alle programma's</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Average Attendance</CardDescription>
+                <CardDescription>Gemiddelde Aanwezigheid</CardDescription>
                 <CardTitle className="text-2xl flex items-center">
-                  87.3%
+                  87,3%
                   <span className="ml-2 text-sm text-red-500">
-                    -1.2%
+                    -1,2%
                   </span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center">
                   <ClipboardList className="h-4 w-4 text-primary mr-2" />
-                  <span className="text-sm text-gray-500">All courses</span>
+                  <span className="text-sm text-gray-500">Alle cursussen</span>
                 </div>
               </CardContent>
             </Card>
@@ -209,15 +209,15 @@ export default function Reports() {
             {/* Department Performance */}
             <Card>
               <CardHeader>
-                <CardTitle>Department Performance</CardTitle>
-                <CardDescription>Academic performance by department</CardDescription>
+                <CardTitle>Prestaties per Afdeling</CardTitle>
+                <CardDescription>Academische prestaties per afdeling</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Computer Science</span>
-                      <span className="text-sm text-gray-500">3.65 GPA</span>
+                      <span className="text-sm font-medium">Informatica</span>
+                      <span className="text-sm text-gray-500">7,9</span>
                     </div>
                     <div className="w-full h-2 bg-gray-100 rounded-full">
                       <div className="h-full bg-primary rounded-full" style={{ width: '91%' }}></div>
@@ -225,8 +225,8 @@ export default function Reports() {
                   </div>
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Business Administration</span>
-                      <span className="text-sm text-gray-500">3.48 GPA</span>
+                      <span className="text-sm font-medium">Bedrijfskunde</span>
+                      <span className="text-sm text-gray-500">7,5</span>
                     </div>
                     <div className="w-full h-2 bg-gray-100 rounded-full">
                       <div className="h-full bg-primary rounded-full" style={{ width: '87%' }}></div>
@@ -234,8 +234,8 @@ export default function Reports() {
                   </div>
                   <div>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium">Engineering</span>
-                      <span className="text-sm text-gray-500">3.56 GPA</span>
+                      <span className="text-sm font-medium">Techniek</span>
+                      <span className="text-sm text-gray-500">7,7</span>
                     </div>
                     <div className="w-full h-2 bg-gray-100 rounded-full">
                       <div className="h-full bg-primary rounded-full" style={{ width: '89%' }}></div>

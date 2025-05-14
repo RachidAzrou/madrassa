@@ -283,23 +283,23 @@ export default function Fees() {
                               <AvatarFallback>JS</AvatarFallback>
                             </Avatar>
                             <div className="ml-4">
-                              <div className="font-medium text-gray-900">John Smith</div>
+                              <div className="font-medium text-gray-900">Jan Smit</div>
                               <div className="text-sm text-gray-500">STU000452</div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">INV-2025-0042</div>
+                          <div className="text-sm text-gray-900">FAC-2025-0042</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Tuition Fee - Spring 2025</div>
-                          <div className="text-xs text-gray-500">Computer Science</div>
+                          <div className="text-sm text-gray-900">Collegegeld - Voorjaar 2025</div>
+                          <div className="text-xs text-gray-500">Informatica</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{formatCurrency(3500)}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Jan 15, 2025</div>
+                          <div className="text-sm text-gray-900">15 jan 2025</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {getStatusBadge('Paid')}
@@ -308,15 +308,15 @@ export default function Fees() {
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
+                              <span className="sr-only">Bewerken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Delete</span>
+                              <span className="sr-only">Verwijderen</span>
                             </Button>
                           </div>
                         </td>
@@ -330,23 +330,23 @@ export default function Fees() {
                               <AvatarFallback>MJ</AvatarFallback>
                             </Avatar>
                             <div className="ml-4">
-                              <div className="font-medium text-gray-900">Maria Johnson</div>
+                              <div className="font-medium text-gray-900">Maria Jansen</div>
                               <div className="text-sm text-gray-500">STU000873</div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">INV-2025-0058</div>
+                          <div className="text-sm text-gray-900">FAC-2025-0058</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Tuition Fee - Spring 2025</div>
-                          <div className="text-xs text-gray-500">Business Administration</div>
+                          <div className="text-sm text-gray-900">Collegegeld - Voorjaar 2025</div>
+                          <div className="text-xs text-gray-500">Bedrijfskunde</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{formatCurrency(3200)}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Jan 15, 2025</div>
+                          <div className="text-sm text-gray-900">15 jan 2025</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {getStatusBadge('Pending')}
@@ -355,15 +355,15 @@ export default function Fees() {
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
+                              <span className="sr-only">Bewerken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Delete</span>
+                              <span className="sr-only">Verwijderen</span>
                             </Button>
                           </div>
                         </td>
@@ -377,23 +377,23 @@ export default function Fees() {
                               <AvatarFallback>DP</AvatarFallback>
                             </Avatar>
                             <div className="ml-4">
-                              <div className="font-medium text-gray-900">David Park</div>
+                              <div className="font-medium text-gray-900">David Peters</div>
                               <div className="text-sm text-gray-500">STU000754</div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">INV-2025-0031</div>
+                          <div className="text-sm text-gray-900">FAC-2025-0031</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Tuition Fee - Spring 2025</div>
-                          <div className="text-xs text-gray-500">Engineering</div>
+                          <div className="text-sm text-gray-900">Collegegeld - Voorjaar 2025</div>
+                          <div className="text-xs text-gray-500">Techniek</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{formatCurrency(3800)}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Dec 15, 2024</div>
+                          <div className="text-sm text-gray-900">15 dec 2024</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {getStatusBadge('Overdue')}
@@ -402,15 +402,15 @@ export default function Fees() {
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">View</span>
+                              <span className="sr-only">Bekijken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
+                              <span className="sr-only">Bewerken</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Delete</span>
+                              <span className="sr-only">Verwijderen</span>
                             </Button>
                           </div>
                         </td>
@@ -431,7 +431,7 @@ export default function Fees() {
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                   >
-                    Previous
+                    Vorige
                   </Button>
                   <Button 
                     variant="outline" 
@@ -439,17 +439,17 @@ export default function Fees() {
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
                   >
-                    Next
+                    Volgende
                   </Button>
                 </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
-                      Showing <span className="font-medium">{((currentPage - 1) * 10) + 1}</span> to{" "}
+                      Tonen <span className="font-medium">{((currentPage - 1) * 10) + 1}</span> tot{" "}
                       <span className="font-medium">
                         {Math.min(currentPage * 10, totalRecords)}
                       </span>{" "}
-                      of <span className="font-medium">{totalRecords}</span> results
+                      van <span className="font-medium">{totalRecords}</span> resultaten
                     </p>
                   </div>
                   <div>
@@ -461,7 +461,7 @@ export default function Fees() {
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
                       >
-                        Previous
+                        Vorige
                       </Button>
                       {Array.from({ length: totalPages }).map((_, i) => (
                         <Button 
@@ -480,7 +480,7 @@ export default function Fees() {
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
                       >
-                        Next
+                        Volgende
                       </Button>
                     </nav>
                   </div>

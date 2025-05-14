@@ -19,8 +19,20 @@ export default function Students() {
   const [sortBy, setSortBy] = useState('name');
   const [currentPage, setCurrentPage] = useState(1);
   
-  // State voor latere dialogimplementatie
-  // (tijdelijk verwijderd vanwege technische problemen)
+  // State voor student dialog
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [studentFormData, setStudentFormData] = useState({
+    studentId: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    dateOfBirth: '',
+    address: '',
+    programId: null as number | null,
+    yearLevel: null as number | null,
+    status: 'Active' as string | null,
+  });
 
   // Fetch students with filters
   const { data, isLoading, isError } = useQuery({
@@ -32,13 +44,54 @@ export default function Students() {
   const totalStudents = data?.totalCount || 0;
   const totalPages = Math.ceil(totalStudents / 10); // Assuming 10 students per page
 
-  const handleAddStudent = async () => {
-    // Toon een toast melding voor de toekomstige implementatie
-    toast({
-      title: "Functie in ontwikkeling",
-      description: "De functie voor het toevoegen van nieuwe studenten is momenteel in ontwikkeling.",
-      variant: "default",
-    });
+  // Mutatie om een student toe te voegen
+  const createStudentMutation = useMutation({
+    mutationFn: async (studentData: typeof studentFormData) => {
+      return apiRequest('POST', '/api/students', studentData);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      
+      // Reset form and close dialog
+      setStudentFormData({
+        studentId: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        dateOfBirth: '',
+        address: '',
+        programId: null,
+        yearLevel: null,
+        status: 'Active',
+      });
+      setIsAddDialogOpen(false);
+      
+      // Toon succes melding
+      toast({
+        title: "Student toegevoegd",
+        description: "De student is succesvol toegevoegd aan het systeem.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij toevoegen",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van de student.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleAddStudent = () => {
+    // Open het toevoeg-dialoogvenster
+    setIsAddDialogOpen(true);
+  };
+  
+  const handleSubmitStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    createStudentMutation.mutate(studentFormData);
   };
 
   const handleViewStudent = (id: string) => {
@@ -420,6 +473,193 @@ export default function Students() {
           />
         </div>
       </div>
+
+      {/* Add Student Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
+            <DialogDescription>
+              Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmitStudent}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="studentId" className="text-right">
+                    Studentnummer
+                  </Label>
+                  <Input
+                    id="studentId"
+                    required
+                    value={studentFormData.studentId}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, studentId: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="status" className="text-right">
+                    Status
+                  </Label>
+                  <Select
+                    value={studentFormData.status || ''}
+                    onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Active">Actief</SelectItem>
+                      <SelectItem value="Inactive">Inactief</SelectItem>
+                      <SelectItem value="Suspended">Geschorst</SelectItem>
+                      <SelectItem value="Graduated">Afgestudeerd</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="firstName" className="text-right">
+                    Voornaam
+                  </Label>
+                  <Input
+                    id="firstName"
+                    required
+                    value={studentFormData.firstName}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, firstName: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="lastName" className="text-right">
+                    Achternaam
+                  </Label>
+                  <Input
+                    id="lastName"
+                    required
+                    value={studentFormData.lastName}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="email" className="text-right">
+                    E-mail
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={studentFormData.email}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="phone" className="text-right">
+                    Telefoonnummer
+                  </Label>
+                  <Input
+                    id="phone"
+                    value={studentFormData.phone || ''}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="dateOfBirth" className="text-right">
+                    Geboortedatum
+                  </Label>
+                  <Input
+                    id="dateOfBirth"
+                    type="date"
+                    value={studentFormData.dateOfBirth || ''}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="address" className="text-right">
+                    Adres
+                  </Label>
+                  <Input
+                    id="address"
+                    value={studentFormData.address || ''}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, address: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="programId" className="text-right">
+                    Opleidingsprogramma
+                  </Label>
+                  <Select
+                    value={studentFormData.programId?.toString() || ''}
+                    onValueChange={(value) => setStudentFormData({ ...studentFormData, programId: value ? parseInt(value) : null })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer programma" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Informatica</SelectItem>
+                      <SelectItem value="2">Bedrijfskunde</SelectItem>
+                      <SelectItem value="3">Techniek</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="yearLevel" className="text-right">
+                    Studiejaar
+                  </Label>
+                  <Select
+                    value={studentFormData.yearLevel?.toString() || ''}
+                    onValueChange={(value) => setStudentFormData({ ...studentFormData, yearLevel: value ? parseInt(value) : null })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer jaar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Jaar 1</SelectItem>
+                      <SelectItem value="2">Jaar 2</SelectItem>
+                      <SelectItem value="3">Jaar 3</SelectItem>
+                      <SelectItem value="4">Jaar 4</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsAddDialogOpen(false)}
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="submit"
+                disabled={createStudentMutation.isPending}
+              >
+                {createStudentMutation.isPending ? 'Bezig met toevoegen...' : 'Student toevoegen'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

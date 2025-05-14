@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, CheckCircle, XCircle, FileText, Clock, School } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

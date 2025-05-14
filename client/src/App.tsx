@@ -13,6 +13,9 @@ import Calendar from "@/pages/Calendar";
 import Attendance from "@/pages/Attendance";
 import Grading from "@/pages/Grading";
 import Reports from "@/pages/Reports";
+import Guardians from "@/pages/Guardians";
+import Admissions from "@/pages/Admissions";
+import StudentGroups from "@/pages/StudentGroups";
 
 function Router() {
   return (
@@ -20,6 +23,8 @@ function Router() {
       <Switch>
         <Route path="/" component={Dashboard} />
         <Route path="/students" component={Students} />
+        <Route path="/guardians" component={Guardians} />
+        <Route path="/admissions" component={Admissions} />
         <Route path="/courses" component={Courses} />
         <Route path="/programs" component={Programs} />
         <Route path="/calendar" component={Calendar} />

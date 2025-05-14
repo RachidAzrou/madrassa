@@ -17,15 +17,15 @@ export default function Grading() {
   const [isGradesModified, setIsGradesModified] = useState(false);
 
   // Fetch courses for dropdown
-  const { data: coursesData } = useQuery({
-    queryKey: ['/api/courses/list'],
+  const { data: coursesData } = useQuery<any[]>({
+    queryKey: ['/api/courses'],
     staleTime: 300000,
   });
 
-  const courses = coursesData?.courses || [];
+  const courses = coursesData || [];
 
   // Fetch assessments for selected course
-  const { data: assessmentsData } = useQuery({
+  const { data: assessmentsData } = useQuery<{assessments: any[]}>({
     queryKey: ['/api/assessments', { courseId: selectedCourse }],
     staleTime: 60000,
     enabled: !!selectedCourse,
@@ -34,14 +34,14 @@ export default function Grading() {
   const assessments = assessmentsData?.assessments || [];
 
   // Fetch students and grades for selected course and assessment
-  const { data, isLoading, isError } = useQuery({
+  const { data: gradesData, isLoading, isError } = useQuery<{students: any[], grades: Record<string, number>}>({
     queryKey: ['/api/grades', { courseId: selectedCourse, assessmentId: selectedAssessment }],
     staleTime: 60000,
     enabled: !!selectedCourse && !!selectedAssessment,
   });
 
-  const students = data?.students || [];
-  const existingGrades = data?.grades || {};
+  const students = gradesData?.students || [];
+  const existingGrades = gradesData?.grades || {};
 
   // Mutation for saving grades
   const saveMutation = useMutation({

@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Search, Download, Filter, CheckCircle, XCircle, Clock, ArrowLeft, ArrowRight, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
-import { Avatar } from '@/components/ui/Avatar';
+import { Avatar } from '@/components/ui/avatar';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
@@ -26,30 +26,57 @@ interface AttendanceSession {
   date: string;
 }
 
+interface Course {
+  id: number;
+  name: string;
+  code: string;
+}
+
 export default function Attendance() {
   const { toast } = useToast();
   
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [attendanceData, setAttendanceData] = useState<Record<string, string>>({});
+  const [studentAttendance, setStudentAttendance] = useState<Record<string, string>>({});
 
   // Fetch courses for dropdown
-  const { data: coursesData } = useQuery({
+  const { data: coursesData } = useQuery<Course[]>({
     queryKey: ['/api/courses'],
     staleTime: 300000,
   });
 
-  const courses = coursesData || [];
+  const courses: Course[] = coursesData || [];
 
   // Fetch attendance data for selected course and date
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data: attendanceRecords, isLoading, isError, refetch } = useQuery({
     queryKey: ['/api/attendance', { courseId: selectedCourse, date: selectedDate }],
     staleTime: 60000,
     enabled: !!selectedCourse,
   });
 
-  const students: Student[] = data?.students || [];
-  const session: AttendanceSession | null = data?.session || null;
+  // API retourneert een array, dus we moeten het omzetten naar de juiste formaten
+  const students: Student[] = attendanceRecords ? 
+    Array.isArray(attendanceRecords) ? 
+      attendanceRecords.map((record: any) => ({
+        id: record.studentId ? record.studentId.toString() : '',
+        firstName: record.studentName?.split(' ')[0] || 'Onbekend',
+        lastName: record.studentName?.split(' ').slice(1).join(' ') || '',
+        email: record.studentEmail || '',
+        studentId: record.studentId ? record.studentId.toString() : '',
+        attendanceRate: record.attendanceRate || 0,
+        lastStatus: record.status || 'unknown'
+      })) : [] 
+    : [];
+  
+  // Sessie-informatie samenstellen op basis van geselecteerde cursus
+  const session: AttendanceSession | null = selectedCourse ? {
+    id: `session-${selectedCourse}-${selectedDate}`,
+    courseId: selectedCourse,
+    courseName: Array.isArray(courses) ? 
+      courses.find((c: Course) => c.id.toString() === selectedCourse)?.name || 'Onbekende cursus' : 
+      'Onbekende cursus',
+    date: selectedDate
+  } : null;
 
   // Mutation for saving attendance
   const saveMutation = useMutation({
@@ -58,7 +85,7 @@ export default function Attendance() {
         sessionId: session?.id,
         courseId: selectedCourse,
         date: selectedDate,
-        attendance: attendanceData,
+        attendance: studentAttendance,
       });
     },
     onSuccess: () => {
@@ -80,18 +107,18 @@ export default function Attendance() {
 
   const handleCourseChange = (value: string) => {
     setSelectedCourse(value);
-    setAttendanceData({});
+    setStudentAttendance({});
   };
 
   const handleDateChange = (increment: number) => {
     const current = new Date(selectedDate);
     current.setDate(current.getDate() + increment);
     setSelectedDate(current.toISOString().split('T')[0]);
-    setAttendanceData({});
+    setStudentAttendance({});
   };
 
   const handleStatusChange = (studentId: string, status: string) => {
-    setAttendanceData(prev => ({
+    setStudentAttendance(prev => ({
       ...prev,
       [studentId]: status
     }));
@@ -102,7 +129,7 @@ export default function Attendance() {
     students.forEach(student => {
       newData[student.id] = status;
     });
-    setAttendanceData(newData);
+    setStudentAttendance(newData);
   };
 
   const handleSaveAttendance = () => {
@@ -115,12 +142,18 @@ export default function Attendance() {
     return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
-  // Load initial attendance data when it becomes available
-  useState(() => {
-    if (data?.attendance && Object.keys(attendanceData).length === 0) {
-      setAttendanceData(data.attendance);
+  // Load initial attendance data from records if available
+  useEffect(() => {
+    if (attendanceRecords && Array.isArray(attendanceRecords) && attendanceRecords.length > 0) {
+      const initialAttendance: Record<string, string> = {};
+      attendanceRecords.forEach((record: any) => {
+        if (record.studentId && record.status) {
+          initialAttendance[record.studentId.toString()] = record.status;
+        }
+      });
+      setStudentAttendance(initialAttendance);
     }
-  });
+  }, [attendanceRecords]);
 
   return (
     <div className="p-4 md:p-6 space-y-6">
@@ -128,133 +161,125 @@ export default function Attendance() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h1 className="text-2xl font-bold text-gray-800">Aanwezigheidsregistratie</h1>
         <div className="flex items-center space-x-3">
-          <Button variant="outline" className="flex items-center">
-            <Download className="mr-2 h-4 w-4" />
-            Rapport Exporteren
+          <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)}>
+            <ArrowLeft className="h-4 w-4 mr-1" /> Vorige dag
           </Button>
-          <Button className="flex items-center">
-            <CheckCircle className="mr-2 h-4 w-4" />
-            Nieuwe Sessie
+          <Button variant="outline" size="sm" onClick={() => handleDateChange(1)}>
+            Volgende dag <ArrowRight className="h-4 w-4 ml-1" />
           </Button>
         </div>
       </div>
 
-      {/* Course and date selector */}
+      {/* Selection and filters */}
       <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Cursus</label>
             <Select value={selectedCourse} onValueChange={handleCourseChange}>
-              <SelectTrigger className="w-full sm:w-[300px]">
-                <SelectValue placeholder="Selecteer een cursus" />
+              <SelectTrigger>
+                <SelectValue placeholder="Selecteer cursus" />
               </SelectTrigger>
               <SelectContent>
-                {courses.length === 0 ? (
-                  <SelectItem value="loading" disabled>Cursussen laden...</SelectItem>
-                ) : (
-                  courses.map((course: any) => (
-                    <SelectItem key={course.id} value={course.id}>
-                      {course.title} ({course.courseCode})
-                    </SelectItem>
-                  ))
-                )}
+                {courses.map(course => (
+                  <SelectItem key={course.id} value={course.id.toString()}>
+                    {course.code} - {course.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            
-            <div className="flex items-center space-x-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handleDateChange(-1)}
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-sm font-medium">{formatDate(selectedDate)}</span>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handleDateChange(1)}
-              >
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
-          
-          <div className="flex items-center space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-              onClick={() => handleMarkAll('present')}
-            >
-              <CheckCircle className="mr-1.5 h-4 w-4" />
-              Allen Aanwezig
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Datum</label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            />
+          </div>
+          <div className="flex items-end space-x-2">
+            <Button onClick={() => handleMarkAll('present')} variant="outline" className="flex items-center">
+              <CheckCircle className="h-4 w-4 mr-1 text-green-500" />
+              Allen aanwezig
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
-              onClick={() => handleMarkAll('absent')}
-            >
-              <XCircle className="mr-1.5 h-4 w-4" />
-              Allen Afwezig
+            <Button onClick={() => handleMarkAll('absent')} variant="outline" className="flex items-center">
+              <XCircle className="h-4 w-4 mr-1 text-red-500" />
+              Allen afwezig
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Attendance table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        {!selectedCourse ? (
-          <div className="p-8 text-center">
-            <h3 className="text-gray-500 text-lg font-medium">Selecteer een cursus om aanwezigheid te bekijken</h3>
+      {/* Session info */}
+      {session && (
+        <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-lg font-medium text-blue-800">{session.courseName}</h2>
+            <p className="text-blue-600">{formatDate(session.date)}</p>
           </div>
-        ) : isLoading ? (
-          <div className="flex justify-center py-12">
-            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <div className="mt-3 md:mt-0">
+            <Button onClick={handleSaveAttendance} disabled={saveMutation.isPending} className="flex items-center">
+              <Save className="h-4 w-4 mr-1" />
+              Aanwezigheid opslaan
+            </Button>
           </div>
-        ) : isError ? (
-          <div className="text-center py-12 text-red-500">
-            Fout bij het laden van aanwezigheidsgegevens. Probeer het opnieuw.
-          </div>
-        ) : students.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            Geen studenten ingeschreven voor deze cursus.
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+        </div>
+      )}
+
+      {/* Loading and error states */}
+      {isLoading && (
+        <div className="text-center p-8">
+          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full inline-block mb-3"></div>
+          <p className="text-gray-600">Gegevens laden...</p>
+        </div>
+      )}
+
+      {isError && (
+        <div className="bg-red-50 text-red-800 p-4 rounded-lg">
+          <p>Er is een fout opgetreden bij het ophalen van de aanwezigheidsgegevens. Probeer de pagina te vernieuwen.</p>
+        </div>
+      )}
+
+      {/* Student attendance list */}
+      {!isLoading && !isError && selectedCourse && (
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Student
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Student ID
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Aanwezigheid
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Totaal Aanwezigheid
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {students.length === 0 ? (
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Student
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      ID
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Aanwezigheidspercentage
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Laatste Les
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Acties
-                    </th>
+                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                      Geen studenten gevonden voor deze cursus/datum.
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {students.map((student) => (
+                ) : (
+                  students.map(student => (
                     <tr key={student.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <Avatar 
-                            initials={`${student.firstName.charAt(0)}${student.lastName.charAt(0)}`} 
-                            size="md" 
-                          />
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <Avatar>
+                              <div className="bg-blue-100 text-blue-800 flex items-center justify-center h-full rounded-full">
+                                {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                              </div>
+                            </Avatar>
+                          </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">{student.firstName} {student.lastName}</div>
                             <div className="text-sm text-gray-500">{student.email}</div>
@@ -265,246 +290,80 @@ export default function Attendance() {
                         {student.studentId}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <Select 
-                          value={attendanceData[student.id] || ''} 
-                          onValueChange={(value) => handleStatusChange(student.id, value)}
-                        >
-                          <SelectTrigger className="w-[120px]">
-                            <SelectValue placeholder="Selecteer status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="present">Aanwezig</SelectItem>
-                            <SelectItem value="absent">Afwezig</SelectItem>
-                            <SelectItem value="late">Te Laat</SelectItem>
-                            <SelectItem value="excused">Geëxcuseerd</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <div className="flex space-x-2">
+                          <Button 
+                            variant={studentAttendance[student.id] === 'present' ? 'default' : 'outline'} 
+                            size="sm" 
+                            onClick={() => handleStatusChange(student.id, 'present')}
+                            className={studentAttendance[student.id] === 'present' ? 'bg-green-600 hover:bg-green-700' : ''}
+                          >
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Aanwezig
+                          </Button>
+                          <Button 
+                            variant={studentAttendance[student.id] === 'absent' ? 'default' : 'outline'} 
+                            size="sm" 
+                            onClick={() => handleStatusChange(student.id, 'absent')}
+                            className={studentAttendance[student.id] === 'absent' ? 'bg-red-600 hover:bg-red-700' : ''}
+                          >
+                            <XCircle className="h-4 w-4 mr-1" />
+                            Afwezig
+                          </Button>
+                          <Button 
+                            variant={studentAttendance[student.id] === 'late' ? 'default' : 'outline'} 
+                            size="sm" 
+                            onClick={() => handleStatusChange(student.id, 'late')}
+                            className={studentAttendance[student.id] === 'late' ? 'bg-yellow-600 hover:bg-yellow-700' : ''}
+                          >
+                            <Clock className="h-4 w-4 mr-1" />
+                            Te laat
+                          </Button>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <Progress 
                             value={student.attendanceRate} 
-                            className="w-16 mr-2"
-                            indicatorColor={
-                              student.attendanceRate >= 90 ? 'bg-green-500' :
-                              student.attendanceRate >= 75 ? 'bg-yellow-500' :
-                              'bg-red-500'
-                            }
+                            className="w-24 h-2 mr-2" 
                           />
-                          <span className="text-sm text-gray-500">{student.attendanceRate}%</span>
+                          <span className="text-sm text-gray-700">{student.attendanceRate}%</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {student.lastStatus.charAt(0).toUpperCase() + student.lastStatus.slice(1)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="text-primary hover:text-primary-dark"
-                        >
-                          Bekijk Geschiedenis
-                        </Button>
-                      </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            <div className="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-4">
-              <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-1">Sessie Samenvatting</h4>
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                    Aanwezig: {Object.values(attendanceData).filter(v => v === 'present').length}
-                  </span>
-                  <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                    Afwezig: {Object.values(attendanceData).filter(v => v === 'absent').length}
-                  </span>
-                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                    Te Laat: {Object.values(attendanceData).filter(v => v === 'late').length}
-                  </span>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                    Geëxcuseerd: {Object.values(attendanceData).filter(v => v === 'excused').length}
-                  </span>
-                </div>
-              </div>
-              
-              <Button 
-                onClick={handleSaveAttendance} 
-                disabled={saveMutation.isPending}
-                className="flex items-center"
-              >
-                {saveMutation.isPending ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                ) : (
-                  <Save className="mr-2 h-4 w-4" />
+                  ))
                 )}
-                Aanwezigheid Opslaan
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
-      {/* Attendance Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-          <div className="p-6 border-b border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-800">Aanwezigheidsoverzicht</h3>
-            <p className="text-sm text-gray-500 mt-1">Aanwezigheidsstatistieken huidige semester</p>
-          </div>
-          <div className="p-6">
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="text-sm font-medium text-gray-700">Algemene Aanwezigheidsgraad</h4>
-                <span className="text-sm font-medium text-gray-700">85%</span>
-              </div>
-              <div className="relative w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                <div className="absolute top-0 left-0 h-full bg-primary rounded-full" style={{ width: '85%' }}></div>
-              </div>
+      {/* Attendance summary */}
+      {!isLoading && !isError && selectedCourse && students.length > 0 && (
+        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <h3 className="font-medium text-gray-700 mb-3">Aanwezigheidsoverzicht</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white p-3 rounded shadow-sm border border-gray-100">
+              <p className="text-sm text-gray-500">Aanwezig</p>
+              <p className="text-2xl font-bold text-green-600">
+                {Object.values(studentAttendance).filter(status => status === 'present').length}
+              </p>
             </div>
-            
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm text-gray-800">Informatica</p>
-                  <span className="text-sm text-gray-700">92%</span>
-                </div>
-                <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="absolute top-0 left-0 h-full bg-green-500 rounded-full" style={{ width: '92%' }}></div>
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm text-gray-800">Bedrijfskunde</p>
-                  <span className="text-sm text-gray-700">78%</span>
-                </div>
-                <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="absolute top-0 left-0 h-full bg-yellow-500 rounded-full" style={{ width: '78%' }}></div>
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm text-gray-800">Techniek</p>
-                  <span className="text-sm text-gray-700">85%</span>
-                </div>
-                <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="absolute top-0 left-0 h-full bg-green-500 rounded-full" style={{ width: '85%' }}></div>
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm text-gray-800">Geneeskunde</p>
-                  <span className="text-sm text-gray-700">95%</span>
-                </div>
-                <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="absolute top-0 left-0 h-full bg-green-500 rounded-full" style={{ width: '95%' }}></div>
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm text-gray-800">Psychologie</p>
-                  <span className="text-sm text-gray-700">75%</span>
-                </div>
-                <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="absolute top-0 left-0 h-full bg-yellow-500 rounded-full" style={{ width: '75%' }}></div>
-                </div>
-              </div>
+            <div className="bg-white p-3 rounded shadow-sm border border-gray-100">
+              <p className="text-sm text-gray-500">Afwezig</p>
+              <p className="text-2xl font-bold text-red-600">
+                {Object.values(studentAttendance).filter(status => status === 'absent').length}
+              </p>
+            </div>
+            <div className="bg-white p-3 rounded shadow-sm border border-gray-100">
+              <p className="text-sm text-gray-500">Te laat</p>
+              <p className="text-2xl font-bold text-yellow-600">
+                {Object.values(studentAttendance).filter(status => status === 'late').length}
+              </p>
             </div>
           </div>
         </div>
-        
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-          <div className="p-6 border-b border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-800">Meldingen Lage Aanwezigheid</h3>
-            <p className="text-sm text-gray-500 mt-1">Studenten met aanwezigheidsproblemen</p>
-          </div>
-          <div className="p-6">
-            <ul className="divide-y divide-gray-200">
-              <li className="py-3 flex items-start">
-                <div className="flex-shrink-0 mt-1">
-                  <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-red-100 text-red-600">
-                    <XCircle className="h-4 w-4" />
-                  </span>
-                </div>
-                <div className="ml-3 flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-900">James Kim</p>
-                    <p className="text-sm text-gray-500">Bedrijfskunde</p>
-                  </div>
-                  <div className="mt-1 flex justify-between">
-                    <p className="text-sm text-gray-500">5 van de laatste 10 lessen gemist</p>
-                    <p className="text-sm font-medium text-red-600">58% Aanwezigheid</p>
-                  </div>
-                  <div className="mt-2">
-                    <Button variant="link" size="sm" className="text-primary hover:text-primary-dark p-0 h-auto">
-                      Herinnering Versturen
-                    </Button>
-                  </div>
-                </div>
-              </li>
-              
-              <li className="py-3 flex items-start">
-                <div className="flex-shrink-0 mt-1">
-                  <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-yellow-100 text-yellow-600">
-                    <Clock className="h-4 w-4" />
-                  </span>
-                </div>
-                <div className="ml-3 flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-900">Aisha Thompson</p>
-                    <p className="text-sm text-gray-500">Psychologie</p>
-                  </div>
-                  <div className="mt-1 flex justify-between">
-                    <p className="text-sm text-gray-500">3 van de laatste 10 lessen gemist</p>
-                    <p className="text-sm font-medium text-yellow-600">70% Aanwezigheid</p>
-                  </div>
-                  <div className="mt-2">
-                    <Button variant="link" size="sm" className="text-primary hover:text-primary-dark p-0 h-auto">
-                      Herinnering Versturen
-                    </Button>
-                  </div>
-                </div>
-              </li>
-              
-              <li className="py-3 flex items-start">
-                <div className="flex-shrink-0 mt-1">
-                  <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-yellow-100 text-yellow-600">
-                    <Clock className="h-4 w-4" />
-                  </span>
-                </div>
-                <div className="ml-3 flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-900">Daniel Lee</p>
-                    <p className="text-sm text-gray-500">Informatica</p>
-                  </div>
-                  <div className="mt-1 flex justify-between">
-                    <p className="text-sm text-gray-500">2 van de laatste 10 lessen gemist</p>
-                    <p className="text-sm font-medium text-yellow-600">75% Aanwezigheid</p>
-                  </div>
-                  <div className="mt-2">
-                    <Button variant="link" size="sm" className="text-primary hover:text-primary-dark p-0 h-auto">
-                      Herinnering Versturen
-                    </Button>
-                  </div>
-                </div>
-              </li>
-            </ul>
-            
-            <div className="mt-4">
-              <Button variant="link" className="text-primary hover:text-primary-dark p-0 h-auto">
-                View all attendance issues
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

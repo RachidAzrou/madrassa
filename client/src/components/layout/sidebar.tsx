@@ -108,63 +108,154 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
 
       {/* Navigation links */}
       <nav className="flex-1 py-6 px-3 overflow-y-auto">
-        <div className="space-y-1.5">
-          <SidebarLink
-            href="/"
-            icon={<LayoutDashboard className="h-5 w-5" />}
-            label="Dashboard"
-            isActive={location === "/"}
-            onClick={handleLinkClick}
-          />
-          <SidebarLink
-            href="/students"
-            icon={<Users className="h-5 w-5" />}
-            label="Students"
-            isActive={location === "/students"}
-            onClick={handleLinkClick}
-          />
-          <SidebarLink
-            href="/courses"
-            icon={<BookOpen className="h-5 w-5" />}
-            label="Courses"
-            isActive={location === "/courses"}
-            onClick={handleLinkClick}
-          />
-          <SidebarLink
-            href="/programs"
-            icon={<Building className="h-5 w-5" />}
-            label="Programs"
-            isActive={location === "/programs"}
-            onClick={handleLinkClick}
-          />
-          <SidebarLink
-            href="/calendar"
-            icon={<Calendar className="h-5 w-5" />}
-            label="Calendar"
-            isActive={location === "/calendar"}
-            onClick={handleLinkClick}
-          />
-          <SidebarLink
-            href="/attendance"
-            icon={<ClipboardCheck className="h-5 w-5" />}
-            label="Attendance"
-            isActive={location === "/attendance"}
-            onClick={handleLinkClick}
-          />
-          <SidebarLink
-            href="/grading"
-            icon={<Medal className="h-5 w-5" />}
-            label="Grading"
-            isActive={location === "/grading"}
-            onClick={handleLinkClick}
-          />
-          <SidebarLink
-            href="/reports"
-            icon={<BarChart3 className="h-5 w-5" />}
-            label="Reports"
-            isActive={location === "/reports"}
-            onClick={handleLinkClick}
-          />
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <SidebarLink
+              href="/"
+              icon={<LayoutDashboard className="h-5 w-5" />}
+              label="Dashboard"
+              isActive={location === "/"}
+              onClick={handleLinkClick}
+            />
+          </div>
+
+          <div className="pt-2">
+            <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Student Management
+            </p>
+            <div className="space-y-1.5">
+              <SidebarLink
+                href="/students"
+                icon={<Users className="h-5 w-5" />}
+                label="Students"
+                isActive={location.startsWith("/students")}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
+                href="/guardians"
+                icon={<UserPlus className="h-5 w-5" />}
+                label="Guardians"
+                isActive={location.startsWith("/guardians")}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
+                href="/admissions"
+                icon={<FileText className="h-5 w-5" />}
+                label="Admissions"
+                isActive={location.startsWith("/admissions")}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
+                href="/student-groups"
+                icon={<Users className="h-5 w-5" />}
+                label="Student Groups"
+                isActive={location.startsWith("/student-groups")}
+                onClick={handleLinkClick}
+              />
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Academic
+            </p>
+            <div className="space-y-1.5">
+              <SidebarLink
+                href="/courses"
+                icon={<BookOpen className="h-5 w-5" />}
+                label="Courses"
+                isActive={location.startsWith("/courses")}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
+                href="/programs"
+                icon={<Building className="h-5 w-5" />}
+                label="Programs"
+                isActive={location.startsWith("/programs")}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
+                href="/enrollments"
+                icon={<School className="h-5 w-5" />}
+                label="Enrollments"
+                isActive={location.startsWith("/enrollments")}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
+                href="/scheduling"
+                icon={<Clock className="h-5 w-5" />}
+                label="Scheduling"
+                isActive={location.startsWith("/scheduling")}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
+                href="/calendar"
+                icon={<Calendar className="h-5 w-5" />}
+                label="Calendar"
+                isActive={location.startsWith("/calendar")}
+                onClick={handleLinkClick}
+              />
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Tools
+            </p>
+            <div className="space-y-1.5">
+              <SidebarLink
+                href="/attendance"
+                icon={<ClipboardCheck className="h-5 w-5" />}
+                label="Attendance"
+                isActive={location.startsWith("/attendance")}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
+                href="/grading"
+                icon={<Medal className="h-5 w-5" />}
+                label="Assessment"
+                isActive={location.startsWith("/grading")}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
+                href="/fees"
+                icon={<CreditCard className="h-5 w-5" />}
+                label="Fee Management"
+                isActive={location.startsWith("/fees")}
+                onClick={handleLinkClick}
+              />
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Reports
+            </p>
+            <div className="space-y-1.5">
+              <SidebarLink
+                href="/reports"
+                icon={<BarChart3 className="h-5 w-5" />}
+                label="Analytics"
+                isActive={location.startsWith("/reports")}
+                onClick={handleLinkClick}
+              />
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              System
+            </p>
+            <div className="space-y-1.5">
+              <SidebarLink
+                href="/settings"
+                icon={<Settings className="h-5 w-5" />}
+                label="Settings"
+                isActive={location.startsWith("/settings")}
+                onClick={handleLinkClick}
+              />
+            </div>
+          </div>
         </div>
       </nav>
 

@@ -345,15 +345,15 @@ export default function Enrollments() {
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
+                              <span className="sr-only">View</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Bewerken</span>
+                              <span className="sr-only">Edit</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Verwijderen</span>
+                              <span className="sr-only">Delete</span>
                             </Button>
                           </div>
                         </td>
@@ -369,38 +369,38 @@ export default function Enrollments() {
                             />
                             <div className="flex items-center">
                               <Avatar className="h-8 w-8">
-                                <AvatarFallback>LV</AvatarFallback>
+                                <AvatarFallback>MJ</AvatarFallback>
                               </Avatar>
                               <div className="ml-4">
-                                <div className="font-medium text-gray-900">Lisa de Vries</div>
-                                <div className="text-sm text-gray-500">STU000389</div>
+                                <div className="font-medium text-gray-900">Maria Johnson</div>
+                                <div className="text-sm text-gray-500">STU000873</div>
                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">Bedrijfskunde</div>
-                          <div className="text-sm text-gray-500">Jaar 1 - Semester 2</div>
+                          <div className="font-medium text-gray-900">Business Administration</div>
+                          <div className="text-sm text-gray-500">Year 3 - Semester 2</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">15 jan 2024</div>
+                          <div className="text-sm text-gray-900">Jan 15, 2023</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {getStatusBadge('Pending')}
+                          {getStatusBadge('Active')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
+                              <span className="sr-only">View</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Bewerken</span>
+                              <span className="sr-only">Edit</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Verwijderen</span>
+                              <span className="sr-only">Delete</span>
                             </Button>
                           </div>
                         </td>
@@ -416,21 +416,21 @@ export default function Enrollments() {
                             />
                             <div className="flex items-center">
                               <Avatar className="h-8 w-8">
-                                <AvatarFallback>MB</AvatarFallback>
+                                <AvatarFallback>DP</AvatarFallback>
                               </Avatar>
                               <div className="ml-4">
-                                <div className="font-medium text-gray-900">Martijn Bakker</div>
-                                <div className="text-sm text-gray-500">STU000517</div>
+                                <div className="font-medium text-gray-900">David Park</div>
+                                <div className="text-sm text-gray-500">STU000754</div>
                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">Techniek</div>
-                          <div className="text-sm text-gray-500">Jaar 3 - Semester 1</div>
+                          <div className="font-medium text-gray-900">Engineering</div>
+                          <div className="text-sm text-gray-500">Year 4 - Semester 1</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">5 sept 2022</div>
+                          <div className="text-sm text-gray-900">Sept 1, 2022</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {getStatusBadge('Completed')}
@@ -439,11 +439,11 @@ export default function Enrollments() {
                           <div className="flex justify-end space-x-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
+                              <span className="sr-only">View</span>
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Bewerken</span>
+                              <span className="sr-only">Edit</span>
                             </Button>
                           </div>
                         </td>
@@ -453,74 +453,269 @@ export default function Enrollments() {
                 </tbody>
               </table>
             </div>
-            
+
             {/* Pagination */}
-            <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-              <div className="flex-1 flex justify-between sm:hidden">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  disabled={currentPage === 1}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                >
-                  Vorige
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  disabled={currentPage === totalPages}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                >
-                  Volgende
-                </Button>
-              </div>
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Pagina <span className="font-medium">{currentPage}</span> van{' '}
-                    <span className="font-medium">{totalPages}</span>
-                  </p>
+            {totalPages > 1 && (
+              <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                <div className="flex-1 flex justify-between sm:hidden">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
                 </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="rounded-l-md"
-                      disabled={currentPage === 1}
-                      onClick={() => handlePageChange(currentPage - 1)}
-                    >
-                      Vorige
-                    </Button>
-                    {/* Page numbers would go here */}
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="rounded-r-md"
-                      disabled={currentPage === totalPages}
-                      onClick={() => handlePageChange(currentPage + 1)}
-                    >
-                      Volgende
-                    </Button>
-                  </nav>
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      Showing <span className="font-medium">{((currentPage - 1) * 10) + 1}</span> to{" "}
+                      <span className="font-medium">
+                        {Math.min(currentPage * 10, totalEnrollments)}
+                      </span>{" "}
+                      of <span className="font-medium">{totalEnrollments}</span> results
+                    </p>
+                  </div>
+                  <div>
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="rounded-l-md"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        Previous
+                      </Button>
+                      {Array.from({ length: totalPages }).map((_, i) => (
+                        <Button 
+                          key={i}
+                          variant={currentPage === i + 1 ? "default" : "outline"} 
+                          size="sm"
+                          onClick={() => handlePageChange(i + 1)}
+                        >
+                          {i + 1}
+                        </Button>
+                      ))}
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="rounded-r-md"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        Next
+                      </Button>
+                    </nav>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </TabsContent>
         
         <TabsContent value="course-enrollments">
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-            <h3 className="text-lg font-medium text-gray-700">Cursusinschrijvingen</h3>
-            <p className="mt-2 text-gray-500">Hier kunnen cursusinschrijvingen per semester en afdeling worden getoond en beheerd.</p>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Course Enrollments</CardTitle>
+              <CardDescription>View enrollment statistics for individual courses</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enrolled</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacity</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fill Rate</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">Introduction to Programming</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">CS101</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge className="bg-blue-100 text-blue-800">Computer Science</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">32</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">35</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Progress value={91} className="h-2 w-20 mr-2" />
+                          <span className="text-sm text-gray-900">91%</span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">Data Structures</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">CS201</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge className="bg-blue-100 text-blue-800">Computer Science</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">28</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">30</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Progress value={93} className="h-2 w-20 mr-2" />
+                          <span className="text-sm text-gray-900">93%</span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">Business Fundamentals</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">BUS101</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge className="bg-green-100 text-green-800">Business</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">42</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">45</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Progress value={93} className="h-2 w-20 mr-2" />
+                          <span className="text-sm text-gray-900">93%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
         
         <TabsContent value="program-enrollments">
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-            <h3 className="text-lg font-medium text-gray-700">Programma-inschrijvingen</h3>
-            <p className="mt-2 text-gray-500">Hier kunnen programma-inschrijvingen per academisch jaar worden getoond en beheerd.</p>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Program Enrollments</CardTitle>
+              <CardDescription>View enrollment statistics across academic programs</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Students</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">New Enrollments</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completion Rate</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">Computer Science</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge className="bg-blue-100 text-blue-800">Engineering</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">4 years</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">210</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">65</div>
+                        <div className="text-xs text-green-600">+12%</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Progress value={86} className="h-2 w-20 mr-2" />
+                          <span className="text-sm text-gray-900">86%</span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">Business Administration</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge className="bg-green-100 text-green-800">Business</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">4 years</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">185</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">42</div>
+                        <div className="text-xs text-red-600">-5%</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Progress value={81} className="h-2 w-20 mr-2" />
+                          <span className="text-sm text-gray-900">81%</span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">Engineering</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge className="bg-purple-100 text-purple-800">Engineering</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">4 years</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">156</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">38</div>
+                        <div className="text-xs text-green-600">+2%</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Progress value={79} className="h-2 w-20 mr-2" />
+                          <span className="text-sm text-gray-900">79%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

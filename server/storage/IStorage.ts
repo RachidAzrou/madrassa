@@ -1,14 +1,15 @@
-import {
-  Student, InsertStudent,
-  Program, InsertProgram,
-  Course, InsertCourse,
-  Enrollment, InsertEnrollment,
-  Attendance, InsertAttendance,
-  Grade, InsertGrade,
-  Event, InsertEvent,
-  User, InsertUser
-} from '@shared/schema';
+import { 
+  type Student, type InsertStudent,
+  type Program, type InsertProgram,
+  type Course, type InsertCourse,
+  type Enrollment, type InsertEnrollment,
+  type Attendance, type InsertAttendance,
+  type Grade, type InsertGrade,
+  type Event, type InsertEvent,
+  type User, type InsertUser 
+} from "@shared/schema";
 
+// Storage interface for CRUD operations
 export interface IStorage {
   // Student operations
   getStudents(): Promise<Student[]>;

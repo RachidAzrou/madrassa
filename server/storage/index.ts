@@ -1,6 +1,5 @@
-import { IStorage } from './IStorage';
 import { DatabaseStorage } from './databaseStorage';
+import { IStorage } from './IStorage';
 
-// Exporteer de storage interface en de DatabaseStorage implementatie
-export type { IStorage };
-export const storage = new DatabaseStorage();
+// Exporteer de DatabaseStorage instantie als storage
+export const storage: IStorage = new DatabaseStorage();

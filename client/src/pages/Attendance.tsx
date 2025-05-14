@@ -352,13 +352,13 @@ export default function Attendance() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
           <div className="p-6 border-b border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-800">Attendance Overview</h3>
-            <p className="text-sm text-gray-500 mt-1">Current semester attendance statistics</p>
+            <h3 className="text-lg font-semibold text-gray-800">Aanwezigheidsoverzicht</h3>
+            <p className="text-sm text-gray-500 mt-1">Aanwezigheidsstatistieken huidige semester</p>
           </div>
           <div className="p-6">
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-sm font-medium text-gray-700">Overall Attendance Rate</h4>
+                <h4 className="text-sm font-medium text-gray-700">Algemene Aanwezigheidsgraad</h4>
                 <span className="text-sm font-medium text-gray-700">85%</span>
               </div>
               <div className="relative w-full h-3 bg-gray-200 rounded-full overflow-hidden">
@@ -369,7 +369,7 @@ export default function Attendance() {
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm text-gray-800">Computer Science</p>
+                  <p className="text-sm text-gray-800">Informatica</p>
                   <span className="text-sm text-gray-700">92%</span>
                 </div>
                 <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -379,7 +379,7 @@ export default function Attendance() {
               
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm text-gray-800">Business Management</p>
+                  <p className="text-sm text-gray-800">Bedrijfskunde</p>
                   <span className="text-sm text-gray-700">78%</span>
                 </div>
                 <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -389,7 +389,7 @@ export default function Attendance() {
               
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm text-gray-800">Engineering</p>
+                  <p className="text-sm text-gray-800">Techniek</p>
                   <span className="text-sm text-gray-700">85%</span>
                 </div>
                 <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -399,7 +399,7 @@ export default function Attendance() {
               
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm text-gray-800">Medicine</p>
+                  <p className="text-sm text-gray-800">Geneeskunde</p>
                   <span className="text-sm text-gray-700">95%</span>
                 </div>
                 <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">

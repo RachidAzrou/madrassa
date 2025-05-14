@@ -597,10 +597,10 @@ export default function Fees() {
               </div>
             </CardContent>
             <CardFooter className="flex justify-between border-t px-6 py-4">
-              <Button variant="outline">Add Fee Structure</Button>
+              <Button variant="outline">Tariefstructuur Toevoegen</Button>
               <Button variant="outline">
                 <Download className="mr-2 h-4 w-4" />
-                Export Structure
+                Structuur Exporteren
               </Button>
             </CardFooter>
           </Card>
@@ -609,40 +609,40 @@ export default function Fees() {
         <TabsContent value="scholarships">
           <Card>
             <CardHeader>
-              <CardTitle>Scholarships & Financial Aid</CardTitle>
-              <CardDescription>Manage scholarships and financial aid programs</CardDescription>
+              <CardTitle>Beurzen & Financiële Steun</CardTitle>
+              <CardDescription>Beheer beurzen en financiële steunprogramma's</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scholarship Name</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Beursnaam</th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Eligibility</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipients</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bedrag</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Voorwaarden</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ontvangers</th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="font-medium text-gray-900">Academic Excellence</div>
-                        <div className="text-xs text-gray-500">Merit-based</div>
+                        <div className="font-medium text-gray-900">Academische Uitmuntendheid</div>
+                        <div className="text-xs text-gray-500">Op basis van prestatie</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge className="bg-blue-100 text-blue-800">Full Tuition</Badge>
+                        <Badge className="bg-blue-100 text-blue-800">Volledig Collegegeld</Badge>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">100% Tuition</div>
+                        <div className="text-sm text-gray-900">100% Collegegeld</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">GPA ≥ 3.8</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">15 students</div>
+                        <div className="text-sm text-gray-900">15 studenten</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge className="bg-green-100 text-green-800">Active</Badge>

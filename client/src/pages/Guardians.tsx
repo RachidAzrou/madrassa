@@ -185,15 +185,15 @@ export default function Guardians() {
                       <div className="flex justify-end space-x-2">
                         <Button variant="ghost" size="icon">
                           <Eye className="h-4 w-4 text-gray-500" />
-                          <span className="sr-only">View</span>
+                          <span className="sr-only">Bekijken</span>
                         </Button>
                         <Button variant="ghost" size="icon">
                           <Edit className="h-4 w-4 text-blue-500" />
-                          <span className="sr-only">Edit</span>
+                          <span className="sr-only">Bewerken</span>
                         </Button>
                         <Button variant="ghost" size="icon">
                           <Trash2 className="h-4 w-4 text-red-500" />
-                          <span className="sr-only">Delete</span>
+                          <span className="sr-only">Verwijderen</span>
                         </Button>
                       </div>
                     </td>
@@ -234,15 +234,15 @@ export default function Guardians() {
                       <div className="flex justify-end space-x-2">
                         <Button variant="ghost" size="icon">
                           <Eye className="h-4 w-4 text-gray-500" />
-                          <span className="sr-only">View</span>
+                          <span className="sr-only">Bekijken</span>
                         </Button>
                         <Button variant="ghost" size="icon">
                           <Edit className="h-4 w-4 text-blue-500" />
-                          <span className="sr-only">Edit</span>
+                          <span className="sr-only">Bewerken</span>
                         </Button>
                         <Button variant="ghost" size="icon">
                           <Trash2 className="h-4 w-4 text-red-500" />
-                          <span className="sr-only">Delete</span>
+                          <span className="sr-only">Verwijderen</span>
                         </Button>
                       </div>
                     </td>
@@ -293,7 +293,7 @@ export default function Guardians() {
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                   >
-                    Previous
+                    Vorige
                   </Button>
                   {Array.from({ length: totalPages }).map((_, i) => (
                     <Button 
@@ -312,7 +312,7 @@ export default function Guardians() {
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
                   >
-                    Next
+                    Volgende
                   </Button>
                 </nav>
               </div>

@@ -60,15 +60,15 @@ export default function Reports() {
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">Reports & Analytics</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Rapporten & Analyses</h1>
         <div className="flex items-center space-x-3">
           <Button variant="outline" className="flex items-center">
             <Download className="mr-2 h-4 w-4" />
-            Export Data
+            Exporteer Gegevens
           </Button>
           <Button onClick={handleGenerateReport} className="flex items-center">
             <FileText className="mr-2 h-4 w-4" />
-            Generate Report
+            Genereer Rapport
           </Button>
         </div>
       </div>
@@ -106,13 +106,13 @@ export default function Reports() {
             </Select>
           </div>
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Report Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Rapport Type</label>
             <Tabs defaultValue="overview" className="w-full" value={reportType} onValueChange={setReportType}>
               <TabsList className="grid grid-cols-4 lg:grid-cols-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="academic">Academic</TabsTrigger>
-                <TabsTrigger value="attendance">Attendance</TabsTrigger>
-                <TabsTrigger value="enrollment">Enrollment</TabsTrigger>
+                <TabsTrigger value="overview">Overzicht</TabsTrigger>
+                <TabsTrigger value="academic">Academisch</TabsTrigger>
+                <TabsTrigger value="attendance">Aanwezigheid</TabsTrigger>
+                <TabsTrigger value="enrollment">Inschrijving</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>

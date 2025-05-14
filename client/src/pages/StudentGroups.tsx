@@ -78,7 +78,7 @@ export default function StudentGroups() {
           </div>
           <Button onClick={handleAddStudentGroup} className="flex items-center">
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Create Group</span>
+            <span>Groep Aanmaken</span>
           </Button>
         </div>
       </div>
@@ -87,13 +87,13 @@ export default function StudentGroups() {
       <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Academisch Jaar</label>
             <Select value={academicYear} onValueChange={handleAcademicYearChange}>
               <SelectTrigger>
-                <SelectValue placeholder="All Years" />
+                <SelectValue placeholder="Alle Jaren" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Years</SelectItem>
+                <SelectItem value="all">Alle Jaren</SelectItem>
                 <SelectItem value="2025-2026">2025-2026</SelectItem>
                 <SelectItem value="2024-2025">2024-2025</SelectItem>
                 <SelectItem value="2023-2024">2023-2024</SelectItem>
@@ -101,17 +101,17 @@ export default function StudentGroups() {
             </Select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Program</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Opleiding</label>
             <Select value={program} onValueChange={handleProgramChange}>
               <SelectTrigger>
-                <SelectValue placeholder="All Programs" />
+                <SelectValue placeholder="Alle Opleidingen" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Programs</SelectItem>
-                <SelectItem value="cs">Computer Science</SelectItem>
-                <SelectItem value="bus">Business Administration</SelectItem>
-                <SelectItem value="eng">Engineering</SelectItem>
-                <SelectItem value="arts">Fine Arts</SelectItem>
+                <SelectItem value="all">Alle Opleidingen</SelectItem>
+                <SelectItem value="cs">Informatica</SelectItem>
+                <SelectItem value="bus">Bedrijfskunde</SelectItem>
+                <SelectItem value="eng">Techniek</SelectItem>
+                <SelectItem value="arts">Kunst</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -122,17 +122,17 @@ export default function StudentGroups() {
       <Tabs defaultValue="grid" className="space-y-4">
         <div className="flex justify-between items-center">
           <TabsList>
-            <TabsTrigger value="grid">Grid View</TabsTrigger>
-            <TabsTrigger value="list">List View</TabsTrigger>
+            <TabsTrigger value="grid">Rasterweergave</TabsTrigger>
+            <TabsTrigger value="list">Lijstweergave</TabsTrigger>
           </TabsList>
           <div className="flex space-x-2">
             <Button variant="outline" size="sm">
               <Filter className="mr-2 h-4 w-4" />
-              Filter
+              Filteren
             </Button>
             <Button variant="outline" size="sm">
               <Download className="mr-2 h-4 w-4" />
-              Export
+              Exporteren
             </Button>
           </div>
         </div>
@@ -163,19 +163,19 @@ export default function StudentGroups() {
             </div>
           ) : isError ? (
             <div className="text-center py-8 text-red-500">
-              Error loading student groups. Please try again later.
+              Fout bij het laden van studentengroepen. Probeer het later opnieuw.
             </div>
           ) : studentGroups.length === 0 ? (
             <div className="text-center py-12">
               <Users className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-lg font-medium text-gray-900">No Student Groups</h3>
+              <h3 className="mt-2 text-lg font-medium text-gray-900">Geen Studentengroepen</h3>
               <p className="mt-1 text-sm text-gray-500">
-                Get started by creating a new student group.
+                Begin door een nieuwe studentengroep aan te maken.
               </p>
               <div className="mt-6">
                 <Button onClick={handleAddStudentGroup}>
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Create Group
+                  Groep Aanmaken
                 </Button>
               </div>
             </div>
@@ -193,15 +193,15 @@ export default function StudentGroups() {
                 <CardContent>
                   <div className="text-sm text-gray-500 space-y-2">
                     <div className="flex justify-between">
-                      <span>Students:</span>
+                      <span>Studenten:</span>
                       <span className="font-medium">32</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Instructor:</span>
+                      <span>Docent:</span>
                       <span className="font-medium">Dr. Alan Turing</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Courses:</span>
+                      <span>Cursussen:</span>
                       <span className="font-medium">6</span>
                     </div>
                   </div>

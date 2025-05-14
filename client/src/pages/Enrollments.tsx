@@ -81,15 +81,15 @@ export default function Enrollments() {
   const getStatusBadge = (status: string) => {
     switch(status.toLowerCase()) {
       case 'active':
-        return <Badge className="bg-green-100 text-green-800 border-green-200">Active</Badge>;
+        return <Badge className="bg-green-100 text-green-800 border-green-200">Actief</Badge>;
       case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">Pending</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">In Behandeling</Badge>;
       case 'completed':
-        return <Badge className="bg-blue-100 text-blue-800 border-blue-200">Completed</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 border-blue-200">Voltooid</Badge>;
       case 'withdrawn':
-        return <Badge className="bg-red-100 text-red-800 border-red-200">Withdrawn</Badge>;
+        return <Badge className="bg-red-100 text-red-800 border-red-200">Teruggetrokken</Badge>;
       case 'on_hold':
-        return <Badge className="bg-gray-100 text-gray-800 border-gray-200">On Hold</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800 border-gray-200">In Wacht</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
@@ -212,16 +212,16 @@ export default function Enrollments() {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Course</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Cursus</label>
                 <Select value={course} onValueChange={handleCourseChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Courses" />
+                    <SelectValue placeholder="Alle Cursussen" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Courses</SelectItem>
-                    <SelectItem value="cs101">CS101: Intro to Programming</SelectItem>
-                    <SelectItem value="cs201">CS201: Data Structures</SelectItem>
-                    <SelectItem value="bus101">BUS101: Business Fundamentals</SelectItem>
+                    <SelectItem value="all">Alle Cursussen</SelectItem>
+                    <SelectItem value="cs101">CS101: Inleiding Programmeren</SelectItem>
+                    <SelectItem value="cs201">CS201: Datastructuren</SelectItem>
+                    <SelectItem value="bus101">BUS101: Bedrijfskunde Basis</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -229,15 +229,15 @@ export default function Enrollments() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <Select value={status} onValueChange={handleStatusChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Statuses" />
+                    <SelectValue placeholder="Alle Statussen" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="withdrawn">Withdrawn</SelectItem>
-                    <SelectItem value="on_hold">On Hold</SelectItem>
+                    <SelectItem value="all">Alle Statussen</SelectItem>
+                    <SelectItem value="active">Actief</SelectItem>
+                    <SelectItem value="pending">In Behandeling</SelectItem>
+                    <SelectItem value="completed">Voltooid</SelectItem>
+                    <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
+                    <SelectItem value="on_hold">In Wacht</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -248,16 +248,16 @@ export default function Enrollments() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
               <div className="text-sm text-gray-500">
-                {isLoading ? 'Loading...' : `Showing ${enrollments.length} of ${totalEnrollments} enrollments`}
+                {isLoading ? 'Laden...' : `Toont ${enrollments.length} van ${totalEnrollments} inschrijvingen`}
               </div>
               <div className="flex space-x-2">
                 <Button variant="outline" size="sm">
                   <Filter className="mr-2 h-4 w-4" />
-                  Filter
+                  Filteren
                 </Button>
                 <Button variant="outline" size="sm">
                   <Download className="mr-2 h-4 w-4" />
-                  Export
+                  Exporteren
                 </Button>
               </div>
             </div>
@@ -275,10 +275,10 @@ export default function Enrollments() {
                       </div>
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Program/Course
+                      Programma/Cursus
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Enrollment Date
+                      Inschrijvingsdatum
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       <div className="flex items-center">
@@ -287,7 +287,7 @@ export default function Enrollments() {
                       </div>
                     </th>
                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      Acties
                     </th>
                   </tr>
                 </thead>
@@ -295,19 +295,19 @@ export default function Enrollments() {
                   {isLoading ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                        Loading enrollments...
+                        Inschrijvingen laden...
                       </td>
                     </tr>
                   ) : isError ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-4 text-center text-sm text-red-500">
-                        Error loading enrollments. Please try again.
+                        Fout bij het laden van inschrijvingen. Probeer het opnieuw.
                       </td>
                     </tr>
                   ) : enrollments.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                        No enrollments found with the current filters. Try changing your search or filters.
+                        Geen inschrijvingen gevonden met de huidige filters. Probeer je zoekopdracht of filters aan te passen.
                       </td>
                     </tr>
                   ) : (
@@ -325,18 +325,18 @@ export default function Enrollments() {
                                 <AvatarFallback>JS</AvatarFallback>
                               </Avatar>
                               <div className="ml-4">
-                                <div className="font-medium text-gray-900">John Smith</div>
+                                <div className="font-medium text-gray-900">Jan Smit</div>
                                 <div className="text-sm text-gray-500">STU000452</div>
                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">Computer Science</div>
-                          <div className="text-sm text-gray-500">Year 2 - Semester 1</div>
+                          <div className="font-medium text-gray-900">Informatica</div>
+                          <div className="text-sm text-gray-500">Jaar 2 - Semester 1</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Sept 1, 2023</div>
+                          <div className="text-sm text-gray-900">1 sept 2023</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {getStatusBadge('Active')}

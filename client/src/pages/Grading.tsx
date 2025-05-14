@@ -54,8 +54,8 @@ export default function Grading() {
     },
     onSuccess: () => {
       toast({
-        title: 'Grades saved',
-        description: 'Student grades have been successfully updated.',
+        title: 'Cijfers opgeslagen',
+        description: 'Studentcijfers zijn succesvol bijgewerkt.',
         variant: 'default',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/grades'] });
@@ -63,8 +63,8 @@ export default function Grading() {
     },
     onError: (error) => {
       toast({
-        title: 'Error saving grades',
-        description: error.message || 'Something went wrong. Please try again.',
+        title: 'Fout bij opslaan van cijfers',
+        description: error.message || 'Er is iets misgegaan. Probeer het opnieuw.',
         variant: 'destructive',
       });
     },
@@ -383,7 +383,7 @@ export default function Grading() {
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-sm text-gray-600">F (Below 60%)</span>
+                <span className="text-sm text-gray-600">F (Onder 60%)</span>
                 <span className="text-sm text-gray-600">4%</span>
               </div>
               <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">

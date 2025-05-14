@@ -4,7 +4,7 @@ import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2 } from 'lucide-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Avatar } from '@/components/ui/Avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { apiRequest } from '@/lib/queryClient';
 
 export default function Courses() {

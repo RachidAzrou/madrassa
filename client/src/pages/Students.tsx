@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2 } from 'lucide-react';
-import { Avatar } from '@/components/ui/Avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -212,10 +212,11 @@ export default function Students() {
                           type="checkbox" 
                           className="rounded border-gray-300 text-primary focus:ring-primary mr-3"
                         />
-                        <Avatar 
-                          initials={`${student.firstName.charAt(0)}${student.lastName.charAt(0)}`} 
-                          size="md" 
-                        />
+                        <Avatar className="h-9 w-9">
+                          <AvatarFallback>
+                            {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">{student.firstName} {student.lastName}</div>
                           <div className="text-sm text-gray-500">{student.email}</div>

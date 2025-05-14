@@ -437,7 +437,7 @@ export default function Reports() {
                       </div>
                       <span className="text-sm font-medium">88%</span>
                     </div>
-                    <Progress value={88} className="h-2 mt-2" indicatorColor="bg-yellow-500" />
+                    <Progress value={88} className="h-2 mt-2" />
                   </div>
                 </div>
               </CardContent>

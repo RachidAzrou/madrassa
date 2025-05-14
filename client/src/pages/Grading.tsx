@@ -404,8 +404,8 @@ export default function Grading() {
           <div className="space-y-4">
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-sm text-gray-600">Midterm Exam</span>
-                <span className="text-sm text-gray-600">Average: 78%</span>
+                <span className="text-sm text-gray-600">Tussentijds Examen</span>
+                <span className="text-sm text-gray-600">Gemiddelde: 78%</span>
               </div>
               <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
                 <div className="h-full bg-yellow-500 rounded-full" style={{ width: '78%' }}></div>
@@ -413,8 +413,8 @@ export default function Grading() {
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-sm text-gray-600">Assignments</span>
-                <span className="text-sm text-gray-600">Average: 85%</span>
+                <span className="text-sm text-gray-600">Opdrachten</span>
+                <span className="text-sm text-gray-600">Gemiddelde: 85%</span>
               </div>
               <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
                 <div className="h-full bg-blue-500 rounded-full" style={{ width: '85%' }}></div>
@@ -422,8 +422,8 @@ export default function Grading() {
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-sm text-gray-600">Projects</span>
-                <span className="text-sm text-gray-600">Average: 88%</span>
+                <span className="text-sm text-gray-600">Projecten</span>
+                <span className="text-sm text-gray-600">Gemiddelde: 88%</span>
               </div>
               <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
                 <div className="h-full bg-blue-500 rounded-full" style={{ width: '88%' }}></div>
@@ -431,8 +431,8 @@ export default function Grading() {
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-sm text-gray-600">Final Exam</span>
-                <span className="text-sm text-gray-600">Average: 80%</span>
+                <span className="text-sm text-gray-600">Eindexamen</span>
+                <span className="text-sm text-gray-600">Gemiddelde: 80%</span>
               </div>
               <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
                 <div className="h-full bg-blue-500 rounded-full" style={{ width: '80%' }}></div>
@@ -442,10 +442,10 @@ export default function Grading() {
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-600">
-                <span className="font-semibold">Highest Performing Area:</span> Projects
+                <span className="font-semibold">Best Presterende Gebied:</span> Projecten
               </div>
               <div className="text-sm text-gray-600">
-                <span className="font-semibold">Lowest Performing Area:</span> Midterm Exam
+                <span className="font-semibold">Minst Presterende Gebied:</span> Tussentijds Examen
               </div>
             </div>
           </div>

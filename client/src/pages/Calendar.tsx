@@ -22,9 +22,9 @@ export default function Calendar() {
   const [view, setView] = useState<'month' | 'week' | 'day'>('month');
   const [filter, setFilter] = useState<string>('all');
 
-  // Get month name, year
-  const monthNames = ["January", "February", "March", "April", "May", "June", 
-                      "July", "August", "September", "October", "November", "December"];
+  // Get month name, year - in Dutch
+  const monthNames = ["Januari", "Februari", "Maart", "April", "Mei", "Juni", 
+                      "Juli", "Augustus", "September", "Oktober", "November", "December"];
   const month = monthNames[currentDate.getMonth()];
   const year = currentDate.getFullYear();
 
@@ -129,7 +129,7 @@ export default function Calendar() {
       {/* Page header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold text-gray-800">Academic Calendar</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Academische Kalender</h1>
           <div className="flex rounded-md shadow-sm">
             <button 
               onClick={() => setView('month')} 
@@ -139,7 +139,7 @@ export default function Calendar() {
                   : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
               }`}
             >
-              Month
+              Maand
             </button>
             <button 
               onClick={() => setView('week')} 
@@ -159,7 +159,7 @@ export default function Calendar() {
                   : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
               }`}
             >
-              Day
+              Dag
             </button>
           </div>
         </div>

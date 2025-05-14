@@ -106,15 +106,15 @@ export default function Programs() {
                 </div>
                 <div className="flex items-center space-x-6">
                   <div className="text-center hidden md:block">
-                    <span className="text-gray-500 text-xs block">Duration</span>
-                    <span className="text-gray-800 font-medium">{program.duration} years</span>
+                    <span className="text-gray-500 text-xs block">Duur</span>
+                    <span className="text-gray-800 font-medium">{program.duration} jaar</span>
                   </div>
                   <div className="text-center hidden md:block">
-                    <span className="text-gray-500 text-xs block">Total Credits</span>
+                    <span className="text-gray-500 text-xs block">Totaal Studiepunten</span>
                     <span className="text-gray-800 font-medium">{program.totalCredits}</span>
                   </div>
                   <div className="text-center hidden md:block">
-                    <span className="text-gray-500 text-xs block">Students</span>
+                    <span className="text-gray-500 text-xs block">Studenten</span>
                     <span className="text-gray-800 font-medium">{program.students}</span>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -138,21 +138,21 @@ export default function Programs() {
                     <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">
                       <Clock className="h-5 w-5 text-primary mr-3" />
                       <div>
-                        <span className="text-xs text-gray-500 block">Duration</span>
-                        <span className="text-sm font-medium">{program.duration} years ({program.totalCredits} credits)</span>
+                        <span className="text-xs text-gray-500 block">Duur</span>
+                        <span className="text-sm font-medium">{program.duration} jaar ({program.totalCredits} studiepunten)</span>
                       </div>
                     </div>
                     <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">
                       <Users className="h-5 w-5 text-primary mr-3" />
                       <div>
-                        <span className="text-xs text-gray-500 block">Enrolled Students</span>
-                        <span className="text-sm font-medium">{program.students} students</span>
+                        <span className="text-xs text-gray-500 block">Ingeschreven Studenten</span>
+                        <span className="text-sm font-medium">{program.students} studenten</span>
                       </div>
                     </div>
                     <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">
                       <Calendar className="h-5 w-5 text-primary mr-3" />
                       <div>
-                        <span className="text-xs text-gray-500 block">Next Start Date</span>
+                        <span className="text-xs text-gray-500 block">Volgende Startdatum</span>
                         <span className="text-sm font-medium">{program.startDate}</span>
                       </div>
                     </div>
@@ -160,15 +160,15 @@ export default function Programs() {
                   <div className="bg-white rounded-lg border border-gray-200 p-4">
                     <h4 className="text-md font-medium text-gray-800 mb-3 flex items-center">
                       <BookOpen className="h-5 w-5 text-primary mr-2" />
-                      Course Structure
+                      Cursusstructuur
                     </h4>
                     <div className="overflow-x-auto">
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course Code</th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course Name</th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Credits</th>
+                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cursuscode</th>
+                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cursusnaam</th>
+                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Studiepunten</th>
                             <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Semester</th>
                           </tr>
                         </thead>

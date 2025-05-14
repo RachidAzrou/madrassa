@@ -638,11 +638,11 @@ export default function Admissions() {
                 </div>
                 
                 <div className="border-t pt-6">
-                  <h3 className="text-lg font-medium mb-2">Email Templates</h3>
+                  <h3 className="text-lg font-medium mb-2">E-mailsjablonen</h3>
                   <p className="text-sm text-gray-500 mb-4">
-                    Customize the email notifications sent to applicants during the admission process.
+                    Pas de e-mailnotificaties aan die aan aanmelders worden verzonden tijdens het toelatingsproces.
                   </p>
-                  <Button variant="outline">Edit Email Templates</Button>
+                  <Button variant="outline">E-mailsjablonen Bewerken</Button>
                 </div>
               </div>
             </CardContent>

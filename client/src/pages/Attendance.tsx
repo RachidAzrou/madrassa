@@ -409,7 +409,7 @@ export default function Attendance() {
               
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm text-gray-800">Psychology</p>
+                  <p className="text-sm text-gray-800">Psychologie</p>
                   <span className="text-sm text-gray-700">75%</span>
                 </div>
                 <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -422,8 +422,8 @@ export default function Attendance() {
         
         <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
           <div className="p-6 border-b border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-800">Low Attendance Alerts</h3>
-            <p className="text-sm text-gray-500 mt-1">Students with attendance concerns</p>
+            <h3 className="text-lg font-semibold text-gray-800">Meldingen Lage Aanwezigheid</h3>
+            <p className="text-sm text-gray-500 mt-1">Studenten met aanwezigheidsproblemen</p>
           </div>
           <div className="p-6">
             <ul className="divide-y divide-gray-200">
@@ -436,11 +436,11 @@ export default function Attendance() {
                 <div className="ml-3 flex-1">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-gray-900">James Kim</p>
-                    <p className="text-sm text-gray-500">Business Management</p>
+                    <p className="text-sm text-gray-500">Bedrijfskunde</p>
                   </div>
                   <div className="mt-1 flex justify-between">
-                    <p className="text-sm text-gray-500">Missed 5 out of last 10 classes</p>
-                    <p className="text-sm font-medium text-red-600">58% Attendance</p>
+                    <p className="text-sm text-gray-500">5 van de laatste 10 lessen gemist</p>
+                    <p className="text-sm font-medium text-red-600">58% Aanwezigheid</p>
                   </div>
                   <div className="mt-2">
                     <Button variant="link" size="sm" className="text-primary hover:text-primary-dark p-0 h-auto">

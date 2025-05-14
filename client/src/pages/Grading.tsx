@@ -119,15 +119,15 @@ export default function Grading() {
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">Grade Management</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Beoordelingsbeheer</h1>
         <div className="flex items-center space-x-3">
           <Button variant="outline" className="flex items-center">
             <Download className="mr-2 h-4 w-4" />
-            Export Grades
+            Cijfers Exporteren
           </Button>
           <Button className="flex items-center">
             <PlusCircle className="mr-2 h-4 w-4" />
-            New Assessment
+            Nieuwe Beoordeling
           </Button>
         </div>
       </div>
@@ -181,14 +181,14 @@ export default function Grading() {
             <div className="relative">
               <Input 
                 type="text" 
-                placeholder="Search students..." 
+                placeholder="Zoek studenten..." 
                 className="w-full md:w-64 pl-10"
               />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             </div>
             <Button variant="outline">
               <Search className="mr-2 h-4 w-4" />
-              Filter
+              Filteren
             </Button>
           </div>
         </div>
@@ -200,8 +200,8 @@ export default function Grading() {
           <div className="p-8 text-center">
             <h3 className="text-gray-500 text-lg font-medium">
               {!selectedCourse 
-                ? "Please select a course" 
-                : "Please select an assessment"}
+                ? "Selecteer een cursus" 
+                : "Selecteer een beoordeling"}
             </h3>
           </div>
         ) : isLoading ? (
@@ -210,11 +210,11 @@ export default function Grading() {
           </div>
         ) : isError ? (
           <div className="text-center py-12 text-red-500">
-            Error loading grades data. Please try again.
+            Fout bij het laden van cijfergegevens. Probeer het opnieuw.
           </div>
         ) : students.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
-            No students enrolled in this course.
+            Geen studenten ingeschreven voor deze cursus.
           </div>
         ) : (
           <>

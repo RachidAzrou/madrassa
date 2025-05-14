@@ -7,9 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Students() {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [program, setProgram] = useState('all');
   const [year, setYear] = useState('all');
@@ -31,38 +33,59 @@ export default function Students() {
   const totalPages = Math.ceil(totalStudents / 10); // Assuming 10 students per page
 
   const handleAddStudent = async () => {
-    // Tijdelijke eenvoudige implementatie
-    alert("Nieuwe student toevoegen functie wordt binnenkort geïmplementeerd!");
+    // Toon een toast melding voor de toekomstige implementatie
+    toast({
+      title: "Functie in ontwikkeling",
+      description: "De functie voor het toevoegen van nieuwe studenten is momenteel in ontwikkeling.",
+      variant: "default",
+    });
   };
 
   const handleViewStudent = (id: string) => {
     console.log(`Viewing student with ID: ${id}`);
-    // Toon een eenvoudig bericht of alert
-    alert(`Student bekijken met ID: ${id}`);
+    // Navigeer naar een gedetailleerde weergave of toon een modal
+    toast({
+      title: "Student details",
+      description: `Details bekijken voor student met ID: ${id}`,
+      variant: "default",
+    });
   };
 
   const handleEditStudent = (id: string) => {
     console.log(`Editing student with ID: ${id}`);
-    // Toon een eenvoudig bericht of alert
-    alert(`Student bewerken met ID: ${id}`);
+    // Toon een edit formulier of navigeer naar een edit pagina
+    toast({
+      title: "Student bewerken",
+      description: `Bewerkingsformulier laden voor student met ID: ${id}`,
+      variant: "default",
+    });
   };
 
   const handleDeleteStudent = (id: string) => {
     console.log(`Deleting student with ID: ${id}`);
-    // In de toekomst: bevestigingsmodaal tonen en verwijderingslogica implementeren
+    
     if (confirm(`Weet je zeker dat je student met ID: ${id} wilt verwijderen?`)) {
-      // Daadwerkelijke API-aanroep zou hier worden gedaan
-      // Het zou er ongeveer zo uitzien:
-      /*
-      apiRequest(`/api/students/${id}`, { 
-        method: 'DELETE' 
-      }).then(() => {
-        // Invalidate cache om de lijst te vernieuwen
-        queryClient.invalidateQueries({ queryKey: ['/api/students'] });
-      });
-      */
-      
-      alert(`Student met ID: ${id} is verwijderd`);
+      // Implementeer de werkelijke verwijdering via API
+      apiRequest('DELETE', `/api/students/${id}`)
+        .then(() => {
+          // Toon succesmelding
+          toast({
+            title: "Student verwijderd",
+            description: `Student met ID ${id} is succesvol verwijderd.`,
+            variant: "default",
+          });
+          
+          // Invalidate cache om de lijst te vernieuwen
+          queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+        })
+        .catch((error) => {
+          // Toon foutmelding bij mislukken
+          toast({
+            title: "Fout bij verwijderen",
+            description: error.message || "Er is een fout opgetreden bij het verwijderen van de student.",
+            variant: "destructive",
+          });
+        });
     }
   };
 

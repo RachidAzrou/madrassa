@@ -186,7 +186,7 @@ export default function Programs() {
                     </div>
                   </div>
                   <div className="mt-4">
-                    <h4 className="text-md font-medium text-gray-800 mb-2">Description</h4>
+                    <h4 className="text-md font-medium text-gray-800 mb-2">Beschrijving</h4>
                     <p className="text-sm text-gray-600">{program.description}</p>
                   </div>
                 </div>

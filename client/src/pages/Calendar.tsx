@@ -1,9 +1,14 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter } from 'lucide-react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from '@/hooks/use-toast';
 
 // Define types
 interface CalendarEvent {
@@ -18,9 +23,20 @@ interface CalendarEvent {
 }
 
 export default function Calendar() {
+  const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<'month' | 'week' | 'day'>('month');
   const [filter, setFilter] = useState<string>('all');
+  const [isAddEventDialogOpen, setIsAddEventDialogOpen] = useState(false);
+  const [newEvent, setNewEvent] = useState({
+    title: '',
+    date: new Date().toISOString().split('T')[0],
+    startTime: '09:00',
+    endTime: '10:00',
+    location: '',
+    type: 'event' as 'exam' | 'class' | 'holiday' | 'event',
+    description: ''
+  });
 
   // Get month name, year - in Dutch
   const monthNames = ["Januari", "Februari", "Maart", "April", "Mei", "Juni", 
@@ -102,9 +118,61 @@ export default function Calendar() {
     return days;
   };
 
+  // Mutation voor het maken van een nieuw event
+  const createEventMutation = useMutation({
+    mutationFn: async (eventData: typeof newEvent) => {
+      return apiRequest('POST', '/api/calendar/events', eventData);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/calendar/events'] });
+      
+      // Reset form and close dialog
+      setNewEvent({
+        title: '',
+        date: new Date().toISOString().split('T')[0],
+        startTime: '09:00',
+        endTime: '10:00',
+        location: '',
+        type: 'event',
+        description: ''
+      });
+      setIsAddEventDialogOpen(false);
+      
+      // Toon succesmelding
+      toast({
+        title: "Evenement toegevoegd",
+        description: "Het evenement is succesvol toegevoegd aan de kalender.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij toevoegen",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van het evenement.",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleAddEvent = () => {
-    // Implementation will be added for event creation
-    console.log('Add event clicked');
+    // Open dialoogvenster
+    setIsAddEventDialogOpen(true);
+  };
+  
+  const handleSubmitEvent = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newEvent.title || !newEvent.date) {
+      toast({
+        title: "Onvolledige gegevens",
+        description: "Vul een titel en datum in om het evenement toe te voegen.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    createEventMutation.mutate(newEvent);
   };
 
   const handleFilterChange = (value: string) => {
@@ -282,6 +350,147 @@ export default function Calendar() {
           </div>
         </div>
       </div>
+
+      {/* Add Event Dialog */}
+      <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Nieuw Evenement Toevoegen</DialogTitle>
+            <DialogDescription>
+              Vul de evenementgegevens in om een nieuw item aan de academische kalender toe te voegen.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmitEvent}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="eventTitle" className="text-right">
+                    Titel
+                  </Label>
+                  <Input
+                    id="eventTitle"
+                    value={newEvent.title}
+                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                    className="mt-1"
+                    placeholder="Voer een titel in"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="eventDate" className="text-right">
+                    Datum
+                  </Label>
+                  <Input
+                    id="eventDate"
+                    type="date"
+                    value={newEvent.date}
+                    onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+
+                <div className="col-span-1">
+                  <Label htmlFor="eventType" className="text-right">
+                    Type
+                  </Label>
+                  <Select
+                    value={newEvent.type}
+                    onValueChange={(value: 'exam' | 'class' | 'holiday' | 'event') => setNewEvent({ 
+                      ...newEvent, 
+                      type: value 
+                    })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="exam">Examen</SelectItem>
+                      <SelectItem value="class">Les</SelectItem>
+                      <SelectItem value="holiday">Vakantie</SelectItem>
+                      <SelectItem value="event">Activiteit</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="startTime" className="text-right">
+                    Starttijd
+                  </Label>
+                  <Input
+                    id="startTime"
+                    type="time"
+                    value={newEvent.startTime}
+                    onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="endTime" className="text-right">
+                    Eindtijd
+                  </Label>
+                  <Input
+                    id="endTime"
+                    type="time"
+                    value={newEvent.endTime}
+                    onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="location" className="text-right">
+                    Locatie
+                  </Label>
+                  <Input
+                    id="location"
+                    value={newEvent.location}
+                    onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+                    className="mt-1"
+                    placeholder="Bijv. Lokaal A1.02 of Online"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="description" className="text-right">
+                    Beschrijving
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={newEvent.description}
+                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                    className="mt-1"
+                    placeholder="Optionele beschrijving"
+                    rows={3}
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsAddEventDialogOpen(false)}
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="submit"
+                disabled={createEventMutation.isPending}
+              >
+                {createEventMutation.isPending ? 'Bezig met toevoegen...' : 'Evenement toevoegen'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

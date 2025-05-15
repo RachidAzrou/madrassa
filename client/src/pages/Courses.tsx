@@ -27,8 +27,11 @@ export default function Courses() {
   const [department, setDepartment] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   
-  // State voor cursus dialoog
+  // State voor cursus dialogen
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [courseFormData, setCourseFormData] = useState({
     name: '',
     code: '',
@@ -98,13 +101,58 @@ export default function Courses() {
     createCourseMutation.mutate(courseFormData);
   };
   
-  const handleEditCourse = (id: string) => {
-    console.log(`Editing course with ID: ${id}`);
-    toast({
-      title: "Cursus bewerken",
-      description: `Bewerkingsformulier laden voor cursus met ID: ${id}`,
-      variant: "default",
+  const handleEditCourse = (course: Course) => {
+    setSelectedCourse(course);
+    setCourseFormData({
+      name: course.name || '',
+      code: course.code || '',
+      programId: course.programId ? parseInt(course.programId) : null,
+      description: course.description || '',
+      credits: course.credits || 6,
+      instructor: course.instructor || '',
+      maxStudents: course.maxStudents || 30,
+      isActive: course.isActive ?? true,
     });
+    setIsEditDialogOpen(true);
+  };
+  
+  // Mutatie voor het bijwerken van een cursus
+  const updateCourseMutation = useMutation({
+    mutationFn: async (data: { id: string; courseData: typeof courseFormData }) => {
+      return apiRequest('PUT', `/api/courses/${data.id}`, data.courseData);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      
+      // Reset form and close dialog
+      setIsEditDialogOpen(false);
+      setSelectedCourse(null);
+      
+      // Toon succes melding
+      toast({
+        title: "Cursus bijgewerkt",
+        description: "De cursus is succesvol bijgewerkt.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij bijwerken",
+        description: error.message || "Er is een fout opgetreden bij het bijwerken van de cursus.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleSubmitEditCourse = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedCourse) {
+      updateCourseMutation.mutate({
+        id: selectedCourse.id,
+        courseData: courseFormData
+      });
+    }
   };
   
   const handleViewCourse = (id: string) => {
@@ -116,31 +164,43 @@ export default function Courses() {
     });
   };
   
-  const handleDeleteCourse = (id: string) => {
-    console.log(`Deleting course with ID: ${id}`);
-    
-    if (confirm(`Weet je zeker dat je de cursus met ID: ${id} wilt verwijderen?`)) {
-      // Implementeer de werkelijke verwijdering via API
-      apiRequest('DELETE', `/api/courses/${id}`)
-        .then(() => {
-          // Toon succesmelding
-          toast({
-            title: "Cursus verwijderd",
-            description: `Cursus met ID ${id} is succesvol verwijderd.`,
-            variant: "default",
-          });
-          
-          // Invalidate cache om de lijst te vernieuwen
-          queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
-        })
-        .catch((error) => {
-          // Toon foutmelding bij mislukken
-          toast({
-            title: "Fout bij verwijderen",
-            description: error.message || "Er is een fout opgetreden bij het verwijderen van de cursus.",
-            variant: "destructive",
-          });
-        });
+  const handleDeleteCourse = (course: Course) => {
+    setSelectedCourse(course);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Mutatie voor het verwijderen van een cursus
+  const deleteCourseMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest('DELETE', `/api/courses/${id}`);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      
+      // Reset form and close dialog
+      setIsDeleteDialogOpen(false);
+      setSelectedCourse(null);
+      
+      // Toon succes melding
+      toast({
+        title: "Cursus verwijderd",
+        description: "De cursus is succesvol verwijderd uit het systeem.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van de cursus.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const confirmDeleteCourse = () => {
+    if (selectedCourse) {
+      deleteCourseMutation.mutate(selectedCourse.id);
     }
   };
 
@@ -256,7 +316,7 @@ export default function Courses() {
                       variant="ghost" 
                       size="sm" 
                       className="text-primary hover:text-primary-dark"
-                      onClick={() => handleEditCourse(course.id)}
+                      onClick={() => handleEditCourse(course)}
                     >
                       <Edit className="h-4 w-4 mr-1" />
                       <span>Bewerken</span>
@@ -274,7 +334,7 @@ export default function Courses() {
                       variant="ghost" 
                       size="sm" 
                       className="text-red-500 hover:text-red-700"
-                      onClick={() => handleDeleteCourse(course.id)}
+                      onClick={() => handleDeleteCourse(course)}
                     >
                       <Trash2 className="h-4 w-4 mr-1" />
                       <span className="sr-only">Verwijderen</span>

@@ -302,6 +302,13 @@ export default function Grading() {
     setGrades({});
     setIsGradesModified(false);
   };
+  
+  const handleClassChange = (value: string) => {
+    setSelectedClass(value);
+    setBehaviorScores({});
+    setBehaviorRemarks({});
+    setIsBehaviorModified(false);
+  };
 
   const handleGradeChange = (studentId: string, value: string) => {
     const numericValue = parseFloat(value);
@@ -312,6 +319,130 @@ export default function Grading() {
         [studentId]: numericValue
       }));
       setIsGradesModified(true);
+    }
+  };
+  
+  const handleBehaviorScoreChange = (studentId: string, value: string) => {
+    const numericValue = parseInt(value);
+    
+    if (!isNaN(numericValue) && numericValue >= 1 && numericValue <= 5) {
+      setBehaviorScores(prev => ({
+        ...prev,
+        [studentId]: numericValue
+      }));
+      
+      // Automatische opmerking genereren
+      const remark = getAutomaticBehaviorRemark(numericValue);
+      setBehaviorRemarks(prev => ({
+        ...prev,
+        [studentId]: remark
+      }));
+      
+      setIsBehaviorModified(true);
+    }
+  };
+  
+  const handleBehaviorRemarkChange = (studentId: string, value: string) => {
+    setBehaviorRemarks(prev => ({
+      ...prev,
+      [studentId]: value
+    }));
+    setIsBehaviorModified(true);
+  };
+  
+  // Fetch attendance data for student attendance analysis
+  const fetchAttendanceForStudent = async (studentId: string) => {
+    try {
+      const attendance = await apiRequest('GET', `/api/students/${studentId}/attendance`);
+      return attendance || [];
+    } catch (error) {
+      console.error("Error fetching attendance:", error);
+      return [];
+    }
+  };
+  
+  // Calculate punctuality score based on attendance
+  const getPunctualityScore = async (studentId: string): Promise<number> => {
+    try {
+      const attendanceData = await fetchAttendanceForStudent(studentId);
+      
+      if (!Array.isArray(attendanceData) || attendanceData.length === 0) {
+        return 3; // Gemiddelde score bij geen gegevens
+      }
+      
+      // Aanwezigheidsanalyse
+      const totalRecords = attendanceData.length;
+      let lateCount = 0;
+      let absentCount = 0;
+      
+      attendanceData.forEach((record: any) => {
+        if (record.status === 'Late') {
+          lateCount++;
+        } else if (record.status === 'Absent') {
+          absentCount++;
+        }
+      });
+      
+      // Punctualiteitsscore berekenen 
+      // 5: 0% absent, 0-5% late
+      // 4: 0-5% absent, 5-10% late
+      // 3: 5-10% absent, 10-20% late
+      // 2: 10-20% absent, 20-30% late
+      // 1: >20% absent, >30% late
+      
+      const absentPercentage = (absentCount / totalRecords) * 100;
+      const latePercentage = (lateCount / totalRecords) * 100;
+      
+      if (absentPercentage === 0 && latePercentage <= 5) {
+        return 5;
+      } else if (absentPercentage <= 5 && latePercentage <= 10) {
+        return 4;
+      } else if (absentPercentage <= 10 && latePercentage <= 20) {
+        return 3;
+      } else if (absentPercentage <= 20 && latePercentage <= 30) {
+        return 2;
+      } else {
+        return 1;
+      }
+    } catch (error) {
+      console.error("Error calculating punctuality:", error);
+      return 3; // Standaard bij een fout
+    }
+  };
+  
+  // Automatische opmerkingen genereren op basis van gedragsscore
+  const getAutomaticBehaviorRemark = (score: number): string => {
+    switch(score) {
+      case 1:
+        return "Gedrag is zorgwekkend. Student vertoont regelmatig storend gedrag en heeft moeite met het volgen van instructies.";
+      case 2:
+        return "Gedrag moet verbeteren. Student moet werken aan houding in de klas en respect voor medeleerlingen.";
+      case 3:
+        return "Gedrag is voldoende. Student volgt meestal de regels maar heeft soms aanmoediging nodig.";
+      case 4:
+        return "Gedrag is goed. Student toont respect en werkt constructief samen met anderen.";
+      case 5:
+        return "Uitstekend gedrag. Student is een positief voorbeeld voor anderen en draagt bij aan een goede leeromgeving.";
+      default:
+        return "";
+    }
+  };
+  
+  // Genereer automatische opmerking voor aanwezigheid/punctualiteit
+  const getPunctualityRemark = (score: number): string => {
+    switch(score) {
+      case 1:
+        return "Zeer frequente afwezigheid en/of te laat komen. Dit belemmert de voortgang ernstig.";
+      case 2:
+        return "Regelmatige afwezigheid en/of te laat komen. Meer consistentie is nodig.";
+      case 3:
+        return "Gemiddelde aanwezigheid. Soms absent of te laat.";
+      case 4:
+        return "Goede aanwezigheid. Zelden absent of te laat.";
+      case 5:
+        return "Uitstekende aanwezigheid en stiptheid. Altijd op tijd aanwezig.";
+      default:
+        return "";
     }
   };
   

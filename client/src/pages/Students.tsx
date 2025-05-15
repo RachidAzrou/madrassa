@@ -19,8 +19,11 @@ export default function Students() {
   const [sortBy, setSortBy] = useState('name');
   const [currentPage, setCurrentPage] = useState(1);
   
-  // State voor student dialog
+  // State voor student dialogen
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [studentFormData, setStudentFormData] = useState({
     studentId: '',
     firstName: '',
@@ -29,9 +32,12 @@ export default function Students() {
     phone: '',
     dateOfBirth: '',
     address: '',
+    city: '',
+    postalCode: '',
     programId: null as number | null,
     yearLevel: null as number | null,
-    status: 'Active' as string | null,
+    enrollmentDate: '',
+    status: 'active' as string,
   });
 
   // Fetch students with filters
@@ -104,41 +110,103 @@ export default function Students() {
     });
   };
 
-  const handleEditStudent = (id: string) => {
-    console.log(`Editing student with ID: ${id}`);
-    // Toon een edit formulier of navigeer naar een edit pagina
-    toast({
-      title: "Student bewerken",
-      description: `Bewerkingsformulier laden voor student met ID: ${id}`,
-      variant: "default",
+  const handleEditStudent = (student: any) => {
+    // Stel de geselecteerde student in en kopieer hun gegevens naar het formulier
+    setSelectedStudent(student);
+    setStudentFormData({
+      studentId: student.studentId || '',
+      firstName: student.firstName || '',
+      lastName: student.lastName || '',
+      email: student.email || '',
+      phone: student.phone || '',
+      dateOfBirth: student.dateOfBirth || '',
+      address: student.address || '',
+      city: student.city || '',
+      postalCode: student.postalCode || '',
+      programId: student.programId,
+      yearLevel: student.yearLevel,
+      enrollmentDate: student.enrollmentDate || '',
+      status: student.status || 'active',
     });
+    setIsEditDialogOpen(true);
   };
 
-  const handleDeleteStudent = (id: string) => {
-    console.log(`Deleting student with ID: ${id}`);
-    
-    if (confirm(`Weet je zeker dat je student met ID: ${id} wilt verwijderen?`)) {
-      // Implementeer de werkelijke verwijdering via API
-      apiRequest('DELETE', `/api/students/${id}`)
-        .then(() => {
-          // Toon succesmelding
-          toast({
-            title: "Student verwijderd",
-            description: `Student met ID ${id} is succesvol verwijderd.`,
-            variant: "default",
-          });
-          
-          // Invalidate cache om de lijst te vernieuwen
-          queryClient.invalidateQueries({ queryKey: ['/api/students'] });
-        })
-        .catch((error) => {
-          // Toon foutmelding bij mislukken
-          toast({
-            title: "Fout bij verwijderen",
-            description: error.message || "Er is een fout opgetreden bij het verwijderen van de student.",
-            variant: "destructive",
-          });
-        });
+  // Mutatie voor het updaten van een student
+  const updateStudentMutation = useMutation({
+    mutationFn: async (data: { id: string; studentData: typeof studentFormData }) => {
+      return apiRequest('PUT', `/api/students/${data.id}`, data.studentData);
+    },
+    onSuccess: () => {
+      // Vernieuw de lijst van studenten
+      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      
+      // Sluit het dialoog en reset het formulier
+      setIsEditDialogOpen(false);
+      setSelectedStudent(null);
+      
+      // Toon een succesmelding
+      toast({
+        title: "Student bijgewerkt",
+        description: "De studentgegevens zijn succesvol bijgewerkt.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij bijwerken",
+        description: error.message || "Er is een fout opgetreden bij het bijwerken van de student.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleSubmitEditStudent = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedStudent) {
+      updateStudentMutation.mutate({
+        id: selectedStudent.id,
+        studentData: studentFormData
+      });
+    }
+  };
+
+  const handleDeleteStudent = (student: any) => {
+    setSelectedStudent(student);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Mutatie voor het verwijderen van een student
+  const deleteStudentMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest('DELETE', `/api/students/${id}`);
+    },
+    onSuccess: () => {
+      // Vernieuw de lijst van studenten
+      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      
+      // Sluit het dialoog
+      setIsDeleteDialogOpen(false);
+      setSelectedStudent(null);
+      
+      // Toon een succesmelding
+      toast({
+        title: "Student verwijderd",
+        description: "De student is succesvol verwijderd uit het systeem.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van de student.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const confirmDeleteStudent = () => {
+    if (selectedStudent) {
+      deleteStudentMutation.mutate(selectedStudent.id);
     }
   };
 
@@ -380,7 +448,7 @@ export default function Students() {
                         variant="ghost" 
                         size="sm" 
                         className="text-gray-500 hover:text-gray-700"
-                        onClick={() => handleEditStudent(student.id)}
+                        onClick={() => handleEditStudent(student)}
                       >
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Bewerken</span>
@@ -389,7 +457,7 @@ export default function Students() {
                         variant="ghost" 
                         size="sm" 
                         className="text-red-500 hover:text-red-700"
-                        onClick={() => handleDeleteStudent(student.id)}
+                        onClick={() => handleDeleteStudent(student)}
                       >
                         <Trash2 className="h-4 w-4" />
                         <span className="sr-only">Verwijderen</span>

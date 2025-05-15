@@ -66,8 +66,7 @@ export default function Guardians() {
     relationship: 'parent',
     email: '',
     phone: '',
-    address: '', // Oude adresveld (behouden voor compatibiliteit)
-    street: '',  // Nieuwe adresvelden
+    street: '',
     houseNumber: '',
     postalCode: '',
     city: '',
@@ -153,7 +152,10 @@ export default function Guardians() {
         relationship: 'parent',
         email: '',
         phone: '',
-        address: '',
+        street: '',
+        houseNumber: '',
+        postalCode: '',
+        city: '',
         occupation: '',
         isEmergencyContact: false,
         notes: '',

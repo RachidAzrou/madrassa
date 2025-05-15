@@ -765,7 +765,7 @@ export default function Students() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Alle Programma's</SelectItem>
-                {programs.map((program) => (
+                {programs.map((program: {id: number, name: string}) => (
                   <SelectItem key={program.id} value={String(program.id)}>
                     {program.name}
                   </SelectItem>
@@ -915,7 +915,7 @@ export default function Students() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.studentId}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {programs.find(p => p.id === student.programId)?.name || 'Onbekend'}
+                      {programs.find((p: {id: number, name: string}) => p.id === student.programId)?.name || 'Onbekend'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       Jaar {student.yearLevel || 'Onbekend'}
@@ -1183,7 +1183,7 @@ export default function Students() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">Geen programma</SelectItem>
-                      {programs.map((program) => (
+                      {programs.map((program: {id: number, name: string}) => (
                         <SelectItem key={program.id} value={String(program.id)}>
                           {program.name}
                         </SelectItem>

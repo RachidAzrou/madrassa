@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, boolean, date, timestamp, unique, decimal } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -16,7 +17,7 @@ export const students = pgTable("students", {
   houseNumber: text("house_number"),
   postalCode: text("postal_code"),
   city: text("city"),
-  programId: integer("program_id"),
+  programId: integer("program_id"), // Behouden voor backward compatibiliteit
   yearLevel: integer("year_level"),
   status: text("status").default("active"), // active, inactive, pending, graduated
   enrollmentDate: timestamp("enrollment_date").defaultNow(),
@@ -63,6 +64,28 @@ export const insertStudentSchema = baseInsertStudentSchema.extend({
 
 export type InsertStudent = z.infer<typeof insertStudentSchema>;
 export type Student = typeof students.$inferSelect;
+
+// Student Programma's (voor meerdere programma's per student)
+export const studentPrograms = pgTable("student_programs", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull(),
+  programId: integer("program_id").notNull(),
+  yearLevel: integer("year_level"),
+  enrollmentDate: timestamp("enrollment_date").defaultNow(),
+  isPrimary: boolean("is_primary").default(false), // Geeft aan of dit het hoofdprogramma is
+  status: text("status").default("active"), // active, inactive, pending, graduated
+}, (table) => {
+  return {
+    unq: unique().on(table.studentId, table.programId),
+  };
+});
+
+export const insertStudentProgramSchema = createInsertSchema(studentPrograms).omit({
+  id: true
+});
+
+export type InsertStudentProgram = z.infer<typeof insertStudentProgramSchema>;
+export type StudentProgram = typeof studentPrograms.$inferSelect;
 
 // Programs
 export const programs = pgTable("programs", {
@@ -382,3 +405,48 @@ export const insertStudentGuardianSchema = createInsertSchema(studentGuardians).
 
 export type InsertStudentGuardian = z.infer<typeof insertStudentGuardianSchema>;
 export type StudentGuardian = typeof studentGuardians.$inferSelect;
+
+// Relatiedefinities
+// Dit zorgt ervoor dat Drizzle ORM de relaties tussen tabellen kan interpreteren
+
+// Student relations
+export const studentsRelations = relations(students, ({ many }) => ({
+  studentPrograms: many(studentPrograms),
+  enrollments: many(enrollments),
+  studentGuardians: many(studentGuardians),
+}));
+
+// Student Programs relations
+export const studentProgramsRelations = relations(studentPrograms, ({ one }) => ({
+  student: one(students, {
+    fields: [studentPrograms.studentId],
+    references: [students.id],
+  }),
+  program: one(programs, {
+    fields: [studentPrograms.programId],
+    references: [programs.id],
+  }),
+}));
+
+// Program relations
+export const programsRelations = relations(programs, ({ many }) => ({
+  courses: many(courses),
+  studentPrograms: many(studentPrograms),
+}));
+
+// Student Guardian relations
+export const studentGuardiansRelations = relations(studentGuardians, ({ one }) => ({
+  student: one(students, {
+    fields: [studentGuardians.studentId],
+    references: [students.id],
+  }),
+  guardian: one(guardians, {
+    fields: [studentGuardians.guardianId],
+    references: [guardians.id],
+  }),
+}));
+
+// Guardian relations
+export const guardiansRelations = relations(guardians, ({ many }) => ({
+  studentGuardians: many(studentGuardians),
+}));

@@ -111,12 +111,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Functie om het volgende beschikbare studentnummer te genereren
   async function generateNextStudentId(): Promise<string> {
     try {
-      // Haal alle bestaande studenten op om het hoogste ID te vinden
+      // Haal alle bestaande studenten op
       const allStudents = await storage.getStudents();
       
-      // Als er geen studenten zijn, begin met 1001
+      // Als er geen studenten zijn, begin met 1
       if (!allStudents || allStudents.length === 0) {
-        return "1001";
+        return "1";
       }
       
       // Filter alle geldige numerieke IDs
@@ -124,20 +124,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .map(student => student.studentId)
         .filter(id => /^\d+$/.test(id))
         .map(id => parseInt(id, 10))
-        .filter(id => !isNaN(id));
+        .filter(id => !isNaN(id))
+        .sort((a, b) => a - b); // Sorteer op numerieke volgorde
       
-      // Als er geen geldige numerieke IDs zijn, begin met 1001
+      // Als er geen geldige numerieke IDs zijn, begin met 1
       if (validIds.length === 0) {
-        return "1001";
+        return "1";
+      }
+
+      // Zoek naar "gaten" in de reeks
+      // Begin te zoeken vanaf 1
+      let expectedId = 1;
+      
+      // Loop door de gesorteerde IDs om het eerste ontbrekende nummer te vinden
+      for (const id of validIds) {
+        if (id > expectedId) {
+          // We hebben een gat gevonden
+          return expectedId.toString();
+        }
+        // Ga door naar het volgende verwachte nummer
+        expectedId = id + 1;
       }
       
-      // Bepaal het hoogste ID en verhoog met 1
-      const maxId = Math.max(...validIds);
-      return (maxId + 1).toString();
+      // Als er geen gaten zijn, gebruik dan het volgende nummer na het hoogste ID
+      return expectedId.toString();
     } catch (error) {
       console.error("Fout bij genereren studentnummer:", error);
-      // Fallback naar timestamp als er een fout optreedt
-      return (1000 + new Date().getTime() % 9000).toString();
+      // Fallback naar gewoon oplopend nummer als er een fout optreedt
+      return Math.floor(Math.random() * 1000 + 1).toString();
     }
   }
   

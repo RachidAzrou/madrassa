@@ -1425,21 +1425,14 @@ export default function Students() {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  // Export studenten als PDF bestand
+                  // Export studenten als PDF bestand met eenvoudige opmaak
                   const doc = new jsPDF();
                   
-                  // Titel direct toevoegen zonder logo
+                  // Logo en titel
                   doc.setFillColor(59, 89, 152); // Primary color - #3b5998
                   doc.circle(20, 15, 10, 'F');   // Cirkel met blauw als symbool
                   
-                  // Teken een kleine graduatie hoed in de cirkel
-                  doc.setDrawColor(255, 255, 255);
-                  doc.setLineWidth(0.5);
-                  doc.line(15, 15, 25, 15);    // Basis van de hoed
-                  doc.line(20, 12, 25, 15);    // Rechterkant van de hoed
-                  doc.line(20, 12, 15, 15);    // Linkerkant van de hoed
-                  
-                  // Add title
+                  // Titel
                   doc.setFontSize(20);
                   doc.setTextColor(59, 89, 152); // Primary color
                   doc.setFont("helvetica", "bold");
@@ -1450,48 +1443,76 @@ export default function Students() {
                   doc.setTextColor(0, 0, 0);
                   doc.text('Studentenlijst', 45, 30);
                   
-                  // Add generation date
+                  // Datum
                   doc.setFontSize(11);
                   doc.setTextColor(100);
                   doc.text(`Gegenereerd op: ${new Date().toLocaleDateString('nl-NL')}`, 14, 45);
                   
-                  // Create the table
-                  // @ts-ignore - jspdf-autotable types
-                  doc.autoTable({
-                    startY: 50,
-                    head: [['Studentnr', 'Naam', 'Vak', 'Klas', 'Leeftijd', 'Geslacht', 'Status']],
-                    body: sortedStudents.map(student => [
-                      student.studentId,
-                      `${student.firstName} ${student.lastName}`,
-                      programs.find((p: any) => p.id === student.programId)?.name || 'Onbekend',
-                      getStudentGroupName(student.id) || 'Geen klas',
-                      calculateAge(student.dateOfBirth) ? `${calculateAge(student.dateOfBirth)} jaar` : 'Onbekend',
-                      student.gender === 'man' ? 'Man' : student.gender === 'vrouw' ? 'Vrouw' : 'Onbekend',
-                      student.status.toLowerCase() === 'active' ? 'Actief' : 
-                      student.status.toLowerCase() === 'pending' ? 'In afwachting' : 
-                      student.status.toLowerCase() === 'inactive' ? 'Inactief' :
-                      student.status
-                    ]),
-                    headStyles: { fillColor: [59, 89, 152], textColor: 255 },
-                    alternateRowStyles: { fillColor: [245, 245, 245] },
-                    styles: { fontSize: 10, cellPadding: 5, overflow: 'linebreak' },
+                  // Header rij voor tabel
+                  doc.setFillColor(59, 89, 152);
+                  doc.setDrawColor(59, 89, 152);
+                  doc.rect(14, 50, 180, 10, 'F');
+                  
+                  doc.setFont("helvetica", "bold");
+                  doc.setTextColor(255, 255, 255);
+                  doc.setFontSize(10);
+                  
+                  // Tabelkoppen
+                  const headers = ['Studentnr', 'Naam', 'Vak', 'Klas', 'Leeftijd', 'Geslacht', 'Status'];
+                  headers.forEach((header, index) => {
+                    doc.text(header, 20 + (index * 25), 56);
                   });
                   
-                  // Add footer with info
-                  const pageCount = doc.internal.getNumberOfPages();
-                  for (let i = 1; i <= pageCount; i++) {
-                    doc.setPage(i);
-                    doc.setFontSize(8);
-                    doc.setTextColor(150);
-                    doc.text(
-                      `myMadrassa Studentenbeheersysteem | Pagina ${i} van ${pageCount}`,
-                      doc.internal.pageSize.getWidth() / 2,
-                      doc.internal.pageSize.getHeight() - 10,
-                      { align: 'center' }
-                    );
+                  // Data rijen
+                  doc.setFont("helvetica", "normal");
+                  doc.setTextColor(0, 0, 0);
+                  doc.setFontSize(9);
+                  
+                  // Toon maximaal 20 studenten
+                  const maxRows = Math.min(sortedStudents.length, 20);
+                  for (let i = 0; i < maxRows; i++) {
+                    const student = sortedStudents[i];
+                    const y = 66 + (i * 10);
+                    
+                    if (i % 2 === 0) {
+                      doc.setFillColor(245, 245, 245);
+                      doc.rect(14, y - 6, 180, 10, 'F');
+                    }
+                    
+                    doc.text(student.studentId, 20, y);
+                    doc.text(`${student.firstName} ${student.lastName}`, 45, y);
+                    
+                    const programName = programs.find((p: any) => p.id === student.programId)?.name || 'Onbekend';
+                    doc.text(programName, 70, y);
+                    
+                    const className = getStudentGroupName(student.id) || 'Geen klas';
+                    doc.text(className, 95, y);
+                    
+                    const age = calculateAge(student.dateOfBirth) ? `${calculateAge(student.dateOfBirth)} jaar` : 'Onbekend';
+                    doc.text(age, 120, y);
+                    
+                    const gender = student.gender === 'man' ? 'Man' : student.gender === 'vrouw' ? 'Vrouw' : 'Onbekend';
+                    doc.text(gender, 145, y);
+                    
+                    let status = student.status;
+                    if (student.status.toLowerCase() === 'active') status = 'Actief';
+                    else if (student.status.toLowerCase() === 'pending') status = 'In afwachting';
+                    else if (student.status.toLowerCase() === 'inactive') status = 'Inactief';
+                    
+                    doc.text(status, 170, y);
                   }
                   
-                  // Save the PDF
+                  // Voetnoot
+                  doc.setFontSize(8);
+                  doc.setTextColor(150);
+                  doc.text(
+                    `myMadrassa Studentenbeheersysteem | Pagina 1 van 1`,
+                    doc.internal.pageSize.getWidth() / 2,
+                    doc.internal.pageSize.getHeight() - 10,
+                    { align: 'center' }
+                  );
+                  
+                  // PDF opslaan
                   doc.save(`studenten_export_${new Date().toISOString().split('T')[0]}.pdf`);
                   
                   toast({

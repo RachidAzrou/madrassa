@@ -82,6 +82,7 @@ export default function Students() {
     yearLevel: null as number | null,
     enrollmentDate: '',
     status: 'active' as string,
+    notes: '',
   });
   
   // State voor meerdere programma's
@@ -201,6 +202,7 @@ export default function Students() {
         yearLevel: null,
         enrollmentDate: '',
         status: 'Active',
+        notes: '',
       });
       setSelectedPrograms([]); // Reset geselecteerde programma's
       setIsAddDialogOpen(false);
@@ -627,6 +629,7 @@ export default function Students() {
       yearLevel: student.yearLevel,
       enrollmentDate: student.enrollmentDate || '',
       status: student.status || 'active',
+      notes: student.notes || '',
     });
     setIsEditDialogOpen(true);
   };

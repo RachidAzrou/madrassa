@@ -1430,90 +1430,119 @@ export default function Guardians() {
       <Dialog open={isViewGuardianDialogOpen} onOpenChange={setIsViewGuardianDialogOpen}>
         <DialogContent className="w-[95vw] h-[90vh] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Voogd Details</DialogTitle>
+            <DialogTitle className="text-2xl">Voogd Details</DialogTitle>
             <DialogDescription>
-              Gedetailleerde informatie over de voogd.
+              Gedetailleerde informatie over de voogd en gekoppelde studenten.
             </DialogDescription>
           </DialogHeader>
           
           {selectedGuardian && (
             <div className="space-y-4 mt-4">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-16 w-16 border-2 border-primary/20">
-                  <AvatarFallback className="text-xl">
+              <div className="flex items-center gap-4 pb-4 border-b">
+                <Avatar className="h-20 w-20 border-2 border-primary/20">
+                  <AvatarFallback className="text-2xl">
                     {selectedGuardian.firstName?.[0]}{selectedGuardian.lastName?.[0]}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="text-xl font-bold">{selectedGuardian.firstName} {selectedGuardian.lastName}</h3>
-                  <Badge variant="outline">
-                    {selectedGuardian.relationship === 'parent' ? 'Ouder' : 
-                     selectedGuardian.relationship === 'guardian' ? 'Voogd' : 
-                     selectedGuardian.relationship}
-                  </Badge>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500">Email</h4>
-                  <p>{selectedGuardian.email}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500">Telefoon</h4>
-                  <p>{selectedGuardian.phone}</p>
-                </div>
-              </div>
-              
-              <div className="pt-2 pb-4 border-b">
-                <h4 className="text-sm font-medium text-gray-500">Adres</h4>
-                {selectedGuardian.street || selectedGuardian.houseNumber ? (
-                  <div>
-                    <p>{selectedGuardian.street || ''} {selectedGuardian.houseNumber || ''}</p>
-                    <p>{selectedGuardian.postalCode || ''} {selectedGuardian.city || ''}</p>
+                  <h3 className="text-2xl font-bold">{selectedGuardian.firstName} {selectedGuardian.lastName}</h3>
+                  <div className="flex gap-2 mt-1">
+                    <Badge variant="outline" className="text-sm px-3 py-1">
+                      {selectedGuardian.relationship === 'parent' ? 'Ouder' : 
+                       selectedGuardian.relationship === 'guardian' ? 'Voogd' : 
+                       selectedGuardian.relationship}
+                    </Badge>
+                    {selectedGuardian.isEmergencyContact && (
+                      <Badge variant="destructive" className="bg-red-600 text-white hover:bg-red-700 text-sm px-3 py-1">
+                        Noodcontact
+                      </Badge>
+                    )}
                   </div>
-                ) : (
-                  <p>Geen adres opgegeven</p>
-                )}
-              </div>
-              
-              <div className="pt-2">
-                <h4 className="text-sm font-medium text-gray-500">Beroep</h4>
-                <p>{selectedGuardian.occupation || 'Niet opgegeven'}</p>
-              </div>
-              
-              {selectedGuardian.isEmergencyContact && (
-                <div className="pt-2">
-                  <Badge variant="destructive" className="bg-red-600 text-white hover:bg-red-700">
-                    Noodcontact
-                  </Badge>
+                  
+                  {selectedGuardian.occupation && (
+                    <p className="text-muted-foreground mt-1">Beroep: {selectedGuardian.occupation}</p>
+                  )}
                 </div>
-              )}
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 mt-2">
+                <div className="rounded-lg border p-4 bg-card shadow-sm">
+                  <h4 className="text-sm font-semibold text-primary mb-2">Contact Gegevens</h4>
+                  <div className="space-y-3">
+                    <div>
+                      <h5 className="text-xs font-medium text-muted-foreground">Email</h5>
+                      <p className="mt-1">{selectedGuardian.email || "Niet opgegeven"}</p>
+                    </div>
+                    <div>
+                      <h5 className="text-xs font-medium text-muted-foreground">Telefoon</h5>
+                      <p className="mt-1">{selectedGuardian.phone || "Niet opgegeven"}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="rounded-lg border p-4 bg-card shadow-sm">
+                  <h4 className="text-sm font-semibold text-primary mb-2">Adres Gegevens</h4>
+                  <div>
+                    {selectedGuardian.street || selectedGuardian.houseNumber ? (
+                      <div className="space-y-1">
+                        <p>{selectedGuardian.street || ''} {selectedGuardian.houseNumber || ''}</p>
+                        <p>{selectedGuardian.postalCode || ''} {selectedGuardian.city || ''}</p>
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-sm">Geen adres opgegeven</p>
+                    )}
+                  </div>
+                </div>
+              </div>
               
               {selectedGuardian.notes && (
-                <div className="pt-2 pb-4 border-b">
-                  <h4 className="text-sm font-medium text-gray-500">Notities</h4>
+                <div className="rounded-lg border p-4 bg-card shadow-sm mt-4">
+                  <h4 className="text-sm font-semibold text-primary mb-2">Notities</h4>
                   <p className="whitespace-pre-wrap text-sm">{selectedGuardian.notes}</p>
                 </div>
               )}
               
-              <div className="pt-4">
-                <h4 className="text-sm font-medium text-gray-500 mb-2">Gekoppelde Studenten</h4>
-                <div id="studentList" className="space-y-2">
+              <div className="pt-4 pb-4 border-t">
+                <h4 className="text-lg font-semibold text-gray-700 mb-2">Gekoppelde Studenten</h4>
+                <div id="studentList" className="space-y-3">
                   {linkedStudents && linkedStudents.length > 0 ? (
                     linkedStudents.map((student: any) => (
-                      <div key={student.id} className="flex items-center gap-2 p-2 border rounded-md">
-                        <Avatar className="h-6 w-6">
-                          <AvatarFallback className="text-xs">{student.firstName?.[0]}{student.lastName?.[0]}</AvatarFallback>
+                      <div key={student.id} className="flex items-center gap-3 p-3 border rounded-md bg-muted/20 hover:bg-muted/30 transition-colors">
+                        <Avatar className="h-10 w-10 border-2 border-primary/20">
+                          <AvatarFallback className="text-sm">{student.firstName?.[0]}{student.lastName?.[0]}</AvatarFallback>
                         </Avatar>
-                        <span>{student.firstName} {student.lastName}</span>
-                        <Badge variant="outline" className="ml-auto text-xs">
-                          Student
-                        </Badge>
+                        <div>
+                          <span className="font-medium">{student.firstName} {student.lastName}</span>
+                          <div className="flex gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              Studentnummer: {student.studentId || "Onbekend"}
+                            </Badge>
+                            {student.status && (
+                              <Badge variant={student.status.toLowerCase() === 'active' ? 'default' : 
+                                     student.status.toLowerCase() === 'inactive' ? 'destructive' : 
+                                     student.status.toLowerCase() === 'pending' ? 'warning' : 'outline'} 
+                                     className="text-xs">
+                                {student.status === 'active' ? 'Actief' : 
+                                 student.status === 'inactive' ? 'Inactief' : 
+                                 student.status === 'pending' ? 'In afwachting' : student.status}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-500">Geen studenten gekoppeld aan deze voogd</p>
+                    <div className="p-6 text-center border rounded-md bg-muted/10">
+                      <p className="text-sm text-muted-foreground">Geen studenten gekoppeld aan deze voogd</p>
+                      <Button onClick={() => {
+                        setIsViewGuardianDialogOpen(false);
+                        handleEditGuardian(selectedGuardian as GuardianType);
+                        setTimeout(() => handleOpenStudentSearch(), 500);
+                      }} variant="outline" size="sm" className="mt-2">
+                        <PlusCircle className="h-3.5 w-3.5 mr-1" />
+                        Student koppelen
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>

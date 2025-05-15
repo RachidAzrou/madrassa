@@ -107,15 +107,15 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
       queryClient.invalidateQueries({ queryKey: ["/api/students", studentId, "programs"] });
       setIsAddDialogOpen(false);
       toast({
-        title: "Programma toegevoegd",
-        description: "Het programma is succesvol toegevoegd aan de student.",
+        title: "Vak toegevoegd",
+        description: "Het vak is succesvol toegevoegd aan de student.",
       });
     },
     onError: (error: any) => {
-      console.error("Fout bij toevoegen programma:", error);
+      console.error("Fout bij toevoegen vak:", error);
       toast({
         title: "Fout bij toevoegen",
-        description: "Er is een fout opgetreden bij het toevoegen van het programma.",
+        description: "Er is een fout opgetreden bij het toevoegen van het vak.",
         variant: "destructive",
       });
     },

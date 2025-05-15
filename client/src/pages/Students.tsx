@@ -70,9 +70,12 @@ export default function Students() {
   
   // Aangepaste onValueChange voor programId selecties
   const handleProgramIdChange = (value: string) => {
+    // Als er een nieuw programma wordt geselecteerd, reset de studiejaar waarde
     setStudentFormData({ 
       ...studentFormData, 
-      programId: value && value !== "none" ? parseInt(value) : null 
+      programId: value && value !== "none" ? parseInt(value) : null,
+      // Reset het studiejaar als het programma wijzigt
+      yearLevel: null
     });
   };
 
@@ -82,6 +85,21 @@ export default function Students() {
       ...studentFormData, 
       yearLevel: value && value !== "none" ? parseInt(value) : null 
     });
+  };
+  
+  // Functie om studiejaren te genereren op basis van programma duur
+  const getYearLevelOptions = (programId: number | null): number[] => {
+    if (!programId) return [];
+    
+    // Zoek het geselecteerde programma op
+    const selectedProgram = programsData?.find(p => p.id === programId);
+    
+    // Als het programma gevonden is, maak dan een array met jaren van 1 tot en met de duur
+    if (selectedProgram) {
+      return Array.from({length: selectedProgram.duration}, (_, i) => i + 1);
+    }
+    
+    return [];
   };
 
   // Fetch programs for dropdown and display

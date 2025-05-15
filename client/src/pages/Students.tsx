@@ -794,7 +794,7 @@ export default function Students() {
   // Dialog voor het verwijderen van een student
   const DeleteStudentDialog = () => (
     <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Student verwijderen</DialogTitle>
           <DialogDescription>

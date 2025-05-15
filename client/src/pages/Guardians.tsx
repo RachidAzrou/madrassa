@@ -835,7 +835,7 @@ export default function Guardians() {
           </DialogHeader>
           <form onSubmit={handleSubmitGuardian}>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 <div className="col-span-1">
                   <Label htmlFor="firstName" className="text-right">
                     Voornaam
@@ -864,7 +864,7 @@ export default function Guardians() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 <div className="col-span-1">
                   <Label htmlFor="relationship" className="text-right">
                     Relatie
@@ -1333,7 +1333,7 @@ export default function Guardians() {
       
       {/* Studenten Zoekdialog */}
       <Dialog open={isStudentSearchDialogOpen} onOpenChange={setIsStudentSearchDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Zoek Studenten</DialogTitle>
             <DialogDescription>

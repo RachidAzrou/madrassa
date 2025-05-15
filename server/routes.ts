@@ -402,8 +402,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.get("/api/courses", async (_req, res) => {
     try {
       const courses = await storage.getCourses();
-      res.json(courses);
+      console.log("Fetched courses:", courses);
+      res.json({ courses });
     } catch (error) {
+      console.error("Error fetching courses:", error);
       res.status(500).json({ message: "Error fetching courses" });
     }
   });
@@ -2138,6 +2140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Haal alle docenten op
       let teachers = await storage.getTeachers();
+      console.log("Fetched teachers:", teachers);
       let totalCount = teachers.length;
       
       // Filter op zoekterm als die is opgegeven
@@ -2146,8 +2149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         teachers = teachers.filter(teacher => 
           teacher.firstName.toLowerCase().includes(term) || 
           teacher.lastName.toLowerCase().includes(term) || 
-          teacher.email.toLowerCase().includes(term) ||
-          (teacher.teacherId && teacher.teacherId.toLowerCase().includes(term))
+          teacher.email.toLowerCase().includes(term)
         );
         totalCount = teachers.length;
       }
@@ -2157,6 +2159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ teachers, totalCount });
     } catch (error) {
+      console.error("Error fetching teachers:", error);
       res.status(500).json({ message: "Error fetching teachers" });
     }
   });

@@ -189,8 +189,35 @@ export default function Students() {
     return "Onbekend";
   };
 
-  // Sorteer studenten op basis van de huidige sorteerrichting
+  // Sorteer studenten op basis van de huidige sorteeroptie en richting
   const sortedStudents = [...students].sort((a, b) => {
+    if (currentSort === 'name') {
+      // Sorteren op naam
+      const nameCompare = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+      return nameSort === 'asc' ? nameCompare : -nameCompare;
+    } 
+    else if (currentSort === 'id') {
+      // Sorteren op studentnummer
+      const idA = a.studentId || '';
+      const idB = b.studentId || '';
+      const idCompare = idA.localeCompare(idB, undefined, {numeric: true});
+      return idSort === 'asc' ? idCompare : -idCompare;
+    }
+    else if (currentSort === 'class') {
+      // Sorteren op klas
+      const classA = getStudentGroupName(a.id) || '';
+      const classB = getStudentGroupName(b.id) || '';
+      const classCompare = classA.localeCompare(classB);
+      return classSort === 'asc' ? classCompare : -classCompare;
+    }
+    else if (currentSort === 'age') {
+      // Sorteren op leeftijd
+      const ageA = calculateAge(a.dateOfBirth) || 0;
+      const ageB = calculateAge(b.dateOfBirth) || 0;
+      const ageCompare = ageA - ageB;
+      return ageSort === 'asc' ? ageCompare : -ageCompare;
+    }
+    
     // Standaard sorteren op naam
     const nameCompare = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
     return nameSort === 'asc' ? nameCompare : -nameCompare;
@@ -852,9 +879,33 @@ export default function Students() {
     // Invalidate queries om zeker te zijn van verse data
     queryClient.invalidateQueries({ queryKey: ['/api/students'] });
   };
+  
+  const handleGenderChange = (value: string) => {
+    setGender(value);
+    setCurrentPage(1);
+    // Invalidate queries om zeker te zijn van verse data
+    queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+  };
 
+  // Sorteerfuncties
   const toggleNameSort = () => {
     setNameSort(prev => prev === 'asc' ? 'desc' : 'asc');
+    setCurrentSort('name');
+  };
+  
+  const toggleIdSort = () => {
+    setIdSort(prev => prev === 'asc' ? 'desc' : 'asc');
+    setCurrentSort('id');
+  };
+  
+  const toggleClassSort = () => {
+    setClassSort(prev => prev === 'asc' ? 'desc' : 'asc');
+    setCurrentSort('class');
+  };
+  
+  const toggleAgeSort = () => {
+    setAgeSort(prev => prev === 'asc' ? 'desc' : 'asc');
+    setCurrentSort('age');
   };
 
   const handlePageChange = (page: number) => {
@@ -1162,16 +1213,6 @@ export default function Students() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h1 className="text-2xl font-bold text-gray-800">Studentenbeheer</h1>
         <div className="flex flex-col md:flex-row gap-3">
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder="Zoek studenten..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="w-full md:w-64 pl-10"
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          </div>
           <Button onClick={handleAddStudent} className="flex items-center">
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Student Toevoegen</span>
@@ -1181,7 +1222,7 @@ export default function Students() {
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Vak</label>
             <Select value={program} onValueChange={handleProgramChange}>
@@ -1229,7 +1270,19 @@ export default function Students() {
             </Select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Exporteren</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Geslacht</label>
+            <Select value={gender} onValueChange={handleGenderChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Alle" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle</SelectItem>
+                <SelectItem value="man">Man</SelectItem>
+                <SelectItem value="vrouw">Vrouw</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center">
             <Button
               variant="outline"
               className="flex items-center w-full"

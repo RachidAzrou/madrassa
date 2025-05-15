@@ -51,7 +51,15 @@ export default function Students() {
   const [program, setProgram] = useState('all');
   const [studentGroup, setStudentGroup] = useState('all');
   const [status, setStatus] = useState('all');
+  const [gender, setGender] = useState('all');
+  
+  // Sorteerstaten
   const [nameSort, setNameSort] = useState('asc');
+  const [idSort, setIdSort] = useState('asc');
+  const [classSort, setClassSort] = useState('asc');
+  const [ageSort, setAgeSort] = useState('asc');
+  const [currentSort, setCurrentSort] = useState('name'); // name, id, class, age
+  
   const [currentPage, setCurrentPage] = useState(1);
   
   // State voor student dialogen
@@ -235,6 +243,7 @@ export default function Students() {
         enrollmentDate: '',
         status: 'Active',
         notes: '',
+        gender: '',
       });
       setSelectedPrograms([]); // Reset geselecteerde programma's
       setIsAddDialogOpen(false);
@@ -1333,9 +1342,33 @@ export default function Students() {
                     </div>
                   </div>
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klas</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leeftijd</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={toggleIdSort}>
+                  <div className="flex items-center">
+                    ID
+                    {idSort === 'asc' ? 
+                      <ChevronUp className="ml-1 h-4 w-4" /> : 
+                      <ChevronDown className="ml-1 h-4 w-4" />
+                    }
+                  </div>
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={toggleClassSort}>
+                  <div className="flex items-center">
+                    Klas
+                    {classSort === 'asc' ? 
+                      <ChevronUp className="ml-1 h-4 w-4" /> : 
+                      <ChevronDown className="ml-1 h-4 w-4" />
+                    }
+                  </div>
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={toggleAgeSort}>
+                  <div className="flex items-center">
+                    Leeftijd
+                    {ageSort === 'asc' ? 
+                      <ChevronUp className="ml-1 h-4 w-4" /> : 
+                      <ChevronDown className="ml-1 h-4 w-4" />
+                    }
+                  </div>
+                </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
               </tr>

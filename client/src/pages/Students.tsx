@@ -1299,7 +1299,7 @@ export default function Students() {
               onClick={() => {
                 // Export studenten als CSV bestand 
                 // Exportfunctionaliteit implementeren
-                const headers = ['Studentnummer', 'Voornaam', 'Achternaam', 'Email', 'Telefoon', 'Vak', 'Klas', 'Status'];
+                const headers = ['Studentnummer', 'Voornaam', 'Achternaam', 'Email', 'Telefoon', 'Vak', 'Klas', 'Geslacht', 'Status'];
                 const csvContent = [
                   headers.join(','),
                   ...sortedStudents.map(student => [
@@ -1310,6 +1310,7 @@ export default function Students() {
                     student.phone || '',
                     programs.find((p: any) => p.id === student.programId)?.name || 'Onbekend',
                     getStudentGroupName(student.id) || 'Geen klas',
+                    student.gender === 'man' ? 'Man' : student.gender === 'vrouw' ? 'Vrouw' : 'Onbekend',
                     student.status
                   ].join(','))
                 ].join('\n');
@@ -1440,7 +1441,7 @@ export default function Students() {
             <tbody className="bg-white divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center">
+                  <td colSpan={7} className="px-6 py-4 text-center">
                     <div className="flex justify-center">
                       <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                     </div>
@@ -1448,13 +1449,13 @@ export default function Students() {
                 </tr>
               ) : isError ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-red-500">
+                  <td colSpan={7} className="px-6 py-4 text-center text-red-500">
                     Fout bij het laden van studenten. Probeer het opnieuw.
                   </td>
                 </tr>
               ) : students.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
                     Geen studenten gevonden. Probeer je filters aan te passen.
                   </td>
                 </tr>
@@ -1484,6 +1485,9 @@ export default function Students() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {calculateAge(student.dateOfBirth) ? `${calculateAge(student.dateOfBirth)} jaar` : 'Onbekend'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {student.gender === 'man' ? 'Man' : student.gender === 'vrouw' ? 'Vrouw' : 'Onbekend'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${

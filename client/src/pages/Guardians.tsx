@@ -653,8 +653,8 @@ export default function Guardians() {
                     </td>
 
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex -space-x-2">
-                        {/* Klikbaar vraagteken om gekoppelde studenten te tonen */}
+                      <div className="flex justify-center items-center">
+                        {/* Klikbaar icoon om gekoppelde studenten te tonen */}
                         <button
                           onClick={async () => {
                             setSelectedGuardian(guardian);

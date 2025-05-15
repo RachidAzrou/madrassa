@@ -369,7 +369,7 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
       
       {/* Toevoegen Dialoogvenster */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-none w-auto">
+        <DialogContent className="max-w-[95vw] w-auto max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Vak Toevoegen</DialogTitle>
             <DialogDescription>
@@ -381,7 +381,7 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <Label htmlFor="programId" className="text-right">
-                    Programma <span className="text-red-500">*</span>
+                    Vak <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     value={programFormData.programId?.toString() || ''}
@@ -489,10 +489,10 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <Label className="text-right font-semibold">
-                    Programma
+                    Vak
                   </Label>
                   <p className="mt-1 text-muted-foreground">
-                    {programs.find(p => p.id === programFormData.programId)?.name || "Onbekend programma"}
+                    {programs.find(p => p.id === programFormData.programId)?.name || "Onbekend vak"}
                   </p>
                 </div>
                 

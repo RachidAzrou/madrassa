@@ -1151,7 +1151,7 @@ export default function Students() {
 
       {/* Add Student Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-[95vw] w-auto max-h-[80vh]">
+        <DialogContent className="max-w-[95vw] w-auto max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
             <DialogDescription>

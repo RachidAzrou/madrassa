@@ -97,7 +97,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
               <img src={madrassaLogo} alt="myMadrassa Logo" className="w-9 h-9 rounded-lg object-cover" />
               <span className="text-xl font-semibold">
                 <span className="text-gray-800">my</span>
-                <span className="text-blue-600">Madrassa</span>
+                <span className="text-[#3b5998]">Madrassa</span>
               </span>
             </div>
           </Link>

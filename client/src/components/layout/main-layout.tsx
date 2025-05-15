@@ -86,7 +86,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         <footer className="py-4 px-6 border-t border-gray-200 bg-white mt-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <p className="text-sm text-gray-500">
-              © {new Date().getFullYear()} <span className="text-gray-600">my</span><span className="text-blue-600">Madrassa</span>. Alle rechten voorbehouden.
+              © {new Date().getFullYear()} <span className="text-gray-600">my</span><span className="text-[#3b5998]">Madrassa</span>. Alle rechten voorbehouden.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-sm text-gray-500 hover:text-primary">

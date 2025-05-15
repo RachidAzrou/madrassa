@@ -152,8 +152,13 @@ export default function Students() {
         phone: '',
         dateOfBirth: '',
         address: '',
+        street: '',
+        houseNumber: '',
+        postalCode: '',
+        city: '',
         programId: null,
         yearLevel: null,
+        enrollmentDate: '',
         status: 'Active',
       });
       setIsAddDialogOpen(false);
@@ -331,8 +336,10 @@ export default function Students() {
       phone: student.phone || '',
       dateOfBirth: student.dateOfBirth || '',
       address: student.address || '',
-      city: student.city || '',
+      street: student.street || '',
+      houseNumber: student.houseNumber || '',
       postalCode: student.postalCode || '',
+      city: student.city || '',
       programId: student.programId,
       yearLevel: student.yearLevel,
       enrollmentDate: student.enrollmentDate || '',
@@ -1230,8 +1237,58 @@ export default function Students() {
 
               <div className="grid grid-cols-1 gap-4">
                 <div className="col-span-1">
+                  <Label htmlFor="street" className="text-right">
+                    Straatnaam
+                  </Label>
+                  <Input
+                    id="street"
+                    value={studentFormData.street || ''}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, street: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-4 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="houseNumber" className="text-right">
+                    Huisnummer
+                  </Label>
+                  <Input
+                    id="houseNumber"
+                    value={studentFormData.houseNumber || ''}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, houseNumber: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="postalCode" className="text-right">
+                    Postcode
+                  </Label>
+                  <Input
+                    id="postalCode"
+                    value={studentFormData.postalCode || ''}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Label htmlFor="city" className="text-right">
+                    Stad
+                  </Label>
+                  <Input
+                    id="city"
+                    value={studentFormData.city || ''}
+                    onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
                   <Label htmlFor="address" className="text-right">
-                    Adres
+                    Adres (oud formaat, optioneel)
                   </Label>
                   <Input
                     id="address"

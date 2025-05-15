@@ -1792,6 +1792,17 @@ export default function Students() {
                         </div>
                       </div>
                       
+                      <div className="mt-4">
+                        <h3 className="text-sm font-medium text-muted-foreground mb-2">Notities</h3>
+                        <div className="p-3 bg-muted rounded-md min-h-[100px]">
+                          {selectedStudent.notes ? (
+                            <p className="whitespace-pre-wrap">{selectedStudent.notes}</p>
+                          ) : (
+                            <p className="text-muted-foreground italic">Geen notities beschikbaar</p>
+                          )}
+                        </div>
+                      </div>
+                      
                       <div className="flex justify-end space-x-2 pt-4 mt-4">
                         <Button variant="outline" onClick={() => handleEditStudent(selectedStudent)}>
                           <Edit className="mr-2 h-4 w-4" />

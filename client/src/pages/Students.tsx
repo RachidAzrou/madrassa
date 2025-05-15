@@ -158,7 +158,7 @@ export default function Students() {
   
   // Fetch students with filters
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['/api/students', { searchTerm, program, studentGroup, status, nameSort, page: currentPage }],
+    queryKey: ['/api/students', { searchTerm, program, studentGroup, status, gender, nameSort, page: currentPage }],
     staleTime: 30000,
   });
 
@@ -189,8 +189,18 @@ export default function Students() {
     return "Onbekend";
   };
 
+  // Filter studenten op basis van geslacht
+  const filteredStudents = [...students].filter(student => {
+    // Filter op geslacht
+    if (gender !== 'all' && student.gender !== gender) {
+      return false;
+    }
+    
+    return true;
+  });
+
   // Sorteer studenten op basis van de huidige sorteeroptie en richting
-  const sortedStudents = [...students].sort((a, b) => {
+  const sortedStudents = [...filteredStudents].sort((a, b) => {
     if (currentSort === 'name') {
       // Sorteren op naam
       const nameCompare = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
@@ -1422,6 +1432,7 @@ export default function Students() {
                     }
                   </div>
                 </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Geslacht</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
               </tr>

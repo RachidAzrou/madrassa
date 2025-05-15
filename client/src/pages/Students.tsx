@@ -575,7 +575,7 @@ export default function Students() {
         
         <form onSubmit={handleSubmitEditStudent}>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               <div className="col-span-1">
                 <Label htmlFor="editStudentId" className="text-right">
                   Studentnummer <span className="text-xs text-muted-foreground font-normal italic">(niet bewerkbaar)</span>
@@ -609,7 +609,7 @@ export default function Students() {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               <div className="col-span-1">
                 <Label htmlFor="editFirstName" className="text-right">
                   Voornaam*
@@ -636,7 +636,7 @@ export default function Students() {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               <div className="col-span-1">
                 <Label htmlFor="editEmail" className="text-right">
                   E-mail*
@@ -663,7 +663,7 @@ export default function Students() {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               <div className="col-span-1">
                 <Label htmlFor="editDateOfBirth" className="text-right">
                   Geboortedatum
@@ -725,17 +725,17 @@ export default function Students() {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-1">
+            <div className="grid grid-cols-4 gap-4">
+              <div className="col-span-2">
                 <Label htmlFor="editProgramId" className="text-right">
-                  Programma
+                  Vak
                 </Label>
                 <Select
                   value={studentFormData.programId?.toString() || ''}
                   onValueChange={handleProgramIdChange}
                 >
                   <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Selecteer programma" />
+                    <SelectValue placeholder="Selecteer vak" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Geen programma</SelectItem>

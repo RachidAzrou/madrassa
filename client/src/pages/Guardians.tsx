@@ -62,9 +62,9 @@ export default function Guardians() {
   const [selectedStudents, setSelectedStudents] = useState<Array<{id: number, name: string}>>([]);
 
   // Fetch guardians with filters
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['/api/guardians', { searchTerm, relation, page: currentPage }],
-    staleTime: 30000,
+    staleTime: 5000, // Verlaagd naar 5 seconden voor snellere updates
   });
   
   // Studenten zoeken

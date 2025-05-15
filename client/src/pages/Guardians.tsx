@@ -1137,20 +1137,7 @@ export default function Guardians() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1">
-                <div className="col-span-1">
-                  <Label htmlFor="edit-address" className="text-right">
-                    Adres
-                  </Label>
-                  <Input
-                    id="edit-address"
-                    placeholder="Volledige adres"
-                    value={guardianFormData.address}
-                    onChange={(e) => setGuardianFormData({ ...guardianFormData, address: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
+
 
               <div className="grid grid-cols-1">
                 <div className="col-span-1">

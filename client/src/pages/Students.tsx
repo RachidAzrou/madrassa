@@ -1285,20 +1285,6 @@ export default function Students() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="address" className="text-right">
-                    Adres (oud formaat, optioneel)
-                  </Label>
-                  <Input
-                    id="address"
-                    value={studentFormData.address || ''}
-                    onChange={(e) => setStudentFormData({ ...studentFormData, address: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-1">
                   <Label htmlFor="programId" className="text-right">

@@ -52,6 +52,8 @@ export default function Students() {
   const [studentGroup, setStudentGroup] = useState('all');
   const [status, setStatus] = useState('all');
   const [gender, setGender] = useState('all');
+  const [minAge, setMinAge] = useState<string | undefined>(undefined);
+  const [maxAge, setMaxAge] = useState<string | undefined>(undefined);
   
   // Sorteerstaten
   const [nameSort, setNameSort] = useState('asc');
@@ -190,10 +192,40 @@ export default function Students() {
     return "Onbekend";
   };
 
-  // Filter studenten op basis van geslacht
+  // Filter studenten op basis van geslacht, leeftijd, klas en status
   const filteredStudents = [...students].filter(student => {
     // Filter op geslacht
     if (gender !== 'all' && student.gender !== gender) {
+      return false;
+    }
+    
+    // Filter op leeftijd (minAge)
+    if (minAge && !isNaN(parseInt(minAge))) {
+      const studentAge = calculateAge(student.dateOfBirth);
+      if (!studentAge || studentAge < parseInt(minAge)) {
+        return false;
+      }
+    }
+    
+    // Filter op leeftijd (maxAge)
+    if (maxAge && !isNaN(parseInt(maxAge))) {
+      const studentAge = calculateAge(student.dateOfBirth);
+      if (!studentAge || studentAge > parseInt(maxAge)) {
+        return false;
+      }
+    }
+    
+    // Filter op studentengroep (klas)
+    if (studentGroup !== 'all') {
+      // We gebruiken hier een helper-functie die de studentengroep-IDs voor een student ophaalt
+      // In de toekomst dit vervangen door een echte query of relatie
+      // Voor nu gebruiken we een vereenvoudigde check
+      // Echte implementatie zou studentGroupEnrollments.studentId checken
+      return false; // Tijdelijk uitgeschakeld tot we StudentGroupEnrollments hebben
+    }
+    
+    // Filter op status
+    if (status !== 'all' && student.status.toLowerCase() !== status.toLowerCase()) {
       return false;
     }
     
@@ -1315,10 +1347,34 @@ export default function Students() {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex items-center">
+
+        </div>
+      </div>
+
+      {/* Student List Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+          <div className="text-sm text-gray-500">
+            {isLoading ? 'Laden...' : `Tonen van ${students.length} van de ${totalStudents} studenten`}
+          </div>
+          <div className="flex space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                // Toon of verberg geavanceerde filteropties
+                const advancedFilters = document.getElementById('advancedFilters');
+                if (advancedFilters) {
+                  advancedFilters.classList.toggle('hidden');
+                }
+              }}
+            >
+              <Filter className="mr-2 h-4 w-4" />
+              Filteren
+            </Button>
             <Button
               variant="outline"
-              className="flex items-center w-full"
+              size="sm"
               onClick={() => {
                 // Export studenten als CSV bestand 
                 // Exportfunctionaliteit implementeren
@@ -1360,43 +1416,81 @@ export default function Students() {
             </Button>
           </div>
         </div>
-      </div>
-
-      {/* Student List Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-          <div className="text-sm text-gray-500">
-            {isLoading ? 'Laden...' : `Tonen van ${students.length} van de ${totalStudents} studenten`}
-          </div>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => {
-                // Toon of verberg geavanceerde filteropties
-                const advancedFilters = document.getElementById('advancedFilters');
-                if (advancedFilters) {
-                  advancedFilters.classList.toggle('hidden');
-                }
-              }}
-            >
-              <Filter className="mr-2 h-4 w-4" />
-              Filteren
-            </Button>
-          </div>
-        </div>
         
         {/* Geavanceerde filter opties - standaard verborgen */}
         <div id="advancedFilters" className="p-4 border-b border-gray-200 bg-gray-50 hidden">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Geavanceerd zoeken</label>
-              <Input
-                type="text"
-                placeholder="Zoek op adres, notities..."
-                className="w-full"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Geslacht</label>
+              <Select value={gender} onValueChange={handleGenderChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Alle" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle</SelectItem>
+                  <SelectItem value="man">Man</SelectItem>
+                  <SelectItem value="vrouw">Vrouw</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Leeftijd</label>
+              <div className="flex items-center space-x-2">
+                <Input 
+                  type="number" 
+                  placeholder="Van" 
+                  className="w-full" 
+                  min={0}
+                  max={100}
+                  value={minAge}
+                  onChange={(e) => setMinAge(e.target.value)}
+                />
+                <span>-</span>
+                <Input 
+                  type="number" 
+                  placeholder="Tot" 
+                  className="w-full" 
+                  min={0}
+                  max={100}
+                  value={maxAge}
+                  onChange={(e) => setMaxAge(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
+              <Select value={studentGroup} onValueChange={handleStudentGroupChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Alle klassen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle klassen</SelectItem>
+                  {studentGroups.map((group: any) => (
+                    <SelectItem key={group.id} value={group.id.toString()}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <Select value={status} onValueChange={handleStatusChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Alle statussen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle statussen</SelectItem>
+                  <SelectItem value="active">Actief</SelectItem>
+                  <SelectItem value="pending">In afwachting</SelectItem>
+                  <SelectItem value="inactive">Inactief</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Registratiedatum</label>
               <Input
@@ -1404,9 +1498,44 @@ export default function Students() {
                 className="w-full"
               />
             </div>
-            <div className="flex items-end">
-              <Button className="w-full">Filters toepassen</Button>
-            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" className="w-auto" onClick={() => {
+              // Reset alle filters
+              setGender('all');
+              setMinAge('');
+              setMaxAge('');
+              setStudentGroup('all');
+              setStatus('all');
+              setCurrentPage(1);
+              
+              // Invalidate queries om zeker te zijn van verse data
+              queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+              
+              // Sluit het filter panel
+              const advancedFilters = document.getElementById('advancedFilters');
+              if (advancedFilters) {
+                advancedFilters.classList.add('hidden');
+              }
+            }}>
+              Filters wissen
+            </Button>
+            <Button className="w-auto" onClick={() => {
+              // Pas filters toe - de state is al bijgewerkt door de onValueChange handlers
+              setCurrentPage(1);
+              
+              // Invalidate queries om zeker te zijn van verse data
+              queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+              
+              // Sluit het filter panel
+              const advancedFilters = document.getElementById('advancedFilters');
+              if (advancedFilters) {
+                advancedFilters.classList.add('hidden');
+              }
+            }}>
+              Filters toepassen
+            </Button>
           </div>
         </div>
         

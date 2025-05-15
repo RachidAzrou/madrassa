@@ -157,12 +157,31 @@ export default function Students() {
   const totalStudents = data?.totalCount || students.length || 0;
   const totalPages = Math.ceil(totalStudents / 10); // Assuming 10 students per page
   
-  // Sorteer studenten op ID (studentId)
-  const sortedStudents = [...students].sort((a, b) => {
-    if (a.studentId && b.studentId) {
-      return a.studentId.localeCompare(b.studentId, undefined, { numeric: true });
+  // Calculate ages from dateOfBirth
+  const calculateAge = (dateOfBirth: string | null) => {
+    if (!dateOfBirth) return null;
+    const dob = new Date(dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--;
     }
-    return 0;
+    return age;
+  };
+
+  // Function to get student group name by student id
+  const getStudentGroupName = (studentId: number) => {
+    // In de toekomst dit vervangen door een echte query of relatie
+    // For now, we'll retrieve from studentGroupsEnrollments when available
+    return "Onbekend";
+  };
+
+  // Sorteer studenten op basis van de huidige sorteerrichting
+  const sortedStudents = [...students].sort((a, b) => {
+    // Standaard sorteren op naam
+    const nameCompare = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+    return nameSort === 'asc' ? nameCompare : -nameCompare;
   });
 
   // Mutatie om een student toe te voegen
@@ -806,8 +825,8 @@ export default function Students() {
     queryClient.invalidateQueries({ queryKey: ['/api/students'] });
   };
 
-  const handleYearChange = (value: string) => {
-    setYear(value);
+  const handleStudentGroupChange = (value: string) => {
+    setStudentGroup(value);
     setCurrentPage(1);
     // Invalidate queries om zeker te zijn van verse data
     queryClient.invalidateQueries({ queryKey: ['/api/students'] });
@@ -820,8 +839,8 @@ export default function Students() {
     queryClient.invalidateQueries({ queryKey: ['/api/students'] });
   };
 
-  const handleSortChange = (value: string) => {
-    setSortBy(value);
+  const toggleNameSort = () => {
+    setNameSort(prev => prev === 'asc' ? 'desc' : 'asc');
   };
 
   const handlePageChange = (page: number) => {
@@ -1133,13 +1152,13 @@ export default function Students() {
       <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Programma</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Vak</label>
             <Select value={program} onValueChange={handleProgramChange}>
               <SelectTrigger>
-                <SelectValue placeholder="Alle Programma's" />
+                <SelectValue placeholder="Alle Vakken" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Alle Programma's</SelectItem>
+                <SelectItem value="all">Alle Vakken</SelectItem>
                 {programs.map((program: {id: number, name: string}) => (
                   <SelectItem key={program.id} value={String(program.id)}>
                     {program.name}
@@ -1149,17 +1168,18 @@ export default function Students() {
             </Select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Jaar</label>
-            <Select value={year} onValueChange={handleYearChange}>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
+            <Select value={studentGroup} onValueChange={handleStudentGroupChange}>
               <SelectTrigger>
-                <SelectValue placeholder="Alle Jaren" />
+                <SelectValue placeholder="Alle Klassen" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Alle Jaren</SelectItem>
-                <SelectItem value="1">Jaar 1</SelectItem>
-                <SelectItem value="2">Jaar 2</SelectItem>
-                <SelectItem value="3">Jaar 3</SelectItem>
-                <SelectItem value="4">Jaar 4</SelectItem>
+                <SelectItem value="all">Alle Klassen</SelectItem>
+                {studentGroups.map((group: {id: number, name: string}) => (
+                  <SelectItem key={group.id} value={String(group.id)}>
+                    {group.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

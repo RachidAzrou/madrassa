@@ -1287,7 +1287,7 @@ export default function Students() {
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         student.status.toLowerCase() === 'active' || student.status.toLowerCase() === 'actief' ? 'bg-green-100 text-green-800' : 
                         student.status.toLowerCase() === 'pending' || student.status.toLowerCase() === 'in afwachting' ? 'bg-yellow-100 text-yellow-800' : 
-                        student.status.toLowerCase() === 'inactive' || student.status.toLowerCase() === 'inactief' ? 'bg-gray-100 text-gray-800' :
+                        student.status.toLowerCase() === 'inactive' || student.status.toLowerCase() === 'inactief' ? 'bg-red-100 text-red-800' :
                         'bg-blue-100 text-blue-800'
                       }`}>
                         {student.status.toLowerCase() === 'active' ? 'Actief' : 

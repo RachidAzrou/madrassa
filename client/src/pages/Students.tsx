@@ -58,7 +58,8 @@ export default function Students() {
   const [idSort, setIdSort] = useState('asc');
   const [classSort, setClassSort] = useState('asc');
   const [ageSort, setAgeSort] = useState('asc');
-  const [currentSort, setCurrentSort] = useState('name'); // name, id, class, age
+  const [genderSort, setGenderSort] = useState('asc');
+  const [currentSort, setCurrentSort] = useState('name'); // name, id, class, age, gender
   
   const [currentPage, setCurrentPage] = useState(1);
   
@@ -226,6 +227,13 @@ export default function Students() {
       const ageB = calculateAge(b.dateOfBirth) || 0;
       const ageCompare = ageA - ageB;
       return ageSort === 'asc' ? ageCompare : -ageCompare;
+    }
+    else if (currentSort === 'gender') {
+      // Sorteren op geslacht
+      const genderA = a.gender || '';
+      const genderB = b.gender || '';
+      const genderCompare = genderA.localeCompare(genderB);
+      return genderSort === 'asc' ? genderCompare : -genderCompare;
     }
     
     // Standaard sorteren op naam
@@ -917,6 +925,11 @@ export default function Students() {
     setAgeSort(prev => prev === 'asc' ? 'desc' : 'asc');
     setCurrentSort('age');
   };
+  
+  const toggleGenderSort = () => {
+    setGenderSort(prev => prev === 'asc' ? 'desc' : 'asc');
+    setCurrentSort('gender');
+  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -1443,7 +1456,15 @@ export default function Students() {
                     }
                   </div>
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Geslacht</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={toggleGenderSort}>
+                  <div className="flex items-center">
+                    Geslacht
+                    {genderSort === 'asc' ? 
+                      <ChevronUp className="ml-1 h-4 w-4" /> : 
+                      <ChevronDown className="ml-1 h-4 w-4" />
+                    }
+                  </div>
+                </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
               </tr>

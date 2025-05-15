@@ -124,8 +124,8 @@ export default function StudentGroups() {
     },
     onSuccess: () => {
       toast({
-        title: 'Studentengroep toegevoegd',
-        description: 'De studentengroep is succesvol aangemaakt.',
+        title: 'Klas toegevoegd',
+        description: 'De klas is succesvol aangemaakt.',
       });
       setIsAddDialogOpen(false);
       form.reset();
@@ -134,7 +134,7 @@ export default function StudentGroups() {
     onError: () => {
       toast({
         title: 'Fout bij aanmaken',
-        description: 'Er is een fout opgetreden bij het aanmaken van de studentengroep.',
+        description: 'Er is een fout opgetreden bij het aanmaken van de klas.',
         variant: 'destructive',
       });
     },

@@ -211,6 +211,40 @@ export class DatabaseStorage implements IStorage {
     return result.length > 0;
   }
 
+  // Assessment operations
+  async getAssessments(): Promise<Assessment[]> {
+    return db.select().from(assessments);
+  }
+
+  async getAssessment(id: number): Promise<Assessment | undefined> {
+    const result = await db.select().from(assessments).where(eq(assessments.id, id));
+    return result[0];
+  }
+
+  async getAssessmentsByCourse(courseId: number): Promise<Assessment[]> {
+    return db.select().from(assessments).where(eq(assessments.courseId, courseId));
+  }
+
+  async createAssessment(assessment: InsertAssessment): Promise<Assessment> {
+    const result = await db.insert(assessments).values(assessment).returning();
+    return result[0];
+  }
+
+  async updateAssessment(id: number, assessment: Partial<Assessment>): Promise<Assessment | undefined> {
+    const result = await db.update(assessments)
+      .set(assessment)
+      .where(eq(assessments.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteAssessment(id: number): Promise<boolean> {
+    const result = await db.delete(assessments)
+      .where(eq(assessments.id, id))
+      .returning({ id: assessments.id });
+    return result.length > 0;
+  }
+
   // Grade operations
   async getGrades(): Promise<Grade[]> {
     return db.select().from(grades);
@@ -227,6 +261,22 @@ export class DatabaseStorage implements IStorage {
 
   async getGradesByCourse(courseId: number): Promise<Grade[]> {
     return db.select().from(grades).where(eq(grades.courseId, courseId));
+  }
+  
+  async getGradesByAssessment(assessmentType: number): Promise<Grade[]> {
+    return db.select().from(grades).where(eq(grades.assessmentType, assessmentType.toString()));
+  }
+  
+  async getGradesByStudentAndCourse(studentId: number, courseId: number): Promise<Grade[]> {
+    return db.select().from(grades)
+      .where(eq(grades.studentId, studentId))
+      .where(eq(grades.courseId, courseId));
+  }
+  
+  async batchCreateGrades(grades: InsertGrade[]): Promise<Grade[]> {
+    if (grades.length === 0) return [];
+    const result = await db.insert(grades).values(grades).returning();
+    return result;
   }
 
   async createGrade(grade: InsertGrade): Promise<Grade> {

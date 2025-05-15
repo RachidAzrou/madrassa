@@ -10,7 +10,8 @@ import {
   insertGradeSchema,
   insertEventSchema,
   insertUserSchema,
-  insertFeeSchema
+  insertFeeSchema,
+  insertAssessmentSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -1202,7 +1203,198 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Geen duplicaat route nodig
+  // Assessments API
+  apiRouter.get("/api/assessments", async (req, res) => {
+    try {
+      const courseId = req.query.courseId ? parseInt(req.query.courseId as string) : undefined;
+      
+      if (courseId) {
+        const assessments = await storage.getAssessmentsByCourse(courseId);
+        res.json(assessments);
+      } else {
+        const assessments = await storage.getAssessments();
+        res.json(assessments);
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij ophalen van beoordelingen" });
+    }
+  });
+  
+  apiRouter.get("/api/assessments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const assessment = await storage.getAssessment(id);
+      
+      if (!assessment) {
+        return res.status(404).json({ message: "Beoordeling niet gevonden" });
+      }
+      
+      res.json(assessment);
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij ophalen van beoordeling" });
+    }
+  });
+  
+  apiRouter.post("/api/assessments", async (req, res) => {
+    try {
+      const parseResult = insertAssessmentSchema.safeParse(req.body);
+      
+      if (!parseResult.success) {
+        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
+      }
+      
+      const assessment = await storage.createAssessment(parseResult.data);
+      res.status(201).json(assessment);
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij aanmaken van beoordeling" });
+    }
+  });
+  
+  apiRouter.put("/api/assessments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const parseResult = insertAssessmentSchema.partial().safeParse(req.body);
+      
+      if (!parseResult.success) {
+        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
+      }
+      
+      const assessment = await storage.updateAssessment(id, parseResult.data);
+      
+      if (!assessment) {
+        return res.status(404).json({ message: "Beoordeling niet gevonden" });
+      }
+      
+      res.json(assessment);
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij bijwerken van beoordeling" });
+    }
+  });
+  
+  apiRouter.delete("/api/assessments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteAssessment(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Beoordeling niet gevonden" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij verwijderen van beoordeling" });
+    }
+  });
+  
+  // Grades API
+  apiRouter.get("/api/grades", async (req, res) => {
+    try {
+      const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : undefined;
+      const courseId = req.query.courseId ? parseInt(req.query.courseId as string) : undefined;
+      const assessmentId = req.query.assessmentId ? parseInt(req.query.assessmentId as string) : undefined;
+      
+      if (studentId && courseId) {
+        const grades = await storage.getGradesByStudentAndCourse(studentId, courseId);
+        res.json(grades);
+      } else if (studentId) {
+        const grades = await storage.getGradesByStudent(studentId);
+        res.json(grades);
+      } else if (courseId) {
+        const grades = await storage.getGradesByCourse(courseId);
+        res.json(grades);
+      } else if (assessmentId) {
+        const grades = await storage.getGradesByAssessment(assessmentId);
+        res.json(grades);
+      } else {
+        const grades = await storage.getGrades();
+        res.json(grades);
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij ophalen van cijfers" });
+    }
+  });
+  
+  apiRouter.get("/api/grades/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const grade = await storage.getGrade(id);
+      
+      if (!grade) {
+        return res.status(404).json({ message: "Cijfer niet gevonden" });
+      }
+      
+      res.json(grade);
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij ophalen van cijfer" });
+    }
+  });
+  
+  apiRouter.post("/api/grades", async (req, res) => {
+    try {
+      const parseResult = insertGradeSchema.safeParse(req.body);
+      
+      if (!parseResult.success) {
+        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
+      }
+      
+      const grade = await storage.createGrade(parseResult.data);
+      res.status(201).json(grade);
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij aanmaken van cijfer" });
+    }
+  });
+  
+  apiRouter.post("/api/grades/batch", async (req, res) => {
+    try {
+      const schema = z.array(insertGradeSchema);
+      const parseResult = schema.safeParse(req.body);
+      
+      if (!parseResult.success) {
+        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
+      }
+      
+      const grades = await storage.batchCreateGrades(parseResult.data);
+      res.status(201).json(grades);
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij aanmaken van cijfers in batch" });
+    }
+  });
+  
+  apiRouter.put("/api/grades/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const parseResult = insertGradeSchema.partial().safeParse(req.body);
+      
+      if (!parseResult.success) {
+        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
+      }
+      
+      const grade = await storage.updateGrade(id, parseResult.data);
+      
+      if (!grade) {
+        return res.status(404).json({ message: "Cijfer niet gevonden" });
+      }
+      
+      res.json(grade);
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij bijwerken van cijfer" });
+    }
+  });
+  
+  apiRouter.delete("/api/grades/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteGrade(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Cijfer niet gevonden" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij verwijderen van cijfer" });
+    }
+  });
 
   // Create HTTP server
   const httpServer = createServer(app);

@@ -1079,7 +1079,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  apiRouter.get("/fees", async (req, res) => {
+  // Het is belangrijk dat we eerst de specifieke routes definieren, en dan pas de routes met parameters
+  apiRouter.get("/api/fees/stats", async (req, res) => {
+    try {
+      const fees = await storage.getFees();
+      
+      const totalCollected = fees
+        .filter(fee => fee.status === 'betaald')
+        .reduce((sum, fee) => sum + Number(fee.amount), 0);
+        
+      const pendingAmount = fees
+        .filter(fee => fee.status === 'in behandeling' || fee.status === 'te laat' || fee.status === 'gedeeltelijk')
+        .reduce((sum, fee) => sum + Number(fee.amount), 0);
+        
+      const totalStudents = new Set(fees.map(fee => fee.studentId)).size;
+      
+      const paidCount = fees.filter(fee => fee.status === 'betaald').length;
+      const totalCount = fees.length;
+      const completionRate = totalCount > 0 ? Math.round((paidCount / totalCount) * 100) : 0;
+      
+      res.json({
+        stats: {
+          totalCollected,
+          pendingAmount,
+          totalStudents,
+          completionRate
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error bij ophalen betaling statistieken" });
+    }
+  });
+  
+  apiRouter.get("/api/fees", async (req, res) => {
     try {
       const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : undefined;
       const status = req.query.status as string | undefined;
@@ -1103,7 +1135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  apiRouter.get("/fees/:id", async (req, res) => {
+  apiRouter.get("/api/fees/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
@@ -1170,37 +1202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Fees statistics API
-  apiRouter.get("/fees/stats", async (req, res) => {
-    try {
-      const fees = await storage.getFees();
-      
-      const totalCollected = fees
-        .filter(fee => fee.status === 'betaald')
-        .reduce((sum, fee) => sum + Number(fee.amount), 0);
-        
-      const pendingAmount = fees
-        .filter(fee => fee.status === 'in behandeling' || fee.status === 'te laat' || fee.status === 'gedeeltelijk')
-        .reduce((sum, fee) => sum + Number(fee.amount), 0);
-        
-      const totalStudents = new Set(fees.map(fee => fee.studentId)).size;
-      
-      const paidCount = fees.filter(fee => fee.status === 'betaald').length;
-      const totalCount = fees.length;
-      const completionRate = totalCount > 0 ? Math.round((paidCount / totalCount) * 100) : 0;
-      
-      res.json({
-        stats: {
-          totalCollected,
-          pendingAmount,
-          totalStudents,
-          completionRate
-        }
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Error bij ophalen betaling statistieken" });
-    }
-  });
+  // Geen duplicaat route nodig
 
   // Create HTTP server
   const httpServer = createServer(app);

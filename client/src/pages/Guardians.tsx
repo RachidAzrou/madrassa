@@ -7,7 +7,23 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
-import { Guardian } from '@shared/schema';
+// We definiëren hier een Guardian type voor lokaal gebruik
+type GuardianType = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  relationship: string;
+  email: string;
+  phone: string;
+  address?: string;
+  street?: string;
+  houseNumber?: string;
+  postalCode?: string;
+  city?: string;
+  occupation?: string;
+  isEmergencyContact?: boolean;
+  notes?: string;
+};
 import { 
   Dialog, 
   DialogContent, 
@@ -1358,6 +1374,96 @@ export default function Guardians() {
               onClick={() => setIsStudentSearchDialogOpen(false)}
             >
               Sluiten
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Voogd Details Dialog */}
+      <Dialog open={isViewGuardianDialogOpen} onOpenChange={setIsViewGuardianDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Voogd Details</DialogTitle>
+            <DialogDescription>
+              Gedetailleerde informatie over de voogd.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedGuardian && (
+            <div className="space-y-4 mt-4">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-16 w-16 border-2 border-primary/20">
+                  <AvatarFallback className="text-xl">
+                    {selectedGuardian.firstName?.[0]}{selectedGuardian.lastName?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-xl font-bold">{selectedGuardian.firstName} {selectedGuardian.lastName}</h3>
+                  <Badge variant="outline">{selectedGuardian.relationship}</Badge>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500">Email</h4>
+                  <p>{selectedGuardian.email}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500">Telefoon</h4>
+                  <p>{selectedGuardian.phone}</p>
+                </div>
+              </div>
+              
+              <div className="pt-2 pb-4 border-b">
+                <h4 className="text-sm font-medium text-gray-500">Adres</h4>
+                {selectedGuardian.street || selectedGuardian.city ? (
+                  <div>
+                    <p>{selectedGuardian.street || ''} {selectedGuardian.houseNumber || ''}</p>
+                    <p>{selectedGuardian.postalCode || ''} {selectedGuardian.city || ''}</p>
+                  </div>
+                ) : (
+                  <p>{selectedGuardian.address || 'Geen adres opgegeven'}</p>
+                )}
+              </div>
+              
+              <div className="pt-2">
+                <h4 className="text-sm font-medium text-gray-500">Beroep</h4>
+                <p>{selectedGuardian.occupation || 'Niet opgegeven'}</p>
+              </div>
+              
+              {selectedGuardian.isEmergencyContact && (
+                <div className="pt-2">
+                  <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-100">
+                    Noodcontact
+                  </Badge>
+                </div>
+              )}
+              
+              {selectedGuardian.notes && (
+                <div className="pt-2">
+                  <h4 className="text-sm font-medium text-gray-500">Notities</h4>
+                  <p className="whitespace-pre-wrap text-sm">{selectedGuardian.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setIsViewGuardianDialogOpen(false)}
+            >
+              Sluiten
+            </Button>
+            <Button 
+              type="button"
+              onClick={() => {
+                setIsViewGuardianDialogOpen(false);
+                handleEditGuardian(selectedGuardian);
+              }}
+            >
+              Bewerken
             </Button>
           </DialogFooter>
         </DialogContent>

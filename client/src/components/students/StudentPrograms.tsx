@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { PlusCircle, Edit, Trash2, Check } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Check, Folder } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -300,9 +300,9 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
   };
   
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Programma-inschrijvingen</h3>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center border-b pb-4">
+        <h3 className="text-xl font-semibold">Programma-inschrijvingen</h3>
         <Button variant="outline" size="sm" onClick={handleAddProgram}>
           <PlusCircle className="h-4 w-4 mr-2" />
           Programma Toevoegen
@@ -310,22 +310,31 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
       </div>
       
       {isLoading ? (
-        <div className="text-center py-4">Laden...</div>
+        <div className="text-center py-8">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em]"></div>
+          <p className="mt-2">Programma's laden...</p>
+        </div>
       ) : studentPrograms.length === 0 ? (
-        <div className="text-center py-4 text-muted-foreground">
-          Deze student is nog niet ingeschreven voor een programma.
+        <div className="text-center py-8 border rounded-lg bg-muted/20">
+          <Folder className="mx-auto h-12 w-12 text-muted-foreground/50" />
+          <p className="mt-2 text-lg font-medium">Geen programma's gevonden</p>
+          <p className="text-muted-foreground">Deze student is nog niet ingeschreven voor een programma.</p>
+          <Button className="mt-4" variant="outline" size="sm" onClick={handleAddProgram}>
+            <PlusCircle className="h-4 w-4 mr-2" />
+            Programma Toevoegen
+          </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {studentPrograms.map((program) => (
-            <Card key={program.id} className={program.isPrimary ? "border-primary" : ""}>
-              <CardHeader className="pb-2">
+            <Card key={program.id} className={`overflow-hidden transition-all hover:shadow-md ${program.isPrimary ? "border-primary" : ""}`}>
+              <CardHeader className="pb-2 bg-muted/20">
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-md flex items-center">
                       {program.programName}
                       {program.isPrimary && (
-                        <Badge className="ml-2 bg-primary" title="Primair programma">
+                        <Badge className="ml-2 bg-primary/80" title="Primair programma">
                           <Check className="h-3 w-3 mr-1" /> Primair
                         </Badge>
                       )}
@@ -339,7 +348,7 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
                   </Badge>
                 </div>
               </CardHeader>
-              <CardFooter className="pt-0 flex justify-end space-x-2">
+              <CardFooter className="pt-3 flex justify-end gap-1">
                 <Button variant="ghost" size="sm" onClick={() => handleEditProgram(program)}>
                   <Edit className="h-4 w-4 mr-1" /> Bewerken
                 </Button>

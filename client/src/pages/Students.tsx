@@ -1356,7 +1356,7 @@ export default function Students() {
       
       {/* Student Detail Dialog */}
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-        <DialogContent className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[90vw] w-[1400px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Studentgegevens</DialogTitle>
             <DialogDescription>
@@ -1372,62 +1372,93 @@ export default function Students() {
                 <TabsTrigger value="enrollments">Inschrijvingen</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="general" className="space-y-4 pt-4">
-                <div className="flex items-center">
-                  <Avatar className="h-20 w-20 mr-4">
-                    <AvatarFallback className="text-xl bg-primary text-primary-foreground">
-                      {selectedStudent.firstName?.charAt(0)}{selectedStudent.lastName?.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h2 className="text-2xl font-bold">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
-                    <p className="text-muted-foreground">{selectedStudent.studentId}</p>
-                    <Badge variant={
-                      selectedStudent.status === 'active' ? 'default' :
-                      selectedStudent.status === 'inactive' ? 'secondary' :
-                      selectedStudent.status === 'pending' ? 'outline' : 'default'
-                    } className="mt-1">
-                      {selectedStudent.status.charAt(0).toUpperCase() + selectedStudent.status.slice(1)}
-                    </Badge>
+              <TabsContent value="general" className="pt-4">
+                <div className="flex flex-col md:flex-row gap-6">
+                  {/* Linker kolom: student profiel */}
+                  <div className="w-full md:w-1/3 border rounded-lg p-6 bg-card">
+                    <div className="flex flex-col items-center mb-6">
+                      <Avatar className="h-24 w-24 mb-4">
+                        <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
+                          {selectedStudent.firstName?.charAt(0)}{selectedStudent.lastName?.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <h2 className="text-2xl font-bold text-center">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
+                      <p className="text-muted-foreground text-center">{selectedStudent.studentId}</p>
+                      <Badge variant={
+                        selectedStudent.status === 'active' ? 'success' :
+                        selectedStudent.status === 'inactive' ? 'secondary' :
+                        selectedStudent.status === 'pending' ? 'warning' : 'default'
+                      } className="mt-2 px-3 py-1">
+                        {selectedStudent.status.charAt(0).toUpperCase() + selectedStudent.status.slice(1)}
+                      </Badge>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
+                        <p className="font-medium">{selectedStudent.email || "Niet ingevuld"}</p>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-muted-foreground">Telefoonnummer</h3>
+                        <p className="font-medium">{selectedStudent.phone || "Niet ingevuld"}</p>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-muted-foreground">Geboortedatum</h3>
+                        <p className="font-medium">{selectedStudent.dateOfBirth ? new Date(selectedStudent.dateOfBirth).toLocaleDateString('nl-NL') : "Niet ingevuld"}</p>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-muted-foreground">Inschrijvingsdatum</h3>
+                        <p className="font-medium">{selectedStudent.enrollmentDate ? new Date(selectedStudent.enrollmentDate).toLocaleDateString('nl-NL') : "Niet ingevuld"}</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 pt-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
-                    <p>{selectedStudent.email || "Niet ingevuld"}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-muted-foreground">Telefoonnummer</h3>
-                    <p>{selectedStudent.phone || "Niet ingevuld"}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-muted-foreground">Geboortedatum</h3>
-                    <p>{selectedStudent.dateOfBirth ? new Date(selectedStudent.dateOfBirth).toLocaleDateString('nl-NL') : "Niet ingevuld"}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-muted-foreground">Inschrijvingsdatum</h3>
-                    <p>{selectedStudent.enrollmentDate ? new Date(selectedStudent.enrollmentDate).toLocaleDateString('nl-NL') : "Niet ingevuld"}</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Adres</h3>
-                  <p>
-                    {selectedStudent.street && selectedStudent.houseNumber ? 
-                      `${selectedStudent.street} ${selectedStudent.houseNumber}` : 
-                      selectedStudent.address || "Niet ingevuld"}
+                  
+                  {/* Rechter kolom: adres en extra informatie */}
+                  <div className="w-full md:w-2/3 space-y-6">
+                    <div className="border rounded-lg p-6 bg-card">
+                      <h3 className="text-lg font-bold mb-4">Adresgegevens</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Straat</h3>
+                          <p className="font-medium">{selectedStudent.street || "Niet ingevuld"}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Huisnummer</h3>
+                          <p className="font-medium">{selectedStudent.houseNumber || "Niet ingevuld"}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Postcode</h3>
+                          <p className="font-medium">{selectedStudent.postalCode || "Niet ingevuld"}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Stad</h3>
+                          <p className="font-medium">{selectedStudent.city || "Niet ingevuld"}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="border rounded-lg p-6 bg-card">
+                      <h3 className="text-lg font-bold mb-4">Aanvullende informatie</h3>
                       
-                    {(selectedStudent.postalCode || selectedStudent.city) && 
-                      `, ${selectedStudent.postalCode || ""} ${selectedStudent.city || ""}`}
-                  </p>
-                </div>
-                
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button variant="outline" onClick={() => handleEditStudent(selectedStudent)}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    Bewerken
-                  </Button>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Ingeschreven sinds</h3>
+                          <p className="font-medium">{selectedStudent.createdAt ? new Date(selectedStudent.createdAt).toLocaleDateString('nl-NL') : "Onbekend"}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Laatst bijgewerkt</h3>
+                          <p className="font-medium">{selectedStudent.updatedAt ? new Date(selectedStudent.updatedAt).toLocaleDateString('nl-NL') : "Onbekend"}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-end space-x-2 pt-4 mt-4">
+                        <Button variant="outline" onClick={() => handleEditStudent(selectedStudent)}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Bewerken
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
               

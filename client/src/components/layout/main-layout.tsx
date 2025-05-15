@@ -27,7 +27,7 @@ const getPageTitle = (path: string): string => {
     case "/reports":
       return "Reports";
     default:
-      return "EduManage";
+      return "myMadrassa";
   }
 };
 
@@ -86,17 +86,17 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         <footer className="py-4 px-6 border-t border-gray-200 bg-white mt-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <p className="text-sm text-gray-500">
-              © {new Date().getFullYear()} EduManage. All rights reserved.
+              © {new Date().getFullYear()} myMadrassa. Alle rechten voorbehouden.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-sm text-gray-500 hover:text-primary">
-                Privacy Policy
+                Privacybeleid
               </a>
               <a href="#" className="text-sm text-gray-500 hover:text-primary">
-                Terms of Service
+                Gebruiksvoorwaarden
               </a>
               <a href="#" className="text-sm text-gray-500 hover:text-primary">
-                Help
+                Hulp
               </a>
             </div>
           </div>

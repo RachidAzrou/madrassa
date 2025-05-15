@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle } from 'lucide-react';
+import { 
+  Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle,
+  ChevronUp, ChevronDown
+} from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1198,18 +1201,48 @@ export default function Students() {
             </Select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sorteren op</label>
-            <Select value={sortBy} onValueChange={handleSortChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Naam" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="name">Naam</SelectItem>
-                <SelectItem value="id">ID</SelectItem>
-                <SelectItem value="program">Programma</SelectItem>
-                <SelectItem value="date">Registratiedatum</SelectItem>
-              </SelectContent>
-            </Select>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Exporteren</label>
+            <Button
+              variant="outline"
+              className="flex items-center w-full"
+              onClick={() => {
+                // Export studenten als CSV bestand 
+                // Exportfunctionaliteit implementeren
+                const headers = ['Studentnummer', 'Voornaam', 'Achternaam', 'Email', 'Telefoon', 'Vak', 'Klas', 'Status'];
+                const csvContent = [
+                  headers.join(','),
+                  ...sortedStudents.map(student => [
+                    student.studentId,
+                    student.firstName,
+                    student.lastName,
+                    student.email,
+                    student.phone || '',
+                    programs.find((p: any) => p.id === student.programId)?.name || 'Onbekend',
+                    getStudentGroupName(student.id) || 'Geen klas',
+                    student.status
+                  ].join(','))
+                ].join('\n');
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `studenten_export_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                toast({
+                  title: "Export geslaagd",
+                  description: "De studentenlijst is succesvol geëxporteerd als CSV-bestand.",
+                  variant: "default",
+                });
+              }}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Exporteren
+            </Button>
           </div>
         </div>
       </div>
@@ -1226,27 +1259,42 @@ export default function Students() {
               size="sm"
               onClick={() => {
                 // Toon of verberg geavanceerde filteropties
-                alert('Geavanceerde filteropties worden hier weergegeven');
+                const advancedFilters = document.getElementById('advancedFilters');
+                if (advancedFilters) {
+                  advancedFilters.classList.toggle('hidden');
+                }
               }}
             >
               <Filter className="mr-2 h-4 w-4" />
               Filteren
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => {
-                // Exporteer studentengegevens als CSV
-                console.log('Exporteren van studentengegevens');
-                alert('Studentengegevens worden geëxporteerd als CSV...');
-                // Hier API-aanroep voor downloaden implementeren
-              }}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Exporteren
-            </Button>
           </div>
         </div>
+        
+        {/* Geavanceerde filter opties - standaard verborgen */}
+        <div id="advancedFilters" className="p-4 border-b border-gray-200 bg-gray-50 hidden">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Geavanceerd zoeken</label>
+              <Input
+                type="text"
+                placeholder="Zoek op adres, notities..."
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Registratiedatum</label>
+              <Input
+                type="date"
+                className="w-full"
+              />
+            </div>
+            <div className="flex items-end">
+              <Button className="w-full">Filters toepassen</Button>
+            </div>
+          </div>
+        </div>
+        
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -1257,14 +1305,20 @@ export default function Students() {
                       type="checkbox" 
                       className="rounded border-gray-300 text-primary focus:ring-primary mr-3"
                     />
-                    Student
+                    <div className="flex items-center cursor-pointer" onClick={toggleNameSort}>
+                      Student
+                      {nameSort === 'asc' ? 
+                        <ChevronUp className="ml-1 h-4 w-4" /> : 
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      }
+                    </div>
                   </div>
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Programma</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jaar</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klas</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leeftijd</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -1310,10 +1364,10 @@ export default function Students() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.studentId}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {programs.find((p: {id: number, name: string}) => p.id === student.programId)?.name || 'Onbekend'}
+                      {getStudentGroupName(student.id) || 'Onbekend'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      Jaar {student.yearLevel || 'Onbekend'}
+                      {calculateAge(student.dateOfBirth) ? `${calculateAge(student.dateOfBirth)} jaar` : 'Onbekend'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -1328,34 +1382,39 @@ export default function Students() {
                          student.status.charAt(0).toUpperCase() + student.status.slice(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-primary hover:text-primary-dark"
-                        onClick={() => handleViewStudent(student)}
-                      >
-                        <Eye className="h-4 w-4" />
-                        <span className="sr-only">Bekijken</span>
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-gray-500 hover:text-gray-700"
-                        onClick={() => handleEditStudent(student)}
-                      >
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">Bewerken</span>
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleDeleteStudent(student)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Verwijderen</span>
-                      </Button>
+                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                      <div className="flex justify-center space-x-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-primary hover:text-primary-dark"
+                          onClick={() => handleViewStudent(student)}
+                          title="Details bekijken"
+                        >
+                          <Eye className="h-4 w-4" />
+                          <span className="sr-only">Bekijken</span>
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-gray-500 hover:text-gray-700"
+                          onClick={() => handleEditStudent(student)}
+                          title="Student bewerken"
+                        >
+                          <Edit className="h-4 w-4" />
+                          <span className="sr-only">Bewerken</span>
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-red-500 hover:text-red-700"
+                          onClick={() => handleDeleteStudent(student)}
+                          title="Student verwijderen"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Verwijderen</span>
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))

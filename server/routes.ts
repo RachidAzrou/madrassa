@@ -151,17 +151,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Ongeldig ID formaat" });
       }
       
+      // Haal de bestaande student op voordat we iets gaan wijzigen
+      const existingStudent = await storage.getStudent(id);
+      if (!existingStudent) {
+        return res.status(404).json({ message: "Student niet gevonden" });
+      }
+      
       // Log de binnenkomende data voor debugging
       console.log("Received student update data:", req.body);
       
+      // Verwijder studentId als het is meegestuurd om te voorkomen dat het wordt gewijzigd
+      const updatedData = { ...req.body };
+      if (updatedData.studentId) {
+        console.log(`Poging tot wijzigen studentnummer gedetecteerd. Origineel: ${existingStudent.studentId}, Nieuw: ${updatedData.studentId}`);
+        delete updatedData.studentId; // We negeren dit veld bij updates
+      }
+      
       // We gebruiken partial schema omdat niet alle velden verplicht zijn bij een update
       // Transformaties gebeuren in de schema definitie zelf
-      const validatedData = insertStudentSchema.partial().parse(req.body);
+      const validatedData = insertStudentSchema.partial().parse(updatedData);
       
       // Log de gevalideerde data
       console.log("Validated student update data:", validatedData);
       
-      // Update de student zonder verdere aanpassingen
+      // Update de student zonder verdere aanpassingen (student ID bleef behouden)
       const updatedStudent = await storage.updateStudent(id, validatedData);
       if (!updatedStudent) {
         return res.status(404).json({ message: "Student niet gevonden" });

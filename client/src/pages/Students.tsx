@@ -1138,6 +1138,10 @@ export default function Students() {
           </form>
         </DialogContent>
       </Dialog>
+      
+      {/* Render de Edit en Delete dialogen */}
+      <EditStudentDialog />
+      <DeleteStudentDialog />
     </div>
   );
 }

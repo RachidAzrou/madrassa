@@ -153,8 +153,8 @@ export default function StudentGroups() {
     },
     onSuccess: () => {
       toast({
-        title: 'Studentengroep bijgewerkt',
-        description: 'De studentengroep is succesvol bijgewerkt.',
+        title: 'Klas bijgewerkt',
+        description: 'De klas is succesvol bijgewerkt.',
       });
       setIsEditDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
@@ -162,7 +162,7 @@ export default function StudentGroups() {
     onError: () => {
       toast({
         title: 'Fout bij bijwerken',
-        description: 'Er is een fout opgetreden bij het bijwerken van de studentengroep.',
+        description: 'Er is een fout opgetreden bij het bijwerken van de klas.',
         variant: 'destructive',
       });
     },
@@ -175,8 +175,8 @@ export default function StudentGroups() {
     },
     onSuccess: () => {
       toast({
-        title: 'Studentengroep verwijderd',
-        description: 'De studentengroep is succesvol verwijderd.',
+        title: 'Klas verwijderd',
+        description: 'De klas is succesvol verwijderd.',
       });
       setIsDeleteDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
@@ -184,7 +184,7 @@ export default function StudentGroups() {
     onError: () => {
       toast({
         title: 'Fout bij verwijderen',
-        description: 'Er is een fout opgetreden bij het verwijderen van de studentengroep.',
+        description: 'Er is een fout opgetreden bij het verwijderen van de klas.',
         variant: 'destructive',
       });
     },
@@ -376,7 +376,7 @@ export default function StudentGroups() {
                 const encodedUri = encodeURI(csvContent);
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "studentengroepen.csv");
+                link.setAttribute("download", "klassen.csv");
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -643,7 +643,7 @@ export default function StudentGroups() {
                 ) : isError ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-4 text-center text-sm text-red-500">
-                      Fout bij het laden van studentengroepen. Probeer het later opnieuw.
+                      Fout bij het laden van klassen. Probeer het later opnieuw.
                     </td>
                   </tr>
                 ) : studentGroups.length === 0 ? (

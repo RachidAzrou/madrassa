@@ -369,7 +369,7 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
       
       {/* Toevoegen Dialoogvenster */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="max-w-none w-auto">
           <DialogHeader>
             <DialogTitle>Programma Toevoegen</DialogTitle>
             <DialogDescription>
@@ -477,7 +477,7 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
       
       {/* Bewerken Dialoogvenster */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="max-w-none w-auto">
           <DialogHeader>
             <DialogTitle>Programma Bewerken</DialogTitle>
             <DialogDescription>

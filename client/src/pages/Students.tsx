@@ -1356,7 +1356,7 @@ export default function Students() {
       
       {/* Student Detail Dialog */}
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-        <DialogContent className="sm:max-w-[90vw] w-[1400px] max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-none w-auto max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Studentgegevens</DialogTitle>
             <DialogDescription>

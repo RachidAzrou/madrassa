@@ -29,11 +29,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ********************
   // Student API endpoints
   // ********************
-  apiRouter.get("/api/students", async (_req, res) => {
+  apiRouter.get("/api/students", async (req, res) => {
     try {
-      const students = await storage.getStudents();
+      // Haal de query parameters op voor filtering
+      const { program, year, status, searchTerm } = req.query;
+      
+      // Haal alle studenten op
+      let students = await storage.getStudents();
+      
+      // Filter op programId als het is opgegeven en niet 'all'
+      if (program && program !== 'all') {
+        const programId = parseInt(program as string);
+        if (!isNaN(programId)) {
+          students = students.filter(student => student.programId === programId);
+        }
+      }
+      
+      // Filter op yearLevel als het is opgegeven en niet 'all'
+      if (year && year !== 'all') {
+        const yearLevel = parseInt(year as string);
+        if (!isNaN(yearLevel)) {
+          students = students.filter(student => student.yearLevel === yearLevel);
+        }
+      }
+      
+      // Filter op status als het is opgegeven en niet 'all'
+      if (status && status !== 'all') {
+        const statusLower = (status as string).toLowerCase();
+        students = students.filter(student => {
+          const studentStatus = student.status?.toLowerCase() || '';
+          
+          // Controleer zowel Engels als Nederlands (voor backwards compatibiliteit)
+          if (statusLower === 'active' || statusLower === 'actief') {
+            return studentStatus === 'active' || studentStatus === 'actief';
+          } else if (statusLower === 'pending' || statusLower === 'in afwachting') {
+            return studentStatus === 'pending' || studentStatus === 'in afwachting';
+          } else if (statusLower === 'inactive' || statusLower === 'inactief') {
+            return studentStatus === 'inactive' || studentStatus === 'inactief';
+          }
+          
+          return studentStatus === statusLower;
+        });
+      }
+      
+      // Filter op zoekterm als die is opgegeven
+      if (searchTerm) {
+        const term = (searchTerm as string).toLowerCase();
+        students = students.filter(student => 
+          (student.firstName?.toLowerCase() || '').includes(term) || 
+          (student.lastName?.toLowerCase() || '').includes(term) || 
+          (student.email?.toLowerCase() || '').includes(term) ||
+          (student.studentId?.toLowerCase() || '').includes(term)
+        );
+      }
+      
       res.json(students);
     } catch (error) {
+      console.error("Error fetching students:", error);
       res.status(500).json({ message: "Error fetching students" });
     }
   });

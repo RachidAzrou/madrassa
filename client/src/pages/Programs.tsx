@@ -10,16 +10,18 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Program {
-  id: string;
+  id: number;
   name: string;
   code: string;
   department: string;
   description: string;
   duration: number;
-  totalCredits: number;
-  students: number;
-  startDate: string;
-  courses: {
+  isActive: boolean;
+  // Optionele velden die mogelijk niet uit de API komen
+  totalCredits?: number;
+  students?: number;
+  startDate?: string;
+  courses?: {
     id: string;
     name: string;
     code: string;
@@ -270,11 +272,11 @@ export default function Programs() {
                   </div>
                   <div className="text-center hidden md:block">
                     <span className="text-gray-500 text-xs block">Totaal Studiepunten</span>
-                    <span className="text-gray-800 font-medium">{program.totalCredits}</span>
+                    <span className="text-gray-800 font-medium">{program.totalCredits || 'N/A'}</span>
                   </div>
                   <div className="text-center hidden md:block">
                     <span className="text-gray-500 text-xs block">Studenten</span>
-                    <span className="text-gray-800 font-medium">{program.students}</span>
+                    <span className="text-gray-800 font-medium">{program.students || 0}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button 
@@ -316,7 +318,7 @@ export default function Programs() {
                       <Clock className="h-5 w-5 text-primary mr-3" />
                       <div>
                         <span className="text-xs text-gray-500 block">Duur</span>
-                        <span className="text-sm font-medium">{program.duration} jaar ({program.totalCredits} studiepunten)</span>
+                        <span className="text-sm font-medium">{program.duration} jaar {program.totalCredits ? `(${program.totalCredits} studiepunten)` : ''}</span>
                       </div>
                     </div>
                     <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">

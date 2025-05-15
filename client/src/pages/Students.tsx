@@ -1425,101 +1425,149 @@ export default function Students() {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  // Export studenten als PDF bestand met eenvoudige opmaak
-                  const doc = new jsPDF();
-                  
-                  // Logo en titel
-                  doc.setFillColor(59, 89, 152); // Primary color - #3b5998
-                  doc.circle(20, 15, 10, 'F');   // Cirkel met blauw als symbool
-                  
-                  // Titel
-                  doc.setFontSize(20);
-                  doc.setTextColor(59, 89, 152); // Primary color
-                  doc.setFont("helvetica", "bold");
-                  doc.text('myMadrassa', 45, 22);
-                  
-                  doc.setFontSize(18);
-                  doc.setFont("helvetica", "normal");
-                  doc.setTextColor(0, 0, 0);
-                  doc.text('Studentenlijst', 45, 30);
-                  
-                  // Datum
-                  doc.setFontSize(11);
-                  doc.setTextColor(100);
-                  doc.text(`Gegenereerd op: ${new Date().toLocaleDateString('nl-NL')}`, 14, 45);
-                  
-                  // Header rij voor tabel
-                  doc.setFillColor(59, 89, 152);
-                  doc.setDrawColor(59, 89, 152);
-                  doc.rect(14, 50, 180, 10, 'F');
-                  
-                  doc.setFont("helvetica", "bold");
-                  doc.setTextColor(255, 255, 255);
-                  doc.setFontSize(10);
-                  
-                  // Tabelkoppen
-                  const headers = ['Studentnr', 'Naam', 'Vak', 'Klas', 'Leeftijd', 'Geslacht', 'Status'];
-                  headers.forEach((header, index) => {
-                    doc.text(header, 20 + (index * 25), 56);
-                  });
-                  
-                  // Data rijen
-                  doc.setFont("helvetica", "normal");
-                  doc.setTextColor(0, 0, 0);
-                  doc.setFontSize(9);
-                  
-                  // Toon maximaal 20 studenten
-                  const maxRows = Math.min(sortedStudents.length, 20);
-                  for (let i = 0; i < maxRows; i++) {
-                    const student = sortedStudents[i];
-                    const y = 66 + (i * 10);
+                  try {
+                    // Export studenten als PDF bestand met eenvoudige opmaak
+                    const doc = new jsPDF();
                     
-                    if (i % 2 === 0) {
-                      doc.setFillColor(245, 245, 245);
-                      doc.rect(14, y - 6, 180, 10, 'F');
+                    // Logo en titel
+                    // Teken een beter logo
+                    // Achtergrond cirkel
+                    doc.setFillColor(59, 89, 152); // Primary color - #3b5998
+                    doc.circle(25, 20, 15, 'F');   // Iets grotere cirkel
+                    
+                    // De afstudeerhoed (graduate cap)
+                    doc.setDrawColor(255, 255, 255);
+                    doc.setLineWidth(1);
+                    
+                    // Onderdelen van de hoed tekenen
+                    doc.setFillColor(255, 255, 255);
+                    doc.rect(18, 16, 14, 2, 'FD'); // Bovenkant hoed
+                    doc.circle(25, 15, 2, 'FD');   // Knop op hoed
+                    
+                    // Titel
+                    doc.setFontSize(22);
+                    doc.setTextColor(59, 89, 152); // Primary color
+                    doc.setFont("helvetica", "bold");
+                    doc.text('myMadrassa', 45, 22);
+                    
+                    doc.setFontSize(18);
+                    doc.setFont("helvetica", "normal");
+                    doc.setTextColor(0, 0, 0);
+                    doc.text('Studentenlijst', 45, 30);
+                    
+                    // Datum
+                    doc.setFontSize(11);
+                    doc.setTextColor(100);
+                    doc.text(`Gegenereerd op: ${new Date().toLocaleDateString('nl-NL')}`, 14, 45);
+                    
+                    // Definities voor tabel
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const margin = 20;
+                    const tableWidth = pageWidth - (margin * 2);
+                    const startY = 50;
+                    
+                    // Header rij voor tabel
+                    doc.setFillColor(59, 89, 152);
+                    doc.setDrawColor(59, 89, 152);
+                    doc.rect(14, 50, 180, 10, 'F');
+                    
+                    doc.setFont("helvetica", "bold");
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(10);
+                    
+                    // Tabelkoppen
+                    const headers = ['Studentnr', 'Naam', 'Vak', 'Klas', 'Leeftijd', 'Geslacht', 'Status'];
+                    const colWidths = [20, 40, 30, 30, 20, 20, 30]; // Kolombreedte in mm
+                    
+                    // Teken kolomtitels
+                    let xPos = margin;
+                    headers.forEach((header, index) => {
+                      doc.text(header, xPos, 56);
+                      xPos += colWidths[index];
+                    });
+                    
+                    // Data rijen
+                    doc.setFont("helvetica", "normal");
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFontSize(9);
+                    
+                    // Toon maximaal 20 studenten
+                    const maxRows = Math.min(sortedStudents.length, 20);
+                    for (let i = 0; i < maxRows; i++) {
+                      const student = sortedStudents[i];
+                      const y = 66 + (i * 10);
+                      
+                      // Afwisselende rijen
+                      if (i % 2 === 0) {
+                        doc.setFillColor(240, 240, 250); // Licht blauw voor even rijen
+                        doc.rect(14, y - 6, 180, 10, 'F');
+                      }
+                      
+                      xPos = margin;
+                      
+                      // Studentnr
+                      doc.text(student.studentId, xPos, y);
+                      xPos += colWidths[0];
+                      
+                      // Naam
+                      doc.text(`${student.firstName} ${student.lastName}`, xPos, y);
+                      xPos += colWidths[1];
+                      
+                      // Vak
+                      const programName = programs.find((p: any) => p.id === student.programId)?.name || 'Onbekend';
+                      doc.text(programName, xPos, y);
+                      xPos += colWidths[2];
+                      
+                      // Klas
+                      const className = getStudentGroupName(student.id) || 'Geen klas';
+                      doc.text(className, xPos, y);
+                      xPos += colWidths[3];
+                      
+                      // Leeftijd
+                      const age = calculateAge(student.dateOfBirth) ? `${calculateAge(student.dateOfBirth)} jaar` : 'Onbekend';
+                      doc.text(age, xPos, y);
+                      xPos += colWidths[4];
+                      
+                      // Geslacht
+                      const gender = student.gender === 'man' ? 'Man' : student.gender === 'vrouw' ? 'Vrouw' : 'Onbekend';
+                      doc.text(gender, xPos, y);
+                      xPos += colWidths[5];
+                      
+                      // Status
+                      let status = student.status;
+                      if (student.status.toLowerCase() === 'active') status = 'Actief';
+                      else if (student.status.toLowerCase() === 'pending') status = 'In afwachting';
+                      else if (student.status.toLowerCase() === 'inactive') status = 'Inactief';
+                      
+                      doc.text(status, xPos, y);
                     }
                     
-                    doc.text(student.studentId, 20, y);
-                    doc.text(`${student.firstName} ${student.lastName}`, 45, y);
+                    // Voetnoot
+                    doc.setFontSize(8);
+                    doc.setTextColor(150);
+                    doc.text(
+                      `myMadrassa Studentenbeheersysteem | Pagina 1 van 1`,
+                      doc.internal.pageSize.getWidth() / 2,
+                      doc.internal.pageSize.getHeight() - 10,
+                      { align: 'center' }
+                    );
                     
-                    const programName = programs.find((p: any) => p.id === student.programId)?.name || 'Onbekend';
-                    doc.text(programName, 70, y);
+                    // PDF opslaan
+                    doc.save(`studenten_export_${new Date().toISOString().split('T')[0]}.pdf`);
                     
-                    const className = getStudentGroupName(student.id) || 'Geen klas';
-                    doc.text(className, 95, y);
-                    
-                    const age = calculateAge(student.dateOfBirth) ? `${calculateAge(student.dateOfBirth)} jaar` : 'Onbekend';
-                    doc.text(age, 120, y);
-                    
-                    const gender = student.gender === 'man' ? 'Man' : student.gender === 'vrouw' ? 'Vrouw' : 'Onbekend';
-                    doc.text(gender, 145, y);
-                    
-                    let status = student.status;
-                    if (student.status.toLowerCase() === 'active') status = 'Actief';
-                    else if (student.status.toLowerCase() === 'pending') status = 'In afwachting';
-                    else if (student.status.toLowerCase() === 'inactive') status = 'Inactief';
-                    
-                    doc.text(status, 170, y);
+                    toast({
+                      title: "PDF Export geslaagd",
+                      description: "De studentenlijst is succesvol geëxporteerd als PDF-bestand.",
+                      variant: "default",
+                    });
+                  } catch (error) {
+                    console.error("PDF export error:", error);
+                    toast({
+                      title: "PDF Export mislukt",
+                      description: "Er is een fout opgetreden bij het exporteren van de PDF.",
+                      variant: "destructive",
+                    });
                   }
-                  
-                  // Voetnoot
-                  doc.setFontSize(8);
-                  doc.setTextColor(150);
-                  doc.text(
-                    `myMadrassa Studentenbeheersysteem | Pagina 1 van 1`,
-                    doc.internal.pageSize.getWidth() / 2,
-                    doc.internal.pageSize.getHeight() - 10,
-                    { align: 'center' }
-                  );
-                  
-                  // PDF opslaan
-                  doc.save(`studenten_export_${new Date().toISOString().split('T')[0]}.pdf`);
-                  
-                  toast({
-                    title: "PDF Export geslaagd",
-                    description: "De studentenlijst is succesvol geëxporteerd als PDF-bestand.",
-                    variant: "default",
-                  });
                 }}
               >
                 <FileText className="mr-2 h-4 w-4" />

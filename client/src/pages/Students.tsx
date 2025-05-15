@@ -46,9 +46,9 @@ export default function Students() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [program, setProgram] = useState('all');
-  const [year, setYear] = useState('all');
+  const [studentGroup, setStudentGroup] = useState('all');
   const [status, setStatus] = useState('all');
-  const [sortBy, setSortBy] = useState('name');
+  const [nameSort, setNameSort] = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
   
   // State voor student dialogen
@@ -136,9 +136,17 @@ export default function Students() {
   // Programma's ophalen voor weergave en dropdown
   const programs = Array.isArray(programsData) ? programsData : programsData?.programs || [];
   
+  // Fetch student groups for dropdown
+  const { data: studentGroupsData } = useQuery({
+    queryKey: ['/api/student-groups'],
+    staleTime: 30000,
+  });
+  
+  const studentGroups = studentGroupsData?.studentGroups || [];
+  
   // Fetch students with filters
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['/api/students', { searchTerm, program, year, status, sortBy, page: currentPage }],
+    queryKey: ['/api/students', { searchTerm, program, studentGroup, status, nameSort, page: currentPage }],
     staleTime: 30000,
   });
 

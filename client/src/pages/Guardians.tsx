@@ -506,9 +506,9 @@ export default function Guardians() {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Verzorger toevoegen</DialogTitle>
+            <DialogTitle>Voogd toevoegen</DialogTitle>
             <DialogDescription>
-              Vul de verzorgerinformatie in. Klik op opslaan wanneer je klaar bent.
+              Vul de voogdinformatie in. Klik op opslaan wanneer je klaar bent.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmitGuardian}>
@@ -673,7 +673,7 @@ export default function Guardians() {
                 type="submit"
                 disabled={createGuardianMutation.isPending}
               >
-                {createGuardianMutation.isPending ? 'Bezig met toevoegen...' : 'Ouder toevoegen'}
+                {createGuardianMutation.isPending ? 'Bezig met toevoegen...' : 'Voogd toevoegen'}
               </Button>
             </DialogFooter>
           </form>
@@ -684,9 +684,9 @@ export default function Guardians() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Verzorger bewerken</DialogTitle>
+            <DialogTitle>Voogd bewerken</DialogTitle>
             <DialogDescription>
-              Bewerk de verzorgerinformatie. Klik op opslaan wanneer je klaar bent.
+              Bewerk de voogdinformatie. Klik op opslaan wanneer je klaar bent.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmitEditGuardian}>

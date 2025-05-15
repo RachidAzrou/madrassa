@@ -1612,7 +1612,6 @@ export default function Students() {
           </div>
         </div>
         
-        <h2 className="text-xl font-bold text-primary mb-4">Studentenlijst</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">

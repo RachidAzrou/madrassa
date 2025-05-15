@@ -87,7 +87,7 @@ export default function Guardians() {
       }
       
       try {
-        return await apiRequest(`/api/guardians?${params.toString()}`);
+        return await apiRequest('GET', `/api/guardians?${params.toString()}`);
       } catch (error) {
         console.error('Error fetching guardians:', error);
         return { guardians: [], totalCount: 0 };

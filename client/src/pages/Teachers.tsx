@@ -82,7 +82,7 @@ export default function Teachers() {
       });
       
       try {
-        return await apiRequest(`/api/teachers?${params.toString()}`);
+        return await apiRequest('GET', `/api/teachers?${params.toString()}`);
       } catch (error) {
         console.error('Error fetching teachers:', error);
         return { teachers: [], totalCount: 0 };
@@ -104,7 +104,7 @@ export default function Teachers() {
     queryFn: async () => {
       if (!selectedTeacher) return [];
       try {
-        return await apiRequest(`/api/teacher-availability?teacherId=${selectedTeacher.id}`);
+        return await apiRequest('GET', `/api/teacher-availability?teacherId=${selectedTeacher.id}`);
       } catch (error) {
         console.error('Error fetching teacher availability:', error);
         return [];
@@ -122,7 +122,7 @@ export default function Teachers() {
     queryFn: async () => {
       if (!selectedTeacher) return [];
       try {
-        return await apiRequest(`/api/teacher-languages?teacherId=${selectedTeacher.id}`);
+        return await apiRequest('GET', `/api/teacher-languages?teacherId=${selectedTeacher.id}`);
       } catch (error) {
         console.error('Error fetching teacher languages:', error);
         return [];
@@ -140,7 +140,7 @@ export default function Teachers() {
     queryFn: async () => {
       if (!selectedTeacher) return [];
       try {
-        return await apiRequest(`/api/teacher-course-assignments?teacherId=${selectedTeacher.id}`);
+        return await apiRequest('GET', `/api/teacher-course-assignments?teacherId=${selectedTeacher.id}`);
       } catch (error) {
         console.error('Error fetching teacher course assignments:', error);
         return [];

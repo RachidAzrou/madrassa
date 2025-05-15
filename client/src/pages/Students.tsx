@@ -1699,7 +1699,6 @@ export default function Students() {
                         </Avatar>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">{student.firstName} {student.lastName}</div>
-                          <div className="text-sm text-gray-500">{student.email}</div>
                         </div>
                       </div>
                     </td>

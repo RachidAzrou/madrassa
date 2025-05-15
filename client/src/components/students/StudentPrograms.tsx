@@ -268,7 +268,7 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
   };
   
   // Helper functie om status badge kleur te bepalen
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeVariant = (status: string): "default" | "destructive" | "outline" | "secondary" | "success" | "warning" | null | undefined => {
     switch (status.toLowerCase()) {
       case 'active':
         return "success";

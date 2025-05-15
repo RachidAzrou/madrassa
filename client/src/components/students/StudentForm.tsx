@@ -154,7 +154,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
 
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="dateOfBirth">
-              Date of Birth
+              Geboortedatum
             </label>
             <Input
               id="dateOfBirth"

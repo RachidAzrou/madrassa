@@ -35,7 +35,7 @@ export default function RecentStudents() {
   // Get program name by ID
   const getProgramName = (programId: number): string => {
     const program = programs.find((p: Program) => p.id === programId);
-    return program ? program.name : "Unknown Program";
+    return program ? program.name : "Onbekend Programma";
   };
 
   // Sort students by enrollment date (newest first) and take first 4
@@ -53,26 +53,26 @@ export default function RecentStudents() {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
     if (diffDays === 0) {
-      return "Today";
+      return "Vandaag";
     } else if (diffDays === 1) {
-      return "1 day ago";
+      return "1 dag geleden";
     } else if (diffDays < 7) {
-      return `${diffDays} days ago`;
+      return `${diffDays} dagen geleden`;
     } else if (diffDays < 30) {
       const weeks = Math.floor(diffDays / 7);
-      return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+      return `${weeks} ${weeks === 1 ? 'week' : 'weken'} geleden`;
     } else {
       const months = Math.floor(diffDays / 30);
-      return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+      return `${months} ${months === 1 ? 'maand' : 'maanden'} geleden`;
     }
   };
 
   return (
     <Card className="lg:col-span-2">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg">Recent Students</CardTitle>
+        <CardTitle className="text-lg">Recent Ingeschreven Studenten</CardTitle>
         <Button variant="link" className="p-0 h-auto" asChild>
-          <Link href="/students">View all students</Link>
+          <Link href="/students">Bekijk alle studenten</Link>
         </Button>
       </CardHeader>
       <CardContent>
@@ -90,7 +90,7 @@ export default function RecentStudents() {
           </div>
         ) : recentStudents.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            No students found. Add students to see them here.
+            Geen studenten gevonden. Voeg studenten toe om ze hier te zien.
           </div>
         ) : (
           <ul className="divide-y divide-gray-200">
@@ -104,11 +104,11 @@ export default function RecentStudents() {
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-900">{student.firstName} {student.lastName}</p>
                   <p className="text-xs text-gray-500">
-                    {getProgramName(student.programId)} - Year {student.yearLevel}
+                    {getProgramName(student.programId)} - Jaar {student.yearLevel}
                   </p>
                 </div>
                 <div className="ml-auto text-xs text-gray-500">
-                  Enrolled {getDaysSinceEnrollment(student.enrollmentDate)}
+                  Ingeschreven {getDaysSinceEnrollment(student.enrollmentDate)}
                 </div>
               </li>
             ))}

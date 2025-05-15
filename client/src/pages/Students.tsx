@@ -1289,13 +1289,13 @@ export default function Students() {
       
       {/* Statistiek widgets */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 mt-4">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-md border border-blue-200 p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10">
-            <UserCircle className="h-20 w-20 text-blue-500" />
+            <UserCircle className="h-20 w-20 text-sky-500" />
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal studenten</h3>
-          <p className="text-2xl font-bold text-blue-700">{totalStudents}</p>
-          <div className="mt-2 text-xs text-blue-600">
+          <p className="text-2xl font-bold text-sky-700">{totalStudents}</p>
+          <div className="mt-2 text-xs text-sky-600">
             {isLoading ? '' : `${Math.round((students.filter(s => s.status.toLowerCase() === 'active' || s.status.toLowerCase() === 'actief').length / totalStudents) * 100)}% actief`}
           </div>
         </div>
@@ -1317,26 +1317,26 @@ export default function Students() {
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-rose-50 to-rose-100 rounded-xl shadow-md border border-rose-200 p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 4h6v3H9V4zm11 16H4V9h16v11z" />
               <circle cx="12" cy="13" r="2" />
               <path d="M8 17h8" />
             </svg>
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Vrouwelijke studenten</h3>
-          <p className="text-2xl font-bold text-rose-700">
+          <p className="text-2xl font-bold text-sky-700">
             {students.filter(s => s.gender === 'vrouw').length}
           </p>
-          <div className="mt-2 text-xs text-rose-600">
+          <div className="mt-2 text-xs text-sky-600">
             {isLoading ? '' : `${Math.round((students.filter(s => s.gender === 'vrouw').length / totalStudents) * 100)}% van totaal`}
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-violet-50 to-violet-100 rounded-xl shadow-md border border-violet-200 p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-violet-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
             </svg>
@@ -1344,12 +1344,12 @@ export default function Students() {
           <div className="flex justify-between">
             <div>
               <h3 className="text-sm font-medium text-gray-600 mb-1">Vakken & Klassen</h3>
-              <p className="text-2xl font-bold text-violet-700">
+              <p className="text-2xl font-bold text-sky-700">
                 {programs.length + studentGroups.length}
               </p>
             </div>
           </div>
-          <div className="flex justify-between mt-2 text-xs text-violet-600">
+          <div className="flex justify-between mt-2 text-xs text-sky-600">
             <span>{programs.length} vakken</span>
             <span>{studentGroups.length} klassen</span>
           </div>

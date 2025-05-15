@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Program {
   id: string;
@@ -29,6 +32,17 @@ export default function Programs() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedProgram, setExpandedProgram] = useState<string | null>(null);
+  
+  // State voor programma dialoog
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [programFormData, setProgramFormData] = useState({
+    name: '',
+    code: '',
+    description: '',
+    duration: 4,
+    department: '',
+    isActive: true,
+  });
 
   // Fetch programs
   const { data, isLoading, isError } = useQuery({
@@ -50,14 +64,50 @@ export default function Programs() {
     }
   };
 
+  // Mutatie om een programma toe te voegen
+  const createProgramMutation = useMutation({
+    mutationFn: async (programData: typeof programFormData) => {
+      return apiRequest('POST', '/api/programs', programData);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/programs'] });
+      
+      // Reset form and close dialog
+      setProgramFormData({
+        name: '',
+        code: '',
+        description: '',
+        duration: 4,
+        department: '',
+        isActive: true,
+      });
+      setIsAddDialogOpen(false);
+      
+      // Toon succes melding
+      toast({
+        title: "Programma toegevoegd",
+        description: "Het programma is succesvol toegevoegd aan het systeem.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij toevoegen",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van het programma.",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleAddProgram = () => {
-    // Implementatie voor het toevoegen van een programma
-    console.log('Add program clicked');
-    toast({
-      title: "Functie in ontwikkeling",
-      description: "De functie voor het toevoegen van nieuwe programma's is momenteel in ontwikkeling.",
-      variant: "default",
-    });
+    // Open het toevoeg-dialoogvenster
+    setIsAddDialogOpen(true);
+  };
+  
+  const handleSubmitProgram = async (e: React.FormEvent) => {
+    e.preventDefault();
+    createProgramMutation.mutate(programFormData);
   };
   
   const handleEditProgram = (id: string) => {
@@ -257,6 +307,131 @@ export default function Programs() {
           ))
         )}
       </div>
+
+      {/* Add Program Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Nieuw Programma Toevoegen</DialogTitle>
+            <DialogDescription>
+              Vul de programma-informatie in om een nieuw onderwijsprogramma toe te voegen.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmitProgram}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="name" className="text-right">
+                    Programmanaam
+                  </Label>
+                  <Input
+                    id="name"
+                    required
+                    value={programFormData.name}
+                    onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="code" className="text-right">
+                    Programmacode
+                  </Label>
+                  <Input
+                    id="code"
+                    required
+                    value={programFormData.code}
+                    onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="department" className="text-right">
+                    Afdeling
+                  </Label>
+                  <Input
+                    id="department"
+                    required
+                    value={programFormData.department}
+                    onChange={(e) => setProgramFormData({ ...programFormData, department: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="duration" className="text-right">
+                    Duur (jaren)
+                  </Label>
+                  <Select
+                    value={programFormData.duration.toString()}
+                    onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer duur" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 jaar</SelectItem>
+                      <SelectItem value="2">2 jaar</SelectItem>
+                      <SelectItem value="3">3 jaar</SelectItem>
+                      <SelectItem value="4">4 jaar</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="description" className="text-right">
+                    Beschrijving
+                  </Label>
+                  <Input
+                    id="description"
+                    value={programFormData.description}
+                    onChange={(e) => setProgramFormData({ ...programFormData, description: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="isActive" className="text-right mr-2">
+                    Status
+                  </Label>
+                  <Select
+                    value={programFormData.isActive ? "true" : "false"}
+                    onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Actief</SelectItem>
+                      <SelectItem value="false">Inactief</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsAddDialogOpen(false)}
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="submit"
+                disabled={createProgramMutation.isPending}
+              >
+                {createProgramMutation.isPending ? 'Bezig met toevoegen...' : 'Programma toevoegen'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

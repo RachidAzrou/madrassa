@@ -127,10 +127,7 @@ export default function Courses() {
   // Create course mutation
   const createCourseMutation = useMutation({
     mutationFn: async (data: typeof courseFormData) => {
-      return await apiRequest('/api/courses', { 
-        method: 'POST',
-        body: data 
-      });
+      return await apiRequest('POST', '/api/courses', data);
     },
     onSuccess: () => {
       toast({
@@ -154,10 +151,7 @@ export default function Courses() {
   // Update course mutation
   const updateCourseMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number, data: typeof courseFormData }) => {
-      return await apiRequest(`/api/courses/${id}`, {
-        method: 'PUT',
-        body: data
-      });
+      return await apiRequest('PUT', `/api/courses/${id}`, data);
     },
     onSuccess: () => {
       toast({
@@ -181,9 +175,7 @@ export default function Courses() {
   // Delete course mutation
   const deleteCourseMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/courses/${id}`, {
-        method: 'DELETE'
-      });
+      return await apiRequest('DELETE', `/api/courses/${id}`);
     },
     onSuccess: () => {
       toast({

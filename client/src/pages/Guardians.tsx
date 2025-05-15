@@ -66,7 +66,7 @@ export default function Guardians() {
   const totalGuardians = data?.totalCount || 0;
   const totalPages = Math.ceil(totalGuardians / 10); // Assuming 10 guardians per page
 
-  // Mutatie om een verzorger toe te voegen
+  // Mutatie om een voogd toe te voegen
   const createGuardianMutation = useMutation({
     mutationFn: async (guardianData: typeof guardianFormData) => {
       return apiRequest('POST', '/api/guardians', guardianData);
@@ -92,15 +92,15 @@ export default function Guardians() {
       
       // Toon succes melding
       toast({
-        title: "Verzorger toegevoegd",
-        description: "De verzorger is succesvol toegevoegd aan het systeem.",
+        title: "Voogd toegevoegd",
+        description: "De voogd is succesvol toegevoegd aan het systeem.",
         variant: "default",
       });
     },
     onError: (error: any) => {
       toast({
         title: "Fout bij toevoegen",
-        description: error.message || "Er is een fout opgetreden bij het toevoegen van de verzorger.",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van de voogd.",
         variant: "destructive",
       });
     }
@@ -121,15 +121,15 @@ export default function Guardians() {
       
       // Toon succes melding
       toast({
-        title: "Verzorger bijgewerkt",
-        description: "De verzorger is succesvol bijgewerkt.",
+        title: "Voogd bijgewerkt",
+        description: "De voogd is succesvol bijgewerkt.",
         variant: "default",
       });
     },
     onError: (error: any) => {
       toast({
         title: "Fout bij bijwerken",
-        description: error.message || "Er is een fout opgetreden bij het bijwerken van de verzorger.",
+        description: error.message || "Er is een fout opgetreden bij het bijwerken van de voogd.",
         variant: "destructive",
       });
     }
@@ -150,15 +150,15 @@ export default function Guardians() {
       
       // Toon succes melding
       toast({
-        title: "Verzorger verwijderd",
-        description: "De verzorger is succesvol verwijderd uit het systeem.",
+        title: "Voogd verwijderd",
+        description: "De voogd is succesvol verwijderd uit het systeem.",
         variant: "default",
       });
     },
     onError: (error: any) => {
       toast({
         title: "Fout bij verwijderen",
-        description: error.message || "Er is een fout opgetreden bij het verwijderen van de verzorger.",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van de voogd.",
         variant: "destructive",
       });
     }
@@ -862,9 +862,9 @@ export default function Guardians() {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Verzorger verwijderen</DialogTitle>
+            <DialogTitle>Voogd verwijderen</DialogTitle>
             <DialogDescription>
-              Weet je zeker dat je deze verzorger wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+              Weet je zeker dat je deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
             </DialogDescription>
           </DialogHeader>
           <div className="my-4">

@@ -1023,21 +1023,31 @@ export default function Students() {
                 />
               </div>
               <div className="col-span-1">
-                <Label htmlFor="editGender" className="text-right">
+                <Label htmlFor="editGender" className="text-right mb-2 block">
                   Geslacht
                 </Label>
-                <Select
-                  value={studentFormData.gender || ''}
-                  onValueChange={(value) => setStudentFormData({ ...studentFormData, gender: value })}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Selecteer geslacht" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="man">Man</SelectItem>
-                    <SelectItem value="vrouw">Vrouw</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2 mt-1">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="edit-gender-man"
+                      checked={studentFormData.gender === 'man'}
+                      onChange={() => setStudentFormData({ ...studentFormData, gender: 'man' })}
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor="edit-gender-man" className="font-normal">Man</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="edit-gender-vrouw"
+                      checked={studentFormData.gender === 'vrouw'}
+                      onChange={() => setStudentFormData({ ...studentFormData, gender: 'vrouw' })}
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor="edit-gender-vrouw" className="font-normal">Vrouw</Label>
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -1661,21 +1671,31 @@ export default function Students() {
                   />
                 </div>
                 <div className="col-span-1">
-                  <Label htmlFor="gender" className="text-right">
+                  <Label htmlFor="gender" className="text-right mb-2 block">
                     Geslacht
                   </Label>
-                  <Select
-                    value={studentFormData.gender || ''}
-                    onValueChange={(value) => setStudentFormData({ ...studentFormData, gender: value })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer geslacht" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="man">Man</SelectItem>
-                      <SelectItem value="vrouw">Vrouw</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="space-y-2 mt-1">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="gender-man"
+                        checked={studentFormData.gender === 'man'}
+                        onChange={() => setStudentFormData({ ...studentFormData, gender: 'man' })}
+                        className="h-4 w-4"
+                      />
+                      <Label htmlFor="gender-man" className="font-normal">Man</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="gender-vrouw"
+                        checked={studentFormData.gender === 'vrouw'}
+                        onChange={() => setStudentFormData({ ...studentFormData, gender: 'vrouw' })}
+                        className="h-4 w-4"
+                      />
+                      <Label htmlFor="gender-vrouw" className="font-normal">Vrouw</Label>
+                    </div>
+                  </div>
                 </div>
               </div>
 

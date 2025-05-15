@@ -74,6 +74,13 @@ export default function Students() {
     status: 'active' as string,
   });
   
+  // State voor meerdere programma's
+  const [selectedPrograms, setSelectedPrograms] = useState<{
+    programId: number;
+    yearLevel: number | null;
+    status: string;
+  }[]>([]);
+  
   // Aangepaste onValueChange voor programId selecties
   const handleProgramIdChange = (value: string) => {
     // Als er een nieuw programma wordt geselecteerd, reset de studiejaar waarde

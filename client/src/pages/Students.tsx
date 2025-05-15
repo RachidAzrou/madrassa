@@ -1122,32 +1122,7 @@ export default function Students() {
         </div>
       </div>
 
-      {/* Student Life Images */}
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Studentenleven</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <img 
-            src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
-            alt="Studenten studeren samen" 
-            className="rounded-lg shadow-sm h-48 w-full object-cover" 
-          />
-          <img 
-            src="https://pixabay.com/get/g5ce301cea77c986decbe6332e3e27b75a70717da74d0bf7c4bfe2ec8dbb3dbd496461b8b2ab7f06b0624f2fe10a4e01a485f2136242a2b6dac2359ccb793d32c_1280.jpg" 
-            alt="Studenten werken samen" 
-            className="rounded-lg shadow-sm h-48 w-full object-cover" 
-          />
-          <img 
-            src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
-            alt="Student studeert buiten" 
-            className="rounded-lg shadow-sm h-48 w-full object-cover" 
-          />
-          <img 
-            src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
-            alt="Diploma-uitreiking" 
-            className="rounded-lg shadow-sm h-48 w-full object-cover" 
-          />
-        </div>
-      </div>
+
 
       {/* Add Student Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -1473,8 +1448,9 @@ export default function Students() {
           
           {selectedStudent && (
             <Tabs defaultValue="general" className="mt-4">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="general">Algemene Informatie</TabsTrigger>
+                <TabsTrigger value="family">Familie</TabsTrigger>
                 <TabsTrigger value="programs">Vakken</TabsTrigger>
                 <TabsTrigger value="enrollments">Inschrijvingen</TabsTrigger>
               </TabsList>

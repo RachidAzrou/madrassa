@@ -19,6 +19,7 @@ import {
   insertExaminationSchema,
   insertGuardianSchema,
   insertStudentGuardianSchema,
+  insertStudentProgramSchema,
   type Student
 } from "@shared/schema";
 

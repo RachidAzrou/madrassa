@@ -17,7 +17,8 @@ import {
   lessons, type Lesson, type InsertLesson,
   examinations, type Examination, type InsertExamination,
   guardians, type Guardian, type InsertGuardian,
-  studentGuardians, type StudentGuardian, type InsertStudentGuardian
+  studentGuardians, type StudentGuardian, type InsertStudentGuardian,
+  studentPrograms, type StudentProgram, type InsertStudentProgram
 } from "@shared/schema";
 
 export class DatabaseStorage implements IStorage {
@@ -712,5 +713,72 @@ export class DatabaseStorage implements IStorage {
       .where(eq(studentGuardians.id, id))
       .returning({ id: studentGuardians.id });
     return result.length > 0;
+  }
+
+  // Student Program operations
+  async getStudentPrograms(): Promise<StudentProgram[]> {
+    return db.select().from(studentPrograms);
+  }
+
+  async getStudentProgram(id: number): Promise<StudentProgram | undefined> {
+    const result = await db.select().from(studentPrograms).where(eq(studentPrograms.id, id));
+    return result[0];
+  }
+
+  async getStudentProgramsByStudent(studentId: number): Promise<StudentProgram[]> {
+    return db.select().from(studentPrograms).where(eq(studentPrograms.studentId, studentId));
+  }
+
+  async getStudentProgramsByProgram(programId: number): Promise<StudentProgram[]> {
+    return db.select().from(studentPrograms).where(eq(studentPrograms.programId, programId));
+  }
+
+  async createStudentProgram(studentProgram: InsertStudentProgram): Promise<StudentProgram> {
+    // Als dit als primair programma wordt gemarkeerd, update dan alle bestaande programma's van de student naar niet-primair
+    if (studentProgram.isPrimary) {
+      await db.update(studentPrograms)
+        .set({ isPrimary: false })
+        .where(eq(studentPrograms.studentId, studentProgram.studentId));
+    }
+    
+    const result = await db.insert(studentPrograms).values(studentProgram).returning();
+    return result[0];
+  }
+
+  async updateStudentProgram(id: number, studentProgram: Partial<StudentProgram>): Promise<StudentProgram | undefined> {
+    // Als dit programma als primair wordt gemarkeerd, update dan alle andere programma's van de student
+    if (studentProgram.isPrimary) {
+      const currentProgram = await this.getStudentProgram(id);
+      if (currentProgram) {
+        await db.update(studentPrograms)
+          .set({ isPrimary: false })
+          .where(eq(studentPrograms.studentId, currentProgram.studentId));
+      }
+    }
+    
+    const result = await db.update(studentPrograms)
+      .set(studentProgram)
+      .where(eq(studentPrograms.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteStudentProgram(id: number): Promise<boolean> {
+    const result = await db.delete(studentPrograms)
+      .where(eq(studentPrograms.id, id))
+      .returning({ id: studentPrograms.id });
+    return result.length > 0;
+  }
+
+  async getPrimaryProgramByStudent(studentId: number): Promise<StudentProgram | undefined> {
+    const result = await db.select()
+      .from(studentPrograms)
+      .where(eq(studentPrograms.studentId, studentId))
+      .where(eq(studentPrograms.isPrimary, true));
+    
+    if (result.length > 0) {
+      return result[0];
+    }
+    return undefined;
   }
 }

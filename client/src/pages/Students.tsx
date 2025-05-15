@@ -753,10 +753,11 @@ export default function Students() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Alle Programma's</SelectItem>
-                <SelectItem value="cs">Informatica</SelectItem>
-                <SelectItem value="bus">Bedrijfskunde</SelectItem>
-                <SelectItem value="eng">Techniek</SelectItem>
-                <SelectItem value="arts">Kunsten</SelectItem>
+                {programs.map((program) => (
+                  <SelectItem key={program.id} value={String(program.id)}>
+                    {program.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

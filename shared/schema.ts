@@ -25,25 +25,64 @@ const baseInsertStudentSchema = createInsertSchema(students).omit({
 
 // Pas het schema aan met aangepaste datumvalidatie
 export const insertStudentSchema = baseInsertStudentSchema.extend({
-  // Voeg uitgebreide validatie voor geboortedatum toe die zowel null als string toestaat
+  // Verbeterde validatie voor geboortedatum met duidelijke foutmeldingen
   dateOfBirth: z.union([
-    z.string(),
+    z.string().refine(val => {
+      // Valideer expliciete lege waarde
+      if (val === "") return true;
+      
+      // Controleer YYYY-MM-DD format (HTML date input format)
+      if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+        const date = new Date(val);
+        return !isNaN(date.getTime());
+      }
+      
+      // Controleer DD-MM-YYYY format
+      if (/^\d{2}-\d{2}-\d{4}$/.test(val)) {
+        const [day, month, year] = val.split('-');
+        const date = new Date(`${year}-${month}-${day}`);
+        return !isNaN(date.getTime());
+      }
+      
+      // Probeer andere formaten als fallback
+      const date = new Date(val);
+      return !isNaN(date.getTime());
+    }, {
+      message: "Ongeldige datum. Gebruik formaat YYYY-MM-DD of DD-MM-YYYY."
+    }),
     z.null(),
     z.date()
   ]).optional().transform(val => {
+    // Behandel lege waarden
     if (!val) return null;
+    if (val === "") return null;
+    
+    // Passeer Date objecten door
     if (val instanceof Date) return val;
     
+    // Verwerk strings
     try {
-      // Converteer string naar Date object
+      // Controleer DD-MM-YYYY format en converteer
+      if (/^\d{2}-\d{2}-\d{4}$/.test(val)) {
+        const [day, month, year] = val.split('-');
+        const formattedDate = new Date(`${year}-${month}-${day}`);
+        if (!isNaN(formattedDate.getTime())) {
+          console.log(`Datum correct geconverteerd van ${val} naar ${formattedDate.toISOString()}`);
+          return formattedDate;
+        }
+      }
+      
+      // Behandel standaard format (YYYY-MM-DD van HTML date input)
       const date = new Date(val);
       if (!isNaN(date.getTime())) {
+        console.log(`Datum correct geparsed: ${date.toISOString()}`);
         return date;
       }
     } catch (e) {
-      console.error('Invalid date format:', val);
+      console.error('Fout bij verwerken datum:', val, e);
     }
     
+    // Als alle conversies mislukken, retourneer null
     return null;
   })
 });

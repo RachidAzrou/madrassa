@@ -21,6 +21,7 @@ export const students = pgTable("students", {
   yearLevel: integer("year_level"),
   status: text("status").default("active"), // active, inactive, pending, graduated
   enrollmentDate: timestamp("enrollment_date").defaultNow(),
+  notes: text("notes"), // Notities over de student
 });
 
 // Maak een standaard schema maar omit ID (wordt gegenereerd door database)

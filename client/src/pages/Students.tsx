@@ -4,6 +4,7 @@ import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -1546,7 +1547,20 @@ export default function Students() {
                 </div>
               </div>
               
-              <div className="space-y-4">
+              <div className="mt-4">
+                <Label htmlFor="notes" className="text-right">
+                  Notities
+                </Label>
+                <Textarea
+                  id="notes"
+                  value={studentFormData.notes || ''}
+                  onChange={(e) => setStudentFormData({ ...studentFormData, notes: e.target.value })}
+                  className="mt-1 min-h-[120px]"
+                  placeholder="Voeg hier eventuele notities over de student toe..."
+                />
+              </div>
+              
+              <div className="space-y-4 mt-4">
                 <div className="flex flex-col">
                   <h3 className="text-lg font-semibold mb-2">Vakken</h3>
                   <p className="text-sm text-muted-foreground mb-4">

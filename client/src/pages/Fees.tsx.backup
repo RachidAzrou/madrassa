@@ -276,16 +276,12 @@ export default function Fees() {
 
   const getStatusBadge = (status: string) => {
     switch(status.toLowerCase()) {
-      case 'betaald':
       case 'paid':
         return <Badge className="bg-green-100 text-green-800 border-green-200">Betaald</Badge>;
-      case 'in behandeling':
       case 'pending':
         return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">In behandeling</Badge>;
-      case 'te laat':
       case 'overdue':
         return <Badge className="bg-red-100 text-red-800 border-red-200">Te laat</Badge>;
-      case 'gedeeltelijk':
       case 'partial':
         return <Badge className="bg-blue-100 text-blue-800 border-blue-200">Gedeeltelijk</Badge>;
       default:
@@ -414,6 +410,7 @@ export default function Fees() {
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
+                              disabled={(date) => date < new Date()}
                               initialFocus
                             />
                           </PopoverContent>
@@ -450,10 +447,10 @@ export default function Fees() {
                     )}
                   />
                   
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
+                  <DialogFooter className="mt-6">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
                       onClick={() => setIsAddDialogOpen(false)}
                     >
                       Annuleren
@@ -466,358 +463,135 @@ export default function Fees() {
           </Dialog>
         </div>
       </div>
-      
-      {/* Bewerk dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Betaling Bewerken</DialogTitle>
-            <DialogDescription>
-              Bewerk de gegevens van deze betalingsverplichting.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleEditSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="studentId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Student</FormLabel>
-                    <Select 
-                      onValueChange={(value) => field.onChange(parseInt(value))}
-                      defaultValue={field.value?.toString()}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer een student" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {students.map((student: any) => (
-                          <SelectItem key={student.id} value={student.id.toString()}>
-                            {student.firstName} {student.lastName} ({student.studentNumber})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Omschrijving</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="bv. Collegegeld Semester 1 2025" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Bedrag (€)</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="0,00" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="dueDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Vervaldatum</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={
-                              "w-full pl-3 text-left font-normal " +
-                              (!field.value && "text-muted-foreground")
-                            }
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP", { locale: nl })
-                            ) : (
-                              <span>Kies een datum</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="in behandeling">In behandeling</SelectItem>
-                        <SelectItem value="betaald">Betaald</SelectItem>
-                        <SelectItem value="te laat">Te laat</SelectItem>
-                        <SelectItem value="gedeeltelijk">Gedeeltelijk betaald</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsEditDialogOpen(false)}
-                >
-                  Annuleren
-                </Button>
-                <Button type="submit">Wijzigingen Opslaan</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Verwijder bevestiging dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Betaling Verwijderen</DialogTitle>
-            <DialogDescription>
-              Weet je zeker dat je deze betaling wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsDeleteDialogOpen(false)}
-            >
-              Annuleren
-            </Button>
-            <Button 
-              variant="destructive"
-              onClick={confirmDelete}
-            >
-              Verwijderen
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
-      {/* Statistische overzichten */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Totaal geïnd */}
+      {/* Dashboard Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              Totaal Geïnd
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             <div className="flex items-center">
-              <div className="mr-2 rounded-full bg-green-100 p-2">
-                <DollarSign className="h-4 w-4 text-green-600" />
+              <div className="p-2 bg-green-50 rounded-full mr-4">
+                <DollarSign className="h-6 w-6 text-green-500" />
               </div>
               <div>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(statsData?.stats?.totalCollected || 0)}
-                </div>
-                <div className="text-xs text-gray-500">
-                  In dit academisch jaar
-                </div>
+                <p className="text-sm font-medium text-gray-500">Totaal Geïnd</p>
+                <p className="text-2xl font-semibold">
+                  {(statsData as StatsType)?.stats ? formatCurrency((statsData as StatsType).stats.totalCollected) : "Laden..."}
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
-        
-        {/* Openstaand bedrag */}
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              Openstaand Bedrag
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             <div className="flex items-center">
-              <div className="mr-2 rounded-full bg-yellow-100 p-2">
-                <CreditCard className="h-4 w-4 text-yellow-600" />
+              <div className="p-2 bg-yellow-50 rounded-full mr-4">
+                <CreditCard className="h-6 w-6 text-yellow-500" />
               </div>
               <div>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(statsData?.stats?.pendingAmount || 0)}
-                </div>
-                <div className="text-xs text-gray-500">
-                  Nog te innen betalingen
-                </div>
+                <p className="text-sm font-medium text-gray-500">Openstaand Bedrag</p>
+                <p className="text-2xl font-semibold">
+                  {(statsData as StatsType)?.stats ? formatCurrency((statsData as StatsType).stats.pendingAmount) : "Laden..."}
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
-        
-        {/* Studenten met openstaande betalingen */}
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              Studenten met Betalingen
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             <div className="flex items-center">
-              <div className="mr-2 rounded-full bg-blue-100 p-2">
-                <Users className="h-4 w-4 text-blue-600" />
+              <div className="p-2 bg-blue-50 rounded-full mr-4">
+                <CheckCircle className="h-6 w-6 text-blue-500" />
               </div>
               <div>
-                <div className="text-2xl font-bold">
-                  {statsData?.stats?.totalStudents || 0}
+                <p className="text-sm font-medium text-gray-500">Voltooiingsgraad</p>
+                <div className="flex items-center">
+                  <p className="text-2xl font-semibold">
+                    {(statsData as StatsType)?.stats ? `${(statsData as StatsType).stats.completionRate}%` : "Laden..."}
+                  </p>
                 </div>
-                <div className="text-xs text-gray-500">
-                  Met actieve betalingsverplichtingen
-                </div>
+                <Progress 
+                  value={(statsData as StatsType)?.stats ? (statsData as StatsType).stats.completionRate : 0} 
+                  className="h-1.5 mt-1.5 w-32" 
+                />
               </div>
             </div>
           </CardContent>
         </Card>
-        
-        {/* Afrondings percentage */}
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">
-              Afrondings Percentage
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="p-4">
             <div className="flex items-center">
-              <div className="mr-2 rounded-full bg-green-100 p-2">
-                <CheckCircle className="h-4 w-4 text-green-600" />
+              <div className="p-2 bg-purple-50 rounded-full mr-4">
+                <Users className="h-6 w-6 text-purple-500" />
               </div>
               <div>
-                <div className="text-2xl font-bold">
-                  {statsData?.stats?.completionRate || 0}%
-                </div>
-                <div className="text-xs text-gray-500">
-                  Van totale betalingsverplichtingen
-                </div>
+                <p className="text-sm font-medium text-gray-500">Betalende Studenten</p>
+                <p className="text-2xl font-semibold">
+                  {(statsData as StatsType)?.stats ? (statsData as StatsType).stats.totalStudents : "Laden..."}
+                </p>
               </div>
             </div>
-            <Progress className="mt-2" value={statsData?.stats?.completionRate || 0} />
           </CardContent>
         </Card>
       </div>
 
-      {/* Tabs voor betalingsrecords, programma's en beurzen */}
-      <Tabs defaultValue="fee-records" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full md:w-[600px] grid-cols-3">
-          <TabsTrigger value="fee-records">
-            <CreditCard className="h-4 w-4 mr-2" />
-            Betalingsrecords
-          </TabsTrigger>
-          <TabsTrigger value="payment-programs">
-            <Filter className="h-4 w-4 mr-2" />
-            Betalingsprogramma's
-          </TabsTrigger>
-          <TabsTrigger value="scholarships">
-            <CheckCircle className="h-4 w-4 mr-2" />
-            Beurzen
-          </TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="fee-records">Betalingsrecords</TabsTrigger>
+          <TabsTrigger value="fee-structure">Tariefstructuur</TabsTrigger>
+          <TabsTrigger value="scholarships">Beurzen</TabsTrigger>
         </TabsList>
         
-        {/* Tab inhoud voor fee records */}
         <TabsContent value="fee-records" className="space-y-4">
-          {/* Filter Controls */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <div className="flex flex-col md:flex-row md:items-center gap-4">
-              <div className="flex-1">
-                <label htmlFor="program-filter" className="block text-sm font-medium text-gray-700 mb-1">
-                  Programma Filter
-                </label>
-                <Select onValueChange={handleProgramChange} defaultValue={program}>
-                  <SelectTrigger id="program-filter">
-                    <SelectValue placeholder="Alle programma's" />
+          {/* Filters */}
+          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Programma</label>
+                <Select value={program} onValueChange={handleProgramChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Alle Programma's" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Alle programma's</SelectItem>
-                    {programs.map((program: any) => (
-                      <SelectItem key={program.id} value={program.id.toString()}>
-                        {program.name}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="all">Alle Programma's</SelectItem>
+                    <SelectItem value="cs">Informatica</SelectItem>
+                    <SelectItem value="bus">Bedrijfskunde</SelectItem>
+                    <SelectItem value="eng">Techniek</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              
-              <div className="flex-1">
-                <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-1">
-                  Status Filter
-                </label>
-                <Select onValueChange={handleStatusChange} defaultValue={status}>
-                  <SelectTrigger id="status-filter">
-                    <SelectValue placeholder="Alle statussen" />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <Select value={status} onValueChange={handleStatusChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Alle Statussen" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Alle statussen</SelectItem>
-                    <SelectItem value="betaald">Betaald</SelectItem>
-                    <SelectItem value="in behandeling">In behandeling</SelectItem>
-                    <SelectItem value="te laat">Te laat</SelectItem>
-                    <SelectItem value="gedeeltelijk">Gedeeltelijk betaald</SelectItem>
+                    <SelectItem value="all">Alle Statussen</SelectItem>
+                    <SelectItem value="paid">Betaald</SelectItem>
+                    <SelectItem value="pending">In behandeling</SelectItem>
+                    <SelectItem value="overdue">Te laat</SelectItem>
+                    <SelectItem value="partial">Gedeeltelijk betaald</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-              
-              <div className="flex-initial">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Acties
-                </label>
-                <Button variant="outline" className="w-full">
-                  <Download className="h-4 w-4 mr-2" />
-                  Exporteren
-                </Button>
               </div>
             </div>
           </div>
-          
+
           {/* Fee Records Table */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
               <div className="text-sm text-gray-500">
                 {isLoading ? 'Laden...' : `Tonen van ${feeRecords.length} van ${totalRecords} betalingsrecords`}
+              </div>
+              <div className="flex space-x-2">
+                <Button variant="outline" size="sm">
+                  <Filter className="mr-2 h-4 w-4" />
+                  Filter
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Download className="mr-2 h-4 w-4" />
+                  Exporteren
+                </Button>
               </div>
             </div>
             <div className="overflow-x-auto">
@@ -825,8 +599,8 @@ export default function Fees() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factuurnr.</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Beschrijving</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factuur ID</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Omschrijving</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bedrag</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vervaldatum</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -834,16 +608,16 @@ export default function Fees() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {isError ? (
-                    <tr>
-                      <td colSpan={7} className="px-6 py-4 text-center text-sm text-red-500">
-                        Fout bij het laden van betalingsrecords. Probeer het opnieuw.
-                      </td>
-                    </tr>
-                  ) : isLoading ? (
+                  {isLoading ? (
                     <tr>
                       <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
                         Betalingsrecords laden...
+                      </td>
+                    </tr>
+                  ) : isError ? (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-4 text-center text-sm text-red-500">
+                        Fout bij het laden van betalingsrecords. Probeer het opnieuw.
                       </td>
                     </tr>
                   ) : feeRecords.length === 0 ? (
@@ -923,37 +697,115 @@ export default function Fees() {
                       })}
                     </>
                   )}
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback>DP</AvatarFallback>
+                            </Avatar>
+                            <div className="ml-4">
+                              <div className="font-medium text-gray-900">David Peters</div>
+                              <div className="text-sm text-gray-500">STU000754</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">FAC-2025-0031</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">Collegegeld - Voorjaar 2025</div>
+                          <div className="text-xs text-gray-500">Techniek</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{formatCurrency(3800)}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">15 dec 2024</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {getStatusBadge('Overdue')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex justify-end space-x-2">
+                            <Button variant="ghost" size="icon">
+                              <Eye className="h-4 w-4 text-gray-500" />
+                              <span className="sr-only">Bekijken</span>
+                            </Button>
+                            <Button variant="ghost" size="icon">
+                              <Edit className="h-4 w-4 text-blue-500" />
+                              <span className="sr-only">Bewerken</span>
+                            </Button>
+                            <Button variant="ghost" size="icon">
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                              <span className="sr-only">Verwijderen</span>
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    </>
+                  )}
                 </tbody>
               </table>
             </div>
-            
-            {/* Pagination controls */}
+
+            {/* Pagination */}
             {totalPages > 1 && (
-              <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                <div className="flex-1 flex justify-between sm:hidden">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Vorige
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Volgende
+                  </Button>
+                </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
-                      Pagina <span className="font-medium">{currentPage}</span> van{' '}
-                      <span className="font-medium">{totalPages}</span>
+                      Tonen <span className="font-medium">{((currentPage - 1) * 10) + 1}</span> tot{" "}
+                      <span className="font-medium">
+                        {Math.min(currentPage * 10, totalRecords)}
+                      </span>{" "}
+                      van <span className="font-medium">{totalRecords}</span> resultaten
                     </p>
                   </div>
                   <div>
                     <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                        disabled={currentPage === 1}
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
                         className="rounded-l-md"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
                       >
                         Vorige
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      {Array.from({ length: totalPages }).map((_, i) => (
+                        <Button 
+                          key={i}
+                          variant={currentPage === i + 1 ? "default" : "outline"} 
+                          size="sm"
+                          onClick={() => handlePageChange(i + 1)}
+                        >
+                          {i + 1}
+                        </Button>
+                      ))}
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="rounded-r-md"
+                        onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="rounded-r-md ml-2"
                       >
                         Volgende
                       </Button>
@@ -965,25 +817,251 @@ export default function Fees() {
           </div>
         </TabsContent>
         
-        {/* Placeholder content voor de andere tabs */}
-        <TabsContent value="payment-programs" className="space-y-4">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-medium">Betalingsprogramma's</h3>
-            <p className="text-gray-500 mt-2">
-              Hier kunt u betalingsprogramma's beheren voor verschillende studierichtingen en semesters.
-              Deze functionaliteit komt binnenkort beschikbaar.
-            </p>
-          </div>
+        <TabsContent value="fee-structure">
+          <Card>
+            <CardHeader>
+              <CardTitle>Tariefstructuur</CardTitle>
+              <CardDescription>Configureer tariefscomponenten en structuren per programma</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Programma</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Academisch Jaar</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Collegegeld</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Practicumkosten</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Overige Kosten</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Totaal</th>
+                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">Informatica</div>
+                        <div className="text-xs text-gray-500">Bachelor Opleiding</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">2024-2025</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{formatCurrency(3000)}/semester</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{formatCurrency(500)}/semester</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{formatCurrency(200)}/semester</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{formatCurrency(3700)}/semester</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <Button variant="ghost" size="icon">
+                          <Edit className="h-4 w-4 text-blue-500" />
+                          <span className="sr-only">Edit</span>
+                        </Button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">Business Administration</div>
+                        <div className="text-xs text-gray-500">Bachelor's Degree</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">2024-2025</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{formatCurrency(2800)}/semester</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{formatCurrency(300)}/semester</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{formatCurrency(200)}/semester</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{formatCurrency(3300)}/semester</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <Button variant="ghost" size="icon">
+                          <Edit className="h-4 w-4 text-blue-500" />
+                          <span className="sr-only">Edit</span>
+                        </Button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">Techniek</div>
+                        <div className="text-xs text-gray-500">Bachelor Opleiding</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">2024-2025</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{formatCurrency(3200)}/semester</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{formatCurrency(600)}/semester</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{formatCurrency(250)}/semester</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{formatCurrency(4050)}/semester</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <Button variant="ghost" size="icon">
+                          <Edit className="h-4 w-4 text-blue-500" />
+                          <span className="sr-only">Edit</span>
+                        </Button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between border-t px-6 py-4">
+              <Button variant="outline">Tariefstructuur Toevoegen</Button>
+              <Button variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Structuur Exporteren
+              </Button>
+            </CardFooter>
+          </Card>
         </TabsContent>
         
-        <TabsContent value="scholarships" className="space-y-4">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-medium">Beurzen en Financiële Ondersteuning</h3>
-            <p className="text-gray-500 mt-2">
-              Beheer beurzen, subsidies en andere vormen van financiële ondersteuning voor studenten.
-              Deze functionaliteit komt binnenkort beschikbaar.
-            </p>
-          </div>
+        <TabsContent value="scholarships">
+          <Card>
+            <CardHeader>
+              <CardTitle>Beurzen & Financiële Steun</CardTitle>
+              <CardDescription>Beheer beurzen en financiële steunprogramma's</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Beursnaam</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bedrag</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Voorwaarden</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ontvangers</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">Academische Uitmuntendheid</div>
+                        <div className="text-xs text-gray-500">Op basis van prestatie</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge className="bg-blue-100 text-blue-800">Volledig Collegegeld</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">100% Collegegeld</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">GPA ≥ 3.8</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">15 studenten</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge className="bg-green-100 text-green-800">Active</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <Button variant="ghost" size="icon">
+                            <Eye className="h-4 w-4 text-gray-500" />
+                            <span className="sr-only">View</span>
+                          </Button>
+                          <Button variant="ghost" size="icon">
+                            <Edit className="h-4 w-4 text-blue-500" />
+                            <span className="sr-only">Edit</span>
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">Need-Based Aid</div>
+                        <div className="text-xs text-gray-500">Financial need</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge className="bg-purple-100 text-purple-800">Partial Tuition</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">50% Tuition</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">Financial Need</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">42 students</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge className="bg-green-100 text-green-800">Active</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <Button variant="ghost" size="icon">
+                            <Eye className="h-4 w-4 text-gray-500" />
+                            <span className="sr-only">View</span>
+                          </Button>
+                          <Button variant="ghost" size="icon">
+                            <Edit className="h-4 w-4 text-blue-500" />
+                            <span className="sr-only">Edit</span>
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">Sports Achievement</div>
+                        <div className="text-xs text-gray-500">Athletics</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge className="bg-yellow-100 text-yellow-800">Partial Tuition</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">75% Tuition</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">Sports Achievement</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">20 students</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge className="bg-green-100 text-green-800">Active</Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <Button variant="ghost" size="icon">
+                            <Eye className="h-4 w-4 text-gray-500" />
+                            <span className="sr-only">View</span>
+                          </Button>
+                          <Button variant="ghost" size="icon">
+                            <Edit className="h-4 w-4 text-blue-500" />
+                            <span className="sr-only">Edit</span>
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between border-t px-6 py-4">
+              <Button variant="outline">Add Scholarship</Button>
+              <Button variant="outline">View Applications</Button>
+            </CardFooter>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

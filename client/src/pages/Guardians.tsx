@@ -558,10 +558,7 @@ export default function Guardians() {
 
       {/* Guardian List Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-          <div className="text-sm text-gray-500">
-            {isLoading ? 'Laden...' : `Toont ${Array.isArray(data) ? data.length : 0} voogd(en)`}
-          </div>
+        <div className="p-4 border-b border-gray-200 flex justify-end items-center">
           <div className="flex space-x-2">
             <Button variant="outline" size="sm" onClick={handleRefresh}>
               <svg 
@@ -597,8 +594,8 @@ export default function Guardians() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <div className="flex items-center">
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center justify-center">
                     <input 
                       type="checkbox" 
                       className="rounded border-gray-300 text-primary focus:ring-primary mr-3"

@@ -1288,49 +1288,34 @@ export default function Students() {
       </div>
       
       {/* Statistiek widgets */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-4">
         <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10">
             <UserCircle className="h-20 w-20 text-sky-500" />
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal studenten</h3>
           <p className="text-2xl font-bold text-sky-700">{totalStudents}</p>
-          <div className="mt-2 text-xs text-sky-600">
-            {isLoading ? '' : `${Math.round((students.filter(s => s.status.toLowerCase() === 'active' || s.status.toLowerCase() === 'actief').length / totalStudents) * 100)}% actief`}
+          <div className="flex justify-between mt-2 text-xs text-sky-600">
+            <span>{students.filter(s => s.gender === 'man').length} mannen</span>
+            <span>{students.filter(s => s.gender === 'vrouw').length} vrouwen</span>
           </div>
         </div>
         
         <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 4h6v3H9V4zm11 16H4V9h16v11z" />
-              <circle cx="12" cy="13" r="2" />
-              <path d="M10 17.5c.8.5 1.8.5 2.5 0" />
+              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+              <path d="M12 16v-4"></path>
+              <path d="M12 8h.01"></path>
             </svg>
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Mannelijke studenten</h3>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Status overzicht</h3>
           <p className="text-2xl font-bold text-sky-700">
-            {students.filter(s => s.gender === 'man').length}
+            {students.filter(s => s.status.toLowerCase() === 'active' || s.status.toLowerCase() === 'actief').length} actief
           </p>
-          <div className="mt-2 text-xs text-sky-600">
-            {isLoading ? '' : `${Math.round((students.filter(s => s.gender === 'man').length / totalStudents) * 100)}% van totaal`}
-          </div>
-        </div>
-        
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 4h6v3H9V4zm11 16H4V9h16v11z" />
-              <circle cx="12" cy="13" r="2" />
-              <path d="M8 17h8" />
-            </svg>
-          </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Vrouwelijke studenten</h3>
-          <p className="text-2xl font-bold text-sky-700">
-            {students.filter(s => s.gender === 'vrouw').length}
-          </p>
-          <div className="mt-2 text-xs text-sky-600">
-            {isLoading ? '' : `${Math.round((students.filter(s => s.gender === 'vrouw').length / totalStudents) * 100)}% van totaal`}
+          <div className="flex justify-between mt-2 text-xs text-sky-600">
+            <span>{students.filter(s => s.status.toLowerCase() === 'pending' || s.status.toLowerCase() === 'in afwachting').length} in afwachting</span>
+            <span>{students.filter(s => s.status.toLowerCase() === 'inactive' || s.status.toLowerCase() === 'inactief').length} inactief</span>
           </div>
         </div>
         

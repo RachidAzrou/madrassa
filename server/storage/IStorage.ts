@@ -14,7 +14,8 @@ import {
   type Lesson, type InsertLesson,
   type Examination, type InsertExamination,
   type Guardian, type InsertGuardian,
-  type StudentGuardian, type InsertStudentGuardian
+  type StudentGuardian, type InsertStudentGuardian,
+  type StudentProgram, type InsertStudentProgram
 } from "@shared/schema";
 
 // Storage interface for CRUD operations
@@ -165,4 +166,14 @@ export interface IStorage {
   createStudentGuardian(relation: InsertStudentGuardian): Promise<StudentGuardian>;
   updateStudentGuardian(id: number, relation: Partial<StudentGuardian>): Promise<StudentGuardian | undefined>;
   deleteStudentGuardian(id: number): Promise<boolean>;
+  
+  // Student Program operations
+  getStudentPrograms(): Promise<StudentProgram[]>;
+  getStudentProgram(id: number): Promise<StudentProgram | undefined>;
+  getStudentProgramsByStudent(studentId: number): Promise<StudentProgram[]>;
+  getStudentProgramsByProgram(programId: number): Promise<StudentProgram[]>;
+  createStudentProgram(studentProgram: InsertStudentProgram): Promise<StudentProgram>;
+  updateStudentProgram(id: number, studentProgram: Partial<StudentProgram>): Promise<StudentProgram | undefined>;
+  deleteStudentProgram(id: number): Promise<boolean>;
+  getPrimaryProgramByStudent(studentId: number): Promise<StudentProgram | undefined>;
 }

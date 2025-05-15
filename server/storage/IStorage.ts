@@ -15,7 +15,11 @@ import {
   type Examination, type InsertExamination,
   type Guardian, type InsertGuardian,
   type StudentGuardian, type InsertStudentGuardian,
-  type StudentProgram, type InsertStudentProgram
+  type StudentProgram, type InsertStudentProgram,
+  type Teacher, type InsertTeacher,
+  type TeacherAvailability, type InsertTeacherAvailability,
+  type TeacherLanguage, type InsertTeacherLanguage,
+  type TeacherCourseAssignment, type InsertTeacherCourseAssignment
 } from "@shared/schema";
 
 // Storage interface for CRUD operations

@@ -14,6 +14,7 @@ import Attendance from "@/pages/Attendance";
 import Grading from "@/pages/Grading";
 import Reports from "@/pages/Reports";
 import Guardians from "@/pages/Guardians";
+import Teachers from "@/pages/Teachers";
 import Admissions from "@/pages/Admissions";
 import StudentGroups from "@/pages/StudentGroups";
 import Enrollments from "@/pages/Enrollments";
@@ -28,6 +29,7 @@ function Router() {
         <Route path="/" component={Dashboard} />
         <Route path="/students" component={Students} />
         <Route path="/guardians" component={Guardians} />
+        <Route path="/teachers" component={Teachers} />
         <Route path="/admissions" component={Admissions} />
         <Route path="/student-groups" component={StudentGroups} />
         <Route path="/courses" component={Courses} />

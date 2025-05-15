@@ -92,7 +92,7 @@ export default function Students() {
     if (!programId) return [];
     
     // Zoek het geselecteerde programma op
-    const selectedProgram = programsData?.find(p => p.id === programId);
+    const selectedProgram = programsData?.find((p: any) => p.id === programId);
     
     // Als het programma gevonden is, maak dan een array met jaren van 1 tot en met de duur
     if (selectedProgram) {
@@ -681,17 +681,18 @@ export default function Students() {
                 <Select
                   value={studentFormData.yearLevel?.toString() || ''}
                   onValueChange={handleYearLevelChange}
+                  disabled={!studentFormData.programId}
                 >
                   <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Selecteer jaar" />
+                    <SelectValue placeholder={!studentFormData.programId ? "Selecteer eerst een programma" : "Selecteer jaar"} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Geen jaar</SelectItem>
-                    <SelectItem value="1">Jaar 1</SelectItem>
-                    <SelectItem value="2">Jaar 2</SelectItem>
-                    <SelectItem value="3">Jaar 3</SelectItem>
-                    <SelectItem value="4">Jaar 4</SelectItem>
-                    <SelectItem value="5">Jaar 5</SelectItem>
+                    {getYearLevelOptions(studentFormData.programId).map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        Jaar {year}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -1232,17 +1233,18 @@ export default function Students() {
                   <Select
                     value={studentFormData.yearLevel?.toString() || ''}
                     onValueChange={handleYearLevelChange}
+                    disabled={!studentFormData.programId}
                   >
                     <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer jaar" />
+                      <SelectValue placeholder={!studentFormData.programId ? "Selecteer eerst een programma" : "Selecteer jaar"} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">Geen jaar</SelectItem>
-                      <SelectItem value="1">Jaar 1</SelectItem>
-                      <SelectItem value="2">Jaar 2</SelectItem>
-                      <SelectItem value="3">Jaar 3</SelectItem>
-                      <SelectItem value="4">Jaar 4</SelectItem>
-                      <SelectItem value="5">Jaar 5</SelectItem>
+                      {getYearLevelOptions(studentFormData.programId).map((year) => (
+                        <SelectItem key={year} value={year.toString()}>
+                          Jaar {year}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

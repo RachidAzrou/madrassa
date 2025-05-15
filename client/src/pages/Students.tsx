@@ -117,32 +117,66 @@ export default function Students() {
       let errorDetail = "";
       
       try {
-        if (error.response && error.response.data) {
-          const responseData = error.response.data;
-          
-          // Controleer op duplicate key fouten (HTTP 409)
-          if (error.response.status === 409) {
-            errorMessage = responseData.message || "Dit studentnummer of e-mailadres is al in gebruik.";
-            errorDetail = responseData.detail || "";
-          }
-          // Validatiefouten (HTTP 400)
-          else if (error.response.status === 400 && responseData.errors) {
-            errorMessage = "Er zijn validatiefouten in het formulier:";
-            
-            if (Array.isArray(responseData.errors)) {
-              // Zet de fouten om in een leesbare lijst
-              errorDetail = responseData.errors.map((err: any) => {
-                const field = err.path ? err.path[err.path.length - 1] : "";
-                return `• ${field || 'Veld'}: ${err.message}`;
-              }).join('\n');
+        // Voor de 409 Conflict fouten (zoals duplicaat e-mail), tonen we de gedetailleerde informatie
+        if (error.message && error.message.startsWith("409:")) {
+          try {
+            // Probeer de JSON foutmelding te parsen uit de error string
+            const errorJson = JSON.parse(error.message.substring(4));
+            if (errorJson.message) {
+              errorMessage = errorJson.message;
+              
+              // Specifieke gebruikersvriendelijke berichten voor bekende fouten
+              if (errorJson.field === "students_email_unique") {
+                errorMessage = "Dit e-mailadres is al in gebruik. Gebruik een ander e-mailadres.";
+                errorDetail = "Er bestaat al een student met dit e-mailadres in het systeem.";
+              } else if (errorJson.field === "students_student_id_unique") {
+                errorMessage = "Dit studentnummer is al in gebruik.";
+                errorDetail = "Er bestaat al een student met dit studentnummer in het systeem.";
+              } else if (errorJson.detail) {
+                errorDetail = errorJson.detail;
+              }
             }
-          } 
-          // Algemene serverfout maar met bericht
-          else if (responseData.message) {
-            errorMessage = responseData.message;
-            errorDetail = responseData.detail || "";
+          } catch (jsonError) {
+            // Als JSON parsen mislukt, toon dan de ruwe error
+            errorMessage = "Duplicaat gevonden: Dit e-mailadres of studentnummer is al in gebruik.";
+            errorDetail = error.message;
           }
-        } 
+        }
+        // Validatiefouten (HTTP 400)
+        else if (error.message && error.message.startsWith("400:")) {
+          try {
+            const errorJson = JSON.parse(error.message.substring(4));
+            if (errorJson.errors) {
+              errorMessage = "Er zijn validatiefouten in het formulier:";
+              
+              if (Array.isArray(errorJson.errors)) {
+                // Zet de fouten om in een leesbare lijst
+                errorDetail = errorJson.errors.map((err: any) => {
+                  const field = err.path ? err.path[err.path.length - 1] : "";
+                  const fieldName = 
+                    field === "email" ? "E-mailadres" :
+                    field === "firstName" ? "Voornaam" :
+                    field === "lastName" ? "Achternaam" :
+                    field === "studentId" ? "Studentnummer" :
+                    field === "phone" ? "Telefoonnummer" :
+                    field === "dateOfBirth" ? "Geboortedatum" :
+                    field === "address" ? "Adres" : field;
+                  return `• ${fieldName || 'Veld'}: ${err.message}`;
+                }).join('\n');
+              }
+            } else if (errorJson.message) {
+              errorMessage = errorJson.message;
+            }
+          } catch (jsonError) {
+            errorMessage = "Validatiefout in het formulier";
+            errorDetail = error.message;
+          }
+        }
+        // Fallback voor andere fouten
+        else if (error.message) {
+          errorMessage = "Fout bij het toevoegen van de student";
+          errorDetail = error.message;
+        }
       } catch (parseError) {
         console.error("Fout bij parsen van API foutmelding:", parseError);
       }

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
+import { Guardian } from '@shared/schema';
 import { 
   Dialog, 
   DialogContent, 
@@ -49,7 +50,11 @@ export default function Guardians() {
     relationship: 'parent',
     email: '',
     phone: '',
-    address: '',
+    address: '', // Oude adresveld (behouden voor compatibiliteit)
+    street: '',  // Nieuwe adresvelden
+    houseNumber: '',
+    postalCode: '',
+    city: '',
     occupation: '',
     isEmergencyContact: false,
     notes: '',
@@ -60,6 +65,9 @@ export default function Guardians() {
   const [studentSearchTerm, setStudentSearchTerm] = useState('');
   const [isStudentSearchDialogOpen, setIsStudentSearchDialogOpen] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState<Array<{id: number, name: string}>>([]);
+  
+  // State voor voogddetails dialog
+  const [isViewGuardianDialogOpen, setIsViewGuardianDialogOpen] = useState(false);
 
   // Fetch guardians with filters
   const { data, isLoading, isError, refetch } = useQuery({
@@ -634,11 +642,8 @@ export default function Guardians() {
                           variant="ghost" 
                           size="icon"
                           onClick={() => {
-                            toast({
-                              title: "Voogd details",
-                              description: `Details van ${guardian.firstName} ${guardian.lastName} bekijken.`,
-                              variant: "default",
-                            });
+                            setSelectedGuardian(guardian);
+                            setIsViewGuardianDialogOpen(true);
                           }}
                         >
                           <Eye className="h-4 w-4 text-gray-500" />
@@ -857,16 +862,55 @@ export default function Guardians() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-1">
-                  <Label htmlFor="address" className="text-right">
-                    Adres
+                  <Label htmlFor="street" className="text-right">
+                    Straatnaam
                   </Label>
                   <Input
-                    id="address"
-                    placeholder="Volledige adres"
-                    value={guardianFormData.address}
-                    onChange={(e) => setGuardianFormData({ ...guardianFormData, address: e.target.value })}
+                    id="street"
+                    placeholder="Straatnaam"
+                    value={guardianFormData.street || ''}
+                    onChange={(e) => setGuardianFormData({ ...guardianFormData, street: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="houseNumber" className="text-right">
+                    Huisnummer
+                  </Label>
+                  <Input
+                    id="houseNumber"
+                    placeholder="123"
+                    value={guardianFormData.houseNumber || ''}
+                    onChange={(e) => setGuardianFormData({ ...guardianFormData, houseNumber: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="postalCode" className="text-right">
+                    Postcode
+                  </Label>
+                  <Input
+                    id="postalCode"
+                    placeholder="1234 AB"
+                    value={guardianFormData.postalCode || ''}
+                    onChange={(e) => setGuardianFormData({ ...guardianFormData, postalCode: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="city" className="text-right">
+                    Stad
+                  </Label>
+                  <Input
+                    id="city"
+                    placeholder="Amsterdam"
+                    value={guardianFormData.city || ''}
+                    onChange={(e) => setGuardianFormData({ ...guardianFormData, city: e.target.value })}
                     className="mt-1"
                   />
                 </div>

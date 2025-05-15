@@ -11,7 +11,11 @@ export const students = pgTable("students", {
   email: text("email").notNull().unique(),
   phone: text("phone"),
   dateOfBirth: date("date_of_birth"), // Terugzetten naar date type
-  address: text("address"),
+  address: text("address"), // Oude adresveld (behouden voor compatibiliteit)
+  street: text("street"),  // Nieuwe adresvelden
+  houseNumber: text("house_number"),
+  postalCode: text("postal_code"),
+  city: text("city"),
   programId: integer("program_id"),
   yearLevel: integer("year_level"),
   status: text("status").default("active"), // active, inactive, pending, graduated
@@ -343,7 +347,11 @@ export const guardians = pgTable("guardians", {
   relationship: text("relationship").notNull(), // parent, guardian, other
   email: text("email").notNull(),
   phone: text("phone").notNull(),
-  address: text("address"),
+  address: text("address"), // Oude adresveld (behouden voor compatibiliteit)
+  street: text("street"), // Nieuwe adresvelden
+  houseNumber: text("house_number"),
+  postalCode: text("postal_code"),
+  city: text("city"),
   occupation: text("occupation"),
   isEmergencyContact: boolean("is_emergency_contact").default(false),
   notes: text("notes"),

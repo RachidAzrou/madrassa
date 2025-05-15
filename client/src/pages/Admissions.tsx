@@ -51,6 +51,7 @@ interface AdmissionStats {
   rejected: number;
   withdrawals: number;
   conversionRate: number;
+  enrollmentRate: number;
 }
 
 export default function Admissions() {

@@ -95,7 +95,10 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
           <Link href="/">
             <div className="flex items-center space-x-2">
               <img src={madrassaLogo} alt="myMadrassa Logo" className="w-9 h-9 rounded-lg object-cover" />
-              <span className="text-xl font-semibold text-gray-800">myMadrassa</span>
+              <span className="text-xl font-semibold">
+                <span className="text-gray-800">my</span>
+                <span className="text-blue-600">Madrassa</span>
+              </span>
             </div>
           </Link>
         </div>

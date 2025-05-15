@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, CheckCircle, XCircle, FileText, Clock, School } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,15 +8,35 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { apiRequest } from '@/lib/queryClient';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Admissions() {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [program, setProgram] = useState('all');
   const [status, setStatus] = useState('all');
   const [academicYear, setAcademicYear] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('applications');
+  
+  // State voor aanvraagformulier
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [applicationFormData, setApplicationFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    dateOfBirth: new Date().toISOString().split('T')[0],
+    programId: null as number | null,
+    academicYearId: null as number | null,
+    previousEducation: '',
+    personalStatement: '',
+    status: 'Pending' as string,
+  });
 
   // Fetch applicants with filters
   const { data, isLoading, isError } = useQuery({
@@ -52,9 +72,65 @@ export default function Admissions() {
     enrollmentRate: 0,
   };
 
-  const handleAddApplicant = async () => {
-    // Implementation will be added for applicant creation
-    console.log('Add applicant clicked');
+  // Mutatie voor het toevoegen van een nieuwe aanvraag
+  const createApplicationMutation = useMutation({
+    mutationFn: async (applicationData: typeof applicationFormData) => {
+      return apiRequest('POST', '/api/admissions/applications', applicationData);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/admissions/applicants'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admissions/stats'] });
+      
+      // Reset form and close dialog
+      setApplicationFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        dateOfBirth: new Date().toISOString().split('T')[0],
+        programId: null,
+        academicYearId: null,
+        previousEducation: '',
+        personalStatement: '',
+        status: 'Pending',
+      });
+      setIsAddDialogOpen(false);
+      
+      // Toon succesmelding
+      toast({
+        title: "Aanvraag toegevoegd",
+        description: "De toelatingsaanvraag is succesvol toegevoegd aan het systeem.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij toevoegen",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van de aanvraag.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleAddApplicant = () => {
+    // Open dialoogvenster
+    setIsAddDialogOpen(true);
+  };
+  
+  const handleSubmitApplication = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!applicationFormData.firstName || !applicationFormData.lastName || !applicationFormData.email) {
+      toast({
+        title: "Onvolledige gegevens",
+        description: "Vul alle verplichte velden in om de aanvraag toe te voegen.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    createApplicationMutation.mutate(applicationFormData);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -649,6 +725,226 @@ export default function Admissions() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Add Application Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Nieuwe Toelatingsaanvraag</DialogTitle>
+            <DialogDescription>
+              Vul de gegevens in om een nieuwe toelatingsaanvraag aan te maken.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmitApplication}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="firstName" className="text-right mb-1 block">
+                    Voornaam*
+                  </Label>
+                  <Input
+                    id="firstName"
+                    value={applicationFormData.firstName}
+                    onChange={(e) => setApplicationFormData({ 
+                      ...applicationFormData, 
+                      firstName: e.target.value 
+                    })}
+                    placeholder="Voornaam"
+                    required
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="lastName" className="text-right mb-1 block">
+                    Achternaam*
+                  </Label>
+                  <Input
+                    id="lastName"
+                    value={applicationFormData.lastName}
+                    onChange={(e) => setApplicationFormData({ 
+                      ...applicationFormData, 
+                      lastName: e.target.value 
+                    })}
+                    placeholder="Achternaam"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="email" className="text-right mb-1 block">
+                    E-mailadres*
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={applicationFormData.email}
+                    onChange={(e) => setApplicationFormData({ 
+                      ...applicationFormData, 
+                      email: e.target.value 
+                    })}
+                    placeholder="email@voorbeeld.nl"
+                    required
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="phone" className="text-right mb-1 block">
+                    Telefoonnummer
+                  </Label>
+                  <Input
+                    id="phone"
+                    value={applicationFormData.phone}
+                    onChange={(e) => setApplicationFormData({ 
+                      ...applicationFormData, 
+                      phone: e.target.value 
+                    })}
+                    placeholder="+31 6 12345678"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="dateOfBirth" className="text-right mb-1 block">
+                    Geboortedatum
+                  </Label>
+                  <Input
+                    id="dateOfBirth"
+                    type="date"
+                    value={applicationFormData.dateOfBirth}
+                    onChange={(e) => setApplicationFormData({ 
+                      ...applicationFormData, 
+                      dateOfBirth: e.target.value 
+                    })}
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="program" className="text-right mb-1 block">
+                    Programma*
+                  </Label>
+                  <Select
+                    value={applicationFormData.programId?.toString() || ''}
+                    onValueChange={(value) => setApplicationFormData({ 
+                      ...applicationFormData, 
+                      programId: value ? parseInt(value) : null 
+                    })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer programma" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {programs.map((program: any) => (
+                        <SelectItem key={program.id} value={program.id.toString()}>
+                          {program.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="academicYear" className="text-right mb-1 block">
+                    Academisch jaar*
+                  </Label>
+                  <Select
+                    value={applicationFormData.academicYearId?.toString() || ''}
+                    onValueChange={(value) => setApplicationFormData({ 
+                      ...applicationFormData, 
+                      academicYearId: value ? parseInt(value) : null 
+                    })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer academisch jaar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {academicYears.map((year: any) => (
+                        <SelectItem key={year.id} value={year.id.toString()}>
+                          {year.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="status" className="text-right mb-1 block">
+                    Status
+                  </Label>
+                  <Select
+                    value={applicationFormData.status}
+                    onValueChange={(value) => setApplicationFormData({ 
+                      ...applicationFormData, 
+                      status: value 
+                    })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Pending">In behandeling</SelectItem>
+                      <SelectItem value="Under Review">In beoordeling</SelectItem>
+                      <SelectItem value="Approved">Goedgekeurd</SelectItem>
+                      <SelectItem value="Rejected">Afgewezen</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="previousEducation" className="text-right mb-1 block">
+                    Vorige opleiding
+                  </Label>
+                  <Textarea
+                    id="previousEducation"
+                    value={applicationFormData.previousEducation}
+                    onChange={(e) => setApplicationFormData({ 
+                      ...applicationFormData, 
+                      previousEducation: e.target.value 
+                    })}
+                    placeholder="Beschrijf je vorige opleiding en behaalde diploma's"
+                    rows={2}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="personalStatement" className="text-right mb-1 block">
+                    Motivatie
+                  </Label>
+                  <Textarea
+                    id="personalStatement"
+                    value={applicationFormData.personalStatement}
+                    onChange={(e) => setApplicationFormData({ 
+                      ...applicationFormData, 
+                      personalStatement: e.target.value 
+                    })}
+                    placeholder="Schrijf een korte motivatie waarom je deze opleiding wilt volgen"
+                    rows={3}
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsAddDialogOpen(false)}
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="submit"
+                disabled={createApplicationMutation.isPending}
+              >
+                {createApplicationMutation.isPending ? 'Bezig met toevoegen...' : 'Aanvraag indienen'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

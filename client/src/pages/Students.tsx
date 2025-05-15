@@ -158,18 +158,20 @@ export default function Students() {
       // Maak een diepe kopie om te voorkomen dat we de originele state aanpassen
       const formattedData = JSON.parse(JSON.stringify(studentFormData));
       
-      // Controleer of we een geboortedatum hebben
-      if (formattedData.dateOfBirth) {
-        console.log('Originele geboortedatum:', formattedData.dateOfBirth);
-        
-        // Verwijder de geboortedatum property volledig als het leeg is
-        if (formattedData.dateOfBirth === '') {
-          delete formattedData.dateOfBirth;
+      // Verwerk alle datumvelden op dezelfde manier
+      ['dateOfBirth', 'enrollmentDate'].forEach(field => {
+        // Verwijder lege datumvelden
+        if (!formattedData[field] || formattedData[field] === '') {
+          delete formattedData[field];
         }
-      } else {
-        // Verwijder de geboortedatum property volledig als undefined of null
-        delete formattedData.dateOfBirth;
-      }
+      });
+      
+      // Verwijder alle lege velden die niet verplicht zijn
+      ['city', 'postalCode'].forEach(field => {
+        if (!formattedData[field] || formattedData[field] === '') {
+          delete formattedData[field];
+        }
+      });
       
       console.log('Verstuur student data na opschoning:', formattedData);
       
@@ -280,18 +282,20 @@ export default function Students() {
         // Maak een diepe kopie om te voorkomen dat we de originele state aanpassen
         const formattedData = JSON.parse(JSON.stringify(studentFormData));
         
-        // Controleer of we een geboortedatum hebben
-        if (formattedData.dateOfBirth) {
-          console.log('Originele geboortedatum bij bewerken:', formattedData.dateOfBirth);
-          
-          // Verwijder de geboortedatum property volledig als het leeg is
-          if (formattedData.dateOfBirth === '') {
-            delete formattedData.dateOfBirth;
+        // Verwerk alle datumvelden op dezelfde manier
+        ['dateOfBirth', 'enrollmentDate'].forEach(field => {
+          // Verwijder lege datumvelden
+          if (!formattedData[field] || formattedData[field] === '') {
+            delete formattedData[field];
           }
-        } else {
-          // Verwijder de geboortedatum property volledig als undefined of null
-          delete formattedData.dateOfBirth;
-        }
+        });
+        
+        // Verwijder alle lege velden die niet verplicht zijn
+        ['city', 'postalCode'].forEach(field => {
+          if (!formattedData[field] || formattedData[field] === '') {
+            delete formattedData[field];
+          }
+        });
         
         console.log('Verstuur bewerkte student data na opschoning:', formattedData);
         

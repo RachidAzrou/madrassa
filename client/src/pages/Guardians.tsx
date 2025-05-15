@@ -660,41 +660,67 @@ export default function Guardians() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex justify-center items-center">
                         {/* Klikbaar icoon om gekoppelde studenten te tonen */}
-                        <button
-                          onClick={async () => {
-                            setSelectedGuardian(guardian);
-                            
-                            // Haal gekoppelde studenten op
-                            try {
-                              const relations = await apiRequest('GET', `/api/guardians/${guardian.id}/students`);
-                              const studentIds = relations.map((rel: any) => rel.studentId);
-                              
-                              // Haal studentendetails op
-                              if (studentIds.length > 0) {
-                                const studentPromises = studentIds.map((id: number) => 
-                                  apiRequest('GET', `/api/students/${id}`)
-                                );
-                                const students = await Promise.all(studentPromises);
-                                setLinkedStudents(students);
-                              } else {
-                                setLinkedStudents([]);
-                              }
-                            } catch (error) {
-                              console.error("Fout bij ophalen van gekoppelde studenten:", error);
-                              setLinkedStudents([]);
-                            }
-                            
-                            setIsViewGuardianDialogOpen(true);
-                          }}
-                          className="cursor-pointer flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
-                          title="Bekijk gekoppelde studenten"
-                        >
-                          {guardian.relationship === 'parent' ? (
-                            <Users className="h-4 w-4 text-primary" />
-                          ) : (
-                            <Link2 className="h-4 w-4 text-primary" />
-                          )}
-                        </button>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button
+                              onClick={async () => {
+                                setShowingStudentsFor(guardian);
+                                
+                                // Haal gekoppelde studenten op
+                                try {
+                                  const relations = await apiRequest('GET', `/api/guardians/${guardian.id}/students`);
+                                  const studentIds = relations.map((rel: any) => rel.studentId);
+                                  
+                                  // Haal studentendetails op
+                                  if (studentIds.length > 0) {
+                                    const studentPromises = studentIds.map((id: number) => 
+                                      apiRequest('GET', `/api/students/${id}`)
+                                    );
+                                    const students = await Promise.all(studentPromises);
+                                    setLinkedStudents(students);
+                                  } else {
+                                    setLinkedStudents([]);
+                                  }
+                                } catch (error) {
+                                  console.error("Fout bij ophalen van gekoppelde studenten:", error);
+                                  setLinkedStudents([]);
+                                }
+                              }}
+                              className="cursor-pointer flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+                              title="Bekijk gekoppelde studenten"
+                            >
+                              {guardian.relationship === 'parent' ? (
+                                <Users className="h-4 w-4 text-primary" />
+                              ) : (
+                                <Link2 className="h-4 w-4 text-primary" />
+                              )}
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-72 p-4">
+                            <div className="space-y-2">
+                              <h4 className="text-sm font-medium">
+                                {showingStudentsFor?.id === guardian.id ? (
+                                  <>
+                                    <span className="font-semibold">
+                                      Studenten van {guardian.firstName} {guardian.lastName}
+                                    </span>
+                                  </>
+                                ) : null}
+                              </h4>
+                              <div className="space-y-1">
+                                {linkedStudents.length === 0 ? (
+                                  <p className="text-sm text-muted-foreground">Geen studenten gekoppeld</p>
+                                ) : (
+                                  linkedStudents.map((student) => (
+                                    <div key={student.id} className="flex items-center space-x-2 text-sm">
+                                      <p>• {student.firstName} {student.lastName}</p>
+                                    </div>
+                                  ))
+                                )}
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">

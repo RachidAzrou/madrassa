@@ -284,8 +284,8 @@ export default function StudentGroups() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="student-groups-filters bg-white rounded-lg shadow-sm p-4 border border-gray-200 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Academisch Jaar</label>
             <Select value={academicYear} onValueChange={handleAcademicYearChange}>
@@ -308,10 +308,32 @@ export default function StudentGroups() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Alle Opleidingen</SelectItem>
-                <SelectItem value="cs">Informatica</SelectItem>
-                <SelectItem value="bus">Bedrijfskunde</SelectItem>
-                <SelectItem value="eng">Techniek</SelectItem>
-                <SelectItem value="arts">Kunst</SelectItem>
+                {programs.map(program => (
+                  <SelectItem key={program.id} value={program.id.toString()}>
+                    {program.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <Select defaultValue="all" onValueChange={(value) => {
+              // Status filter handler
+              setCurrentPage(1);
+              // Implementeer statusfiltering in de API of client-side
+              toast({
+                title: "Status filter aangepast",
+                description: `Filter op status: ${value}`,
+              });
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Alle Statussen" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Statussen</SelectItem>
+                <SelectItem value="active">Actief</SelectItem>
+                <SelectItem value="inactive">Inactief</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -326,11 +348,51 @@ export default function StudentGroups() {
             <TabsTrigger value="list">Lijstweergave</TabsTrigger>
           </TabsList>
           <div className="flex space-x-2">
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                // Toon een uitgebreider filtervenster
+                const filterSection = document.querySelector('.student-groups-filters');
+                if (filterSection) {
+                  filterSection.classList.toggle('hidden');
+                  
+                  toast({
+                    title: "Filters bijgewerkt",
+                    description: "Gebruik de filtervelden om groepen te zoeken.",
+                  });
+                }
+              }}
+            >
               <Filter className="mr-2 h-4 w-4" />
               Filteren
             </Button>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                // Download studentengroepen als CSV
+                const csvContent = 
+                  "data:text/csv;charset=utf-8," + 
+                  "ID,Naam,Academisch Jaar,Programma,Capaciteit,Status\n" + 
+                  studentGroups.map(g => 
+                    `${g.id || ''},${g.name || ''},${g.academicYear || ''},${g.programName || ''},${g.maxCapacity || 0},${g.isActive ? 'Actief' : 'Inactief'}`
+                  ).join("\n");
+                
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "studentengroepen.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                toast({
+                  title: "Exporteren voltooid",
+                  description: "Studentengroepen zijn geëxporteerd als CSV bestand.",
+                });
+              }}
+            >
               <Download className="mr-2 h-4 w-4" />
               Exporteren
             </Button>

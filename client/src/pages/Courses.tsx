@@ -318,6 +318,15 @@ export default function Courses() {
                   </span>
                 </div>
                 <p className="mt-3 text-gray-600 text-sm">{course.description || 'Geen beschrijving beschikbaar'}</p>
+                
+                {/* Toon de nieuwe velden indien beschikbaar */}
+                {course.learningObjectives && (
+                  <div className="mt-3">
+                    <h4 className="text-xs font-semibold text-gray-700">Lesdoelen:</h4>
+                    <p className="text-gray-600 text-xs mt-1">{course.learningObjectives}</p>
+                  </div>
+                )}
+                
                 <div className="mt-4 flex items-center">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback>
@@ -501,6 +510,71 @@ export default function Courses() {
                 </div>
               </div>
 
+              {/* Nieuwe velden */}
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="learningObjectives" className="text-right">
+                    Lesdoelen
+                  </Label>
+                  <textarea
+                    id="learningObjectives"
+                    value={courseFormData.learningObjectives || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, learningObjectives: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
+                    rows={3}
+                    placeholder="Beschrijf de lesdoelen van deze cursus..."
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="materials" className="text-right">
+                    Lesmateriaal
+                  </Label>
+                  <textarea
+                    id="materials"
+                    value={courseFormData.materials || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, materials: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
+                    rows={3}
+                    placeholder="Welk lesmateriaal is nodig voor deze cursus?"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="competencies" className="text-right">
+                    Eindcompetenties
+                  </Label>
+                  <textarea
+                    id="competencies"
+                    value={courseFormData.competencies || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
+                    rows={3}
+                    placeholder="Wat moeten studenten kunnen na afloop van de cursus?"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="prerequisites" className="text-right">
+                    Voorwaarden
+                  </Label>
+                  <textarea
+                    id="prerequisites"
+                    value={courseFormData.prerequisites || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
+                    rows={3}
+                    placeholder="Welke voorkennis of andere cursussen zijn vereist?"
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-1">
                   <Label htmlFor="instructor" className="text-right">
@@ -654,6 +728,71 @@ export default function Courses() {
                     value={courseFormData.description || ''}
                     onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
                     className="mt-1"
+                  />
+                </div>
+              </div>
+
+              {/* Nieuwe velden voor het bewerkformulier */}
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="edit-learningObjectives" className="text-right">
+                    Lesdoelen
+                  </Label>
+                  <textarea
+                    id="edit-learningObjectives"
+                    value={courseFormData.learningObjectives || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, learningObjectives: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
+                    rows={3}
+                    placeholder="Beschrijf de lesdoelen van deze cursus..."
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="edit-materials" className="text-right">
+                    Lesmateriaal
+                  </Label>
+                  <textarea
+                    id="edit-materials"
+                    value={courseFormData.materials || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, materials: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
+                    rows={3}
+                    placeholder="Welk lesmateriaal is nodig voor deze cursus?"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="edit-competencies" className="text-right">
+                    Eindcompetenties
+                  </Label>
+                  <textarea
+                    id="edit-competencies"
+                    value={courseFormData.competencies || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
+                    rows={3}
+                    placeholder="Wat moeten studenten kunnen na afloop van de cursus?"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="edit-prerequisites" className="text-right">
+                    Voorwaarden
+                  </Label>
+                  <textarea
+                    id="edit-prerequisites"
+                    value={courseFormData.prerequisites || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
+                    rows={3}
+                    placeholder="Welke voorkennis of andere cursussen zijn vereist?"
                   />
                 </div>
               </div>

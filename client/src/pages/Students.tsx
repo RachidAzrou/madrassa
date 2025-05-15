@@ -2219,7 +2219,7 @@ export default function Students() {
                   <div className="w-full md:w-1/4 border rounded-lg p-6 bg-card">
                     <div className="flex flex-col items-center mb-6">
                       <Avatar className="h-24 w-24 mb-4">
-                        <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
+                        <AvatarFallback className="text-2xl">
                           {selectedStudent.firstName?.charAt(0)}{selectedStudent.lastName?.charAt(0)}
                         </AvatarFallback>
                       </Avatar>

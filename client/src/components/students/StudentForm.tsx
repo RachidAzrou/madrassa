@@ -116,7 +116,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
             <Input
               id="firstName"
               {...form.register("firstName")}
-              placeholder="Enter first name"
+              placeholder="Voer voornaam in"
             />
             {form.formState.errors.firstName && (
               <p className="text-sm text-red-500 mt-1">{form.formState.errors.firstName.message}</p>
@@ -130,7 +130,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
             <Input
               id="lastName"
               {...form.register("lastName")}
-              placeholder="Enter last name"
+              placeholder="Voer achternaam in"
             />
             {form.formState.errors.lastName && (
               <p className="text-sm text-red-500 mt-1">{form.formState.errors.lastName.message}</p>
@@ -145,7 +145,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
               id="email"
               type="email"
               {...form.register("email")}
-              placeholder="Enter email address"
+              placeholder="Voer e-mailadres in"
             />
             {form.formState.errors.email && (
               <p className="text-sm text-red-500 mt-1">{form.formState.errors.email.message}</p>
@@ -189,18 +189,18 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
 
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="phoneNumber">
-              Phone Number
+              Telefoonnummer
             </label>
             <Input
               id="phoneNumber"
               {...form.register("phoneNumber")}
-              placeholder="Enter phone number"
+              placeholder="Voer telefoonnummer in"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="address">
-              Address
+              Adres
             </label>
             <Input
               id="address"
@@ -211,7 +211,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
 
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="programId">
-              Program
+              Programma
             </label>
             <Select 
               value={form.watch("programId")?.toString()} 
@@ -232,7 +232,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
 
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="yearLevel">
-              Year Level
+              Jaarniveau
             </label>
             <Select 
               value={form.watch("yearLevel")?.toString()} 
@@ -242,10 +242,10 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
                 <SelectValue placeholder="Select year level" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">Year 1</SelectItem>
-                <SelectItem value="2">Year 2</SelectItem>
-                <SelectItem value="3">Year 3</SelectItem>
-                <SelectItem value="4">Year 4</SelectItem>
+                <SelectItem value="1">Jaar 1</SelectItem>
+                <SelectItem value="2">Jaar 2</SelectItem>
+                <SelectItem value="3">Jaar 3</SelectItem>
+                <SelectItem value="4">Jaar 4</SelectItem>
               </SelectContent>
             </Select>
           </div>

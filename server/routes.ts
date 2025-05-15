@@ -1153,7 +1153,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  apiRouter.post("/fees", async (req, res) => {
+  apiRouter.post("/api/fees", async (req, res) => {
     try {
       const validatedData = insertFeeSchema.parse(req.body);
       const newFee = await storage.createFee(validatedData);
@@ -1166,7 +1166,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  apiRouter.put("/fees/:id", async (req, res) => {
+  apiRouter.put("/api/fees/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
@@ -1184,7 +1184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  apiRouter.delete("/fees/:id", async (req, res) => {
+  apiRouter.delete("/api/fees/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {

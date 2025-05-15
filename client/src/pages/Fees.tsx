@@ -40,18 +40,31 @@ export default function Fees() {
   const { data: statsData } = useQuery({
     queryKey: ['/api/fees/stats'],
   });
+  
+  type StatsType = {
+    stats: {
+      totalCollected: number;
+      pendingAmount: number;
+      totalStudents: number;
+      completionRate: number;
+    }
+  };
+  
+  // Fetch students for the student selector
+  const { data: studentsData } = useQuery({
+    queryKey: ['/api/students'],
+  });
 
-  const feeRecords = data?.feeRecords || [];
-  const totalRecords = data?.totalCount || 0;
+  // Vanwege de API structuur, is data een array van fee records
+  const feeRecords = data || [];
+  const totalRecords = feeRecords.length;
   const totalPages = Math.ceil(totalRecords / 10);
   
-  const programs = programsData?.programs || [];
-  const stats = statsData?.stats || {
-    totalCollected: 0,
-    pendingAmount: 0,
-    totalStudents: 0,
-    completionRate: 0
-  };
+  // Ophalen van programma's voor het filter
+  const programs = programsData || [];
+  
+  // Students voor in de dropdown
+  const students = studentsData || [];
 
   const handleAddFeeRecord = async () => {
     // Implementation will be added for fee record creation
@@ -132,7 +145,9 @@ export default function Fees() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Totaal Geïnd</p>
-                <p className="text-2xl font-semibold">{formatCurrency(482500)}</p>
+                <p className="text-2xl font-semibold">
+                  {(statsData as StatsType)?.stats ? formatCurrency((statsData as StatsType).stats.totalCollected) : "Laden..."}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -145,7 +160,9 @@ export default function Fees() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Openstaand Bedrag</p>
-                <p className="text-2xl font-semibold">{formatCurrency(68500)}</p>
+                <p className="text-2xl font-semibold">
+                  {(statsData as StatsType)?.stats ? formatCurrency((statsData as StatsType).stats.pendingAmount) : "Laden..."}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -159,9 +176,14 @@ export default function Fees() {
               <div>
                 <p className="text-sm font-medium text-gray-500">Voltooiingsgraad</p>
                 <div className="flex items-center">
-                  <p className="text-2xl font-semibold">87,5%</p>
+                  <p className="text-2xl font-semibold">
+                    {statsData?.stats ? `${statsData.stats.completionRate}%` : "Laden..."}
+                  </p>
                 </div>
-                <Progress value={87.5} className="h-1.5 mt-1.5 w-32" />
+                <Progress 
+                  value={statsData?.stats ? statsData.stats.completionRate : 0} 
+                  className="h-1.5 mt-1.5 w-32" 
+                />
               </div>
             </div>
           </CardContent>
@@ -174,7 +196,9 @@ export default function Fees() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Betalende Studenten</p>
-                <p className="text-2xl font-semibold">845</p>
+                <p className="text-2xl font-semibold">
+                  {statsData?.stats ? statsData.stats.totalStudents : "Laden..."}
+                </p>
               </div>
             </div>
           </CardContent>

@@ -410,6 +410,243 @@ export default function Students() {
     setCurrentPage(page);
   };
 
+  // Dialog voor het bewerken van een student
+  const EditStudentDialog = () => (
+    <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle>Student bewerken</DialogTitle>
+          <DialogDescription>
+            Werk de gegevens van de student bij. Velden met een * zijn verplicht.
+            Studentnummer kan niet gewijzigd worden.
+          </DialogDescription>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmitEditStudent}>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-1">
+                <Label htmlFor="editStudentId" className="text-right flex items-center gap-2">
+                  Studentnummer
+                  <span className="text-xs text-muted-foreground font-normal italic">(niet bewerkbaar)</span>
+                </Label>
+                <Input
+                  id="editStudentId"
+                  value={studentFormData.studentId}
+                  className="mt-1 text-muted-foreground bg-muted cursor-not-allowed"
+                  disabled
+                  readOnly
+                />
+              </div>
+              <div className="col-span-1">
+                <Label htmlFor="editStatus" className="text-right">
+                  Status
+                </Label>
+                <Select 
+                  value={studentFormData.status} 
+                  onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecteer status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Active">Actief</SelectItem>
+                    <SelectItem value="Inactive">Inactief</SelectItem>
+                    <SelectItem value="Pending">In afwachting</SelectItem>
+                    <SelectItem value="Graduated">Afgestudeerd</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-1">
+                <Label htmlFor="editFirstName" className="text-right">
+                  Voornaam*
+                </Label>
+                <Input
+                  id="editFirstName"
+                  required
+                  value={studentFormData.firstName}
+                  onChange={(e) => setStudentFormData({ ...studentFormData, firstName: e.target.value })}
+                  className="mt-1"
+                />
+              </div>
+              <div className="col-span-1">
+                <Label htmlFor="editLastName" className="text-right">
+                  Achternaam*
+                </Label>
+                <Input
+                  id="editLastName"
+                  required
+                  value={studentFormData.lastName}
+                  onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-1">
+                <Label htmlFor="editEmail" className="text-right">
+                  E-mail*
+                </Label>
+                <Input
+                  id="editEmail"
+                  type="email"
+                  required
+                  value={studentFormData.email}
+                  onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
+                  className="mt-1"
+                />
+              </div>
+              <div className="col-span-1">
+                <Label htmlFor="editPhone" className="text-right">
+                  Telefoon
+                </Label>
+                <Input
+                  id="editPhone"
+                  value={studentFormData.phone}
+                  onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-1">
+                <Label htmlFor="editDateOfBirth" className="text-right">
+                  Geboortedatum
+                </Label>
+                <Input
+                  id="editDateOfBirth"
+                  type="date"
+                  value={studentFormData.dateOfBirth || ''}
+                  onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
+                  className="mt-1"
+                />
+              </div>
+              <div className="col-span-1">
+                <Label htmlFor="editAddress" className="text-right">
+                  Adres
+                </Label>
+                <Input
+                  id="editAddress"
+                  value={studentFormData.address}
+                  onChange={(e) => setStudentFormData({ ...studentFormData, address: e.target.value })}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-1">
+                <Label htmlFor="editProgramId" className="text-right">
+                  Programma
+                </Label>
+                <Select
+                  value={studentFormData.programId?.toString() || ''}
+                  onValueChange={(value) => setStudentFormData({ ...studentFormData, programId: value ? parseInt(value) : null })}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecteer programma" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Informatica</SelectItem>
+                    <SelectItem value="2">Bedrijfskunde</SelectItem>
+                    <SelectItem value="3">Techniek</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="col-span-1">
+                <Label htmlFor="editYearLevel" className="text-right">
+                  Studiejaar
+                </Label>
+                <Select
+                  value={studentFormData.yearLevel?.toString() || ''}
+                  onValueChange={(value) => setStudentFormData({ ...studentFormData, yearLevel: value ? parseInt(value) : null })}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecteer jaar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Jaar 1</SelectItem>
+                    <SelectItem value="2">Jaar 2</SelectItem>
+                    <SelectItem value="3">Jaar 3</SelectItem>
+                    <SelectItem value="4">Jaar 4</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setIsEditDialogOpen(false)}
+            >
+              Annuleren
+            </Button>
+            <Button 
+              type="submit"
+              disabled={updateStudentMutation.isPending}
+            >
+              {updateStudentMutation.isPending ? 'Bezig met bijwerken...' : 'Student bijwerken'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+  
+  // Dialog voor het verwijderen van een student
+  const DeleteStudentDialog = () => (
+    <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Student verwijderen</DialogTitle>
+          <DialogDescription>
+            Weet je zeker dat je deze student wilt verwijderen? 
+            Deze actie kan niet ongedaan worden gemaakt.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="py-4">
+          {selectedStudent && (
+            <div className="flex items-center space-x-4">
+              <Avatar className="h-12 w-12">
+                <AvatarFallback>
+                  {selectedStudent.firstName?.charAt(0)}{selectedStudent.lastName?.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium">{selectedStudent.firstName} {selectedStudent.lastName}</p>
+                <p className="text-sm text-gray-500">Studentnummer: {selectedStudent.studentId}</p>
+                <p className="text-sm text-gray-500">{selectedStudent.email}</p>
+              </div>
+            </div>
+          )}
+        </div>
+        <DialogFooter>
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => setIsDeleteDialogOpen(false)}
+          >
+            Annuleren
+          </Button>
+          <Button 
+            type="button"
+            variant="destructive"
+            onClick={confirmDeleteStudent}
+            disabled={deleteStudentMutation.isPending}
+          >
+            {deleteStudentMutation.isPending ? 'Bezig met verwijderen...' : 'Student verwijderen'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+  
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page Title */}

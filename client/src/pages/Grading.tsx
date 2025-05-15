@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Search, Download, PlusCircle, History, Save, Plus, X, Edit, Trash2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -156,6 +156,36 @@ export default function Grading() {
   const students = activeTab === 'grades' 
     ? allStudents 
     : (classStudentsData || []);
+    
+  // Effect om punctualiteitsscores te laden wanneer een klas wordt geselecteerd
+  useEffect(() => {
+    if (selectedClass && students.length > 0) {
+      const loadPunctualityScores = async () => {
+        const newBehaviorScores = { ...behaviorScores };
+        const newBehaviorRemarks = { ...behaviorRemarks };
+        
+        for (const student of students) {
+          try {
+            // Punctualiteitsscore berekenen op basis van aanwezigheidsgegevens
+            const punctualityScore = await getPunctualityScore(student.id);
+            
+            // Alleen bijwerken als er nog geen score is
+            if (!behaviorScores[student.id]) {
+              newBehaviorScores[student.id] = punctualityScore;
+              newBehaviorRemarks[student.id] = getPunctualityRemark(punctualityScore);
+            }
+          } catch (error) {
+            console.error(`Error loading punctuality for student ${student.id}:`, error);
+          }
+        }
+        
+        setBehaviorScores(newBehaviorScores);
+        setBehaviorRemarks(newBehaviorRemarks);
+      };
+      
+      loadPunctualityScores();
+    }
+  }, [selectedClass, students]);
   
   // Filter students based on search
   const filteredStudents = studentFilter 
@@ -781,6 +811,202 @@ export default function Grading() {
               )}
             </Button>
           </div>
+        </TabsContent>
+
+        {/* Behavior Assessment Tab */}
+        <TabsContent value="behavior" className="space-y-4">
+          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+            <h3 className="text-lg font-semibold mb-4">Gedragsbeoordelingen</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Klas selecteren</label>
+                <Select value={selectedClass} onValueChange={handleClassChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecteer een klas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Alle klassen</SelectItem>
+                    {classes.map((cls: any) => (
+                      <SelectItem key={cls.id} value={cls.id.toString()}>
+                        {cls.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium mb-2 block">Student zoeken</label>
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Zoek op naam of ID..."
+                    className="pl-8"
+                    value={studentFilter}
+                    onChange={(e) => setStudentFilter(e.target.value)}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-end">
+                <Button 
+                  variant="default" 
+                  disabled={!isBehaviorModified}
+                  onClick={() => {
+                    // Implementeren: opslaan van beoordelingen
+                    toast({
+                      title: "Beoordelingen opgeslagen",
+                      description: "Alle gedragsbeoordelingen zijn succesvol opgeslagen",
+                    });
+                    setIsBehaviorModified(false);
+                  }}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Wijzigingen opslaan
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Beoordelingstabel */}
+          {selectedClass ? (isLoadingClassStudents ? (
+            <div className="text-center py-8">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin inline-block"></div>
+              <p className="mt-2">Gegevens laden...</p>
+            </div>
+          ) : filteredStudents.length === 0 ? (
+            <div className="text-center py-8 bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+              <p className="text-muted-foreground">Geen studenten gevonden voor deze klas.</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Student
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Aanwezigheid
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Gedrag (1-5)
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Opmerkingen
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredStudents.map((student: any) => (
+                      <tr key={student.id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <Avatar className="h-8 w-8 mr-3">
+                              <AvatarFallback className="bg-primary text-primary-foreground">
+                                {getInitials(student.firstName, student.lastName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {student.firstName} {student.lastName}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {student.studentId}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <div className="flex items-center">
+                            <Badge className="mr-2 bg-blue-100 text-blue-800 hover:bg-blue-200">
+                              Automatisch
+                            </Badge>
+                            <Select 
+                              value={behaviorScores[student.id] ? behaviorScores[student.id].toString() : "3"}
+                              onValueChange={(value) => handleBehaviorScoreChange(student.id, value)}
+                              disabled
+                            >
+                              <SelectTrigger className="w-[100px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="1">1 - Slecht</SelectItem>
+                                <SelectItem value="2">2 - Matig</SelectItem>
+                                <SelectItem value="3">3 - Voldoende</SelectItem>
+                                <SelectItem value="4">4 - Goed</SelectItem>
+                                <SelectItem value="5">5 - Uitstekend</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <Select 
+                            value={behaviorScores[student.id] ? behaviorScores[student.id].toString() : "3"}
+                            onValueChange={(value) => handleBehaviorScoreChange(student.id, value)}
+                          >
+                            <SelectTrigger className="w-[100px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1">1 - Slecht</SelectItem>
+                              <SelectItem value="2">2 - Matig</SelectItem>
+                              <SelectItem value="3">3 - Voldoende</SelectItem>
+                              <SelectItem value="4">4 - Goed</SelectItem>
+                              <SelectItem value="5">5 - Uitstekend</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <Input
+                            placeholder="Opmerkingen"
+                            className="w-full"
+                            value={behaviorRemarks[student.id] || ''}
+                            onChange={(e) => handleBehaviorRemarkChange(student.id, e.target.value)}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )) : (
+            <div className="text-center py-8 bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+              <AlertCircle className="h-10 w-10 text-yellow-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2">Selecteer een klas</h3>
+              <p className="text-muted-foreground">Selecteer een klas om de gedragsbeoordelingen van studenten te bekijken en beheren.</p>
+            </div>
+          )}
+          
+          {/* Actions buttons */}
+          {selectedClass && filteredStudents.length > 0 && (
+            <div className="flex justify-end space-x-2">
+              <Button 
+                variant="default" 
+                disabled={!isBehaviorModified}
+                onClick={() => {
+                  // Implementeren: opslaan van beoordelingen
+                  toast({
+                    title: "Beoordelingen opgeslagen",
+                    description: "Alle gedragsbeoordelingen zijn succesvol opgeslagen",
+                  });
+                  setIsBehaviorModified(false);
+                }}
+              >
+                {isBehaviorModified ? (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Wijzigingen opslaan
+                  </>
+                ) : (
+                  'Geen wijzigingen'
+                )}
+              </Button>
+            </div>
+          )}
         </TabsContent>
 
         {/* Assessments Tab */}

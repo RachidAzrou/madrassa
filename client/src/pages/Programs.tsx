@@ -33,8 +33,11 @@ export default function Programs() {
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedProgram, setExpandedProgram] = useState<string | null>(null);
   
-  // State voor programma dialoog
+  // State voor programma dialogen
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const [programFormData, setProgramFormData] = useState({
     name: '',
     code: '',

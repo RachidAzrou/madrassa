@@ -327,9 +327,36 @@ export default function Guardians() {
                   </td>
                 </tr>
               ) : (
-                // Temporary demo data
-                <>
-                  <tr>
+                // Demodata met werkende actieknoppen
+                [
+                  {
+                    id: 1,
+                    firstName: "John",
+                    lastName: "Doe",
+                    relationship: "parent",
+                    email: "johndoe@example.com",
+                    phone: "+1 (555) 123-4567",
+                    address: "New York, USA",
+                    occupation: "Engineer",
+                    isEmergencyContact: true,
+                    notes: null,
+                    students: ["TD", "AD"]
+                  },
+                  {
+                    id: 2,
+                    firstName: "Maria",
+                    lastName: "Smith",
+                    relationship: "guardian",
+                    email: "maria.smith@example.com",
+                    phone: "+1 (555) 987-6543",
+                    address: "Chicago, USA",
+                    occupation: "Teacher",
+                    isEmergencyContact: false,
+                    notes: null,
+                    students: ["JS"]
+                  }
+                ].map(guardian => (
+                  <tr key={guardian.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <input 
@@ -338,99 +365,70 @@ export default function Guardians() {
                         />
                         <div className="flex items-center">
                           <Avatar className="h-8 w-8">
-                            <AvatarFallback>JD</AvatarFallback>
+                            <AvatarFallback>{guardian.firstName[0]}{guardian.lastName[0]}</AvatarFallback>
                           </Avatar>
                           <div className="ml-4">
-                            <div className="font-medium text-gray-900">John Doe</div>
-                            <div className="text-sm text-gray-500">johndoe@example.com</div>
+                            <div className="font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</div>
+                            <div className="text-sm text-gray-500">{guardian.email}</div>
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge>Parent</Badge>
+                      <Badge>
+                        {guardian.relationship === 'parent' ? 'Ouder' : 
+                         guardian.relationship === 'guardian' ? 'Voogd' : 'Overig'}
+                      </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">+1 (555) 123-4567</div>
-                      <div className="text-sm text-gray-500">New York, USA</div>
+                      <div className="text-sm text-gray-900">{guardian.phone}</div>
+                      <div className="text-sm text-gray-500">{guardian.address}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex -space-x-2">
-                        <Avatar className="h-6 w-6 border-2 border-white">
-                          <AvatarFallback className="text-xs">TD</AvatarFallback>
-                        </Avatar>
-                        <Avatar className="h-6 w-6 border-2 border-white">
-                          <AvatarFallback className="text-xs">AD</AvatarFallback>
-                        </Avatar>
+                        {guardian.students.map((initials, idx) => (
+                          <Avatar key={idx} className="h-6 w-6 border-2 border-white">
+                            <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                          </Avatar>
+                        ))}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
-                        <Button variant="ghost" size="icon">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => {
+                            toast({
+                              title: "Voogd details",
+                              description: `Details van ${guardian.firstName} ${guardian.lastName} bekijken.`,
+                              variant: "default",
+                            });
+                          }}
+                        >
                           <Eye className="h-4 w-4 text-gray-500" />
                           <span className="sr-only">Bekijken</span>
                         </Button>
-                        <Button variant="ghost" size="icon">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleEditGuardian(guardian)}
+                        >
                           <Edit className="h-4 w-4 text-blue-500" />
                           <span className="sr-only">Bewerken</span>
                         </Button>
-                        <Button variant="ghost" size="icon">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleDeleteGuardian(guardian)}
+                        >
                           <Trash2 className="h-4 w-4 text-red-500" />
                           <span className="sr-only">Verwijderen</span>
                         </Button>
                       </div>
                     </td>
                   </tr>
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <input 
-                          type="checkbox" 
-                          className="rounded border-gray-300 text-primary focus:ring-primary mr-3"
-                        />
-                        <div className="flex items-center">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback>MS</AvatarFallback>
-                          </Avatar>
-                          <div className="ml-4">
-                            <div className="font-medium text-gray-900">Maria Smith</div>
-                            <div className="text-sm text-gray-500">maria.smith@example.com</div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge>Guardian</Badge>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">+1 (555) 987-6543</div>
-                      <div className="text-sm text-gray-500">Chicago, USA</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex -space-x-2">
-                        <Avatar className="h-6 w-6 border-2 border-white">
-                          <AvatarFallback className="text-xs">JS</AvatarFallback>
-                        </Avatar>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <Button variant="ghost" size="icon">
-                          <Eye className="h-4 w-4 text-gray-500" />
-                          <span className="sr-only">Bekijken</span>
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Edit className="h-4 w-4 text-blue-500" />
-                          <span className="sr-only">Bewerken</span>
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                          <span className="sr-only">Verwijderen</span>
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                </>
+                ))
               )}
             </tbody>
           </table>

@@ -1780,10 +1780,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.post("/api/student-guardians", async (req, res) => {
     try {
+      console.log("Student-Guardian data received:", req.body);
       const validatedData = insertStudentGuardianSchema.parse(req.body);
+      console.log("Validated data:", validatedData);
       const newRelation = await storage.createStudentGuardian(validatedData);
       res.status(201).json(newRelation);
     } catch (error) {
+      console.error("Error creating student-guardian relation:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }

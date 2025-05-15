@@ -82,8 +82,12 @@ export default function Guardians() {
   // Mutatie voor student-guardian koppelingen
   const createStudentGuardianMutation = useMutation({
     mutationFn: async (data: { studentId: number; guardianId: number; isPrimary: boolean }) => {
+      console.log("Creating student-guardian relation:", data);
       return apiRequest('POST', '/api/student-guardians', data);
     },
+    onError: (error) => {
+      console.error("Error in createStudentGuardianMutation:", error);
+    }
   });
   
   const createGuardianMutation = useMutation({
@@ -384,19 +388,35 @@ export default function Guardians() {
   };
   
   const handleSelectStudent = (student: any) => {
-    const studentExists = selectedStudents.some(s => s.id === student.id);
+    // Typesafe studentId verkrijgen door te controleren of het een getal is
+    const studentId = typeof student.id === 'string' ? parseInt(student.id) : student.id;
+    
+    // Alleen doorgaan als het een geldig getal is
+    if (isNaN(studentId)) {
+      console.error("Ongeldige student ID:", student.id);
+      toast({
+        title: "Fout bij selecteren student",
+        description: "De geselecteerde student heeft een ongeldig ID.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const studentExists = selectedStudents.some(s => s.id === studentId);
     
     if (!studentExists) {
       setSelectedStudents([
         ...selectedStudents, 
-        { id: student.id, name: `${student.firstName} ${student.lastName}` }
+        { id: studentId, name: `${student.firstName} ${student.lastName}` }
       ]);
       
       // Ook aan de form data toevoegen
       setGuardianFormData({
         ...guardianFormData,
-        studentIds: [...guardianFormData.studentIds, student.id]
+        studentIds: [...guardianFormData.studentIds, studentId]
       });
+      
+      console.log("Student toegevoegd:", studentId, student.firstName, student.lastName);
     }
   };
   

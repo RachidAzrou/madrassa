@@ -108,6 +108,7 @@ export default function Students() {
   const [selectedPrograms, setSelectedPrograms] = useState<{
     programId: number;
     yearLevel: number | null;
+    studentGroupId?: number | null;
     status: string;
   }[]>([]);
   

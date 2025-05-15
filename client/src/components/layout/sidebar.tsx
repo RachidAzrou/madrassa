@@ -145,6 +145,13 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
                 onClick={handleLinkClick}
               />
               <SidebarLink
+                href="/teachers"
+                icon={<GraduationCap className="h-5 w-5" />}
+                label="Docenten"
+                isActive={location.startsWith("/teachers")}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
                 href="/admissions"
                 icon={<FileText className="h-5 w-5" />}
                 label="Aanmeldingen"

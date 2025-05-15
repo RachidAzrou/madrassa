@@ -451,3 +451,116 @@ export const studentGuardiansRelations = relations(studentGuardians, ({ one }) =
 export const guardiansRelations = relations(guardians, ({ many }) => ({
   studentGuardians: many(studentGuardians),
 }));
+
+// Teachers
+export const teachers = pgTable("teachers", {
+  id: serial("id").primaryKey(),
+  teacherId: text("teacher_id").notNull().unique(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  gender: text("gender"),
+  email: text("email").notNull().unique(),
+  phone: text("phone"),
+  dateOfBirth: date("date_of_birth"),
+  address: text("address"),
+  street: text("street"),
+  houseNumber: text("house_number"),
+  postalCode: text("postal_code"),
+  city: text("city"),
+  isActive: boolean("is_active").default(true),
+  hireDate: date("hire_date"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertTeacherSchema = createInsertSchema(teachers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export type InsertTeacher = z.infer<typeof insertTeacherSchema>;
+export type Teacher = typeof teachers.$inferSelect;
+
+// Teacher Availability
+export const teacherAvailability = pgTable("teacher_availability", {
+  id: serial("id").primaryKey(),
+  teacherId: integer("teacher_id").notNull().references(() => teachers.id),
+  dayOfWeek: integer("day_of_week").notNull(), // 0 = zondag, 1 = maandag, etc.
+  startTime: text("start_time").notNull(), // format: "HH:MM"
+  endTime: text("end_time").notNull(), // format: "HH:MM"
+  isBackup: boolean("is_backup").default(false),
+  notes: text("notes"),
+});
+
+export const insertTeacherAvailabilitySchema = createInsertSchema(teacherAvailability).omit({
+  id: true
+});
+
+export type InsertTeacherAvailability = z.infer<typeof insertTeacherAvailabilitySchema>;
+export type TeacherAvailability = typeof teacherAvailability.$inferSelect;
+
+// Teacher Languages
+export const teacherLanguages = pgTable("teacher_languages", {
+  id: serial("id").primaryKey(),
+  teacherId: integer("teacher_id").notNull().references(() => teachers.id),
+  language: text("language").notNull(),
+  proficiencyLevel: text("proficiency_level").notNull(), // beginner, intermediate, advanced, native
+});
+
+export const insertTeacherLanguageSchema = createInsertSchema(teacherLanguages).omit({
+  id: true
+});
+
+export type InsertTeacherLanguage = z.infer<typeof insertTeacherLanguageSchema>;
+export type TeacherLanguage = typeof teacherLanguages.$inferSelect;
+
+// Teacher Course Assignments
+export const teacherCourseAssignments = pgTable("teacher_course_assignments", {
+  id: serial("id").primaryKey(),
+  teacherId: integer("teacher_id").notNull().references(() => teachers.id),
+  courseId: integer("course_id").notNull().references(() => courses.id),
+  isActive: boolean("is_active").default(true),
+  assignedDate: date("assigned_date").defaultNow(),
+  notes: text("notes"),
+});
+
+export const insertTeacherCourseAssignmentSchema = createInsertSchema(teacherCourseAssignments).omit({
+  id: true
+});
+
+export type InsertTeacherCourseAssignment = z.infer<typeof insertTeacherCourseAssignmentSchema>;
+export type TeacherCourseAssignment = typeof teacherCourseAssignments.$inferSelect;
+
+// Teacher relations
+export const teachersRelations = relations(teachers, ({ many }) => ({
+  availability: many(teacherAvailability),
+  languages: many(teacherLanguages),
+  courseAssignments: many(teacherCourseAssignments),
+}));
+
+export const teacherAvailabilityRelations = relations(teacherAvailability, ({ one }) => ({
+  teacher: one(teachers, {
+    fields: [teacherAvailability.teacherId],
+    references: [teachers.id],
+  }),
+}));
+
+export const teacherLanguagesRelations = relations(teacherLanguages, ({ one }) => ({
+  teacher: one(teachers, {
+    fields: [teacherLanguages.teacherId],
+    references: [teachers.id],
+  }),
+}));
+
+export const teacherCourseAssignmentsRelations = relations(teacherCourseAssignments, ({ one }) => ({
+  teacher: one(teachers, {
+    fields: [teacherCourseAssignments.teacherId],
+    references: [teachers.id],
+  }),
+  course: one(courses, {
+    fields: [teacherCourseAssignments.courseId],
+    references: [courses.id],
+  }),
+}));

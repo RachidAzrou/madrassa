@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, date, timestamp, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, date, timestamp, unique, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -163,3 +163,29 @@ export const insertUserSchema = createInsertSchema(users).omit({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+// Fees (betalingen)
+export const fees = pgTable("fees", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull(),
+  invoiceNumber: text("invoice_number").notNull().unique(),
+  description: text("description").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  dueDate: date("due_date").notNull(),
+  paymentDate: date("payment_date"),
+  status: text("status").notNull().default("pending"), // pending, paid, overdue, partial, cancelled
+  paymentMethod: text("payment_method"), // bank, cash, online, etc.
+  academicYear: text("academic_year"),
+  semester: text("semester"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertFeeSchema = createInsertSchema(fees).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export type InsertFee = z.infer<typeof insertFeeSchema>;
+export type Fee = typeof fees.$inferSelect;

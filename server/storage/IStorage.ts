@@ -6,7 +6,8 @@ import {
   type Attendance, type InsertAttendance,
   type Grade, type InsertGrade,
   type Event, type InsertEvent,
-  type User, type InsertUser 
+  type User, type InsertUser,
+  type Fee, type InsertFee
 } from "@shared/schema";
 
 // Storage interface for CRUD operations
@@ -79,4 +80,14 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
   deleteUser(id: number): Promise<boolean>;
+  
+  // Fee operations
+  getFees(): Promise<Fee[]>;
+  getFee(id: number): Promise<Fee | undefined>;
+  getFeesByStudent(studentId: number): Promise<Fee[]>;
+  getFeesByStatus(status: string): Promise<Fee[]>;
+  getFeesByDateRange(startDate: Date, endDate: Date): Promise<Fee[]>;
+  createFee(fee: InsertFee): Promise<Fee>;
+  updateFee(id: number, fee: Partial<Fee>): Promise<Fee | undefined>;
+  deleteFee(id: number): Promise<boolean>;
 }

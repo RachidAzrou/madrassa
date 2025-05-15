@@ -9,7 +9,8 @@ import {
   attendance, type Attendance, type InsertAttendance,
   grades, type Grade, type InsertGrade,
   events, type Event, type InsertEvent,
-  users, type User, type InsertUser 
+  users, type User, type InsertUser,
+  fees, type Fee, type InsertFee
 } from "@shared/schema";
 
 export class DatabaseStorage implements IStorage {
@@ -324,6 +325,61 @@ export class DatabaseStorage implements IStorage {
     const result = await db.delete(users)
       .where(eq(users.id, id))
       .returning({ id: users.id });
+    return result.length > 0;
+  }
+
+  // Fee operations
+  async getFees(): Promise<Fee[]> {
+    return db.select().from(fees);
+  }
+
+  async getFee(id: number): Promise<Fee | undefined> {
+    const result = await db.select().from(fees).where(eq(fees.id, id));
+    return result[0];
+  }
+
+  async getFeesByStudent(studentId: number): Promise<Fee[]> {
+    return db.select().from(fees).where(eq(fees.studentId, studentId));
+  }
+
+  async getFeesByStatus(status: string): Promise<Fee[]> {
+    return db.select().from(fees).where(eq(fees.status, status));
+  }
+
+  async getFeesByDateRange(startDate: Date, endDate: Date): Promise<Fee[]> {
+    // Voor datum vergelijkingen, eerst de datums converteren naar strings zonder tijdcomponent
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+    
+    const allFees = await db.select().from(fees);
+    
+    // Filteren op datum - vergelijk alleen de datum component
+    return allFees.filter(fee => {
+      // Converteer naar string en verwijder de tijdcomponent
+      const dueDateStr = new Date(fee.dueDate).toISOString().split('T')[0];
+      
+      // Check of de vervaldag binnen de opgegeven periode valt
+      return dueDateStr >= startDateStr && dueDateStr <= endDateStr;
+    });
+  }
+
+  async createFee(fee: InsertFee): Promise<Fee> {
+    const result = await db.insert(fees).values(fee).returning();
+    return result[0];
+  }
+
+  async updateFee(id: number, fee: Partial<Fee>): Promise<Fee | undefined> {
+    const result = await db.update(fees)
+      .set(fee)
+      .where(eq(fees.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteFee(id: number): Promise<boolean> {
+    const result = await db.delete(fees)
+      .where(eq(fees.id, id))
+      .returning({ id: fees.id });
     return result.length > 0;
   }
 }

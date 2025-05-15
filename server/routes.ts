@@ -1046,6 +1046,162 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Fees API
+  // Fees statistics API moet vóór de route met parameter staan
+  apiRouter.get("/fees/stats", async (req, res) => {
+    try {
+      const fees = await storage.getFees();
+      
+      const totalCollected = fees
+        .filter(fee => fee.status === 'betaald')
+        .reduce((sum, fee) => sum + Number(fee.amount), 0);
+        
+      const pendingAmount = fees
+        .filter(fee => fee.status === 'in behandeling' || fee.status === 'te laat' || fee.status === 'gedeeltelijk')
+        .reduce((sum, fee) => sum + Number(fee.amount), 0);
+        
+      const totalStudents = new Set(fees.map(fee => fee.studentId)).size;
+      
+      const paidCount = fees.filter(fee => fee.status === 'betaald').length;
+      const totalCount = fees.length;
+      const completionRate = totalCount > 0 ? Math.round((paidCount / totalCount) * 100) : 0;
+      
+      res.json({
+        stats: {
+          totalCollected,
+          pendingAmount,
+          totalStudents,
+          completionRate
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error bij ophalen betaling statistieken" });
+    }
+  });
+  
+  apiRouter.get("/fees", async (req, res) => {
+    try {
+      const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : undefined;
+      const status = req.query.status as string | undefined;
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      
+      let fees;
+      if (studentId && !isNaN(studentId)) {
+        fees = await storage.getFeesByStudent(studentId);
+      } else if (status) {
+        fees = await storage.getFeesByStatus(status);
+      } else if (startDate && endDate && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+        fees = await storage.getFeesByDateRange(startDate, endDate);
+      } else {
+        fees = await storage.getFees();
+      }
+      
+      res.json(fees);
+    } catch (error) {
+      res.status(500).json({ message: "Error bij ophalen betalingen" });
+    }
+  });
+
+  apiRouter.get("/fees/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Ongeldig ID formaat" });
+      }
+      
+      const fee = await storage.getFee(id);
+      if (!fee) {
+        return res.status(404).json({ message: "Betaling niet gevonden" });
+      }
+      
+      res.json(fee);
+    } catch (error) {
+      res.status(500).json({ message: "Error bij ophalen betaling" });
+    }
+  });
+
+  apiRouter.post("/fees", async (req, res) => {
+    try {
+      const validatedData = insertFeeSchema.parse(req.body);
+      const newFee = await storage.createFee(validatedData);
+      res.status(201).json(newFee);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validatie error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error bij aanmaken betaling" });
+    }
+  });
+
+  apiRouter.put("/fees/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Ongeldig ID formaat" });
+      }
+      
+      const updatedFee = await storage.updateFee(id, req.body);
+      if (!updatedFee) {
+        return res.status(404).json({ message: "Betaling niet gevonden" });
+      }
+      
+      res.json(updatedFee);
+    } catch (error) {
+      res.status(500).json({ message: "Error bij bijwerken betaling" });
+    }
+  });
+
+  apiRouter.delete("/fees/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Ongeldig ID formaat" });
+      }
+      
+      const success = await storage.deleteFee(id);
+      if (!success) {
+        return res.status(404).json({ message: "Betaling niet gevonden" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Error bij verwijderen betaling" });
+    }
+  });
+
+  // Fees statistics API
+  apiRouter.get("/fees/stats", async (req, res) => {
+    try {
+      const fees = await storage.getFees();
+      
+      const totalCollected = fees
+        .filter(fee => fee.status === 'betaald')
+        .reduce((sum, fee) => sum + Number(fee.amount), 0);
+        
+      const pendingAmount = fees
+        .filter(fee => fee.status === 'in behandeling' || fee.status === 'te laat' || fee.status === 'gedeeltelijk')
+        .reduce((sum, fee) => sum + Number(fee.amount), 0);
+        
+      const totalStudents = new Set(fees.map(fee => fee.studentId)).size;
+      
+      const paidCount = fees.filter(fee => fee.status === 'betaald').length;
+      const totalCount = fees.length;
+      const completionRate = totalCount > 0 ? Math.round((paidCount / totalCount) * 100) : 0;
+      
+      res.json({
+        stats: {
+          totalCollected,
+          pendingAmount,
+          totalStudents,
+          completionRate
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error bij ophalen betaling statistieken" });
+    }
+  });
+
   // Create HTTP server
   const httpServer = createServer(app);
 

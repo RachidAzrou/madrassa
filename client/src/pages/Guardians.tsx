@@ -601,9 +601,9 @@ export default function Guardians() {
                   </div>
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relatie</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Studenten</th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -641,7 +641,6 @@ export default function Guardians() {
                           </Avatar>
                           <div className="ml-4">
                             <div className="font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</div>
-                            <div className="text-sm text-gray-500">{guardian.email}</div>
                           </div>
                         </div>
                       </div>
@@ -652,25 +651,26 @@ export default function Guardians() {
                          guardian.relationship === 'guardian' ? 'Voogd' : 'Overig'}
                       </Badge>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{guardian.phone}</div>
-                      <div className="text-sm text-gray-500">
-                        {guardian.street && guardian.houseNumber ? 
-                          `${guardian.street} ${guardian.houseNumber}, ${guardian.postalCode || ''} ${guardian.city || ''}` : 
-                          'Geen adres opgegeven'
-                        }
-                      </div>
-                    </td>
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex -space-x-2">
-                        {/* Placeholder voor gekoppelde studenten - studentgegevens zijn niet direct beschikbaar */}
-                        <Avatar className="h-6 w-6 border-2 border-white">
-                          <AvatarFallback className="text-xs bg-blue-100 text-blue-600">?</AvatarFallback>
-                        </Avatar>
+                        {/* Klikbaar vraagteken om gekoppelde studenten te tonen */}
+                        <button
+                          onClick={() => {
+                            setSelectedGuardian(guardian);
+                            setIsViewGuardianDialogOpen(true);
+                          }}
+                          className="cursor-pointer"
+                          title="Klik om studenten te bekijken"
+                        >
+                          <Avatar className="h-6 w-6 border-2 border-white">
+                            <AvatarFallback className="text-xs bg-blue-100 text-blue-600">?</AvatarFallback>
+                          </Avatar>
+                        </button>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
+                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                      <div className="flex justify-center space-x-2">
                         <Button 
                           variant="ghost" 
                           size="icon"

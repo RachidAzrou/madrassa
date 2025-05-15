@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import StudentPrograms from '@/components/students/StudentPrograms';
 
 // Hulpfunctie om data in correct formaat te zetten voor API
 const formatDateForApi = (dateString: string | null | undefined): string | null => {
@@ -51,6 +54,7 @@ export default function Students() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [studentFormData, setStudentFormData] = useState({
     studentId: '',
@@ -315,14 +319,10 @@ export default function Students() {
     }
   };
 
-  const handleViewStudent = (id: string) => {
-    console.log(`Viewing student with ID: ${id}`);
-    // Navigeer naar een gedetailleerde weergave of toon een modal
-    toast({
-      title: "Student details",
-      description: `Details bekijken voor student met ID: ${id}`,
-      variant: "default",
-    });
+  const handleViewStudent = (student: any) => {
+    // Stel de geselecteerde student in en open het dialoogvenster
+    setSelectedStudent(student);
+    setIsDetailDialogOpen(true);
   };
 
   const handleEditStudent = (student: any) => {
@@ -1018,7 +1018,7 @@ export default function Students() {
                         variant="ghost" 
                         size="sm" 
                         className="text-primary hover:text-primary-dark"
-                        onClick={() => handleViewStudent(student.id)}
+                        onClick={() => handleViewStudent(student)}
                       >
                         <Eye className="h-4 w-4" />
                         <span className="sr-only">Bekijken</span>
@@ -1353,6 +1353,99 @@ export default function Students() {
       {/* Render de Edit en Delete dialogen */}
       <EditStudentDialog />
       <DeleteStudentDialog />
+      
+      {/* Student Detail Dialog */}
+      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+        <DialogContent className="sm:max-w-[800px]">
+          <DialogHeader>
+            <DialogTitle>Studentgegevens</DialogTitle>
+            <DialogDescription>
+              Gedetailleerde informatie over de student en programma-inschrijvingen.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedStudent && (
+            <Tabs defaultValue="general" className="mt-4">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="general">Algemene Informatie</TabsTrigger>
+                <TabsTrigger value="programs">Programma's</TabsTrigger>
+                <TabsTrigger value="enrollments">Inschrijvingen</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="general" className="space-y-4 pt-4">
+                <div className="flex items-center">
+                  <Avatar className="h-20 w-20 mr-4">
+                    <AvatarFallback className="text-xl bg-primary text-primary-foreground">
+                      {selectedStudent.firstName?.charAt(0)}{selectedStudent.lastName?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h2 className="text-2xl font-bold">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
+                    <p className="text-muted-foreground">{selectedStudent.studentId}</p>
+                    <Badge variant={
+                      selectedStudent.status === 'active' ? 'default' :
+                      selectedStudent.status === 'inactive' ? 'secondary' :
+                      selectedStudent.status === 'pending' ? 'outline' : 'default'
+                    } className="mt-1">
+                      {selectedStudent.status.charAt(0).toUpperCase() + selectedStudent.status.slice(1)}
+                    </Badge>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 pt-4">
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
+                    <p>{selectedStudent.email || "Niet ingevuld"}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Telefoonnummer</h3>
+                    <p>{selectedStudent.phone || "Niet ingevuld"}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Geboortedatum</h3>
+                    <p>{selectedStudent.dateOfBirth ? new Date(selectedStudent.dateOfBirth).toLocaleDateString('nl-NL') : "Niet ingevuld"}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Inschrijvingsdatum</h3>
+                    <p>{selectedStudent.enrollmentDate ? new Date(selectedStudent.enrollmentDate).toLocaleDateString('nl-NL') : "Niet ingevuld"}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Adres</h3>
+                  <p>
+                    {selectedStudent.street && selectedStudent.houseNumber ? 
+                      `${selectedStudent.street} ${selectedStudent.houseNumber}` : 
+                      selectedStudent.address || "Niet ingevuld"}
+                      
+                    {(selectedStudent.postalCode || selectedStudent.city) && 
+                      `, ${selectedStudent.postalCode || ""} ${selectedStudent.city || ""}`}
+                  </p>
+                </div>
+                
+                <div className="flex justify-end space-x-2 pt-4">
+                  <Button variant="outline" onClick={() => handleEditStudent(selectedStudent)}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Bewerken
+                  </Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="programs" className="pt-4">
+                <StudentPrograms studentId={selectedStudent.id} />
+              </TabsContent>
+              
+              <TabsContent value="enrollments" className="pt-4">
+                <div className="text-center py-8 text-muted-foreground">
+                  <UserCircle className="mx-auto h-12 w-12 opacity-50" />
+                  <p className="mt-2">Cursusinschrijvingen worden hier weergegeven.</p>
+                  <p className="text-sm">Deze functionaliteit is nog in ontwikkeling.</p>
+                </div>
+              </TabsContent>
+            </Tabs>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -160,8 +160,27 @@ export default function Students() {
     }
   });
 
-  const handleAddStudent = () => {
-    // Open het toevoeg-dialoogvenster
+  const handleAddStudent = async () => {
+    // Maak een API aanroep om het volgende studentnummer te verkrijgen
+    try {
+      const response = await fetch('/api/next-student-id');
+      const data = await response.json();
+      
+      // Open het toevoeg-dialoogvenster en zet het voorgestelde studentnummer
+      setStudentFormData({
+        ...studentFormData,
+        studentId: data.nextStudentId || 'Wordt gegenereerd'
+      });
+    } catch (error) {
+      console.error('Fout bij ophalen volgende studentnummer:', error);
+      // Bij fout gebruiken we een standaard waarde
+      setStudentFormData({
+        ...studentFormData,
+        studentId: 'Wordt gegenereerd'
+      });
+    }
+    
+    // Open het dialoogvenster
     setIsAddDialogOpen(true);
   };
   
@@ -426,14 +445,13 @@ export default function Students() {
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-1">
-                <Label htmlFor="editStudentId" className="text-right flex items-center gap-2">
-                  Studentnummer
-                  <span className="text-xs text-muted-foreground font-normal italic">(niet bewerkbaar)</span>
+                <Label htmlFor="editStudentId" className="text-right">
+                  Studentnummer <span className="text-xs text-muted-foreground font-normal italic">(niet bewerkbaar)</span>
                 </Label>
                 <Input
                   id="editStudentId"
                   value={studentFormData.studentId}
-                  className="mt-1 text-muted-foreground bg-muted cursor-not-allowed"
+                  className="mt-1 bg-muted cursor-not-allowed"
                   disabled
                   readOnly
                 />
@@ -964,14 +982,13 @@ export default function Students() {
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-1">
-                  <Label htmlFor="studentId" className="text-right flex items-center gap-2">
-                    Studentnummer
-                    <span className="text-xs text-muted-foreground font-normal italic">(automatisch)</span>
+                  <Label htmlFor="studentId" className="text-right">
+                    Studentnummer <span className="text-xs text-muted-foreground font-normal italic">(automatisch)</span>
                   </Label>
                   <Input
                     id="studentId"
-                    value="Wordt automatisch gegenereerd"
-                    className="mt-1 text-muted-foreground bg-muted cursor-not-allowed"
+                    value={studentFormData.studentId}
+                    className="mt-1 bg-muted cursor-not-allowed"
                     disabled
                     readOnly
                   />

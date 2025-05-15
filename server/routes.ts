@@ -88,6 +88,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return (1000 + new Date().getTime() % 9000).toString();
     }
   }
+  
+  // Endpoint om het volgende beschikbare studentnummer op te halen
+  apiRouter.get("/api/next-student-id", async (req, res) => {
+    try {
+      const nextStudentId = await generateNextStudentId();
+      res.json({ nextStudentId });
+    } catch (error) {
+      console.error("Fout bij ophalen volgend studentnummer:", error);
+      res.status(500).json({ 
+        message: "Fout bij ophalen volgend studentnummer", 
+        nextStudentId: null 
+      });
+    }
+  });
 
   apiRouter.post("/api/students", async (req, res) => {
     try {

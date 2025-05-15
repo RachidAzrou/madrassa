@@ -59,7 +59,7 @@ export default function Guardians() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedGuardian, setSelectedGuardian] = useState<Guardian | null>(null);
+  const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
   const [guardianFormData, setGuardianFormData] = useState({
     firstName: '',
     lastName: '',
@@ -1460,7 +1460,7 @@ export default function Guardians() {
               type="button"
               onClick={() => {
                 setIsViewGuardianDialogOpen(false);
-                handleEditGuardian(selectedGuardian);
+                handleEditGuardian(selectedGuardian as GuardianType);
               }}
             >
               Bewerken

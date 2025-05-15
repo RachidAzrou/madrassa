@@ -327,6 +327,27 @@ export default function Courses() {
                   </div>
                 )}
                 
+                {course.materials && (
+                  <div className="mt-3">
+                    <h4 className="text-xs font-semibold text-gray-700">Lesmateriaal:</h4>
+                    <p className="text-gray-600 text-xs mt-1">{course.materials}</p>
+                  </div>
+                )}
+                
+                {course.competencies && (
+                  <div className="mt-3">
+                    <h4 className="text-xs font-semibold text-gray-700">Eindcompetenties:</h4>
+                    <p className="text-gray-600 text-xs mt-1">{course.competencies}</p>
+                  </div>
+                )}
+                
+                {course.prerequisites && (
+                  <div className="mt-3">
+                    <h4 className="text-xs font-semibold text-gray-700">Voorwaarden:</h4>
+                    <p className="text-gray-600 text-xs mt-1">{course.prerequisites}</p>
+                  </div>
+                )}
+                
                 <div className="mt-4 flex items-center">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback>

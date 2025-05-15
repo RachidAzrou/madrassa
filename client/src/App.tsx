@@ -17,7 +17,7 @@ import Guardians from "@/pages/Guardians";
 import Teachers from "@/pages/Teachers";
 import Admissions from "@/pages/Admissions";
 import StudentGroups from "@/pages/StudentGroups";
-import Enrollments from "@/pages/Enrollments";
+
 import Scheduling from "@/pages/Scheduling";
 import Fees from "@/pages/Fees";
 import Settings from "@/pages/Settings";
@@ -34,7 +34,7 @@ function Router() {
         <Route path="/student-groups" component={StudentGroups} />
         <Route path="/courses" component={Courses} />
         <Route path="/programs" component={Programs} />
-        <Route path="/enrollments" component={Enrollments} />
+
         <Route path="/scheduling" component={Scheduling} />
         <Route path="/calendar" component={Calendar} />
         <Route path="/attendance" component={Attendance} />

@@ -1,3 +1,4 @@
+// Import de types uit schema
 import { 
   students, type Student, type InsertStudent,
   programs, type Program, type InsertProgram,
@@ -8,6 +9,9 @@ import {
   events, type Event, type InsertEvent,
   users, type User, type InsertUser 
 } from "@shared/schema";
+
+// Import de storage implementatie
+import { storage } from './storage/index';
 
 // Storage interface for CRUD operations
 export interface IStorage {

@@ -461,18 +461,25 @@ export default function Students() {
   };
 
   const handleProgramChange = (value: string) => {
+    // Waarde opslaan als string maar zorg ervoor dat cijfers correct worden verwerkt
     setProgram(value);
     setCurrentPage(1);
+    // Invalidate queries om zeker te zijn van verse data
+    queryClient.invalidateQueries({ queryKey: ['/api/students'] });
   };
 
   const handleYearChange = (value: string) => {
     setYear(value);
     setCurrentPage(1);
+    // Invalidate queries om zeker te zijn van verse data
+    queryClient.invalidateQueries({ queryKey: ['/api/students'] });
   };
 
   const handleStatusChange = (value: string) => {
     setStatus(value);
     setCurrentPage(1);
+    // Invalidate queries om zeker te zijn van verse data
+    queryClient.invalidateQueries({ queryKey: ['/api/students'] });
   };
 
   const handleSortChange = (value: string) => {

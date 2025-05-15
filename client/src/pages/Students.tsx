@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle,
-  ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone
+  ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
+  Users
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -1868,7 +1869,7 @@ export default function Students() {
             <div className="grid gap-6 py-2">
               {/* Tabs voor verschillende secties */}
               <Tabs defaultValue="personal" className="w-full">
-                <TabsList className="grid grid-cols-4 mb-6">
+                <TabsList className="grid grid-cols-5 mb-6">
                   <TabsTrigger value="personal" className="flex gap-2 items-center">
                     <UserCircle className="h-4 w-4" />
                     Persoonlijk
@@ -1880,6 +1881,10 @@ export default function Students() {
                   <TabsTrigger value="address" className="flex gap-2 items-center">
                     <Home className="h-4 w-4" />
                     Adres
+                  </TabsTrigger>
+                  <TabsTrigger value="class" className="flex gap-2 items-center">
+                    <Users className="h-4 w-4" />
+                    Klas
                   </TabsTrigger>
                   <TabsTrigger value="courses" className="flex gap-2 items-center">
                     <BookOpen className="h-4 w-4" />
@@ -2124,6 +2129,76 @@ export default function Students() {
                   </div>
                 </TabsContent>
 
+                {/* Klas toewijzing tab */}
+                <TabsContent value="class" className="space-y-6">
+                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold text-primary">Klas Toewijzing</h3>
+                      {studentFormData.studentGroupId && (
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
+                          Klas toegewezen
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="space-y-6">
+                      <p className="text-sm text-gray-500">
+                        Wijs de student toe aan een klas. Een student kan maar in één klas zitten.
+                      </p>
+                      
+                      <div className="mt-2">
+                        <Label htmlFor="studentGroupId" className="text-sm font-medium text-gray-700">
+                          Selecteer klas
+                        </Label>
+                        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Select
+                              value={studentFormData.studentGroupId?.toString() || 'none'}
+                              onValueChange={(value) => setStudentFormData({ 
+                                ...studentFormData, 
+                                studentGroupId: value !== 'none' ? parseInt(value) : null 
+                              })}
+                            >
+                              <SelectTrigger className="border-gray-200 bg-white">
+                                <SelectValue placeholder="Selecteer klas" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">Geen klas</SelectItem>
+                                {studentGroups.map((group: {id: number, name: string}) => (
+                                  <SelectItem key={group.id} value={String(group.id)}>
+                                    {group.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          {studentGroups.length === 0 && (
+                            <div className="flex items-center text-sm text-amber-600">
+                              <p className="italic">Er zijn nog geen klassen aangemaakt.</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {studentFormData.studentGroupId && (
+                        <div className="flex items-center p-4 mt-4 rounded-md bg-blue-50 border border-blue-100">
+                          <div className="mr-4 p-2 bg-primary rounded-full">
+                            <Users className="h-5 w-5 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-primary">
+                              {studentGroups.find((g: any) => g.id === studentFormData.studentGroupId)?.name}
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              De student wordt toegewezen aan deze klas
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </TabsContent>
+
                 {/* Vakken tab */}
                 <TabsContent value="courses" className="space-y-6">
                   <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
@@ -2177,7 +2252,7 @@ export default function Students() {
                     {/* Nieuwe programma toevoegen interface */}
                     <div className="mt-6 p-4 border rounded-md border-dashed border-gray-300 bg-gray-50">
                       <h4 className="text-sm font-medium text-gray-700 mb-3">Vak toevoegen</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <Label htmlFor="newProgramId" className="text-xs text-gray-500">Vak</Label>
                           <Select
@@ -2191,29 +2266,6 @@ export default function Students() {
                               {programs.map((program: {id: number, name: string}) => (
                                 <SelectItem key={program.id} value={String(program.id)}>
                                   {program.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="newStudentGroupId" className="text-xs text-gray-500">Klas</Label>
-                          <Select
-                            value={studentFormData.studentGroupId?.toString() || 'none'}
-                            onValueChange={(value) => setStudentFormData({ 
-                              ...studentFormData, 
-                              studentGroupId: value !== 'none' ? parseInt(value) : null 
-                            })}
-                          >
-                            <SelectTrigger className="mt-1 border-gray-200 bg-white">
-                              <SelectValue placeholder="Selecteer klas" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">Geen klas</SelectItem>
-                              {studentGroups.map((group: {id: number, name: string}) => (
-                                <SelectItem key={group.id} value={String(group.id)}>
-                                  {group.name}
                                 </SelectItem>
                               ))}
                             </SelectContent>

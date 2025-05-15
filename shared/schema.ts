@@ -151,13 +151,14 @@ export const insertEnrollmentSchema = createInsertSchema(enrollments).omit({
 export type InsertEnrollment = z.infer<typeof insertEnrollmentSchema>;
 export type Enrollment = typeof enrollments.$inferSelect;
 
-// Attendance
+// Attendance van studenten, bijgehouden door docenten
 export const attendance = pgTable("attendance", {
   id: serial("id").primaryKey(),
   studentId: integer("student_id").notNull(),
   courseId: integer("course_id").notNull(),
+  teacherId: integer("teacher_id").notNull(), // Docent die de aanwezigheid bijhoudt
   date: date("date").notNull(),
-  status: text("status").notNull(), // present, absent, late, excused
+  status: text("status").notNull(), // aanwezig, afwezig, te laat
   notes: text("notes"),
 }, (table) => {
   return {
@@ -169,8 +170,29 @@ export const insertAttendanceSchema = createInsertSchema(attendance).omit({
   id: true
 });
 
+// Attendance van docenten (hun eigen aanwezigheid)
+export const teacherAttendance = pgTable("teacher_attendance", {
+  id: serial("id").primaryKey(),
+  teacherId: integer("teacher_id").notNull(), // De docent waarvan de aanwezigheid wordt bijgehouden
+  courseId: integer("course_id").notNull(),
+  date: date("date").notNull(),
+  status: text("status").notNull(), // aanwezig, afwezig, vervangen
+  replacementTeacherId: integer("replacement_teacher_id"), // Indien vervangen, door welke docent
+  notes: text("notes"),
+}, (table) => {
+  return {
+    unq: unique().on(table.teacherId, table.courseId, table.date),
+  };
+});
+
+export const insertTeacherAttendanceSchema = createInsertSchema(teacherAttendance).omit({
+  id: true
+});
+
 export type InsertAttendance = z.infer<typeof insertAttendanceSchema>;
 export type Attendance = typeof attendance.$inferSelect;
+export type InsertTeacherAttendance = z.infer<typeof insertTeacherAttendanceSchema>;
+export type TeacherAttendance = typeof teacherAttendance.$inferSelect;
 
 // Grades
 export const grades = pgTable("grades", {
@@ -543,6 +565,8 @@ export const teachersRelations = relations(teachers, ({ many }) => ({
   availability: many(teacherAvailability),
   languages: many(teacherLanguages),
   courseAssignments: many(teacherCourseAssignments),
+  attendance: many(teacherAttendance),
+  studentAttendance: many(attendance, { relationName: "recordedAttendance" })
 }));
 
 export const teacherAvailabilityRelations = relations(teacherAvailability, ({ one }) => ({
@@ -568,4 +592,36 @@ export const teacherCourseAssignmentsRelations = relations(teacherCourseAssignme
     fields: [teacherCourseAssignments.courseId],
     references: [courses.id],
   }),
+}));
+
+export const attendanceRelations = relations(attendance, ({ one }) => ({
+  student: one(students, {
+    fields: [attendance.studentId],
+    references: [students.id]
+  }),
+  course: one(courses, {
+    fields: [attendance.courseId],
+    references: [courses.id]
+  }),
+  teacher: one(teachers, {
+    fields: [attendance.teacherId],
+    references: [teachers.id],
+    relationName: "recordedAttendance"
+  })
+}));
+
+export const teacherAttendanceRelations = relations(teacherAttendance, ({ one }) => ({
+  teacher: one(teachers, {
+    fields: [teacherAttendance.teacherId],
+    references: [teachers.id]
+  }),
+  course: one(courses, {
+    fields: [teacherAttendance.courseId],
+    references: [courses.id]
+  }),
+  replacementTeacher: one(teachers, {
+    fields: [teacherAttendance.replacementTeacherId],
+    references: [teachers.id],
+    relationName: "replacements"
+  })
 }));

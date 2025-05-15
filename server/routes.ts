@@ -11,7 +11,13 @@ import {
   insertEventSchema,
   insertUserSchema,
   insertFeeSchema,
-  insertAssessmentSchema
+  insertAssessmentSchema,
+  insertStudentGroupSchema,
+  insertStudentGroupEnrollmentSchema,
+  insertLessonSchema,
+  insertExaminationSchema,
+  insertGuardianSchema,
+  insertStudentGuardianSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -1393,6 +1399,162 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Fout bij verwijderen van cijfer" });
+    }
+  });
+
+  // Student Groups API
+  apiRouter.get("/api/student-groups", async (req, res) => {
+    try {
+      const academicYear = req.query.academicYear as string;
+      const programId = req.query.programId ? parseInt(req.query.programId as string) : undefined;
+      const search = req.query.searchTerm as string;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      
+      if (academicYear && academicYear !== 'all') {
+        const groups = await storage.getStudentGroupsByAcademicYear(academicYear);
+        res.json({ 
+          studentGroups: groups,
+          totalCount: groups.length,
+          page,
+          totalPages: Math.ceil(groups.length / limit)
+        });
+      } else if (programId) {
+        const groups = await storage.getStudentGroupsByProgram(programId);
+        res.json({ 
+          studentGroups: groups,
+          totalCount: groups.length,
+          page,
+          totalPages: Math.ceil(groups.length / limit)
+        });
+      } else {
+        const groups = await storage.getStudentGroups();
+        res.json({ 
+          studentGroups: groups,
+          totalCount: groups.length,
+          page,
+          totalPages: Math.ceil(groups.length / limit)
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij ophalen van studentengroepen" });
+    }
+  });
+  
+  apiRouter.get("/api/student-groups/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const group = await storage.getStudentGroup(id);
+      
+      if (!group) {
+        return res.status(404).json({ message: "Studentengroep niet gevonden" });
+      }
+      
+      res.json(group);
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij ophalen van studentengroep" });
+    }
+  });
+  
+  apiRouter.post("/api/student-groups", async (req, res) => {
+    try {
+      const parseResult = insertStudentGroupSchema.safeParse(req.body);
+      
+      if (!parseResult.success) {
+        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
+      }
+      
+      const group = await storage.createStudentGroup(parseResult.data);
+      res.status(201).json(group);
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij aanmaken van studentengroep" });
+    }
+  });
+  
+  apiRouter.put("/api/student-groups/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const parseResult = insertStudentGroupSchema.partial().safeParse(req.body);
+      
+      if (!parseResult.success) {
+        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
+      }
+      
+      const group = await storage.updateStudentGroup(id, parseResult.data);
+      
+      if (!group) {
+        return res.status(404).json({ message: "Studentengroep niet gevonden" });
+      }
+      
+      res.json(group);
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij bijwerken van studentengroep" });
+    }
+  });
+  
+  apiRouter.delete("/api/student-groups/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteStudentGroup(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Studentengroep niet gevonden" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij verwijderen van studentengroep" });
+    }
+  });
+  
+  // Student Group Enrollments API
+  apiRouter.get("/api/student-group-enrollments", async (req, res) => {
+    try {
+      const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : undefined;
+      const groupId = req.query.groupId ? parseInt(req.query.groupId as string) : undefined;
+      
+      if (studentId) {
+        const enrollments = await storage.getStudentGroupEnrollmentsByStudent(studentId);
+        res.json(enrollments);
+      } else if (groupId) {
+        const enrollments = await storage.getStudentGroupEnrollmentsByGroup(groupId);
+        res.json(enrollments);
+      } else {
+        const enrollments = await storage.getStudentGroupEnrollments();
+        res.json(enrollments);
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij ophalen van groepsinschrijvingen" });
+    }
+  });
+  
+  apiRouter.post("/api/student-group-enrollments", async (req, res) => {
+    try {
+      const parseResult = insertStudentGroupEnrollmentSchema.safeParse(req.body);
+      
+      if (!parseResult.success) {
+        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
+      }
+      
+      const enrollment = await storage.createStudentGroupEnrollment(parseResult.data);
+      res.status(201).json(enrollment);
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij aanmaken van groepsinschrijving" });
+    }
+  });
+  
+  apiRouter.delete("/api/student-group-enrollments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteStudentGroupEnrollment(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Groepsinschrijving niet gevonden" });
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Fout bij verwijderen van groepsinschrijving" });
     }
   });
 

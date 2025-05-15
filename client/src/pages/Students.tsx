@@ -60,8 +60,10 @@ export default function Students() {
     phone: '',
     dateOfBirth: '' as string | null,
     address: '',
-    city: '',
+    street: '',
+    houseNumber: '',
     postalCode: '',
+    city: '',
     programId: null as number | null,
     yearLevel: null as number | null,
     enrollmentDate: '',
@@ -640,13 +642,49 @@ export default function Students() {
                 />
               </div>
               <div className="col-span-1">
-                <Label htmlFor="editAddress" className="text-right">
-                  Adres
+                <Label htmlFor="editStreet" className="text-right">
+                  Straatnaam
                 </Label>
                 <Input
-                  id="editAddress"
-                  value={studentFormData.address}
-                  onChange={(e) => setStudentFormData({ ...studentFormData, address: e.target.value })}
+                  id="editStreet"
+                  value={studentFormData.street}
+                  onChange={(e) => setStudentFormData({ ...studentFormData, street: e.target.value })}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-4 gap-4">
+              <div className="col-span-1">
+                <Label htmlFor="editHouseNumber" className="text-right">
+                  Huisnummer
+                </Label>
+                <Input
+                  id="editHouseNumber"
+                  value={studentFormData.houseNumber}
+                  onChange={(e) => setStudentFormData({ ...studentFormData, houseNumber: e.target.value })}
+                  className="mt-1"
+                />
+              </div>
+              <div className="col-span-1">
+                <Label htmlFor="editPostalCode" className="text-right">
+                  Postcode
+                </Label>
+                <Input
+                  id="editPostalCode"
+                  value={studentFormData.postalCode}
+                  onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
+                  className="mt-1"
+                />
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor="editCity" className="text-right">
+                  Stad
+                </Label>
+                <Input
+                  id="editCity"
+                  value={studentFormData.city}
+                  onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
                   className="mt-1"
                 />
               </div>

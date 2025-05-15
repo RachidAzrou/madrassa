@@ -19,7 +19,8 @@ import {
   type Teacher, type InsertTeacher,
   type TeacherAvailability, type InsertTeacherAvailability,
   type TeacherLanguage, type InsertTeacherLanguage,
-  type TeacherCourseAssignment, type InsertTeacherCourseAssignment
+  type TeacherCourseAssignment, type InsertTeacherCourseAssignment,
+  type TeacherAttendance, type InsertTeacherAttendance
 } from "@shared/schema";
 
 // Storage interface for CRUD operations
@@ -213,4 +214,18 @@ export interface IStorage {
   createTeacherCourseAssignment(assignment: InsertTeacherCourseAssignment): Promise<TeacherCourseAssignment>;
   updateTeacherCourseAssignment(id: number, assignment: Partial<TeacherCourseAssignment>): Promise<TeacherCourseAssignment | undefined>;
   deleteTeacherCourseAssignment(id: number): Promise<boolean>;
+  
+  // Teacher Attendance operations
+  getTeacherAttendanceRecords(): Promise<TeacherAttendance[]>;
+  getTeacherAttendanceRecord(id: number): Promise<TeacherAttendance | undefined>;
+  getTeacherAttendanceByTeacher(teacherId: number): Promise<TeacherAttendance[]>;
+  getTeacherAttendanceByCourse(courseId: number): Promise<TeacherAttendance[]>;
+  getTeacherAttendanceByDate(date: Date): Promise<TeacherAttendance[]>;
+  createTeacherAttendance(attendance: InsertTeacherAttendance): Promise<TeacherAttendance>;
+  updateTeacherAttendance(id: number, attendance: Partial<TeacherAttendance>): Promise<TeacherAttendance | undefined>;
+  deleteTeacherAttendance(id: number): Promise<boolean>;
+  
+  // Enhanced Attendance operations (with teacher who recorded attendance)
+  getAttendanceByTeacher(teacherId: number): Promise<Attendance[]>; // Attendance records created by this teacher
+  getAttendanceByClassAndDate(courseId: number, date: Date): Promise<Attendance[]>; // All student attendance for a class on a specific date
 }

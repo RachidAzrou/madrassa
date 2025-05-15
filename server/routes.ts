@@ -720,6 +720,206 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ********************
+  // Teacher Attendance API endpoints
+  // ********************
+  apiRouter.get("/api/teacher-attendance", async (_req, res) => {
+    try {
+      const attendanceRecords = await storage.getTeacherAttendanceRecords();
+      res.json(attendanceRecords);
+    } catch (error) {
+      console.error("Error fetching teacher attendance records:", error);
+      res.status(500).json({ message: "Error fetching teacher attendance records" });
+    }
+  });
+
+  apiRouter.get("/api/teacher-attendance/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const attendanceRecord = await storage.getTeacherAttendanceRecord(id);
+      if (!attendanceRecord) {
+        return res.status(404).json({ message: "Teacher attendance record not found" });
+      }
+      
+      res.json(attendanceRecord);
+    } catch (error) {
+      console.error("Error fetching teacher attendance record:", error);
+      res.status(500).json({ message: "Error fetching teacher attendance record" });
+    }
+  });
+
+  apiRouter.get("/api/teachers/:teacherId/attendance", async (req, res) => {
+    try {
+      const teacherId = parseInt(req.params.teacherId);
+      if (isNaN(teacherId)) {
+        return res.status(400).json({ message: "Invalid teacher ID format" });
+      }
+      
+      const attendanceRecords = await storage.getTeacherAttendanceByTeacher(teacherId);
+      res.json(attendanceRecords);
+    } catch (error) {
+      console.error("Error fetching teacher attendance records by teacher:", error);
+      res.status(500).json({ message: "Error fetching teacher attendance records by teacher" });
+    }
+  });
+
+  apiRouter.get("/api/courses/:courseId/teacher-attendance", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID format" });
+      }
+      
+      const attendanceRecords = await storage.getTeacherAttendanceByCourse(courseId);
+      res.json(attendanceRecords);
+    } catch (error) {
+      console.error("Error fetching teacher attendance records by course:", error);
+      res.status(500).json({ message: "Error fetching teacher attendance records by course" });
+    }
+  });
+
+  apiRouter.get("/api/teacher-attendance/date/:date", async (req, res) => {
+    try {
+      const date = new Date(req.params.date);
+      if (isNaN(date.getTime())) {
+        return res.status(400).json({ message: "Invalid date format" });
+      }
+      
+      const attendanceRecords = await storage.getTeacherAttendanceByDate(date);
+      res.json(attendanceRecords);
+    } catch (error) {
+      console.error("Error fetching teacher attendance records by date:", error);
+      res.status(500).json({ message: "Error fetching teacher attendance records by date" });
+    }
+  });
+
+  apiRouter.post("/api/teacher-attendance", async (req, res) => {
+    try {
+      const validatedData = insertTeacherAttendanceSchema.parse(req.body);
+      const newAttendanceRecord = await storage.createTeacherAttendance(validatedData);
+      res.status(201).json(newAttendanceRecord);
+    } catch (error) {
+      console.error("Error creating teacher attendance record:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating teacher attendance record" });
+    }
+  });
+
+  apiRouter.put("/api/teacher-attendance/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const existingRecord = await storage.getTeacherAttendanceRecord(id);
+      if (!existingRecord) {
+        return res.status(404).json({ message: "Teacher attendance record not found" });
+      }
+      
+      const validatedData = insertTeacherAttendanceSchema.partial().parse(req.body);
+      const updatedAttendanceRecord = await storage.updateTeacherAttendance(id, validatedData);
+      
+      if (!updatedAttendanceRecord) {
+        return res.status(404).json({ message: "Teacher attendance record not found" });
+      }
+      
+      res.json(updatedAttendanceRecord);
+    } catch (error) {
+      console.error("Error updating teacher attendance record:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating teacher attendance record" });
+    }
+  });
+
+  apiRouter.delete("/api/teacher-attendance/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const existingRecord = await storage.getTeacherAttendanceRecord(id);
+      if (!existingRecord) {
+        return res.status(404).json({ message: "Teacher attendance record not found" });
+      }
+      
+      const success = await storage.deleteTeacherAttendance(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Teacher attendance record not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting teacher attendance record:", error);
+      res.status(500).json({ message: "Error deleting teacher attendance record" });
+    }
+  });
+
+  // Enhanced Attendance API endpoints for class view (with teacher parameter)
+  apiRouter.get("/api/courses/:courseId/attendance/date/:date", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      const date = new Date(req.params.date);
+      
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID format" });
+      }
+      
+      if (isNaN(date.getTime())) {
+        return res.status(400).json({ message: "Invalid date format" });
+      }
+      
+      const attendanceRecords = await storage.getAttendanceByClassAndDate(courseId, date);
+      res.json(attendanceRecords);
+    } catch (error) {
+      console.error("Error fetching attendance by class and date:", error);
+      res.status(500).json({ message: "Error fetching attendance by class and date" });
+    }
+  });
+
+  // Batch create attendance records for a class
+  apiRouter.post("/api/attendance/batch", async (req, res) => {
+    try {
+      // Expect an array of attendance records
+      const attendanceRecords = req.body;
+      if (!Array.isArray(attendanceRecords)) {
+        return res.status(400).json({ message: "Expected an array of attendance records" });
+      }
+      
+      // Process each record individually
+      const results = [];
+      for (const record of attendanceRecords) {
+        try {
+          const validatedData = insertAttendanceSchema.parse(record);
+          const newRecord = await storage.createAttendance(validatedData);
+          results.push({ success: true, record: newRecord });
+        } catch (error) {
+          results.push({ success: false, error: error instanceof z.ZodError ? error.errors : "Validation error", record });
+        }
+      }
+      
+      const success = results.every(r => r.success);
+      if (success) {
+        res.status(201).json({ success: true, results });
+      } else {
+        res.status(207).json({ success: false, results });
+      }
+    } catch (error) {
+      console.error("Error processing batch attendance records:", error);
+      res.status(500).json({ message: "Error processing batch attendance records" });
+    }
+  });
+
+  // ********************
   // Assessment API endpoints
   // ********************
   apiRouter.get("/api/assessments", async (_req, res) => {

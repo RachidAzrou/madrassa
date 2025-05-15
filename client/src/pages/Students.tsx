@@ -10,6 +10,34 @@ import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
+// Hulpfunctie om data in correct formaat te zetten voor API
+const formatDateForApi = (dateString: string | null | undefined): string | null => {
+  if (!dateString) return null;
+  
+  // Als datum al in YYYY-MM-DD formaat is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    return dateString;
+  }
+  
+  // Als datum in DD-MM-YYYY formaat is (zoals van datepicker)
+  if (/^\d{2}-\d{2}-\d{4}$/.test(dateString)) {
+    const [day, month, year] = dateString.split('-');
+    return `${year}-${month}-${day}`;
+  }
+  
+  // Probeert datum om te zetten via Date object
+  try {
+    const date = new Date(dateString);
+    if (!isNaN(date.getTime())) {
+      return date.toISOString().split('T')[0];
+    }
+  } catch (e) {
+    console.error('Ongeldige datumwaarde:', dateString);
+  }
+  
+  return null;
+};
+
 export default function Students() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,7 +58,7 @@ export default function Students() {
     lastName: '',
     email: '',
     phone: '',
-    dateOfBirth: '',
+    dateOfBirth: '' as string | null,
     address: '',
     city: '',
     postalCode: '',
@@ -101,15 +129,12 @@ export default function Students() {
     // Kopieer de student data voor we deze aanpassen
     const formattedData = { ...studentFormData };
     
-    // Controleer en formatteer de geboortedatum naar het juiste formaat (YYYY-MM-DD)
-    if (formattedData.dateOfBirth) {
-      // Zorg ervoor dat de datum in correct ISO formaat is (YYYY-MM-DD)
-      const date = new Date(formattedData.dateOfBirth);
-      if (!isNaN(date.getTime())) {
-        // Formatteer naar YYYY-MM-DD
-        formattedData.dateOfBirth = date.toISOString().split('T')[0];
-      }
-    }
+    // Gebruik de formatDateForApi functie voor correcte datumformattering
+    // Zet de geboortedatum om naar het juiste format en gebruik een lege string als het null is
+    const formattedDate = formatDateForApi(formattedData.dateOfBirth) || '';
+    formattedData.dateOfBirth = formattedDate;
+    
+    console.log('Verstuur student data:', formattedData);
     
     // Verzend de geformatteerde data
     createStudentMutation.mutate(formattedData);
@@ -181,15 +206,11 @@ export default function Students() {
       // Kopieer de studentdata voor we deze aanpassen
       const formattedData = { ...studentFormData };
       
-      // Controleer en formatteer de geboortedatum naar het juiste formaat (YYYY-MM-DD)
-      if (formattedData.dateOfBirth) {
-        // Zorg ervoor dat de datum in correct ISO formaat is (YYYY-MM-DD)
-        const date = new Date(formattedData.dateOfBirth);
-        if (!isNaN(date.getTime())) {
-          // Formatteer naar YYYY-MM-DD
-          formattedData.dateOfBirth = date.toISOString().split('T')[0];
-        }
-      }
+      // Gebruik de formatDateForApi functie voor correcte datumformattering
+      const formattedDate = formatDateForApi(formattedData.dateOfBirth);
+      formattedData.dateOfBirth = formattedDate;
+      
+      console.log('Verstuur bewerkte student data:', formattedData);
       
       updateStudentMutation.mutate({
         id: selectedStudent.id,

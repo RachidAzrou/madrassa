@@ -18,16 +18,18 @@ import {
   insertLessonSchema,
   insertExaminationSchema,
   insertGuardianSchema,
-  insertStudentGuardianSchema
+  insertStudentGuardianSchema,
+  type Student
 } from "@shared/schema";
-import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // prefix all routes with /api
   const apiRouter = app;
 
-  // Students API
-  apiRouter.get("/api/students", async (req, res) => {
+  // ********************
+  // Student API endpoints
+  // ********************
+  apiRouter.get("/api/students", async (_req, res) => {
     try {
       const students = await storage.getStudents();
       res.json(students);
@@ -117,14 +119,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Student not found" });
       }
       
-      res.status(204).send();
+      res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: "Error deleting student" });
     }
   });
 
-  // Programs API
-  apiRouter.get("/api/programs", async (req, res) => {
+  // ********************
+  // Program API endpoints
+  // ********************
+  apiRouter.get("/api/programs", async (_req, res) => {
     try {
       const programs = await storage.getPrograms();
       res.json(programs);
@@ -194,24 +198,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Program not found" });
       }
       
-      res.status(204).send();
+      res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: "Error deleting program" });
     }
   });
 
-  // Courses API
-  apiRouter.get("/api/courses", async (req, res) => {
+  // ********************
+  // Course API endpoints
+  // ********************
+  apiRouter.get("/api/courses", async (_req, res) => {
     try {
-      const programId = req.query.programId ? parseInt(req.query.programId as string) : undefined;
-      
-      let courses;
-      if (programId && !isNaN(programId)) {
-        courses = await storage.getCoursesByProgram(programId);
-      } else {
-        courses = await storage.getCourses();
-      }
-      
+      const courses = await storage.getCourses();
       res.json(courses);
     } catch (error) {
       res.status(500).json({ message: "Error fetching courses" });
@@ -233,6 +231,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(course);
     } catch (error) {
       res.status(500).json({ message: "Error fetching course" });
+    }
+  });
+
+  apiRouter.get("/api/programs/:programId/courses", async (req, res) => {
+    try {
+      const programId = parseInt(req.params.programId);
+      if (isNaN(programId)) {
+        return res.status(400).json({ message: "Invalid program ID format" });
+      }
+      
+      const courses = await storage.getCoursesByProgram(programId);
+      res.json(courses);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching courses by program" });
     }
   });
 
@@ -279,30 +291,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Course not found" });
       }
       
-      res.status(204).send();
+      res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: "Error deleting course" });
     }
   });
 
-  // Enrollments API
-  apiRouter.get("/api/enrollments", async (req, res) => {
+  // ********************
+  // Enrollment API endpoints
+  // ********************
+  apiRouter.get("/api/enrollments", async (_req, res) => {
     try {
-      const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : undefined;
-      const courseId = req.query.courseId ? parseInt(req.query.courseId as string) : undefined;
-      
-      let enrollments;
-      if (studentId && !isNaN(studentId)) {
-        enrollments = await storage.getEnrollmentsByStudent(studentId);
-      } else if (courseId && !isNaN(courseId)) {
-        enrollments = await storage.getEnrollmentsByCourse(courseId);
-      } else {
-        enrollments = await storage.getEnrollments();
-      }
-      
+      const enrollments = await storage.getEnrollments();
       res.json(enrollments);
     } catch (error) {
       res.status(500).json({ message: "Error fetching enrollments" });
+    }
+  });
+
+  apiRouter.get("/api/enrollments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const enrollment = await storage.getEnrollment(id);
+      if (!enrollment) {
+        return res.status(404).json({ message: "Enrollment not found" });
+      }
+      
+      res.json(enrollment);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching enrollment" });
+    }
+  });
+
+  apiRouter.get("/api/students/:studentId/enrollments", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      if (isNaN(studentId)) {
+        return res.status(400).json({ message: "Invalid student ID format" });
+      }
+      
+      const enrollments = await storage.getEnrollmentsByStudent(studentId);
+      res.json(enrollments);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching enrollments by student" });
+    }
+  });
+
+  apiRouter.get("/api/courses/:courseId/enrollments", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID format" });
+      }
+      
+      const enrollments = await storage.getEnrollmentsByCourse(courseId);
+      res.json(enrollments);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching enrollments by course" });
     }
   });
 
@@ -349,41 +398,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Enrollment not found" });
       }
       
-      res.status(204).send();
+      res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: "Error deleting enrollment" });
     }
   });
 
-  // Attendance API
-  apiRouter.get("/api/attendance", async (req, res) => {
+  // ********************
+  // Attendance API endpoints
+  // ********************
+  apiRouter.get("/api/attendance", async (_req, res) => {
     try {
-      const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : undefined;
-      const courseId = req.query.courseId ? parseInt(req.query.courseId as string) : undefined;
-      const date = req.query.date ? new Date(req.query.date as string) : undefined;
-      
-      let attendance;
-      if (studentId && !isNaN(studentId)) {
-        attendance = await storage.getAttendanceByStudent(studentId);
-      } else if (courseId && !isNaN(courseId)) {
-        attendance = await storage.getAttendanceByCourse(courseId);
-      } else if (date && !isNaN(date.getTime())) {
-        attendance = await storage.getAttendanceByDate(date);
-      } else {
-        attendance = await storage.getAttendanceRecords();
-      }
-      
-      res.json(attendance);
+      const attendanceRecords = await storage.getAttendanceRecords();
+      res.json(attendanceRecords);
     } catch (error) {
       res.status(500).json({ message: "Error fetching attendance records" });
+    }
+  });
+
+  apiRouter.get("/api/attendance/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const attendanceRecord = await storage.getAttendanceRecord(id);
+      if (!attendanceRecord) {
+        return res.status(404).json({ message: "Attendance record not found" });
+      }
+      
+      res.json(attendanceRecord);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching attendance record" });
+    }
+  });
+
+  apiRouter.get("/api/students/:studentId/attendance", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      if (isNaN(studentId)) {
+        return res.status(400).json({ message: "Invalid student ID format" });
+      }
+      
+      const attendanceRecords = await storage.getAttendanceByStudent(studentId);
+      res.json(attendanceRecords);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching attendance records by student" });
+    }
+  });
+
+  apiRouter.get("/api/courses/:courseId/attendance", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID format" });
+      }
+      
+      const attendanceRecords = await storage.getAttendanceByCourse(courseId);
+      res.json(attendanceRecords);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching attendance records by course" });
+    }
+  });
+
+  apiRouter.get("/api/attendance/date/:date", async (req, res) => {
+    try {
+      const date = new Date(req.params.date);
+      if (isNaN(date.getTime())) {
+        return res.status(400).json({ message: "Invalid date format" });
+      }
+      
+      const attendanceRecords = await storage.getAttendanceByDate(date);
+      res.json(attendanceRecords);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching attendance records by date" });
     }
   });
 
   apiRouter.post("/api/attendance", async (req, res) => {
     try {
       const validatedData = insertAttendanceSchema.parse(req.body);
-      const newAttendance = await storage.createAttendance(validatedData);
-      res.status(201).json(newAttendance);
+      const newAttendanceRecord = await storage.createAttendance(validatedData);
+      res.status(201).json(newAttendanceRecord);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
@@ -399,12 +496,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid ID format" });
       }
       
-      const updatedAttendance = await storage.updateAttendance(id, req.body);
-      if (!updatedAttendance) {
+      const updatedAttendanceRecord = await storage.updateAttendance(id, req.body);
+      if (!updatedAttendanceRecord) {
         return res.status(404).json({ message: "Attendance record not found" });
       }
       
-      res.json(updatedAttendance);
+      res.json(updatedAttendanceRecord);
     } catch (error) {
       res.status(500).json({ message: "Error updating attendance record" });
     }
@@ -422,30 +519,176 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Attendance record not found" });
       }
       
-      res.status(204).send();
+      res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: "Error deleting attendance record" });
     }
   });
 
-  // Grades API
-  apiRouter.get("/api/grades", async (req, res) => {
+  // ********************
+  // Assessment API endpoints
+  // ********************
+  apiRouter.get("/api/assessments", async (_req, res) => {
     try {
-      const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : undefined;
-      const courseId = req.query.courseId ? parseInt(req.query.courseId as string) : undefined;
-      
-      let grades;
-      if (studentId && !isNaN(studentId)) {
-        grades = await storage.getGradesByStudent(studentId);
-      } else if (courseId && !isNaN(courseId)) {
-        grades = await storage.getGradesByCourse(courseId);
-      } else {
-        grades = await storage.getGrades();
+      const assessments = await storage.getAssessments();
+      res.json(assessments);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching assessments" });
+    }
+  });
+
+  apiRouter.get("/api/assessments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
       }
       
+      const assessment = await storage.getAssessment(id);
+      if (!assessment) {
+        return res.status(404).json({ message: "Assessment not found" });
+      }
+      
+      res.json(assessment);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching assessment" });
+    }
+  });
+
+  apiRouter.get("/api/courses/:courseId/assessments", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID format" });
+      }
+      
+      const assessments = await storage.getAssessmentsByCourse(courseId);
+      res.json(assessments);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching assessments by course" });
+    }
+  });
+
+  apiRouter.post("/api/assessments", async (req, res) => {
+    try {
+      const validatedData = insertAssessmentSchema.parse(req.body);
+      const newAssessment = await storage.createAssessment(validatedData);
+      res.status(201).json(newAssessment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating assessment" });
+    }
+  });
+
+  apiRouter.put("/api/assessments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const updatedAssessment = await storage.updateAssessment(id, req.body);
+      if (!updatedAssessment) {
+        return res.status(404).json({ message: "Assessment not found" });
+      }
+      
+      res.json(updatedAssessment);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating assessment" });
+    }
+  });
+
+  apiRouter.delete("/api/assessments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteAssessment(id);
+      if (!success) {
+        return res.status(404).json({ message: "Assessment not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting assessment" });
+    }
+  });
+
+  // ********************
+  // Grade API endpoints
+  // ********************
+  apiRouter.get("/api/grades", async (_req, res) => {
+    try {
+      const grades = await storage.getGrades();
       res.json(grades);
     } catch (error) {
       res.status(500).json({ message: "Error fetching grades" });
+    }
+  });
+
+  apiRouter.get("/api/grades/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const grade = await storage.getGrade(id);
+      if (!grade) {
+        return res.status(404).json({ message: "Grade not found" });
+      }
+      
+      res.json(grade);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching grade" });
+    }
+  });
+
+  apiRouter.get("/api/students/:studentId/grades", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      if (isNaN(studentId)) {
+        return res.status(400).json({ message: "Invalid student ID format" });
+      }
+      
+      const grades = await storage.getGradesByStudent(studentId);
+      res.json(grades);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching grades by student" });
+    }
+  });
+
+  apiRouter.get("/api/courses/:courseId/grades", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID format" });
+      }
+      
+      const grades = await storage.getGradesByCourse(courseId);
+      res.json(grades);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching grades by course" });
+    }
+  });
+
+  apiRouter.get("/api/students/:studentId/courses/:courseId/grades", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      const courseId = parseInt(req.params.courseId);
+      
+      if (isNaN(studentId) || isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const grades = await storage.getGradesByStudentAndCourse(studentId, courseId);
+      res.json(grades);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching grades by student and course" });
     }
   });
 
@@ -459,6 +702,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       res.status(500).json({ message: "Error creating grade" });
+    }
+  });
+
+  apiRouter.post("/api/grades/batch", async (req, res) => {
+    try {
+      // Validate each grade in the batch
+      const grades = req.body.grades;
+      if (!Array.isArray(grades)) {
+        return res.status(400).json({ message: "Grades must be an array" });
+      }
+      
+      const validatedGrades = grades.map(grade => insertGradeSchema.parse(grade));
+      const newGrades = await storage.batchCreateGrades(validatedGrades);
+      
+      res.status(201).json(newGrades);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating grades" });
     }
   });
 
@@ -492,25 +755,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Grade not found" });
       }
       
-      res.status(204).send();
+      res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: "Error deleting grade" });
     }
   });
 
-  // Events API
-  apiRouter.get("/api/events", async (req, res) => {
+  // ********************
+  // Event API endpoints
+  // ********************
+  apiRouter.get("/api/events", async (_req, res) => {
     try {
-      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
-      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
-      
-      let events;
-      if (startDate && endDate && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
-        events = await storage.getEventsByDateRange(startDate, endDate);
-      } else {
-        events = await storage.getEvents();
-      }
-      
+      const events = await storage.getEvents();
       res.json(events);
     } catch (error) {
       res.status(500).json({ message: "Error fetching events" });
@@ -532,6 +788,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(event);
     } catch (error) {
       res.status(500).json({ message: "Error fetching event" });
+    }
+  });
+
+  apiRouter.get("/api/events/range", async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "Start date and end date are required" });
+      }
+      
+      const start = new Date(startDate as string);
+      const end = new Date(endDate as string);
+      
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return res.status(400).json({ message: "Invalid date format" });
+      }
+      
+      const events = await storage.getEventsByDateRange(start, end);
+      res.json(events);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching events by date range" });
     }
   });
 
@@ -578,588 +856,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Event not found" });
       }
       
-      res.status(204).send();
+      res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: "Error deleting event" });
     }
   });
 
-  // Authentication API
-  apiRouter.post("/api/auth/login", async (req, res) => {
-    try {
-      const { username, password } = req.body;
-      
-      if (!username || !password) {
-        return res.status(400).json({ message: "Username and password are required" });
-      }
-      
-      const user = await storage.getUserByUsername(username);
-      
-      if (!user || user.password !== password) { // In real app, use bcrypt for password comparison
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-      
-      if (!user.isActive) {
-        return res.status(403).json({ message: "Account is inactive" });
-      }
-      
-      // Return user info without password
-      const { password: _, ...userWithoutPassword } = user;
-      res.json({ 
-        message: "Login successful",
-        user: userWithoutPassword
-      });
-      
-    } catch (error) {
-      res.status(500).json({ message: "Error during authentication" });
-    }
-  });
-
-  // Users API (admin only in real app)
-  apiRouter.get("/api/users", async (req, res) => {
-    try {
-      const users = await storage.getUsers();
-      // Remove password from response
-      const usersWithoutPasswords = users.map(user => {
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-      });
-      res.json(usersWithoutPasswords);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching users" });
-    }
-  });
-
-  apiRouter.post("/api/users", async (req, res) => {
-    try {
-      const validatedData = insertUserSchema.parse(req.body);
-      const newUser = await storage.createUser(validatedData);
-      
-      // Remove password from response
-      const { password, ...userWithoutPassword } = newUser;
-      res.status(201).json(userWithoutPassword);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
-      }
-      res.status(500).json({ message: "Error creating user" });
-    }
-  });
-
-  // Admissions API
-  apiRouter.get("/api/admissions/applicants", async (req, res) => {
-    try {
-      // Get query parameters for filtering
-      const { searchTerm, program, status, academicYear, page } = req.query;
-      
-      // Mock implementation using students as applicants
-      const students = await storage.getStudents();
-      
-      // Apply filters if provided
-      let filteredApplicants = students.map(student => ({
-        id: student.id,
-        name: `${student.firstName} ${student.lastName}`,
-        email: student.email,
-        programId: student.programId,
-        status: ['pending', 'approved', 'rejected', 'waitlisted'][Math.floor(Math.random() * 4)],
-        academicYear: '2023-2024',
-        applicationDate: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString().split('T')[0],
-        lastUpdate: new Date(Date.now() - Math.floor(Math.random() * 1000000000)).toISOString().split('T')[0],
-      }));
-      
-      if (searchTerm) {
-        const term = String(searchTerm).toLowerCase();
-        filteredApplicants = filteredApplicants.filter(
-          app => app.name.toLowerCase().includes(term) || app.email.toLowerCase().includes(term)
-        );
-      }
-      
-      if (program && program !== 'all') {
-        filteredApplicants = filteredApplicants.filter(app => String(app.programId) === program);
-      }
-      
-      if (status && status !== 'all') {
-        filteredApplicants = filteredApplicants.filter(app => app.status === status);
-      }
-      
-      if (academicYear && academicYear !== 'all') {
-        filteredApplicants = filteredApplicants.filter(app => app.academicYear === academicYear);
-      }
-      
-      // Pagination
-      const pageSize = 10;
-      const currentPage = page ? parseInt(String(page)) : 1;
-      const startIndex = (currentPage - 1) * pageSize;
-      const paginatedApplicants = filteredApplicants.slice(startIndex, startIndex + pageSize);
-      
-      res.json({
-        applicants: paginatedApplicants,
-        totalCount: filteredApplicants.length,
-        totalPages: Math.ceil(filteredApplicants.length / pageSize),
-        currentPage
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching applicants" });
-    }
-  });
-
-  apiRouter.get("/api/admissions/stats", async (req, res) => {
-    try {
-      // Mock admission stats
-      res.json({
-        totalApplications: 182,
-        newApplications: 24,
-        approved: 76,
-        rejected: 15,
-        pending: 68,
-        waitlisted: 23,
-        conversionRate: 78.5,
-        applicationsByProgram: [
-          { program: "Informatica", count: 56 },
-          { program: "Wiskunde", count: 32 },
-          { program: "Economie", count: 48 },
-          { program: "Psychologie", count: 46 }
-        ],
-        applicationTrend: [
-          { month: "Jan", count: 12 },
-          { month: "Feb", count: 18 },
-          { month: "Mar", count: 22 },
-          { month: "Apr", count: 15 },
-          { month: "Mei", count: 28 },
-          { month: "Jun", count: 35 },
-          { month: "Jul", count: 42 },
-          { month: "Aug", count: 10 }
-        ]
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching admission stats" });
-    }
-  });
-
-  // Academic Years API
-  apiRouter.get("/api/academic-years", async (req, res) => {
-    try {
-      // Mock academic years data
-      res.json([
-        { id: 1, name: "2021-2022" },
-        { id: 2, name: "2022-2023" },
-        { id: 3, name: "2023-2024" },
-        { id: 4, name: "2024-2025" }
-      ]);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching academic years" });
-    }
-  });
-
-  // Dashboard API
-  apiRouter.get("/api/dashboard/stats", async (req, res) => {
-    try {
-      const students = await storage.getStudents();
-      const courses = await storage.getCourses();
-      const programs = await storage.getPrograms();
-      const attendance = await storage.getAttendanceRecords();
-      
-      const totalAttendance = attendance.length;
-      const presentAttendance = attendance.filter(a => a.status === 'present').length;
-      const attendanceRate = totalAttendance > 0 ? (presentAttendance / totalAttendance) * 100 : 0;
-      
-      res.json({
-        totalStudents: students.length,
-        activeCourses: courses.length,
-        programs: programs.length,
-        attendanceRate: Math.round(attendanceRate)
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching dashboard stats" });
-    }
-  });
-
-  apiRouter.get("/api/dashboard/enrollment", async (req, res) => {
-    try {
-      // Mock enrollment trend data
-      res.json({
-        enrollmentTrend: [
-          { month: "Jan", count: 85 },
-          { month: "Feb", count: 90 },
-          { month: "Mar", count: 92 },
-          { month: "Apr", count: 95 },
-          { month: "Mei", count: 100 },
-          { month: "Jun", count: 110 },
-          { month: "Jul", count: 115 },
-          { month: "Aug", count: 120 }
-        ]
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching enrollment data" });
-    }
-  });
-
-  apiRouter.get("/api/dashboard/events", async (req, res) => {
-    try {
-      const events = await storage.getEvents();
-      
-      // Get upcoming events (next 7 days)
-      const now = new Date();
-      const nextWeek = new Date(now);
-      nextWeek.setDate(now.getDate() + 7);
-      
-      const upcomingEvents = events.filter(event => {
-        const eventDate = new Date(event.startDate);
-        return eventDate >= now && eventDate <= nextWeek;
-      }).slice(0, 5);
-      
-      res.json(upcomingEvents);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching events" });
-    }
-  });
-
-  apiRouter.get("/api/dashboard/recent-students", async (req, res) => {
-    try {
-      const students = await storage.getStudents();
-      
-      // Sort by ID (assuming higher ID = more recent) and take 5
-      const recentStudents = [...students]
-        .sort((a, b) => b.id - a.id)
-        .slice(0, 5);
-      
-      res.json(recentStudents);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching recent students" });
-    }
-  });
-
-  // Fees API for stats
-  apiRouter.get("/api/fees/stats", async (req, res) => {
-    try {
-      // Mock fees statistics
-      res.json({
-        totalCollected: 256780.50,
-        pendingAmount: 45320.75,
-        overdueAmount: 12340.25,
-        collectionRate: 85.2,
-        paymentsByMonth: [
-          { month: "Jan", amount: 32450.75 },
-          { month: "Feb", amount: 28750.50 },
-          { month: "Mar", amount: 36540.25 },
-          { month: "Apr", amount: 30120.00 },
-          { month: "Mei", amount: 38750.25 },
-          { month: "Jun", amount: 42150.75 },
-          { month: "Jul", amount: 35230.50 },
-          { month: "Aug", amount: 12750.50 }
-        ]
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching fees stats" });
-    }
-  });
-
-  apiRouter.get("/api/fees", async (req, res) => {
-    try {
-      const students = await storage.getStudents();
-      
-      // Create mock fee records for each student
-      const feeRecords = students.map(student => {
-        const semesterFee = 1250 + Math.floor(Math.random() * 750);
-        const materialsFee = 180 + Math.floor(Math.random() * 120);
-        const totalAmount = semesterFee + materialsFee;
-        const paidAmount = Math.random() > 0.3 ? totalAmount : Math.floor(Math.random() * totalAmount);
-        
-        return {
-          id: student.id,
-          studentId: student.id,
-          studentName: `${student.firstName} ${student.lastName}`,
-          invoiceNumber: `INV-${new Date().getFullYear()}-${student.id.toString().padStart(4, '0')}`,
-          feeType: 'Collegegeld',
-          totalAmount: totalAmount,
-          paidAmount: paidAmount,
-          dueDate: new Date(Date.now() + Math.floor(Math.random() * 5000000000)).toISOString().split('T')[0],
-          status: paidAmount >= totalAmount ? 'Betaald' : (Math.random() > 0.5 ? 'In afwachting' : 'Te laat'),
-          lastPaymentDate: paidAmount > 0 ? new Date(Date.now() - Math.floor(Math.random() * 1000000000)).toISOString().split('T')[0] : null
-        };
-      });
-      
-      res.json(feeRecords);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching fee records" });
-    }
-  });
-
-  // Calendar API
-  apiRouter.get("/api/calendar/events", async (req, res) => {
-    try {
-      const { year, month, view, filter } = req.query;
-      
-      // Get events from storage
-      const allEvents = await storage.getEvents();
-      
-      // Filter by date range based on view
-      const startDate = new Date(Number(year), Number(month) - 1, 1);
-      let endDate;
-      
-      if (view === 'month') {
-        endDate = new Date(Number(year), Number(month), 0); // Last day of the month
-      } else if (view === 'week') {
-        const tempDate = new Date(startDate);
-        tempDate.setDate(tempDate.getDate() + 7);
-        endDate = tempDate;
-      } else { // day view
-        endDate = new Date(startDate);
-        endDate.setHours(23, 59, 59);
-      }
-      
-      // Filter events in the date range
-      const filteredEvents = allEvents.filter(event => {
-        const eventStartDate = new Date(event.startDate);
-        return eventStartDate >= startDate && eventStartDate <= endDate;
-      });
-      
-      // Format events for calendar display
-      const formattedEvents = filteredEvents.map(event => {
-        const eventDate = new Date(event.startDate);
-        const endDate = new Date(event.endDate);
-        
-        return {
-          id: String(event.id),
-          title: event.title,
-          date: new Date(event.startDate).toISOString().split('T')[0],
-          startTime: new Date(event.startDate).toLocaleTimeString('nl-NL', {hour: '2-digit', minute: '2-digit'}),
-          endTime: new Date(event.endDate).toLocaleTimeString('nl-NL', {hour: '2-digit', minute: '2-digit'}),
-          location: event.location || '',
-          type: 'event',
-          description: event.description
-        };
-      });
-      
-      res.json({ events: formattedEvents });
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching calendar events" });
-    }
-  });
-
-  // Courses API with list endpoint
-  apiRouter.get("/api/courses/list", async (req, res) => {
-    try {
-      const courses = await storage.getCourses();
-      res.json({ courses });
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching courses list" });
-    }
-  });
-
-  // Assessments API
-  apiRouter.get("/api/assessments", async (req, res) => {
-    try {
-      const { courseId } = req.query;
-      
-      if (!courseId) {
-        return res.status(400).json({ message: "Course ID is required" });
-      }
-      
-      // Mock assessments for the course
-      const assessments = [
-        { id: 1, name: "Tentamen", type: "examen", date: "2023-12-15", maxScore: 100, weight: 60 },
-        { id: 2, name: "Opdracht", type: "opdracht", date: "2023-11-20", maxScore: 50, weight: 20 },
-        { id: 3, name: "Presentatie", type: "presentatie", date: "2023-10-30", maxScore: 25, weight: 10 },
-        { id: 4, name: "Deelname", type: "participatie", date: "2023-12-01", maxScore: 10, weight: 10 }
-      ];
-      
-      res.json({ assessments });
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching assessments" });
-    }
-  });
-
-  // Grades API
-  apiRouter.get("/api/grades", async (req, res) => {
-    try {
-      const { courseId, assessmentId } = req.query;
-      
-      if (!courseId || !assessmentId) {
-        return res.status(400).json({ message: "Course ID and Assessment ID are required" });
-      }
-      
-      // Get students for this course using enrollments
-      const enrollments = await storage.getEnrollmentsByCourse(Number(courseId));
-      const studentIds = enrollments.map(e => e.studentId);
-      
-      // Get all students
-      const allStudents = await storage.getStudents();
-      
-      // Filter students by enrolled students
-      const enrolledStudents = allStudents.filter(s => studentIds.includes(s.id));
-      
-      // Format student data for response
-      const students = enrolledStudents.map(student => ({
-        id: student.id,
-        name: `${student.firstName} ${student.lastName}`,
-        studentId: student.studentId,
-        email: student.email
-      }));
-      
-      // Get grades for these students for this assessment
-      const allGrades = await storage.getGrades();
-      
-      // Filter grades by course and assessment
-      const filteredGrades = allGrades.filter(
-        g => g.courseId === Number(courseId) && g.assessmentType === `assessment-${assessmentId}`
-      );
-      
-      // Format grades as a lookup object by student ID
-      const grades: Record<number, {score: number, feedback: string}> = {};
-      filteredGrades.forEach(grade => {
-        grades[grade.studentId] = {
-          score: grade.score,
-          feedback: grade.remark || ""
-        };
-      });
-      
-      res.json({ students, grades });
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching grades" });
-    }
-  });
-
-  // Save grades
-  apiRouter.post("/api/grades/save", async (req, res) => {
-    try {
-      const { courseId, assessmentId, grades } = req.body;
-      
-      if (!courseId || !assessmentId || !grades) {
-        return res.status(400).json({ message: "Missing required data" });
-      }
-      
-      // Process each grade update
-      const results = await Promise.all(
-        Object.entries(grades).map(async ([studentId, gradeData]) => {
-          const { score, feedback } = gradeData as { score: number, feedback: string };
-          
-          // Check if grade already exists
-          const allGrades = await storage.getGrades();
-          const existingGrade = allGrades.find(
-            g => g.studentId === Number(studentId) && 
-                 g.courseId === Number(courseId) && 
-                 g.assessmentType === `assessment-${assessmentId}`
-          );
-          
-          if (existingGrade) {
-            // Update existing grade
-            const updatedGrade = await storage.updateGrade(existingGrade.id, {
-              score,
-              remark: feedback
-            });
-            return updatedGrade;
-          } else {
-            // Create new grade
-            const newGrade = await storage.createGrade({
-              studentId: Number(studentId),
-              courseId: Number(courseId),
-              assessmentType: `assessment-${assessmentId}`,
-              assessmentName: `Beoordeling ${assessmentId}`,
-              score,
-              maxScore: 100,
-              weight: 50, // Default weight
-              date: new Date().toISOString(),
-              remark: feedback,
-              outOf: 100
-            });
-            return newGrade;
-          }
-        })
-      );
-      
-      res.json({ success: true, message: "Cijfers succesvol opgeslagen", updatedCount: results.length });
-    } catch (error) {
-      res.status(500).json({ message: "Error saving grades" });
-    }
-  });
-
-  // Fees API
-  // Fees statistics API moet vóór de route met parameter staan
-  apiRouter.get("/fees/stats", async (req, res) => {
+  // ********************
+  // Fee API endpoints
+  // ********************
+  apiRouter.get("/api/fees", async (_req, res) => {
     try {
       const fees = await storage.getFees();
-      
-      const totalCollected = fees
-        .filter(fee => fee.status === 'betaald')
-        .reduce((sum, fee) => sum + Number(fee.amount), 0);
-        
-      const pendingAmount = fees
-        .filter(fee => fee.status === 'in behandeling' || fee.status === 'te laat' || fee.status === 'gedeeltelijk')
-        .reduce((sum, fee) => sum + Number(fee.amount), 0);
-        
-      const totalStudents = new Set(fees.map(fee => fee.studentId)).size;
-      
-      const paidCount = fees.filter(fee => fee.status === 'betaald').length;
-      const totalCount = fees.length;
-      const completionRate = totalCount > 0 ? Math.round((paidCount / totalCount) * 100) : 0;
-      
-      res.json({
-        stats: {
-          totalCollected,
-          pendingAmount,
-          totalStudents,
-          completionRate
-        }
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Error bij ophalen betaling statistieken" });
-    }
-  });
-  
-  // Het is belangrijk dat we eerst de specifieke routes definieren, en dan pas de routes met parameters
-  apiRouter.get("/api/fees/stats", async (req, res) => {
-    try {
-      const fees = await storage.getFees();
-      
-      const totalCollected = fees
-        .filter(fee => fee.status === 'betaald')
-        .reduce((sum, fee) => sum + Number(fee.amount), 0);
-        
-      const pendingAmount = fees
-        .filter(fee => fee.status === 'in behandeling' || fee.status === 'te laat' || fee.status === 'gedeeltelijk')
-        .reduce((sum, fee) => sum + Number(fee.amount), 0);
-        
-      const totalStudents = new Set(fees.map(fee => fee.studentId)).size;
-      
-      const paidCount = fees.filter(fee => fee.status === 'betaald').length;
-      const totalCount = fees.length;
-      const completionRate = totalCount > 0 ? Math.round((paidCount / totalCount) * 100) : 0;
-      
-      res.json({
-        stats: {
-          totalCollected,
-          pendingAmount,
-          totalStudents,
-          completionRate
-        }
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Error bij ophalen betaling statistieken" });
-    }
-  });
-  
-  apiRouter.get("/api/fees", async (req, res) => {
-    try {
-      const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : undefined;
-      const status = req.query.status as string | undefined;
-      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
-      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
-      
-      let fees;
-      if (studentId && !isNaN(studentId)) {
-        fees = await storage.getFeesByStudent(studentId);
-      } else if (status) {
-        fees = await storage.getFeesByStatus(status);
-      } else if (startDate && endDate && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
-        fees = await storage.getFeesByDateRange(startDate, endDate);
-      } else {
-        fees = await storage.getFees();
-      }
-      
       res.json(fees);
     } catch (error) {
-      res.status(500).json({ message: "Error bij ophalen betalingen" });
+      res.status(500).json({ message: "Error fetching fees" });
     }
   });
 
@@ -1167,17 +878,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
-        return res.status(400).json({ message: "Ongeldig ID formaat" });
+        return res.status(400).json({ message: "Invalid ID format" });
       }
       
       const fee = await storage.getFee(id);
       if (!fee) {
-        return res.status(404).json({ message: "Betaling niet gevonden" });
+        return res.status(404).json({ message: "Fee not found" });
       }
       
       res.json(fee);
     } catch (error) {
-      res.status(500).json({ message: "Error bij ophalen betaling" });
+      res.status(500).json({ message: "Error fetching fee" });
+    }
+  });
+
+  apiRouter.get("/api/students/:studentId/fees", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      if (isNaN(studentId)) {
+        return res.status(400).json({ message: "Invalid student ID format" });
+      }
+      
+      const fees = await storage.getFeesByStudent(studentId);
+      res.json(fees);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching fees by student" });
+    }
+  });
+
+  apiRouter.get("/api/fees/status/:status", async (req, res) => {
+    try {
+      const status = req.params.status;
+      const fees = await storage.getFeesByStatus(status);
+      res.json(fees);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching fees by status" });
+    }
+  });
+
+  apiRouter.get("/api/fees/range", async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "Start date and end date are required" });
+      }
+      
+      const start = new Date(startDate as string);
+      const end = new Date(endDate as string);
+      
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return res.status(400).json({ message: "Invalid date format" });
+      }
+      
+      const fees = await storage.getFeesByDateRange(start, end);
+      res.json(fees);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching fees by date range" });
     }
   });
 
@@ -1188,9 +945,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(newFee);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validatie error", errors: error.errors });
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
-      res.status(500).json({ message: "Error bij aanmaken betaling" });
+      res.status(500).json({ message: "Error creating fee" });
     }
   });
 
@@ -1198,17 +955,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
-        return res.status(400).json({ message: "Ongeldig ID formaat" });
+        return res.status(400).json({ message: "Invalid ID format" });
       }
       
       const updatedFee = await storage.updateFee(id, req.body);
       if (!updatedFee) {
-        return res.status(404).json({ message: "Betaling niet gevonden" });
+        return res.status(404).json({ message: "Fee not found" });
       }
       
       res.json(updatedFee);
     } catch (error) {
-      res.status(500).json({ message: "Error bij bijwerken betaling" });
+      res.status(500).json({ message: "Error updating fee" });
     }
   });
 
@@ -1216,371 +973,836 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
-        return res.status(400).json({ message: "Ongeldig ID formaat" });
+        return res.status(400).json({ message: "Invalid ID format" });
       }
       
       const success = await storage.deleteFee(id);
       if (!success) {
-        return res.status(404).json({ message: "Betaling niet gevonden" });
+        return res.status(404).json({ message: "Fee not found" });
       }
       
-      res.status(204).send();
+      res.status(204).end();
     } catch (error) {
-      res.status(500).json({ message: "Error bij verwijderen betaling" });
+      res.status(500).json({ message: "Error deleting fee" });
     }
   });
 
-  // Assessments API
-  apiRouter.get("/api/assessments", async (req, res) => {
+  // ********************
+  // Student Group API endpoints
+  // ********************
+  apiRouter.get("/api/student-groups", async (_req, res) => {
     try {
-      const courseId = req.query.courseId ? parseInt(req.query.courseId as string) : undefined;
-      
-      if (courseId) {
-        const assessments = await storage.getAssessmentsByCourse(courseId);
-        res.json(assessments);
-      } else {
-        const assessments = await storage.getAssessments();
-        res.json(assessments);
-      }
+      const groups = await storage.getStudentGroups();
+      res.json(groups);
     } catch (error) {
-      res.status(500).json({ message: "Fout bij ophalen van beoordelingen" });
-    }
-  });
-  
-  apiRouter.get("/api/assessments/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const assessment = await storage.getAssessment(id);
-      
-      if (!assessment) {
-        return res.status(404).json({ message: "Beoordeling niet gevonden" });
-      }
-      
-      res.json(assessment);
-    } catch (error) {
-      res.status(500).json({ message: "Fout bij ophalen van beoordeling" });
-    }
-  });
-  
-  apiRouter.post("/api/assessments", async (req, res) => {
-    try {
-      const parseResult = insertAssessmentSchema.safeParse(req.body);
-      
-      if (!parseResult.success) {
-        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
-      }
-      
-      const assessment = await storage.createAssessment(parseResult.data);
-      res.status(201).json(assessment);
-    } catch (error) {
-      res.status(500).json({ message: "Fout bij aanmaken van beoordeling" });
-    }
-  });
-  
-  apiRouter.put("/api/assessments/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const parseResult = insertAssessmentSchema.partial().safeParse(req.body);
-      
-      if (!parseResult.success) {
-        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
-      }
-      
-      const assessment = await storage.updateAssessment(id, parseResult.data);
-      
-      if (!assessment) {
-        return res.status(404).json({ message: "Beoordeling niet gevonden" });
-      }
-      
-      res.json(assessment);
-    } catch (error) {
-      res.status(500).json({ message: "Fout bij bijwerken van beoordeling" });
-    }
-  });
-  
-  apiRouter.delete("/api/assessments/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const success = await storage.deleteAssessment(id);
-      
-      if (!success) {
-        return res.status(404).json({ message: "Beoordeling niet gevonden" });
-      }
-      
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Fout bij verwijderen van beoordeling" });
-    }
-  });
-  
-  // Grades API
-  apiRouter.get("/api/grades", async (req, res) => {
-    try {
-      const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : undefined;
-      const courseId = req.query.courseId ? parseInt(req.query.courseId as string) : undefined;
-      const assessmentId = req.query.assessmentId ? parseInt(req.query.assessmentId as string) : undefined;
-      
-      if (studentId && courseId) {
-        const grades = await storage.getGradesByStudentAndCourse(studentId, courseId);
-        res.json(grades);
-      } else if (studentId) {
-        const grades = await storage.getGradesByStudent(studentId);
-        res.json(grades);
-      } else if (courseId) {
-        const grades = await storage.getGradesByCourse(courseId);
-        res.json(grades);
-      } else if (assessmentId) {
-        const grades = await storage.getGradesByAssessment(assessmentId);
-        res.json(grades);
-      } else {
-        const grades = await storage.getGrades();
-        res.json(grades);
-      }
-    } catch (error) {
-      res.status(500).json({ message: "Fout bij ophalen van cijfers" });
-    }
-  });
-  
-  apiRouter.get("/api/grades/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const grade = await storage.getGrade(id);
-      
-      if (!grade) {
-        return res.status(404).json({ message: "Cijfer niet gevonden" });
-      }
-      
-      res.json(grade);
-    } catch (error) {
-      res.status(500).json({ message: "Fout bij ophalen van cijfer" });
-    }
-  });
-  
-  apiRouter.post("/api/grades", async (req, res) => {
-    try {
-      const parseResult = insertGradeSchema.safeParse(req.body);
-      
-      if (!parseResult.success) {
-        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
-      }
-      
-      const grade = await storage.createGrade(parseResult.data);
-      res.status(201).json(grade);
-    } catch (error) {
-      res.status(500).json({ message: "Fout bij aanmaken van cijfer" });
-    }
-  });
-  
-  apiRouter.post("/api/grades/batch", async (req, res) => {
-    try {
-      const schema = z.array(insertGradeSchema);
-      const parseResult = schema.safeParse(req.body);
-      
-      if (!parseResult.success) {
-        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
-      }
-      
-      const grades = await storage.batchCreateGrades(parseResult.data);
-      res.status(201).json(grades);
-    } catch (error) {
-      res.status(500).json({ message: "Fout bij aanmaken van cijfers in batch" });
-    }
-  });
-  
-  apiRouter.put("/api/grades/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const parseResult = insertGradeSchema.partial().safeParse(req.body);
-      
-      if (!parseResult.success) {
-        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
-      }
-      
-      const grade = await storage.updateGrade(id, parseResult.data);
-      
-      if (!grade) {
-        return res.status(404).json({ message: "Cijfer niet gevonden" });
-      }
-      
-      res.json(grade);
-    } catch (error) {
-      res.status(500).json({ message: "Fout bij bijwerken van cijfer" });
-    }
-  });
-  
-  apiRouter.delete("/api/grades/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const success = await storage.deleteGrade(id);
-      
-      if (!success) {
-        return res.status(404).json({ message: "Cijfer niet gevonden" });
-      }
-      
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Fout bij verwijderen van cijfer" });
+      res.status(500).json({ message: "Error fetching student groups" });
     }
   });
 
-  // Student Groups API
-  apiRouter.get("/api/student-groups", async (req, res) => {
-    try {
-      const academicYear = req.query.academicYear as string;
-      const programId = req.query.programId ? parseInt(req.query.programId as string) : undefined;
-      const search = req.query.searchTerm as string;
-      const page = req.query.page ? parseInt(req.query.page as string) : 1;
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
-      
-      if (academicYear && academicYear !== 'all') {
-        const groups = await storage.getStudentGroupsByAcademicYear(academicYear);
-        res.json({ 
-          studentGroups: groups,
-          totalCount: groups.length,
-          page,
-          totalPages: Math.ceil(groups.length / limit)
-        });
-      } else if (programId) {
-        const groups = await storage.getStudentGroupsByProgram(programId);
-        res.json({ 
-          studentGroups: groups,
-          totalCount: groups.length,
-          page,
-          totalPages: Math.ceil(groups.length / limit)
-        });
-      } else {
-        const groups = await storage.getStudentGroups();
-        res.json({ 
-          studentGroups: groups,
-          totalCount: groups.length,
-          page,
-          totalPages: Math.ceil(groups.length / limit)
-        });
-      }
-    } catch (error) {
-      res.status(500).json({ message: "Fout bij ophalen van studentengroepen" });
-    }
-  });
-  
   apiRouter.get("/api/student-groups/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const group = await storage.getStudentGroup(id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
       
+      const group = await storage.getStudentGroup(id);
       if (!group) {
-        return res.status(404).json({ message: "Studentengroep niet gevonden" });
+        return res.status(404).json({ message: "Student group not found" });
       }
       
       res.json(group);
     } catch (error) {
-      res.status(500).json({ message: "Fout bij ophalen van studentengroep" });
+      res.status(500).json({ message: "Error fetching student group" });
     }
   });
-  
-  apiRouter.post("/api/student-groups", async (req, res) => {
+
+  apiRouter.get("/api/programs/:programId/student-groups", async (req, res) => {
     try {
-      const parseResult = insertStudentGroupSchema.safeParse(req.body);
-      
-      if (!parseResult.success) {
-        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
+      const programId = parseInt(req.params.programId);
+      if (isNaN(programId)) {
+        return res.status(400).json({ message: "Invalid program ID format" });
       }
       
-      const group = await storage.createStudentGroup(parseResult.data);
-      res.status(201).json(group);
+      const groups = await storage.getStudentGroupsByProgram(programId);
+      res.json(groups);
     } catch (error) {
-      res.status(500).json({ message: "Fout bij aanmaken van studentengroep" });
+      res.status(500).json({ message: "Error fetching student groups by program" });
     }
   });
-  
+
+  apiRouter.get("/api/courses/:courseId/student-groups", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID format" });
+      }
+      
+      const groups = await storage.getStudentGroupsByCourse(courseId);
+      res.json(groups);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student groups by course" });
+    }
+  });
+
+  apiRouter.get("/api/student-groups/year/:academicYear", async (req, res) => {
+    try {
+      const academicYear = req.params.academicYear;
+      const groups = await storage.getStudentGroupsByAcademicYear(academicYear);
+      res.json(groups);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student groups by academic year" });
+    }
+  });
+
+  apiRouter.post("/api/student-groups", async (req, res) => {
+    try {
+      const validatedData = insertStudentGroupSchema.parse(req.body);
+      const newGroup = await storage.createStudentGroup(validatedData);
+      res.status(201).json(newGroup);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating student group" });
+    }
+  });
+
   apiRouter.put("/api/student-groups/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const parseResult = insertStudentGroupSchema.partial().safeParse(req.body);
-      
-      if (!parseResult.success) {
-        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
       }
       
-      const group = await storage.updateStudentGroup(id, parseResult.data);
-      
-      if (!group) {
-        return res.status(404).json({ message: "Studentengroep niet gevonden" });
+      const updatedGroup = await storage.updateStudentGroup(id, req.body);
+      if (!updatedGroup) {
+        return res.status(404).json({ message: "Student group not found" });
       }
       
-      res.json(group);
+      res.json(updatedGroup);
     } catch (error) {
-      res.status(500).json({ message: "Fout bij bijwerken van studentengroep" });
+      res.status(500).json({ message: "Error updating student group" });
     }
   });
-  
+
   apiRouter.delete("/api/student-groups/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
       const success = await storage.deleteStudentGroup(id);
-      
       if (!success) {
-        return res.status(404).json({ message: "Studentengroep niet gevonden" });
+        return res.status(404).json({ message: "Student group not found" });
       }
       
-      res.status(204).send();
+      res.status(204).end();
     } catch (error) {
-      res.status(500).json({ message: "Fout bij verwijderen van studentengroep" });
+      res.status(500).json({ message: "Error deleting student group" });
     }
   });
-  
-  // Student Group Enrollments API
-  apiRouter.get("/api/student-group-enrollments", async (req, res) => {
+
+  // ********************
+  // Student Group Enrollment API endpoints
+  // ********************
+  apiRouter.get("/api/student-group-enrollments", async (_req, res) => {
     try {
-      const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : undefined;
-      const groupId = req.query.groupId ? parseInt(req.query.groupId as string) : undefined;
-      
-      if (studentId) {
-        const enrollments = await storage.getStudentGroupEnrollmentsByStudent(studentId);
-        res.json(enrollments);
-      } else if (groupId) {
-        const enrollments = await storage.getStudentGroupEnrollmentsByGroup(groupId);
-        res.json(enrollments);
-      } else {
-        const enrollments = await storage.getStudentGroupEnrollments();
-        res.json(enrollments);
-      }
+      const enrollments = await storage.getStudentGroupEnrollments();
+      res.json(enrollments);
     } catch (error) {
-      res.status(500).json({ message: "Fout bij ophalen van groepsinschrijvingen" });
+      res.status(500).json({ message: "Error fetching student group enrollments" });
     }
   });
-  
+
+  apiRouter.get("/api/student-group-enrollments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const enrollment = await storage.getStudentGroupEnrollment(id);
+      if (!enrollment) {
+        return res.status(404).json({ message: "Student group enrollment not found" });
+      }
+      
+      res.json(enrollment);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student group enrollment" });
+    }
+  });
+
+  apiRouter.get("/api/student-groups/:groupId/enrollments", async (req, res) => {
+    try {
+      const groupId = parseInt(req.params.groupId);
+      if (isNaN(groupId)) {
+        return res.status(400).json({ message: "Invalid group ID format" });
+      }
+      
+      const enrollments = await storage.getStudentGroupEnrollmentsByGroup(groupId);
+      res.json(enrollments);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student group enrollments by group" });
+    }
+  });
+
+  apiRouter.get("/api/students/:studentId/group-enrollments", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      if (isNaN(studentId)) {
+        return res.status(400).json({ message: "Invalid student ID format" });
+      }
+      
+      const enrollments = await storage.getStudentGroupEnrollmentsByStudent(studentId);
+      res.json(enrollments);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student group enrollments by student" });
+    }
+  });
+
   apiRouter.post("/api/student-group-enrollments", async (req, res) => {
     try {
-      const parseResult = insertStudentGroupEnrollmentSchema.safeParse(req.body);
-      
-      if (!parseResult.success) {
-        return res.status(400).json({ message: "Ongeldige gegevens", errors: parseResult.error.format() });
-      }
-      
-      const enrollment = await storage.createStudentGroupEnrollment(parseResult.data);
-      res.status(201).json(enrollment);
+      const validatedData = insertStudentGroupEnrollmentSchema.parse(req.body);
+      const newEnrollment = await storage.createStudentGroupEnrollment(validatedData);
+      res.status(201).json(newEnrollment);
     } catch (error) {
-      res.status(500).json({ message: "Fout bij aanmaken van groepsinschrijving" });
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating student group enrollment" });
     }
   });
-  
+
+  apiRouter.put("/api/student-group-enrollments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const updatedEnrollment = await storage.updateStudentGroupEnrollment(id, req.body);
+      if (!updatedEnrollment) {
+        return res.status(404).json({ message: "Student group enrollment not found" });
+      }
+      
+      res.json(updatedEnrollment);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating student group enrollment" });
+    }
+  });
+
   apiRouter.delete("/api/student-group-enrollments/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deleteStudentGroupEnrollment(id);
-      
-      if (!success) {
-        return res.status(404).json({ message: "Groepsinschrijving niet gevonden" });
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
       }
       
-      res.status(204).send();
+      const success = await storage.deleteStudentGroupEnrollment(id);
+      if (!success) {
+        return res.status(404).json({ message: "Student group enrollment not found" });
+      }
+      
+      res.status(204).end();
     } catch (error) {
-      res.status(500).json({ message: "Fout bij verwijderen van groepsinschrijving" });
+      res.status(500).json({ message: "Error deleting student group enrollment" });
     }
   });
 
-  // Create HTTP server
-  const httpServer = createServer(app);
+  // ********************
+  // Lesson API endpoints
+  // ********************
+  apiRouter.get("/api/lessons", async (_req, res) => {
+    try {
+      const lessons = await storage.getLessons();
+      res.json(lessons);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching lessons" });
+    }
+  });
 
-  return httpServer;
+  apiRouter.get("/api/lessons/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const lesson = await storage.getLesson(id);
+      if (!lesson) {
+        return res.status(404).json({ message: "Lesson not found" });
+      }
+      
+      res.json(lesson);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching lesson" });
+    }
+  });
+
+  apiRouter.get("/api/courses/:courseId/lessons", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID format" });
+      }
+      
+      const lessons = await storage.getLessonsByCourse(courseId);
+      res.json(lessons);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching lessons by course" });
+    }
+  });
+
+  apiRouter.get("/api/student-groups/:groupId/lessons", async (req, res) => {
+    try {
+      const groupId = parseInt(req.params.groupId);
+      if (isNaN(groupId)) {
+        return res.status(400).json({ message: "Invalid group ID format" });
+      }
+      
+      const lessons = await storage.getLessonsByGroup(groupId);
+      res.json(lessons);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching lessons by group" });
+    }
+  });
+
+  apiRouter.get("/api/lessons/range", async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "Start date and end date are required" });
+      }
+      
+      const start = new Date(startDate as string);
+      const end = new Date(endDate as string);
+      
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return res.status(400).json({ message: "Invalid date format" });
+      }
+      
+      const lessons = await storage.getLessonsByDateRange(start, end);
+      res.json(lessons);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching lessons by date range" });
+    }
+  });
+
+  apiRouter.post("/api/lessons", async (req, res) => {
+    try {
+      const validatedData = insertLessonSchema.parse(req.body);
+      const newLesson = await storage.createLesson(validatedData);
+      res.status(201).json(newLesson);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating lesson" });
+    }
+  });
+
+  apiRouter.put("/api/lessons/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const updatedLesson = await storage.updateLesson(id, req.body);
+      if (!updatedLesson) {
+        return res.status(404).json({ message: "Lesson not found" });
+      }
+      
+      res.json(updatedLesson);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating lesson" });
+    }
+  });
+
+  apiRouter.delete("/api/lessons/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteLesson(id);
+      if (!success) {
+        return res.status(404).json({ message: "Lesson not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting lesson" });
+    }
+  });
+
+  // ********************
+  // Examination API endpoints
+  // ********************
+  apiRouter.get("/api/examinations", async (_req, res) => {
+    try {
+      const examinations = await storage.getExaminations();
+      res.json(examinations);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching examinations" });
+    }
+  });
+
+  apiRouter.get("/api/examinations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const examination = await storage.getExamination(id);
+      if (!examination) {
+        return res.status(404).json({ message: "Examination not found" });
+      }
+      
+      res.json(examination);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching examination" });
+    }
+  });
+
+  apiRouter.get("/api/courses/:courseId/examinations", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID format" });
+      }
+      
+      const examinations = await storage.getExaminationsByCourse(courseId);
+      res.json(examinations);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching examinations by course" });
+    }
+  });
+
+  apiRouter.get("/api/examinations/range", async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "Start date and end date are required" });
+      }
+      
+      const start = new Date(startDate as string);
+      const end = new Date(endDate as string);
+      
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return res.status(400).json({ message: "Invalid date format" });
+      }
+      
+      const examinations = await storage.getExaminationsByDateRange(start, end);
+      res.json(examinations);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching examinations by date range" });
+    }
+  });
+
+  apiRouter.post("/api/examinations", async (req, res) => {
+    try {
+      const validatedData = insertExaminationSchema.parse(req.body);
+      const newExamination = await storage.createExamination(validatedData);
+      res.status(201).json(newExamination);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating examination" });
+    }
+  });
+
+  apiRouter.put("/api/examinations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const updatedExamination = await storage.updateExamination(id, req.body);
+      if (!updatedExamination) {
+        return res.status(404).json({ message: "Examination not found" });
+      }
+      
+      res.json(updatedExamination);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating examination" });
+    }
+  });
+
+  apiRouter.delete("/api/examinations/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteExamination(id);
+      if (!success) {
+        return res.status(404).json({ message: "Examination not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting examination" });
+    }
+  });
+
+  // ********************
+  // Guardian API endpoints
+  // ********************
+  apiRouter.get("/api/guardians", async (_req, res) => {
+    try {
+      const guardians = await storage.getGuardians();
+      res.json(guardians);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching guardians" });
+    }
+  });
+
+  apiRouter.get("/api/guardians/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const guardian = await storage.getGuardian(id);
+      if (!guardian) {
+        return res.status(404).json({ message: "Guardian not found" });
+      }
+      
+      res.json(guardian);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching guardian" });
+    }
+  });
+
+  apiRouter.post("/api/guardians", async (req, res) => {
+    try {
+      const validatedData = insertGuardianSchema.parse(req.body);
+      const newGuardian = await storage.createGuardian(validatedData);
+      res.status(201).json(newGuardian);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating guardian" });
+    }
+  });
+
+  apiRouter.put("/api/guardians/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const updatedGuardian = await storage.updateGuardian(id, req.body);
+      if (!updatedGuardian) {
+        return res.status(404).json({ message: "Guardian not found" });
+      }
+      
+      res.json(updatedGuardian);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating guardian" });
+    }
+  });
+
+  apiRouter.delete("/api/guardians/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteGuardian(id);
+      if (!success) {
+        return res.status(404).json({ message: "Guardian not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting guardian" });
+    }
+  });
+
+  // ********************
+  // Student Guardian API endpoints
+  // ********************
+  apiRouter.get("/api/student-guardians", async (_req, res) => {
+    try {
+      const relations = await storage.getStudentGuardians();
+      res.json(relations);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student-guardian relations" });
+    }
+  });
+
+  apiRouter.get("/api/student-guardians/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const relation = await storage.getStudentGuardian(id);
+      if (!relation) {
+        return res.status(404).json({ message: "Student-guardian relation not found" });
+      }
+      
+      res.json(relation);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student-guardian relation" });
+    }
+  });
+
+  apiRouter.get("/api/students/:studentId/guardians", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      if (isNaN(studentId)) {
+        return res.status(400).json({ message: "Invalid student ID format" });
+      }
+      
+      const relations = await storage.getStudentGuardiansByStudent(studentId);
+      res.json(relations);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student-guardian relations by student" });
+    }
+  });
+
+  apiRouter.get("/api/guardians/:guardianId/students", async (req, res) => {
+    try {
+      const guardianId = parseInt(req.params.guardianId);
+      if (isNaN(guardianId)) {
+        return res.status(400).json({ message: "Invalid guardian ID format" });
+      }
+      
+      const relations = await storage.getStudentGuardiansByGuardian(guardianId);
+      res.json(relations);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student-guardian relations by guardian" });
+    }
+  });
+
+  apiRouter.post("/api/student-guardians", async (req, res) => {
+    try {
+      const validatedData = insertStudentGuardianSchema.parse(req.body);
+      const newRelation = await storage.createStudentGuardian(validatedData);
+      res.status(201).json(newRelation);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating student-guardian relation" });
+    }
+  });
+
+  apiRouter.put("/api/student-guardians/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const updatedRelation = await storage.updateStudentGuardian(id, req.body);
+      if (!updatedRelation) {
+        return res.status(404).json({ message: "Student-guardian relation not found" });
+      }
+      
+      res.json(updatedRelation);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating student-guardian relation" });
+    }
+  });
+
+  apiRouter.delete("/api/student-guardians/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteStudentGuardian(id);
+      if (!success) {
+        return res.status(404).json({ message: "Student-guardian relation not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting student-guardian relation" });
+    }
+  });
+
+  // ********************
+  // User API endpoints
+  // ********************
+  apiRouter.get("/api/users", async (_req, res) => {
+    try {
+      const users = await storage.getUsers();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching users" });
+    }
+  });
+
+  apiRouter.get("/api/users/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const user = await storage.getUser(id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching user" });
+    }
+  });
+
+  apiRouter.post("/api/users", async (req, res) => {
+    try {
+      const validatedData = insertUserSchema.parse(req.body);
+      const newUser = await storage.createUser(validatedData);
+      res.status(201).json(newUser);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating user" });
+    }
+  });
+
+  apiRouter.put("/api/users/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const updatedUser = await storage.updateUser(id, req.body);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating user" });
+    }
+  });
+
+  apiRouter.delete("/api/users/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteUser(id);
+      if (!success) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting user" });
+    }
+  });
+
+  // ******************* 
+  // Dashboard API endpoints
+  // *******************
+  apiRouter.get("/api/dashboard/stats", async (_req, res) => {
+    try {
+      // Verzamel alle benodigde data
+      const students = await storage.getStudents();
+      const courses = await storage.getCourses();
+      const programs = await storage.getPrograms();
+      const enrollments = await storage.getEnrollments();
+      
+      // Bereken statistieken
+      const totalStudents = students.length;
+      const activeCourses = courses.length;
+      const activePrograms = programs.length;
+      const totalEnrollments = enrollments.length;
+      
+      // Stuur response
+      res.json({
+        totalStudents,
+        activeCourses,
+        activePrograms,
+        totalEnrollments
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching dashboard stats" });
+    }
+  });
+  
+  apiRouter.get("/api/dashboard/enrollment", async (_req, res) => {
+    try {
+      // Voor demo-doeleinden genereren we gesimuleerde data
+      // In productie zou dit uit de database komen
+      const enrollmentTrend = [
+        { month: "Jan", count: 12 },
+        { month: "Feb", count: 15 },
+        { month: "Mar", count: 21 },
+        { month: "Apr", count: 18 },
+        { month: "Mei", count: 24 },
+        { month: "Jun", count: 22 },
+        { month: "Jul", count: 16 },
+        { month: "Aug", count: 14 },
+        { month: "Sep", count: 30 },
+        { month: "Okt", count: 26 },
+        { month: "Nov", count: 19 },
+        { month: "Dec", count: 10 }
+      ];
+      
+      res.json({ enrollmentTrend });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching enrollment trend" });
+    }
+  });
+  
+  apiRouter.get("/api/dashboard/recent-students", async (_req, res) => {
+    try {
+      // Haal de 5 meest recente studenten op (in productie zou dit op datum sorteren)
+      const students = await storage.getStudents();
+      const recentStudents = students.slice(0, 5);
+      
+      res.json(recentStudents);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching recent students" });
+    }
+  });
+  
+  apiRouter.get("/api/dashboard/events", async (_req, res) => {
+    try {
+      // Haal aankomende evenementen op voor de komende maand
+      const now = new Date();
+      const oneMonthLater = new Date();
+      oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+      
+      const events = await storage.getEventsByDateRange(now, oneMonthLater);
+      
+      res.json(events);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching upcoming events" });
+    }
+  });
+
+  // creëer HTTP server
+  const server = createServer(app);
+
+  return server;
 }

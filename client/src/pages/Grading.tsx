@@ -319,6 +319,28 @@ export default function Grading() {
       });
     },
   });
+  
+  // Mutation for saving behavior assessments
+  const saveBehaviorAssessmentsMutation = useMutation({
+    mutationFn: async (assessments: any[]) => {
+      return await apiRequest('POST', '/api/behavior-assessments/batch', assessments);
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Beoordelingen opgeslagen',
+        description: 'Gedragsbeoordelingen zijn succesvol bijgewerkt.',
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/behavior-assessments'] });
+      setIsBehaviorModified(false);
+    },
+    onError: () => {
+      toast({
+        title: 'Fout bij opslaan van beoordelingen',
+        description: 'Er is een fout opgetreden bij het opslaan van gedragsbeoordelingen. Probeer het opnieuw.',
+        variant: 'destructive',
+      });
+    },
+  });
 
   const handleCourseChange = (value: string) => {
     setSelectedCourse(value);
@@ -545,6 +567,30 @@ export default function Grading() {
     
     if (gradesToSave.length > 0) {
       batchSaveGradesMutation.mutate(gradesToSave as any[]);
+    }
+  };
+  
+  const handleSaveBehaviorAssessments = () => {
+    const assessmentsToSave = Object.keys(behaviorScores).map(studentId => {
+      // Alleen opslaan als er een score is toegekend
+      if (!behaviorScores[studentId]) return null;
+      
+      return {
+        studentId: parseInt(studentId),
+        classId: parseInt(selectedClass),
+        date: new Date().toISOString().split('T')[0],
+        behaviorScore: behaviorScores[studentId],
+        remarks: behaviorRemarks[studentId] || '',
+      };
+    }).filter(Boolean);
+    
+    if (assessmentsToSave.length > 0) {
+      saveBehaviorAssessmentsMutation.mutate(assessmentsToSave as any[]);
+    } else {
+      toast({
+        title: 'Geen wijzigingen',
+        description: 'Er zijn geen wijzigingen om op te slaan.',
+      });
     }
   };
 
@@ -853,14 +899,7 @@ export default function Grading() {
                 <Button 
                   variant="default" 
                   disabled={!isBehaviorModified}
-                  onClick={() => {
-                    // Implementeren: opslaan van beoordelingen
-                    toast({
-                      title: "Beoordelingen opgeslagen",
-                      description: "Alle gedragsbeoordelingen zijn succesvol opgeslagen",
-                    });
-                    setIsBehaviorModified(false);
-                  }}
+                  onClick={handleSaveBehaviorAssessments}
                 >
                   <Save className="h-4 w-4 mr-2" />
                   Wijzigingen opslaan

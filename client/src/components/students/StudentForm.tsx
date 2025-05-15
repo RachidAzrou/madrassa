@@ -111,7 +111,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
 
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="firstName">
-              First Name*
+              Voornaam*
             </label>
             <Input
               id="firstName"
@@ -125,7 +125,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
 
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="lastName">
-              Last Name*
+              Achternaam*
             </label>
             <Input
               id="lastName"
@@ -170,7 +170,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="gender">
-              Gender
+              Geslacht
             </label>
             <Select 
               value={form.watch("gender")} 
@@ -180,9 +180,9 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                <SelectItem value="male">Man</SelectItem>
+                <SelectItem value="female">Vrouw</SelectItem>
+                <SelectItem value="other">Anders</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -262,10 +262,10 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="graduated">Graduated</SelectItem>
+                <SelectItem value="active">Actief</SelectItem>
+                <SelectItem value="inactive">Inactief</SelectItem>
+                <SelectItem value="pending">In Afwachting</SelectItem>
+                <SelectItem value="graduated">Afgestudeerd</SelectItem>
               </SelectContent>
             </Select>
             {form.formState.errors.status && (
@@ -275,7 +275,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
 
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="enrollmentDate">
-              Enrollment Date*
+              Inschrijvingsdatum*
             </label>
             <Input
               id="enrollmentDate"

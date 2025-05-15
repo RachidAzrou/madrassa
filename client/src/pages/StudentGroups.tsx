@@ -46,7 +46,12 @@ export default function StudentGroups() {
   const queryClient = useQueryClient();
 
   // Fetch student groups with filters
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<{
+    studentGroups: any[];
+    totalCount: number;
+    page: number;
+    totalPages: number;
+  }>({
     queryKey: ['/api/student-groups', { searchTerm, academicYear, program, page: currentPage }],
     staleTime: 30000,
   });

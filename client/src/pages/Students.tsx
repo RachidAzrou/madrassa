@@ -1382,10 +1382,7 @@ export default function Students() {
 
       {/* Student List Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-          <p className="text-sm text-gray-500">
-            {isLoading ? 'Laden...' : `Tonen van ${students.length} van de ${totalStudents} studenten`}
-          </p>
+        <div className="p-4 border-b border-gray-200 flex justify-end items-center">
           <div className="flex space-x-2">
             <Button 
               variant="outline" 

@@ -210,3 +210,132 @@ export const insertFeeSchema = createInsertSchema(fees).omit({
 
 export type InsertFee = z.infer<typeof insertFeeSchema>;
 export type Fee = typeof fees.$inferSelect;
+
+// StudentGroups (klassen)
+export const studentGroups = pgTable("student_groups", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(), // Naam van de groep/klas
+  academicYear: text("academic_year").notNull(), // Academisch jaar (bijv. "2024-2025")
+  programId: integer("program_id"), // Gekoppeld aan een studierichting
+  description: text("description"),
+  courseId: integer("course_id"), // Optioneel gekoppeld aan een specifieke cursus
+  instructor: text("instructor"), // Verantwoordelijke docent
+  startDate: date("start_date"), 
+  endDate: date("end_date"),
+  maxCapacity: integer("max_capacity"),
+  isActive: boolean("is_active").default(true),
+});
+
+export const insertStudentGroupSchema = createInsertSchema(studentGroups).omit({
+  id: true
+});
+
+export type InsertStudentGroup = z.infer<typeof insertStudentGroupSchema>;
+export type StudentGroup = typeof studentGroups.$inferSelect;
+
+// StudentGroupEnrollments (koppeling tussen studenten en groepen)
+export const studentGroupEnrollments = pgTable("student_group_enrollments", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull(),
+  groupId: integer("group_id").notNull(), // Verwijst naar student_groups.id
+  enrollmentDate: timestamp("enrollment_date").defaultNow(),
+  status: text("status").default("active"), // active, inactive, completed
+  notes: text("notes"),
+}, (table) => {
+  return {
+    unq: unique().on(table.studentId, table.groupId),
+  };
+});
+
+export const insertStudentGroupEnrollmentSchema = createInsertSchema(studentGroupEnrollments).omit({
+  id: true
+});
+
+export type InsertStudentGroupEnrollment = z.infer<typeof insertStudentGroupEnrollmentSchema>;
+export type StudentGroupEnrollment = typeof studentGroupEnrollments.$inferSelect;
+
+// Lessons (lessen)
+export const lessons = pgTable("lessons", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  courseId: integer("course_id").notNull(),
+  groupId: integer("group_id"), // Optioneel gekoppeld aan een studentengroep
+  scheduledDate: timestamp("scheduled_date").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  location: text("location"),
+  instructor: text("instructor"),
+  description: text("description"),
+  lessonMaterials: text("lesson_materials"), // URL of verwijzing naar lesmateriaal
+  status: text("status").default("scheduled"), // scheduled, completed, cancelled
+});
+
+export const insertLessonSchema = createInsertSchema(lessons).omit({
+  id: true
+});
+
+export type InsertLesson = z.infer<typeof insertLessonSchema>;
+export type Lesson = typeof lessons.$inferSelect;
+
+// Examinations (examens)
+export const examinations = pgTable("examinations", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  courseId: integer("course_id").notNull(),
+  assessmentId: integer("assessment_id"), // Gekoppeld aan de beoordelingsstructuur
+  examDate: timestamp("exam_date").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  location: text("location"),
+  supervisor: text("supervisor"), // Toezichthouder
+  maxScore: integer("max_score").notNull(),
+  duration: integer("duration").notNull(), // Duur in minuten
+  format: text("format").notNull(), // written, oral, practical, online
+  instructions: text("instructions"), // Specifieke instructies
+  status: text("status").default("scheduled"), // scheduled, in-progress, completed, cancelled
+});
+
+export const insertExaminationSchema = createInsertSchema(examinations).omit({
+  id: true
+});
+
+export type InsertExamination = z.infer<typeof insertExaminationSchema>;
+export type Examination = typeof examinations.$inferSelect;
+
+// Guardians (ouders/verzorgers)
+export const guardians = pgTable("guardians", {
+  id: serial("id").primaryKey(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  relationship: text("relationship").notNull(), // parent, guardian, other
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  address: text("address"),
+  occupation: text("occupation"),
+  isEmergencyContact: boolean("is_emergency_contact").default(false),
+  notes: text("notes"),
+});
+
+export const insertGuardianSchema = createInsertSchema(guardians).omit({
+  id: true
+});
+
+export type InsertGuardian = z.infer<typeof insertGuardianSchema>;
+export type Guardian = typeof guardians.$inferSelect;
+
+// StudentGuardians (koppeling tussen studenten en verzorgers)
+export const studentGuardians = pgTable("student_guardians", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull(),
+  guardianId: integer("guardian_id").notNull(),
+  isPrimary: boolean("is_primary").default(false), // Primaire contactpersoon
+}, (table) => {
+  return {
+    unq: unique().on(table.studentId, table.guardianId),
+  };
+});
+
+export const insertStudentGuardianSchema = createInsertSchema(studentGuardians).omit({
+  id: true
+});
+
+export type InsertStudentGuardian = z.infer<typeof insertStudentGuardianSchema>;
+export type StudentGuardian = typeof studentGuardians.$inferSelect;

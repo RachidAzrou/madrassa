@@ -8,7 +8,13 @@ import {
   type Event, type InsertEvent,
   type User, type InsertUser,
   type Fee, type InsertFee,
-  type Assessment, type InsertAssessment
+  type Assessment, type InsertAssessment,
+  type StudentGroup, type InsertStudentGroup,
+  type StudentGroupEnrollment, type InsertStudentGroupEnrollment,
+  type Lesson, type InsertLesson,
+  type Examination, type InsertExamination,
+  type Guardian, type InsertGuardian,
+  type StudentGuardian, type InsertStudentGuardian
 } from "@shared/schema";
 
 // Storage interface for CRUD operations
@@ -102,4 +108,61 @@ export interface IStorage {
   createFee(fee: InsertFee): Promise<Fee>;
   updateFee(id: number, fee: Partial<Fee>): Promise<Fee | undefined>;
   deleteFee(id: number): Promise<boolean>;
+
+  // Student Group operations
+  getStudentGroups(): Promise<StudentGroup[]>;
+  getStudentGroup(id: number): Promise<StudentGroup | undefined>;
+  getStudentGroupsByProgram(programId: number): Promise<StudentGroup[]>;
+  getStudentGroupsByCourse(courseId: number): Promise<StudentGroup[]>;
+  getStudentGroupsByAcademicYear(academicYear: string): Promise<StudentGroup[]>;
+  createStudentGroup(group: InsertStudentGroup): Promise<StudentGroup>;
+  updateStudentGroup(id: number, group: Partial<StudentGroup>): Promise<StudentGroup | undefined>;
+  deleteStudentGroup(id: number): Promise<boolean>;
+
+  // Student Group Enrollment operations
+  getStudentGroupEnrollments(): Promise<StudentGroupEnrollment[]>;
+  getStudentGroupEnrollment(id: number): Promise<StudentGroupEnrollment | undefined>;
+  getStudentGroupEnrollmentsByStudent(studentId: number): Promise<StudentGroupEnrollment[]>;
+  getStudentGroupEnrollmentsByGroup(groupId: number): Promise<StudentGroupEnrollment[]>;
+  createStudentGroupEnrollment(enrollment: InsertStudentGroupEnrollment): Promise<StudentGroupEnrollment>;
+  updateStudentGroupEnrollment(id: number, enrollment: Partial<StudentGroupEnrollment>): Promise<StudentGroupEnrollment | undefined>;
+  deleteStudentGroupEnrollment(id: number): Promise<boolean>;
+  
+  // Lesson operations
+  getLessons(): Promise<Lesson[]>;
+  getLesson(id: number): Promise<Lesson | undefined>;
+  getLessonsByCourse(courseId: number): Promise<Lesson[]>;
+  getLessonsByGroup(groupId: number): Promise<Lesson[]>;
+  getLessonsByDateRange(startDate: Date, endDate: Date): Promise<Lesson[]>;
+  createLesson(lesson: InsertLesson): Promise<Lesson>;
+  updateLesson(id: number, lesson: Partial<Lesson>): Promise<Lesson | undefined>;
+  deleteLesson(id: number): Promise<boolean>;
+  
+  // Examination operations
+  getExaminations(): Promise<Examination[]>;
+  getExamination(id: number): Promise<Examination | undefined>;
+  getExaminationsByCourse(courseId: number): Promise<Examination[]>;
+  getExaminationsByDateRange(startDate: Date, endDate: Date): Promise<Examination[]>;
+  getExaminationsByAssessment(assessmentId: number): Promise<Examination[]>;
+  createExamination(examination: InsertExamination): Promise<Examination>;
+  updateExamination(id: number, examination: Partial<Examination>): Promise<Examination | undefined>;
+  deleteExamination(id: number): Promise<boolean>;
+  
+  // Guardian operations
+  getGuardians(): Promise<Guardian[]>;
+  getGuardian(id: number): Promise<Guardian | undefined>;
+  getGuardianByEmail(email: string): Promise<Guardian | undefined>;
+  getGuardiansByStudent(studentId: number): Promise<Guardian[]>;
+  createGuardian(guardian: InsertGuardian): Promise<Guardian>;
+  updateGuardian(id: number, guardian: Partial<Guardian>): Promise<Guardian | undefined>;
+  deleteGuardian(id: number): Promise<boolean>;
+  
+  // Student Guardian operations
+  getStudentGuardians(): Promise<StudentGuardian[]>;
+  getStudentGuardian(id: number): Promise<StudentGuardian | undefined>;
+  getStudentGuardiansByStudent(studentId: number): Promise<StudentGuardian[]>;
+  getStudentGuardiansByGuardian(guardianId: number): Promise<StudentGuardian[]>;
+  createStudentGuardian(relation: InsertStudentGuardian): Promise<StudentGuardian>;
+  updateStudentGuardian(id: number, relation: Partial<StudentGuardian>): Promise<StudentGuardian | undefined>;
+  deleteStudentGuardian(id: number): Promise<boolean>;
 }

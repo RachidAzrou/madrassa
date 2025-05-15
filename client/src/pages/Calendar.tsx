@@ -45,7 +45,7 @@ export default function Calendar() {
   const year = currentDate.getFullYear();
 
   // Fetch calendar events for the current month/view
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<{ events: CalendarEvent[] }>({
     queryKey: ['/api/calendar/events', 
       { 
         year: currentDate.getFullYear(), 

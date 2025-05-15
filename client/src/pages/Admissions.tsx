@@ -14,6 +14,45 @@ import { Textarea } from "@/components/ui/textarea";
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
+interface Applicant {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dateOfBirth: string;
+  programId: number;
+  programName: string;
+  academicYearId: number;
+  academicYear: string;
+  previousEducation: string;
+  personalStatement: string;
+  status: string;
+  applicationDate: string;
+}
+
+interface Program {
+  id: string;
+  name: string;
+  code: string;
+}
+
+interface AcademicYear {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+}
+
+interface AdmissionStats {
+  totalApplications: number;
+  pendingReview: number;
+  approved: number;
+  rejected: number;
+  withdrawals: number;
+  conversionRate: number;
+}
+
 export default function Admissions() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,23 +78,23 @@ export default function Admissions() {
   });
 
   // Fetch applicants with filters
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<{ applicants: Applicant[], totalCount: number }>({
     queryKey: ['/api/admissions/applicants', { searchTerm, program, status, academicYear, page: currentPage }],
     staleTime: 30000,
   });
 
   // Fetch programs for filter
-  const { data: programsData } = useQuery({
+  const { data: programsData } = useQuery<{ programs: Program[] }>({
     queryKey: ['/api/programs'],
   });
 
   // Fetch academic years for filter
-  const { data: academicYearsData } = useQuery({
+  const { data: academicYearsData } = useQuery<{ academicYears: AcademicYear[] }>({
     queryKey: ['/api/academic-years'],
   });
 
   // Fetch admission stats
-  const { data: statsData } = useQuery({
+  const { data: statsData } = useQuery<{ stats: AdmissionStats }>({
     queryKey: ['/api/admissions/stats'],
   });
 

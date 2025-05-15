@@ -97,7 +97,22 @@ export default function Students() {
   
   const handleSubmitStudent = async (e: React.FormEvent) => {
     e.preventDefault();
-    createStudentMutation.mutate(studentFormData);
+    
+    // Kopieer de student data voor we deze aanpassen
+    const formattedData = { ...studentFormData };
+    
+    // Controleer en formatteer de geboortedatum naar het juiste formaat (YYYY-MM-DD)
+    if (formattedData.dateOfBirth) {
+      // Zorg ervoor dat de datum in correct ISO formaat is (YYYY-MM-DD)
+      const date = new Date(formattedData.dateOfBirth);
+      if (!isNaN(date.getTime())) {
+        // Formatteer naar YYYY-MM-DD
+        formattedData.dateOfBirth = date.toISOString().split('T')[0];
+      }
+    }
+    
+    // Verzend de geformatteerde data
+    createStudentMutation.mutate(formattedData);
   };
 
   const handleViewStudent = (id: string) => {
@@ -163,9 +178,22 @@ export default function Students() {
   const handleSubmitEditStudent = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedStudent) {
+      // Kopieer de studentdata voor we deze aanpassen
+      const formattedData = { ...studentFormData };
+      
+      // Controleer en formatteer de geboortedatum naar het juiste formaat (YYYY-MM-DD)
+      if (formattedData.dateOfBirth) {
+        // Zorg ervoor dat de datum in correct ISO formaat is (YYYY-MM-DD)
+        const date = new Date(formattedData.dateOfBirth);
+        if (!isNaN(date.getTime())) {
+          // Formatteer naar YYYY-MM-DD
+          formattedData.dateOfBirth = date.toISOString().split('T')[0];
+        }
+      }
+      
       updateStudentMutation.mutate({
         id: selectedStudent.id,
-        studentData: studentFormData
+        studentData: formattedData
       });
     }
   };

@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle,
-  ChevronUp, ChevronDown
+  ChevronUp, ChevronDown, FileText, FileDown
 } from 'lucide-react';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1284,6 +1286,28 @@ export default function Students() {
           </Button>
         </div>
       </div>
+      
+      {/* Statistiek widgets */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 mt-4">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <h3 className="text-sm font-medium text-gray-500 mb-1">Totaal studenten</h3>
+          <p className="text-2xl font-semibold">{totalStudents}</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <h3 className="text-sm font-medium text-gray-500 mb-1">Actieve studenten</h3>
+          <p className="text-2xl font-semibold">
+            {students.filter(s => s.status.toLowerCase() === 'active' || s.status.toLowerCase() === 'actief').length}
+          </p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <h3 className="text-sm font-medium text-gray-500 mb-1">Aantal klassen</h3>
+          <p className="text-2xl font-semibold">{studentGroups.length}</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <h3 className="text-sm font-medium text-gray-500 mb-1">Aantal vakken</h3>
+          <p className="text-2xl font-semibold">{programs.length}</p>
+        </div>
+      </div>
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
@@ -1372,97 +1396,194 @@ export default function Students() {
               <Filter className="mr-2 h-4 w-4" />
               Filteren
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                // Export studenten als CSV bestand 
-                // Exportfunctionaliteit implementeren
-                const headers = ['Studentnummer', 'Voornaam', 'Achternaam', 'Email', 'Telefoon', 'Vak', 'Klas', 'Geslacht', 'Status'];
-                const csvContent = [
-                  headers.join(','),
-                  ...sortedStudents.map(student => [
-                    student.studentId,
-                    student.firstName,
-                    student.lastName,
-                    student.email,
-                    student.phone || '',
-                    programs.find((p: any) => p.id === student.programId)?.name || 'Onbekend',
-                    getStudentGroupName(student.id) || 'Geen klas',
-                    student.gender === 'man' ? 'Man' : student.gender === 'vrouw' ? 'Vrouw' : 'Onbekend',
-                    student.status
-                  ].join(','))
-                ].join('\n');
-                
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.setAttribute('href', url);
-                link.setAttribute('download', `studenten_export_${new Date().toISOString().split('T')[0]}.csv`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                toast({
-                  title: "Export geslaagd",
-                  description: "De studentenlijst is succesvol geëxporteerd als CSV-bestand.",
-                  variant: "default",
-                });
-              }}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Exporteren
-            </Button>
+            
+            <div className="flex gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Export studenten als CSV bestand 
+                  const headers = ['Studentnummer', 'Voornaam', 'Achternaam', 'Email', 'Telefoon', 'Vak', 'Klas', 'Geslacht', 'Status'];
+                  const csvContent = [
+                    headers.join(','),
+                    ...sortedStudents.map(student => [
+                      student.studentId,
+                      student.firstName,
+                      student.lastName,
+                      student.email,
+                      student.phone || '',
+                      programs.find((p: any) => p.id === student.programId)?.name || 'Onbekend',
+                      getStudentGroupName(student.id) || 'Geen klas',
+                      student.gender === 'man' ? 'Man' : student.gender === 'vrouw' ? 'Vrouw' : 'Onbekend',
+                      student.status
+                    ].join(','))
+                  ].join('\n');
+                  
+                  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.setAttribute('href', url);
+                  link.setAttribute('download', `studenten_export_${new Date().toISOString().split('T')[0]}.csv`);
+                  link.style.visibility = 'hidden';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  
+                  toast({
+                    title: "CSV Export geslaagd",
+                    description: "De studentenlijst is succesvol geëxporteerd als CSV-bestand.",
+                    variant: "default",
+                  });
+                }}
+              >
+                <FileDown className="mr-2 h-4 w-4" />
+                CSV
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Export studenten als PDF bestand
+                  const doc = new jsPDF();
+                  
+                  // Add title
+                  doc.setFontSize(18);
+                  doc.text('myMadrassa - Studentenlijst', 14, 22);
+                  
+                  // Add generation date
+                  doc.setFontSize(11);
+                  doc.setTextColor(100);
+                  doc.text(`Gegenereerd op: ${new Date().toLocaleDateString('nl-NL')}`, 14, 30);
+                  
+                  // Create the table
+                  // @ts-ignore - jspdf-autotable types
+                  doc.autoTable({
+                    startY: 40,
+                    head: [['Studentnr', 'Naam', 'Vak', 'Klas', 'Leeftijd', 'Geslacht', 'Status']],
+                    body: sortedStudents.map(student => [
+                      student.studentId,
+                      `${student.firstName} ${student.lastName}`,
+                      programs.find((p: any) => p.id === student.programId)?.name || 'Onbekend',
+                      getStudentGroupName(student.id) || 'Geen klas',
+                      calculateAge(student.dateOfBirth) ? `${calculateAge(student.dateOfBirth)} jaar` : 'Onbekend',
+                      student.gender === 'man' ? 'Man' : student.gender === 'vrouw' ? 'Vrouw' : 'Onbekend',
+                      student.status.toLowerCase() === 'active' ? 'Actief' : 
+                      student.status.toLowerCase() === 'pending' ? 'In afwachting' : 
+                      student.status.toLowerCase() === 'inactive' ? 'Inactief' :
+                      student.status
+                    ]),
+                    headStyles: { fillColor: [59, 89, 152], textColor: 255 },
+                    alternateRowStyles: { fillColor: [245, 245, 245] },
+                    styles: { fontSize: 10, cellPadding: 5, overflow: 'linebreak' },
+                  });
+                  
+                  // Add footer with info
+                  const pageCount = doc.internal.getNumberOfPages();
+                  for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(150);
+                    doc.text(
+                      `myMadrassa Studentenbeheersysteem | Pagina ${i} van ${pageCount}`,
+                      doc.internal.pageSize.getWidth() / 2,
+                      doc.internal.pageSize.getHeight() - 10,
+                      { align: 'center' }
+                    );
+                  }
+                  
+                  // Save the PDF
+                  doc.save(`studenten_export_${new Date().toISOString().split('T')[0]}.pdf`);
+                  
+                  toast({
+                    title: "PDF Export geslaagd",
+                    description: "De studentenlijst is succesvol geëxporteerd als PDF-bestand.",
+                    variant: "default",
+                  });
+                }}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                PDF
+              </Button>
+            </div>
           </div>
         </div>
         
         {/* Geavanceerde filter opties - standaard verborgen */}
-        <div id="advancedFilters" className="p-4 border-b border-gray-200 bg-gray-50 hidden">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Geslacht</label>
-              <Select value={gender} onValueChange={handleGenderChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Alle" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle</SelectItem>
-                  <SelectItem value="man">Man</SelectItem>
-                  <SelectItem value="vrouw">Vrouw</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Leeftijd</label>
-              <div className="flex items-center space-x-2">
-                <Input 
-                  type="number" 
-                  placeholder="Van" 
-                  className="w-full" 
-                  min={0}
-                  max={100}
-                  value={minAge}
-                  onChange={(e) => setMinAge(e.target.value)}
-                />
-                <span>-</span>
-                <Input 
-                  type="number" 
-                  placeholder="Tot" 
-                  className="w-full" 
-                  min={0}
-                  max={100}
-                  value={maxAge}
-                  onChange={(e) => setMaxAge(e.target.value)}
-                />
+        <div id="advancedFilters" className="p-6 border-b border-gray-200 bg-white hidden rounded-b-lg shadow-inner">
+          <h3 className="text-lg font-medium text-gray-800 mb-4">Geavanceerde filters</h3>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Geslacht</label>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="filter-gender-all"
+                    checked={gender === 'all'}
+                    onChange={() => handleGenderChange('all')}
+                    className="h-4 w-4"
+                  />
+                  <Label htmlFor="filter-gender-all" className="font-normal">Alle</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="filter-gender-man"
+                    checked={gender === 'man'}
+                    onChange={() => handleGenderChange('man')}
+                    className="h-4 w-4"
+                  />
+                  <Label htmlFor="filter-gender-man" className="font-normal">Man</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="filter-gender-vrouw"
+                    checked={gender === 'vrouw'}
+                    onChange={() => handleGenderChange('vrouw')}
+                    className="h-4 w-4"
+                  />
+                  <Label htmlFor="filter-gender-vrouw" className="font-normal">Vrouw</Label>
+                </div>
               </div>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Leeftijd</label>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <label className="text-sm font-medium text-gray-600">Van</label>
+                  <Input 
+                    type="number" 
+                    placeholder="Min" 
+                    className="w-full bg-white" 
+                    min={0}
+                    max={100}
+                    value={minAge}
+                    onChange={(e) => setMinAge(e.target.value)}
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <label className="text-sm font-medium text-gray-600">Tot</label>
+                  <Input 
+                    type="number" 
+                    placeholder="Max" 
+                    className="w-full bg-white" 
+                    min={0}
+                    max={100}
+                    value={maxAge}
+                    onChange={(e) => setMaxAge(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Klas</label>
               <Select value={studentGroup} onValueChange={handleStudentGroupChange}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-white">
                   <SelectValue placeholder="Alle klassen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -1476,36 +1597,36 @@ export default function Students() {
               </Select>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-              <Select value={status} onValueChange={handleStatusChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Alle statussen" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle statussen</SelectItem>
-                  <SelectItem value="active">Actief</SelectItem>
-                  <SelectItem value="pending">In afwachting</SelectItem>
-                  <SelectItem value="inactive">Inactief</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Registratiedatum</label>
-              <Input
-                type="date"
-                className="w-full"
-              />
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <div className="space-y-1">
+                {['all', 'active', 'pending', 'inactive'].map((statusOption) => (
+                  <div key={statusOption} className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id={`filter-status-${statusOption}`}
+                      checked={status === statusOption}
+                      onChange={() => handleStatusChange(statusOption)}
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor={`filter-status-${statusOption}`} className="font-normal">
+                      {statusOption === 'all' ? 'Alle' : 
+                       statusOption === 'active' ? 'Actief' : 
+                       statusOption === 'pending' ? 'In afwachting' : 
+                       'Inactief'}
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" className="w-auto" onClick={() => {
+          <div className="flex justify-end space-x-3">
+            <Button variant="outline" className="px-6" onClick={() => {
               // Reset alle filters
               setGender('all');
-              setMinAge('');
-              setMaxAge('');
+              setMinAge(undefined);
+              setMaxAge(undefined);
               setStudentGroup('all');
               setStatus('all');
               setCurrentPage(1);
@@ -1513,15 +1634,16 @@ export default function Students() {
               // Invalidate queries om zeker te zijn van verse data
               queryClient.invalidateQueries({ queryKey: ['/api/students'] });
               
-              // Sluit het filter panel
-              const advancedFilters = document.getElementById('advancedFilters');
-              if (advancedFilters) {
-                advancedFilters.classList.add('hidden');
-              }
+              // Notification
+              toast({
+                title: "Filters gewist",
+                description: "Alle filter-instellingen zijn gereset.",
+                variant: "default",
+              });
             }}>
               Filters wissen
             </Button>
-            <Button className="w-auto" onClick={() => {
+            <Button className="px-6" onClick={() => {
               // Pas filters toe - de state is al bijgewerkt door de onValueChange handlers
               setCurrentPage(1);
               
@@ -1533,6 +1655,13 @@ export default function Students() {
               if (advancedFilters) {
                 advancedFilters.classList.add('hidden');
               }
+              
+              // Notification
+              toast({
+                title: "Filters toegepast",
+                description: "De lijst is gefilterd volgens je selectie.",
+                variant: "default",
+              });
             }}>
               Filters toepassen
             </Button>
@@ -1544,18 +1673,12 @@ export default function Students() {
             <thead className="bg-gray-50">
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <div className="flex items-center">
-                    <input 
-                      type="checkbox" 
-                      className="rounded border-gray-300 text-primary focus:ring-primary mr-3"
-                    />
-                    <div className="flex items-center cursor-pointer" onClick={toggleNameSort}>
-                      Student
-                      {nameSort === 'asc' ? 
-                        <ChevronUp className="ml-1 h-4 w-4" /> : 
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      }
-                    </div>
+                  <div className="flex items-center cursor-pointer" onClick={toggleNameSort}>
+                    Student
+                    {nameSort === 'asc' ? 
+                      <ChevronUp className="ml-1 h-4 w-4" /> : 
+                      <ChevronDown className="ml-1 h-4 w-4" />
+                    }
                   </div>
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={toggleIdSort}>
@@ -1624,10 +1747,6 @@ export default function Students() {
                   <tr key={student.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <input 
-                          type="checkbox" 
-                          className="rounded border-gray-300 text-primary focus:ring-primary mr-3"
-                        />
                         <Avatar className="h-9 w-9">
                           <AvatarFallback>
                             {student.firstName.charAt(0)}{student.lastName.charAt(0)}

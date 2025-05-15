@@ -2200,17 +2200,17 @@ export default function Students() {
                         <div>
                           <Label htmlFor="newStudentGroupId" className="text-xs text-gray-500">Klas</Label>
                           <Select
-                            value={studentFormData.studentGroupId?.toString() || ''}
+                            value={studentFormData.studentGroupId?.toString() || 'none'}
                             onValueChange={(value) => setStudentFormData({ 
                               ...studentFormData, 
-                              studentGroupId: value !== '' ? parseInt(value) : null 
+                              studentGroupId: value !== 'none' ? parseInt(value) : null 
                             })}
                           >
                             <SelectTrigger className="mt-1 border-gray-200 bg-white">
                               <SelectValue placeholder="Selecteer klas" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">Geen klas</SelectItem>
+                              <SelectItem value="none">Geen klas</SelectItem>
                               {studentGroups.map((group: {id: number, name: string}) => (
                                 <SelectItem key={group.id} value={String(group.id)}>
                                   {group.name}

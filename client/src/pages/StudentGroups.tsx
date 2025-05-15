@@ -258,9 +258,9 @@ export default function StudentGroups() {
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Studentengroepen</h1>
+          <h1 className="text-2xl font-bold">Klassen</h1>
           <p className="text-gray-500 mt-1">
-            Beheer studentengroepen, secties en activiteitengroepen
+            Beheer klassen, secties en activiteitengroepen
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -383,7 +383,7 @@ export default function StudentGroups() {
 
                 toast({
                   title: "Exporteren voltooid",
-                  description: "Studentengroepen zijn geëxporteerd als CSV bestand.",
+                  description: "Klassen zijn geëxporteerd als CSV bestand.",
                 });
               }}
             >
@@ -424,9 +424,9 @@ export default function StudentGroups() {
           ) : studentGroups.length === 0 ? (
             <div className="text-center py-12">
               <Users className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-lg font-medium text-gray-900">Geen Studentengroepen</h3>
+              <h3 className="mt-2 text-lg font-medium text-gray-900">Geen Klassen</h3>
               <p className="mt-1 text-sm text-gray-500">
-                Begin door een nieuwe studentengroep aan te maken.
+                Begin door een nieuwe klas aan te maken.
               </p>
               <div className="mt-6">
                 <Button onClick={handleAddStudentGroup}>

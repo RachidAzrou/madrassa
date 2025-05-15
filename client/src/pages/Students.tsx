@@ -1916,11 +1916,12 @@ export default function Students() {
                         </div>
                         <div className="w-2/3">
                           <Label htmlFor="status" className="text-sm font-medium text-gray-700">
-                            Status
+                            Status <span className="text-primary">*</span>
                           </Label>
                           <Select
                             value={studentFormData.status || ''}
                             onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
+                            required
                           >
                             <SelectTrigger className="mt-1 border-gray-200">
                               <SelectValue placeholder="Selecteer status" />
@@ -1966,11 +1967,12 @@ export default function Students() {
 
                         <div>
                           <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700">
-                            Geboortedatum
+                            Geboortedatum <span className="text-primary">*</span>
                           </Label>
                           <Input
                             id="dateOfBirth"
                             type="date"
+                            required
                             value={studentFormData.dateOfBirth || ''}
                             onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
                             className="mt-1 border-gray-200"
@@ -1982,7 +1984,7 @@ export default function Students() {
                     <div className="w-full md:w-1/2 space-y-5">
                       <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
                         <Label htmlFor="gender" className="text-sm font-medium text-gray-700 mb-3 block">
-                          Geslacht
+                          Geslacht <span className="text-primary">*</span>
                         </Label>
                         <div className="flex gap-8 items-center mt-2">
                           <div className="flex items-center space-x-2">
@@ -1993,6 +1995,7 @@ export default function Students() {
                               checked={studentFormData.gender === 'man'}
                               onChange={() => setStudentFormData({ ...studentFormData, gender: 'man' })}
                               className="h-5 w-5 text-primary focus:ring-primary"
+                              required
                             />
                             <Label htmlFor="gender-man" className="font-medium">Man</Label>
                           </div>
@@ -2004,6 +2007,7 @@ export default function Students() {
                               checked={studentFormData.gender === 'vrouw'}
                               onChange={() => setStudentFormData({ ...studentFormData, gender: 'vrouw' })}
                               className="h-5 w-5 text-primary focus:ring-primary"
+                              required
                             />
                             <Label htmlFor="gender-vrouw" className="font-medium">Vrouw</Label>
                           </div>
@@ -2051,11 +2055,12 @@ export default function Students() {
 
                       <div>
                         <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
-                          Telefoonnummer
+                          Telefoonnummer <span className="text-primary">*</span>
                         </Label>
                         <div className="mt-1 relative">
                           <Input
                             id="phone"
+                            required
                             value={studentFormData.phone || ''}
                             onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
                             className="border-gray-200 pl-9"
@@ -2076,52 +2081,56 @@ export default function Students() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="md:col-span-2">
                           <Label htmlFor="street" className="text-sm font-medium text-gray-700">
-                            Straatnaam
+                            Straatnaam <span className="text-primary">*</span>
                           </Label>
                           <Input
                             id="street"
+                            required
                             value={studentFormData.street || ''}
                             onChange={(e) => setStudentFormData({ ...studentFormData, street: e.target.value })}
                             className="mt-1 border-gray-200"
-                            placeholder="Hoofdstraat"
+                            placeholder="Leuvensesteenweg"
                           />
                         </div>
                         <div>
                           <Label htmlFor="houseNumber" className="text-sm font-medium text-gray-700">
-                            Huisnummer
+                            Huisnummer <span className="text-primary">*</span>
                           </Label>
                           <Input
                             id="houseNumber"
+                            required
                             value={studentFormData.houseNumber || ''}
                             onChange={(e) => setStudentFormData({ ...studentFormData, houseNumber: e.target.value })}
                             className="mt-1 border-gray-200"
-                            placeholder="123"
+                            placeholder="42"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <Label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
-                            Postcode
+                            Postcode <span className="text-primary">*</span>
                           </Label>
                           <Input
                             id="postalCode"
+                            required
                             value={studentFormData.postalCode || ''}
                             onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
                             className="mt-1 border-gray-200"
-                            placeholder="1234 AB"
+                            placeholder="1030"
                           />
                         </div>
                         <div className="md:col-span-2">
                           <Label htmlFor="city" className="text-sm font-medium text-gray-700">
-                            Stad
+                            Stad <span className="text-primary">*</span>
                           </Label>
                           <Input
                             id="city"
+                            required
                             value={studentFormData.city || ''}
                             onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
                             className="mt-1 border-gray-200"
-                            placeholder="Amsterdam"
+                            placeholder="Brussel"
                           />
                         </div>
                       </div>

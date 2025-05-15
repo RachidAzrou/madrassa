@@ -216,6 +216,26 @@ export const insertGradeSchema = createInsertSchema(grades).omit({
 export type InsertGrade = z.infer<typeof insertGradeSchema>;
 export type Grade = typeof grades.$inferSelect;
 
+// Behavior Assessments
+export const behaviorAssessments = pgTable("behavior_assessments", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull(),
+  classId: integer("class_id").notNull(), // student_groups id
+  date: date("date").notNull(),
+  behaviorScore: integer("behavior_score").notNull(), // 1-5 score
+  punctualityScore: integer("punctuality_score"), // 1-5 score (optional, calculated)
+  remarks: text("remarks"), // feedback or comments
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertBehaviorAssessmentSchema = createInsertSchema(behaviorAssessments).omit({
+  id: true,
+  createdAt: true
+});
+
+export type InsertBehaviorAssessment = z.infer<typeof insertBehaviorAssessmentSchema>;
+export type BehaviorAssessment = typeof behaviorAssessments.$inferSelect;
+
 // Assessment Types Schema
 export const assessments = pgTable("assessments", {
   id: serial("id").primaryKey(),

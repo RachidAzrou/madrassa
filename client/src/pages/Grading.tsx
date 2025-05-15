@@ -1026,14 +1026,7 @@ export default function Grading() {
               <Button 
                 variant="default" 
                 disabled={!isBehaviorModified}
-                onClick={() => {
-                  // Implementeren: opslaan van beoordelingen
-                  toast({
-                    title: "Beoordelingen opgeslagen",
-                    description: "Alle gedragsbeoordelingen zijn succesvol opgeslagen",
-                  });
-                  setIsBehaviorModified(false);
-                }}
+                onClick={handleSaveBehaviorAssessments}
               >
                 {isBehaviorModified ? (
                   <>

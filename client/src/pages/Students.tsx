@@ -110,9 +110,37 @@ export default function Students() {
       });
     },
     onError: (error: any) => {
+      console.error("Student toevoegfout:", error);
+      
+      // Probeer meer gedetailleerde foutinformatie te krijgen
+      let errorMessage = "Er is een fout opgetreden bij het toevoegen van de student.";
+      
+      if (error.response?.data) {
+        // Als er een gestructureerde fout is van de API
+        const apiError = error.response.data;
+        console.log("API foutgegevens:", apiError);
+        
+        if (apiError.message) {
+          errorMessage = apiError.message;
+        }
+        
+        // Als er specifieke validatiefouten zijn
+        if (apiError.errors && Array.isArray(apiError.errors)) {
+          const validationErrors = apiError.errors.map((err: any) => 
+            `${err.path}: ${err.message}`
+          ).join(", ");
+          
+          if (validationErrors) {
+            errorMessage += ` Validatiefouten: ${validationErrors}`;
+          }
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Fout bij toevoegen",
-        description: error.message || "Er is een fout opgetreden bij het toevoegen van de student.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -192,9 +220,37 @@ export default function Students() {
       });
     },
     onError: (error: any) => {
+      console.error("Student bijwerkfout:", error);
+      
+      // Probeer meer gedetailleerde foutinformatie te krijgen
+      let errorMessage = "Er is een fout opgetreden bij het bijwerken van de student.";
+      
+      if (error.response?.data) {
+        // Als er een gestructureerde fout is van de API
+        const apiError = error.response.data;
+        console.log("API foutgegevens:", apiError);
+        
+        if (apiError.message) {
+          errorMessage = apiError.message;
+        }
+        
+        // Als er specifieke validatiefouten zijn
+        if (apiError.errors && Array.isArray(apiError.errors)) {
+          const validationErrors = apiError.errors.map((err: any) => 
+            `${err.path}: ${err.message}`
+          ).join(", ");
+          
+          if (validationErrors) {
+            errorMessage += ` Validatiefouten: ${validationErrors}`;
+          }
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Fout bij bijwerken",
-        description: error.message || "Er is een fout opgetreden bij het bijwerken van de student.",
+        description: errorMessage,
         variant: "destructive",
       });
     }

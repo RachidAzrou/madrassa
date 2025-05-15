@@ -58,13 +58,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.post("/api/students", async (req, res) => {
     try {
-      const validatedData = insertStudentSchema.parse(req.body);
+      // Maak een kopie van de request body om deze te formatteren
+      const formattedBody = { ...req.body };
+      
+      // Format datumvelden voordat ze worden gevalideerd
+      if (formattedBody.dateOfBirth) {
+        // Als het veld al bestaat, probeer het te formatteren naar ISO-formaat YYYY-MM-DD
+        try {
+          // Controleer of het al in YYYY-MM-DD formaat is
+          if (/^\d{4}-\d{2}-\d{2}$/.test(formattedBody.dateOfBirth)) {
+            // Laat het zoals het is
+          } 
+          // Controleer op DD-MM-YYYY formaat
+          else if (/^\d{2}-\d{2}-\d{4}$/.test(formattedBody.dateOfBirth)) {
+            const [day, month, year] = formattedBody.dateOfBirth.split('-');
+            formattedBody.dateOfBirth = `${year}-${month}-${day}`;
+          } 
+          // Anders probeer Date object te gebruiken
+          else {
+            const date = new Date(formattedBody.dateOfBirth);
+            if (!isNaN(date.getTime())) {
+              formattedBody.dateOfBirth = date.toISOString().split('T')[0];
+            } else {
+              // Als het niet als datum kan worden geparsed, zet het op null
+              formattedBody.dateOfBirth = null;
+            }
+          }
+        } catch (dateError) {
+          console.error("Error formatting date:", dateError);
+          formattedBody.dateOfBirth = null;
+        }
+      }
+      
+      console.log("Formatted student data for creation:", formattedBody);
+      
+      // Valideer de geformatteerde data
+      const validatedData = insertStudentSchema.parse(formattedBody);
       const newStudent = await storage.createStudent(validatedData);
       res.status(201).json(newStudent);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Validation error:", error.errors);
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
+      console.error("Error creating student:", error);
       res.status(500).json({ message: "Error creating student" });
     }
   });
@@ -76,21 +113,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid ID format" });
       }
       
-      // Valideer de data voordat deze wordt opgeslagen
-      // We gebruiken partial omdat bij een update niet alle velden verplicht zijn
-      const validated = insertStudentSchema.partial().parse(req.body);
+      // Maak een kopie van de request body om deze te formatteren
+      const formattedBody = { ...req.body };
       
-      // Converteren van het gevalideerde data naar het juiste type (Partial<Student>)
-      // Dit omvat vooral de datumvelden die in de juiste formaten moeten zijn
-      const validatedData: Partial<Student> = {
-        ...validated,
-        // Zorg ervoor dat datums correct worden behandeld
-        dateOfBirth: validated.dateOfBirth ? 
-          (validated.dateOfBirth instanceof Date ? 
-            validated.dateOfBirth.toISOString().split('T')[0] : 
-            validated.dateOfBirth) : 
-          null
-      };
+      // Format datumvelden voordat ze worden gevalideerd
+      if (formattedBody.dateOfBirth) {
+        // Als het veld al bestaat, probeer het te formatteren naar ISO-formaat YYYY-MM-DD
+        try {
+          // Controleer of het al in YYYY-MM-DD formaat is
+          if (/^\d{4}-\d{2}-\d{2}$/.test(formattedBody.dateOfBirth)) {
+            // Laat het zoals het is
+          } 
+          // Controleer op DD-MM-YYYY formaat
+          else if (/^\d{2}-\d{2}-\d{4}$/.test(formattedBody.dateOfBirth)) {
+            const [day, month, year] = formattedBody.dateOfBirth.split('-');
+            formattedBody.dateOfBirth = `${year}-${month}-${day}`;
+          } 
+          // Anders probeer Date object te gebruiken
+          else {
+            const date = new Date(formattedBody.dateOfBirth);
+            if (!isNaN(date.getTime())) {
+              formattedBody.dateOfBirth = date.toISOString().split('T')[0];
+            } else {
+              // Als het niet als datum kan worden geparsed, zet het op null
+              formattedBody.dateOfBirth = null;
+            }
+          }
+        } catch (dateError) {
+          console.error("Error formatting date:", dateError);
+          formattedBody.dateOfBirth = null;
+        }
+      }
+      
+      console.log("Formatted student data for update:", formattedBody);
+      
+      // Valideer de geformatteerde data
+      // We gebruiken partial omdat bij een update niet alle velden verplicht zijn
+      const validatedData = insertStudentSchema.partial().parse(formattedBody);
       
       const updatedStudent = await storage.updateStudent(id, validatedData);
       if (!updatedStudent) {
@@ -100,6 +159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updatedStudent);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Validation error:", error.errors);
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Update student error:", error);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2 } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, Users, UserPlus, Link2 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -602,8 +602,7 @@ export default function Guardians() {
                   </div>
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relatie</th>
-
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Studenten</th>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Studenten</th>
                 <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
               </tr>
             </thead>
@@ -682,12 +681,14 @@ export default function Guardians() {
                             
                             setIsViewGuardianDialogOpen(true);
                           }}
-                          className="cursor-pointer"
-                          title="Klik om studenten te bekijken"
+                          className="cursor-pointer flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+                          title="Bekijk gekoppelde studenten"
                         >
-                          <Avatar className="h-6 w-6 border-2 border-white">
-                            <AvatarFallback className="text-xs bg-blue-100 text-blue-600">?</AvatarFallback>
-                          </Avatar>
+                          {guardian.relationship === 'parent' ? (
+                            <Users className="h-4 w-4 text-primary" />
+                          ) : (
+                            <Link2 className="h-4 w-4 text-primary" />
+                          )}
                         </button>
                       </div>
                     </td>

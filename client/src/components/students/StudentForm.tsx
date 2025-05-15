@@ -177,7 +177,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
               onValueChange={(value) => form.setValue("gender", value)}
             >
               <SelectTrigger id="gender">
-                <SelectValue placeholder="Select gender" />
+                <SelectValue placeholder="Selecteer geslacht" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="male">Man</SelectItem>
@@ -205,7 +205,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
             <Input
               id="address"
               {...form.register("address")}
-              placeholder="Enter address"
+              placeholder="Voer adres in"
             />
           </div>
 
@@ -218,7 +218,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
               onValueChange={(value) => form.setValue("programId", parseInt(value))}
             >
               <SelectTrigger id="programId">
-                <SelectValue placeholder="Select program" />
+                <SelectValue placeholder="Selecteer programma" />
               </SelectTrigger>
               <SelectContent>
                 {programs.map((program) => (
@@ -239,7 +239,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
               onValueChange={(value) => form.setValue("yearLevel", parseInt(value))}
             >
               <SelectTrigger id="yearLevel">
-                <SelectValue placeholder="Select year level" />
+                <SelectValue placeholder="Selecteer jaarniveau" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="1">Jaar 1</SelectItem>
@@ -259,7 +259,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
               onValueChange={(value) => form.setValue("status", value)}
             >
               <SelectTrigger id="status">
-                <SelectValue placeholder="Select status" />
+                <SelectValue placeholder="Selecteer status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="active">Actief</SelectItem>
@@ -291,10 +291,10 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
 
       <div className="flex justify-end space-x-2 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
+          Annuleren
         </Button>
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : "Save Student"}
+          {isSubmitting ? "Opslaan..." : "Student Opslaan"}
         </Button>
       </div>
     </form>

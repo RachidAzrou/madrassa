@@ -11,13 +11,14 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
 interface Course {
-  id: string;
+  id: number;
   name: string;
   code: string;
-  description: string;
-  department: string;
-  programId: string;
+  description: string | null;
+  programId: number | null;
   credits: number;
+  instructor: string | null;
+  maxStudents: number | null;
   isActive: boolean;
 }
 
@@ -104,21 +105,21 @@ export default function Courses() {
   const handleEditCourse = (course: Course) => {
     setSelectedCourse(course);
     setCourseFormData({
-      name: course.name || '',
-      code: course.code || '',
-      programId: course.programId ? parseInt(course.programId) : null,
+      name: course.name,
+      code: course.code,
+      programId: course.programId,
       description: course.description || '',
-      credits: course.credits || 6,
+      credits: course.credits,
       instructor: course.instructor || '',
       maxStudents: course.maxStudents || 30,
-      isActive: course.isActive ?? true,
+      isActive: course.isActive,
     });
     setIsEditDialogOpen(true);
   };
   
   // Mutatie voor het bijwerken van een cursus
   const updateCourseMutation = useMutation({
-    mutationFn: async (data: { id: string; courseData: typeof courseFormData }) => {
+    mutationFn: async (data: { id: number; courseData: typeof courseFormData }) => {
       return apiRequest('PUT', `/api/courses/${data.id}`, data.courseData);
     },
     onSuccess: () => {
@@ -287,21 +288,25 @@ export default function Courses() {
               <div className="p-5">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-semibold text-lg text-gray-800">{course.title}</h3>
-                    <p className="text-gray-500 text-sm mt-1">{course.courseCode} • {course.credits} Studiepunten</p>
+                    <h3 className="font-semibold text-lg text-gray-800">{course.name}</h3>
+                    <p className="text-gray-500 text-sm mt-1">{course.code} • {course.credits} Studiepunten</p>
                   </div>
-                  <span className="bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded">{course.department}</span>
+                  <span className="bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded">
+                    {course.programId === 1 ? 'Informatica' : 
+                    course.programId === 2 ? 'Bedrijfskunde' : 
+                    course.programId === 3 ? 'Techniek' : 'Algemeen'}
+                  </span>
                 </div>
-                <p className="mt-3 text-gray-600 text-sm">{course.description}</p>
+                <p className="mt-3 text-gray-600 text-sm">{course.description || 'Geen beschrijving beschikbaar'}</p>
                 <div className="mt-4 flex items-center">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback>
-                      {course.instructor.firstName.charAt(0)}{course.instructor.lastName.charAt(0)}
+                      {course.instructor ? course.instructor.charAt(0) : 'D'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="ml-2">
-                    <p className="text-xs font-medium text-gray-800">{course.instructor.title} {course.instructor.firstName} {course.instructor.lastName}</p>
-                    <p className="text-xs text-gray-500">{course.instructor.position}</p>
+                    <p className="text-xs font-medium text-gray-800">{course.instructor || 'Nog geen docent toegewezen'}</p>
+                    <p className="text-xs text-gray-500">Docent</p>
                   </div>
                 </div>
                 <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
@@ -538,6 +543,181 @@ export default function Courses() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Course Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Cursus bewerken</DialogTitle>
+            <DialogDescription>
+              Bewerk de cursusinformatie en klik op opslaan om de wijzigingen toe te passen.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmitEditCourse}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="edit-name" className="text-right">
+                    Cursusnaam
+                  </Label>
+                  <Input
+                    id="edit-name"
+                    required
+                    value={courseFormData.name}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="edit-code" className="text-right">
+                    Cursuscode
+                  </Label>
+                  <Input
+                    id="edit-code"
+                    required
+                    value={courseFormData.code}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="edit-programId" className="text-right">
+                    Programma
+                  </Label>
+                  <Select
+                    value={courseFormData.programId?.toString() || ''}
+                    onValueChange={(value) => setCourseFormData({ ...courseFormData, programId: value ? parseInt(value) : null })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer programma" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Informatica</SelectItem>
+                      <SelectItem value="2">Bedrijfskunde</SelectItem>
+                      <SelectItem value="3">Techniek</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="edit-credits" className="text-right">
+                    Studiepunten
+                  </Label>
+                  <Select
+                    value={courseFormData.credits.toString()}
+                    onValueChange={(value) => setCourseFormData({ ...courseFormData, credits: parseInt(value) })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer studiepunten" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="3">3 ECTS</SelectItem>
+                      <SelectItem value="6">6 ECTS</SelectItem>
+                      <SelectItem value="9">9 ECTS</SelectItem>
+                      <SelectItem value="12">12 ECTS</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="edit-description" className="text-right">
+                    Beschrijving
+                  </Label>
+                  <Input
+                    id="edit-description"
+                    value={courseFormData.description || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="edit-instructor" className="text-right">
+                    Docent
+                  </Label>
+                  <Input
+                    id="edit-instructor"
+                    value={courseFormData.instructor || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, instructor: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="edit-maxStudents" className="text-right">
+                    Maximum aantal studenten
+                  </Label>
+                  <Input
+                    id="edit-maxStudents"
+                    type="number"
+                    value={courseFormData.maxStudents || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, maxStudents: parseInt(e.target.value) })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="submit"
+                disabled={updateCourseMutation.isPending}
+              >
+                {updateCourseMutation.isPending ? 'Bezig met bijwerken...' : 'Wijzigingen opslaan'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Course Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Cursus verwijderen</DialogTitle>
+            <DialogDescription>
+              Weet je zeker dat je deze cursus wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="my-4">
+            {selectedCourse && (
+              <div className="bg-gray-50 p-4 rounded-md">
+                <p className="font-semibold">{selectedCourse.name}</p>
+                <p className="text-sm text-gray-500">Code: {selectedCourse.code}</p>
+                <p className="text-sm text-gray-500">Studiepunten: {selectedCourse.credits} ECTS</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button 
+              type="button"
+              variant="outline" 
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Annuleren
+            </Button>
+            <Button 
+              type="button"
+              variant="destructive" 
+              onClick={confirmDeleteCourse}
+              disabled={deleteCourseMutation.isPending}
+            >
+              {deleteCourseMutation.isPending ? 'Bezig met verwijderen...' : 'Verwijderen'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

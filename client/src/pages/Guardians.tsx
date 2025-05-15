@@ -109,7 +109,7 @@ export default function Guardians() {
     queryFn: async () => {
       if (!selectedGuardian) return [];
       try {
-        return await apiRequest(`/api/guardian-students?guardianId=${selectedGuardian.id}`);
+        return await apiRequest('GET', `/api/guardian-students?guardianId=${selectedGuardian.id}`);
       } catch (error) {
         console.error('Error fetching guardian students:', error);
         return [];

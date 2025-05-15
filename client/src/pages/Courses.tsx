@@ -95,7 +95,7 @@ export default function Courses() {
       }
       
       try {
-        return await apiRequest(`/api/courses?${params.toString()}`, { method: 'GET' });
+        return await apiRequest('GET', `/api/courses?${params.toString()}`);
       } catch (error) {
         console.error('Error fetching courses:', error);
         return { courses: [], totalCount: 0 };
@@ -110,7 +110,7 @@ export default function Courses() {
     queryKey: ['/api/programs'],
     queryFn: async () => {
       try {
-        return await apiRequest('/api/programs', { method: 'GET' });
+        return await apiRequest('GET', '/api/programs');
       } catch (error) {
         console.error('Error fetching programs:', error);
         return [];

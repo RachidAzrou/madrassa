@@ -7,7 +7,8 @@ import {
   type Grade, type InsertGrade,
   type Event, type InsertEvent,
   type User, type InsertUser,
-  type Fee, type InsertFee
+  type Fee, type InsertFee,
+  type Assessment, type InsertAssessment
 } from "@shared/schema";
 
 // Storage interface for CRUD operations
@@ -56,14 +57,25 @@ export interface IStorage {
   updateAttendance(id: number, attendance: Partial<Attendance>): Promise<Attendance | undefined>;
   deleteAttendance(id: number): Promise<boolean>;
 
+  // Assessment operations
+  getAssessments(): Promise<Assessment[]>;
+  getAssessment(id: number): Promise<Assessment | undefined>;
+  getAssessmentsByCourse(courseId: number): Promise<Assessment[]>;
+  createAssessment(assessment: InsertAssessment): Promise<Assessment>;
+  updateAssessment(id: number, assessment: Partial<Assessment>): Promise<Assessment | undefined>;
+  deleteAssessment(id: number): Promise<boolean>;
+  
   // Grade operations
   getGrades(): Promise<Grade[]>;
   getGrade(id: number): Promise<Grade | undefined>;
   getGradesByStudent(studentId: number): Promise<Grade[]>;
   getGradesByCourse(courseId: number): Promise<Grade[]>;
+  getGradesByAssessment(assessmentId: number): Promise<Grade[]>;
+  getGradesByStudentAndCourse(studentId: number, courseId: number): Promise<Grade[]>;
   createGrade(grade: InsertGrade): Promise<Grade>;
   updateGrade(id: number, grade: Partial<Grade>): Promise<Grade | undefined>;
   deleteGrade(id: number): Promise<boolean>;
+  batchCreateGrades(grades: InsertGrade[]): Promise<Grade[]>;
 
   // Event operations
   getEvents(): Promise<Event[]>;

@@ -10,7 +10,8 @@ import {
   grades, type Grade, type InsertGrade,
   events, type Event, type InsertEvent,
   users, type User, type InsertUser,
-  fees, type Fee, type InsertFee
+  fees, type Fee, type InsertFee,
+  assessments, type Assessment, type InsertAssessment
 } from "@shared/schema";
 
 export class DatabaseStorage implements IStorage {

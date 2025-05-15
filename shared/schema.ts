@@ -10,7 +10,7 @@ export const students = pgTable("students", {
   lastName: text("last_name").notNull(),
   email: text("email").notNull().unique(),
   phone: text("phone"),
-  dateOfBirth: date("date_of_birth"),
+  dateOfBirth: date("date_of_birth"), // Terugzetten naar date type
   address: text("address"),
   programId: integer("program_id"),
   yearLevel: integer("year_level"),

@@ -154,18 +154,35 @@ export default function Students() {
   const handleSubmitStudent = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Kopieer de student data voor we deze aanpassen
-    const formattedData = { ...studentFormData };
-    
-    // Gebruik de formatDateForApi functie voor correcte datumformattering
-    // Zet de geboortedatum om naar het juiste format en gebruik een lege string als het null is
-    const formattedDate = formatDateForApi(formattedData.dateOfBirth) || '';
-    formattedData.dateOfBirth = formattedDate;
-    
-    console.log('Verstuur student data:', formattedData);
-    
-    // Verzend de geformatteerde data
-    createStudentMutation.mutate(formattedData);
+    try {
+      // Maak een diepe kopie om te voorkomen dat we de originele state aanpassen
+      const formattedData = JSON.parse(JSON.stringify(studentFormData));
+      
+      // Controleer of we een geboortedatum hebben
+      if (formattedData.dateOfBirth) {
+        console.log('Originele geboortedatum:', formattedData.dateOfBirth);
+        
+        // Verwijder de geboortedatum property volledig als het leeg is
+        if (formattedData.dateOfBirth === '') {
+          delete formattedData.dateOfBirth;
+        }
+      } else {
+        // Verwijder de geboortedatum property volledig als undefined of null
+        delete formattedData.dateOfBirth;
+      }
+      
+      console.log('Verstuur student data na opschoning:', formattedData);
+      
+      // Verzend de geformatteerde data
+      createStudentMutation.mutate(formattedData);
+    } catch (error) {
+      console.error('Fout bij het formatteren van studentgegevens:', error);
+      toast({
+        title: "Fout bij verwerken",
+        description: "Er is een fout opgetreden bij het verwerken van het formulier.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleViewStudent = (id: string) => {
@@ -259,20 +276,37 @@ export default function Students() {
   const handleSubmitEditStudent = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedStudent) {
-      // Kopieer de studentdata voor we deze aanpassen
-      const formattedData = { ...studentFormData };
-      
-      // Gebruik de formatDateForApi functie voor correcte datumformattering
-      // Zet de geboortedatum om naar het juiste format en gebruik een lege string als het null is
-      const formattedDate = formatDateForApi(formattedData.dateOfBirth) || '';
-      formattedData.dateOfBirth = formattedDate;
-      
-      console.log('Verstuur bewerkte student data:', formattedData);
-      
-      updateStudentMutation.mutate({
-        id: selectedStudent.id,
-        studentData: formattedData
-      });
+      try {
+        // Maak een diepe kopie om te voorkomen dat we de originele state aanpassen
+        const formattedData = JSON.parse(JSON.stringify(studentFormData));
+        
+        // Controleer of we een geboortedatum hebben
+        if (formattedData.dateOfBirth) {
+          console.log('Originele geboortedatum bij bewerken:', formattedData.dateOfBirth);
+          
+          // Verwijder de geboortedatum property volledig als het leeg is
+          if (formattedData.dateOfBirth === '') {
+            delete formattedData.dateOfBirth;
+          }
+        } else {
+          // Verwijder de geboortedatum property volledig als undefined of null
+          delete formattedData.dateOfBirth;
+        }
+        
+        console.log('Verstuur bewerkte student data na opschoning:', formattedData);
+        
+        updateStudentMutation.mutate({
+          id: selectedStudent.id,
+          studentData: formattedData
+        });
+      } catch (error) {
+        console.error('Fout bij het formatteren van studentgegevens voor update:', error);
+        toast({
+          title: "Fout bij verwerken",
+          description: "Er is een fout opgetreden bij het verwerken van het formulier.",
+          variant: "destructive",
+        });
+      }
     }
   };
 

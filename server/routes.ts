@@ -58,48 +58,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.post("/api/students", async (req, res) => {
     try {
-      // Maak een kopie van de request body om deze te formatteren
-      const formattedBody = { ...req.body };
+      // Log de binnenkomende data voor debugging
+      console.log("Received student data:", req.body);
       
-      // Format datumvelden voordat ze worden gevalideerd
-      if (formattedBody.dateOfBirth) {
-        // Als het veld al bestaat, probeer het te formatteren naar ISO-formaat YYYY-MM-DD
-        try {
-          // Controleer of het al in YYYY-MM-DD formaat is
-          if (/^\d{4}-\d{2}-\d{2}$/.test(formattedBody.dateOfBirth)) {
-            // Laat het zoals het is
-          } 
-          // Controleer op DD-MM-YYYY formaat
-          else if (/^\d{2}-\d{2}-\d{4}$/.test(formattedBody.dateOfBirth)) {
-            const [day, month, year] = formattedBody.dateOfBirth.split('-');
-            formattedBody.dateOfBirth = `${year}-${month}-${day}`;
-          } 
-          // Anders probeer Date object te gebruiken
-          else {
-            const date = new Date(formattedBody.dateOfBirth);
-            if (!isNaN(date.getTime())) {
-              formattedBody.dateOfBirth = date.toISOString().split('T')[0];
-            } else {
-              // Als het niet als datum kan worden geparsed, zet het op null
-              formattedBody.dateOfBirth = null;
-            }
-          }
-        } catch (dateError) {
-          console.error("Error formatting date:", dateError);
-          formattedBody.dateOfBirth = null;
-        }
-      }
+      // We gebruiken het schema om eerst te valideren
+      // Transformaties gebeuren in de schema zelf via .transform()
+      const validatedData = insertStudentSchema.parse(req.body);
       
-      console.log("Formatted student data for creation:", formattedBody);
+      // Log de gevalideerde data
+      console.log("Validated student data:", validatedData);
       
-      // Valideer de geformatteerde data
-      const validatedData = insertStudentSchema.parse(formattedBody);
+      // Stuur de data door naar storage zonder verdere aanpassingen
       const newStudent = await storage.createStudent(validatedData);
       res.status(201).json(newStudent);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.error("Validation error:", error.errors);
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        console.error("Student validation error:", error.errors);
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: error.errors,
+          received: req.body  // Dit helpt bij diagnose
+        });
       }
       console.error("Error creating student:", error);
       res.status(500).json({ message: "Error creating student" });
@@ -113,44 +92,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid ID format" });
       }
       
-      // Maak een kopie van de request body om deze te formatteren
-      const formattedBody = { ...req.body };
+      // Log de binnenkomende data voor debugging
+      console.log("Received student update data:", req.body);
       
-      // Format datumvelden voordat ze worden gevalideerd
-      if (formattedBody.dateOfBirth) {
-        // Als het veld al bestaat, probeer het te formatteren naar ISO-formaat YYYY-MM-DD
-        try {
-          // Controleer of het al in YYYY-MM-DD formaat is
-          if (/^\d{4}-\d{2}-\d{2}$/.test(formattedBody.dateOfBirth)) {
-            // Laat het zoals het is
-          } 
-          // Controleer op DD-MM-YYYY formaat
-          else if (/^\d{2}-\d{2}-\d{4}$/.test(formattedBody.dateOfBirth)) {
-            const [day, month, year] = formattedBody.dateOfBirth.split('-');
-            formattedBody.dateOfBirth = `${year}-${month}-${day}`;
-          } 
-          // Anders probeer Date object te gebruiken
-          else {
-            const date = new Date(formattedBody.dateOfBirth);
-            if (!isNaN(date.getTime())) {
-              formattedBody.dateOfBirth = date.toISOString().split('T')[0];
-            } else {
-              // Als het niet als datum kan worden geparsed, zet het op null
-              formattedBody.dateOfBirth = null;
-            }
-          }
-        } catch (dateError) {
-          console.error("Error formatting date:", dateError);
-          formattedBody.dateOfBirth = null;
-        }
-      }
+      // We gebruiken partial schema omdat niet alle velden verplicht zijn bij een update
+      // Transformaties gebeuren in de schema definitie zelf
+      const validatedData = insertStudentSchema.partial().parse(req.body);
       
-      console.log("Formatted student data for update:", formattedBody);
+      // Log de gevalideerde data
+      console.log("Validated student update data:", validatedData);
       
-      // Valideer de geformatteerde data
-      // We gebruiken partial omdat bij een update niet alle velden verplicht zijn
-      const validatedData = insertStudentSchema.partial().parse(formattedBody);
-      
+      // Update de student zonder verdere aanpassingen
       const updatedStudent = await storage.updateStudent(id, validatedData);
       if (!updatedStudent) {
         return res.status(404).json({ message: "Student not found" });
@@ -159,8 +111,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updatedStudent);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.error("Validation error:", error.errors);
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
+        console.error("Student update validation error:", error.errors);
+        return res.status(400).json({ 
+          message: "Validation error", 
+          errors: error.errors,
+          received: req.body  // Dit helpt bij diagnose
+        });
       }
       console.error("Update student error:", error);
       res.status(500).json({ message: "Error updating student" });

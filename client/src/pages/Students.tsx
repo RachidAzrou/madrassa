@@ -727,15 +727,16 @@ export default function Students() {
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-1">
-                  <Label htmlFor="studentId" className="text-right">
+                  <Label htmlFor="studentId" className="text-right flex items-center gap-2">
                     Studentnummer
+                    <span className="text-xs text-muted-foreground font-normal italic">(automatisch)</span>
                   </Label>
                   <Input
                     id="studentId"
-                    required
-                    value={studentFormData.studentId}
-                    onChange={(e) => setStudentFormData({ ...studentFormData, studentId: e.target.value })}
-                    className="mt-1"
+                    value="Wordt automatisch gegenereerd"
+                    className="mt-1 text-muted-foreground bg-muted cursor-not-allowed"
+                    disabled
+                    readOnly
                   />
                 </div>
                 <div className="col-span-1">

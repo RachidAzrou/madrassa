@@ -56,14 +56,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Functie om het volgende beschikbare studentnummer te genereren
+  async function generateNextStudentId(): Promise<string> {
+    try {
+      // Haal alle bestaande studenten op om het hoogste ID te vinden
+      const allStudents = await storage.getStudents();
+      
+      // Als er geen studenten zijn, begin met 1001
+      if (!allStudents || allStudents.length === 0) {
+        return "1001";
+      }
+      
+      // Filter alle geldige numerieke IDs
+      const validIds = allStudents
+        .map(student => student.studentId)
+        .filter(id => /^\d+$/.test(id))
+        .map(id => parseInt(id, 10))
+        .filter(id => !isNaN(id));
+      
+      // Als er geen geldige numerieke IDs zijn, begin met 1001
+      if (validIds.length === 0) {
+        return "1001";
+      }
+      
+      // Bepaal het hoogste ID en verhoog met 1
+      const maxId = Math.max(...validIds);
+      return (maxId + 1).toString();
+    } catch (error) {
+      console.error("Fout bij genereren studentnummer:", error);
+      // Fallback naar timestamp als er een fout optreedt
+      return (1000 + new Date().getTime() % 9000).toString();
+    }
+  }
+
   apiRouter.post("/api/students", async (req, res) => {
     try {
       // Log de binnenkomende data voor debugging
       console.log("Received student data:", req.body);
       
+      // Genereer een nieuw studentnummer en voeg dit toe aan de data
+      const studentData = { ...req.body };
+      
+      // Als er geen studentnummer is meegegeven of als we het altijd willen overschrijven
+      studentData.studentId = await generateNextStudentId();
+      
+      console.log("Gegenereerd studentnummer:", studentData.studentId);
+      
       // We gebruiken het schema om eerst te valideren
       // Transformaties gebeuren in de schema zelf via .transform()
-      const validatedData = insertStudentSchema.parse(req.body);
+      const validatedData = insertStudentSchema.parse(studentData);
       
       // Log de gevalideerde data
       console.log("Validated student data:", validatedData);

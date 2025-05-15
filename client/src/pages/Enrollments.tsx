@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, Check, X, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,8 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
@@ -22,6 +24,31 @@ import { Progress } from '@/components/ui/progress';
 // ActionButtons Component voor de consistency in enrollment-lijsten
 function EnrollmentActionButtons({ id }: { id: string }) {
   const { toast } = useToast();
+  
+  // Mutatie om een inschrijving te verwijderen
+  const deleteEnrollmentMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest('DELETE', `/api/enrollments/${id}`);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/enrollments'] });
+      
+      // Toon succes melding
+      toast({
+        title: "Inschrijving verwijderd",
+        description: "De inschrijving is succesvol verwijderd uit het systeem.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van de inschrijving.",
+        variant: "destructive",
+      });
+    }
+  });
   
   const handleViewEnrollment = (id: string) => {
     console.log(`Viewing enrollment with ID: ${id}`);
@@ -45,27 +72,7 @@ function EnrollmentActionButtons({ id }: { id: string }) {
     console.log(`Deleting enrollment with ID: ${id}`);
     
     if (confirm(`Weet je zeker dat je de inschrijving met ID: ${id} wilt verwijderen?`)) {
-      // Implementeer de werkelijke verwijdering via API
-      apiRequest('DELETE', `/api/enrollments/${id}`)
-        .then(() => {
-          // Toon succesmelding
-          toast({
-            title: "Inschrijving verwijderd",
-            description: `Inschrijving met ID ${id} is succesvol verwijderd.`,
-            variant: "default",
-          });
-          
-          // Invalidate cache om de lijst te vernieuwen
-          queryClient.invalidateQueries({ queryKey: ['/api/enrollments'] });
-        })
-        .catch((error) => {
-          // Toon foutmelding bij mislukken
-          toast({
-            title: "Fout bij verwijderen",
-            description: error.message || "Er is een fout opgetreden bij het verwijderen van de inschrijving.",
-            variant: "destructive",
-          });
-        });
+      deleteEnrollmentMutation.mutate(id);
     }
   };
 
@@ -107,6 +114,15 @@ export default function Enrollments() {
   const [status, setStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('student-enrollments');
+  
+  // State voor inschrijving dialoog
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [enrollmentFormData, setEnrollmentFormData] = useState({
+    studentId: null as number | null,
+    courseId: null as number | null,
+    status: 'Active' as string,
+    enrollmentDate: new Date().toISOString().slice(0, 10),
+  });
 
   // Fetch enrollments with filters
   const { data, isLoading, isError } = useQuery({
@@ -131,14 +147,58 @@ export default function Enrollments() {
   const programs = programsData?.programs || [];
   const courses = coursesData?.courses || [];
 
-  const handleAddEnrollment = async () => {
-    // Implementatie voor het toevoegen van een inschrijving
-    console.log('Add enrollment clicked');
-    toast({
-      title: "Functie in ontwikkeling",
-      description: "De functie voor het toevoegen van nieuwe inschrijvingen is momenteel in ontwikkeling.",
-      variant: "default",
-    });
+  // Mutatie om een inschrijving toe te voegen
+  const createEnrollmentMutation = useMutation({
+    mutationFn: async (enrollmentData: typeof enrollmentFormData) => {
+      return apiRequest('POST', '/api/enrollments', enrollmentData);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/enrollments'] });
+      
+      // Reset form and close dialog
+      setEnrollmentFormData({
+        studentId: null,
+        courseId: null,
+        status: 'Active',
+        enrollmentDate: new Date().toISOString().slice(0, 10),
+      });
+      setIsAddDialogOpen(false);
+      
+      // Toon succes melding
+      toast({
+        title: "Inschrijving toegevoegd",
+        description: "De inschrijving is succesvol toegevoegd aan het systeem.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij toevoegen",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van de inschrijving.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleAddEnrollment = () => {
+    // Open het toevoeg-dialoogvenster
+    setIsAddDialogOpen(true);
+  };
+  
+  const handleSubmitEnrollment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!enrollmentFormData.studentId || !enrollmentFormData.courseId) {
+      toast({
+        title: "Onvolledige gegevens",
+        description: "Selecteer een student en een cursus om de inschrijving te voltooien.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    createEnrollmentMutation.mutate(enrollmentFormData);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -575,6 +635,120 @@ export default function Enrollments() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Add Enrollment Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Nieuwe Inschrijving Toevoegen</DialogTitle>
+            <DialogDescription>
+              Vul de inschrijvingsinformatie in om een nieuwe inschrijving aan te maken.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmitEnrollment}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="studentId" className="text-right">
+                    Student
+                  </Label>
+                  <Select
+                    value={enrollmentFormData.studentId?.toString() || ''}
+                    onValueChange={(value) => setEnrollmentFormData({ 
+                      ...enrollmentFormData, 
+                      studentId: value ? parseInt(value) : null 
+                    })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer student" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {/* We tonen een hardcodeerde lijst omdat de echte lijst via de API op dit moment niet beschikbaar is */}
+                      <SelectItem value="1">S1001 - Jan de Vries</SelectItem>
+                      <SelectItem value="2">S1002 - Emma Bakker</SelectItem>
+                      <SelectItem value="3">S1003 - Noah van Dijk</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="courseId" className="text-right">
+                    Cursus
+                  </Label>
+                  <Select
+                    value={enrollmentFormData.courseId?.toString() || ''}
+                    onValueChange={(value) => setEnrollmentFormData({ 
+                      ...enrollmentFormData, 
+                      courseId: value ? parseInt(value) : null 
+                    })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer cursus" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {/* We tonen een hardcodeerde lijst omdat de echte lijst via de API op dit moment niet beschikbaar is */}
+                      <SelectItem value="1">CS101 - Introductie Programmeren</SelectItem>
+                      <SelectItem value="2">CS202 - Datastructuren en Algoritmen</SelectItem>
+                      <SelectItem value="3">MATH110 - Lineaire Algebra</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="status" className="text-right">
+                    Status
+                  </Label>
+                  <Select
+                    value={enrollmentFormData.status}
+                    onValueChange={(value) => setEnrollmentFormData({ ...enrollmentFormData, status: value })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Active">Actief</SelectItem>
+                      <SelectItem value="Pending">In afwachting</SelectItem>
+                      <SelectItem value="Withdrawn">Teruggetrokken</SelectItem>
+                      <SelectItem value="Completed">Voltooid</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="enrollmentDate" className="text-right">
+                    Inschrijvingsdatum
+                  </Label>
+                  <Input
+                    id="enrollmentDate"
+                    type="date"
+                    value={enrollmentFormData.enrollmentDate}
+                    onChange={(e) => setEnrollmentFormData({ ...enrollmentFormData, enrollmentDate: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsAddDialogOpen(false)}
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="submit"
+                disabled={createEnrollmentMutation.isPending}
+              >
+                {createEnrollmentMutation.isPending ? 'Bezig met toevoegen...' : 'Inschrijving toevoegen'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

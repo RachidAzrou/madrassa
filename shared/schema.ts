@@ -126,6 +126,27 @@ export const insertGradeSchema = createInsertSchema(grades).omit({
 export type InsertGrade = z.infer<typeof insertGradeSchema>;
 export type Grade = typeof grades.$inferSelect;
 
+// Assessment Types Schema
+export const assessments = pgTable("assessments", {
+  id: serial("id").primaryKey(),
+  courseId: integer("course_id").notNull(), // foreign key to courses
+  name: text("name").notNull(), // Name of the assessment
+  type: text("type").notNull(), // Type: midterm, final, assignment, project, quiz
+  maxScore: integer("max_score").notNull(), // Maximum possible score
+  weight: integer("weight").notNull(), // Percentage weight in final grade
+  dueDate: date("due_date"), // When the assessment is due
+  description: text("description"), // Optional description
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertAssessmentSchema = createInsertSchema(assessments).omit({
+  id: true,
+  createdAt: true
+});
+
+export type InsertAssessment = z.infer<typeof insertAssessmentSchema>;
+export type Assessment = typeof assessments.$inferSelect;
+
 // Calendar Events
 export const events = pgTable("events", {
   id: serial("id").primaryKey(),

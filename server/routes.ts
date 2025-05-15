@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
+import { z } from "zod";
 import { 
   insertStudentSchema, 
   insertProgramSchema, 
@@ -73,13 +74,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid ID format" });
       }
       
-      const updatedStudent = await storage.updateStudent(id, req.body);
+      // Valideer de data voordat deze wordt opgeslagen
+      // We gebruiken partial omdat bij een update niet alle velden verplicht zijn
+      const validated = insertStudentSchema.partial().parse(req.body);
+      
+      // Converteren van het gevalideerde data naar het juiste type (Partial<Student>)
+      // Dit omvat vooral de datumvelden die in de juiste formaten moeten zijn
+      const validatedData: Partial<Student> = {
+        ...validated,
+        // Zorg ervoor dat datums correct worden behandeld
+        dateOfBirth: validated.dateOfBirth ? 
+          (validated.dateOfBirth instanceof Date ? 
+            validated.dateOfBirth.toISOString().split('T')[0] : 
+            validated.dateOfBirth) : 
+          null
+      };
+      
+      const updatedStudent = await storage.updateStudent(id, validatedData);
       if (!updatedStudent) {
         return res.status(404).json({ message: "Student not found" });
       }
       
       res.json(updatedStudent);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Update student error:", error);
       res.status(500).json({ message: "Error updating student" });
     }
   });

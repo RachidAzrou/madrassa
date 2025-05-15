@@ -18,8 +18,34 @@ export const students = pgTable("students", {
   enrollmentDate: timestamp("enrollment_date").defaultNow(),
 });
 
-export const insertStudentSchema = createInsertSchema(students).omit({
+// Maak een standaard schema maar omit ID (wordt gegenereerd door database)
+const baseInsertStudentSchema = createInsertSchema(students).omit({
   id: true
+});
+
+// Pas het schema aan met aangepaste datumvalidatie
+export const insertStudentSchema = baseInsertStudentSchema.extend({
+  // Voeg uitgebreide validatie voor geboortedatum toe die zowel null als string toestaat
+  dateOfBirth: z.union([
+    z.string(),
+    z.null(),
+    z.date()
+  ]).optional().transform(val => {
+    if (!val) return null;
+    if (val instanceof Date) return val;
+    
+    try {
+      // Converteer string naar Date object
+      const date = new Date(val);
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    } catch (e) {
+      console.error('Invalid date format:', val);
+    }
+    
+    return null;
+  })
 });
 
 export type InsertStudent = z.infer<typeof insertStudentSchema>;

@@ -207,7 +207,8 @@ export default function Students() {
       const formattedData = { ...studentFormData };
       
       // Gebruik de formatDateForApi functie voor correcte datumformattering
-      const formattedDate = formatDateForApi(formattedData.dateOfBirth);
+      // Zet de geboortedatum om naar het juiste format en gebruik een lege string als het null is
+      const formattedDate = formatDateForApi(formattedData.dateOfBirth) || '';
       formattedData.dateOfBirth = formattedDate;
       
       console.log('Verstuur bewerkte student data:', formattedData);

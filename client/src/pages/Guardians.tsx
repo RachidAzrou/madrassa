@@ -428,6 +428,23 @@ export default function Guardians() {
     });
   };
 
+  // Handler voor de vernieuwknop
+  const handleRefresh = async () => {
+    console.log("Vernieuwen van voogdenlijst...");
+    // Forceer een vernieuwing van de gegevens
+    await refetch();
+    
+    // Wis ook de client cache voor het guardians endpoint
+    queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+    
+    // Toon een bevestigingsmelding
+    toast({
+      title: "Vernieuwd",
+      description: "De voogdenlijst is vernieuwd",
+      variant: "default",
+    });
+  };
+  
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -447,6 +464,30 @@ export default function Guardians() {
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
+          <Button 
+            variant="outline" 
+            onClick={handleRefresh} 
+            className="flex items-center"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              className="mr-2"
+            >
+              <path d="M21 2v6h-6"></path>
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+              <path d="M3 22v-6h6"></path>
+              <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+            </svg>
+            <span>Vernieuwen</span>
+          </Button>
           <Button onClick={handleAddGuardian} className="flex items-center">
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Voogd Toevoegen</span>
@@ -478,9 +519,29 @@ export default function Guardians() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <div className="text-sm text-gray-500">
-            {isLoading ? 'Laden...' : `Toont ${guardians.length} van ${totalGuardians} voogden`}
+            {isLoading ? 'Laden...' : `Toont ${Array.isArray(data) ? data.length : 0} voogd(en)`}
           </div>
           <div className="flex space-x-2">
+            <Button variant="outline" size="sm" onClick={handleRefresh}>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className="mr-2 h-4 w-4"
+              >
+                <path d="M21 2v6h-6"></path>
+                <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                <path d="M3 22v-6h6"></path>
+                <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+              </svg>
+              Vernieuwen
+            </Button>
             <Button variant="outline" size="sm">
               <Filter className="mr-2 h-4 w-4" />
               Filteren
@@ -523,10 +584,10 @@ export default function Guardians() {
                     Fout bij het laden van voogden. Probeer het opnieuw.
                   </td>
                 </tr>
-              ) : guardians.length === 0 ? (
+              ) : !Array.isArray(data) || data.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                    Geen voogden gevonden met de huidige filters. Pas uw zoekterm of filters aan.
+                    Geen voogden gevonden. Klik op 'Vernieuwen' of voeg nieuwe voogden toe.
                   </td>
                 </tr>
               ) : (

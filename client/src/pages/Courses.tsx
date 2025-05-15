@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,6 +15,19 @@ export default function Courses() {
   const [searchTerm, setSearchTerm] = useState('');
   const [department, setDepartment] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  
+  // State voor cursus dialoog
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [courseFormData, setCourseFormData] = useState({
+    name: '',
+    code: '',
+    programId: null as number | null,
+    description: '',
+    credits: 6,
+    instructor: '',
+    maxStudents: 30,
+    isActive: true,
+  });
 
   // Fetch courses with filters
   const { data, isLoading, isError } = useQuery({
@@ -24,14 +39,52 @@ export default function Courses() {
   const totalCourses = data?.totalCount || 0;
   const totalPages = Math.ceil(totalCourses / 10); // Assuming 10 courses per page
 
-  const handleAddCourse = async () => {
-    // Implementatie voor het toevoegen van een cursus
-    console.log('Add course clicked');
-    toast({
-      title: "Functie in ontwikkeling",
-      description: "De functie voor het toevoegen van nieuwe cursussen is momenteel in ontwikkeling.",
-      variant: "default",
-    });
+  // Mutatie om een cursus toe te voegen
+  const createCourseMutation = useMutation({
+    mutationFn: async (courseData: typeof courseFormData) => {
+      return apiRequest('POST', '/api/courses', courseData);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      
+      // Reset form and close dialog
+      setCourseFormData({
+        name: '',
+        code: '',
+        programId: null,
+        description: '',
+        credits: 6,
+        instructor: '',
+        maxStudents: 30,
+        isActive: true,
+      });
+      setIsAddDialogOpen(false);
+      
+      // Toon succes melding
+      toast({
+        title: "Cursus toegevoegd",
+        description: "De cursus is succesvol toegevoegd aan het systeem.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij toevoegen",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van de cursus.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleAddCourse = () => {
+    // Open het toevoeg-dialoogvenster
+    setIsAddDialogOpen(true);
+  };
+  
+  const handleSubmitCourse = async (e: React.FormEvent) => {
+    e.preventDefault();
+    createCourseMutation.mutate(courseFormData);
   };
   
   const handleEditCourse = (id: string) => {
@@ -259,6 +312,163 @@ export default function Courses() {
           </nav>
         </div>
       )}
+
+      {/* Add Course Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Nieuwe Cursus Toevoegen</DialogTitle>
+            <DialogDescription>
+              Vul de cursusinformatie in om een nieuwe cursus toe te voegen aan het systeem.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmitCourse}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="name" className="text-right">
+                    Cursusnaam
+                  </Label>
+                  <Input
+                    id="name"
+                    required
+                    value={courseFormData.name}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="code" className="text-right">
+                    Cursuscode
+                  </Label>
+                  <Input
+                    id="code"
+                    required
+                    value={courseFormData.code}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="programId" className="text-right">
+                    Programma
+                  </Label>
+                  <Select
+                    value={courseFormData.programId?.toString() || ''}
+                    onValueChange={(value) => setCourseFormData({ ...courseFormData, programId: value ? parseInt(value) : null })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer programma" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Informatica</SelectItem>
+                      <SelectItem value="2">Bedrijfskunde</SelectItem>
+                      <SelectItem value="3">Techniek</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="credits" className="text-right">
+                    Studiepunten
+                  </Label>
+                  <Select
+                    value={courseFormData.credits.toString()}
+                    onValueChange={(value) => setCourseFormData({ ...courseFormData, credits: parseInt(value) })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer studiepunten" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="3">3 ECTS</SelectItem>
+                      <SelectItem value="6">6 ECTS</SelectItem>
+                      <SelectItem value="9">9 ECTS</SelectItem>
+                      <SelectItem value="12">12 ECTS</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="description" className="text-right">
+                    Beschrijving
+                  </Label>
+                  <Input
+                    id="description"
+                    value={courseFormData.description || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="instructor" className="text-right">
+                    Docent
+                  </Label>
+                  <Input
+                    id="instructor"
+                    value={courseFormData.instructor || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, instructor: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="maxStudents" className="text-right">
+                    Maximum aantal studenten
+                  </Label>
+                  <Input
+                    id="maxStudents"
+                    type="number"
+                    value={courseFormData.maxStudents || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, maxStudents: parseInt(e.target.value) })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="isActive" className="text-right mr-2">
+                    Status
+                  </Label>
+                  <Select
+                    value={courseFormData.isActive ? "true" : "false"}
+                    onValueChange={(value) => setCourseFormData({ ...courseFormData, isActive: value === "true" })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Actief</SelectItem>
+                      <SelectItem value="false">Inactief</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsAddDialogOpen(false)}
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="submit"
+                disabled={createCourseMutation.isPending}
+              >
+                {createCourseMutation.isPending ? 'Bezig met toevoegen...' : 'Cursus toevoegen'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

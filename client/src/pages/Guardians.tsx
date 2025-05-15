@@ -33,6 +33,7 @@ import {
   DialogTitle 
 } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
@@ -88,6 +89,10 @@ export default function Guardians() {
   
   // State voor voogddetails dialog
   const [isViewGuardianDialogOpen, setIsViewGuardianDialogOpen] = useState(false);
+  
+  // State voor studenten pop-up
+  const [popoverGuardianId, setPopoverGuardianId] = useState<number | null>(null);
+  const [showingStudentsFor, setShowingStudentsFor] = useState<GuardianType | null>(null);
 
   // Fetch guardians with filters
   const { data, isLoading, isError, refetch } = useQuery({

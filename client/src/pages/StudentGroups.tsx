@@ -45,6 +45,12 @@ export default function StudentGroups() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Dialoog controls
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+
   // Fetch student groups with filters
   const { data, isLoading, isError } = useQuery<{
     studentGroups: any[];
@@ -58,22 +64,12 @@ export default function StudentGroups() {
 
   const studentGroups = data?.studentGroups || [];
   const totalStudentGroups = data?.totalCount || 0;
-  const totalPages = Math.ceil(totalStudentGroups / 9); // Assuming 9 groups per page for grid layout
-
-  // Dialoog controls
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+  const totalPages = Math.ceil(totalStudentGroups / 9);
 
   // Form validation schema
   const studentGroupSchema = z.object({
-    name: z.string().min(2, {
-      message: "Naam moet minimaal 2 tekens bevatten",
-    }),
-    academicYear: z.string({
-      required_error: "Selecteer een academisch jaar",
-    }),
+    name: z.string().min(2, { message: "Naam moet minimaal 2 tekens bevatten" }),
+    academicYear: z.string({ required_error: "Selecteer een academisch jaar" }),
     programId: z.coerce.number().optional(),
     courseId: z.coerce.number().optional(),
     instructor: z.string().optional(),
@@ -257,6 +253,7 @@ export default function StudentGroups() {
     setCurrentPage(page);
   };
 
+  // Render the page
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -308,7 +305,7 @@ export default function StudentGroups() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Alle Opleidingen</SelectItem>
-                {programs.map(program => (
+                {programs.map((program) => (
                   <SelectItem key={program.id} value={program.id.toString()}>
                     {program.name}
                   </SelectItem>
@@ -340,7 +337,7 @@ export default function StudentGroups() {
         </div>
       </div>
 
-      {/* Student Groups View */}
+      {/* Main content area */}
       <Tabs defaultValue="grid" className="space-y-4">
         <div className="flex justify-between items-center">
           <TabsList>
@@ -352,11 +349,9 @@ export default function StudentGroups() {
               variant="outline" 
               size="sm"
               onClick={() => {
-                // Toon een uitgebreider filtervenster
                 const filterSection = document.querySelector('.student-groups-filters');
                 if (filterSection) {
                   filterSection.classList.toggle('hidden');
-                  
                   toast({
                     title: "Filters bijgewerkt",
                     description: "Gebruik de filtervelden om groepen te zoeken.",
@@ -371,7 +366,6 @@ export default function StudentGroups() {
               variant="outline" 
               size="sm"
               onClick={() => {
-                // Download studentengroepen als CSV
                 const csvContent = 
                   "data:text/csv;charset=utf-8," + 
                   "ID,Naam,Academisch Jaar,Programma,Capaciteit,Status\n" + 
@@ -443,363 +437,303 @@ export default function StudentGroups() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Example card 1 */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>CS-2024-A</CardTitle>
-                  <CardDescription>
-                    <Badge className="mr-1 bg-blue-100 text-blue-800 hover:bg-blue-100">Computer Science</Badge>
-                    <Badge variant="outline">2024-2025</Badge>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-gray-500 space-y-2">
-                    <div className="flex justify-between">
-                      <span>Studenten:</span>
-                      <span className="font-medium">32</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Docent:</span>
-                      <span className="font-medium">Dr. Alan Turing</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Cursussen:</span>
-                      <span className="font-medium">6</span>
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <p className="text-xs text-gray-500 mb-1">Studenten</p>
-                    <div className="flex -space-x-2">
-                      <Avatar className="h-8 w-8 border-2 border-white">
-                        <AvatarFallback>JD</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="h-8 w-8 border-2 border-white">
-                        <AvatarFallback>AB</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="h-8 w-8 border-2 border-white">
-                        <AvatarFallback>CD</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="h-8 w-8 border-2 border-white">
-                        <AvatarFallback>EF</AvatarFallback>
-                      </Avatar>
-                      <div className="flex items-center justify-center h-8 w-8 rounded-full border-2 border-white bg-gray-100 text-xs text-gray-500">
-                        +28
+              {studentGroups.map((group) => (
+                <Card key={group.id} className="overflow-hidden">
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle>{group.name}</CardTitle>
+                        <CardDescription>
+                          <Badge variant="outline" className="mr-1">{group.academicYear}</Badge>
+                          {group.programName && (
+                            <Badge className="mr-1 bg-blue-100 text-blue-800 hover:bg-blue-100">{group.programName}</Badge>
+                          )}
+                        </CardDescription>
                       </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                            <span className="sr-only">Menu openen</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onSelect={() => handleEditStudentGroup(group)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            <span>Bewerken</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onSelect={() => {
+                              toast({
+                                title: "Studenten bekijken",
+                                description: `Studenten in groep ${group.name} bekijken.`,
+                              });
+                            }}
+                          >
+                            <Users className="mr-2 h-4 w-4" />
+                            <span>Studenten bekijken</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-red-600"
+                            onSelect={() => handleDeleteStudentGroup(group)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            <span>Verwijderen</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="border-t pt-4 flex justify-between">
-                  <Button variant="outline" size="sm">
-                    <Eye className="mr-2 h-4 w-4" />
-                    View
-                  </Button>
-                  <div className="space-x-1">
-                    <Button variant="ghost" size="icon">
-                      <Edit className="h-4 w-4 text-blue-500" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </div>
-                </CardFooter>
-              </Card>
-
-              {/* Example card 2 */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>BUS-2024-B</CardTitle>
-                  <CardDescription>
-                    <Badge className="mr-1 bg-green-100 text-green-800 hover:bg-green-100">Business</Badge>
-                    <Badge variant="outline">2024-2025</Badge>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-gray-500 space-y-2">
-                    <div className="flex justify-between">
-                      <span>Students:</span>
-                      <span className="font-medium">28</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Instructor:</span>
-                      <span className="font-medium">Prof. Adam Smith</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Courses:</span>
-                      <span className="font-medium">5</span>
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <p className="text-xs text-gray-500 mb-1">Studenten</p>
-                    <div className="flex -space-x-2">
-                      <Avatar className="h-8 w-8 border-2 border-white">
-                        <AvatarFallback>TJ</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="h-8 w-8 border-2 border-white">
-                        <AvatarFallback>PK</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="h-8 w-8 border-2 border-white">
-                        <AvatarFallback>ML</AvatarFallback>
-                      </Avatar>
-                      <div className="flex items-center justify-center h-8 w-8 rounded-full border-2 border-white bg-gray-100 text-xs text-gray-500">
-                        +25
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm text-gray-500 space-y-2">
+                      <div className="flex justify-between">
+                        <span>Studenten:</span>
+                        <span className="font-medium">{group.studentCount || 0}</span>
                       </div>
+                      {group.instructor && (
+                        <div className="flex justify-between">
+                          <span>Docent:</span>
+                          <span className="font-medium">{group.instructor}</span>
+                        </div>
+                      )}
+                      {group.courseName && (
+                        <div className="flex justify-between">
+                          <span>Cursus:</span>
+                          <span className="font-medium">{group.courseName}</span>
+                        </div>
+                      )}
+                      {group.maxCapacity && (
+                        <div className="flex justify-between">
+                          <span>Max. capaciteit:</span>
+                          <span className="font-medium">{group.maxCapacity}</span>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="border-t pt-4 flex justify-between">
-                  <Button variant="outline" size="sm">
-                    <Eye className="mr-2 h-4 w-4" />
-                    View
-                  </Button>
-                  <div className="space-x-1">
-                    <Button variant="ghost" size="icon">
-                      <Edit className="h-4 w-4 text-blue-500" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </div>
-                </CardFooter>
-              </Card>
-
-              {/* Example card 3 */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>ENG-2024-A</CardTitle>
-                  <CardDescription>
-                    <Badge className="mr-1 bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Engineering</Badge>
-                    <Badge variant="outline">2024-2025</Badge>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-gray-500 space-y-2">
-                    <div className="flex justify-between">
-                      <span>Students:</span>
-                      <span className="font-medium">24</span>
+                  </CardContent>
+                  <CardFooter className="border-t pt-4 flex justify-between">
+                    <Badge variant={group.isActive ? "default" : "outline"} className="mr-2">
+                      {group.isActive ? "Actief" : "Inactief"}
+                    </Badge>
+                    <div className="space-x-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          toast({
+                            title: "Details bekijken",
+                            description: `Details van groep ${group.name} bekijken.`,
+                          });
+                        }}
+                      >
+                        <Eye className="mr-2 h-4 w-4" />
+                        Details
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleEditStudentGroup(group)}
+                      >
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Bewerken
+                      </Button>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Instructor:</span>
-                      <span className="font-medium">Dr. Nikola Tesla</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Courses:</span>
-                      <span className="font-medium">7</span>
-                    </div>
+                  </CardFooter>
+                </Card>
+              ))}
+              
+              {/* Nieuwe groep knop als kaart */}
+              <Card 
+                className="flex flex-col items-center justify-center border-dashed border-2 h-full min-h-[250px] hover:border-primary/50 hover:bg-secondary/20 transition-colors cursor-pointer" 
+                onClick={handleAddStudentGroup}
+              >
+                <div className="p-6 flex flex-col items-center justify-center text-center">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <Plus className="h-6 w-6 text-primary" />
                   </div>
-                  <div className="mt-4">
-                    <p className="text-xs text-gray-500 mb-1">Studenten</p>
-                    <div className="flex -space-x-2">
-                      <Avatar className="h-8 w-8 border-2 border-white">
-                        <AvatarFallback>RB</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="h-8 w-8 border-2 border-white">
-                        <AvatarFallback>ST</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="h-8 w-8 border-2 border-white">
-                        <AvatarFallback>LM</AvatarFallback>
-                      </Avatar>
-                      <div className="flex items-center justify-center h-8 w-8 rounded-full border-2 border-white bg-gray-100 text-xs text-gray-500">
-                        +21
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="border-t pt-4 flex justify-between">
-                  <Button variant="outline" size="sm">
-                    <Eye className="mr-2 h-4 w-4" />
-                    View
-                  </Button>
-                  <div className="space-x-1">
-                    <Button variant="ghost" size="icon">
-                      <Edit className="h-4 w-4 text-blue-500" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </div>
-                </CardFooter>
+                  <h3 className="text-lg font-medium mb-2">Nieuwe groep</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Klik om een nieuwe studentengroep aan te maken
+                  </p>
+                </div>
               </Card>
             </div>
           )}
-          
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center space-x-2 mt-8">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </Button>
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <Button 
-                  key={i}
-                  variant={currentPage === i + 1 ? "default" : "outline"} 
-                  size="sm"
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </Button>
-              ))}
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </Button>
+
+          {/* Pagination for grid view */}
+          {!isLoading && studentGroups.length > 0 && totalPages > 1 && (
+            <div className="flex justify-center mt-6">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: totalPages }).map((_, i) => {
+                    const page = i + 1;
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => handlePageChange(page)}
+                          isActive={page === currentPage}
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage === totalPages}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </TabsContent>
 
         <TabsContent value="list" className="space-y-4">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-              <div className="text-sm text-gray-500">
-                {isLoading ? 'Loading...' : `Showing ${studentGroups.length} of ${totalStudentGroups} student groups`}
-              </div>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+          <div className="overflow-hidden border rounded-lg">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Naam
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Programma
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Academisch Jaar
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Studenten
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Docent
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Acties
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {isLoading ? (
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Group Name</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Academic Year</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Students</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instructor</th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                      Laden...
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {isLoading ? (
-                    <tr>
-                      <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
-                        Loading student groups...
+                ) : isError ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-sm text-red-500">
+                      Fout bij het laden van studentengroepen. Probeer het later opnieuw.
+                    </td>
+                  </tr>
+                ) : studentGroups.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                      Geen studentengroepen gevonden met de huidige filters. Wijzig uw zoekopdracht of filters.
+                    </td>
+                  </tr>
+                ) : (
+                  studentGroups.map((group) => (
+                    <tr key={group.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">{group.name}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {group.programName && (
+                          <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">{group.programName}</Badge>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{group.academicYear}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{group.studentCount || 0} studenten</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{group.instructor || '-'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              toast({
+                                title: "Details bekijken", 
+                                description: `Details van groep ${group.name} bekijken.`
+                              });
+                            }}
+                          >
+                            <Eye className="h-4 w-4 text-gray-600" />
+                            <span className="sr-only">Details</span>
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleEditStudentGroup(group)}
+                          >
+                            <Edit className="h-4 w-4 text-blue-500" />
+                            <span className="sr-only">Bewerken</span>
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleDeleteStudentGroup(group)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                            <span className="sr-only">Verwijderen</span>
+                          </Button>
+                        </div>
                       </td>
                     </tr>
-                  ) : isError ? (
-                    <tr>
-                      <td colSpan={6} className="px-6 py-4 text-center text-sm text-red-500">
-                        Error loading student groups. Please try again.
-                      </td>
-                    </tr>
-                  ) : studentGroups.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
-                        No student groups found with the current filters. Try changing your search or filters.
-                      </td>
-                    </tr>
-                  ) : (
-                    <>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">CS-2024-A</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Computer Science</Badge>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">2024-2025</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">32 students</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Dr. Alan Turing</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">BUS-2024-B</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Business</Badge>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">2024-2025</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">28 students</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Prof. Adam Smith</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">ENG-2024-A</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Engineering</Badge>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">2024-2025</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">24 students</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Dr. Nikola Tesla</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Edit</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    </>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
+          
+          {/* Pagination for list view */}
+          {!isLoading && studentGroups.length > 0 && totalPages > 1 && (
+            <div className="flex justify-center mt-6">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: totalPages }).map((_, i) => {
+                    const page = i + 1;
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => handlePageChange(page)}
+                          isActive={page === currentPage}
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage === totalPages}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
 

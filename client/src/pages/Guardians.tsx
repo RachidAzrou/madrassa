@@ -84,6 +84,7 @@ export default function Guardians() {
   const [studentSearchTerm, setStudentSearchTerm] = useState('');
   const [isStudentSearchDialogOpen, setIsStudentSearchDialogOpen] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState<Array<{id: number, name: string}>>([]);
+  const [linkedStudents, setLinkedStudents] = useState<Array<{id: number, firstName: string, lastName: string}>>([]);
   
   // State voor voogddetails dialog
   const [isViewGuardianDialogOpen, setIsViewGuardianDialogOpen] = useState(false);
@@ -656,8 +657,29 @@ export default function Guardians() {
                       <div className="flex -space-x-2">
                         {/* Klikbaar vraagteken om gekoppelde studenten te tonen */}
                         <button
-                          onClick={() => {
+                          onClick={async () => {
                             setSelectedGuardian(guardian);
+                            
+                            // Haal gekoppelde studenten op
+                            try {
+                              const relations = await apiRequest('GET', `/api/guardians/${guardian.id}/students`);
+                              const studentIds = relations.map((rel: any) => rel.studentId);
+                              
+                              // Haal studentendetails op
+                              if (studentIds.length > 0) {
+                                const studentPromises = studentIds.map((id: number) => 
+                                  apiRequest('GET', `/api/students/${id}`)
+                                );
+                                const students = await Promise.all(studentPromises);
+                                setLinkedStudents(students);
+                              } else {
+                                setLinkedStudents([]);
+                              }
+                            } catch (error) {
+                              console.error("Fout bij ophalen van gekoppelde studenten:", error);
+                              setLinkedStudents([]);
+                            }
+                            
                             setIsViewGuardianDialogOpen(true);
                           }}
                           className="cursor-pointer"
@@ -674,8 +696,29 @@ export default function Guardians() {
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          onClick={() => {
+                          onClick={async () => {
                             setSelectedGuardian(guardian);
+                            
+                            // Haal gekoppelde studenten op
+                            try {
+                              const relations = await apiRequest('GET', `/api/guardians/${guardian.id}/students`);
+                              const studentIds = relations.map((rel: any) => rel.studentId);
+                              
+                              // Haal studentendetails op
+                              if (studentIds.length > 0) {
+                                const studentPromises = studentIds.map((id: number) => 
+                                  apiRequest('GET', `/api/students/${id}`)
+                                );
+                                const students = await Promise.all(studentPromises);
+                                setLinkedStudents(students);
+                              } else {
+                                setLinkedStudents([]);
+                              }
+                            } catch (error) {
+                              console.error("Fout bij ophalen van gekoppelde studenten:", error);
+                              setLinkedStudents([]);
+                            }
+                            
                             setIsViewGuardianDialogOpen(true);
                           }}
                         >
@@ -1042,7 +1085,7 @@ export default function Guardians() {
 
       {/* Edit Guardian Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="w-[95vw] h-[90vh] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Voogd bewerken</DialogTitle>
             <DialogDescription>

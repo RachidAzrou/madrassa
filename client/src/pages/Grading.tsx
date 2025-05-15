@@ -88,12 +88,18 @@ export default function Grading() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [activeTab, setActiveTab] = useState('grades');
+  const [activeTab, setActiveTab] = useState('grades'); // 'grades' of 'behavior'
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedAssessment, setSelectedAssessment] = useState('');
+  const [selectedClass, setSelectedClass] = useState(''); // Voor klassen (studentengroepen)
   const [studentFilter, setStudentFilter] = useState('');
   const [grades, setGrades] = useState<Record<string, number>>({});
   const [isGradesModified, setIsGradesModified] = useState(false);
+  
+  // Gedragsbeoordelingen
+  const [behaviorScores, setBehaviorScores] = useState<Record<string, number>>({});
+  const [behaviorRemarks, setBehaviorRemarks] = useState<Record<string, string>>({});
+  const [isBehaviorModified, setIsBehaviorModified] = useState(false);
   
   // Dialog controls
   const [isAddAssessmentOpen, setIsAddAssessmentOpen] = useState(false);
@@ -102,12 +108,20 @@ export default function Grading() {
   const [selectedAssessmentItem, setSelectedAssessmentItem] = useState<any>(null);
 
   // Fetch courses for dropdown
-  const { data: coursesData } = useQuery<any[]>({
+  const { data: coursesData } = useQuery<{ courses: any[] }>({
     queryKey: ['/api/courses'],
     staleTime: 300000,
   });
 
-  const courses = coursesData || [];
+  const courses = coursesData?.courses || [];
+  
+  // Fetch student groups/classes for dropdown
+  const { data: classesData } = useQuery<{ studentGroups: any[], totalCount: number }>({
+    queryKey: ['/api/student-groups'],
+    staleTime: 300000,
+  });
+  
+  const classes = classesData?.studentGroups || [];
 
   // Fetch assessments for selected course
   const { data: assessmentsData } = useQuery<any[]>({
@@ -118,13 +132,30 @@ export default function Grading() {
 
   const assessments = assessmentsData || [];
 
-  // Fetch students
-  const { data: studentsData } = useQuery<any[]>({
+  // Fetch all students
+  const { data: allStudentsData } = useQuery<any[]>({
     queryKey: ['/api/students'],
     staleTime: 300000,
   });
 
-  const students = studentsData || [];
+  const allStudents = allStudentsData || [];
+  
+  // Fetch students per class/student group
+  const { data: classStudentsData, isLoading: isLoadingClassStudents } = useQuery<any[]>({
+    queryKey: ['/api/student-groups', selectedClass, 'students'],
+    queryFn: async () => {
+      if (!selectedClass) return [];
+      const response = await apiRequest('GET', `/api/student-groups/${selectedClass}/students`);
+      return response;
+    },
+    staleTime: 60000,
+    enabled: !!selectedClass,
+  });
+  
+  // Bepaal welke lijst studenten we moeten gebruiken gebaseerd op de huidige tab
+  const students = activeTab === 'grades' 
+    ? allStudents 
+    : (classStudentsData || []);
   
   // Filter students based on search
   const filteredStudents = studentFilter 
@@ -408,10 +439,9 @@ export default function Grading() {
 
       {/* Tabs */}
       <Tabs defaultValue="grades" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-3 w-full md:w-[400px]">
+        <TabsList className="grid grid-cols-2 w-full md:w-[400px]">
           <TabsTrigger value="grades">Cijfers</TabsTrigger>
-          <TabsTrigger value="assessments">Beoordelingen</TabsTrigger>
-          <TabsTrigger value="reports">Rapporten</TabsTrigger>
+          <TabsTrigger value="behavior">Beoordelingen</TabsTrigger>
         </TabsList>
         
         <TabsContent value="grades" className="space-y-4">

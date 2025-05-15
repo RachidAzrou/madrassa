@@ -299,6 +299,24 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
     }
   };
   
+  // Functie om docent te bepalen op basis van programma ID
+  const getTeacherByProgramId = (programId: number): string => {
+    switch (programId) {
+      case 1:
+        return "Mevr. Fatima El-Amrani";
+      case 2:
+        return "Dhr. Yousef Benali";
+      case 3:
+        return "Dhr. Ahmed Bouali";
+      case 4:
+        return "Dhr. Mohammed Idrissi";
+      case 5:
+        return "Mevr. Khadija Aziz";
+      default:
+        return "Nog niet toegewezen";
+    }
+  };
+  
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center border-b pb-4">

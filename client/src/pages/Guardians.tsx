@@ -15,14 +15,14 @@ type GuardianType = {
   relationship: string;
   email: string;
   phone: string;
-  address?: string;
-  street?: string;
-  houseNumber?: string;
-  postalCode?: string;
-  city?: string;
-  occupation?: string;
-  isEmergencyContact?: boolean;
-  notes?: string;
+  address: string | null;
+  street: string | null;
+  houseNumber: string | null;
+  postalCode: string | null;
+  city: string | null;
+  occupation: string | null;
+  isEmergencyContact: boolean;
+  notes: string | null;
 };
 import { 
   Dialog, 
@@ -44,6 +44,10 @@ interface Guardian {
   email: string;
   phone: string;
   address: string | null;
+  street: string | null;
+  houseNumber: string | null;
+  postalCode: string | null;
+  city: string | null;
   occupation: string | null;
   isEmergencyContact: boolean;
   notes: string | null;
@@ -328,7 +332,10 @@ export default function Guardians() {
         relationship: guardian.relationship,
         email: guardian.email,
         phone: guardian.phone,
-        address: guardian.address || '',
+        street: guardian.street || '',
+        houseNumber: guardian.houseNumber || '',
+        postalCode: guardian.postalCode || '',
+        city: guardian.city || '',
         occupation: guardian.occupation || '',
         isEmergencyContact: guardian.isEmergencyContact,
         notes: guardian.notes || '',
@@ -345,7 +352,10 @@ export default function Guardians() {
         relationship: guardian.relationship,
         email: guardian.email,
         phone: guardian.phone,
-        address: guardian.address || '',
+        street: guardian.street || '',
+        houseNumber: guardian.houseNumber || '',
+        postalCode: guardian.postalCode || '',
+        city: guardian.city || '',
         occupation: guardian.occupation || '',
         isEmergencyContact: guardian.isEmergencyContact,
         notes: guardian.notes || '',
@@ -644,7 +654,12 @@ export default function Guardians() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{guardian.phone}</div>
-                      <div className="text-sm text-gray-500">{guardian.address}</div>
+                      <div className="text-sm text-gray-500">
+                        {guardian.street && guardian.houseNumber ? 
+                          `${guardian.street} ${guardian.houseNumber}, ${guardian.postalCode || ''} ${guardian.city || ''}` : 
+                          'Geen adres opgegeven'
+                        }
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex -space-x-2">

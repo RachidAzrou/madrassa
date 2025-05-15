@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, DollarSign, CreditCard, CheckCircle, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,53 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { apiRequest } from '@/lib/queryClient';
 import { Progress } from '@/components/ui/progress';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog';
+import { 
+  Form, 
+  FormControl, 
+  FormDescription, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage 
+} from '@/components/ui/form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { toast } from '@/hooks/use-toast';
+import { z } from 'zod';
+import { Calendar } from '@/components/ui/calendar';
+import { CalendarIcon } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { nl } from 'date-fns/locale';
+
+// Validatieschema voor betalingsformulier
+const feeFormSchema = z.object({
+  studentId: z.number({
+    required_error: "Selecteer een student"
+  }),
+  description: z.string().min(3, {
+    message: "Beschrijving moet minimaal 3 tekens bevatten"
+  }),
+  amount: z.string().refine(
+    (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, 
+    { message: "Bedrag moet een positief getal zijn" }
+  ),
+  dueDate: z.date({
+    required_error: "Vervaldatum is verplicht",
+  }),
+  status: z.string({
+    required_error: "Status is verplicht",
+  })
+});
 
 export default function Fees() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,6 +71,8 @@ export default function Fees() {
   const [status, setStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('fee-records');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   // Fetch fee records with filters
   const { data, isLoading, isError } = useQuery({
@@ -56,19 +105,68 @@ export default function Fees() {
   });
 
   // Vanwege de API structuur, is data een array van fee records
-  const feeRecords = data || [];
+  const feeRecords = Array.isArray(data) ? data : [];
   const totalRecords = feeRecords.length;
   const totalPages = Math.ceil(totalRecords / 10);
   
   // Ophalen van programma's voor het filter
-  const programs = programsData || [];
+  const programs = Array.isArray(programsData) ? programsData : [];
   
   // Students voor in de dropdown
-  const students = studentsData || [];
+  const students = Array.isArray(studentsData) ? studentsData : [];
 
-  const handleAddFeeRecord = async () => {
-    // Implementation will be added for fee record creation
-    console.log('Add fee record clicked');
+  // Type voor het formulier
+  type FeeFormValues = z.infer<typeof feeFormSchema>;
+  
+  // Formulier init
+  const form = useForm<FeeFormValues>({
+    resolver: zodResolver(feeFormSchema),
+    defaultValues: {
+      description: '',
+      amount: '',
+      status: 'in behandeling',
+    },
+  });
+  
+  const handleAddFeeRecord = () => {
+    setIsAddDialogOpen(true);
+  };
+  
+  const onSubmit = async (values: FeeFormValues) => {
+    try {
+      // Converteren naar juiste formaat voor de API
+      const feeData = {
+        studentId: values.studentId,
+        description: values.description,
+        amount: parseFloat(values.amount),
+        dueDate: values.dueDate.toISOString(),
+        status: values.status,
+        createdAt: new Date().toISOString()
+      };
+      
+      await apiRequest('POST', '/api/fees', feeData);
+      
+      // Data refreshen
+      queryClient.invalidateQueries({ queryKey: ['/api/fees'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/fees/stats'] });
+      
+      // Dialog sluiten en succes melding tonen
+      setIsAddDialogOpen(false);
+      toast({
+        title: "Betaling aangemaakt",
+        description: "De betaling is succesvol toegevoegd aan het systeem.",
+      });
+      
+      // Form resetten
+      form.reset();
+    } catch (error) {
+      console.error('Fout bij aanmaken betaling:', error);
+      toast({
+        title: "Fout bij aanmaken betaling",
+        description: "Er is een fout opgetreden bij het aanmaken van de betaling. Probeer het opnieuw.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,10 +226,159 @@ export default function Fees() {
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
-          <Button onClick={handleAddFeeRecord} className="flex items-center">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Betalingsrecord Toevoegen</span>
-          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={handleAddFeeRecord} className="flex items-center">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                <span>Betalingsrecord Toevoegen</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Nieuwe Betaling Toevoegen</DialogTitle>
+                <DialogDescription>
+                  Voeg een nieuwe betalingsverplichting toe aan het systeem.
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="studentId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Student</FormLabel>
+                        <Select 
+                          onValueChange={(value) => field.onChange(parseInt(value))}
+                          defaultValue={field.value?.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer een student" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {students.map((student: any) => (
+                              <SelectItem key={student.id} value={student.id.toString()}>
+                                {student.firstName} {student.lastName} ({student.studentNumber})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Omschrijving</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="bv. Collegegeld Semester 1 2025" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bedrag (€)</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="0,00" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="dueDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Vervaldatum</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={
+                                  "w-full pl-3 text-left font-normal " +
+                                  (!field.value && "text-muted-foreground")
+                                }
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP", { locale: nl })
+                                ) : (
+                                  <span>Kies een datum</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) => date < new Date()}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Status</FormLabel>
+                        <Select 
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="in behandeling">In behandeling</SelectItem>
+                            <SelectItem value="betaald">Betaald</SelectItem>
+                            <SelectItem value="te laat">Te laat</SelectItem>
+                            <SelectItem value="gedeeltelijk">Gedeeltelijk betaald</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <DialogFooter className="mt-6">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => setIsAddDialogOpen(false)}
+                    >
+                      Annuleren
+                    </Button>
+                    <Button type="submit">Betaling Toevoegen</Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -177,11 +424,11 @@ export default function Fees() {
                 <p className="text-sm font-medium text-gray-500">Voltooiingsgraad</p>
                 <div className="flex items-center">
                   <p className="text-2xl font-semibold">
-                    {statsData?.stats ? `${statsData.stats.completionRate}%` : "Laden..."}
+                    {(statsData as StatsType)?.stats ? `${(statsData as StatsType).stats.completionRate}%` : "Laden..."}
                   </p>
                 </div>
                 <Progress 
-                  value={statsData?.stats ? statsData.stats.completionRate : 0} 
+                  value={(statsData as StatsType)?.stats ? (statsData as StatsType).stats.completionRate : 0} 
                   className="h-1.5 mt-1.5 w-32" 
                 />
               </div>
@@ -197,7 +444,7 @@ export default function Fees() {
               <div>
                 <p className="text-sm font-medium text-gray-500">Betalende Studenten</p>
                 <p className="text-2xl font-semibold">
-                  {statsData?.stats ? statsData.stats.totalStudents : "Laden..."}
+                  {(statsData as StatsType)?.stats ? (statsData as StatsType).stats.totalStudents : "Laden..."}
                 </p>
               </div>
             </div>

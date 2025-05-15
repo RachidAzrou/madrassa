@@ -1289,91 +1289,74 @@ export default function Students() {
       
       {/* Statistiek widgets */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 mt-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <h3 className="text-sm font-medium text-gray-500 mb-1">Totaal studenten</h3>
-          <p className="text-2xl font-semibold">{totalStudents}</p>
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-md border border-blue-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <UserCircle className="h-20 w-20 text-blue-500" />
+          </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal studenten</h3>
+          <p className="text-2xl font-bold text-blue-700">{totalStudents}</p>
+          <div className="mt-2 text-xs text-blue-600">
+            {isLoading ? '' : `${Math.round((students.filter(s => s.status.toLowerCase() === 'active' || s.status.toLowerCase() === 'actief').length / totalStudents) * 100)}% actief`}
+          </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <h3 className="text-sm font-medium text-gray-500 mb-1">Actieve studenten</h3>
-          <p className="text-2xl font-semibold">
-            {students.filter(s => s.status.toLowerCase() === 'active' || s.status.toLowerCase() === 'actief').length}
+        
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 4h6v3H9V4zm11 16H4V9h16v11z" />
+              <circle cx="12" cy="13" r="2" />
+              <path d="M10 17.5c.8.5 1.8.5 2.5 0" />
+            </svg>
+          </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Mannelijke studenten</h3>
+          <p className="text-2xl font-bold text-sky-700">
+            {students.filter(s => s.gender === 'man').length}
           </p>
+          <div className="mt-2 text-xs text-sky-600">
+            {isLoading ? '' : `${Math.round((students.filter(s => s.gender === 'man').length / totalStudents) * 100)}% van totaal`}
+          </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <h3 className="text-sm font-medium text-gray-500 mb-1">Aantal klassen</h3>
-          <p className="text-2xl font-semibold">{studentGroups.length}</p>
+        
+        <div className="bg-gradient-to-br from-rose-50 to-rose-100 rounded-xl shadow-md border border-rose-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 4h6v3H9V4zm11 16H4V9h16v11z" />
+              <circle cx="12" cy="13" r="2" />
+              <path d="M8 17h8" />
+            </svg>
+          </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Vrouwelijke studenten</h3>
+          <p className="text-2xl font-bold text-rose-700">
+            {students.filter(s => s.gender === 'vrouw').length}
+          </p>
+          <div className="mt-2 text-xs text-rose-600">
+            {isLoading ? '' : `${Math.round((students.filter(s => s.gender === 'vrouw').length / totalStudents) * 100)}% van totaal`}
+          </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <h3 className="text-sm font-medium text-gray-500 mb-1">Aantal vakken</h3>
-          <p className="text-2xl font-semibold">{programs.length}</p>
+        
+        <div className="bg-gradient-to-br from-violet-50 to-violet-100 rounded-xl shadow-md border border-violet-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-violet-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+          </div>
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 mb-1">Vakken & Klassen</h3>
+              <p className="text-2xl font-bold text-violet-700">
+                {programs.length + studentGroups.length}
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-between mt-2 text-xs text-violet-600">
+            <span>{programs.length} vakken</span>
+            <span>{studentGroups.length} klassen</span>
+          </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Vak</label>
-            <Select value={program} onValueChange={handleProgramChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Alle Vakken" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Vakken</SelectItem>
-                {programs.map((program: {id: number, name: string}) => (
-                  <SelectItem key={program.id} value={String(program.id)}>
-                    {program.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
-            <Select value={studentGroup} onValueChange={handleStudentGroupChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Alle Klassen" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Klassen</SelectItem>
-                {studentGroups.map((group: {id: number, name: string}) => (
-                  <SelectItem key={group.id} value={String(group.id)}>
-                    {group.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <Select value={status} onValueChange={handleStatusChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Alle Statussen" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Statussen</SelectItem>
-                <SelectItem value="active">Actief</SelectItem>
-                <SelectItem value="pending">In afwachting</SelectItem>
-                <SelectItem value="inactive">Inactief</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Geslacht</label>
-            <Select value={gender} onValueChange={handleGenderChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Alle" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle</SelectItem>
-                <SelectItem value="man">Man</SelectItem>
-                <SelectItem value="vrouw">Vrouw</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
-        </div>
-      </div>
 
       {/* Student List Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">

@@ -21,6 +21,31 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 
+interface Enrollment {
+  id: string;
+  studentId: string;
+  courseId: string;
+  status: string;
+  enrollmentDate: string;
+  endDate: string | null;
+  type: string;
+  studentName: string;
+  courseName: string;
+}
+
+interface Program {
+  id: string;
+  name: string;
+  code: string;
+}
+
+interface Course {
+  id: string;
+  name: string;
+  code: string;
+  programId: string;
+}
+
 // ActionButtons Component voor de consistency in enrollment-lijsten
 function EnrollmentActionButtons({ id }: { id: string }) {
   const { toast } = useToast();
@@ -125,18 +150,18 @@ export default function Enrollments() {
   });
 
   // Fetch enrollments with filters
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<{ enrollments: Enrollment[], totalCount: number }>({
     queryKey: ['/api/enrollments', { searchTerm, program, course, status, page: currentPage, type: activeTab }],
     staleTime: 30000,
   });
 
   // Fetch programs for filter
-  const { data: programsData } = useQuery({
+  const { data: programsData } = useQuery<{ programs: Program[] }>({
     queryKey: ['/api/programs'],
   });
 
   // Fetch courses for filter
-  const { data: coursesData } = useQuery({
+  const { data: coursesData } = useQuery<{ courses: Course[] }>({
     queryKey: ['/api/courses'],
   });
 

@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { db } from '../db';
 import { IStorage } from './IStorage';
 import { 
@@ -773,8 +773,10 @@ export class DatabaseStorage implements IStorage {
   async getPrimaryProgramByStudent(studentId: number): Promise<StudentProgram | undefined> {
     const result = await db.select()
       .from(studentPrograms)
-      .where(eq(studentPrograms.studentId, studentId))
-      .where(eq(studentPrograms.isPrimary, true));
+      .where(and(
+        eq(studentPrograms.studentId, studentId),
+        eq(studentPrograms.isPrimary, true)
+      ));
     
     if (result.length > 0) {
       return result[0];

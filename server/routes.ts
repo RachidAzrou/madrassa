@@ -1832,6 +1832,136 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ********************
+  // Student Program API endpoints
+  // ********************
+  apiRouter.get("/api/student-programs", async (_req, res) => {
+    try {
+      const studentPrograms = await storage.getStudentPrograms();
+      res.json(studentPrograms);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student programs" });
+    }
+  });
+
+  apiRouter.get("/api/student-programs/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const studentProgram = await storage.getStudentProgram(id);
+      if (!studentProgram) {
+        return res.status(404).json({ message: "Student program not found" });
+      }
+      
+      res.json(studentProgram);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student program" });
+    }
+  });
+
+  apiRouter.get("/api/students/:studentId/programs", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      if (isNaN(studentId)) {
+        return res.status(400).json({ message: "Invalid student ID format" });
+      }
+      
+      const studentPrograms = await storage.getStudentProgramsByStudent(studentId);
+      res.json(studentPrograms);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student programs" });
+    }
+  });
+
+  apiRouter.get("/api/programs/:programId/students", async (req, res) => {
+    try {
+      const programId = parseInt(req.params.programId);
+      if (isNaN(programId)) {
+        return res.status(400).json({ message: "Invalid program ID format" });
+      }
+      
+      const studentPrograms = await storage.getStudentProgramsByProgram(programId);
+      res.json(studentPrograms);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching student programs" });
+    }
+  });
+
+  apiRouter.get("/api/students/:studentId/primary-program", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      if (isNaN(studentId)) {
+        return res.status(400).json({ message: "Invalid student ID format" });
+      }
+      
+      const primaryProgram = await storage.getPrimaryProgramByStudent(studentId);
+      if (!primaryProgram) {
+        return res.status(404).json({ message: "Primary program not found for student" });
+      }
+      
+      res.json(primaryProgram);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching primary program" });
+    }
+  });
+
+  apiRouter.post("/api/student-programs", async (req, res) => {
+    try {
+      // Valideer input met Zod schema
+      const validatedData = insertStudentProgramSchema.parse(req.body);
+      
+      const studentProgram = await storage.createStudentProgram(validatedData);
+      res.status(201).json(studentProgram);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Invalid input data", 
+          errors: error.errors 
+        });
+      }
+      res.status(500).json({ message: "Error creating student program" });
+    }
+  });
+
+  apiRouter.patch("/api/student-programs/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const studentProgram = await storage.updateStudentProgram(id, req.body);
+      if (!studentProgram) {
+        return res.status(404).json({ message: "Student program not found" });
+      }
+      
+      res.json(studentProgram);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating student program" });
+    }
+  });
+
+  apiRouter.delete("/api/student-programs/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteStudentProgram(id);
+      if (!success) {
+        return res.status(404).json({ message: "Student program not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting student program" });
+    }
+  });
+
+  // ********************
   // User API endpoints
   // ********************
   apiRouter.get("/api/users", async (_req, res) => {

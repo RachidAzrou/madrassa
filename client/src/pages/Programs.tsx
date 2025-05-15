@@ -218,7 +218,7 @@ export default function Programs() {
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">Programmabeheer</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Vakkenbeheer</h1>
         <div className="flex flex-col md:flex-row gap-3">
           <div className="relative">
             <Input

@@ -1151,7 +1151,7 @@ export default function Students() {
 
       {/* Add Student Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-[95vw] w-auto max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
             <DialogDescription>
@@ -1160,7 +1160,7 @@ export default function Students() {
           </DialogHeader>
           <form onSubmit={handleSubmitStudent}>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 <div className="col-span-1">
                   <Label htmlFor="studentId" className="text-right">
                     Studentnummer <span className="text-xs text-muted-foreground font-normal italic">(automatisch)</span>
@@ -1194,7 +1194,7 @@ export default function Students() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 <div className="col-span-1">
                   <Label htmlFor="firstName" className="text-right">
                     Voornaam
@@ -1237,7 +1237,7 @@ export default function Students() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-4 gap-4">
                 <div className="col-span-1">
                   <Label htmlFor="phone" className="text-right">
                     Telefoonnummer

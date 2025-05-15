@@ -81,8 +81,12 @@ export default function Teachers() {
         search: searchTerm,
       });
       
-      const response = await apiRequest(`/api/teachers?${params.toString()}`);
-      return response;
+      try {
+        return await apiRequest(`/api/teachers?${params.toString()}`);
+      } catch (error) {
+        console.error('Error fetching teachers:', error);
+        return { teachers: [], totalCount: 0 };
+      }
     },
   });
 
@@ -99,8 +103,12 @@ export default function Teachers() {
     queryKey: ['/api/teacher-availability', selectedTeacher?.id],
     queryFn: async () => {
       if (!selectedTeacher) return [];
-      const response = await apiRequest(`/api/teacher-availability?teacherId=${selectedTeacher.id}`);
-      return response;
+      try {
+        return await apiRequest(`/api/teacher-availability?teacherId=${selectedTeacher.id}`);
+      } catch (error) {
+        console.error('Error fetching teacher availability:', error);
+        return [];
+      }
     },
     enabled: !!selectedTeacher,
   });
@@ -113,8 +121,12 @@ export default function Teachers() {
     queryKey: ['/api/teacher-languages', selectedTeacher?.id],
     queryFn: async () => {
       if (!selectedTeacher) return [];
-      const response = await apiRequest(`/api/teacher-languages?teacherId=${selectedTeacher.id}`);
-      return response;
+      try {
+        return await apiRequest(`/api/teacher-languages?teacherId=${selectedTeacher.id}`);
+      } catch (error) {
+        console.error('Error fetching teacher languages:', error);
+        return [];
+      }
     },
     enabled: !!selectedTeacher,
   });
@@ -127,8 +139,12 @@ export default function Teachers() {
     queryKey: ['/api/teacher-course-assignments', selectedTeacher?.id],
     queryFn: async () => {
       if (!selectedTeacher) return [];
-      const response = await apiRequest(`/api/teacher-course-assignments?teacherId=${selectedTeacher.id}`);
-      return response;
+      try {
+        return await apiRequest(`/api/teacher-course-assignments?teacherId=${selectedTeacher.id}`);
+      } catch (error) {
+        console.error('Error fetching teacher course assignments:', error);
+        return [];
+      }
     },
     enabled: !!selectedTeacher,
   });
@@ -136,9 +152,7 @@ export default function Teachers() {
   // Delete Mutation
   const deleteMutation = useMutation({
     mutationFn: async (teacherId: number) => {
-      return await apiRequest(`/api/teachers/${teacherId}`, {
-        method: 'DELETE',
-      });
+      return await apiRequest(`/api/teachers/${teacherId}`, 'DELETE');
     },
     onSuccess: () => {
       toast({

@@ -1026,6 +1026,21 @@ export default function Students() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="col-span-1">
+                <Label htmlFor="editEnrollmentDate" className="text-right">
+                  Inschrijvingsdatum
+                </Label>
+                <Input
+                  id="editEnrollmentDate"
+                  placeholder="DD/MM/JJJJ"
+                  value={studentFormData.enrollmentDate ? formatDateToDisplayFormat(studentFormData.enrollmentDate) : ''}
+                  onChange={(e) => {
+                    const formattedDate = formatDateToDatabaseFormat(e.target.value);
+                    setStudentFormData({ ...studentFormData, enrollmentDate: formattedDate || '' });
+                  }}
+                  className="mt-1"
+                />
+              </div>
             </div>
             
             <div className="grid grid-cols-4 gap-4">
@@ -1116,9 +1131,12 @@ export default function Students() {
                 </Label>
                 <Input
                   id="editDateOfBirth"
-                  type="date"
-                  value={studentFormData.dateOfBirth || ''}
-                  onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
+                  placeholder="DD/MM/JJJJ"
+                  value={studentFormData.dateOfBirth ? formatDateToDisplayFormat(studentFormData.dateOfBirth) : ''}
+                  onChange={(e) => {
+                    const formattedDate = formatDateToDatabaseFormat(e.target.value);
+                    setStudentFormData({ ...studentFormData, dateOfBirth: formattedDate || '' });
+                  }}
                   className="mt-1"
                 />
               </div>

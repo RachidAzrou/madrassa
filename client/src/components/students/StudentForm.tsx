@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { formatDateToDisplayFormat, formatDateToDatabaseFormat } from "@/lib/utils";
 
 // Extend the schema with validation rules
 const studentFormSchema = insertStudentSchema.extend({
@@ -48,7 +49,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
       address: "",
       phoneNumber: "",
       status: "active",
-      enrollmentDate: new Date().toISOString().split('T')[0],
+      enrollmentDate: formatDateToDisplayFormat(new Date().toISOString().split('T')[0]),
     },
   });
 
@@ -78,7 +79,16 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
   // Handle form submission
   const handleFormSubmit = (data: StudentFormValues) => {
     setIsSubmitting(true);
-    createStudent.mutate(data);
+    
+    // Verwerk alle datumvelden voor database opslag
+    const formattedData = { ...data };
+    ['dateOfBirth', 'enrollmentDate'].forEach(field => {
+      if (formattedData[field] && typeof formattedData[field] === 'string') {
+        formattedData[field] = formatDateToDatabaseFormat(formattedData[field]);
+      }
+    });
+    
+    createStudent.mutate(formattedData);
   };
 
   return (
@@ -148,7 +158,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
             </label>
             <Input
               id="dateOfBirth"
-              type="date"
+              placeholder="DD/MM/JJJJ"
               {...form.register("dateOfBirth")}
             />
             {form.formState.errors.dateOfBirth && (
@@ -269,7 +279,7 @@ export default function StudentForm({ onCancel, onSubmit, studentToEdit }: Stude
             </label>
             <Input
               id="enrollmentDate"
-              type="date"
+              placeholder="DD/MM/JJJJ"
               {...form.register("enrollmentDate")}
             />
             {form.formState.errors.enrollmentDate && (

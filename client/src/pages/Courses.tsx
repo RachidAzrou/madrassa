@@ -1,16 +1,27 @@
 import { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { Search, PlusCircle, Filter, Eye, Pencil, Trash2, BookOpen, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { apiRequest, queryClient } from '@/lib/queryClient';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 
-interface Course {
+// Type definities
+type CourseType = {
   id: number;
   name: string;
   code: string;
@@ -20,24 +31,32 @@ interface Course {
   instructor: string | null;
   maxStudents: number | null;
   isActive: boolean;
-  // Nieuwe velden voor uitgebreide cursusinformatie
+  // Uitgebreide cursusinformatie
   learningObjectives: string | null; // Lesdoelen
   materials: string | null; // Benodigde lesmaterialen
-  competencies: string | null; // Eindcompetenties wat studenten moeten kunnen
+  competencies: string | null; // Eindcompetenties
   prerequisites: string | null; // Voorwaarden voor deelname
-}
+  enrolledStudents?: number;
+};
+
+type ProgramType = {
+  id: number;
+  name: string;
+  code: string;
+};
 
 export default function Courses() {
-  const { toast } = useToast();
+  // States
   const [searchTerm, setSearchTerm] = useState('');
-  const [department, setDepartment] = useState('all');
+  const [programFilter, setProgramFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  
-  // State voor cursus dialogen
+  const [itemsPerPage] = useState(6);
+  const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  
   const [courseFormData, setCourseFormData] = useState({
     name: '',
     code: '',
@@ -47,77 +66,188 @@ export default function Courses() {
     instructor: '',
     maxStudents: 30,
     isActive: true,
-    // Nieuwe velden
     learningObjectives: '',
     materials: '',
     competencies: '',
     prerequisites: '',
   });
+  
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Fetch courses with filters
-  const { data, isLoading, isError } = useQuery<{ courses: Course[], totalCount: number }>({
-    queryKey: ['/api/courses', { searchTerm, department, page: currentPage }],
-    staleTime: 30000,
+  // Fetch courses data
+  const {
+    data: coursesResponse,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ['/api/courses', { page: currentPage, search: searchTerm, program: programFilter }],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: itemsPerPage.toString(),
+        search: searchTerm,
+      });
+      
+      if (programFilter !== 'all') {
+        params.append('programId', programFilter);
+      }
+      
+      try {
+        return await apiRequest(`/api/courses?${params.toString()}`, { method: 'GET' });
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+        return { courses: [], totalCount: 0 };
+      }
+    },
   });
 
-  const courses = data?.courses || [];
-  const totalCourses = data?.totalCount || 0;
-  const totalPages = Math.ceil(totalCourses / 10); // Assuming 10 courses per page
-
-  // Mutatie om een cursus toe te voegen
-  const createCourseMutation = useMutation({
-    mutationFn: async (courseData: typeof courseFormData) => {
-      return apiRequest('POST', '/api/courses', courseData);
-    },
-    onSuccess: () => {
-      // Invalidate query cache to refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
-      
-      // Reset form and close dialog
-      setCourseFormData({
-        name: '',
-        code: '',
-        programId: null,
-        description: '',
-        credits: 6,
-        instructor: '',
-        maxStudents: 30,
-        isActive: true,
-        // Reset nieuwe velden
-        learningObjectives: '',
-        materials: '',
-        competencies: '',
-        prerequisites: '',
-      });
-      setIsAddDialogOpen(false);
-      
-      // Toon succes melding
-      toast({
-        title: "Cursus toegevoegd",
-        description: "De cursus is succesvol toegevoegd aan het systeem.",
-        variant: "default",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Fout bij toevoegen",
-        description: error.message || "Er is een fout opgetreden bij het toevoegen van de cursus.",
-        variant: "destructive",
-      });
+  // Fetch programs for dropdown
+  const {
+    data: programsData,
+  } = useQuery({
+    queryKey: ['/api/programs'],
+    queryFn: async () => {
+      try {
+        return await apiRequest('/api/programs', { method: 'GET' });
+      } catch (error) {
+        console.error('Error fetching programs:', error);
+        return [];
+      }
     }
   });
 
+  // Extract courses and total count from response
+  const courses = coursesResponse?.courses || [];
+  const totalCourses = coursesResponse?.totalCount || 0;
+  const totalPages = Math.ceil(totalCourses / itemsPerPage);
+  const programs = programsData || [];
+
+  // Create course mutation
+  const createCourseMutation = useMutation({
+    mutationFn: async (data: typeof courseFormData) => {
+      return await apiRequest('/api/courses', { 
+        method: 'POST',
+        body: data 
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Cursus toegevoegd",
+        description: "De cursus is succesvol toegevoegd",
+      });
+      setIsAddDialogOpen(false);
+      resetFormData();
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Fout bij toevoegen",
+        description: "Er is een fout opgetreden bij het toevoegen van de cursus",
+        variant: "destructive",
+      });
+      console.error('Error creating course:', error);
+    },
+  });
+
+  // Update course mutation
+  const updateCourseMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number, data: typeof courseFormData }) => {
+      return await apiRequest(`/api/courses/${id}`, {
+        method: 'PUT',
+        body: data
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Cursus bijgewerkt",
+        description: "De cursus is succesvol bijgewerkt",
+      });
+      setIsEditDialogOpen(false);
+      resetFormData();
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Fout bij bijwerken",
+        description: "Er is een fout opgetreden bij het bijwerken van de cursus",
+        variant: "destructive",
+      });
+      console.error('Error updating course:', error);
+    },
+  });
+
+  // Delete course mutation
+  const deleteCourseMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest(`/api/courses/${id}`, {
+        method: 'DELETE'
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Cursus verwijderd",
+        description: "De cursus is succesvol verwijderd",
+      });
+      setIsDeleteDialogOpen(false);
+      setSelectedCourse(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: "Er is een fout opgetreden bij het verwijderen van de cursus",
+        variant: "destructive",
+      });
+      console.error('Error deleting course:', error);
+    },
+  });
+
+  // Reset form data
+  const resetFormData = () => {
+    setCourseFormData({
+      name: '',
+      code: '',
+      programId: null,
+      description: '',
+      credits: 6,
+      instructor: '',
+      maxStudents: 30,
+      isActive: true,
+      learningObjectives: '',
+      materials: '',
+      competencies: '',
+      prerequisites: '',
+    });
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when search changes
+  };
+
+  // Handle program filter change
+  const handleProgramFilterChange = (value: string) => {
+    setProgramFilter(value);
+    setCurrentPage(1);
+  };
+
+  // Handle adding new course
   const handleAddCourse = () => {
-    // Open het toevoeg-dialoogvenster
+    resetFormData();
     setIsAddDialogOpen(true);
   };
-  
-  const handleSubmitCourse = async (e: React.FormEvent) => {
+
+  // Handle submit course form
+  const handleSubmitCourse = (e: React.FormEvent) => {
     e.preventDefault();
     createCourseMutation.mutate(courseFormData);
   };
-  
-  const handleEditCourse = (course: Course) => {
+
+  // Handle editing course
+  const handleEditCourse = (course: CourseType) => {
     setSelectedCourse(course);
     setCourseFormData({
       name: course.name,
@@ -128,7 +258,6 @@ export default function Courses() {
       instructor: course.instructor || '',
       maxStudents: course.maxStudents || 30,
       isActive: course.isActive,
-      // Nieuwe velden
       learningObjectives: course.learningObjectives || '',
       materials: course.materials || '',
       competencies: course.competencies || '',
@@ -136,132 +265,49 @@ export default function Courses() {
     });
     setIsEditDialogOpen(true);
   };
-  
-  // Mutatie voor het bijwerken van een cursus
-  const updateCourseMutation = useMutation({
-    mutationFn: async (data: { id: number; courseData: typeof courseFormData }) => {
-      return apiRequest('PUT', `/api/courses/${data.id}`, data.courseData);
-    },
-    onSuccess: () => {
-      // Invalidate query cache to refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
-      
-      // Reset form and close dialog
-      setIsEditDialogOpen(false);
-      setSelectedCourse(null);
-      
-      // Toon succes melding
-      toast({
-        title: "Cursus bijgewerkt",
-        description: "De cursus is succesvol bijgewerkt.",
-        variant: "default",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Fout bij bijwerken",
-        description: error.message || "Er is een fout opgetreden bij het bijwerken van de cursus.",
-        variant: "destructive",
-      });
-    }
-  });
 
+  // Handle submit edit course form
   const handleSubmitEditCourse = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedCourse) {
       updateCourseMutation.mutate({
         id: selectedCourse.id,
-        courseData: courseFormData
+        data: courseFormData
       });
     }
   };
-  
-  const handleViewCourse = (id: string) => {
-    console.log(`Viewing course with ID: ${id}`);
-    toast({
-      title: "Cursus details",
-      description: `Details bekijken voor cursus met ID: ${id}`,
-      variant: "default",
-    });
+
+  // Handle viewing course details
+  const handleViewCourse = (course: CourseType) => {
+    setSelectedCourse(course);
+    setIsViewDialogOpen(true);
   };
-  
-  const handleDeleteCourse = (course: Course) => {
+
+  // Handle deleting course
+  const handleDeleteCourse = (course: CourseType) => {
     setSelectedCourse(course);
     setIsDeleteDialogOpen(true);
   };
 
-  // Mutatie voor het verwijderen van een cursus
-  const deleteCourseMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return apiRequest('DELETE', `/api/courses/${id}`);
-    },
-    onSuccess: () => {
-      // Invalidate query cache to refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
-      
-      // Reset form and close dialog
-      setIsDeleteDialogOpen(false);
-      setSelectedCourse(null);
-      
-      // Toon succes melding
-      toast({
-        title: "Cursus verwijderd",
-        description: "De cursus is succesvol verwijderd uit het systeem.",
-        variant: "default",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Fout bij verwijderen",
-        description: error.message || "Er is een fout opgetreden bij het verwijderen van de cursus.",
-        variant: "destructive",
-      });
-    }
-  });
-
-  const confirmDeleteCourse = () => {
-    if (selectedCourse) {
-      deleteCourseMutation.mutate(selectedCourse.id);
-    }
+  // Get program name by id
+  const getProgramNameById = (id: number | null): string => {
+    if (!id) return 'Onbekend';
+    const program = programs.find((p: any) => p.id === id);
+    return program ? program.name : 'Onbekend';
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when search changes
-  };
-
-  const handleDepartmentChange = (value: string) => {
-    setDepartment(value);
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
+  // Render courses page
   return (
     <div className="p-4 md:p-6 space-y-6">
-      {/* Campus afbeelding met collegezaal */}
-      <div className="relative rounded-xl overflow-hidden h-48 md:h-64">
-        <img 
-          src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&h=500" 
-          alt="Universiteitslokaal" 
-          className="w-full h-full object-cover" 
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900/60 to-gray-900/30 flex items-center">
-          <div className="px-6 md:px-10">
-            <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Cursusbeheer</h1>
-            <p className="text-gray-200 max-w-xl">Beheer de cursuscatalogus, inschrijvingen en roosters van uw instelling op één plek.</p>
-          </div>
+      {/* Page Title */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-primary">Cursusbeheer</h1>
+          <p className="text-sm text-gray-500 mt-1">Beheer het cursusaanbod en de inschrijvingen</p>
         </div>
-      </div>
-
-      {/* Controls */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-col md:flex-row gap-3">
           <div className="relative">
             <Input
-              type="text"
               placeholder="Zoek cursussen..."
               value={searchTerm}
               onChange={handleSearchChange}
@@ -269,26 +315,27 @@ export default function Courses() {
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
-          <Select value={department} onValueChange={handleDepartmentChange}>
+          <Select value={programFilter} onValueChange={handleProgramFilterChange}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Alle Afdelingen" />
+              <SelectValue placeholder="Alle Programma's" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Alle Afdelingen</SelectItem>
-              <SelectItem value="cs">Informatica</SelectItem>
-              <SelectItem value="bus">Bedrijfskunde</SelectItem>
-              <SelectItem value="eng">Techniek</SelectItem>
-              <SelectItem value="arts">Kunst</SelectItem>
+              <SelectItem value="all">Alle Programma's</SelectItem>
+              {programs.map((program: any) => (
+                <SelectItem key={program.id} value={program.id.toString()}>
+                  {program.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
+          <Button onClick={handleAddCourse} className="flex items-center">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            <span>Cursus Toevoegen</span>
+          </Button>
         </div>
-        <Button onClick={handleAddCourse} className="flex items-center">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          <span>Nieuwe Cursus Toevoegen</span>
-        </Button>
       </div>
-
-      {/* Course Cards */}
+      
+      {/* Cursus overzicht */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
           <div className="col-span-full flex justify-center py-8">
@@ -300,10 +347,10 @@ export default function Courses() {
           </div>
         ) : courses.length === 0 ? (
           <div className="col-span-full text-center py-8 text-gray-500">
-            Geen cursussen gevonden. Pas uw filters aan.
+            Geen cursussen gevonden. Pas uw filters aan of voeg een nieuwe cursus toe.
           </div>
         ) : (
-          courses.map((course: any) => (
+          courses.map((course: CourseType) => (
             <div key={course.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
               <div className="p-5">
                 <div className="flex justify-between items-start">
@@ -311,42 +358,11 @@ export default function Courses() {
                     <h3 className="font-semibold text-lg text-gray-800">{course.name}</h3>
                     <p className="text-gray-500 text-sm mt-1">{course.code} • {course.credits} Studiepunten</p>
                   </div>
-                  <span className="bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded">
-                    {course.programId === 1 ? 'Informatica' : 
-                    course.programId === 2 ? 'Bedrijfskunde' : 
-                    course.programId === 3 ? 'Techniek' : 'Algemeen'}
-                  </span>
+                  <Badge variant={course.isActive ? "default" : "secondary"}>
+                    {course.isActive ? "Actief" : "Inactief"}
+                  </Badge>
                 </div>
-                <p className="mt-3 text-gray-600 text-sm">{course.description || 'Geen beschrijving beschikbaar'}</p>
-                
-                {/* Toon de nieuwe velden indien beschikbaar */}
-                {course.learningObjectives && (
-                  <div className="mt-3">
-                    <h4 className="text-xs font-semibold text-gray-700">Lesdoelen:</h4>
-                    <p className="text-gray-600 text-xs mt-1">{course.learningObjectives}</p>
-                  </div>
-                )}
-                
-                {course.materials && (
-                  <div className="mt-3">
-                    <h4 className="text-xs font-semibold text-gray-700">Lesmateriaal:</h4>
-                    <p className="text-gray-600 text-xs mt-1">{course.materials}</p>
-                  </div>
-                )}
-                
-                {course.competencies && (
-                  <div className="mt-3">
-                    <h4 className="text-xs font-semibold text-gray-700">Eindcompetenties:</h4>
-                    <p className="text-gray-600 text-xs mt-1">{course.competencies}</p>
-                  </div>
-                )}
-                
-                {course.prerequisites && (
-                  <div className="mt-3">
-                    <h4 className="text-xs font-semibold text-gray-700">Voorwaarden:</h4>
-                    <p className="text-gray-600 text-xs mt-1">{course.prerequisites}</p>
-                  </div>
-                )}
+                <p className="mt-3 text-gray-600 text-sm line-clamp-2">{course.description || 'Geen beschrijving beschikbaar'}</p>
                 
                 <div className="mt-4 flex items-center">
                   <Avatar className="h-8 w-8">
@@ -359,39 +375,41 @@ export default function Courses() {
                     <p className="text-xs text-gray-500">Docent</p>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                  <div className="flex items-center text-gray-500 text-xs">
-                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                    <span>{course.enrolledStudents || 0} studenten ingeschreven</span>
-                  </div>
+                
+                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                  <Badge variant="outline" className="text-xs">
+                    {getProgramNameById(course.programId)}
+                  </Badge>
+                  
                   <div className="flex space-x-2">
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="text-primary hover:text-primary-dark"
+                      onClick={() => handleViewCourse(course)}
+                      title="Details bekijken"
+                      className="h-8 w-8 p-0"
+                    >
+                      <Eye className="h-4 w-4 text-gray-500" />
+                      <span className="sr-only">Bekijken</span>
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
                       onClick={() => handleEditCourse(course)}
+                      title="Cursus bewerken"
+                      className="h-8 w-8 p-0"
                     >
-                      <Edit className="h-4 w-4 mr-1" />
-                      <span>Bewerken</span>
+                      <Pencil className="h-4 w-4 text-gray-500" />
+                      <span className="sr-only">Bewerken</span>
                     </Button>
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="text-gray-500 hover:text-gray-700"
-                      onClick={() => handleViewCourse(course.id)}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      <span>Bekijken</span>
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-red-500 hover:text-red-700"
+                      className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
                       onClick={() => handleDeleteCourse(course)}
+                      title="Cursus verwijderen"
                     >
-                      <Trash2 className="h-4 w-4 mr-1" />
+                      <Trash2 className="h-4 w-4" />
                       <span className="sr-only">Verwijderen</span>
                     </Button>
                   </div>
@@ -401,501 +419,467 @@ export default function Courses() {
           ))
         )}
       </div>
-
+      
       {/* Pagination */}
-      {!isLoading && !isError && totalPages > 0 && (
-        <div className="flex items-center justify-center mt-8">
-          <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-            <button
-              onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-              className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-            >
-              <span className="sr-only">Vorige</span>
-              &larr;
-            </button>
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => handlePageChange(i + 1)}
-                className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
-                  currentPage === i + 1
-                    ? 'bg-primary text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button
-              onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-              className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-            >
-              <span className="sr-only">Volgende</span>
-              &rarr;
-            </button>
-          </nav>
+      {totalPages > 1 && (
+        <div className="bg-white mt-4 px-4 py-3 flex items-center justify-between border border-gray-200 rounded-lg sm:px-6">
+          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700">
+                Tonen <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> tot <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalCourses)}</span> van <span className="font-medium">{totalCourses}</span> resultaten
+              </p>
+            </div>
+            <div>
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Paginering">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <span className="sr-only">Vorige</span>
+                  &larr;
+                </button>
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
+                      currentPage === i + 1
+                        ? 'bg-primary text-white'
+                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <span className="sr-only">Volgende</span>
+                  &rarr;
+                </button>
+              </nav>
+            </div>
+          </div>
         </div>
       )}
-
-      {/* Add Course Dialog */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+      
+      {/* Cursus detail dialoog */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+          {selectedCourse && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-xl font-semibold flex items-center">
+                  <BookOpen className="mr-2 h-5 w-5" />
+                  {selectedCourse.name}
+                </DialogTitle>
+                <DialogDescription className="flex items-center mt-1">
+                  <Badge className="mr-2">{selectedCourse.code}</Badge>
+                  <span className="text-gray-500">{selectedCourse.credits} Studiepunten</span>
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="mt-6">
+                <Tabs defaultValue="details">
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="details">Details</TabsTrigger>
+                    <TabsTrigger value="content">Inhoud</TabsTrigger>
+                    <TabsTrigger value="requirements">Vereisten</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="details">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h3 className="text-md font-medium mb-3">Cursusinformatie</h3>
+                        <div className="space-y-3">
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-500">Naam</span>
+                            <span className="font-medium">{selectedCourse.name}</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-500">Code</span>
+                            <span>{selectedCourse.code}</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-500">Programma</span>
+                            <span>{getProgramNameById(selectedCourse.programId)}</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-500">Studiepunten</span>
+                            <span>{selectedCourse.credits}</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-500">Status</span>
+                            <Badge variant={selectedCourse.isActive ? "default" : "secondary"} className="w-fit mt-1">
+                              {selectedCourse.isActive ? "Actief" : "Inactief"}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-md font-medium mb-3">Onderwijsinformatie</h3>
+                        <div className="space-y-3">
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-500">Docent</span>
+                            <span>{selectedCourse.instructor || 'Nog niet toegewezen'}</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-500">Maximaal aantal studenten</span>
+                            <span>{selectedCourse.maxStudents || 'Onbeperkt'}</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-500">Ingeschreven studenten</span>
+                            <span>{selectedCourse.enrolledStudents || 0} studenten</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6">
+                      <h3 className="text-md font-medium mb-3">Beschrijving</h3>
+                      <p className="text-gray-700 text-sm bg-gray-50 p-4 rounded-md border border-gray-100">
+                        {selectedCourse.description || 'Geen beschrijving beschikbaar'}
+                      </p>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="content">
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-md font-medium mb-3">Leerdoelen</h3>
+                        <p className="text-gray-700 text-sm bg-gray-50 p-4 rounded-md border border-gray-100">
+                          {selectedCourse.learningObjectives || 'Geen leerdoelen gespecificeerd'}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-md font-medium mb-3">Lesmateriaal</h3>
+                        <p className="text-gray-700 text-sm bg-gray-50 p-4 rounded-md border border-gray-100">
+                          {selectedCourse.materials || 'Geen lesmateriaal gespecificeerd'}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-md font-medium mb-3">Competenties</h3>
+                        <p className="text-gray-700 text-sm bg-gray-50 p-4 rounded-md border border-gray-100">
+                          {selectedCourse.competencies || 'Geen competenties gespecificeerd'}
+                        </p>
+                      </div>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="requirements">
+                    <div>
+                      <h3 className="text-md font-medium mb-3">Vereisten voor deelname</h3>
+                      <p className="text-gray-700 text-sm bg-gray-50 p-4 rounded-md border border-gray-100">
+                        {selectedCourse.prerequisites || 'Geen vereisten gespecificeerd'}
+                      </p>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
+              
+              <DialogFooter className="mt-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsViewDialogOpen(false)}
+                >
+                  Sluiten
+                </Button>
+                <Button 
+                  variant="default" 
+                  onClick={() => {
+                    setIsViewDialogOpen(false);
+                    handleEditCourse(selectedCourse);
+                  }}
+                >
+                  Bewerken
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Toevoegen/bewerken dialoog */}
+      <Dialog open={isAddDialogOpen || isEditDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          isAddDialogOpen ? setIsAddDialogOpen(false) : setIsEditDialogOpen(false);
+          resetFormData();
+        }
+      }}>
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Nieuwe Cursus Toevoegen</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">
+              {isAddDialogOpen ? 'Nieuwe Cursus Toevoegen' : 'Cursus Bewerken'}
+            </DialogTitle>
             <DialogDescription>
-              Vul de cursusinformatie in om een nieuwe cursus toe te voegen aan het systeem.
+              Vul de onderstaande velden in om {isAddDialogOpen ? 'een nieuwe cursus toe te voegen' : 'de cursus bij te werken'}.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmitCourse}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="name" className="text-right">
-                    Cursusnaam
-                  </Label>
-                  <Input
-                    id="name"
-                    required
-                    value={courseFormData.name}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
-                    className="mt-1"
-                  />
+          
+          <form onSubmit={isAddDialogOpen ? handleSubmitCourse : handleSubmitEditCourse} className="space-y-6 pt-4">
+            <Tabs defaultValue="basic">
+              <TabsList className="mb-4">
+                <TabsTrigger value="basic">Basisinformatie</TabsTrigger>
+                <TabsTrigger value="advanced">Geavanceerd</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="basic">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="name" className="text-right">
+                        Cursusnaam <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="name"
+                        value={courseFormData.name}
+                        onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="code" className="text-right">
+                        Cursuscode <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="code"
+                        value={courseFormData.code}
+                        onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="programId" className="text-right">
+                        Programma
+                      </Label>
+                      <Select 
+                        value={courseFormData.programId?.toString() || ''} 
+                        onValueChange={(val) => setCourseFormData({ 
+                          ...courseFormData, 
+                          programId: val ? parseInt(val) : null 
+                        })}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Selecteer een programma" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">Geen programma</SelectItem>
+                          {programs.map((program: any) => (
+                            <SelectItem key={program.id} value={program.id.toString()}>
+                              {program.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="credits" className="text-right">
+                        Studiepunten <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="credits"
+                        type="number"
+                        min="0"
+                        max="60"
+                        value={courseFormData.credits}
+                        onChange={(e) => setCourseFormData({ ...courseFormData, credits: parseInt(e.target.value) })}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="instructor" className="text-right">
+                        Docent
+                      </Label>
+                      <Input
+                        id="instructor"
+                        value={courseFormData.instructor}
+                        onChange={(e) => setCourseFormData({ ...courseFormData, instructor: e.target.value })}
+                        className="mt-1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="maxStudents" className="text-right">
+                        Maximaal Aantal Studenten
+                      </Label>
+                      <Input
+                        id="maxStudents"
+                        type="number"
+                        min="1"
+                        value={courseFormData.maxStudents}
+                        onChange={(e) => setCourseFormData({ ...courseFormData, maxStudents: parseInt(e.target.value) })}
+                        className="mt-1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="isActive" className="text-right">
+                        Status
+                      </Label>
+                      <Select 
+                        value={courseFormData.isActive ? "true" : "false"} 
+                        onValueChange={(val) => setCourseFormData({ 
+                          ...courseFormData, 
+                          isActive: val === "true" 
+                        })}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="true">Actief</SelectItem>
+                          <SelectItem value="false">Inactief</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="description" className="text-right">
+                        Beschrijving
+                      </Label>
+                      <Textarea
+                        id="description"
+                        value={courseFormData.description}
+                        onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
+                        className="mt-1"
+                        rows={3}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="col-span-1">
-                  <Label htmlFor="code" className="text-right">
-                    Cursuscode
-                  </Label>
-                  <Input
-                    id="code"
-                    required
-                    value={courseFormData.code}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
-                    className="mt-1"
-                  />
+              </TabsContent>
+              
+              <TabsContent value="advanced">
+                <div className="space-y-6">
+                  <div>
+                    <Label htmlFor="learningObjectives" className="text-right">
+                      Leerdoelen
+                    </Label>
+                    <Textarea
+                      id="learningObjectives"
+                      value={courseFormData.learningObjectives}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, learningObjectives: e.target.value })}
+                      className="mt-1"
+                      rows={3}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="materials" className="text-right">
+                      Lesmateriaal
+                    </Label>
+                    <Textarea
+                      id="materials"
+                      value={courseFormData.materials}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, materials: e.target.value })}
+                      className="mt-1"
+                      rows={3}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="competencies" className="text-right">
+                      Competenties
+                    </Label>
+                    <Textarea
+                      id="competencies"
+                      value={courseFormData.competencies}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
+                      className="mt-1"
+                      rows={3}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="prerequisites" className="text-right">
+                      Vereisten voor deelname
+                    </Label>
+                    <Textarea
+                      id="prerequisites"
+                      value={courseFormData.prerequisites}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
+                      className="mt-1"
+                      rows={3}
+                    />
+                  </div>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="programId" className="text-right">
-                    Programma
-                  </Label>
-                  <Select
-                    value={courseFormData.programId?.toString() || ''}
-                    onValueChange={(value) => setCourseFormData({ ...courseFormData, programId: value ? parseInt(value) : null })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer programma" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Informatica</SelectItem>
-                      <SelectItem value="2">Bedrijfskunde</SelectItem>
-                      <SelectItem value="3">Techniek</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="credits" className="text-right">
-                    Studiepunten
-                  </Label>
-                  <Select
-                    value={courseFormData.credits.toString()}
-                    onValueChange={(value) => setCourseFormData({ ...courseFormData, credits: parseInt(value) })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer studiepunten" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="3">3 ECTS</SelectItem>
-                      <SelectItem value="6">6 ECTS</SelectItem>
-                      <SelectItem value="9">9 ECTS</SelectItem>
-                      <SelectItem value="12">12 ECTS</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="description" className="text-right">
-                    Beschrijving
-                  </Label>
-                  <Input
-                    id="description"
-                    value={courseFormData.description || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-
-              {/* Nieuwe velden */}
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="learningObjectives" className="text-right">
-                    Lesdoelen
-                  </Label>
-                  <textarea
-                    id="learningObjectives"
-                    value={courseFormData.learningObjectives || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, learningObjectives: e.target.value })}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
-                    rows={3}
-                    placeholder="Beschrijf de lesdoelen van deze cursus..."
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="materials" className="text-right">
-                    Lesmateriaal
-                  </Label>
-                  <textarea
-                    id="materials"
-                    value={courseFormData.materials || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, materials: e.target.value })}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
-                    rows={3}
-                    placeholder="Welk lesmateriaal is nodig voor deze cursus?"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="competencies" className="text-right">
-                    Eindcompetenties
-                  </Label>
-                  <textarea
-                    id="competencies"
-                    value={courseFormData.competencies || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
-                    rows={3}
-                    placeholder="Wat moeten studenten kunnen na afloop van de cursus?"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="prerequisites" className="text-right">
-                    Voorwaarden
-                  </Label>
-                  <textarea
-                    id="prerequisites"
-                    value={courseFormData.prerequisites || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
-                    rows={3}
-                    placeholder="Welke voorkennis of andere cursussen zijn vereist?"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="instructor" className="text-right">
-                    Docent
-                  </Label>
-                  <Input
-                    id="instructor"
-                    value={courseFormData.instructor || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, instructor: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="maxStudents" className="text-right">
-                    Maximum aantal studenten
-                  </Label>
-                  <Input
-                    id="maxStudents"
-                    type="number"
-                    value={courseFormData.maxStudents || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, maxStudents: parseInt(e.target.value) })}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="isActive" className="text-right mr-2">
-                    Status
-                  </Label>
-                  <Select
-                    value={courseFormData.isActive ? "true" : "false"}
-                    onValueChange={(value) => setCourseFormData({ ...courseFormData, isActive: value === "true" })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Actief</SelectItem>
-                      <SelectItem value="false">Inactief</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
+              </TabsContent>
+            </Tabs>
+            
             <DialogFooter>
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => setIsAddDialogOpen(false)}
+                onClick={() => isAddDialogOpen ? setIsAddDialogOpen(false) : setIsEditDialogOpen(false)}
               >
                 Annuleren
               </Button>
               <Button 
-                type="submit"
-                disabled={createCourseMutation.isPending}
+                type="submit" 
+                disabled={createCourseMutation.isPending || updateCourseMutation.isPending}
               >
-                {createCourseMutation.isPending ? 'Bezig met toevoegen...' : 'Cursus toevoegen'}
+                {(createCourseMutation.isPending || updateCourseMutation.isPending) && (
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                )}
+                {isAddDialogOpen ? 'Toevoegen' : 'Opslaan'}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
-
-      {/* Edit Course Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Cursus bewerken</DialogTitle>
-            <DialogDescription>
-              Bewerk de cursusinformatie en klik op opslaan om de wijzigingen toe te passen.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmitEditCourse}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="edit-name" className="text-right">
-                    Cursusnaam
-                  </Label>
-                  <Input
-                    id="edit-name"
-                    required
-                    value={courseFormData.name}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="edit-code" className="text-right">
-                    Cursuscode
-                  </Label>
-                  <Input
-                    id="edit-code"
-                    required
-                    value={courseFormData.code}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="edit-programId" className="text-right">
-                    Programma
-                  </Label>
-                  <Select
-                    value={courseFormData.programId?.toString() || ''}
-                    onValueChange={(value) => setCourseFormData({ ...courseFormData, programId: value ? parseInt(value) : null })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer programma" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Informatica</SelectItem>
-                      <SelectItem value="2">Bedrijfskunde</SelectItem>
-                      <SelectItem value="3">Techniek</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="edit-credits" className="text-right">
-                    Studiepunten
-                  </Label>
-                  <Select
-                    value={courseFormData.credits.toString()}
-                    onValueChange={(value) => setCourseFormData({ ...courseFormData, credits: parseInt(value) })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer studiepunten" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="3">3 ECTS</SelectItem>
-                      <SelectItem value="6">6 ECTS</SelectItem>
-                      <SelectItem value="9">9 ECTS</SelectItem>
-                      <SelectItem value="12">12 ECTS</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="edit-description" className="text-right">
-                    Beschrijving
-                  </Label>
-                  <Input
-                    id="edit-description"
-                    value={courseFormData.description || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-
-              {/* Nieuwe velden voor het bewerkformulier */}
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="edit-learningObjectives" className="text-right">
-                    Lesdoelen
-                  </Label>
-                  <textarea
-                    id="edit-learningObjectives"
-                    value={courseFormData.learningObjectives || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, learningObjectives: e.target.value })}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
-                    rows={3}
-                    placeholder="Beschrijf de lesdoelen van deze cursus..."
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="edit-materials" className="text-right">
-                    Lesmateriaal
-                  </Label>
-                  <textarea
-                    id="edit-materials"
-                    value={courseFormData.materials || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, materials: e.target.value })}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
-                    rows={3}
-                    placeholder="Welk lesmateriaal is nodig voor deze cursus?"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="edit-competencies" className="text-right">
-                    Eindcompetenties
-                  </Label>
-                  <textarea
-                    id="edit-competencies"
-                    value={courseFormData.competencies || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
-                    rows={3}
-                    placeholder="Wat moeten studenten kunnen na afloop van de cursus?"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="edit-prerequisites" className="text-right">
-                    Voorwaarden
-                  </Label>
-                  <textarea
-                    id="edit-prerequisites"
-                    value={courseFormData.prerequisites || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
-                    rows={3}
-                    placeholder="Welke voorkennis of andere cursussen zijn vereist?"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="edit-instructor" className="text-right">
-                    Docent
-                  </Label>
-                  <Input
-                    id="edit-instructor"
-                    value={courseFormData.instructor || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, instructor: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="edit-maxStudents" className="text-right">
-                    Maximum aantal studenten
-                  </Label>
-                  <Input
-                    id="edit-maxStudents"
-                    type="number"
-                    value={courseFormData.maxStudents || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, maxStudents: parseInt(e.target.value) })}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setIsEditDialogOpen(false)}
-              >
-                Annuleren
-              </Button>
-              <Button 
-                type="submit"
-                disabled={updateCourseMutation.isPending}
-              >
-                {updateCourseMutation.isPending ? 'Bezig met bijwerken...' : 'Wijzigingen opslaan'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Course Dialog */}
+      
+      {/* Delete confirmation dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Cursus verwijderen</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">Cursus verwijderen</DialogTitle>
             <DialogDescription>
-              Weet je zeker dat je deze cursus wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+              Weet u zeker dat u de cursus "{selectedCourse?.name}" wilt verwijderen? 
+              Deze actie kan niet ongedaan worden gemaakt.
             </DialogDescription>
           </DialogHeader>
-          <div className="my-4">
-            {selectedCourse && (
-              <div className="bg-gray-50 p-4 rounded-md">
-                <p className="font-semibold">{selectedCourse.name}</p>
-                <p className="text-sm text-gray-500">Code: {selectedCourse.code}</p>
-                <p className="text-sm text-gray-500">Studiepunten: {selectedCourse.credits} ECTS</p>
-              </div>
-            )}
-          </div>
-          <DialogFooter>
+          
+          <DialogFooter className="mt-6">
             <Button 
-              type="button"
               variant="outline" 
               onClick={() => setIsDeleteDialogOpen(false)}
             >
               Annuleren
             </Button>
             <Button 
-              type="button"
               variant="destructive" 
-              onClick={confirmDeleteCourse}
+              onClick={() => {
+                if (selectedCourse) {
+                  deleteCourseMutation.mutate(selectedCourse.id);
+                }
+              }}
               disabled={deleteCourseMutation.isPending}
             >
-              {deleteCourseMutation.isPending ? 'Bezig met verwijderen...' : 'Verwijderen'}
+              {deleteCourseMutation.isPending && (
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              )}
+              Verwijderen
             </Button>
           </DialogFooter>
         </DialogContent>

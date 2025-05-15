@@ -990,4 +990,59 @@ export class DatabaseStorage implements IStorage {
         eq(attendance.date, dateString)
       ));
   }
+  
+  // Behavior Assessment operations
+  async getBehaviorAssessments(filter?: any): Promise<BehaviorAssessment[]> {
+    let query = db.select().from(behaviorAssessments);
+    
+    if (filter) {
+      if (filter.studentId) {
+        query = query.where(eq(behaviorAssessments.studentId, filter.studentId));
+      }
+      if (filter.classId) {
+        query = query.where(eq(behaviorAssessments.classId, filter.classId));
+      }
+    }
+    
+    return query;
+  }
+
+  async getBehaviorAssessment(id: number): Promise<BehaviorAssessment | undefined> {
+    const result = await db.select().from(behaviorAssessments).where(eq(behaviorAssessments.id, id));
+    return result[0];
+  }
+
+  async getBehaviorAssessmentsByStudent(studentId: number): Promise<BehaviorAssessment[]> {
+    return db.select().from(behaviorAssessments).where(eq(behaviorAssessments.studentId, studentId));
+  }
+
+  async getBehaviorAssessmentsByClass(classId: number): Promise<BehaviorAssessment[]> {
+    return db.select().from(behaviorAssessments).where(eq(behaviorAssessments.classId, classId));
+  }
+
+  async createBehaviorAssessment(assessment: InsertBehaviorAssessment): Promise<BehaviorAssessment> {
+    const result = await db.insert(behaviorAssessments).values(assessment).returning();
+    return result[0];
+  }
+
+  async createBehaviorAssessments(assessments: InsertBehaviorAssessment[]): Promise<BehaviorAssessment[]> {
+    if (assessments.length === 0) return [];
+    const result = await db.insert(behaviorAssessments).values(assessments).returning();
+    return result;
+  }
+
+  async updateBehaviorAssessment(id: number, assessment: Partial<BehaviorAssessment>): Promise<BehaviorAssessment | undefined> {
+    const result = await db.update(behaviorAssessments)
+      .set(assessment)
+      .where(eq(behaviorAssessments.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteBehaviorAssessment(id: number): Promise<boolean> {
+    const result = await db.delete(behaviorAssessments)
+      .where(eq(behaviorAssessments.id, id))
+      .returning({ id: behaviorAssessments.id });
+    return result.length > 0;
+  }
 }

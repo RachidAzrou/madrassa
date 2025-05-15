@@ -20,7 +20,12 @@ import {
   insertGuardianSchema,
   insertStudentGuardianSchema,
   insertStudentProgramSchema,
-  type Student
+  insertTeacherSchema,
+  insertTeacherAvailabilitySchema,
+  insertTeacherLanguageSchema,
+  insertTeacherCourseAssignmentSchema,
+  type Student,
+  type Teacher
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -2118,6 +2123,474 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(events);
     } catch (error) {
       res.status(500).json({ message: "Error fetching upcoming events" });
+    }
+  });
+
+  // ********************
+  // Teacher API endpoints
+  // ********************
+  apiRouter.get("/api/teachers", async (req, res) => {
+    try {
+      const { searchTerm, page = '1', limit = '10' } = req.query;
+      const pageNumber = parseInt(page as string) || 1;
+      const limitNumber = parseInt(limit as string) || 10;
+      const offset = (pageNumber - 1) * limitNumber;
+      
+      // Haal alle docenten op
+      let teachers = await storage.getTeachers();
+      let totalCount = teachers.length;
+      
+      // Filter op zoekterm als die is opgegeven
+      if (searchTerm) {
+        const term = (searchTerm as string).toLowerCase();
+        teachers = teachers.filter(teacher => 
+          teacher.firstName.toLowerCase().includes(term) || 
+          teacher.lastName.toLowerCase().includes(term) || 
+          teacher.email.toLowerCase().includes(term) ||
+          (teacher.teacherId && teacher.teacherId.toLowerCase().includes(term))
+        );
+        totalCount = teachers.length;
+      }
+      
+      // Paginering toepassen
+      teachers = teachers.slice(offset, offset + limitNumber);
+      
+      res.json({ teachers, totalCount });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching teachers" });
+    }
+  });
+  
+  apiRouter.get("/api/teachers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const teacher = await storage.getTeacher(id);
+      if (!teacher) {
+        return res.status(404).json({ message: "Teacher not found" });
+      }
+      
+      res.json(teacher);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching teacher" });
+    }
+  });
+  
+  apiRouter.post("/api/teachers", async (req, res) => {
+    try {
+      const validatedData = insertTeacherSchema.parse(req.body);
+      
+      // Controleer of e-mail al bestaat
+      const existingTeacher = await storage.getTeacherByEmail(validatedData.email);
+      if (existingTeacher) {
+        return res.status(409).json({ message: "Email already in use" });
+      }
+      
+      // Genereer teacherId als deze niet is opgegeven
+      if (!validatedData.teacherId) {
+        const teachers = await storage.getTeachers();
+        const nextId = (teachers.length + 1).toString();
+        validatedData.teacherId = `D-${nextId.padStart(3, '0')}`;
+      }
+      
+      const teacher = await storage.createTeacher(validatedData);
+      res.status(201).json(teacher);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid teacher data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating teacher" });
+    }
+  });
+  
+  apiRouter.put("/api/teachers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      // Controleer of docent bestaat
+      const existingTeacher = await storage.getTeacher(id);
+      if (!existingTeacher) {
+        return res.status(404).json({ message: "Teacher not found" });
+      }
+      
+      // Valideer de gegevens
+      const validatedData = insertTeacherSchema.partial().parse(req.body);
+      
+      // Controleer of e-mail al in gebruik is door een andere docent
+      if (validatedData.email && validatedData.email !== existingTeacher.email) {
+        const teacherWithEmail = await storage.getTeacherByEmail(validatedData.email);
+        if (teacherWithEmail && teacherWithEmail.id !== id) {
+          return res.status(409).json({ message: "Email already in use by another teacher" });
+        }
+      }
+      
+      const updatedTeacher = await storage.updateTeacher(id, validatedData);
+      res.json(updatedTeacher);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid teacher data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating teacher" });
+    }
+  });
+  
+  apiRouter.delete("/api/teachers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteTeacher(id);
+      if (!success) {
+        return res.status(404).json({ message: "Teacher not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting teacher" });
+    }
+  });
+  
+  // Teacher Availability API endpoints
+  apiRouter.get("/api/teacher-availability", async (req, res) => {
+    try {
+      const { teacherId } = req.query;
+      
+      if (teacherId) {
+        const id = parseInt(teacherId as string);
+        if (isNaN(id)) {
+          return res.status(400).json({ message: "Invalid teacher ID format" });
+        }
+        
+        const availabilities = await storage.getTeacherAvailabilitiesByTeacher(id);
+        res.json(availabilities);
+      } else {
+        const availabilities = await storage.getTeacherAvailabilities();
+        res.json(availabilities);
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching teacher availabilities" });
+    }
+  });
+  
+  apiRouter.get("/api/teacher-availability/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const availability = await storage.getTeacherAvailability(id);
+      if (!availability) {
+        return res.status(404).json({ message: "Teacher availability not found" });
+      }
+      
+      res.json(availability);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching teacher availability" });
+    }
+  });
+  
+  apiRouter.post("/api/teacher-availability", async (req, res) => {
+    try {
+      const validatedData = insertTeacherAvailabilitySchema.parse(req.body);
+      
+      // Controleer of docent bestaat
+      const teacher = await storage.getTeacher(validatedData.teacherId);
+      if (!teacher) {
+        return res.status(404).json({ message: "Teacher not found" });
+      }
+      
+      const availability = await storage.createTeacherAvailability(validatedData);
+      res.status(201).json(availability);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid availability data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating teacher availability" });
+    }
+  });
+  
+  apiRouter.put("/api/teacher-availability/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      // Controleer of beschikbaarheid bestaat
+      const existingAvailability = await storage.getTeacherAvailability(id);
+      if (!existingAvailability) {
+        return res.status(404).json({ message: "Teacher availability not found" });
+      }
+      
+      // Valideer de gegevens
+      const validatedData = insertTeacherAvailabilitySchema.partial().parse(req.body);
+      
+      const updatedAvailability = await storage.updateTeacherAvailability(id, validatedData);
+      res.json(updatedAvailability);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid availability data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating teacher availability" });
+    }
+  });
+  
+  apiRouter.delete("/api/teacher-availability/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteTeacherAvailability(id);
+      if (!success) {
+        return res.status(404).json({ message: "Teacher availability not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting teacher availability" });
+    }
+  });
+  
+  // Teacher Language API endpoints
+  apiRouter.get("/api/teacher-languages", async (req, res) => {
+    try {
+      const { teacherId } = req.query;
+      
+      if (teacherId) {
+        const id = parseInt(teacherId as string);
+        if (isNaN(id)) {
+          return res.status(400).json({ message: "Invalid teacher ID format" });
+        }
+        
+        const languages = await storage.getTeacherLanguagesByTeacher(id);
+        res.json(languages);
+      } else {
+        const languages = await storage.getTeacherLanguages();
+        res.json(languages);
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching teacher languages" });
+    }
+  });
+  
+  apiRouter.get("/api/teacher-languages/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const language = await storage.getTeacherLanguage(id);
+      if (!language) {
+        return res.status(404).json({ message: "Teacher language not found" });
+      }
+      
+      res.json(language);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching teacher language" });
+    }
+  });
+  
+  apiRouter.post("/api/teacher-languages", async (req, res) => {
+    try {
+      const validatedData = insertTeacherLanguageSchema.parse(req.body);
+      
+      // Controleer of docent bestaat
+      const teacher = await storage.getTeacher(validatedData.teacherId);
+      if (!teacher) {
+        return res.status(404).json({ message: "Teacher not found" });
+      }
+      
+      const language = await storage.createTeacherLanguage(validatedData);
+      res.status(201).json(language);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid language data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating teacher language" });
+    }
+  });
+  
+  apiRouter.put("/api/teacher-languages/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      // Controleer of taal bestaat
+      const existingLanguage = await storage.getTeacherLanguage(id);
+      if (!existingLanguage) {
+        return res.status(404).json({ message: "Teacher language not found" });
+      }
+      
+      // Valideer de gegevens
+      const validatedData = insertTeacherLanguageSchema.partial().parse(req.body);
+      
+      const updatedLanguage = await storage.updateTeacherLanguage(id, validatedData);
+      res.json(updatedLanguage);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid language data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating teacher language" });
+    }
+  });
+  
+  apiRouter.delete("/api/teacher-languages/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteTeacherLanguage(id);
+      if (!success) {
+        return res.status(404).json({ message: "Teacher language not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting teacher language" });
+    }
+  });
+  
+  // Teacher Course Assignment API endpoints
+  apiRouter.get("/api/teacher-course-assignments", async (req, res) => {
+    try {
+      const { teacherId, courseId } = req.query;
+      
+      if (teacherId) {
+        const id = parseInt(teacherId as string);
+        if (isNaN(id)) {
+          return res.status(400).json({ message: "Invalid teacher ID format" });
+        }
+        
+        const assignments = await storage.getTeacherCourseAssignmentsByTeacher(id);
+        
+        // Verrijk de toewijzingen met cursusinformatie
+        const enrichedAssignments = await Promise.all(assignments.map(async (assignment) => {
+          const course = await storage.getCourse(assignment.courseId);
+          return {
+            ...assignment,
+            courseName: course ? course.name : undefined
+          };
+        }));
+        
+        res.json(enrichedAssignments);
+      } else if (courseId) {
+        const id = parseInt(courseId as string);
+        if (isNaN(id)) {
+          return res.status(400).json({ message: "Invalid course ID format" });
+        }
+        
+        const assignments = await storage.getTeacherCourseAssignmentsByCourse(id);
+        res.json(assignments);
+      } else {
+        const assignments = await storage.getTeacherCourseAssignments();
+        res.json(assignments);
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching teacher course assignments" });
+    }
+  });
+  
+  apiRouter.get("/api/teacher-course-assignments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const assignment = await storage.getTeacherCourseAssignment(id);
+      if (!assignment) {
+        return res.status(404).json({ message: "Teacher course assignment not found" });
+      }
+      
+      res.json(assignment);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching teacher course assignment" });
+    }
+  });
+  
+  apiRouter.post("/api/teacher-course-assignments", async (req, res) => {
+    try {
+      const validatedData = insertTeacherCourseAssignmentSchema.parse(req.body);
+      
+      // Controleer of docent bestaat
+      const teacher = await storage.getTeacher(validatedData.teacherId);
+      if (!teacher) {
+        return res.status(404).json({ message: "Teacher not found" });
+      }
+      
+      // Controleer of cursus bestaat
+      const course = await storage.getCourse(validatedData.courseId);
+      if (!course) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+      
+      const assignment = await storage.createTeacherCourseAssignment(validatedData);
+      res.status(201).json(assignment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid assignment data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating teacher course assignment" });
+    }
+  });
+  
+  apiRouter.put("/api/teacher-course-assignments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      // Controleer of toewijzing bestaat
+      const existingAssignment = await storage.getTeacherCourseAssignment(id);
+      if (!existingAssignment) {
+        return res.status(404).json({ message: "Teacher course assignment not found" });
+      }
+      
+      // Valideer de gegevens
+      const validatedData = insertTeacherCourseAssignmentSchema.partial().parse(req.body);
+      
+      const updatedAssignment = await storage.updateTeacherCourseAssignment(id, validatedData);
+      res.json(updatedAssignment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid assignment data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error updating teacher course assignment" });
+    }
+  });
+  
+  apiRouter.delete("/api/teacher-course-assignments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteTeacherCourseAssignment(id);
+      if (!success) {
+        return res.status(404).json({ message: "Teacher course assignment not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting teacher course assignment" });
     }
   });
 

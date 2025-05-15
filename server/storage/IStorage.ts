@@ -180,4 +180,37 @@ export interface IStorage {
   updateStudentProgram(id: number, studentProgram: Partial<StudentProgram>): Promise<StudentProgram | undefined>;
   deleteStudentProgram(id: number): Promise<boolean>;
   getPrimaryProgramByStudent(studentId: number): Promise<StudentProgram | undefined>;
+  
+  // Teacher operations
+  getTeachers(): Promise<Teacher[]>;
+  getTeacher(id: number): Promise<Teacher | undefined>;
+  getTeacherByEmail(email: string): Promise<Teacher | undefined>;
+  createTeacher(teacher: InsertTeacher): Promise<Teacher>;
+  updateTeacher(id: number, teacher: Partial<Teacher>): Promise<Teacher | undefined>;
+  deleteTeacher(id: number): Promise<boolean>;
+  
+  // Teacher Availability operations
+  getTeacherAvailabilities(): Promise<TeacherAvailability[]>;
+  getTeacherAvailability(id: number): Promise<TeacherAvailability | undefined>;
+  getTeacherAvailabilitiesByTeacher(teacherId: number): Promise<TeacherAvailability[]>;
+  createTeacherAvailability(availability: InsertTeacherAvailability): Promise<TeacherAvailability>;
+  updateTeacherAvailability(id: number, availability: Partial<TeacherAvailability>): Promise<TeacherAvailability | undefined>;
+  deleteTeacherAvailability(id: number): Promise<boolean>;
+  
+  // Teacher Language operations
+  getTeacherLanguages(): Promise<TeacherLanguage[]>;
+  getTeacherLanguage(id: number): Promise<TeacherLanguage | undefined>;
+  getTeacherLanguagesByTeacher(teacherId: number): Promise<TeacherLanguage[]>;
+  createTeacherLanguage(language: InsertTeacherLanguage): Promise<TeacherLanguage>;
+  updateTeacherLanguage(id: number, language: Partial<TeacherLanguage>): Promise<TeacherLanguage | undefined>;
+  deleteTeacherLanguage(id: number): Promise<boolean>;
+  
+  // Teacher Course Assignment operations
+  getTeacherCourseAssignments(): Promise<TeacherCourseAssignment[]>;
+  getTeacherCourseAssignment(id: number): Promise<TeacherCourseAssignment | undefined>;
+  getTeacherCourseAssignmentsByTeacher(teacherId: number): Promise<TeacherCourseAssignment[]>;
+  getTeacherCourseAssignmentsByCourse(courseId: number): Promise<TeacherCourseAssignment[]>;
+  createTeacherCourseAssignment(assignment: InsertTeacherCourseAssignment): Promise<TeacherCourseAssignment>;
+  updateTeacherCourseAssignment(id: number, assignment: Partial<TeacherCourseAssignment>): Promise<TeacherCourseAssignment | undefined>;
+  deleteTeacherCourseAssignment(id: number): Promise<boolean>;
 }

@@ -114,39 +114,100 @@ export default function Programs() {
   };
   
   const handleEditProgram = (id: string) => {
-    console.log(`Editing program with ID: ${id}`);
-    toast({
-      title: "Programma bewerken",
-      description: `Bewerkingsformulier laden voor programma met ID: ${id}`,
-      variant: "default",
-    });
+    const program = programs.find(p => p.id === id);
+    if (program) {
+      setSelectedProgram(program);
+      setProgramFormData({
+        name: program.name || '',
+        code: program.code || '',
+        description: program.description || '',
+        duration: program.duration || 4,
+        department: program.department || '',
+        isActive: true, // Assuming all existing programs are active
+      });
+      setIsEditDialogOpen(true);
+    }
   };
   
+  // Mutatie voor het bijwerken van een programma
+  const updateProgramMutation = useMutation({
+    mutationFn: async (data: { id: string; programData: typeof programFormData }) => {
+      return apiRequest('PUT', `/api/programs/${data.id}`, data.programData);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/programs'] });
+      
+      // Reset form and close dialog
+      setIsEditDialogOpen(false);
+      setSelectedProgram(null);
+      
+      // Toon succes melding
+      toast({
+        title: "Programma bijgewerkt",
+        description: "Het programma is succesvol bijgewerkt.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij bijwerken",
+        description: error.message || "Er is een fout opgetreden bij het bijwerken van het programma.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleSubmitEditProgram = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedProgram) {
+      updateProgramMutation.mutate({
+        id: selectedProgram.id,
+        programData: programFormData
+      });
+    }
+  };
+
   const handleDeleteProgram = (id: string) => {
-    console.log(`Deleting program with ID: ${id}`);
-    
-    if (confirm(`Weet je zeker dat je het programma met ID: ${id} wilt verwijderen?`)) {
-      // Implementeer de werkelijke verwijdering via API
-      apiRequest('DELETE', `/api/programs/${id}`)
-        .then(() => {
-          // Toon succesmelding
-          toast({
-            title: "Programma verwijderd",
-            description: `Programma met ID ${id} is succesvol verwijderd.`,
-            variant: "default",
-          });
-          
-          // Invalidate cache om de lijst te vernieuwen
-          queryClient.invalidateQueries({ queryKey: ['/api/programs'] });
-        })
-        .catch((error) => {
-          // Toon foutmelding bij mislukken
-          toast({
-            title: "Fout bij verwijderen",
-            description: error.message || "Er is een fout opgetreden bij het verwijderen van het programma.",
-            variant: "destructive",
-          });
-        });
+    const program = programs.find(p => p.id === id);
+    if (program) {
+      setSelectedProgram(program);
+      setIsDeleteDialogOpen(true);
+    }
+  };
+
+  // Mutatie voor het verwijderen van een programma
+  const deleteProgramMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest('DELETE', `/api/programs/${id}`);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/programs'] });
+      
+      // Reset form and close dialog
+      setIsDeleteDialogOpen(false);
+      setSelectedProgram(null);
+      
+      // Toon succes melding
+      toast({
+        title: "Programma verwijderd",
+        description: "Het programma is succesvol verwijderd uit het systeem.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van het programma.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const confirmDeleteProgram = () => {
+    if (selectedProgram) {
+      deleteProgramMutation.mutate(selectedProgram.id);
     }
   };
 
@@ -433,6 +494,168 @@ export default function Programs() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Programma bewerken dialoogvenster */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Programma bewerken</DialogTitle>
+            <DialogDescription>
+              Vul de onderstaande velden in om dit programma bij te werken.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmitEditProgram}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="name" className="text-right">
+                    Naam *
+                  </Label>
+                  <Input
+                    id="name"
+                    value={programFormData.name}
+                    onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
+                    className="mt-1"
+                    required
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="code" className="text-right">
+                    Code *
+                  </Label>
+                  <Input
+                    id="code"
+                    value={programFormData.code}
+                    onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
+                    className="mt-1"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="department" className="text-right">
+                    Afdeling
+                  </Label>
+                  <Input
+                    id="department"
+                    value={programFormData.department}
+                    onChange={(e) => setProgramFormData({ ...programFormData, department: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="duration" className="text-right">
+                    Duur (jaren)
+                  </Label>
+                  <Select
+                    value={programFormData.duration.toString()}
+                    onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer duur" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 jaar</SelectItem>
+                      <SelectItem value="2">2 jaar</SelectItem>
+                      <SelectItem value="3">3 jaar</SelectItem>
+                      <SelectItem value="4">4 jaar</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="description" className="text-right">
+                    Beschrijving
+                  </Label>
+                  <Input
+                    id="description"
+                    value={programFormData.description}
+                    onChange={(e) => setProgramFormData({ ...programFormData, description: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <Label htmlFor="isActive" className="text-right mr-2">
+                    Status
+                  </Label>
+                  <Select
+                    value={programFormData.isActive ? "true" : "false"}
+                    onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Actief</SelectItem>
+                      <SelectItem value="false">Inactief</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="submit"
+                disabled={updateProgramMutation.isPending}
+              >
+                {updateProgramMutation.isPending ? 'Bezig met bijwerken...' : 'Opslaan'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Programma verwijderen dialoogvenster */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Programma verwijderen</DialogTitle>
+            <DialogDescription>
+              Weet je zeker dat je dit programma wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {selectedProgram && (
+              <div className="space-y-2">
+                <p><strong>Naam:</strong> {selectedProgram.name}</p>
+                <p><strong>Code:</strong> {selectedProgram.code}</p>
+                {selectedProgram.department && (
+                  <p><strong>Afdeling:</strong> {selectedProgram.department}</p>
+                )}
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Annuleren
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeleteProgram}
+              disabled={deleteProgramMutation.isPending}
+            >
+              {deleteProgramMutation.isPending ? 'Bezig met verwijderen...' : 'Verwijderen'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -21,6 +21,7 @@ import {
   FileText,
   Clock,
 } from "lucide-react";
+import madrassaLogo from "@assets/myMadrassa.png";
 
 type SidebarLinkProps = {
   href: string;
@@ -91,10 +92,12 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
       {/* Logo and header */}
       <div className="flex items-center justify-between px-4 py-5 border-b border-gray-200">
         <div className="flex items-center space-x-2">
-          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-            <GraduationCap className="text-white h-5 w-5" />
-          </div>
-          <span className="text-xl font-semibold text-gray-800">Onderwijs Beheer</span>
+          <Link href="/">
+            <div className="flex items-center space-x-2">
+              <img src={madrassaLogo} alt="myMadrassa Logo" className="w-9 h-9 rounded-lg object-cover" />
+              <span className="text-xl font-semibold text-gray-800">myMadrassa</span>
+            </div>
+          </Link>
         </div>
         {isMobile && (
           <button 
@@ -267,7 +270,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-800 truncate">Beheerder</p>
-            <p className="text-xs text-gray-500 truncate">admin@onderwijsbeheer.nl</p>
+            <p className="text-xs text-gray-500 truncate">admin@mymadrassa.nl</p>
           </div>
           <button className="p-1.5 rounded text-gray-500 hover:bg-gray-100">
             <LogOut className="h-4 w-4" />

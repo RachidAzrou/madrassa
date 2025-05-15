@@ -32,7 +32,7 @@ const Header = ({ onMenuClick, title }: HeaderProps) => {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
             <Input
               type="search"
-              placeholder="Search..."
+              placeholder="Zoeken..."
               className="w-[200px] pl-8 md:w-[260px] rounded-md border border-gray-200"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -41,12 +41,12 @@ const Header = ({ onMenuClick, title }: HeaderProps) => {
 
           <Button variant="ghost" size="icon" className="text-gray-500">
             <Bell className="h-5 w-5" />
-            <span className="sr-only">Notifications</span>
+            <span className="sr-only">Meldingen</span>
           </Button>
 
           <Button variant="ghost" size="icon" className="text-gray-500">
             <Settings className="h-5 w-5" />
-            <span className="sr-only">Settings</span>
+            <span className="sr-only">Instellingen</span>
           </Button>
         </div>
       </div>

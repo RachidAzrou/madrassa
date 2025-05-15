@@ -148,13 +148,33 @@ export default function Students() {
   // Mutatie om een student toe te voegen
   const createStudentMutation = useMutation({
     mutationFn: async (studentData: typeof studentFormData) => {
-      return apiRequest('POST', '/api/students', studentData);
+      const response = await apiRequest('POST', '/api/students', studentData);
+      
+      // Nu studentId-programma associaties toevoegen als er programma's zijn geselecteerd
+      if (selectedPrograms.length > 0 && response.id) {
+        // Voor elk programma, een student_program record maken
+        const programPromises = selectedPrograms.map(program => 
+          apiRequest('POST', '/api/student-programs', {
+            studentId: response.id,
+            programId: program.programId,
+            yearLevel: program.yearLevel,
+            status: program.status,
+            enrollmentDate: new Date().toISOString().split('T')[0],
+            primaryProgram: selectedPrograms.indexOf(program) === 0 // Eerste programma is primair
+          })
+        );
+        
+        // Wacht tot alle programma's zijn toegevoegd
+        await Promise.all(programPromises);
+      }
+      
+      return response;
     },
     onSuccess: () => {
       // Invalidate query cache to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
       
-      // Reset form and close dialog
+      // Reset form en geselecteerde programma's en sluit dialoog
       setStudentFormData({
         studentId: '',
         firstName: '',
@@ -172,6 +192,7 @@ export default function Students() {
         enrollmentDate: '',
         status: 'Active',
       });
+      setSelectedPrograms([]); // Reset geselecteerde programma's
       setIsAddDialogOpen(false);
       
       // Toon succes melding
@@ -1292,49 +1313,128 @@ export default function Students() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="programId" className="text-right">
-                    Opleidingsprogramma
-                  </Label>
-                  <Select
-                    value={studentFormData.programId?.toString() || ''}
-                    onValueChange={handleProgramIdChange}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer programma" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Geen programma</SelectItem>
-                      {programs.map((program: {id: number, name: string}) => (
-                        <SelectItem key={program.id} value={String(program.id)}>
-                          {program.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="yearLevel" className="text-right">
-                    Studiejaar
-                  </Label>
-                  <Select
-                    value={studentFormData.yearLevel?.toString() || ''}
-                    onValueChange={handleYearLevelChange}
-                    disabled={!studentFormData.programId}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder={!studentFormData.programId ? "Selecteer eerst een programma" : "Selecteer jaar"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Geen jaar</SelectItem>
-                      {getYearLevelOptions(studentFormData.programId).map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                          Jaar {year}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              <div className="space-y-4">
+                <div className="flex flex-col">
+                  <h3 className="text-lg font-semibold mb-2">Programma's</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Selecteer één of meerdere programma's voor deze student
+                  </p>
+                  
+                  {/* Lijst met toegevoegde programma's */}
+                  {selectedPrograms.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      {selectedPrograms.map((program, index) => {
+                        const programInfo = programs.find((p: any) => p.id === program.programId);
+                        return (
+                          <div key={index} className="flex items-center justify-between border rounded-md p-3 bg-muted/20">
+                            <div>
+                              <div className="font-medium">{programInfo?.name}</div>
+                              <div className="text-sm text-muted-foreground">Jaar: {program.yearLevel || 'Niet gespecificeerd'}</div>
+                              <Badge variant={program.status === 'active' ? 'success' : 'outline'}>
+                                {program.status === 'active' ? 'Actief' : program.status === 'inactive' ? 'Inactief' : program.status}
+                              </Badge>
+                            </div>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => {
+                                setSelectedPrograms(selectedPrograms.filter((_, i) => i !== index));
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  
+                  {/* Nieuwe programma toevoegen interface */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-md">
+                    <div>
+                      <Label htmlFor="newProgramId">Programma</Label>
+                      <Select
+                        value={studentFormData.programId?.toString() || ''}
+                        onValueChange={handleProgramIdChange}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Selecteer programma" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {programs.map((program: {id: number, name: string}) => (
+                            <SelectItem key={program.id} value={String(program.id)}>
+                              {program.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="newYearLevel">Studiejaar</Label>
+                      <Select
+                        value={studentFormData.yearLevel?.toString() || ''}
+                        onValueChange={handleYearLevelChange}
+                        disabled={!studentFormData.programId}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder={!studentFormData.programId ? "Selecteer eerst programma" : "Selecteer jaar"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Geen jaar</SelectItem>
+                          {getYearLevelOptions(studentFormData.programId).map((year) => (
+                            <SelectItem key={year} value={year.toString()}>
+                              Jaar {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="flex items-end">
+                      <Button 
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        disabled={!studentFormData.programId}
+                        onClick={() => {
+                          if (studentFormData.programId) {
+                            // Controleer of dit programma al is toegevoegd
+                            const alreadyExists = selectedPrograms.some(
+                              p => p.programId === studentFormData.programId
+                            );
+                            
+                            if (!alreadyExists) {
+                              setSelectedPrograms([
+                                ...selectedPrograms,
+                                {
+                                  programId: studentFormData.programId,
+                                  yearLevel: studentFormData.yearLevel,
+                                  status: 'active'
+                                }
+                              ]);
+                              
+                              // Reset de programId en yearLevel voor de volgende toevoeging
+                              setStudentFormData({
+                                ...studentFormData,
+                                programId: null,
+                                yearLevel: null
+                              });
+                            } else {
+                              // Toon een waarschuwing dat het programma al is toegevoegd
+                              toast({
+                                title: "Programma al toegevoegd",
+                                description: "Deze student is al ingeschreven voor dit programma.",
+                                variant: "destructive"
+                              });
+                            }
+                          }
+                        }}
+                      >
+                        Programma toevoegen
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1428,7 +1428,7 @@ export default function Guardians() {
       
       {/* Voogd Details Dialog */}
       <Dialog open={isViewGuardianDialogOpen} onOpenChange={setIsViewGuardianDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="w-[95vw] h-[90vh] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Voogd Details</DialogTitle>
             <DialogDescription>

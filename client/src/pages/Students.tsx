@@ -97,6 +97,7 @@ export default function Students() {
     city: '',
     programId: null as number | null,
     yearLevel: null as number | null,
+    studentGroupId: null as number | null,
     enrollmentDate: '',
     status: 'active' as string,
     notes: '',
@@ -2137,14 +2138,24 @@ export default function Students() {
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                         {selectedPrograms.map((program, index) => {
                           const programInfo = programs.find((p: any) => p.id === program.programId);
+                          const groupInfo = program.studentGroupId ? studentGroups.find((g: any) => g.id === program.studentGroupId) : null;
                           return (
                             <div key={index} className="flex items-center justify-between border rounded-md p-4 bg-blue-50/50 border-blue-100 hover:shadow-sm transition-shadow">
                               <div>
                                 <div className="font-medium text-primary">{programInfo?.name}</div>
-                                <div className="text-sm text-gray-500">Jaar: {program.yearLevel || 'Niet gespecificeerd'}</div>
-                                <Badge variant={program.status === 'active' ? 'success' : 'outline'} className="mt-1">
-                                  {program.status === 'active' ? 'Actief' : program.status === 'inactive' ? 'Inactief' : program.status}
-                                </Badge>
+                                <div className="flex flex-col space-y-1">
+                                  {program.yearLevel && (
+                                    <div className="text-sm text-gray-500">Jaar: {program.yearLevel}</div>
+                                  )}
+                                  {groupInfo && (
+                                    <div className="text-sm text-gray-600 font-medium">
+                                      Klas: {groupInfo.name}
+                                    </div>
+                                  )}
+                                  <Badge variant={program.status === 'active' ? 'success' : 'outline'} className="w-fit">
+                                    {program.status === 'active' ? 'Actief' : program.status === 'inactive' ? 'Inactief' : program.status}
+                                  </Badge>
+                                </div>
                               </div>
                               <Button 
                                 variant="ghost" 
@@ -2165,7 +2176,7 @@ export default function Students() {
                     {/* Nieuwe programma toevoegen interface */}
                     <div className="mt-6 p-4 border rounded-md border-dashed border-gray-300 bg-gray-50">
                       <h4 className="text-sm font-medium text-gray-700 mb-3">Vak toevoegen</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                           <Label htmlFor="newProgramId" className="text-xs text-gray-500">Vak</Label>
                           <Select
@@ -2173,12 +2184,35 @@ export default function Students() {
                             onValueChange={handleProgramIdChange}
                           >
                             <SelectTrigger className="mt-1 border-gray-200 bg-white">
-                              <SelectValue placeholder="Selecteer programma" />
+                              <SelectValue placeholder="Selecteer vak" />
                             </SelectTrigger>
                             <SelectContent>
                               {programs.map((program: {id: number, name: string}) => (
                                 <SelectItem key={program.id} value={String(program.id)}>
                                   {program.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="newStudentGroupId" className="text-xs text-gray-500">Klas</Label>
+                          <Select
+                            value={studentFormData.studentGroupId?.toString() || ''}
+                            onValueChange={(value) => setStudentFormData({ 
+                              ...studentFormData, 
+                              studentGroupId: value !== '' ? parseInt(value) : null 
+                            })}
+                          >
+                            <SelectTrigger className="mt-1 border-gray-200 bg-white">
+                              <SelectValue placeholder="Selecteer klas" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="">Geen klas</SelectItem>
+                              {studentGroups.map((group: {id: number, name: string}) => (
+                                <SelectItem key={group.id} value={String(group.id)}>
+                                  {group.name}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -2193,7 +2227,7 @@ export default function Students() {
                             disabled={!studentFormData.programId}
                           >
                             <SelectTrigger className="mt-1 border-gray-200 bg-white">
-                              <SelectValue placeholder={!studentFormData.programId ? "Selecteer eerst programma" : "Selecteer jaar"} />
+                              <SelectValue placeholder={!studentFormData.programId ? "Selecteer eerst vak" : "Selecteer jaar"} />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="none">Geen jaar</SelectItem>
@@ -2225,15 +2259,17 @@ export default function Students() {
                                     {
                                       programId: studentFormData.programId,
                                       yearLevel: studentFormData.yearLevel,
+                                      studentGroupId: studentFormData.studentGroupId,
                                       status: 'active'
                                     }
                                   ]);
                                   
-                                  // Reset de programId en yearLevel voor de volgende toevoeging
+                                  // Reset de programId, yearLevel en studentGroupId voor de volgende toevoeging
                                   setStudentFormData({
                                     ...studentFormData,
                                     programId: null,
-                                    yearLevel: null
+                                    yearLevel: null,
+                                    studentGroupId: null
                                   });
                                 } else {
                                   // Toon een waarschuwing dat het vak al is toegevoegd

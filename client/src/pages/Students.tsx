@@ -56,6 +56,10 @@ export default function Students() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  
+  // State voor familie tab
+  const [linkedGuardians, setLinkedGuardians] = useState<any[]>([]);
+  const [siblings, setSiblings] = useState<any[]>([]);
   const [studentFormData, setStudentFormData] = useState({
     studentId: '',
     firstName: '',
@@ -1539,6 +1543,39 @@ export default function Students() {
                           <Edit className="mr-2 h-4 w-4" />
                           Bewerken
                         </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="family" className="pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Ouders/Voogden sectie */}
+                  <div className="border rounded-lg p-6 bg-card">
+                    <h3 className="text-lg font-bold mb-4">Ouders / Voogden</h3>
+                    <div className="space-y-4" id="guardians-list">
+                      {/* Dit zal later dynamisch worden gevuld met guardians data */}
+                      <div className="text-center py-6 text-muted-foreground">
+                        <UserCircle className="mx-auto h-12 w-12 opacity-50" />
+                        <p className="mt-2">Geen ouders of voogden gekoppeld.</p>
+                        <Button variant="outline" size="sm" className="mt-2">
+                          <PlusCircle className="mr-2 h-4 w-4" />
+                          Voogd koppelen
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Broers/Zussen sectie */}
+                  <div className="border rounded-lg p-6 bg-card">
+                    <h3 className="text-lg font-bold mb-4">Broers / Zussen</h3>
+                    <div className="space-y-4" id="siblings-list">
+                      {/* Dit zal later dynamisch worden gevuld met siblings data */}
+                      <div className="text-center py-6 text-muted-foreground">
+                        <UserCircle className="mx-auto h-12 w-12 opacity-50" />
+                        <p className="mt-2">Geen broers of zussen gevonden.</p>
+                        <p className="text-sm">Broers en zussen worden automatisch gelinkt op basis van gemeenschappelijke ouders/voogden.</p>
                       </div>
                     </div>
                   </div>

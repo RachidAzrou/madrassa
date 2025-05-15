@@ -564,7 +564,7 @@ export default function Students() {
   // Dialog voor het bewerken van een student
   const EditStudentDialog = () => (
     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Student bewerken</DialogTitle>
           <DialogDescription>
@@ -1521,10 +1521,10 @@ export default function Students() {
                   </div>
                   
                   {/* Rechter kolom: adres en extra informatie */}
-                  <div className="w-full md:w-2/3 space-y-6">
+                  <div className="w-full md:w-3/4 space-y-6">
                     <div className="border rounded-lg p-6 bg-card">
                       <h3 className="text-lg font-bold mb-4">Adresgegevens</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                           <h3 className="text-sm font-medium text-muted-foreground">Straat</h3>
                           <p className="font-medium">{selectedStudent.street || "Niet ingevuld"}</p>
@@ -1547,7 +1547,7 @@ export default function Students() {
                     <div className="border rounded-lg p-6 bg-card">
                       <h3 className="text-lg font-bold mb-4">Aanvullende informatie</h3>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                           <h3 className="text-sm font-medium text-muted-foreground">Ingeschreven sinds</h3>
                           <p className="font-medium">{selectedStudent.createdAt ? new Date(selectedStudent.createdAt).toLocaleDateString('nl-NL') : "Onbekend"}</p>

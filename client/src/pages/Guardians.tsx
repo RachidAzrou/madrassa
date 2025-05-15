@@ -783,7 +783,7 @@ export default function Guardians() {
 
       {/* Add Guardian Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="w-[95vw] h-[90vh] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Voogd toevoegen</DialogTitle>
             <DialogDescription>

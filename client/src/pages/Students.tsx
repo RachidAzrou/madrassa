@@ -1724,7 +1724,7 @@ export default function Students() {
                 <TabsTrigger value="general">Algemene Informatie</TabsTrigger>
                 <TabsTrigger value="family">Familie</TabsTrigger>
                 <TabsTrigger value="programs">Vakken</TabsTrigger>
-                <TabsTrigger value="enrollments">Inschrijvingen</TabsTrigger>
+                <TabsTrigger value="payments">Betaalgegevens</TabsTrigger>
               </TabsList>
               
               <TabsContent value="general" className="pt-4">
@@ -1927,11 +1927,57 @@ export default function Students() {
                 <StudentPrograms studentId={selectedStudent.id} />
               </TabsContent>
               
-              <TabsContent value="enrollments" className="pt-4">
-                <div className="text-center py-8 text-muted-foreground">
-                  <UserCircle className="mx-auto h-12 w-12 opacity-50" />
-                  <p className="mt-2">Cursusinschrijvingen worden hier weergegeven.</p>
-                  <p className="text-sm">Deze functionaliteit is nog in ontwikkeling.</p>
+              <TabsContent value="payments" className="pt-4">
+                <div className="bg-card border rounded-lg p-6">
+                  <h3 className="text-lg font-bold mb-4">Betaalgegevens</h3>
+                  <div className="space-y-6">
+                    {/* Betaalgegevens formulier */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <Label htmlFor="paymentMethod" className="text-sm font-medium">
+                          Betaalwijze
+                        </Label>
+                        <Select defaultValue="bancontact">
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Selecteer betaalwijze" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="bancontact">Bancontact</SelectItem>
+                            <SelectItem value="cash">Cash</SelectItem>
+                            <SelectItem value="transfer">Overschrijving</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="paymentDueDate" className="text-sm font-medium">
+                          Betaaltermijn
+                        </Label>
+                        <Input
+                          id="paymentDueDate"
+                          type="date"
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="paymentNotes" className="text-sm font-medium">
+                        Betalingsnotities
+                      </Label>
+                      <Textarea
+                        id="paymentNotes"
+                        className="mt-1 min-h-[120px]"
+                        placeholder="Notities over betalingen..."
+                      />
+                    </div>
+                    
+                    <div className="flex justify-end pt-4">
+                      <Button>
+                        Betaalgegevens opslaan
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>

@@ -673,7 +673,7 @@ export default function Guardians() {
                 type="submit"
                 disabled={createGuardianMutation.isPending}
               >
-                {createGuardianMutation.isPending ? 'Bezig met toevoegen...' : 'Verzorger toevoegen'}
+                {createGuardianMutation.isPending ? 'Bezig met toevoegen...' : 'Ouder toevoegen'}
               </Button>
             </DialogFooter>
           </form>

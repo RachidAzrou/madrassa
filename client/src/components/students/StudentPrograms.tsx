@@ -302,10 +302,10 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center border-b pb-4">
-        <h3 className="text-xl font-semibold">Programma-inschrijvingen</h3>
+        <h3 className="text-xl font-semibold">Vakken en Klas Indeling</h3>
         <Button variant="outline" size="sm" onClick={handleAddProgram}>
           <PlusCircle className="h-4 w-4 mr-2" />
-          Programma Toevoegen
+          Vak Toevoegen
         </Button>
       </div>
       
@@ -317,11 +317,11 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
       ) : studentPrograms.length === 0 ? (
         <div className="text-center py-8 border rounded-lg bg-muted/20">
           <Folder className="mx-auto h-12 w-12 text-muted-foreground/50" />
-          <p className="mt-2 text-lg font-medium">Geen programma's gevonden</p>
-          <p className="text-muted-foreground">Deze student is nog niet ingeschreven voor een programma.</p>
+          <p className="mt-2 text-lg font-medium">Geen vakken gevonden</p>
+          <p className="text-muted-foreground">Deze student is nog niet ingeschreven voor een vak.</p>
           <Button className="mt-4" variant="outline" size="sm" onClick={handleAddProgram}>
             <PlusCircle className="h-4 w-4 mr-2" />
-            Programma Toevoegen
+            Vak Toevoegen
           </Button>
         </div>
       ) : (
@@ -340,8 +340,11 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
                       )}
                     </CardTitle>
                     <CardDescription>
-                      {program.yearLevel ? `Jaar ${program.yearLevel}` : "Geen jaar toegewezen"}
+                      {program.yearLevel ? `Klas: Jaar ${program.yearLevel}` : "Geen klas toegewezen"}
                     </CardDescription>
+                    <div className="mt-2 text-xs text-muted-foreground">
+                      <p>Docent: {getTeacherByProgramId(program.programId)}</p>
+                    </div>
                   </div>
                   <Badge variant={getStatusBadgeVariant(program.status)}>
                     {getLocalizedStatus(program.status)}
@@ -468,7 +471,7 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
                 type="submit"
                 disabled={addProgramMutation.isPending}
               >
-                {addProgramMutation.isPending ? "Bezig met toevoegen..." : "Programma Toevoegen"}
+                {addProgramMutation.isPending ? "Bezig met toevoegen..." : "Vak Toevoegen"}
               </Button>
             </DialogFooter>
           </form>

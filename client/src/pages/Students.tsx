@@ -1543,7 +1543,7 @@ export default function Students() {
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
               <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
               <div className="space-y-1">
-                {['all', 'active', 'pending', 'inactive'].map((statusOption) => (
+                {['all', 'active', 'pending', 'inactive', 'graduated'].map((statusOption) => (
                   <div key={statusOption} className="flex items-center space-x-2">
                     <input
                       type="radio"
@@ -1556,7 +1556,8 @@ export default function Students() {
                       {statusOption === 'all' ? 'Alle' : 
                        statusOption === 'active' ? 'Actief' : 
                        statusOption === 'pending' ? 'In afwachting' : 
-                       'Inactief'}
+                       statusOption === 'inactive' ? 'Inactief' :
+                       'Afgestudeerd'}
                     </Label>
                   </div>
                 ))}
@@ -1716,11 +1717,13 @@ export default function Students() {
                         student.status.toLowerCase() === 'active' || student.status.toLowerCase() === 'actief' ? 'bg-green-100 text-green-800' : 
                         student.status.toLowerCase() === 'pending' || student.status.toLowerCase() === 'in afwachting' ? 'bg-yellow-100 text-yellow-800' : 
                         student.status.toLowerCase() === 'inactive' || student.status.toLowerCase() === 'inactief' ? 'bg-red-100 text-red-800' :
-                        'bg-blue-100 text-blue-800'
+                        student.status.toLowerCase() === 'graduated' || student.status.toLowerCase() === 'afgestudeerd' ? 'bg-blue-100 text-blue-800' :
+                        'bg-gray-100 text-gray-800'
                       }`}>
                         {student.status.toLowerCase() === 'active' ? 'Actief' : 
                          student.status.toLowerCase() === 'pending' ? 'In afwachting' : 
                          student.status.toLowerCase() === 'inactive' ? 'Inactief' :
+                         student.status.toLowerCase() === 'graduated' ? 'Afgestudeerd' :
                          student.status.charAt(0).toUpperCase() + student.status.slice(1)}
                       </span>
                     </td>

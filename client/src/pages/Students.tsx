@@ -74,8 +74,11 @@ export default function Students() {
     staleTime: 30000,
   });
 
-  const students = data?.students || [];
-  const totalStudents = data?.totalCount || 0;
+  // Als data direct een array is, gebruik het; anders zoek naar data.students
+  const students = Array.isArray(data) ? data : data?.students || [];
+  
+  // Totaal aantal studenten is de lengte van de array als we geen expliciete totalCount hebben
+  const totalStudents = data?.totalCount || students.length || 0;
   const totalPages = Math.ceil(totalStudents / 10); // Assuming 10 students per page
 
   // Mutatie om een student toe te voegen

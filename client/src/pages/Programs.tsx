@@ -48,12 +48,13 @@ export default function Programs() {
   });
 
   // Fetch programs
-  const { data, isLoading, isError } = useQuery<{ programs: Program[] }>({
+  const { data, isLoading, isError } = useQuery<Program[] | { programs: Program[] }>({
     queryKey: ['/api/programs', { searchTerm }],
     staleTime: 30000,
   });
 
-  const programs = data?.programs || [];
+  // Als data direct een array is, gebruik het; anders zoek naar data.programs
+  const programs = Array.isArray(data) ? data : data?.programs || [];
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);

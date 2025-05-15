@@ -1277,8 +1277,11 @@ export default function Students() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page Title */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">Studentenbeheer</h1>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-primary">Studentenbeheer</h1>
+          <p className="text-sm text-gray-500 mt-1">Beheer en monitor alle studenten in het systeem</p>
+        </div>
         <div className="flex flex-col md:flex-row gap-3">
           <Button onClick={handleAddStudent} className="flex items-center">
             <PlusCircle className="mr-2 h-4 w-4" />
@@ -1358,6 +1361,7 @@ export default function Students() {
             <Button 
               variant="outline" 
               size="sm"
+              className="border-primary/30 text-primary hover:text-primary hover:bg-primary/5 hover:border-primary/50"
               onClick={() => {
                 // Toon of verberg geavanceerde filteropties
                 const advancedFilters = document.getElementById('advancedFilters');
@@ -1374,6 +1378,7 @@ export default function Students() {
               <Button
                 variant="outline"
                 size="sm"
+                className="border-primary/30 text-primary hover:text-primary hover:bg-primary/5 hover:border-primary/50"
                 onClick={() => {
                   // Export studenten als CSV bestand 
                   const headers = ['Studentnummer', 'Voornaam', 'Achternaam', 'Email', 'Telefoon', 'Vak', 'Klas', 'Geslacht', 'Status'];
@@ -1757,9 +1762,8 @@ export default function Students() {
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                       <div className="flex justify-center space-x-2">
                         <Button 
-                          variant="ghost" 
+                          variant="action" 
                           size="sm" 
-                          className="text-primary hover:text-primary-dark"
                           onClick={() => handleViewStudent(student)}
                           title="Details bekijken"
                         >
@@ -1767,9 +1771,8 @@ export default function Students() {
                           <span className="sr-only">Bekijken</span>
                         </Button>
                         <Button 
-                          variant="ghost" 
+                          variant="action" 
                           size="sm" 
-                          className="text-gray-500 hover:text-gray-700"
                           onClick={() => handleEditStudent(student)}
                           title="Student bewerken"
                         >

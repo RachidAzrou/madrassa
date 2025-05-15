@@ -351,10 +351,60 @@ export default function Students() {
     }
   };
 
+  // Functie om voogden en siblings voor een student op te halen
+  const fetchStudentFamily = async (studentId: number) => {
+    try {
+      // 1. Haal eerst alle voogden op die gekoppeld zijn aan deze student
+      const studentGuardians = await apiRequest('GET', `/api/student-guardians/student/${studentId}`);
+      setLinkedGuardians(studentGuardians || []);
+      
+      // 2. Voor elke voogd, haal alle gekoppelde studenten op (potentiële siblings)
+      let allSiblings = new Set();
+      
+      // Voor elke voogd, zoek alle studenten die aan deze voogd zijn gekoppeld
+      if (studentGuardians && studentGuardians.length > 0) {
+        for (const guardianLink of studentGuardians) {
+          const guardianStudents = await apiRequest('GET', `/api/student-guardians/guardian/${guardianLink.guardianId}`);
+          
+          // Voeg studenten toe die niet de huidige student zijn
+          if (guardianStudents && guardianStudents.length > 0) {
+            for (const link of guardianStudents) {
+              if (link.studentId !== studentId) {
+                // Haal de volledige studentinformatie op
+                const siblingDetails = await apiRequest('GET', `/api/students/${link.studentId}`);
+                if (siblingDetails) {
+                  allSiblings.add(siblingDetails);
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Converteer Set naar Array en filter duplicaten
+      const uniqueSiblings = Array.from(allSiblings);
+      setSiblings(uniqueSiblings);
+      
+    } catch (error) {
+      console.error("Fout bij ophalen van familie-informatie:", error);
+      setLinkedGuardians([]);
+      setSiblings([]);
+      
+      toast({
+        title: "Fout bij ophalen",
+        description: "Er is een fout opgetreden bij het ophalen van familiegegevens.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleViewStudent = (student: any) => {
     // Stel de geselecteerde student in en open het dialoogvenster
     setSelectedStudent(student);
     setIsDetailDialogOpen(true);
+    
+    // Haal familiegegevens op
+    fetchStudentFamily(student.id);
   };
 
   const handleEditStudent = (student: any) => {

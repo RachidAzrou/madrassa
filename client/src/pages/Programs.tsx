@@ -45,7 +45,7 @@ export default function Programs() {
   });
 
   // Fetch programs
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<{ programs: Program[] }>({
     queryKey: ['/api/programs', { searchTerm }],
     staleTime: 30000,
   });

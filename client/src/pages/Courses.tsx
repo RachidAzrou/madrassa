@@ -10,6 +10,17 @@ import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
+interface Course {
+  id: string;
+  name: string;
+  code: string;
+  description: string;
+  department: string;
+  programId: string;
+  credits: number;
+  isActive: boolean;
+}
+
 export default function Courses() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,7 +41,7 @@ export default function Courses() {
   });
 
   // Fetch courses with filters
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<{ courses: Course[], totalCount: number }>({
     queryKey: ['/api/courses', { searchTerm, department, page: currentPage }],
     staleTime: 30000,
   });

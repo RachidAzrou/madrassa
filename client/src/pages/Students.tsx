@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { formatDateToDatabaseFormat, formatDateToDisplayFormat } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -2378,7 +2379,7 @@ export default function Students() {
                       </div>
                       <div>
                         <h3 className="text-sm font-medium text-muted-foreground">Geboortedatum</h3>
-                        <p className="font-medium">{selectedStudent.dateOfBirth ? new Date(selectedStudent.dateOfBirth).toLocaleDateString('nl-NL') : "Niet ingevuld"}</p>
+                        <p className="font-medium">{selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "Niet ingevuld"}</p>
                       </div>
                       <div>
                         <h3 className="text-sm font-medium text-muted-foreground">Inschrijvingsdatum</h3>

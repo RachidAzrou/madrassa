@@ -1420,13 +1420,13 @@ export default function Guardians() {
               
               <div className="pt-2 pb-4 border-b">
                 <h4 className="text-sm font-medium text-gray-500">Adres</h4>
-                {selectedGuardian.street || selectedGuardian.city ? (
+                {selectedGuardian.street || selectedGuardian.houseNumber ? (
                   <div>
                     <p>{selectedGuardian.street || ''} {selectedGuardian.houseNumber || ''}</p>
                     <p>{selectedGuardian.postalCode || ''} {selectedGuardian.city || ''}</p>
                   </div>
                 ) : (
-                  <p>{selectedGuardian.address || 'Geen adres opgegeven'}</p>
+                  <p>Geen adres opgegeven</p>
                 )}
               </div>
               

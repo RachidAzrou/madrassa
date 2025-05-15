@@ -693,11 +693,17 @@ export default function Guardians() {
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-700">
-                  Tonen <span className="font-medium">{((currentPage - 1) * 10) + 1}</span> tot{" "}
-                  <span className="font-medium">
-                    {Math.min(currentPage * 10, totalGuardians)}
-                  </span>{" "}
-                  van <span className="font-medium">{totalGuardians}</span> resultaten
+                  {Array.isArray(data) ? (
+                    <>
+                      Tonen <span className="font-medium">{((currentPage - 1) * 10) + 1}</span> tot{" "}
+                      <span className="font-medium">
+                        {Math.min(currentPage * 10, data.length)}
+                      </span>{" "}
+                      van <span className="font-medium">{data.length}</span> resultaten
+                    </>
+                  ) : (
+                    <>Geen resultaten beschikbaar</>
+                  )}
                 </p>
               </div>
               <div>

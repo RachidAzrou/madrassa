@@ -74,9 +74,8 @@ export default function Guardians() {
     enabled: isStudentSearchDialogOpen && studentSearchTerm.length > 0,
   });
 
-  const guardians = data?.guardians || [];
-  const totalGuardians = data?.totalCount || 0;
-  const totalPages = Math.ceil(totalGuardians / 10); // Assuming 10 guardians per page
+  // We gaan direct werken met de data array
+  const totalPages = Array.isArray(data) ? Math.ceil(data.length / 10) : 0; // Assuming 10 guardians per page
 
   // Mutatie om een voogd toe te voegen
   // Mutatie voor student-guardian koppelingen
@@ -591,35 +590,8 @@ export default function Guardians() {
                   </td>
                 </tr>
               ) : (
-                // Demodata met werkende actieknoppen
-                [
-                  {
-                    id: 1,
-                    firstName: "John",
-                    lastName: "Doe",
-                    relationship: "parent",
-                    email: "johndoe@example.com",
-                    phone: "+1 (555) 123-4567",
-                    address: "New York, USA",
-                    occupation: "Engineer",
-                    isEmergencyContact: true,
-                    notes: null,
-                    students: ["TD", "AD"]
-                  },
-                  {
-                    id: 2,
-                    firstName: "Maria",
-                    lastName: "Smith",
-                    relationship: "guardian",
-                    email: "maria.smith@example.com",
-                    phone: "+1 (555) 987-6543",
-                    address: "Chicago, USA",
-                    occupation: "Teacher",
-                    isEmergencyContact: false,
-                    notes: null,
-                    students: ["JS"]
-                  }
-                ].map(guardian => (
+                // Gebruik de echte data van de API
+                Array.isArray(data) && data.map((guardian: Guardian) => (
                   <tr key={guardian.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -650,11 +622,10 @@ export default function Guardians() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex -space-x-2">
-                        {guardian.students.map((initials, idx) => (
-                          <Avatar key={idx} className="h-6 w-6 border-2 border-white">
-                            <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-                          </Avatar>
-                        ))}
+                        {/* Placeholder voor gekoppelde studenten - studentgegevens zijn niet direct beschikbaar */}
+                        <Avatar className="h-6 w-6 border-2 border-white">
+                          <AvatarFallback className="text-xs bg-blue-100 text-blue-600">?</AvatarFallback>
+                        </Avatar>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -698,8 +669,8 @@ export default function Guardians() {
           </table>
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
+        {/* Pagination - alleen tonen als er meerdere pagina's zijn */}
+        {Array.isArray(data) && Math.ceil(data.length / 10) > 1 && (
           <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
             <div className="flex-1 flex justify-between sm:hidden">
               <Button 

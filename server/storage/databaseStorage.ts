@@ -787,4 +787,145 @@ export class DatabaseStorage implements IStorage {
     }
     return undefined;
   }
+
+  // Teacher operations
+  async getTeachers(): Promise<Teacher[]> {
+    return db.select().from(teachers);
+  }
+
+  async getTeacher(id: number): Promise<Teacher | undefined> {
+    const result = await db.select().from(teachers).where(eq(teachers.id, id));
+    return result[0];
+  }
+
+  async getTeacherByEmail(email: string): Promise<Teacher | undefined> {
+    const result = await db.select().from(teachers).where(eq(teachers.email, email));
+    return result[0];
+  }
+
+  async createTeacher(teacher: InsertTeacher): Promise<Teacher> {
+    const result = await db.insert(teachers).values(teacher).returning();
+    return result[0];
+  }
+
+  async updateTeacher(id: number, teacher: Partial<Teacher>): Promise<Teacher | undefined> {
+    const result = await db.update(teachers)
+      .set(teacher)
+      .where(eq(teachers.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteTeacher(id: number): Promise<boolean> {
+    const result = await db.delete(teachers)
+      .where(eq(teachers.id, id))
+      .returning({ id: teachers.id });
+    return result.length > 0;
+  }
+  
+  // Teacher Availability operations
+  async getTeacherAvailabilities(): Promise<TeacherAvailability[]> {
+    return db.select().from(teacherAvailability);
+  }
+
+  async getTeacherAvailability(id: number): Promise<TeacherAvailability | undefined> {
+    const result = await db.select().from(teacherAvailability).where(eq(teacherAvailability.id, id));
+    return result[0];
+  }
+
+  async getTeacherAvailabilitiesByTeacher(teacherId: number): Promise<TeacherAvailability[]> {
+    return db.select().from(teacherAvailability).where(eq(teacherAvailability.teacherId, teacherId));
+  }
+
+  async createTeacherAvailability(availability: InsertTeacherAvailability): Promise<TeacherAvailability> {
+    const result = await db.insert(teacherAvailability).values(availability).returning();
+    return result[0];
+  }
+
+  async updateTeacherAvailability(id: number, availability: Partial<TeacherAvailability>): Promise<TeacherAvailability | undefined> {
+    const result = await db.update(teacherAvailability)
+      .set(availability)
+      .where(eq(teacherAvailability.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteTeacherAvailability(id: number): Promise<boolean> {
+    const result = await db.delete(teacherAvailability)
+      .where(eq(teacherAvailability.id, id))
+      .returning({ id: teacherAvailability.id });
+    return result.length > 0;
+  }
+  
+  // Teacher Language operations
+  async getTeacherLanguages(): Promise<TeacherLanguage[]> {
+    return db.select().from(teacherLanguages);
+  }
+
+  async getTeacherLanguage(id: number): Promise<TeacherLanguage | undefined> {
+    const result = await db.select().from(teacherLanguages).where(eq(teacherLanguages.id, id));
+    return result[0];
+  }
+
+  async getTeacherLanguagesByTeacher(teacherId: number): Promise<TeacherLanguage[]> {
+    return db.select().from(teacherLanguages).where(eq(teacherLanguages.teacherId, teacherId));
+  }
+
+  async createTeacherLanguage(language: InsertTeacherLanguage): Promise<TeacherLanguage> {
+    const result = await db.insert(teacherLanguages).values(language).returning();
+    return result[0];
+  }
+
+  async updateTeacherLanguage(id: number, language: Partial<TeacherLanguage>): Promise<TeacherLanguage | undefined> {
+    const result = await db.update(teacherLanguages)
+      .set(language)
+      .where(eq(teacherLanguages.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteTeacherLanguage(id: number): Promise<boolean> {
+    const result = await db.delete(teacherLanguages)
+      .where(eq(teacherLanguages.id, id))
+      .returning({ id: teacherLanguages.id });
+    return result.length > 0;
+  }
+  
+  // Teacher Course Assignment operations
+  async getTeacherCourseAssignments(): Promise<TeacherCourseAssignment[]> {
+    return db.select().from(teacherCourseAssignments);
+  }
+
+  async getTeacherCourseAssignment(id: number): Promise<TeacherCourseAssignment | undefined> {
+    const result = await db.select().from(teacherCourseAssignments).where(eq(teacherCourseAssignments.id, id));
+    return result[0];
+  }
+
+  async getTeacherCourseAssignmentsByTeacher(teacherId: number): Promise<TeacherCourseAssignment[]> {
+    return db.select().from(teacherCourseAssignments).where(eq(teacherCourseAssignments.teacherId, teacherId));
+  }
+
+  async getTeacherCourseAssignmentsByCourse(courseId: number): Promise<TeacherCourseAssignment[]> {
+    return db.select().from(teacherCourseAssignments).where(eq(teacherCourseAssignments.courseId, courseId));
+  }
+
+  async createTeacherCourseAssignment(assignment: InsertTeacherCourseAssignment): Promise<TeacherCourseAssignment> {
+    const result = await db.insert(teacherCourseAssignments).values(assignment).returning();
+    return result[0];
+  }
+
+  async updateTeacherCourseAssignment(id: number, assignment: Partial<TeacherCourseAssignment>): Promise<TeacherCourseAssignment | undefined> {
+    const result = await db.update(teacherCourseAssignments)
+      .set(assignment)
+      .where(eq(teacherCourseAssignments.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteTeacherCourseAssignment(id: number): Promise<boolean> {
+    const result = await db.delete(teacherCourseAssignments)
+      .where(eq(teacherCourseAssignments.id, id))
+      .returning({ id: teacherCourseAssignments.id });
+    return result.length > 0;
+  }
 }

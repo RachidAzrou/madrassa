@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle,
-  ChevronUp, ChevronDown, FileText, FileDown
+  ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -1847,334 +1847,420 @@ export default function Students() {
 
       {/* Add Student Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
-            <DialogDescription>
-              Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmitStudent}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="studentId" className="text-right">
-                    Studentnummer <span className="text-xs text-muted-foreground font-normal italic">(automatisch)</span>
-                  </Label>
-                  <Input
-                    id="studentId"
-                    value={studentFormData.studentId}
-                    className="mt-1 bg-muted cursor-not-allowed"
-                    disabled
-                    readOnly
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="status" className="text-right">
-                    Status
-                  </Label>
-                  <Select
-                    value={studentFormData.status || ''}
-                    onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Active">Actief</SelectItem>
-                      <SelectItem value="Inactive">Inactief</SelectItem>
-                      <SelectItem value="Suspended">Geschorst</SelectItem>
-                      <SelectItem value="Graduated">Afgestudeerd</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+        <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto bg-gradient-to-b from-white to-blue-50/40">
+          <DialogHeader className="border-b pb-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+                <UserCircle className="h-6 w-6 text-white" />
               </div>
-              
-              <div className="grid grid-cols-4 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="firstName" className="text-right">
-                    Voornaam
-                  </Label>
-                  <Input
-                    id="firstName"
-                    required
-                    value={studentFormData.firstName}
-                    onChange={(e) => setStudentFormData({ ...studentFormData, firstName: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="lastName" className="text-right">
-                    Achternaam
-                  </Label>
-                  <Input
-                    id="lastName"
-                    required
-                    value={studentFormData.lastName}
-                    onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="gender" className="text-right mb-2 block">
-                    Geslacht
-                  </Label>
-                  <div className="space-y-2 mt-1">
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        id="gender-man"
-                        checked={studentFormData.gender === 'man'}
-                        onChange={() => setStudentFormData({ ...studentFormData, gender: 'man' })}
-                        className="h-4 w-4"
-                      />
-                      <Label htmlFor="gender-man" className="font-normal">Man</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        id="gender-vrouw"
-                        checked={studentFormData.gender === 'vrouw'}
-                        onChange={() => setStudentFormData({ ...studentFormData, gender: 'vrouw' })}
-                        className="h-4 w-4"
-                      />
-                      <Label htmlFor="gender-vrouw" className="font-normal">Vrouw</Label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="email" className="text-right">
-                    E-mail
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    value={studentFormData.email}
-                    onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-4 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="phone" className="text-right">
-                    Telefoonnummer
-                  </Label>
-                  <Input
-                    id="phone"
-                    value={studentFormData.phone || ''}
-                    onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="dateOfBirth" className="text-right">
-                    Geboortedatum
-                  </Label>
-                  <Input
-                    id="dateOfBirth"
-                    type="date"
-                    value={studentFormData.dateOfBirth || ''}
-                    onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="street" className="text-right">
-                    Straatnaam
-                  </Label>
-                  <Input
-                    id="street"
-                    value={studentFormData.street || ''}
-                    onChange={(e) => setStudentFormData({ ...studentFormData, street: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-4 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="houseNumber" className="text-right">
-                    Huisnummer
-                  </Label>
-                  <Input
-                    id="houseNumber"
-                    value={studentFormData.houseNumber || ''}
-                    onChange={(e) => setStudentFormData({ ...studentFormData, houseNumber: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="postalCode" className="text-right">
-                    Postcode
-                  </Label>
-                  <Input
-                    id="postalCode"
-                    value={studentFormData.postalCode || ''}
-                    onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="col-span-2">
-                  <Label htmlFor="city" className="text-right">
-                    Stad
-                  </Label>
-                  <Input
-                    id="city"
-                    value={studentFormData.city || ''}
-                    onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-              
-              <div className="mt-4">
-                <Label htmlFor="notes" className="text-right">
-                  Notities
-                </Label>
-                <Textarea
-                  id="notes"
-                  value={studentFormData.notes || ''}
-                  onChange={(e) => setStudentFormData({ ...studentFormData, notes: e.target.value })}
-                  className="mt-1 min-h-[120px]"
-                  placeholder="Voeg hier eventuele notities over de student toe..."
-                />
-              </div>
-              
-              <div className="space-y-4 mt-4">
-                <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold mb-2">Vakken</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Selecteer één of meerdere vakken voor deze student
-                  </p>
-                  
-                  {/* Lijst met toegevoegde programma's */}
-                  {selectedPrograms.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      {selectedPrograms.map((program, index) => {
-                        const programInfo = programs.find((p: any) => p.id === program.programId);
-                        return (
-                          <div key={index} className="flex items-center justify-between border rounded-md p-3 bg-muted/20">
-                            <div>
-                              <div className="font-medium">{programInfo?.name}</div>
-                              <div className="text-sm text-muted-foreground">Jaar: {program.yearLevel || 'Niet gespecificeerd'}</div>
-                              <Badge variant={program.status === 'active' ? 'success' : 'outline'}>
-                                {program.status === 'active' ? 'Actief' : program.status === 'inactive' ? 'Inactief' : program.status}
-                              </Badge>
-                            </div>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => {
-                                setSelectedPrograms(selectedPrograms.filter((_, i) => i !== index));
-                              }}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                  
-                  {/* Nieuwe programma toevoegen interface */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-md">
-                    <div>
-                      <Label htmlFor="newProgramId">Vak</Label>
-                      <Select
-                        value={studentFormData.programId?.toString() || ''}
-                        onValueChange={handleProgramIdChange}
-                      >
-                        <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Selecteer programma" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {programs.map((program: {id: number, name: string}) => (
-                            <SelectItem key={program.id} value={String(program.id)}>
-                              {program.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="newYearLevel">Studiejaar</Label>
-                      <Select
-                        value={studentFormData.yearLevel?.toString() || ''}
-                        onValueChange={handleYearLevelChange}
-                        disabled={!studentFormData.programId}
-                      >
-                        <SelectTrigger className="mt-1">
-                          <SelectValue placeholder={!studentFormData.programId ? "Selecteer eerst programma" : "Selecteer jaar"} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Geen jaar</SelectItem>
-                          {getYearLevelOptions(studentFormData.programId).map((year) => (
-                            <SelectItem key={year} value={year.toString()}>
-                              Jaar {year}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="flex items-end">
-                      <Button 
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        disabled={!studentFormData.programId}
-                        onClick={() => {
-                          if (studentFormData.programId) {
-                            // Controleer of dit vak al is toegevoegd
-                            const alreadyExists = selectedPrograms.some(
-                              p => p.programId === studentFormData.programId
-                            );
-                            
-                            if (!alreadyExists) {
-                              setSelectedPrograms([
-                                ...selectedPrograms,
-                                {
-                                  programId: studentFormData.programId,
-                                  yearLevel: studentFormData.yearLevel,
-                                  status: 'active'
-                                }
-                              ]);
-                              
-                              // Reset de programId en yearLevel voor de volgende toevoeging
-                              setStudentFormData({
-                                ...studentFormData,
-                                programId: null,
-                                yearLevel: null
-                              });
-                            } else {
-                              // Toon een waarschuwing dat het vak al is toegevoegd
-                              toast({
-                                title: "Vak al toegevoegd",
-                                description: "Deze student is al ingeschreven voor dit vak.",
-                                variant: "destructive"
-                              });
-                            }
-                          }
-                        }}
-                      >
-                        Vak toevoegen
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+              <div>
+                <DialogTitle className="text-primary text-xl font-bold">Nieuwe Student Toevoegen</DialogTitle>
+                <DialogDescription className="text-gray-500">
+                  Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem.
+                </DialogDescription>
               </div>
             </div>
-            <DialogFooter>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmitStudent}>
+            <div className="grid gap-6 py-2">
+              {/* Tabs voor verschillende secties */}
+              <Tabs defaultValue="personal" className="w-full">
+                <TabsList className="grid grid-cols-4 mb-6">
+                  <TabsTrigger value="personal" className="flex gap-2 items-center">
+                    <UserCircle className="h-4 w-4" />
+                    Persoonlijk
+                  </TabsTrigger>
+                  <TabsTrigger value="contact" className="flex gap-2 items-center">
+                    <Mail className="h-4 w-4" />
+                    Contact
+                  </TabsTrigger>
+                  <TabsTrigger value="address" className="flex gap-2 items-center">
+                    <Home className="h-4 w-4" />
+                    Adres
+                  </TabsTrigger>
+                  <TabsTrigger value="courses" className="flex gap-2 items-center">
+                    <BookOpen className="h-4 w-4" />
+                    Vakken
+                  </TabsTrigger>
+                </TabsList>
+
+                {/* Persoonlijke informatie tab */}
+                <TabsContent value="personal" className="space-y-6">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="w-full md:w-1/2 space-y-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-1/3">
+                          <Label htmlFor="studentId" className="text-sm font-medium text-gray-700">
+                            Studentnummer
+                          </Label>
+                          <div className="mt-1 relative">
+                            <Input
+                              id="studentId"
+                              value={studentFormData.studentId}
+                              className="bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed font-medium"
+                              disabled
+                              readOnly
+                            />
+                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 italic">
+                              (automatisch)
+                            </div>
+                          </div>
+                        </div>
+                        <div className="w-2/3">
+                          <Label htmlFor="status" className="text-sm font-medium text-gray-700">
+                            Status
+                          </Label>
+                          <Select
+                            value={studentFormData.status || ''}
+                            onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
+                          >
+                            <SelectTrigger className="mt-1 border-gray-200">
+                              <SelectValue placeholder="Selecteer status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Active">Actief</SelectItem>
+                              <SelectItem value="Inactive">Inactief</SelectItem>
+                              <SelectItem value="Suspended">Geschorst</SelectItem>
+                              <SelectItem value="Graduated">Afgestudeerd</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-5">
+                        <div>
+                          <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                            Voornaam <span className="text-primary">*</span>
+                          </Label>
+                          <Input
+                            id="firstName"
+                            required
+                            value={studentFormData.firstName}
+                            onChange={(e) => setStudentFormData({ ...studentFormData, firstName: e.target.value })}
+                            className="mt-1 border-gray-200"
+                            placeholder="Voer voornaam in"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                            Achternaam <span className="text-primary">*</span>
+                          </Label>
+                          <Input
+                            id="lastName"
+                            required
+                            value={studentFormData.lastName}
+                            onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
+                            className="mt-1 border-gray-200"
+                            placeholder="Voer achternaam in"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700">
+                            Geboortedatum
+                          </Label>
+                          <Input
+                            id="dateOfBirth"
+                            type="date"
+                            value={studentFormData.dateOfBirth || ''}
+                            onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
+                            className="mt-1 border-gray-200"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="w-full md:w-1/2 space-y-5">
+                      <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                        <Label htmlFor="gender" className="text-sm font-medium text-gray-700 mb-3 block">
+                          Geslacht
+                        </Label>
+                        <div className="flex gap-8 items-center mt-2">
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="radio"
+                              id="gender-man"
+                              name="gender"
+                              checked={studentFormData.gender === 'man'}
+                              onChange={() => setStudentFormData({ ...studentFormData, gender: 'man' })}
+                              className="h-5 w-5 text-primary focus:ring-primary"
+                            />
+                            <Label htmlFor="gender-man" className="font-medium">Man</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="radio"
+                              id="gender-vrouw"
+                              name="gender"
+                              checked={studentFormData.gender === 'vrouw'}
+                              onChange={() => setStudentFormData({ ...studentFormData, gender: 'vrouw' })}
+                              className="h-5 w-5 text-primary focus:ring-primary"
+                            />
+                            <Label htmlFor="gender-vrouw" className="font-medium">Vrouw</Label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                        <Label htmlFor="notes" className="text-sm font-medium text-gray-700 mb-3 block">
+                          Notities
+                        </Label>
+                        <Textarea
+                          id="notes"
+                          value={studentFormData.notes || ''}
+                          onChange={(e) => setStudentFormData({ ...studentFormData, notes: e.target.value })}
+                          className="min-h-[120px] border-gray-200"
+                          placeholder="Voeg hier eventuele notities over de student toe..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Contact informatie tab */}
+                <TabsContent value="contact" className="space-y-6">
+                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                          E-mail <span className="text-primary">*</span>
+                        </Label>
+                        <div className="mt-1 relative">
+                          <Input
+                            id="email"
+                            type="email"
+                            required
+                            value={studentFormData.email}
+                            onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
+                            className="border-gray-200 pl-9"
+                            placeholder="naam@voorbeeld.nl"
+                          />
+                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                          Telefoonnummer
+                        </Label>
+                        <div className="mt-1 relative">
+                          <Input
+                            id="phone"
+                            value={studentFormData.phone || ''}
+                            onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
+                            className="border-gray-200 pl-9"
+                            placeholder="06 12345678"
+                          />
+                          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Adres informatie tab */}
+                <TabsContent value="address" className="space-y-6">
+                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
+                    <div className="grid grid-cols-1 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="md:col-span-2">
+                          <Label htmlFor="street" className="text-sm font-medium text-gray-700">
+                            Straatnaam
+                          </Label>
+                          <Input
+                            id="street"
+                            value={studentFormData.street || ''}
+                            onChange={(e) => setStudentFormData({ ...studentFormData, street: e.target.value })}
+                            className="mt-1 border-gray-200"
+                            placeholder="Hoofdstraat"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="houseNumber" className="text-sm font-medium text-gray-700">
+                            Huisnummer
+                          </Label>
+                          <Input
+                            id="houseNumber"
+                            value={studentFormData.houseNumber || ''}
+                            onChange={(e) => setStudentFormData({ ...studentFormData, houseNumber: e.target.value })}
+                            className="mt-1 border-gray-200"
+                            placeholder="123"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
+                            Postcode
+                          </Label>
+                          <Input
+                            id="postalCode"
+                            value={studentFormData.postalCode || ''}
+                            onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
+                            className="mt-1 border-gray-200"
+                            placeholder="1234 AB"
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <Label htmlFor="city" className="text-sm font-medium text-gray-700">
+                            Stad
+                          </Label>
+                          <Input
+                            id="city"
+                            value={studentFormData.city || ''}
+                            onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
+                            className="mt-1 border-gray-200"
+                            placeholder="Amsterdam"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Vakken tab */}
+                <TabsContent value="courses" className="space-y-6">
+                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold text-primary">Vakken</h3>
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
+                        {selectedPrograms.length} vakken geselecteerd
+                      </Badge>
+                    </div>
+                    
+                    {/* Lijst met toegevoegde programma's */}
+                    {selectedPrograms.length > 0 && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                        {selectedPrograms.map((program, index) => {
+                          const programInfo = programs.find((p: any) => p.id === program.programId);
+                          return (
+                            <div key={index} className="flex items-center justify-between border rounded-md p-4 bg-blue-50/50 border-blue-100 hover:shadow-sm transition-shadow">
+                              <div>
+                                <div className="font-medium text-primary">{programInfo?.name}</div>
+                                <div className="text-sm text-gray-500">Jaar: {program.yearLevel || 'Niet gespecificeerd'}</div>
+                                <Badge variant={program.status === 'active' ? 'success' : 'outline'} className="mt-1">
+                                  {program.status === 'active' ? 'Actief' : program.status === 'inactive' ? 'Inactief' : program.status}
+                                </Badge>
+                              </div>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                className="text-gray-400 hover:text-red-500 hover:bg-red-50"
+                                onClick={() => {
+                                  setSelectedPrograms(selectedPrograms.filter((_, i) => i !== index));
+                                }}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    
+                    {/* Nieuwe programma toevoegen interface */}
+                    <div className="mt-6 p-4 border rounded-md border-dashed border-gray-300 bg-gray-50">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">Vak toevoegen</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="newProgramId" className="text-xs text-gray-500">Vak</Label>
+                          <Select
+                            value={studentFormData.programId?.toString() || ''}
+                            onValueChange={handleProgramIdChange}
+                          >
+                            <SelectTrigger className="mt-1 border-gray-200 bg-white">
+                              <SelectValue placeholder="Selecteer programma" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {programs.map((program: {id: number, name: string}) => (
+                                <SelectItem key={program.id} value={String(program.id)}>
+                                  {program.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="newYearLevel" className="text-xs text-gray-500">Studiejaar</Label>
+                          <Select
+                            value={studentFormData.yearLevel?.toString() || ''}
+                            onValueChange={handleYearLevelChange}
+                            disabled={!studentFormData.programId}
+                          >
+                            <SelectTrigger className="mt-1 border-gray-200 bg-white">
+                              <SelectValue placeholder={!studentFormData.programId ? "Selecteer eerst programma" : "Selecteer jaar"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">Geen jaar</SelectItem>
+                              {getYearLevelOptions(studentFormData.programId).map((year) => (
+                                <SelectItem key={year} value={year.toString()}>
+                                  Jaar {year}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="flex items-end">
+                          <Button 
+                            type="button"
+                            variant="outline"
+                            className="w-full border-primary/50 text-primary hover:bg-primary/5"
+                            disabled={!studentFormData.programId}
+                            onClick={() => {
+                              if (studentFormData.programId) {
+                                // Controleer of dit vak al is toegevoegd
+                                const alreadyExists = selectedPrograms.some(
+                                  p => p.programId === studentFormData.programId
+                                );
+                                
+                                if (!alreadyExists) {
+                                  setSelectedPrograms([
+                                    ...selectedPrograms,
+                                    {
+                                      programId: studentFormData.programId,
+                                      yearLevel: studentFormData.yearLevel,
+                                      status: 'active'
+                                    }
+                                  ]);
+                                  
+                                  // Reset de programId en yearLevel voor de volgende toevoeging
+                                  setStudentFormData({
+                                    ...studentFormData,
+                                    programId: null,
+                                    yearLevel: null
+                                  });
+                                } else {
+                                  // Toon een waarschuwing dat het vak al is toegevoegd
+                                  toast({
+                                    title: "Vak al toegevoegd",
+                                    description: "Deze student is al ingeschreven voor dit vak.",
+                                    variant: "destructive"
+                                  });
+                                }
+                              }
+                            }}
+                          >
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Vak toevoegen
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+
+            <DialogFooter className="mt-8 pt-4 border-t">
+              <div className="flex items-center text-xs text-gray-500 mr-auto">
+                <span className="text-primary font-bold mr-1">*</span> Verplichte velden
+              </div>
               <Button 
                 type="button" 
                 variant="outline" 
@@ -2185,8 +2271,19 @@ export default function Students() {
               <Button 
                 type="submit"
                 disabled={createStudentMutation.isPending}
+                className="ml-2 gap-2"
               >
-                {createStudentMutation.isPending ? 'Bezig met toevoegen...' : 'Student toevoegen'}
+                {createStudentMutation.isPending ? (
+                  <>
+                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                    Bezig met toevoegen...
+                  </>
+                ) : (
+                  <>
+                    <UserCircle className="h-4 w-4" />
+                    Student toevoegen
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>

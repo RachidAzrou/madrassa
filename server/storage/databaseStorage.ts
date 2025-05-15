@@ -23,7 +23,8 @@ import {
   teachers, type Teacher, type InsertTeacher,
   teacherAvailability, type TeacherAvailability, type InsertTeacherAvailability,
   teacherLanguages, type TeacherLanguage, type InsertTeacherLanguage,
-  teacherCourseAssignments, type TeacherCourseAssignment, type InsertTeacherCourseAssignment
+  teacherCourseAssignments, type TeacherCourseAssignment, type InsertTeacherCourseAssignment,
+  behaviorAssessments, type BehaviorAssessment, type InsertBehaviorAssessment
 } from "@shared/schema";
 
 export class DatabaseStorage implements IStorage {

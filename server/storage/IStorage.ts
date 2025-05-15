@@ -20,7 +20,8 @@ import {
   type TeacherAvailability, type InsertTeacherAvailability,
   type TeacherLanguage, type InsertTeacherLanguage,
   type TeacherCourseAssignment, type InsertTeacherCourseAssignment,
-  type TeacherAttendance, type InsertTeacherAttendance
+  type TeacherAttendance, type InsertTeacherAttendance,
+  type BehaviorAssessment, type InsertBehaviorAssessment
 } from "@shared/schema";
 
 // Storage interface for CRUD operations
@@ -228,4 +229,14 @@ export interface IStorage {
   // Enhanced Attendance operations (with teacher who recorded attendance)
   getAttendanceByTeacher(teacherId: number): Promise<Attendance[]>; // Attendance records created by this teacher
   getAttendanceByClassAndDate(courseId: number, date: Date): Promise<Attendance[]>; // All student attendance for a class on a specific date
+  
+  // Behavior Assessment operations
+  getBehaviorAssessments(filter?: any): Promise<BehaviorAssessment[]>;
+  getBehaviorAssessment(id: number): Promise<BehaviorAssessment | undefined>;
+  getBehaviorAssessmentsByStudent(studentId: number): Promise<BehaviorAssessment[]>;
+  getBehaviorAssessmentsByClass(classId: number): Promise<BehaviorAssessment[]>;
+  createBehaviorAssessment(assessment: InsertBehaviorAssessment): Promise<BehaviorAssessment>;
+  createBehaviorAssessments(assessments: InsertBehaviorAssessment[]): Promise<BehaviorAssessment[]>;
+  updateBehaviorAssessment(id: number, assessment: Partial<BehaviorAssessment>): Promise<BehaviorAssessment | undefined>;
+  deleteBehaviorAssessment(id: number): Promise<boolean>;
 }

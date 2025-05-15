@@ -25,8 +25,10 @@ import {
   insertTeacherLanguageSchema,
   insertTeacherCourseAssignmentSchema,
   insertTeacherAttendanceSchema,
+  insertBehaviorAssessmentSchema,
   type Student,
-  type Teacher
+  type Teacher,
+  type BehaviorAssessment
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1153,6 +1155,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: "Error deleting grade" });
+    }
+  });
+
+  // ********************
+  // Behavior Assessment API endpoints
+  // ********************
+  apiRouter.get("/api/behavior-assessments", async (req, res) => {
+    try {
+      const { studentId, classId } = req.query;
+      
+      // Filter op student ID of klas ID indien opgegeven
+      let filter: any = {};
+      if (studentId) filter = { ...filter, studentId: parseInt(studentId as string) };
+      if (classId) filter = { ...filter, classId: parseInt(classId as string) };
+      
+      const assessments = await storage.getBehaviorAssessments(filter);
+      res.json(assessments);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching behavior assessments" });
+    }
+  });
+
+  apiRouter.get("/api/behavior-assessments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const assessment = await storage.getBehaviorAssessment(id);
+      if (!assessment) {
+        return res.status(404).json({ message: "Behavior assessment not found" });
+      }
+      
+      res.json(assessment);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching behavior assessment" });
+    }
+  });
+
+  apiRouter.post("/api/behavior-assessments", async (req, res) => {
+    try {
+      const validatedData = insertBehaviorAssessmentSchema.parse(req.body);
+      const newAssessment = await storage.createBehaviorAssessment(validatedData);
+      res.status(201).json(newAssessment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating behavior assessment" });
+    }
+  });
+
+  apiRouter.post("/api/behavior-assessments/batch", async (req, res) => {
+    try {
+      if (!Array.isArray(req.body)) {
+        return res.status(400).json({ message: "Expected an array of behavior assessments" });
+      }
+      
+      const validatedAssessments = req.body.map(assessment => 
+        insertBehaviorAssessmentSchema.parse(assessment)
+      );
+      
+      const newAssessments = await storage.createBehaviorAssessments(validatedAssessments);
+      res.status(201).json(newAssessments);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error creating behavior assessments" });
+    }
+  });
+
+  apiRouter.put("/api/behavior-assessments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const updatedAssessment = await storage.updateBehaviorAssessment(id, req.body);
+      if (!updatedAssessment) {
+        return res.status(404).json({ message: "Behavior assessment not found" });
+      }
+      
+      res.json(updatedAssessment);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating behavior assessment" });
+    }
+  });
+
+  apiRouter.delete("/api/behavior-assessments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteBehaviorAssessment(id);
+      if (!success) {
+        return res.status(404).json({ message: "Behavior assessment not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting behavior assessment" });
     }
   });
 

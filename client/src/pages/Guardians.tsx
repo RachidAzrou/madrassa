@@ -1403,7 +1403,11 @@ export default function Guardians() {
                 </Avatar>
                 <div>
                   <h3 className="text-xl font-bold">{selectedGuardian.firstName} {selectedGuardian.lastName}</h3>
-                  <Badge variant="outline">{selectedGuardian.relationship}</Badge>
+                  <Badge variant="outline">
+                    {selectedGuardian.relationship === 'parent' ? 'Ouder' : 
+                     selectedGuardian.relationship === 'guardian' ? 'Voogd' : 
+                     selectedGuardian.relationship}
+                  </Badge>
                 </div>
               </div>
               
@@ -1437,18 +1441,39 @@ export default function Guardians() {
               
               {selectedGuardian.isEmergencyContact && (
                 <div className="pt-2">
-                  <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-100">
+                  <Badge variant="destructive" className="bg-red-600 text-white hover:bg-red-700">
                     Noodcontact
                   </Badge>
                 </div>
               )}
               
               {selectedGuardian.notes && (
-                <div className="pt-2">
+                <div className="pt-2 pb-4 border-b">
                   <h4 className="text-sm font-medium text-gray-500">Notities</h4>
                   <p className="whitespace-pre-wrap text-sm">{selectedGuardian.notes}</p>
                 </div>
               )}
+              
+              <div className="pt-4">
+                <h4 className="text-sm font-medium text-gray-500 mb-2">Gekoppelde Studenten</h4>
+                <div id="studentList" className="space-y-2">
+                  {linkedStudents && linkedStudents.length > 0 ? (
+                    linkedStudents.map((student: any) => (
+                      <div key={student.id} className="flex items-center gap-2 p-2 border rounded-md">
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className="text-xs">{student.firstName?.[0]}{student.lastName?.[0]}</AvatarFallback>
+                        </Avatar>
+                        <span>{student.firstName} {student.lastName}</span>
+                        <Badge variant="outline" className="ml-auto text-xs">
+                          Student
+                        </Badge>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">Geen studenten gekoppeld aan deze voogd</p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
           

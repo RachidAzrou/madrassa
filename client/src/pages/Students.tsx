@@ -60,6 +60,12 @@ export default function Students() {
   // State voor familie tab
   const [linkedGuardians, setLinkedGuardians] = useState<any[]>([]);
   const [siblings, setSiblings] = useState<any[]>([]);
+  const [isLinkGuardianDialogOpen, setIsLinkGuardianDialogOpen] = useState(false);
+  const [isCreateGuardianDialogOpen, setIsCreateGuardianDialogOpen] = useState(false);
+  const [availableGuardians, setAvailableGuardians] = useState<any[]>([]);
+  const [selectedGuardianId, setSelectedGuardianId] = useState<number | null>(null);
+  const [guardianRelationType, setGuardianRelationType] = useState('parent');
+  const [isEmergencyContact, setIsEmergencyContact] = useState(false);
   const [studentFormData, setStudentFormData] = useState({
     studentId: '',
     firstName: '',
@@ -354,26 +360,56 @@ export default function Students() {
   // Functie om voogden en siblings voor een student op te halen
   const fetchStudentFamily = async (studentId: number) => {
     try {
+      // Reset de huidige staat
+      setLinkedGuardians([]);
+      setSiblings([]);
+      
       // 1. Haal eerst alle voogden op die gekoppeld zijn aan deze student
-      const studentGuardians = await apiRequest('GET', `/api/student-guardians/student/${studentId}`);
-      setLinkedGuardians(studentGuardians || []);
+      const guardianRelationsResponse = await apiRequest('GET', `/api/students/${studentId}/guardians`);
+      const guardianRelations = Array.isArray(guardianRelationsResponse) ? guardianRelationsResponse : [];
+      
+      // Voor elke guardian relatie, haal de volledige guardian informatie op
+      const enrichedGuardianPromises = guardianRelations.map(async (relation: any) => {
+        if (relation && relation.guardianId) {
+          try {
+            const guardianResponse = await apiRequest('GET', `/api/guardians/${relation.guardianId}`);
+            // Voeg guardian info toe aan de relatie
+            return {
+              ...relation,
+              guardian: guardianResponse
+            };
+          } catch (err) {
+            console.error(`Fout bij ophalen van guardian ${relation.guardianId}:`, err);
+            return relation;
+          }
+        }
+        return relation;
+      });
+      
+      const enrichedGuardians = await Promise.all(enrichedGuardianPromises);
+      setLinkedGuardians(enrichedGuardians);
       
       // 2. Voor elke voogd, haal alle gekoppelde studenten op (potentiële siblings)
-      let allSiblings = new Set();
+      const allSiblingsSet = new Set<any>();
       
       // Voor elke voogd, zoek alle studenten die aan deze voogd zijn gekoppeld
-      if (studentGuardians && studentGuardians.length > 0) {
-        for (const guardianLink of studentGuardians) {
-          const guardianStudents = await apiRequest('GET', `/api/student-guardians/guardian/${guardianLink.guardianId}`);
-          
-          // Voeg studenten toe die niet de huidige student zijn
-          if (guardianStudents && guardianStudents.length > 0) {
-            for (const link of guardianStudents) {
-              if (link.studentId !== studentId) {
-                // Haal de volledige studentinformatie op
-                const siblingDetails = await apiRequest('GET', `/api/students/${link.studentId}`);
-                if (siblingDetails) {
-                  allSiblings.add(siblingDetails);
+      if (guardianRelations.length > 0) {
+        for (const guardianLink of guardianRelations) {
+          if (guardianLink && guardianLink.guardianId) {
+            const guardianStudentsResponse = await apiRequest('GET', `/api/guardians/${guardianLink.guardianId}/students`);
+            const guardianStudentRelations = Array.isArray(guardianStudentsResponse) ? guardianStudentsResponse : [];
+            
+            // Voeg studenten toe die niet de huidige student zijn
+            for (const relation of guardianStudentRelations) {
+              if (relation && relation.studentId && relation.studentId !== studentId) {
+                try {
+                  // Haal de volledige studentinformatie op
+                  const siblingResponse = await apiRequest('GET', `/api/students/${relation.studentId}`);
+                  if (siblingResponse) {
+                    allSiblingsSet.add(siblingResponse);
+                  }
+                } catch (err) {
+                  console.error(`Fout bij ophalen van sibling ${relation.studentId}:`, err);
                 }
               }
             }
@@ -381,8 +417,8 @@ export default function Students() {
         }
       }
       
-      // Converteer Set naar Array en filter duplicaten
-      const uniqueSiblings = Array.from(allSiblings);
+      // Converteer Set naar Array
+      const uniqueSiblings = Array.from(allSiblingsSet);
       setSiblings(uniqueSiblings);
       
     } catch (error) {
@@ -393,6 +429,171 @@ export default function Students() {
       toast({
         title: "Fout bij ophalen",
         description: "Er is een fout opgetreden bij het ophalen van familiegegevens.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Functie om beschikbare voogden op te halen die nog niet aan de student zijn gekoppeld
+  const fetchAvailableGuardians = async (studentId: number) => {
+    try {
+      // Haal alle voogden op
+      const allGuardiansResponse = await apiRequest('GET', '/api/guardians');
+      const allGuardians = Array.isArray(allGuardiansResponse) ? allGuardiansResponse : [];
+      
+      // Haal voogden op die al gekoppeld zijn aan deze student
+      const studentGuardiansResponse = await apiRequest('GET', `/api/students/${studentId}/guardians`);
+      const studentGuardians = Array.isArray(studentGuardiansResponse) ? studentGuardiansResponse : [];
+      
+      // Maak een set van guardian IDs die al gekoppeld zijn
+      const linkedGuardianIds = new Set(studentGuardians.map((relation: any) => relation.guardianId));
+      
+      // Filter alleen voogden die nog niet gekoppeld zijn
+      const availableGuardiansList = allGuardians.filter((guardian: any) => !linkedGuardianIds.has(guardian.id));
+      
+      setAvailableGuardians(availableGuardiansList);
+      // Reset geselecteerde waarden
+      setSelectedGuardianId(null);
+      setGuardianRelationType('parent');
+      setIsEmergencyContact(false);
+      
+    } catch (error) {
+      console.error("Fout bij ophalen van beschikbare voogden:", error);
+      setAvailableGuardians([]);
+      
+      toast({
+        title: "Fout bij ophalen",
+        description: "Er is een fout opgetreden bij het ophalen van beschikbare voogden.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  // Functie om een voogd aan een student te koppelen
+  const linkGuardianToStudent = async (studentId: number, guardianId: number) => {
+    if (!guardianId) {
+      toast({
+        title: "Selectie vereist",
+        description: "Selecteer een voogd om te koppelen.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      const response = await apiRequest('POST', '/api/student-guardians', {
+        studentId,
+        guardianId,
+        relationshipType: guardianRelationType,
+        isEmergencyContact
+      });
+      
+      // Succes melding
+      toast({
+        title: "Voogd gekoppeld",
+        description: "De voogd is succesvol gekoppeld aan de student.",
+        variant: "default",
+      });
+      
+      // Sluit dialoog en vernieuw familie gegevens
+      setIsLinkGuardianDialogOpen(false);
+      fetchStudentFamily(studentId);
+      
+    } catch (error) {
+      console.error("Fout bij koppelen van voogd:", error);
+      
+      toast({
+        title: "Fout bij koppelen",
+        description: "Er is een fout opgetreden bij het koppelen van de voogd.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const handleOpenLinkGuardianDialog = () => {
+    if (selectedStudent) {
+      fetchAvailableGuardians(selectedStudent.id);
+      setIsLinkGuardianDialogOpen(true);
+    }
+  };
+  
+  // State voor nieuwe voogd aanmaken
+  const [newGuardianData, setNewGuardianData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    postalCode: '',
+    relationshipType: 'parent',
+    isEmergencyContact: false
+  });
+  
+  // Functie om een nieuwe voogd aan te maken
+  const createGuardian = async () => {
+    // Validatie
+    if (!newGuardianData.firstName || !newGuardianData.lastName) {
+      toast({
+        title: "Verplichte velden",
+        description: "Vul ten minste de voor- en achternaam in.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      // Maak eerst de voogd aan
+      const guardianResponse = await apiRequest('POST', '/api/guardians', {
+        firstName: newGuardianData.firstName,
+        lastName: newGuardianData.lastName,
+        email: newGuardianData.email || undefined,
+        phone: newGuardianData.phone || undefined,
+        address: newGuardianData.address || undefined,
+        city: newGuardianData.city || undefined,
+        postalCode: newGuardianData.postalCode || undefined,
+      });
+      
+      // Koppel de voogd aan de student als dat succesvol was
+      if (guardianResponse && selectedStudent) {
+        await apiRequest('POST', '/api/student-guardians', {
+          studentId: selectedStudent.id,
+          guardianId: guardianResponse.id,
+          relationshipType: newGuardianData.relationshipType,
+          isEmergencyContact: newGuardianData.isEmergencyContact
+        });
+        
+        // Reset het formulier en sluit het dialoogvenster
+        setNewGuardianData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          address: '',
+          city: '',
+          postalCode: '',
+          relationshipType: 'parent',
+          isEmergencyContact: false
+        });
+        
+        setIsCreateGuardianDialogOpen(false);
+        setIsLinkGuardianDialogOpen(false);
+        
+        // Vernieuw de gegevens
+        fetchStudentFamily(selectedStudent.id);
+        
+        toast({
+          title: "Voogd toegevoegd",
+          description: "De nieuwe voogd is succesvol aangemaakt en gekoppeld.",
+          variant: "default",
+        });
+      }
+    } catch (error) {
+      console.error("Fout bij aanmaken van voogd:", error);
+      
+      toast({
+        title: "Fout bij aanmaken",
+        description: "Er is een fout opgetreden bij het aanmaken van de voogd.",
         variant: "destructive",
       });
     }
@@ -1603,17 +1804,52 @@ export default function Students() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Ouders/Voogden sectie */}
                   <div className="border rounded-lg p-6 bg-card">
-                    <h3 className="text-lg font-bold mb-4">Ouders / Voogden</h3>
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-bold">Ouders / Voogden</h3>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-8"
+                        onClick={handleOpenLinkGuardianDialog}
+                      >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Voogd koppelen
+                      </Button>
+                    </div>
                     <div className="space-y-4" id="guardians-list">
-                      {/* Dit zal later dynamisch worden gevuld met guardians data */}
-                      <div className="text-center py-6 text-muted-foreground">
-                        <UserCircle className="mx-auto h-12 w-12 opacity-50" />
-                        <p className="mt-2">Geen ouders of voogden gekoppeld.</p>
-                        <Button variant="outline" size="sm" className="mt-2">
-                          <PlusCircle className="mr-2 h-4 w-4" />
-                          Voogd koppelen
-                        </Button>
-                      </div>
+                      {linkedGuardians && linkedGuardians.length > 0 ? (
+                        <div className="divide-y divide-gray-200">
+                          {linkedGuardians.map((guardianLink: any) => (
+                            <div key={guardianLink.id} className="py-3 flex justify-between items-center">
+                              <div className="flex items-center">
+                                <Avatar className="h-10 w-10 mr-3">
+                                  <AvatarFallback className="bg-primary/10 text-primary">
+                                    {guardianLink.guardian?.firstName?.[0]}{guardianLink.guardian?.lastName?.[0]}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-medium">{guardianLink.guardian?.firstName} {guardianLink.guardian?.lastName}</p>
+                                  <p className="text-sm text-muted-foreground">{guardianLink.relationshipType || 'Ouder'}</p>
+                                </div>
+                              </div>
+                              <div>
+                                {guardianLink.isEmergencyContact && (
+                                  <Badge variant="destructive" className="mr-2">Noodcontact</Badge>
+                                )}
+                                <Button variant="ghost" size="sm" className="h-8">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-6 text-muted-foreground">
+                          <UserCircle className="mx-auto h-12 w-12 opacity-50" />
+                          <p className="mt-2">Geen ouders of voogden gekoppeld.</p>
+                          <p className="text-sm">Koppel voogden om familierelaties te beheren.</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                   
@@ -1621,12 +1857,39 @@ export default function Students() {
                   <div className="border rounded-lg p-6 bg-card">
                     <h3 className="text-lg font-bold mb-4">Broers / Zussen</h3>
                     <div className="space-y-4" id="siblings-list">
-                      {/* Dit zal later dynamisch worden gevuld met siblings data */}
-                      <div className="text-center py-6 text-muted-foreground">
-                        <UserCircle className="mx-auto h-12 w-12 opacity-50" />
-                        <p className="mt-2">Geen broers of zussen gevonden.</p>
-                        <p className="text-sm">Broers en zussen worden automatisch gelinkt op basis van gemeenschappelijke ouders/voogden.</p>
-                      </div>
+                      {siblings && siblings.length > 0 ? (
+                        <div className="divide-y divide-gray-200">
+                          {siblings.map((sibling: any) => (
+                            <div key={sibling.id} className="py-3 flex justify-between items-center">
+                              <div className="flex items-center">
+                                <Avatar className="h-10 w-10 mr-3">
+                                  <AvatarFallback className="bg-primary/10 text-primary">
+                                    {sibling.firstName?.[0]}{sibling.lastName?.[0]}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-medium">{sibling.firstName} {sibling.lastName}</p>
+                                  <p className="text-sm text-muted-foreground">#{sibling.studentId}</p>
+                                </div>
+                              </div>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="h-8"
+                                onClick={() => handleViewStudent(sibling)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-6 text-muted-foreground">
+                          <UserCircle className="mx-auto h-12 w-12 opacity-50" />
+                          <p className="mt-2">Geen broers of zussen gevonden.</p>
+                          <p className="text-sm">Broers en zussen worden automatisch gelinkt op basis van gemeenschappelijke ouders/voogden.</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1645,6 +1908,209 @@ export default function Students() {
               </TabsContent>
             </Tabs>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialoogvenster voor het koppelen van een voogd */}
+      <Dialog open={isLinkGuardianDialogOpen} onOpenChange={setIsLinkGuardianDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Voogd koppelen</DialogTitle>
+            <DialogDescription>
+              Selecteer een bestaande voogd om te koppelen aan {selectedStudent?.firstName} {selectedStudent?.lastName}.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="guardian">Selecteer een voogd</Label>
+              <Select value={selectedGuardianId?.toString() || ''} onValueChange={(value) => setSelectedGuardianId(parseInt(value))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecteer een voogd" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableGuardians.length > 0 ? (
+                    availableGuardians.map((guardian) => (
+                      <SelectItem key={guardian.id} value={guardian.id.toString()}>
+                        {guardian.firstName} {guardian.lastName}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>Geen beschikbare voogden</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="relationType">Relatie type</Label>
+              <Select value={guardianRelationType} onValueChange={setGuardianRelationType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="parent">Ouder</SelectItem>
+                  <SelectItem value="guardian">Voogd</SelectItem>
+                  <SelectItem value="grandparent">Grootouder</SelectItem>
+                  <SelectItem value="other">Anders</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isEmergencyContact"
+                checked={isEmergencyContact}
+                onChange={(e) => setIsEmergencyContact(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <Label htmlFor="isEmergencyContact" className="font-normal">
+                Noodcontact
+              </Label>
+            </div>
+
+            <div className="flex justify-between pt-3">
+              <Button variant="outline" onClick={() => setIsCreateGuardianDialogOpen(true)}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Nieuwe voogd aanmaken
+              </Button>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsLinkGuardianDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button onClick={() => selectedStudent && selectedGuardianId && linkGuardianToStudent(selectedStudent.id, selectedGuardianId)}>
+              Koppelen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Dialoogvenster voor het aanmaken van een nieuwe voogd */}
+      <Dialog open={isCreateGuardianDialogOpen} onOpenChange={setIsCreateGuardianDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Nieuwe voogd aanmaken</DialogTitle>
+            <DialogDescription>
+              Maak een nieuwe voogd aan om te koppelen aan {selectedStudent?.firstName} {selectedStudent?.lastName}.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4 space-y-5">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName" className="font-medium">Voornaam*</Label>
+                <Input
+                  id="firstName"
+                  value={newGuardianData.firstName}
+                  onChange={(e) => setNewGuardianData({ ...newGuardianData, firstName: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName" className="font-medium">Achternaam*</Label>
+                <Input
+                  id="lastName"
+                  value={newGuardianData.lastName}
+                  onChange={(e) => setNewGuardianData({ ...newGuardianData, lastName: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="font-medium">E-mail</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={newGuardianData.email}
+                  onChange={(e) => setNewGuardianData({ ...newGuardianData, email: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="font-medium">Telefoonnummer</Label>
+                <Input
+                  id="phone"
+                  value={newGuardianData.phone}
+                  onChange={(e) => setNewGuardianData({ ...newGuardianData, phone: e.target.value })}
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="address" className="font-medium">Adres</Label>
+              <Input
+                id="address"
+                value={newGuardianData.address}
+                onChange={(e) => setNewGuardianData({ ...newGuardianData, address: e.target.value })}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city" className="font-medium">Plaats</Label>
+                <Input
+                  id="city"
+                  value={newGuardianData.city}
+                  onChange={(e) => setNewGuardianData({ ...newGuardianData, city: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="postalCode" className="font-medium">Postcode</Label>
+                <Input
+                  id="postalCode"
+                  value={newGuardianData.postalCode}
+                  onChange={(e) => setNewGuardianData({ ...newGuardianData, postalCode: e.target.value })}
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="relationshipType" className="font-medium">Relatie tot student</Label>
+                <Select 
+                  value={newGuardianData.relationshipType}
+                  onValueChange={(value) => setNewGuardianData({ ...newGuardianData, relationshipType: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="parent">Ouder</SelectItem>
+                    <SelectItem value="guardian">Voogd</SelectItem>
+                    <SelectItem value="grandparent">Grootouder</SelectItem>
+                    <SelectItem value="other">Anders</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="newIsEmergencyContact"
+                checked={newGuardianData.isEmergencyContact}
+                onChange={(e) => setNewGuardianData({ ...newGuardianData, isEmergencyContact: e.target.checked })}
+                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <Label htmlFor="newIsEmergencyContact" className="font-normal">
+                Dit is een noodcontact
+              </Label>
+            </div>
+          </div>
+          
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsCreateGuardianDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button onClick={createGuardian}>
+              Voogd aanmaken en koppelen
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

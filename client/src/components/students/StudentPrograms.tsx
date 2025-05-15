@@ -371,9 +371,9 @@ export default function StudentPrograms({ studentId }: StudentProgramsProps) {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="max-w-none w-auto">
           <DialogHeader>
-            <DialogTitle>Programma Toevoegen</DialogTitle>
+            <DialogTitle>Vak Toevoegen</DialogTitle>
             <DialogDescription>
-              Voeg een nieuw programma toe aan deze student.
+              Voeg een nieuw vak toe aan deze student.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmitAddProgram}>

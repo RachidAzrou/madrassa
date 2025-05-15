@@ -1151,7 +1151,7 @@ export default function Students() {
 
       {/* Add Student Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="max-w-[95vw] w-auto max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
             <DialogDescription>
@@ -1315,9 +1315,9 @@ export default function Students() {
               
               <div className="space-y-4">
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold mb-2">Programma's</h3>
+                  <h3 className="text-lg font-semibold mb-2">Vakken</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Selecteer één of meerdere programma's voor deze student
+                    Selecteer één of meerdere vakken voor deze student
                   </p>
                   
                   {/* Lijst met toegevoegde programma's */}
@@ -1352,7 +1352,7 @@ export default function Students() {
                   {/* Nieuwe programma toevoegen interface */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-md">
                     <div>
-                      <Label htmlFor="newProgramId">Programma</Label>
+                      <Label htmlFor="newProgramId">Vak</Label>
                       <Select
                         value={studentFormData.programId?.toString() || ''}
                         onValueChange={handleProgramIdChange}
@@ -1399,7 +1399,7 @@ export default function Students() {
                         disabled={!studentFormData.programId}
                         onClick={() => {
                           if (studentFormData.programId) {
-                            // Controleer of dit programma al is toegevoegd
+                            // Controleer of dit vak al is toegevoegd
                             const alreadyExists = selectedPrograms.some(
                               p => p.programId === studentFormData.programId
                             );
@@ -1421,17 +1421,17 @@ export default function Students() {
                                 yearLevel: null
                               });
                             } else {
-                              // Toon een waarschuwing dat het programma al is toegevoegd
+                              // Toon een waarschuwing dat het vak al is toegevoegd
                               toast({
-                                title: "Programma al toegevoegd",
-                                description: "Deze student is al ingeschreven voor dit programma.",
+                                title: "Vak al toegevoegd",
+                                description: "Deze student is al ingeschreven voor dit vak.",
                                 variant: "destructive"
                               });
                             }
                           }
                         }}
                       >
-                        Programma toevoegen
+                        Vak toevoegen
                       </Button>
                     </div>
                   </div>
@@ -1475,7 +1475,7 @@ export default function Students() {
             <Tabs defaultValue="general" className="mt-4">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="general">Algemene Informatie</TabsTrigger>
-                <TabsTrigger value="programs">Programma's</TabsTrigger>
+                <TabsTrigger value="programs">Vakken</TabsTrigger>
                 <TabsTrigger value="enrollments">Inschrijvingen</TabsTrigger>
               </TabsList>
               

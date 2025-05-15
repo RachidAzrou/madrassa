@@ -18,7 +18,11 @@ import {
   examinations, type Examination, type InsertExamination,
   guardians, type Guardian, type InsertGuardian,
   studentGuardians, type StudentGuardian, type InsertStudentGuardian,
-  studentPrograms, type StudentProgram, type InsertStudentProgram
+  studentPrograms, type StudentProgram, type InsertStudentProgram,
+  teachers, type Teacher, type InsertTeacher,
+  teacherAvailability, type TeacherAvailability, type InsertTeacherAvailability,
+  teacherLanguages, type TeacherLanguage, type InsertTeacherLanguage,
+  teacherCourseAssignments, type TeacherCourseAssignment, type InsertTeacherCourseAssignment
 } from "@shared/schema";
 
 export class DatabaseStorage implements IStorage {

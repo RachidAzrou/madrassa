@@ -68,6 +68,15 @@ export default function Students() {
     status: 'active' as string,
   });
 
+  // Fetch programs for dropdown and display
+  const { data: programsData } = useQuery({
+    queryKey: ['/api/programs'],
+    staleTime: 30000,
+  });
+  
+  // Programma's ophalen voor weergave en dropdown
+  const programs = Array.isArray(programsData) ? programsData : programsData?.programs || [];
+  
   // Fetch students with filters
   const { data, isLoading, isError } = useQuery({
     queryKey: ['/api/students', { searchTerm, program, year, status, sortBy, page: currentPage }],
@@ -80,6 +89,14 @@ export default function Students() {
   // Totaal aantal studenten is de lengte van de array als we geen expliciete totalCount hebben
   const totalStudents = data?.totalCount || students.length || 0;
   const totalPages = Math.ceil(totalStudents / 10); // Assuming 10 students per page
+  
+  // Sorteer studenten op ID (studentId)
+  const sortedStudents = [...students].sort((a, b) => {
+    if (a.studentId && b.studentId) {
+      return a.studentId.localeCompare(b.studentId, undefined, { numeric: true });
+    }
+    return 0;
+  });
 
   // Mutatie om een student toe te voegen
   const createStudentMutation = useMutation({
@@ -864,7 +881,7 @@ export default function Students() {
                   </td>
                 </tr>
               ) : (
-                students.map((student: any) => (
+                sortedStudents.map((student: any) => (
                   <tr key={student.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -884,17 +901,22 @@ export default function Students() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.studentId}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.program}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Jaar {student.year}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {programs.find(p => p.id === student.programId)?.name || 'Onbekend'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Jaar {student.yearLevel || 'Onbekend'}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        student.status === 'active' ? 'bg-green-100 text-green-800' : 
-                        student.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                        'bg-gray-100 text-gray-800'
+                        student.status.toLowerCase() === 'active' || student.status.toLowerCase() === 'actief' ? 'bg-green-100 text-green-800' : 
+                        student.status.toLowerCase() === 'pending' || student.status.toLowerCase() === 'in afwachting' ? 'bg-yellow-100 text-yellow-800' : 
+                        student.status.toLowerCase() === 'inactive' || student.status.toLowerCase() === 'inactief' ? 'bg-gray-100 text-gray-800' :
+                        'bg-blue-100 text-blue-800'
                       }`}>
-                        {student.status === 'active' ? 'Actief' : 
-                         student.status === 'pending' ? 'In afwachting' : 
-                         student.status === 'inactive' ? 'Inactief' :
+                        {student.status.toLowerCase() === 'active' ? 'Actief' : 
+                         student.status.toLowerCase() === 'pending' ? 'In afwachting' : 
+                         student.status.toLowerCase() === 'inactive' ? 'Inactief' :
                          student.status.charAt(0).toUpperCase() + student.status.slice(1)}
                       </span>
                     </td>

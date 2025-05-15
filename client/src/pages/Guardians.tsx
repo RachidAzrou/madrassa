@@ -55,6 +55,11 @@ export default function Guardians() {
     notes: '',
     studentIds: [] as number[]
   });
+  
+  // State voor studentenzoekopdracht
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
+  const [isStudentSearchDialogOpen, setIsStudentSearchDialogOpen] = useState(false);
+  const [selectedStudents, setSelectedStudents] = useState<Array<{id: number, name: string}>>([]);
 
   // Fetch guardians with filters
   const { data, isLoading, isError } = useQuery({

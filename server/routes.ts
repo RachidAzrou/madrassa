@@ -24,6 +24,7 @@ import {
   insertTeacherAvailabilitySchema,
   insertTeacherLanguageSchema,
   insertTeacherCourseAssignmentSchema,
+  insertTeacherAttendanceSchema,
   type Student,
   type Teacher
 } from "@shared/schema";

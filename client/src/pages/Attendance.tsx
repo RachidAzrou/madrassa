@@ -1,12 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Search, Download, Filter, CheckCircle, XCircle, Clock, ArrowLeft, ArrowRight, Save } from 'lucide-react';
+import { 
+  Search, Download, Filter, CheckCircle, XCircle, Clock, 
+  ArrowLeft, ArrowRight, Save, User, UserPlus, MessageSquare, 
+  AlertCircle, UserCheck 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Avatar } from '@/components/ui/avatar';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 
 // Define types
 interface Student {

@@ -7,6 +7,7 @@ import {
   courses, type Course, type InsertCourse,
   enrollments, type Enrollment, type InsertEnrollment,
   attendance, type Attendance, type InsertAttendance,
+  teacherAttendance, type TeacherAttendance, type InsertTeacherAttendance,
   grades, type Grade, type InsertGrade,
   events, type Event, type InsertEvent,
   users, type User, type InsertUser,
@@ -927,5 +928,65 @@ export class DatabaseStorage implements IStorage {
       .where(eq(teacherCourseAssignments.id, id))
       .returning({ id: teacherCourseAssignments.id });
     return result.length > 0;
+  }
+  
+  // Teacher Attendance operations
+  async getTeacherAttendanceRecords(): Promise<TeacherAttendance[]> {
+    return db.select().from(teacherAttendance);
+  }
+
+  async getTeacherAttendanceRecord(id: number): Promise<TeacherAttendance | undefined> {
+    const result = await db.select().from(teacherAttendance).where(eq(teacherAttendance.id, id));
+    return result[0];
+  }
+
+  async getTeacherAttendanceByTeacher(teacherId: number): Promise<TeacherAttendance[]> {
+    return db.select().from(teacherAttendance).where(eq(teacherAttendance.teacherId, teacherId));
+  }
+
+  async getTeacherAttendanceByCourse(courseId: number): Promise<TeacherAttendance[]> {
+    return db.select().from(teacherAttendance).where(eq(teacherAttendance.courseId, courseId));
+  }
+
+  async getTeacherAttendanceByDate(date: Date): Promise<TeacherAttendance[]> {
+    // Converteer naar ISO string en gebruik alleen de datum (zonder tijd)
+    const dateString = date.toISOString().split('T')[0];
+    return db.select().from(teacherAttendance).where(eq(teacherAttendance.date, dateString));
+  }
+
+  async createTeacherAttendance(attendance: InsertTeacherAttendance): Promise<TeacherAttendance> {
+    const result = await db.insert(teacherAttendance).values(attendance).returning();
+    return result[0];
+  }
+
+  async updateTeacherAttendance(id: number, attendance: Partial<TeacherAttendance>): Promise<TeacherAttendance | undefined> {
+    const result = await db.update(teacherAttendance)
+      .set(attendance)
+      .where(eq(teacherAttendance.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteTeacherAttendance(id: number): Promise<boolean> {
+    const result = await db.delete(teacherAttendance)
+      .where(eq(teacherAttendance.id, id))
+      .returning({ id: teacherAttendance.id });
+    return result.length > 0;
+  }
+  
+  // Enhanced Attendance operations (with teacher)
+  async getAttendanceByTeacher(teacherId: number): Promise<Attendance[]> {
+    return db.select().from(attendance).where(eq(attendance.teacherId, teacherId));
+  }
+
+  async getAttendanceByClassAndDate(courseId: number, date: Date): Promise<Attendance[]> {
+    // Converteer naar ISO string en gebruik alleen de datum (zonder tijd)
+    const dateString = date.toISOString().split('T')[0];
+    return db.select()
+      .from(attendance)
+      .where(and(
+        eq(attendance.courseId, courseId),
+        eq(attendance.date, dateString)
+      ));
   }
 }

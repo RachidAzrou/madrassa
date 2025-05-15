@@ -67,6 +67,22 @@ export default function Students() {
     enrollmentDate: '',
     status: 'active' as string,
   });
+  
+  // Aangepaste onValueChange voor programId selecties
+  const handleProgramIdChange = (value: string) => {
+    setStudentFormData({ 
+      ...studentFormData, 
+      programId: value && value !== "none" ? parseInt(value) : null 
+    });
+  };
+
+  // Aangepaste onValueChange voor yearLevel selecties
+  const handleYearLevelChange = (value: string) => {
+    setStudentFormData({ 
+      ...studentFormData, 
+      yearLevel: value && value !== "none" ? parseInt(value) : null 
+    });
+  };
 
   // Fetch programs for dropdown and display
   const { data: programsData } = useQuery({
@@ -625,13 +641,13 @@ export default function Students() {
                 </Label>
                 <Select
                   value={studentFormData.programId?.toString() || ''}
-                  onValueChange={(value) => setStudentFormData({ ...studentFormData, programId: value ? parseInt(value) : null })}
+                  onValueChange={handleProgramIdChange}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Selecteer programma" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Geen programma</SelectItem>
+                    <SelectItem value="none">Geen programma</SelectItem>
                     {programs.map((program: {id: number, name: string}) => (
                       <SelectItem key={program.id} value={String(program.id)}>
                         {program.name}
@@ -646,13 +662,13 @@ export default function Students() {
                 </Label>
                 <Select
                   value={studentFormData.yearLevel?.toString() || ''}
-                  onValueChange={(value) => setStudentFormData({ ...studentFormData, yearLevel: value ? parseInt(value) : null })}
+                  onValueChange={handleYearLevelChange}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Selecteer jaar" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Geen jaar</SelectItem>
+                    <SelectItem value="none">Geen jaar</SelectItem>
                     <SelectItem value="1">Jaar 1</SelectItem>
                     <SelectItem value="2">Jaar 2</SelectItem>
                     <SelectItem value="3">Jaar 3</SelectItem>
@@ -1176,13 +1192,13 @@ export default function Students() {
                   </Label>
                   <Select
                     value={studentFormData.programId?.toString() || ''}
-                    onValueChange={(value) => setStudentFormData({ ...studentFormData, programId: value ? parseInt(value) : null })}
+                    onValueChange={handleProgramIdChange}
                   >
                     <SelectTrigger className="mt-1">
                       <SelectValue placeholder="Selecteer programma" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Geen programma</SelectItem>
+                      <SelectItem value="none">Geen programma</SelectItem>
                       {programs.map((program: {id: number, name: string}) => (
                         <SelectItem key={program.id} value={String(program.id)}>
                           {program.name}
@@ -1197,13 +1213,13 @@ export default function Students() {
                   </Label>
                   <Select
                     value={studentFormData.yearLevel?.toString() || ''}
-                    onValueChange={(value) => setStudentFormData({ ...studentFormData, yearLevel: value ? parseInt(value) : null })}
+                    onValueChange={handleYearLevelChange}
                   >
                     <SelectTrigger className="mt-1">
                       <SelectValue placeholder="Selecteer jaar" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Geen jaar</SelectItem>
+                      <SelectItem value="none">Geen jaar</SelectItem>
                       <SelectItem value="1">Jaar 1</SelectItem>
                       <SelectItem value="2">Jaar 2</SelectItem>
                       <SelectItem value="3">Jaar 3</SelectItem>

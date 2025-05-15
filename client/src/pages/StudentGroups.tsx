@@ -419,7 +419,7 @@ export default function StudentGroups() {
             </div>
           ) : isError ? (
             <div className="text-center py-8 text-red-500">
-              Fout bij het laden van studentengroepen. Probeer het later opnieuw.
+              Fout bij het laden van klassen. Probeer het later opnieuw.
             </div>
           ) : studentGroups.length === 0 ? (
             <div className="text-center py-12">
@@ -553,7 +553,7 @@ export default function StudentGroups() {
                   </div>
                   <h3 className="text-lg font-medium mb-2">Nieuwe groep</h3>
                   <p className="text-sm text-muted-foreground">
-                    Klik om een nieuwe studentengroep aan te maken
+                    Klik om een nieuwe klas aan te maken
                   </p>
                 </div>
               </Card>
@@ -649,7 +649,7 @@ export default function StudentGroups() {
                 ) : studentGroups.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
-                      Geen studentengroepen gevonden met de huidige filters. Wijzig uw zoekopdracht of filters.
+                      Geen klassen gevonden met de huidige filters. Wijzig uw zoekopdracht of filters.
                     </td>
                   </tr>
                 ) : (
@@ -771,10 +771,10 @@ export default function StudentGroups() {
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>
-              {isEditDialogOpen ? "Studentengroep bewerken" : "Nieuwe studentengroep aanmaken"}
+              {isEditDialogOpen ? "Klas bewerken" : "Nieuwe klas aanmaken"}
             </DialogTitle>
             <DialogDescription>
-              Vul de onderstaande gegevens in om een {isEditDialogOpen ? "bestaande" : "nieuwe"} studentengroep {isEditDialogOpen ? "bij te werken" : "aan te maken"}.
+              Vul de onderstaande gegevens in om een {isEditDialogOpen ? "bestaande" : "nieuwe"} klas {isEditDialogOpen ? "bij te werken" : "aan te maken"}.
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -998,7 +998,7 @@ export default function StudentGroups() {
                       <FormLabel>Beschrijving</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Beschrijving van de studentengroep"
+                          placeholder="Beschrijving van de klas"
                           className="min-h-[80px]"
                           {...field}
                         />
@@ -1016,7 +1016,7 @@ export default function StudentGroups() {
                       <div className="space-y-0.5">
                         <FormLabel>Status</FormLabel>
                         <FormDescription>
-                          Is deze studentengroep actief?
+                          Is deze klas actief?
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -1063,9 +1063,9 @@ export default function StudentGroups() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Studentengroep verwijderen</AlertDialogTitle>
+            <AlertDialogTitle>Klas verwijderen</AlertDialogTitle>
             <AlertDialogDescription>
-              Weet je zeker dat je de studentengroep "{selectedGroup?.name}" wilt verwijderen?
+              Weet je zeker dat je de klas "{selectedGroup?.name}" wilt verwijderen?
               Deze actie kan niet ongedaan worden gemaakt.
             </AlertDialogDescription>
           </AlertDialogHeader>

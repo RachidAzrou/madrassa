@@ -114,33 +114,47 @@ export default function Students() {
       
       // Probeer meer gedetailleerde foutinformatie te krijgen
       let errorMessage = "Er is een fout opgetreden bij het toevoegen van de student.";
+      let errorDetail = "";
       
-      if (error.response?.data) {
-        // Als er een gestructureerde fout is van de API
-        const apiError = error.response.data;
-        console.log("API foutgegevens:", apiError);
-        
-        if (apiError.message) {
-          errorMessage = apiError.message;
-        }
-        
-        // Als er specifieke validatiefouten zijn
-        if (apiError.errors && Array.isArray(apiError.errors)) {
-          const validationErrors = apiError.errors.map((err: any) => 
-            `${err.path}: ${err.message}`
-          ).join(", ");
+      try {
+        if (error.response && error.response.data) {
+          const responseData = error.response.data;
           
-          if (validationErrors) {
-            errorMessage += ` Validatiefouten: ${validationErrors}`;
+          // Controleer op duplicate key fouten (HTTP 409)
+          if (error.response.status === 409) {
+            errorMessage = responseData.message || "Dit studentnummer of e-mailadres is al in gebruik.";
+            errorDetail = responseData.detail || "";
           }
-        }
-      } else if (error.message) {
-        errorMessage = error.message;
+          // Validatiefouten (HTTP 400)
+          else if (error.response.status === 400 && responseData.errors) {
+            errorMessage = "Er zijn validatiefouten in het formulier:";
+            
+            if (Array.isArray(responseData.errors)) {
+              // Zet de fouten om in een leesbare lijst
+              errorDetail = responseData.errors.map((err: any) => {
+                const field = err.path ? err.path[err.path.length - 1] : "";
+                return `• ${field || 'Veld'}: ${err.message}`;
+              }).join('\n');
+            }
+          } 
+          // Algemene serverfout maar met bericht
+          else if (responseData.message) {
+            errorMessage = responseData.message;
+            errorDetail = responseData.detail || "";
+          }
+        } 
+      } catch (parseError) {
+        console.error("Fout bij parsen van API foutmelding:", parseError);
       }
       
       toast({
         title: "Fout bij toevoegen",
-        description: errorMessage,
+        description: (
+          <div>
+            <p>{errorMessage}</p>
+            {errorDetail && <pre className="mt-2 p-2 bg-destructive/10 rounded text-sm">{errorDetail}</pre>}
+          </div>
+        ),
         variant: "destructive",
       });
     }
@@ -243,33 +257,47 @@ export default function Students() {
       
       // Probeer meer gedetailleerde foutinformatie te krijgen
       let errorMessage = "Er is een fout opgetreden bij het bijwerken van de student.";
+      let errorDetail = "";
       
-      if (error.response?.data) {
-        // Als er een gestructureerde fout is van de API
-        const apiError = error.response.data;
-        console.log("API foutgegevens:", apiError);
-        
-        if (apiError.message) {
-          errorMessage = apiError.message;
-        }
-        
-        // Als er specifieke validatiefouten zijn
-        if (apiError.errors && Array.isArray(apiError.errors)) {
-          const validationErrors = apiError.errors.map((err: any) => 
-            `${err.path}: ${err.message}`
-          ).join(", ");
+      try {
+        if (error.response && error.response.data) {
+          const responseData = error.response.data;
           
-          if (validationErrors) {
-            errorMessage += ` Validatiefouten: ${validationErrors}`;
+          // Controleer op duplicate key fouten (HTTP 409)
+          if (error.response.status === 409) {
+            errorMessage = responseData.message || "Dit studentnummer of e-mailadres is al in gebruik.";
+            errorDetail = responseData.detail || "";
           }
-        }
-      } else if (error.message) {
-        errorMessage = error.message;
+          // Validatiefouten (HTTP 400)
+          else if (error.response.status === 400 && responseData.errors) {
+            errorMessage = "Er zijn validatiefouten in het formulier:";
+            
+            if (Array.isArray(responseData.errors)) {
+              // Zet de fouten om in een leesbare lijst
+              errorDetail = responseData.errors.map((err: any) => {
+                const field = err.path ? err.path[err.path.length - 1] : "";
+                return `• ${field || 'Veld'}: ${err.message}`;
+              }).join('\n');
+            }
+          } 
+          // Algemene serverfout maar met bericht
+          else if (responseData.message) {
+            errorMessage = responseData.message;
+            errorDetail = responseData.detail || "";
+          }
+        } 
+      } catch (parseError) {
+        console.error("Fout bij parsen van API foutmelding:", parseError);
       }
       
       toast({
         title: "Fout bij bijwerken",
-        description: errorMessage,
+        description: (
+          <div>
+            <p>{errorMessage}</p>
+            {errorDetail && <pre className="mt-2 p-2 bg-destructive/10 rounded text-sm">{errorDetail}</pre>}
+          </div>
+        ),
         variant: "destructive",
       });
     }

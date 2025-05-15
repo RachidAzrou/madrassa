@@ -1,0 +1,54 @@
+{studentId: '001', firstName: 'Zaina', lastName: 'El Mouden', email: 'razrou@outlook.be', phone: '0493401412', …}
+queryClient.ts:15 
+            
+            
+           POST https://20340410-aa90-446c-91d7-edd3db6ed9b5-00-2m6qxjft59zdz.picard.replit.dev/api/students 500 (Internal Server Error)
+apiRequest @ queryClient.ts:15
+mutationFn @ Students.tsx:84
+fn @ @tanstack_react-query.js?v=e82fc932:1189
+run @ @tanstack_react-query.js?v=e82fc932:494
+start @ @tanstack_react-query.js?v=e82fc932:536
+execute @ @tanstack_react-query.js?v=e82fc932:1225
+await in execute
+mutate @ @tanstack_react-query.js?v=e82fc932:2630
+(anonymous) @ @tanstack_react-query.js?v=e82fc932:3295
+handleSubmitStudent @ Students.tsx:179
+callCallback2 @ chunk-RPCDYKBN.js?v=e82fc932:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=e82fc932:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=e82fc932:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=e82fc932:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=e82fc932:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=e82fc932:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=e82fc932:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=e82fc932:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=e82fc932:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=e82fc932:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=e82fc932:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=e82fc932:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=e82fc932:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=e82fc932:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=e82fc932:5449Understand this errorAI
+Students.tsx:113 Student toevoegfout: Error: 500: {"message":"Error creating student"}
+    at throwIfResNotOk (queryClient.ts:6:11)
+    at async apiRequest (queryClient.ts:22:3)
+onError @ Students.tsx:113
+execute @ @tanstack_react-query.js?v=e82fc932:1254
+await in execute
+mutate @ @tanstack_react-query.js?v=e82fc932:2630
+(anonymous) @ @tanstack_react-query.js?v=e82fc932:3295
+handleSubmitStudent @ Students.tsx:179
+callCallback2 @ chunk-RPCDYKBN.js?v=e82fc932:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=e82fc932:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=e82fc932:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=e82fc932:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=e82fc932:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=e82fc932:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=e82fc932:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=e82fc932:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=e82fc932:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=e82fc932:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=e82fc932:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=e82fc932:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=e82fc932:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=e82fc932:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=e82fc932:5449Understand this errorAI

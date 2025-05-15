@@ -71,7 +71,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Stuur de data door naar storage zonder verdere aanpassingen
       const newStudent = await storage.createStudent(validatedData);
       res.status(201).json(newStudent);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         console.error("Student validation error:", error.errors);
         return res.status(400).json({ 
@@ -80,8 +80,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           received: req.body  // Dit helpt bij diagnose
         });
       }
+      
+      // Controleer op specifieke database fouten
+      if (error.code === '23505') {
+        // Unieke sleutel overtreding
+        const fieldName = error.constraint?.includes('student_id') ? 'studentnummer' : 
+                         error.constraint?.includes('email') ? 'e-mailadres' : 'veld';
+                         
+        console.error(`Duplicate key error for ${fieldName}:`, error);
+        return res.status(409).json({ 
+          message: `Er bestaat al een student met dit ${fieldName}. Kies een andere waarde.`,
+          field: error.constraint,
+          detail: error.detail
+        });
+      }
+      
       console.error("Error creating student:", error);
-      res.status(500).json({ message: "Error creating student" });
+      res.status(500).json({ 
+        message: "Fout bij het aanmaken van de student", 
+        detail: error.message || "Onbekende fout"
+      });
     }
   });
 
@@ -89,7 +107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid ID format" });
+        return res.status(400).json({ message: "Ongeldig ID formaat" });
       }
       
       // Log de binnenkomende data voor debugging
@@ -105,21 +123,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update de student zonder verdere aanpassingen
       const updatedStudent = await storage.updateStudent(id, validatedData);
       if (!updatedStudent) {
-        return res.status(404).json({ message: "Student not found" });
+        return res.status(404).json({ message: "Student niet gevonden" });
       }
       
       res.json(updatedStudent);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         console.error("Student update validation error:", error.errors);
         return res.status(400).json({ 
-          message: "Validation error", 
+          message: "Validatiefout", 
           errors: error.errors,
           received: req.body  // Dit helpt bij diagnose
         });
       }
+      
+      // Controleer op specifieke database fouten
+      if (error.code === '23505') {
+        // Unieke sleutel overtreding
+        const fieldName = error.constraint?.includes('student_id') ? 'studentnummer' : 
+                         error.constraint?.includes('email') ? 'e-mailadres' : 'veld';
+                         
+        console.error(`Duplicate key error for ${fieldName}:`, error);
+        return res.status(409).json({ 
+          message: `Er bestaat al een student met dit ${fieldName}. Kies een andere waarde.`,
+          field: error.constraint,
+          detail: error.detail
+        });
+      }
+      
       console.error("Update student error:", error);
-      res.status(500).json({ message: "Error updating student" });
+      res.status(500).json({ 
+        message: "Fout bij het bijwerken van de student", 
+        detail: error.message || "Onbekende fout"
+      });
     }
   });
 

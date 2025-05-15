@@ -631,9 +631,12 @@ export default function Students() {
                     <SelectValue placeholder="Selecteer programma" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">Informatica</SelectItem>
-                    <SelectItem value="2">Bedrijfskunde</SelectItem>
-                    <SelectItem value="3">Techniek</SelectItem>
+                    <SelectItem value="">Geen programma</SelectItem>
+                    {programs.map((program: {id: number, name: string}) => (
+                      <SelectItem key={program.id} value={String(program.id)}>
+                        {program.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -649,10 +652,12 @@ export default function Students() {
                     <SelectValue placeholder="Selecteer jaar" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="">Geen jaar</SelectItem>
                     <SelectItem value="1">Jaar 1</SelectItem>
                     <SelectItem value="2">Jaar 2</SelectItem>
                     <SelectItem value="3">Jaar 3</SelectItem>
                     <SelectItem value="4">Jaar 4</SelectItem>
+                    <SelectItem value="5">Jaar 5</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1177,9 +1182,12 @@ export default function Students() {
                       <SelectValue placeholder="Selecteer programma" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Informatica</SelectItem>
-                      <SelectItem value="2">Bedrijfskunde</SelectItem>
-                      <SelectItem value="3">Techniek</SelectItem>
+                      <SelectItem value="">Geen programma</SelectItem>
+                      {programs.map((program) => (
+                        <SelectItem key={program.id} value={String(program.id)}>
+                          {program.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -1195,10 +1203,12 @@ export default function Students() {
                       <SelectValue placeholder="Selecteer jaar" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="">Geen jaar</SelectItem>
                       <SelectItem value="1">Jaar 1</SelectItem>
                       <SelectItem value="2">Jaar 2</SelectItem>
                       <SelectItem value="3">Jaar 3</SelectItem>
                       <SelectItem value="4">Jaar 4</SelectItem>
+                      <SelectItem value="5">Jaar 5</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

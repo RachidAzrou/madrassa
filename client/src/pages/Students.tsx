@@ -459,6 +459,10 @@ export default function Students() {
         if (!formattedData[field] || formattedData[field] === '') {
           delete formattedData[field];
         }
+        // Zorg ervoor dat de datum in het juiste formaat voor de database staat
+        else if (typeof formattedData[field] === 'string') {
+          formattedData[field] = formatDateToDatabaseFormat(formattedData[field]);
+        }
       });
       
       // Verwijder alle lege velden die niet verplicht zijn
@@ -841,6 +845,10 @@ export default function Students() {
           // Verwijder lege datumvelden
           if (!formattedData[field] || formattedData[field] === '') {
             delete formattedData[field];
+          }
+          // Zorg ervoor dat de datum in het juiste formaat voor de database staat
+          else if (typeof formattedData[field] === 'string') {
+            formattedData[field] = formatDateToDatabaseFormat(formattedData[field]);
           }
         });
         
@@ -1907,10 +1915,13 @@ export default function Students() {
                           </Label>
                           <Input
                             id="dateOfBirth"
-                            type="date"
+                            placeholder="DD/MM/JJJJ"
                             required
-                            value={studentFormData.dateOfBirth || ''}
-                            onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
+                            value={studentFormData.dateOfBirth ? formatDateToDisplayFormat(studentFormData.dateOfBirth) : ''}
+                            onChange={(e) => {
+                              const formattedDate = formatDateToDatabaseFormat(e.target.value);
+                              setStudentFormData({ ...studentFormData, dateOfBirth: formattedDate || '' });
+                            }}
                             className="mt-1 border-gray-200"
                           />
                         </div>
@@ -2383,7 +2394,7 @@ export default function Students() {
                       </div>
                       <div>
                         <h3 className="text-sm font-medium text-muted-foreground">Inschrijvingsdatum</h3>
-                        <p className="font-medium">{selectedStudent.enrollmentDate ? new Date(selectedStudent.enrollmentDate).toLocaleDateString('nl-NL') : "Niet ingevuld"}</p>
+                        <p className="font-medium">{selectedStudent.enrollmentDate ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) : "Niet ingevuld"}</p>
                       </div>
                     </div>
                   </div>

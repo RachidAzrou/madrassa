@@ -1,12 +1,32 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, Users } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { 
+  Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, Users, 
+  Pencil, MoreVertical, Plus, GraduationCap, BookOpen, UsersRound,
+  CalendarIcon, Loader2, 
+} from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Calendar } from "@/components/ui/calendar";
+import { Switch } from "@/components/ui/switch";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { apiRequest } from '@/lib/queryClient';
+import { useToast } from "@/hooks/use-toast";
 import { 
   Card, 
   CardContent, 
@@ -22,6 +42,8 @@ export default function StudentGroups() {
   const [academicYear, setAcademicYear] = useState('all');
   const [program, setProgram] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Fetch student groups with filters
   const { data, isLoading, isError } = useQuery({
@@ -33,9 +55,182 @@ export default function StudentGroups() {
   const totalStudentGroups = data?.totalCount || 0;
   const totalPages = Math.ceil(totalStudentGroups / 9); // Assuming 9 groups per page for grid layout
 
-  const handleAddStudentGroup = async () => {
-    // Implementation will be added for student group creation
-    console.log('Add student group clicked');
+  // Dialoog controls
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+
+  // Form validation schema
+  const studentGroupSchema = z.object({
+    name: z.string().min(2, {
+      message: "Naam moet minimaal 2 tekens bevatten",
+    }),
+    academicYear: z.string({
+      required_error: "Selecteer een academisch jaar",
+    }),
+    programId: z.coerce.number().optional(),
+    courseId: z.coerce.number().optional(),
+    instructor: z.string().optional(),
+    description: z.string().optional(),
+    maxCapacity: z.coerce.number().optional(),
+    startDate: z.date().optional(),
+    endDate: z.date().optional(),
+    isActive: z.boolean().default(true),
+  });
+
+  // Form setup
+  const form = useForm<z.infer<typeof studentGroupSchema>>({
+    resolver: zodResolver(studentGroupSchema),
+    defaultValues: {
+      name: "",
+      academicYear: "2024-2025",
+      programId: undefined,
+      courseId: undefined,
+      instructor: "",
+      description: "",
+      maxCapacity: 30,
+      isActive: true,
+    },
+  });
+
+  // Fetch programs for dropdown
+  const { data: programsData } = useQuery<any[]>({
+    queryKey: ['/api/programs'],
+    staleTime: 300000,
+  });
+
+  const programs = programsData || [];
+
+  // Fetch courses for dropdown
+  const { data: coursesData } = useQuery<any[]>({
+    queryKey: ['/api/courses'],
+    staleTime: 300000,
+  });
+
+  const courses = coursesData || [];
+
+  // Mutation for creating a new student group
+  const createStudentGroupMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof studentGroupSchema>) => {
+      // Convert dates to ISO strings
+      const formattedData = {
+        ...data,
+        startDate: data.startDate ? data.startDate.toISOString() : undefined,
+        endDate: data.endDate ? data.endDate.toISOString() : undefined,
+      };
+      return await apiRequest('POST', '/api/student-groups', formattedData);
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Studentengroep toegevoegd',
+        description: 'De studentengroep is succesvol aangemaakt.',
+      });
+      setIsAddDialogOpen(false);
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
+    },
+    onError: () => {
+      toast({
+        title: 'Fout bij aanmaken',
+        description: 'Er is een fout opgetreden bij het aanmaken van de studentengroep.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Mutation for updating a student group
+  const updateStudentGroupMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number, data: z.infer<typeof studentGroupSchema> }) => {
+      // Convert dates to ISO strings
+      const formattedData = {
+        ...data,
+        startDate: data.startDate ? data.startDate.toISOString() : undefined,
+        endDate: data.endDate ? data.endDate.toISOString() : undefined,
+      };
+      return await apiRequest('PUT', `/api/student-groups/${id}`, formattedData);
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Studentengroep bijgewerkt',
+        description: 'De studentengroep is succesvol bijgewerkt.',
+      });
+      setIsEditDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
+    },
+    onError: () => {
+      toast({
+        title: 'Fout bij bijwerken',
+        description: 'Er is een fout opgetreden bij het bijwerken van de studentengroep.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Mutation for deleting a student group
+  const deleteStudentGroupMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest('DELETE', `/api/student-groups/${id}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Studentengroep verwijderd',
+        description: 'De studentengroep is succesvol verwijderd.',
+      });
+      setIsDeleteDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
+    },
+    onError: () => {
+      toast({
+        title: 'Fout bij verwijderen',
+        description: 'Er is een fout opgetreden bij het verwijderen van de studentengroep.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleAddStudentGroup = () => {
+    form.reset({
+      name: "",
+      academicYear: "2024-2025",
+      programId: undefined,
+      courseId: undefined,
+      instructor: "",
+      description: "",
+      maxCapacity: 30,
+      isActive: true,
+    });
+    setIsAddDialogOpen(true);
+  };
+
+  const handleEditStudentGroup = (group: any) => {
+    setSelectedGroup(group);
+    form.reset({
+      name: group.name,
+      academicYear: group.academicYear,
+      programId: group.programId,
+      courseId: group.courseId,
+      instructor: group.instructor || "",
+      description: group.description || "",
+      maxCapacity: group.maxCapacity,
+      startDate: group.startDate ? new Date(group.startDate) : undefined,
+      endDate: group.endDate ? new Date(group.endDate) : undefined,
+      isActive: group.isActive,
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteStudentGroup = (group: any) => {
+    setSelectedGroup(group);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const onSubmit = (data: z.infer<typeof studentGroupSchema>) => {
+    if (isEditDialogOpen && selectedGroup) {
+      updateStudentGroupMutation.mutate({ id: selectedGroup.id, data });
+    } else {
+      createStudentGroupMutation.mutate(data);
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -540,6 +735,334 @@ export default function StudentGroups() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Student Group toevoegen/bewerken dialog */}
+      <Dialog open={isAddDialogOpen || isEditDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          setIsAddDialogOpen(false);
+          setIsEditDialogOpen(false);
+        }
+      }}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>
+              {isEditDialogOpen ? "Studentengroep bewerken" : "Nieuwe studentengroep aanmaken"}
+            </DialogTitle>
+            <DialogDescription>
+              Vul de onderstaande gegevens in om een {isEditDialogOpen ? "bestaande" : "nieuwe"} studentengroep {isEditDialogOpen ? "bij te werken" : "aan te maken"}.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Naam *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Voer groepsnaam in" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="academicYear"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Academisch jaar *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer jaar" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="2023-2024">2023-2024</SelectItem>
+                            <SelectItem value="2024-2025">2024-2025</SelectItem>
+                            <SelectItem value="2025-2026">2025-2026</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="maxCapacity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Maximale capaciteit</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={1}
+                            placeholder="30"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="programId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Programma</FormLabel>
+                        <Select
+                          onValueChange={(value) => field.onChange(parseInt(value))}
+                          value={field.value?.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer programma" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {programs.map((program) => (
+                              <SelectItem key={program.id} value={program.id.toString()}>
+                                {program.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="courseId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cursus</FormLabel>
+                        <Select
+                          onValueChange={(value) => field.onChange(parseInt(value))}
+                          value={field.value?.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer cursus" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {courses.map((course) => (
+                              <SelectItem key={course.id} value={course.id.toString()}>
+                                {course.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Startdatum</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "P")
+                                ) : (
+                                  <span>Kies een datum</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="endDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Einddatum</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "P")
+                                ) : (
+                                  <span>Kies een datum</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="instructor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Docent</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Naam van docent" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Beschrijving</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Beschrijving van de studentengroep"
+                          className="min-h-[80px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <FormLabel>Status</FormLabel>
+                        <FormDescription>
+                          Is deze studentengroep actief?
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <DialogFooter>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsAddDialogOpen(false);
+                    setIsEditDialogOpen(false);
+                  }}
+                >
+                  Annuleren
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={
+                    createStudentGroupMutation.isPending || 
+                    updateStudentGroupMutation.isPending
+                  }
+                >
+                  {(createStudentGroupMutation.isPending || updateStudentGroupMutation.isPending) && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  {isEditDialogOpen ? "Bijwerken" : "Aanmaken"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Studentengroep verwijderen</AlertDialogTitle>
+            <AlertDialogDescription>
+              Weet je zeker dat je de studentengroep "{selectedGroup?.name}" wilt verwijderen?
+              Deze actie kan niet ongedaan worden gemaakt.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (selectedGroup) {
+                  deleteStudentGroupMutation.mutate(selectedGroup.id);
+                }
+              }}
+              className="bg-red-600 text-white hover:bg-red-700"
+              disabled={deleteStudentGroupMutation.isPending}
+            >
+              {deleteStudentGroupMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Verwijderen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

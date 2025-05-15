@@ -87,6 +87,7 @@ export default function Students() {
     enrollmentDate: '',
     status: 'active' as string,
     notes: '',
+    gender: '' as string,
   });
   
   // State voor meerdere programma's

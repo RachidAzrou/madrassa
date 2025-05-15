@@ -567,8 +567,12 @@ export default function StudentGroups() {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(Math.max(1, currentPage - 1));
+                      }}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>
                   {Array.from({ length: totalPages }).map((_, i) => {
@@ -576,7 +580,11 @@ export default function StudentGroups() {
                     return (
                       <PaginationItem key={page}>
                         <PaginationLink
-                          onClick={() => handlePageChange(page)}
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePageChange(page);
+                          }}
                           isActive={page === currentPage}
                         >
                           {page}
@@ -586,8 +594,12 @@ export default function StudentGroups() {
                   })}
                   <PaginationItem>
                     <PaginationNext
-                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                      disabled={currentPage === totalPages}
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(Math.min(totalPages, currentPage + 1));
+                      }}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>
                 </PaginationContent>
@@ -707,8 +719,12 @@ export default function StudentGroups() {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(Math.max(1, currentPage - 1));
+                      }}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>
                   {Array.from({ length: totalPages }).map((_, i) => {
@@ -716,7 +732,11 @@ export default function StudentGroups() {
                     return (
                       <PaginationItem key={page}>
                         <PaginationLink
-                          onClick={() => handlePageChange(page)}
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePageChange(page);
+                          }}
                           isActive={page === currentPage}
                         >
                           {page}
@@ -726,8 +746,12 @@ export default function StudentGroups() {
                   })}
                   <PaginationItem>
                     <PaginationNext
-                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                      disabled={currentPage === totalPages}
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(Math.min(totalPages, currentPage + 1));
+                      }}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
                     />
                   </PaginationItem>
                 </PaginationContent>

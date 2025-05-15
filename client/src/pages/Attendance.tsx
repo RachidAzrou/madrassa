@@ -158,8 +158,8 @@ export default function Attendance() {
   const session: AttendanceSession | null = selectedCourse ? {
     id: `session-${selectedCourse}-${selectedDate}`,
     courseId: selectedCourse,
-    courseName: Array.isArray(courses) ? 
-      courses.find((c: Course) => c.id.toString() === selectedCourse)?.name || 'Onbekende cursus' : 
+    courseName: Array.isArray(courses) && courses.length > 0 ? 
+      (courses.find((c: Course) => c.id.toString() === selectedCourse)?.name || 'Onbekende cursus') : 
       'Onbekende cursus',
     date: selectedDate
   } : null;
@@ -385,11 +385,15 @@ export default function Attendance() {
                 <SelectValue placeholder="Selecteer cursus" />
               </SelectTrigger>
               <SelectContent>
-                {courses.map(course => (
-                  <SelectItem key={course.id} value={course.id.toString()}>
-                    {course.code} - {course.name}
-                  </SelectItem>
-                ))}
+                {Array.isArray(courses) && courses.length > 0 ? (
+                  courses.map(course => (
+                    <SelectItem key={course.id} value={course.id.toString()}>
+                      {course.code} - {course.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="none" disabled>Geen cursussen beschikbaar</SelectItem>
+                )}
               </SelectContent>
             </Select>
           </div>

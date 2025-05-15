@@ -117,6 +117,11 @@ export const courses = pgTable("courses", {
   instructor: text("instructor"),
   maxStudents: integer("max_students"),
   isActive: boolean("is_active").default(true),
+  // Nieuwe velden voor uitgebreide cursusinformatie
+  learningObjectives: text("learning_objectives"), // Lesdoelen
+  materials: text("materials"), // Benodigde lesmaterialen
+  competencies: text("competencies"), // Eindcompetenties wat studenten moeten kunnen
+  prerequisites: text("prerequisites"), // Voorwaarden voor deelname
 });
 
 export const insertCourseSchema = createInsertSchema(courses).omit({

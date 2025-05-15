@@ -20,6 +20,11 @@ interface Course {
   instructor: string | null;
   maxStudents: number | null;
   isActive: boolean;
+  // Nieuwe velden voor uitgebreide cursusinformatie
+  learningObjectives: string | null; // Lesdoelen
+  materials: string | null; // Benodigde lesmaterialen
+  competencies: string | null; // Eindcompetenties wat studenten moeten kunnen
+  prerequisites: string | null; // Voorwaarden voor deelname
 }
 
 export default function Courses() {
@@ -42,6 +47,11 @@ export default function Courses() {
     instructor: '',
     maxStudents: 30,
     isActive: true,
+    // Nieuwe velden
+    learningObjectives: '',
+    materials: '',
+    competencies: '',
+    prerequisites: '',
   });
 
   // Fetch courses with filters
@@ -73,6 +83,11 @@ export default function Courses() {
         instructor: '',
         maxStudents: 30,
         isActive: true,
+        // Reset nieuwe velden
+        learningObjectives: '',
+        materials: '',
+        competencies: '',
+        prerequisites: '',
       });
       setIsAddDialogOpen(false);
       
@@ -113,6 +128,11 @@ export default function Courses() {
       instructor: course.instructor || '',
       maxStudents: course.maxStudents || 30,
       isActive: course.isActive,
+      // Nieuwe velden
+      learningObjectives: course.learningObjectives || '',
+      materials: course.materials || '',
+      competencies: course.competencies || '',
+      prerequisites: course.prerequisites || '',
     });
     setIsEditDialogOpen(true);
   };

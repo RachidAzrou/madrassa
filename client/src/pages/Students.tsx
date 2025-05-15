@@ -662,6 +662,7 @@ export default function Students() {
       enrollmentDate: student.enrollmentDate || '',
       status: student.status || 'active',
       notes: student.notes || '',
+      gender: student.gender || '',
     });
     setIsEditDialogOpen(true);
   };
@@ -950,6 +951,23 @@ export default function Students() {
                   onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
                   className="mt-1"
                 />
+              </div>
+              <div className="col-span-1">
+                <Label htmlFor="editGender" className="text-right">
+                  Geslacht
+                </Label>
+                <Select
+                  value={studentFormData.gender || ''}
+                  onValueChange={(value) => setStudentFormData({ ...studentFormData, gender: value })}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecteer geslacht" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="man">Man</SelectItem>
+                    <SelectItem value="vrouw">Vrouw</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             
@@ -1540,6 +1558,23 @@ export default function Students() {
                     onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
                     className="mt-1"
                   />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="gender" className="text-right">
+                    Geslacht
+                  </Label>
+                  <Select
+                    value={studentFormData.gender || ''}
+                    onValueChange={(value) => setStudentFormData({ ...studentFormData, gender: value })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecteer geslacht" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="man">Man</SelectItem>
+                      <SelectItem value="vrouw">Vrouw</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

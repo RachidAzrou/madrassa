@@ -323,7 +323,7 @@ export default function Students() {
         programId: null,
         yearLevel: null,
         enrollmentDate: '',
-        status: 'Active',
+        status: 'active',
         notes: '',
         gender: '',
       });

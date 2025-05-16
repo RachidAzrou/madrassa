@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book } from "lucide-react";
+import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type TeacherType = {
   id: number;
@@ -93,8 +95,14 @@ export default function Teachers() {
     education: '',
     gender: '',
     notes: '',
-    isActive: true
+    isActive: true,
+    assignedSubjects: [] as number[],
+    assignedClasses: [] as number[]
   });
+  
+  // State voor beschikbare vakken en klassen
+  const [availableSubjects, setAvailableSubjects] = useState<{id: number, name: string}[]>([]);
+  const [availableClasses, setAvailableClasses] = useState<{id: number, name: string}[]>([]);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -117,6 +125,39 @@ export default function Teachers() {
       }));
     }
   }, [nextTeacherIdData, isCreateDialogOpen]);
+  
+  // Query voor het ophalen van beschikbare vakken
+  const { 
+    data: coursesData
+  } = useQuery({
+    queryKey: ['/api/courses'],
+    enabled: isCreateDialogOpen,
+  });
+  
+  // Query voor het ophalen van beschikbare klassen (student groups)
+  const { 
+    data: classesData
+  } = useQuery({
+    queryKey: ['/api/student-groups'],
+    enabled: isCreateDialogOpen,
+  });
+  
+  // Effect voor het verwerken van opgehaalde vakken en klassen
+  useEffect(() => {
+    if (coursesData) {
+      setAvailableSubjects(coursesData.map((course: any) => ({
+        id: course.id,
+        name: course.name
+      })));
+    }
+    
+    if (classesData) {
+      setAvailableClasses(classesData.map((group: any) => ({
+        id: group.id,
+        name: group.name || `Groep ${group.id}`
+      })));
+    }
+  }, [coursesData, classesData]);
 
   // Fetching teachers data
   const {
@@ -755,9 +796,12 @@ export default function Teachers() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[95vw] sm:h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Nieuwe Docent Toevoegen</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-primary flex items-center">
+              <User className="mr-2 h-5 w-5" />
+              Nieuwe Docent Toevoegen
+            </DialogTitle>
             <DialogDescription>
-              Vul de informatie in om een nieuwe docent toe te voegen aan het systeem.
+              Vul alle benodigde informatie in om een nieuwe docent toe te voegen aan het systeem.
             </DialogDescription>
           </DialogHeader>
           
@@ -1036,12 +1080,68 @@ export default function Teachers() {
                 <h3 className="text-lg font-semibold text-primary mb-4">Vakken</h3>
                 <div className="space-y-6">
                   <p className="text-sm text-gray-500">
-                    Wijs de docent toe aan vakken. Deze functionaliteit wordt later geïmplementeerd.
+                    Selecteer de vakken die deze docent zal geven.
                   </p>
-                  <div className="border border-dashed border-gray-200 rounded-md p-4 text-center text-gray-500">
-                    <Book className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>Nog geen vakken toegewezen</p>
-                  </div>
+                  
+                  {availableSubjects.length > 0 ? (
+                    <div className="space-y-4">
+                      {availableSubjects.map(subject => (
+                        <div key={subject.id} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-50">
+                          <Checkbox 
+                            id={`subject-${subject.id}`}
+                            checked={teacherFormData.assignedSubjects.includes(subject.id)}
+                            onCheckedChange={(checked) => {
+                              const newAssignedSubjects = checked 
+                                ? [...teacherFormData.assignedSubjects, subject.id]
+                                : teacherFormData.assignedSubjects.filter(id => id !== subject.id);
+                              
+                              setTeacherFormData({
+                                ...teacherFormData,
+                                assignedSubjects: newAssignedSubjects
+                              });
+                            }}
+                          />
+                          <Label htmlFor={`subject-${subject.id}`} className="cursor-pointer w-full">
+                            {subject.name}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border border-dashed border-gray-200 rounded-md p-4 text-center text-gray-500">
+                      <Book className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>Geen vakken beschikbaar</p>
+                    </div>
+                  )}
+                  
+                  {teacherFormData.assignedSubjects.length > 0 && (
+                    <div className="mt-4">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Geselecteerde vakken:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {teacherFormData.assignedSubjects.map(subjectId => {
+                          const subject = availableSubjects.find(s => s.id === subjectId);
+                          return (
+                            <Badge key={subjectId} variant="outline" className="flex items-center gap-1">
+                              {subject?.name}
+                              <Button 
+                                type="button" 
+                                variant="ghost" 
+                                className="h-4 w-4 p-0 text-gray-500 hover:text-red-500"
+                                onClick={() => {
+                                  setTeacherFormData({
+                                    ...teacherFormData,
+                                    assignedSubjects: teacherFormData.assignedSubjects.filter(id => id !== subjectId)
+                                  });
+                                }}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </Badge>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </TabsContent>
@@ -1052,8 +1152,68 @@ export default function Teachers() {
                 <h3 className="text-lg font-semibold text-primary mb-4">Klas Toewijzing</h3>
                 <div className="space-y-6">
                   <p className="text-sm text-gray-500">
-                    Wijs de docent toe aan klassen en vakken. Deze functionaliteit wordt later geïmplementeerd.
+                    Selecteer de klassen waar deze docent les zal geven.
                   </p>
+                  
+                  {availableClasses.length > 0 ? (
+                    <div className="space-y-4">
+                      {availableClasses.map(classItem => (
+                        <div key={classItem.id} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-50">
+                          <Checkbox 
+                            id={`class-${classItem.id}`}
+                            checked={teacherFormData.assignedClasses.includes(classItem.id)}
+                            onCheckedChange={(checked) => {
+                              const newAssignedClasses = checked 
+                                ? [...teacherFormData.assignedClasses, classItem.id]
+                                : teacherFormData.assignedClasses.filter(id => id !== classItem.id);
+                              
+                              setTeacherFormData({
+                                ...teacherFormData,
+                                assignedClasses: newAssignedClasses
+                              });
+                            }}
+                          />
+                          <Label htmlFor={`class-${classItem.id}`} className="cursor-pointer w-full">
+                            {classItem.name}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border border-dashed border-gray-200 rounded-md p-4 text-center text-gray-500">
+                      <BookOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>Geen klassen beschikbaar</p>
+                    </div>
+                  )}
+                  
+                  {teacherFormData.assignedClasses.length > 0 && (
+                    <div className="mt-4">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Geselecteerde klassen:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {teacherFormData.assignedClasses.map(classId => {
+                          const classItem = availableClasses.find(c => c.id === classId);
+                          return (
+                            <Badge key={classId} variant="outline" className="flex items-center gap-1">
+                              {classItem?.name}
+                              <Button 
+                                type="button" 
+                                variant="ghost" 
+                                className="h-4 w-4 p-0 text-gray-500 hover:text-red-500"
+                                onClick={() => {
+                                  setTeacherFormData({
+                                    ...teacherFormData,
+                                    assignedClasses: teacherFormData.assignedClasses.filter(id => id !== classId)
+                                  });
+                                }}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </Badge>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </TabsContent>

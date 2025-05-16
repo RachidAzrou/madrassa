@@ -25,6 +25,7 @@ type TeacherType = {
   city?: string;
   isActive: boolean;
   hireDate?: Date;
+  profession?: string; // Toegevoegd voor beroep
   notes?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -63,12 +64,20 @@ export default function Teachers() {
   const [itemsPerPage] = useState(10);
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherType | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [newTeacherData, setNewTeacherData] = useState({
+  const [teacherFormData, setTeacherFormData] = useState({
     teacherId: '',
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
+    street: '',
+    houseNumber: '',
+    postalCode: '',
+    city: '',
+    dateOfBirth: '',
+    profession: '',
+    gender: '',
+    notes: '',
     isActive: true
   });
   

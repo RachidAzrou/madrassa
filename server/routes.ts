@@ -177,6 +177,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+  
+  // Functie om het volgende beschikbare docentnummer te genereren
+  async function generateNextTeacherId(): Promise<string> {
+    try {
+      // Haal alle bestaande docenten op
+      const allTeachers = await storage.getTeachers();
+      
+      // Als er geen docenten zijn, begin met D001
+      if (!allTeachers || allTeachers.length === 0) {
+        return "D001";
+      }
+      
+      // Filter alle geldige IDs in het formaat D###
+      const validIds = allTeachers
+        .map(teacher => teacher.teacherId)
+        .filter(id => /^D\d{3}$/.test(id))
+        .map(id => parseInt(id.substring(1), 10))
+        .filter(id => !isNaN(id))
+        .sort((a, b) => a - b); // Sorteer op numerieke volgorde
+      
+      // Als er geen geldige IDs zijn, begin met D001
+      if (validIds.length === 0) {
+        return "D001";
+      }
+      
+      // Zoek naar "gaten" in de reeks
+      // Begin te zoeken vanaf 1
+      let expectedId = 1;
+      
+      // Loop door de gesorteerde IDs om het eerste ontbrekende nummer te vinden
+      for (const id of validIds) {
+        if (id > expectedId) {
+          // We hebben een gat gevonden
+          return `D${expectedId.toString().padStart(3, '0')}`;
+        }
+        // Ga door naar het volgende verwachte nummer
+        expectedId = id + 1;
+      }
+      
+      // Als er geen gaten zijn, gebruik dan het volgende nummer na het hoogste ID
+      return `D${expectedId.toString().padStart(3, '0')}`;
+    } catch (error) {
+      console.error("Fout bij genereren docentnummer:", error);
+      // Fallback naar willekeurig nummer als er een fout optreedt
+      const randomNum = Math.floor(Math.random() * 999 + 1);
+      return `D${randomNum.toString().padStart(3, '0')}`;
+    }
+  }
+  
+  // Endpoint om het volgende beschikbare docentnummer op te halen
+  apiRouter.get("/api/next-teacher-id", async (req, res) => {
+    try {
+      const nextTeacherId = await generateNextTeacherId();
+      res.json({ nextTeacherId });
+    } catch (error) {
+      console.error("Fout bij ophalen volgend docentnummer:", error);
+      res.status(500).json({ 
+        message: "Fout bij ophalen volgend docentnummer", 
+        nextTeacherId: null 
+      });
+    }
+  });
 
   apiRouter.post("/api/students", async (req, res) => {
     try {

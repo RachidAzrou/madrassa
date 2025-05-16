@@ -926,16 +926,66 @@ export default function StudentGroups() {
                             <tr>
                               <th className="px-2 py-2 text-left">ID</th>
                               <th className="px-2 py-2 text-left">Naam</th>
-                              <th className="px-2 py-2 text-left">Specialisatie</th>
+                              <th className="px-2 py-2 text-left">Vakken</th>
+                              <th className="px-2 py-2 text-left">Geslacht</th>
                               <th className="px-2 py-2 text-left">Status</th>
                               <th className="px-2 py-2 text-left">Acties</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y">
-                            {/* Docenten zullen hier dynamisch geladen worden */}
-                            <tr className="text-center h-16">
-                              <td colSpan={5} className="text-gray-500 text-sm">
-                                Zoek docenten om toe te voegen aan de klas
+                            {/* Voorbeeldgegevens - Deze worden later dynamisch geladen */}
+                            <tr>
+                              <td className="px-2 py-2">D001</td>
+                              <td className="px-2 py-2">Ahmed Mustapha</td>
+                              <td className="px-2 py-2">
+                                <div className="flex flex-wrap gap-1">
+                                  <Badge variant="outline" className="bg-blue-50">Arabisch</Badge>
+                                  <Badge variant="outline" className="bg-blue-50">Tajweed</Badge>
+                                </div>
+                              </td>
+                              <td className="px-2 py-2">
+                                <div className="bg-blue-100 text-blue-800 rounded-full p-1 w-7 h-7 flex items-center justify-center">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="7" r="4"/>
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                  </svg>
+                                </div>
+                              </td>
+                              <td className="px-2 py-2">
+                                <Badge variant="default">Actief</Badge>
+                              </td>
+                              <td className="px-2 py-2">
+                                <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="px-2 py-2">D002</td>
+                              <td className="px-2 py-2">Fatima El-Zahra</td>
+                              <td className="px-2 py-2">
+                                <div className="flex flex-wrap gap-1">
+                                  <Badge variant="outline" className="bg-blue-50">Fiqh</Badge>
+                                  <Badge variant="outline" className="bg-blue-50">Islamitische Geschiedenis</Badge>
+                                </div>
+                              </td>
+                              <td className="px-2 py-2">
+                                <div className="bg-pink-100 text-pink-800 rounded-full p-1 w-7 h-7 flex items-center justify-center">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="7" r="4"/>
+                                    <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+                                    <line x1="16" y1="16" x2="13" y2="16"/>
+                                    <line x1="8" y1="16" x2="11" y2="16"/>
+                                  </svg>
+                                </div>
+                              </td>
+                              <td className="px-2 py-2">
+                                <Badge variant="default">Actief</Badge>
+                              </td>
+                              <td className="px-2 py-2">
+                                <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                                  <Plus className="h-4 w-4" />
+                                </Button>
                               </td>
                             </tr>
                           </tbody>

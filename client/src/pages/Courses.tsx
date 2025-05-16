@@ -73,6 +73,10 @@ export default function Courses() {
     materials: '',
     competencies: '',
     prerequisites: '',
+    subsequentCourses: '',
+    endLevel: '',
+    periodicObjectives: '',
+    assessmentDescription: '',
   });
   
   const { toast } = useToast();

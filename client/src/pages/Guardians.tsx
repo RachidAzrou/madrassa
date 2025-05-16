@@ -377,7 +377,6 @@ export default function Guardians() {
                         </Avatar>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</div>
-                          <div className="text-xs text-gray-500">{guardian.email}</div>
                         </div>
                       </div>
                     </td>
@@ -489,11 +488,12 @@ export default function Guardians() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="relationship">Relatie tot student</Label>
+                  <Label htmlFor="relationship">Relatie tot student<span className="text-red-500">*</span></Label>
                   <Select 
                     name="relationship" 
                     defaultValue={newGuardian.relationship}
                     onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
+                    required
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecteer relatie" />
@@ -548,23 +548,25 @@ export default function Guardians() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Telefoonnummer</Label>
+                    <Label htmlFor="phone">Telefoonnummer<span className="text-red-500">*</span></Label>
                     <Input 
                       id="phone"
                       name="phone"
                       value={newGuardian.phone || ''}
                       onChange={handleInputChange}
+                      required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="street">Straat</Label>
+                  <Label htmlFor="street">Straat<span className="text-red-500">*</span></Label>
                   <Input 
                     id="street"
                     name="street"
                     value={newGuardian.street || ''}
                     onChange={handleInputChange}
+                    required
                   />
                 </div>
 

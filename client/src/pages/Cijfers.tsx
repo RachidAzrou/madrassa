@@ -646,7 +646,7 @@ export default function Cijfers() {
                                   <TableCell className="bg-white sticky left-0 z-10 border-r border-gray-200 shadow-sm">
                                     <div className="flex items-center">
                                       <Avatar className="h-10 w-10 mr-3">
-                                        <AvatarFallback className="bg-blue-800 text-white">
+                                        <AvatarFallback className="bg-[#1e3a8a] text-white">
                                           {student.firstName.charAt(0)}
                                           {student.lastName.charAt(0)}
                                         </AvatarFallback>
@@ -839,7 +839,7 @@ export default function Cijfers() {
                                     <TableCell className="bg-white sticky left-0 z-10 border-r border-gray-200 shadow-sm">
                                       <div className="flex items-center">
                                         <Avatar className="h-10 w-10 mr-3">
-                                          <AvatarFallback className="bg-blue-800 text-white">
+                                          <AvatarFallback className="bg-[#1e3a8a] text-white">
                                             {student.firstName.charAt(0)}
                                             {student.lastName.charAt(0)}
                                           </AvatarFallback>

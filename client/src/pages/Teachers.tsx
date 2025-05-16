@@ -432,12 +432,13 @@ export default function Teachers() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center justify-center">
                         <Avatar className="h-9 w-9">
-                          <AvatarFallback>
+                          <AvatarFallback className="bg-[#1e3a8a] text-white">
                             {teacher.firstName.charAt(0)}{teacher.lastName.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">{teacher.firstName} {teacher.lastName}</div>
+                          <div className="text-xs text-gray-500">ID: {teacher.teacherId}</div>
                         </div>
                       </div>
                     </td>

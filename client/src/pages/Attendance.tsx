@@ -593,7 +593,7 @@ export default function Attendance() {
         {/* Student Attendance Tab Content */}
         <TabsContent value="students" className="mt-0">
           {/* Mark All Buttons for Students */}
-          {selectedCourse && (
+          {(selectedCourse || selectedClass) && (
             <div className="flex flex-wrap gap-2 mb-4">
               <Button onClick={() => handleMarkAll('present')} variant="outline" className="flex items-center">
                 <CheckCircle className="h-4 w-4 mr-1 text-green-500" />
@@ -602,6 +602,10 @@ export default function Attendance() {
               <Button onClick={() => handleMarkAll('absent')} variant="outline" className="flex items-center">
                 <XCircle className="h-4 w-4 mr-1 text-red-500" />
                 Allen afwezig
+              </Button>
+              <Button onClick={() => handleMarkAll('late')} variant="outline" className="flex items-center">
+                <Clock className="h-4 w-4 mr-1 text-yellow-500" />
+                Allen te laat
               </Button>
               <Button onClick={handleSaveStudentAttendance} 
                 disabled={saveStudentAttendanceMutation.isPending} 
@@ -628,7 +632,7 @@ export default function Attendance() {
           )}
 
           {/* Student attendance list */}
-          {!isLoadingStudentAttendance && !isErrorStudentAttendance && selectedCourse && (
+          {!isLoadingStudentAttendance && !isErrorStudentAttendance && (selectedCourse || selectedClass) && (
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -655,7 +659,9 @@ export default function Attendance() {
                     {students.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                          Geen studenten gevonden voor deze cursus/datum.
+                          {selectedType === 'vak' 
+                            ? 'Geen studenten gevonden voor dit vak/datum.'
+                            : 'Geen studenten gevonden voor deze klas/datum.'}
                         </td>
                       </tr>
                     ) : (
@@ -785,10 +791,14 @@ export default function Attendance() {
             </div>
           )}
           
-          {!isLoadingTeacherAttendance && !isErrorTeacherAttendance && selectedCourse && (
+          {!isLoadingTeacherAttendance && !isErrorTeacherAttendance && (selectedCourse || selectedClass) && (
             <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <h3 className="text-lg font-medium text-gray-800">Uw aanwezigheid voor {session?.courseName}</h3>
+                <h3 className="text-lg font-medium text-gray-800">
+                  {selectedType === 'vak' 
+                    ? `Uw aanwezigheid voor ${session?.courseName}`
+                    : `Uw aanwezigheid voor ${session?.className}`}
+                </h3>
                 <Button 
                   onClick={handleSaveTeacherAttendance} 
                   disabled={saveTeacherAttendanceMutation.isPending}
@@ -818,14 +828,6 @@ export default function Attendance() {
                     >
                       <XCircle className="h-4 w-4 mr-1" />
                       Afwezig
-                    </Button>
-                    <Button 
-                      variant={teacherAttendance === 'replaced' ? 'default' : 'outline'} 
-                      onClick={() => handleTeacherAttendanceChange('replaced')}
-                      className={teacherAttendance === 'replaced' ? 'bg-yellow-600 hover:bg-yellow-700' : ''}
-                    >
-                      <UserPlus className="h-4 w-4 mr-1" />
-                      Vervangen
                     </Button>
                   </div>
                 </div>

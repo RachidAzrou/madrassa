@@ -394,11 +394,11 @@ export default function Programs() {
 
       {/* Add Program Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Nieuw Programma Toevoegen</DialogTitle>
+            <DialogTitle>Vak Toevoegen</DialogTitle>
             <DialogDescription>
-              Vul de programma-informatie in om een nieuw onderwijsprogramma toe te voegen.
+              Vul de onderstaande velden in om een nieuw vak toe te voegen.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmitProgram}>

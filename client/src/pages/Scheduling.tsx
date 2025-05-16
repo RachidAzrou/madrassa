@@ -106,7 +106,7 @@ export default function Scheduling() {
         <div className="flex items-center gap-2">
           <div className="relative">
             <Input
-              placeholder="Zoek roosters..."
+              placeholder="Zoek planning..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full md:w-64 pl-10"
@@ -244,7 +244,7 @@ export default function Scheduling() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
               <div className="text-sm text-gray-500">
-                {isLoading ? 'Laden...' : `Toont ${schedules.length} van ${totalSchedules} roosters`}
+                {isLoading ? 'Laden...' : `Toont ${schedules.length} van ${totalSchedules} planningen`}
               </div>
               <div className="flex space-x-2">
                 <Button variant="outline" size="sm">
@@ -273,19 +273,19 @@ export default function Scheduling() {
                   {isLoading ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
-                        Roosters laden...
+                        Planning laden...
                       </td>
                     </tr>
                   ) : isError ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-4 text-center text-sm text-red-500">
-                        Fout bij het laden van roosters. Probeer het opnieuw.
+                        Fout bij het laden van planning. Probeer het opnieuw.
                       </td>
                     </tr>
                   ) : schedules.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
-                        Geen roosters gevonden met de huidige filters. Probeer je zoekopdracht of filters aan te passen.
+                        Geen planning gevonden met de huidige filters. Probeer je zoekopdracht of filters aan te passen.
                       </td>
                     </tr>
                   ) : (

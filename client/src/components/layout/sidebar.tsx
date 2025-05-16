@@ -6,9 +6,10 @@ import {
   LayoutDashboard,
   Users,
   BookOpen,
-  Building,
+  BookText,
   Calendar,
   ClipboardCheck,
+  Medal,
   BarChart3,
   LogOut,
   Menu,
@@ -163,7 +164,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
               />
               <SidebarLink
                 href="/student-groups"
-                icon={<Users className="h-5 w-5" />}
+                icon={<School className="h-5 w-5" />}
                 label="Klassen"
                 isActive={location.startsWith("/student-groups")}
                 onClick={handleLinkClick}
@@ -185,7 +186,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
               />
               <SidebarLink
                 href="/programs"
-                icon={<Glasses className="h-5 w-5" />}
+                icon={<BookText className="h-5 w-5" />}
                 label="Vakken"
                 isActive={location.startsWith("/programs")}
                 onClick={handleLinkClick}
@@ -222,7 +223,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
               />
               <SidebarLink
                 href="/grading"
-                icon={<GraduationCap className="h-5 w-5" />}
+                icon={<Medal className="h-5 w-5" />}
                 label="Beoordeling"
                 isActive={location.startsWith("/grading")}
                 onClick={handleLinkClick}

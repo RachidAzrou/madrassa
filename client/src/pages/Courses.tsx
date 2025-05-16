@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Eye, Pencil, Trash2, BookOpen, GraduationCap, Glasses } from 'lucide-react';
+import { Search, PlusCircle, Filter, Eye, Pencil, Trash2, BookOpen, GraduationCap, Glasses, Upload, FileText, Calendar, BookMarked, FileUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -56,6 +56,9 @@ export default function Courses() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [uploadType, setUploadType] = useState<'material' | 'assignment' | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [courseFormData, setCourseFormData] = useState({
     name: '',
@@ -493,6 +496,8 @@ export default function Courses() {
                     <TabsTrigger value="details">Details</TabsTrigger>
                     <TabsTrigger value="content">Inhoud</TabsTrigger>
                     <TabsTrigger value="requirements">Vereisten</TabsTrigger>
+                    <TabsTrigger value="materials">Lesmateriaal</TabsTrigger>
+                    <TabsTrigger value="curriculum">Leerplan</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="details">
@@ -583,6 +588,193 @@ export default function Courses() {
                       <p className="text-gray-700 text-sm bg-gray-50 p-4 rounded-md border border-gray-100">
                         {selectedCourse.prerequisites || 'Geen vereisten gespecificeerd'}
                       </p>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="materials">
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex justify-between items-center mb-3">
+                          <h3 className="text-md font-medium">Studiemateriaal</h3>
+                          <Button variant="outline" size="sm" className="text-xs h-8 px-2">
+                            <span className="mr-1">+</span> Toevoegen
+                          </Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="border rounded-md p-4 bg-white">
+                            <div className="flex justify-between">
+                              <div className="flex items-center">
+                                <div className="bg-blue-100 rounded-full p-2 mr-3">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-700">
+                                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+                                  </svg>
+                                </div>
+                                <div>
+                                  <h4 className="font-medium text-sm">Hoofdboek Arabische Grammatica</h4>
+                                  <p className="text-xs text-gray-500">PDF • 4.2 MB</p>
+                                </div>
+                              </div>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                  <polyline points="7 10 12 15 17 10"></polyline>
+                                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          <div className="border rounded-md p-4 bg-white">
+                            <div className="flex justify-between">
+                              <div className="flex items-center">
+                                <div className="bg-purple-100 rounded-full p-2 mr-3">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-700">
+                                    <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <path d="M2 15h10"></path>
+                                    <path d="M9 18l3-3-3-3"></path>
+                                  </svg>
+                                </div>
+                                <div>
+                                  <h4 className="font-medium text-sm">Oefeningen Week 1-5</h4>
+                                  <p className="text-xs text-gray-500">Word • 568 KB</p>
+                                </div>
+                              </div>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                  <polyline points="7 10 12 15 17 10"></polyline>
+                                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="flex justify-between items-center mb-3">
+                          <h3 className="text-md font-medium">Opdrachten en Toetsen</h3>
+                          <Button variant="outline" size="sm" className="text-xs h-8 px-2">
+                            <span className="mr-1">+</span> Toevoegen
+                          </Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="border rounded-md p-4 bg-white">
+                            <div className="flex justify-between">
+                              <div className="flex items-center">
+                                <div className="bg-red-100 rounded-full p-2 mr-3">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-700">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                  </svg>
+                                </div>
+                                <div>
+                                  <h4 className="font-medium text-sm">Halfjaarexamen 2025</h4>
+                                  <p className="text-xs text-gray-500">PDF • 1.3 MB</p>
+                                </div>
+                              </div>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                  <polyline points="7 10 12 15 17 10"></polyline>
+                                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="curriculum">
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex justify-between items-center mb-3">
+                          <h3 className="text-md font-medium">Leerdoelen per periode</h3>
+                          <Button variant="outline" size="sm" className="text-xs h-8 px-2">
+                            <span className="mr-1">+</span> Toevoegen
+                          </Button>
+                        </div>
+                        
+                        <div className="border rounded-md overflow-hidden">
+                          <div className="bg-gray-50 p-3 border-b">
+                            <h4 className="font-medium text-sm">Leerplan overzicht</h4>
+                          </div>
+                          <div className="p-4">
+                            <div className="space-y-4">
+                              <div className="border-l-4 border-blue-500 pl-3 py-1">
+                                <h5 className="font-medium text-sm">Periode 1: Introductie en Basisprincipes</h5>
+                                <p className="text-xs text-gray-600 mt-1">
+                                  Na deze periode kan de student de fundamentele concepten uitleggen en eenvoudige oefeningen zelfstandig uitvoeren.
+                                </p>
+                                <div className="mt-2 flex flex-wrap gap-1">
+                                  <Badge variant="outline" className="text-xs">Basis grammatica</Badge>
+                                  <Badge variant="outline" className="text-xs">Eenvoudige constructies</Badge>
+                                </div>
+                              </div>
+                              
+                              <div className="border-l-4 border-green-500 pl-3 py-1">
+                                <h5 className="font-medium text-sm">Periode 2: Verdieping en Praktijk</h5>
+                                <p className="text-xs text-gray-600 mt-1">
+                                  Student kan na deze periode complexere structuren herkennen en toepassen in praktische situaties.
+                                </p>
+                                <div className="mt-2 flex flex-wrap gap-1">
+                                  <Badge variant="outline" className="text-xs">Gevorderde constructies</Badge>
+                                  <Badge variant="outline" className="text-xs">Praktijkopdrachten</Badge>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="flex justify-between items-center mb-3">
+                          <h3 className="text-md font-medium">In- en uitstroomcriteria</h3>
+                          <Button variant="outline" size="sm" className="text-xs h-8 px-2">
+                            <span className="mr-1">+</span> Bewerken
+                          </Button>
+                        </div>
+                        
+                        <div className="border rounded-md p-4 space-y-4">
+                          <div>
+                            <h4 className="text-sm font-medium mb-2">Instroom (voorkennis)</h4>
+                            <div className="pl-3 border-l-2 border-gray-200">
+                              <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                <li>Basiskennis Arabisch alfabet</li>
+                                <li>Introductiecursus Arabisch afgerond</li>
+                              </ul>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <h4 className="text-sm font-medium mb-2">Doorstroom (vervolgcursussen)</h4>
+                            <div className="pl-3 border-l-2 border-gray-200">
+                              <ul className="text-sm text-gray-600 space-y-1 list-disc pl-4">
+                                <li>Arabisch Conversatie Niveau 2</li>
+                                <li>Arabische Literatuur Inleiding</li>
+                              </ul>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <h4 className="text-sm font-medium mb-2">Uitstroom (eindniveau)</h4>
+                            <div className="pl-3 border-l-2 border-gray-200">
+                              <p className="text-sm text-gray-600">
+                                Na succesvolle afronding kan de student eenvoudige gesprekken voeren over alledaagse onderwerpen en beschikt over
+                                een woordenschat van ongeveer 1000 woorden.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </TabsContent>
                 </Tabs>

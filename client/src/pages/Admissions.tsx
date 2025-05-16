@@ -465,10 +465,11 @@ export default function Admissions() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Alle Programma's</SelectItem>
-                    <SelectItem value="cs">Informatica</SelectItem>
-                    <SelectItem value="bus">Bedrijfskunde</SelectItem>
-                    <SelectItem value="eng">Techniek</SelectItem>
-                    <SelectItem value="arts">Kunst</SelectItem>
+                    {programs.map(program => (
+                      <SelectItem key={program.id} value={program.id.toString()}>
+                        {program.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -547,22 +548,15 @@ export default function Admissions() {
                         Aanmelders laden...
                       </td>
                     </tr>
-                  ) : isError ? (
-                    <tr>
-                      <td colSpan={5} className="px-6 py-4 text-center text-sm text-red-500">
-                        Fout bij het laden van aanmelders. Probeer het opnieuw.
-                      </td>
-                    </tr>
                   ) : applicants.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                        Geen aanmelders gevonden met de huidige filters. Probeer uw zoekopdracht of filters aan te passen.
+                        Geen aanmelders gevonden
                       </td>
                     </tr>
                   ) : (
-                    // Temporary demo data
-                    <>
-                      <tr>
+                    applicants.map((applicant) => (
+                      <tr key={applicant.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <input 
@@ -570,565 +564,741 @@ export default function Admissions() {
                               className="rounded border-gray-300 text-primary focus:ring-primary mr-3"
                             />
                             <div>
-                              <div className="font-medium text-gray-900">Thomas Johnson</div>
-                              <div className="text-sm text-gray-500">thomas.johnson@example.com</div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {applicant.firstName} {applicant.lastName}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {new Date().getFullYear() - new Date(applicant.dateOfBirth).getFullYear()} jaar
+                              </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Computer Science</div>
-                          <div className="text-xs text-gray-500">Bachelor's Degree</div>
+                          <div className="text-sm text-gray-900">{applicant.programName}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {formatDate(applicant.applicationDate)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">12 Apr, 2024</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {getStatusBadge('Pending')}
+                          {getStatusBadge(applicant.status)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                              <span className="sr-only">Approve</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <XCircle className="h-4 w-4 text-red-500" />
-                              <span className="sr-only">Reject</span>
-                            </Button>
-                          </div>
+                          <button 
+                            className="text-blue-600 hover:text-blue-900 mr-3"
+                            onClick={() => handleViewApplicant(applicant)}
+                            title="Bekijken"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                          <button 
+                            className="text-green-600 hover:text-green-900 mr-3"
+                            onClick={() => handleEditApplicant(applicant)}
+                            title="Bewerken"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button 
+                            className="text-red-600 hover:text-red-900"
+                            onClick={() => handleDeleteApplicant(applicant)}
+                            title="Verwijderen"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         </td>
                       </tr>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <input 
-                              type="checkbox" 
-                              className="rounded border-gray-300 text-primary focus:ring-primary mr-3"
-                            />
-                            <div>
-                              <div className="font-medium text-gray-900">Sarah Williams</div>
-                              <div className="text-sm text-gray-500">sarah.williams@example.com</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Business Administration</div>
-                          <div className="text-xs text-gray-500">Master's Degree</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">08 Apr, 2024</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {getStatusBadge('Approved')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Bewerken</span>
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <input 
-                              type="checkbox" 
-                              className="rounded border-gray-300 text-primary focus:ring-primary mr-3"
-                            />
-                            <div>
-                              <div className="font-medium text-gray-900">Michael Brown</div>
-                              <div className="text-sm text-gray-500">michael.brown@example.com</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">Engineering</div>
-                          <div className="text-xs text-gray-500">Bachelor's Degree</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">05 Apr, 2024</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {getStatusBadge('Rejected')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    </>
+                    ))
                   )}
                 </tbody>
               </table>
             </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
-                <div className="flex-1 flex justify-between sm:hidden">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                  </Button>
-                </div>
-                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-gray-700">
-                      Showing <span className="font-medium">{((currentPage - 1) * 10) + 1}</span> to{" "}
-                      <span className="font-medium">
-                        {Math.min(currentPage * 10, totalApplicants)}
-                      </span>{" "}
-                      of <span className="font-medium">{totalApplicants}</span> results
-                    </p>
-                  </div>
-                  <div>
-                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="rounded-l-md"
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                      >
-                        Vorige
-                      </Button>
-                      {Array.from({ length: totalPages }).map((_, i) => (
-                        <Button 
-                          key={i}
-                          variant={currentPage === i + 1 ? "default" : "outline"} 
-                          size="sm"
-                          onClick={() => handlePageChange(i + 1)}
-                        >
-                          {i + 1}
-                        </Button>
-                      ))}
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="rounded-r-md"
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                      >
-                        Volgende
-                      </Button>
-                    </nav>
-                  </div>
-                </div>
+            <div className="bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between">
+              <div className="flex-1 flex justify-between sm:hidden">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  Vorige
+                </button>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  Volgende
+                </button>
               </div>
-            )}
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="admission-programs">
-          <Card>
-            <CardHeader>
-              <CardTitle>Toelatingsprogramma's</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-500 mb-4">
-                Configureer toelatingsprogramma's, vereisten en aanmeldformulieren voor verschillende academische jaren.
-              </p>
-              
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Programmanaam</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Academisch Jaar</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Startdatum</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Einddatum</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">Bachelor Toelating</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">2024-2025</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">01 jan 2024</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">30 jun 2024</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge className="bg-green-100 text-green-800 border-green-200">Actief</Badge>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Bewerken</span>
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">Master Toelating</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">2024-2025</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">01 feb 2024</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">31 jul 2024</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge className="bg-green-100 text-green-800 border-green-200">Actief</Badge>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Bewerken</span>
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">Overstapstudenten</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">2024-2025</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">15 jan 2024</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">15 jul 2024</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge className="bg-green-100 text-green-800 border-green-200">Actief</Badge>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4 text-blue-500" />
-                              <span className="sr-only">Bewerken</span>
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="settings">
-          <Card>
-            <CardHeader>
-              <CardTitle>Toelatingsinstelling</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-500 mb-6">
-                Configureer globale instellingen voor het toelatingsproces, inclusief aanmeldformulieren, vereisten en werkstromen.
-              </p>
-              
-              <div className="space-y-6">
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Aanmeldformulier Instellingen</h3>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Configureer de velden en secties die in het aanmeldformulier verschijnen.
+                  <p className="text-sm text-gray-700">
+                    <span className="font-medium">{currentPage}</span> van <span className="font-medium">{totalPages}</span> pagina's
                   </p>
-                  <Button variant="outline">Aanmeldformulier Aanpassen</Button>
                 </div>
-                
-                <div className="border-t pt-6">
-                  <h3 className="text-lg font-medium mb-2">Documentvereisten</h3>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Specificeer de vereiste documenten voor verschillende programma's en aanmelderstypes.
-                  </p>
-                  <Button variant="outline">Documentvereisten Beheren</Button>
-                </div>
-                
-                <div className="border-t pt-6">
-                  <h3 className="text-lg font-medium mb-2">Goedkeuringsproces</h3>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Definieer het goedkeuringsproces en notificatie-instellingen voor aanmeldingen.
-                  </p>
-                  <Button variant="outline">Goedkeuringsproces Configureren</Button>
-                </div>
-                
-                <div className="border-t pt-6">
-                  <h3 className="text-lg font-medium mb-2">E-mailsjablonen</h3>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Pas de e-mailnotificaties aan die aan aanmelders worden verzonden tijdens het toelatingsproces.
-                  </p>
-                  <Button variant="outline">E-mailsjablonen Bewerken</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Add Application Dialog */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Nieuwe Toelatingsaanvraag</DialogTitle>
-            <DialogDescription>
-              Vul de gegevens in om een nieuwe toelatingsaanvraag aan te maken.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmitApplication}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="firstName" className="text-right mb-1 block">
-                    Voornaam*
-                  </Label>
-                  <Input
-                    id="firstName"
-                    value={applicationFormData.firstName}
-                    onChange={(e) => setApplicationFormData({ 
-                      ...applicationFormData, 
-                      firstName: e.target.value 
+                <div>
+                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                    >
+                      <span className="sr-only">Vorige</span>
+                      &laquo;
+                    </button>
+                    {/* Generate page buttons */}
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const pageNumber = currentPage <= 3 
+                        ? i + 1 
+                        : currentPage >= totalPages - 2 
+                          ? totalPages - 4 + i 
+                          : currentPage - 2 + i;
+                      
+                      if (pageNumber > 0 && pageNumber <= totalPages) {
+                        return (
+                          <button
+                            key={pageNumber}
+                            onClick={() => handlePageChange(pageNumber)}
+                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium
+                            ${pageNumber === currentPage
+                              ? 'z-10 bg-primary text-white border-primary'
+                              : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            {pageNumber}
+                          </button>
+                        );
+                      }
+                      return null;
                     })}
-                    placeholder="Voornaam"
-                    required
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="lastName" className="text-right mb-1 block">
-                    Achternaam*
-                  </Label>
-                  <Input
-                    id="lastName"
-                    value={applicationFormData.lastName}
-                    onChange={(e) => setApplicationFormData({ 
-                      ...applicationFormData, 
-                      lastName: e.target.value 
-                    })}
-                    placeholder="Achternaam"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="email" className="text-right mb-1 block">
-                    E-mailadres*
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={applicationFormData.email}
-                    onChange={(e) => setApplicationFormData({ 
-                      ...applicationFormData, 
-                      email: e.target.value 
-                    })}
-                    placeholder="email@voorbeeld.nl"
-                    required
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="phone" className="text-right mb-1 block">
-                    Telefoonnummer
-                  </Label>
-                  <Input
-                    id="phone"
-                    value={applicationFormData.phone}
-                    onChange={(e) => setApplicationFormData({ 
-                      ...applicationFormData, 
-                      phone: e.target.value 
-                    })}
-                    placeholder="+31 6 12345678"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="dateOfBirth" className="text-right mb-1 block">
-                    Geboortedatum
-                  </Label>
-                  <Input
-                    id="dateOfBirth"
-                    type="date"
-                    value={applicationFormData.dateOfBirth}
-                    onChange={(e) => setApplicationFormData({ 
-                      ...applicationFormData, 
-                      dateOfBirth: e.target.value 
-                    })}
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="program" className="text-right mb-1 block">
-                    Programma*
-                  </Label>
-                  <Select
-                    value={applicationFormData.programId?.toString() || ''}
-                    onValueChange={(value) => setApplicationFormData({ 
-                      ...applicationFormData, 
-                      programId: value ? parseInt(value) : null 
-                    })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecteer programma" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {programs.map((program: any) => (
-                        <SelectItem key={program.id} value={program.id.toString()}>
-                          {program.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="academicYear" className="text-right mb-1 block">
-                    Academisch jaar*
-                  </Label>
-                  <Select
-                    value={applicationFormData.academicYearId?.toString() || ''}
-                    onValueChange={(value) => setApplicationFormData({ 
-                      ...applicationFormData, 
-                      academicYearId: value ? parseInt(value) : null 
-                    })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecteer academisch jaar" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {academicYears.map((year: any) => (
-                        <SelectItem key={year.id} value={year.id.toString()}>
-                          {year.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="status" className="text-right mb-1 block">
-                    Status
-                  </Label>
-                  <Select
-                    value={applicationFormData.status}
-                    onValueChange={(value) => setApplicationFormData({ 
-                      ...applicationFormData, 
-                      status: value 
-                    })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecteer status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Pending">In behandeling</SelectItem>
-                      <SelectItem value="Under Review">In beoordeling</SelectItem>
-                      <SelectItem value="Approved">Goedgekeurd</SelectItem>
-                      <SelectItem value="Rejected">Afgewezen</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="previousEducation" className="text-right mb-1 block">
-                    Vorige opleiding
-                  </Label>
-                  <Textarea
-                    id="previousEducation"
-                    value={applicationFormData.previousEducation}
-                    onChange={(e) => setApplicationFormData({ 
-                      ...applicationFormData, 
-                      previousEducation: e.target.value 
-                    })}
-                    placeholder="Beschrijf je vorige opleiding en behaalde diploma's"
-                    rows={2}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="personalStatement" className="text-right mb-1 block">
-                    Motivatie
-                  </Label>
-                  <Textarea
-                    id="personalStatement"
-                    value={applicationFormData.personalStatement}
-                    onChange={(e) => setApplicationFormData({ 
-                      ...applicationFormData, 
-                      personalStatement: e.target.value 
-                    })}
-                    placeholder="Schrijf een korte motivatie waarom je deze opleiding wilt volgen"
-                    rows={3}
-                  />
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                    >
+                      <span className="sr-only">Volgende</span>
+                      &raquo;
+                    </button>
+                  </nav>
                 </div>
               </div>
             </div>
-            <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setIsAddDialogOpen(false)}
-              >
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="admission-programs" className="space-y-4">
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            <p className="text-gray-500">Toelatingsprogramma's configuratie</p>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="settings" className="space-y-4">
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            <p className="text-gray-500">Toelatingsproces instellingen</p>
+          </div>
+        </TabsContent>
+      </Tabs>
+    
+      {/* Dialoogvenster voor het bekijken van een aanmelding */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="w-[95vw] max-w-[95vw] max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-xl">
+              Aanmeldingsdetails
+              {currentApplicant && (
+                <span className="ml-2 text-sm font-normal text-gray-500">
+                  {currentApplicant.firstName} {currentApplicant.lastName}
+                </span>
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              Bekijk alle details van de aanmelding
+            </DialogDescription>
+          </DialogHeader>
+          
+          {currentApplicant && (
+            <ScrollArea className="flex-1 px-1">
+              <Tabs value={String(currentTabIndex)} onValueChange={(value) => setCurrentTabIndex(Number(value))}>
+                <TabsList className="mb-4">
+                  <TabsTrigger value="0" className="flex items-center">
+                    <User className="w-4 h-4 mr-2" />
+                    Persoonlijk
+                  </TabsTrigger>
+                  <TabsTrigger value="1" className="flex items-center">
+                    <Mail className="w-4 h-4 mr-2" />
+                    Contact
+                  </TabsTrigger>
+                  <TabsTrigger value="2" className="flex items-center">
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Programma
+                  </TabsTrigger>
+                  <TabsTrigger value="3" className="flex items-center">
+                    <Clipboard className="w-4 h-4 mr-2" />
+                    Motivatie
+                  </TabsTrigger>
+                  <TabsTrigger value="4" className="flex items-center">
+                    <Info className="w-4 h-4 mr-2" />
+                    Status
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="0" className="space-y-4 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="view-firstName" className="text-gray-700">Voornaam</Label>
+                      <div id="view-firstName" className="mt-1 p-2 border rounded-md bg-gray-50">{currentApplicant.firstName}</div>
+                    </div>
+                    <div>
+                      <Label htmlFor="view-lastName" className="text-gray-700">Achternaam</Label>
+                      <div id="view-lastName" className="mt-1 p-2 border rounded-md bg-gray-50">{currentApplicant.lastName}</div>
+                    </div>
+                    <div>
+                      <Label htmlFor="view-dateOfBirth" className="text-gray-700">Geboortedatum</Label>
+                      <div id="view-dateOfBirth" className="mt-1 p-2 border rounded-md bg-gray-50">{formatDate(currentApplicant.dateOfBirth)}</div>
+                    </div>
+                    <div>
+                      <Label htmlFor="view-applicationDate" className="text-gray-700">Aanmeldingsdatum</Label>
+                      <div id="view-applicationDate" className="mt-1 p-2 border rounded-md bg-gray-50">{formatDate(currentApplicant.applicationDate)}</div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="1" className="space-y-4 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="view-email" className="text-gray-700">E-mailadres</Label>
+                      <div id="view-email" className="mt-1 p-2 border rounded-md bg-gray-50">{currentApplicant.email}</div>
+                    </div>
+                    <div>
+                      <Label htmlFor="view-phone" className="text-gray-700">Telefoonnummer</Label>
+                      <div id="view-phone" className="mt-1 p-2 border rounded-md bg-gray-50">{currentApplicant.phone}</div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="2" className="space-y-4 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="view-program" className="text-gray-700">Programma</Label>
+                      <div id="view-program" className="mt-1 p-2 border rounded-md bg-gray-50">{currentApplicant.programName}</div>
+                    </div>
+                    <div>
+                      <Label htmlFor="view-academicYear" className="text-gray-700">Academisch Jaar</Label>
+                      <div id="view-academicYear" className="mt-1 p-2 border rounded-md bg-gray-50">{currentApplicant.academicYear}</div>
+                    </div>
+                    <div className="md:col-span-2">
+                      <Label htmlFor="view-previousEducation" className="text-gray-700">Eerdere Opleiding</Label>
+                      <div id="view-previousEducation" className="mt-1 p-2 border rounded-md bg-gray-50 min-h-[100px]">
+                        {currentApplicant.previousEducation || "Geen informatie beschikbaar"}
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="3" className="space-y-4 pt-2">
+                  <div>
+                    <Label htmlFor="view-personalStatement" className="text-gray-700">Persoonlijke Motivatie</Label>
+                    <div id="view-personalStatement" className="mt-1 p-2 border rounded-md bg-gray-50 min-h-[200px]">
+                      {currentApplicant.personalStatement || "Geen informatie beschikbaar"}
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="4" className="space-y-4 pt-2">
+                  <div>
+                    <Label htmlFor="view-status" className="text-gray-700">Huidige Status</Label>
+                    <div id="view-status" className="mt-1 p-2 border rounded-md bg-gray-50">
+                      {getStatusBadge(currentApplicant.status)}
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </ScrollArea>
+          )}
+          
+          <DialogFooter className="mt-6 gap-2">
+            <Button onClick={() => setIsViewDialogOpen(false)} variant="outline">
+              Sluiten
+            </Button>
+            {currentApplicant && (
+              <Button onClick={() => {
+                setIsViewDialogOpen(false);
+                handleEditApplicant(currentApplicant);
+              }}>
+                <Edit className="w-4 h-4 mr-2" />
+                Bewerken
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Dialoogvenster voor het toevoegen/bewerken van een aanmelding */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="w-[95vw] max-w-[95vw] max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Nieuwe Aanmelding</DialogTitle>
+            <DialogDescription>
+              Voeg een nieuwe aanmelding toe aan het systeem
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmitApplication} className="flex-1 flex flex-col">
+            <ScrollArea className="flex-1 px-1">
+              <Tabs value={String(currentTabIndex)} onValueChange={(value) => setCurrentTabIndex(Number(value))}>
+                <TabsList className="mb-4">
+                  <TabsTrigger value="0" className="flex items-center">
+                    <User className="w-4 h-4 mr-2" />
+                    Persoonlijk
+                  </TabsTrigger>
+                  <TabsTrigger value="1" className="flex items-center">
+                    <Mail className="w-4 h-4 mr-2" />
+                    Contact
+                  </TabsTrigger>
+                  <TabsTrigger value="2" className="flex items-center">
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Programma
+                  </TabsTrigger>
+                  <TabsTrigger value="3" className="flex items-center">
+                    <Clipboard className="w-4 h-4 mr-2" />
+                    Motivatie
+                  </TabsTrigger>
+                  <TabsTrigger value="4" className="flex items-center">
+                    <Info className="w-4 h-4 mr-2" />
+                    Status
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="0" className="space-y-4 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="firstName" className="text-gray-700">
+                        Voornaam <span className="text-[#3b5998]">*</span>
+                      </Label>
+                      <Input
+                        id="firstName"
+                        value={applicationFormData.firstName}
+                        onChange={(e) => setApplicationFormData({ ...applicationFormData, firstName: e.target.value })}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="lastName" className="text-gray-700">
+                        Achternaam <span className="text-[#3b5998]">*</span>
+                      </Label>
+                      <Input
+                        id="lastName"
+                        value={applicationFormData.lastName}
+                        onChange={(e) => setApplicationFormData({ ...applicationFormData, lastName: e.target.value })}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="dateOfBirth" className="text-gray-700">Geboortedatum</Label>
+                      <Input
+                        id="dateOfBirth"
+                        type="date"
+                        value={applicationFormData.dateOfBirth}
+                        onChange={(e) => setApplicationFormData({ ...applicationFormData, dateOfBirth: e.target.value })}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="1" className="space-y-4 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="email" className="text-gray-700">
+                        E-mailadres <span className="text-[#3b5998]">*</span>
+                      </Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={applicationFormData.email}
+                        onChange={(e) => setApplicationFormData({ ...applicationFormData, email: e.target.value })}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone" className="text-gray-700">Telefoonnummer</Label>
+                      <Input
+                        id="phone"
+                        value={applicationFormData.phone}
+                        onChange={(e) => setApplicationFormData({ ...applicationFormData, phone: e.target.value })}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="2" className="space-y-4 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="programId" className="text-gray-700">Programma</Label>
+                      <Select
+                        value={applicationFormData.programId?.toString() || ""}
+                        onValueChange={(value) => setApplicationFormData({ ...applicationFormData, programId: Number(value) })}
+                      >
+                        <SelectTrigger id="programId" className="mt-1">
+                          <SelectValue placeholder="Selecteer een programma" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {programs.map((program) => (
+                            <SelectItem key={program.id} value={program.id.toString()}>
+                              {program.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="academicYearId" className="text-gray-700">Academisch Jaar</Label>
+                      <Select
+                        value={applicationFormData.academicYearId?.toString() || ""}
+                        onValueChange={(value) => setApplicationFormData({ ...applicationFormData, academicYearId: Number(value) })}
+                      >
+                        <SelectTrigger id="academicYearId" className="mt-1">
+                          <SelectValue placeholder="Selecteer een academisch jaar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">2025-2026</SelectItem>
+                          <SelectItem value="2">2024-2025</SelectItem>
+                          <SelectItem value="3">2023-2024</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="md:col-span-2">
+                      <Label htmlFor="previousEducation" className="text-gray-700">Eerdere Opleiding</Label>
+                      <Textarea
+                        id="previousEducation"
+                        value={applicationFormData.previousEducation}
+                        onChange={(e) => setApplicationFormData({ ...applicationFormData, previousEducation: e.target.value })}
+                        className="mt-1 min-h-[100px]"
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="3" className="space-y-4 pt-2">
+                  <div>
+                    <Label htmlFor="personalStatement" className="text-gray-700">Persoonlijke Motivatie</Label>
+                    <Textarea
+                      id="personalStatement"
+                      value={applicationFormData.personalStatement}
+                      onChange={(e) => setApplicationFormData({ ...applicationFormData, personalStatement: e.target.value })}
+                      className="mt-1 min-h-[200px]"
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="4" className="space-y-4 pt-2">
+                  <div>
+                    <Label htmlFor="status" className="text-gray-700">Status</Label>
+                    <RadioGroup
+                      value={applicationFormData.status}
+                      onValueChange={(value) => setApplicationFormData({ ...applicationFormData, status: value })}
+                      className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-3"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Pending" id="status-pending" />
+                        <Label htmlFor="status-pending" className="flex items-center">
+                          <Clock className="h-4 w-4 mr-2 text-yellow-600" />
+                          In afwachting
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Approved" id="status-approved" />
+                        <Label htmlFor="status-approved" className="flex items-center">
+                          <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                          Goedgekeurd
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Rejected" id="status-rejected" />
+                        <Label htmlFor="status-rejected" className="flex items-center">
+                          <XCircle className="h-4 w-4 mr-2 text-red-600" />
+                          Afgewezen
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Enrolled" id="status-enrolled" />
+                        <Label htmlFor="status-enrolled" className="flex items-center">
+                          <School className="h-4 w-4 mr-2 text-blue-600" />
+                          Ingeschreven
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </ScrollArea>
+            
+            <DialogFooter className="mt-6 gap-2">
+              <Button type="button" onClick={() => setIsAddDialogOpen(false)} variant="outline">
                 Annuleren
               </Button>
-              <Button 
-                type="submit"
-                disabled={createApplicationMutation.isPending}
-              >
-                {createApplicationMutation.isPending ? 'Bezig met toevoegen...' : 'Aanvraag indienen'}
+              <Button type="submit" disabled={createApplicationMutation.isPending}>
+                {createApplicationMutation.isPending ? "Bezig met toevoegen..." : "Aanmelding toevoegen"}
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Dialoogvenster voor het bewerken van een aanmelding */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="w-[95vw] max-w-[95vw] max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-xl">
+              Aanmelding Bewerken
+              {currentApplicant && (
+                <span className="ml-2 text-sm font-normal text-gray-500">
+                  {currentApplicant.firstName} {currentApplicant.lastName}
+                </span>
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              Wijzig de gegevens van de aanmelding
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleUpdateApplication} className="flex-1 flex flex-col">
+            <ScrollArea className="flex-1 px-1">
+              <Tabs value={String(currentTabIndex)} onValueChange={(value) => setCurrentTabIndex(Number(value))}>
+                <TabsList className="mb-4">
+                  <TabsTrigger value="0" className="flex items-center">
+                    <User className="w-4 h-4 mr-2" />
+                    Persoonlijk
+                  </TabsTrigger>
+                  <TabsTrigger value="1" className="flex items-center">
+                    <Mail className="w-4 h-4 mr-2" />
+                    Contact
+                  </TabsTrigger>
+                  <TabsTrigger value="2" className="flex items-center">
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Programma
+                  </TabsTrigger>
+                  <TabsTrigger value="3" className="flex items-center">
+                    <Clipboard className="w-4 h-4 mr-2" />
+                    Motivatie
+                  </TabsTrigger>
+                  <TabsTrigger value="4" className="flex items-center">
+                    <Info className="w-4 h-4 mr-2" />
+                    Status
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="0" className="space-y-4 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="edit-firstName" className="text-gray-700">
+                        Voornaam <span className="text-[#3b5998]">*</span>
+                      </Label>
+                      <Input
+                        id="edit-firstName"
+                        value={applicationFormData.firstName}
+                        onChange={(e) => setApplicationFormData({ ...applicationFormData, firstName: e.target.value })}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-lastName" className="text-gray-700">
+                        Achternaam <span className="text-[#3b5998]">*</span>
+                      </Label>
+                      <Input
+                        id="edit-lastName"
+                        value={applicationFormData.lastName}
+                        onChange={(e) => setApplicationFormData({ ...applicationFormData, lastName: e.target.value })}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-dateOfBirth" className="text-gray-700">Geboortedatum</Label>
+                      <Input
+                        id="edit-dateOfBirth"
+                        type="date"
+                        value={applicationFormData.dateOfBirth}
+                        onChange={(e) => setApplicationFormData({ ...applicationFormData, dateOfBirth: e.target.value })}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="1" className="space-y-4 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="edit-email" className="text-gray-700">
+                        E-mailadres <span className="text-[#3b5998]">*</span>
+                      </Label>
+                      <Input
+                        id="edit-email"
+                        type="email"
+                        value={applicationFormData.email}
+                        onChange={(e) => setApplicationFormData({ ...applicationFormData, email: e.target.value })}
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-phone" className="text-gray-700">Telefoonnummer</Label>
+                      <Input
+                        id="edit-phone"
+                        value={applicationFormData.phone}
+                        onChange={(e) => setApplicationFormData({ ...applicationFormData, phone: e.target.value })}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="2" className="space-y-4 pt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="edit-programId" className="text-gray-700">Programma</Label>
+                      <Select
+                        value={applicationFormData.programId?.toString() || ""}
+                        onValueChange={(value) => setApplicationFormData({ ...applicationFormData, programId: Number(value) })}
+                      >
+                        <SelectTrigger id="edit-programId" className="mt-1">
+                          <SelectValue placeholder="Selecteer een programma" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {programs.map((program) => (
+                            <SelectItem key={program.id} value={program.id.toString()}>
+                              {program.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-academicYearId" className="text-gray-700">Academisch Jaar</Label>
+                      <Select
+                        value={applicationFormData.academicYearId?.toString() || ""}
+                        onValueChange={(value) => setApplicationFormData({ ...applicationFormData, academicYearId: Number(value) })}
+                      >
+                        <SelectTrigger id="edit-academicYearId" className="mt-1">
+                          <SelectValue placeholder="Selecteer een academisch jaar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">2025-2026</SelectItem>
+                          <SelectItem value="2">2024-2025</SelectItem>
+                          <SelectItem value="3">2023-2024</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="md:col-span-2">
+                      <Label htmlFor="edit-previousEducation" className="text-gray-700">Eerdere Opleiding</Label>
+                      <Textarea
+                        id="edit-previousEducation"
+                        value={applicationFormData.previousEducation}
+                        onChange={(e) => setApplicationFormData({ ...applicationFormData, previousEducation: e.target.value })}
+                        className="mt-1 min-h-[100px]"
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="3" className="space-y-4 pt-2">
+                  <div>
+                    <Label htmlFor="edit-personalStatement" className="text-gray-700">Persoonlijke Motivatie</Label>
+                    <Textarea
+                      id="edit-personalStatement"
+                      value={applicationFormData.personalStatement}
+                      onChange={(e) => setApplicationFormData({ ...applicationFormData, personalStatement: e.target.value })}
+                      className="mt-1 min-h-[200px]"
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="4" className="space-y-4 pt-2">
+                  <div>
+                    <Label htmlFor="edit-status" className="text-gray-700">Status</Label>
+                    <RadioGroup
+                      value={applicationFormData.status}
+                      onValueChange={(value) => setApplicationFormData({ ...applicationFormData, status: value })}
+                      className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-3"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Pending" id="edit-status-pending" />
+                        <Label htmlFor="edit-status-pending" className="flex items-center">
+                          <Clock className="h-4 w-4 mr-2 text-yellow-600" />
+                          In afwachting
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Approved" id="edit-status-approved" />
+                        <Label htmlFor="edit-status-approved" className="flex items-center">
+                          <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                          Goedgekeurd
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Rejected" id="edit-status-rejected" />
+                        <Label htmlFor="edit-status-rejected" className="flex items-center">
+                          <XCircle className="h-4 w-4 mr-2 text-red-600" />
+                          Afgewezen
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Enrolled" id="edit-status-enrolled" />
+                        <Label htmlFor="edit-status-enrolled" className="flex items-center">
+                          <School className="h-4 w-4 mr-2 text-blue-600" />
+                          Ingeschreven
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </ScrollArea>
+            
+            <DialogFooter className="mt-6 gap-2">
+              <Button type="button" onClick={() => setIsEditDialogOpen(false)} variant="outline">
+                Annuleren
+              </Button>
+              <Button type="submit" disabled={updateApplicationMutation.isPending}>
+                {updateApplicationMutation.isPending ? "Bezig met opslaan..." : "Wijzigingen opslaan"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Dialoogvenster voor het verwijderen van een aanmelding */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Aanmelding verwijderen</DialogTitle>
+            <DialogDescription>
+              Weet je zeker dat je deze aanmelding wilt verwijderen? 
+              Deze actie kan niet ongedaan gemaakt worden.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {currentApplicant && (
+              <p className="text-sm text-gray-700">
+                Je staat op het punt om de aanmelding van <strong>{currentApplicant.firstName} {currentApplicant.lastName}</strong> te verwijderen.
+              </p>
+            )}
+          </div>
+          <DialogFooter className="gap-2">
+            <Button onClick={() => setIsDeleteDialogOpen(false)} variant="outline">
+              Annuleren
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              disabled={deleteApplicationMutation.isPending}
+              variant="destructive"
+            >
+              {deleteApplicationMutation.isPending ? "Bezig met verwijderen..." : "Verwijderen"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -1035,8 +1035,13 @@ export default function Students() {
                   placeholder="DD/MM/JJJJ"
                   value={studentFormData.enrollmentDate ? formatDateToDisplayFormat(studentFormData.enrollmentDate) : ''}
                   onChange={(e) => {
+                    setStudentFormData({ ...studentFormData, enrollmentDate: e.target.value });
+                  }}
+                  onBlur={(e) => {
                     const formattedDate = formatDateToDatabaseFormat(e.target.value);
-                    setStudentFormData({ ...studentFormData, enrollmentDate: formattedDate || '' });
+                    if (formattedDate) {
+                      setStudentFormData({ ...studentFormData, enrollmentDate: formattedDate });
+                    }
                   }}
                   className="mt-1"
                 />
@@ -1936,8 +1941,13 @@ export default function Students() {
                             required
                             value={studentFormData.dateOfBirth ? formatDateToDisplayFormat(studentFormData.dateOfBirth) : ''}
                             onChange={(e) => {
+                              setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value });
+                            }}
+                            onBlur={(e) => {
                               const formattedDate = formatDateToDatabaseFormat(e.target.value);
-                              setStudentFormData({ ...studentFormData, dateOfBirth: formattedDate || '' });
+                              if (formattedDate) {
+                                setStudentFormData({ ...studentFormData, dateOfBirth: formattedDate });
+                              }
                             }}
                             className="mt-1 border-gray-200"
                           />

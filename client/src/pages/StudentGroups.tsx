@@ -104,12 +104,12 @@ export default function StudentGroups() {
   const programs = programsData || [];
 
   // Fetch courses for dropdown
-  const { data: coursesData } = useQuery<any[]>({
+  const { data: coursesData } = useQuery<{courses: any[]}>({
     queryKey: ['/api/courses'],
     staleTime: 300000,
   });
 
-  const courses = coursesData || [];
+  const courses = coursesData?.courses || [];
 
   // Mutation for creating a new student group
   const createStudentGroupMutation = useMutation({

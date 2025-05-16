@@ -116,7 +116,7 @@ export default function Students() {
     mutationFn: (data: any) => {
       return apiRequest('/api/students', {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: data
       });
     },
     onSuccess: () => {
@@ -131,7 +131,7 @@ export default function Students() {
     mutationFn: ({ id, data }: { id: string; data: any }) => {
       return apiRequest(`/api/students/${id}`, {
         method: 'PATCH',
-        body: JSON.stringify(data)
+        body: data
       });
     },
     onSuccess: () => {
@@ -159,7 +159,7 @@ export default function Students() {
     mutationFn: (ids: string[]) => {
       return apiRequest('/api/students/batch', {
         method: 'DELETE',
-        body: JSON.stringify({ ids })
+        body: { ids }
       });
     },
     onSuccess: () => {

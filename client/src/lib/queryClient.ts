@@ -11,7 +11,7 @@ export async function apiRequest(
   url: string,
   options?: {
     method?: string;
-    body?: string;
+    body?: any;
   }
 ): Promise<any> {
   const method = options?.method || 'GET';
@@ -20,7 +20,7 @@ export async function apiRequest(
   const res = await fetch(url, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
-    body: data,
+    body: typeof data === 'string' ? data : data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
 

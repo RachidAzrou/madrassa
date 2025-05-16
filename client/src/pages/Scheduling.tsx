@@ -97,7 +97,7 @@ export default function Scheduling() {
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
               <Clock className="h-6 w-6" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Roostering</h1>
+            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Planning</h1>
           </div>
           <p className="text-gray-500 text-sm mt-1 ml-11">
             Beheer cursusroosters, lokalen en lesschema's
@@ -120,7 +120,7 @@ export default function Scheduling() {
             className="bg-primary hover:bg-primary/90 flex items-center"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Rooster Toevoegen</span>
+            <span>Planning Toevoegen</span>
           </Button>
         </div>
       </div>

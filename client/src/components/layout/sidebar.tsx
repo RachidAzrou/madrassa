@@ -221,7 +221,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
               <SidebarLink
                 href="/scheduling"
                 icon={<Clock className="h-5 w-5" />}
-                label="Roostering"
+                label="Planning"
                 isActive={location.startsWith("/scheduling")}
                 onClick={handleLinkClick}
               />

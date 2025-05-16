@@ -296,7 +296,7 @@ export default function Courses() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
-            <Glasses className="h-6 w-6 text-primary mr-3" />
+            <BookOpen className="h-6 w-6 text-primary mr-3" />
             <h1 className="text-2xl font-semibold text-primary">Cursussen</h1>
           </div>
           <p className="text-gray-500 text-sm mt-1 ml-9">

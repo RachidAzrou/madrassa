@@ -178,14 +178,14 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
             <div className="space-y-1.5">
               <SidebarLink
                 href="/courses"
-                icon={<Glasses className="h-5 w-5" />}
+                icon={<BookOpen className="h-5 w-5" />}
                 label="Cursussen"
                 isActive={location.startsWith("/courses")}
                 onClick={handleLinkClick}
               />
               <SidebarLink
                 href="/programs"
-                icon={<Building className="h-5 w-5" />}
+                icon={<Glasses className="h-5 w-5" />}
                 label="Vakken"
                 isActive={location.startsWith("/programs")}
                 onClick={handleLinkClick}

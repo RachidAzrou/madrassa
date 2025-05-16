@@ -518,18 +518,23 @@ export default function Guardians() {
       
       {/* Voogd details dialoog */}
       <Dialog open={!!selectedGuardian} onOpenChange={() => setSelectedGuardian(null)}>
-        <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-primary flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
-              </svg>
-              Voogd Details
-            </DialogTitle>
-            <DialogDescription>
-              Gedetailleerde informatie over {selectedGuardian?.firstName} {selectedGuardian?.lastName}
-            </DialogDescription>
+        <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto bg-gradient-to-b from-white to-blue-50/40">
+          <DialogHeader className="border-b pb-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M3 8a13 13 0 0 1 18 0"></path>
+                  <path d="M21 8a13 13 0 0 0-18 0"></path>
+                </svg>
+              </div>
+              <div>
+                <DialogTitle className="text-primary text-xl font-bold">Voogd Details</DialogTitle>
+                <DialogDescription className="text-gray-500">
+                  Gedetailleerde informatie over {selectedGuardian?.firstName} {selectedGuardian?.lastName}
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
           
           {selectedGuardian && (

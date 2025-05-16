@@ -596,8 +596,16 @@ export default function Courses() {
                       <div>
                         <div className="flex justify-between items-center mb-3">
                           <h3 className="text-md font-medium">Studiemateriaal</h3>
-                          <Button variant="outline" size="sm" className="text-xs h-8 px-2">
-                            <span className="mr-1">+</span> Toevoegen
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-xs h-8 px-2"
+                            onClick={() => {
+                              setUploadType('material');
+                              setIsUploadDialogOpen(true);
+                            }}
+                          >
+                            <FileUp className="h-3 w-3 mr-1" /> Toevoegen
                           </Button>
                         </div>
                         
@@ -656,8 +664,16 @@ export default function Courses() {
                       <div>
                         <div className="flex justify-between items-center mb-3">
                           <h3 className="text-md font-medium">Opdrachten en Toetsen</h3>
-                          <Button variant="outline" size="sm" className="text-xs h-8 px-2">
-                            <span className="mr-1">+</span> Toevoegen
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-xs h-8 px-2"
+                            onClick={() => {
+                              setUploadType('assignment');
+                              setIsUploadDialogOpen(true);
+                            }}
+                          >
+                            <FileText className="h-3 w-3 mr-1" /> Toevoegen
                           </Button>
                         </div>
                         
@@ -1077,6 +1093,82 @@ export default function Courses() {
                 </svg>
               )}
               Verwijderen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Bestand upload dialog */}
+      <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">
+              {uploadType === 'material' ? 'Lesmateriaal toevoegen' : 'Opdracht of toets toevoegen'}
+            </DialogTitle>
+            <DialogDescription>
+              Upload een bestand om toe te voegen aan de cursus
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fileTitle">Titel</Label>
+              <Input id="fileTitle" placeholder="Voer een titel in voor dit bestand" />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="fileDescription">Beschrijving (optioneel)</Label>
+              <Textarea id="fileDescription" placeholder="Geef een korte beschrijving van dit bestand" className="resize-none h-20" />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="fileType">Bestandstype</Label>
+              <Select defaultValue="pdf">
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecteer bestandstype" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pdf">PDF Document</SelectItem>
+                  <SelectItem value="doc">Word Document</SelectItem>
+                  <SelectItem value="ppt">PowerPoint Presentatie</SelectItem>
+                  <SelectItem value="xls">Excel Werkblad</SelectItem>
+                  <SelectItem value="other">Ander bestandstype</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="border-2 border-dashed rounded-md p-6 text-center cursor-pointer hover:bg-gray-50 transition-colors"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"
+              />
+              <Upload className="h-10 w-10 text-gray-400 mx-auto mb-2" />
+              <p className="text-sm font-medium">Klik om een bestand te kiezen of sleep het hier naartoe</p>
+              <p className="text-xs text-gray-500 mt-1">PDF, Word, PowerPoint, Excel tot 10MB</p>
+            </div>
+            
+            <div className="bg-blue-50 p-3 rounded-md flex items-center">
+              <div className="bg-blue-100 rounded-full p-2 mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+              </div>
+              <div className="text-sm text-blue-700">
+                Bestanden worden geüpload naar de cursus en zijn zichtbaar voor alle studenten die zijn ingeschreven.
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setIsUploadDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button type="button">
+              Uploaden
             </Button>
           </DialogFooter>
         </DialogContent>

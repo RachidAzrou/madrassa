@@ -11,7 +11,7 @@ import {
   BookText,
   Calendar,
   ClipboardCheck,
-  Medal,
+  Calculator,
   BarChart3,
   LogOut,
   Menu,
@@ -249,8 +249,8 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
               />
               <SidebarLink
                 href="/grading"
-                icon={<Medal className="h-5 w-5" />}
-                label="Beoordeling"
+                icon={<Calculator className="h-5 w-5" />}
+                label="Cijfers"
                 isActive={location.startsWith("/grading")}
                 onClick={handleLinkClick}
               />

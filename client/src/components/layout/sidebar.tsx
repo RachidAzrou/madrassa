@@ -117,15 +117,18 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
       )}
     >
       {/* Logo and header */}
-      <div className="flex items-center justify-between px-4 py-5 border-b border-gray-200">
-        <div className="flex items-center space-x-2">
-          <Link href="/">
-            <div className="flex items-center space-x-2">
-              <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8" />
-              <span className="sr-only">myMadrassa</span>
-            </div>
-          </Link>
-        </div>
+      <div className="flex items-center justify-center px-2 pt-4 pb-3 border-b border-gray-200">
+        <Link href="/">
+          <div className="w-full flex items-center justify-center">
+            <img 
+              src={myMadrassaLogo} 
+              alt="myMadrassa Logo" 
+              className="w-[90%] object-contain" 
+              style={{ maxHeight: "40px" }}
+            />
+            <span className="sr-only">myMadrassa</span>
+          </div>
+        </Link>
         {isMobile && (
           <button 
             onClick={onClose} 

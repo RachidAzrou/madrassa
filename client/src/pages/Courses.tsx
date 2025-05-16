@@ -122,7 +122,8 @@ export default function Courses() {
   const courses = coursesResponse?.courses || [];
   const totalCourses = coursesResponse?.totalCount || 0;
   const totalPages = Math.ceil(totalCourses / itemsPerPage);
-  const programs = programsData || [];
+  // Zorg ervoor dat programsData een array is
+  const programs = Array.isArray(programsData) ? programsData : [];
 
   // Create course mutation
   const createCourseMutation = useMutation({

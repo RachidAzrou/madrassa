@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   Search, Download, Filter, CheckCircle, XCircle, Clock, 
   ArrowLeft, ArrowRight, Save, User, UserPlus, MessageSquare, 
-  AlertCircle, UserCheck 
+  AlertCircle, UserCheck, ClipboardCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

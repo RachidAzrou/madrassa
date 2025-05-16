@@ -851,10 +851,19 @@ export default function Cijfers() {
                                     </TableCell>
                                     <TableCell>
                                       <div className="flex items-center space-x-3">
-                                        <Progress value={behaviorScore * 20} className="w-24 h-3" />
-                                        <span className="text-sm font-medium">
-                                          {behaviorScore}/5
-                                        </span>
+                                        {/* Bereken score op basis van afwezigheid en te laat */}
+                                        {(() => {
+                                          // Bereken de score direct in de render functie zodat deze altijd actueel is
+                                          const calculatedScore = calculatePunctualityScore(absentCount, lateCount);
+                                          return (
+                                            <>
+                                              <Progress value={calculatedScore * 20} className="w-24 h-3" />
+                                              <span className="text-sm font-medium">
+                                                {calculatedScore}/5
+                                              </span>
+                                            </>
+                                          );
+                                        })()}
                                       </div>
                                     </TableCell>
                                     <TableCell>
@@ -869,7 +878,7 @@ export default function Cijfers() {
                                     </TableCell>
                                     <TableCell>
                                       <Select 
-                                        value={behaviorScore.toString()} 
+                                        value={behaviorScore.toString() || calculatePunctualityScore(absentCount, lateCount).toString()} 
                                         onValueChange={(value) => handleBehaviorScoreChange(student.id, value)}
                                       >
                                         <SelectTrigger className="w-20 border-gray-300 focus:border-blue-500">

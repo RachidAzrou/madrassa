@@ -2366,62 +2366,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const courses = await storage.getCourses();
       const programs = await storage.getPrograms();
       const enrollments = await storage.getEnrollments();
-      const teachers = await storage.getTeachers();
-      const studentGroups = await storage.getStudentGroups();
       
       // Bereken statistieken
       const totalStudents = students.length;
       const activeCourses = courses.length;
       const activePrograms = programs.length;
       const totalEnrollments = enrollments.length;
-      const totalTeachers = teachers.length;
-      const totalStudentGroups = studentGroups.length;
       
       // Stuur response
       res.json({
         totalStudents,
         activeCourses,
         activePrograms,
-        totalEnrollments,
-        totalTeachers,
-        studentGroups: totalStudentGroups
+        totalEnrollments
       });
     } catch (error) {
       res.status(500).json({ message: "Error fetching dashboard stats" });
     }
   });
   
-  apiRouter.get("/api/dashboard/students-by-group", async (_req, res) => {
+  apiRouter.get("/api/dashboard/enrollment", async (_req, res) => {
     try {
-      // Haal alle studentgroepen op
-      const studentGroups = await storage.getStudentGroups();
+      // Voor demo-doeleinden genereren we gesimuleerde data
+      // In productie zou dit uit de database komen
+      const enrollmentTrend = [
+        { month: "Jan", count: 12 },
+        { month: "Feb", count: 15 },
+        { month: "Mar", count: 21 },
+        { month: "Apr", count: 18 },
+        { month: "Mei", count: 24 },
+        { month: "Jun", count: 22 },
+        { month: "Jul", count: 16 },
+        { month: "Aug", count: 14 },
+        { month: "Sep", count: 30 },
+        { month: "Okt", count: 26 },
+        { month: "Nov", count: 19 },
+        { month: "Dec", count: 10 }
+      ];
       
-      // Als er geen groepen zijn, maak dan enkele voorbeeldgegevens aan
-      if (studentGroups.length === 0) {
-        res.json([
-          { groupName: "Groep A", studentCount: 0 }
-        ]);
-        return;
-      }
-      
-      // Voor elke groep, haal de inschrijvingen op
-      const studentsPerGroup = await Promise.all(
-        studentGroups.map(async (group) => {
-          // Inschrijvingen tellen voor deze groep
-          const enrollments = await storage.getStudentGroupEnrollmentsByGroup(group.id);
-          
-          return {
-            groupId: group.id,
-            groupName: group.name,
-            studentCount: enrollments.length
-          };
-        })
-      );
-      
-      res.json(studentsPerGroup);
+      res.json({ enrollmentTrend });
     } catch (error) {
-      console.error("Error fetching students by group:", error);
-      res.status(500).json({ message: "Error fetching students by group data" });
+      res.status(500).json({ message: "Error fetching enrollment trend" });
     }
   });
   

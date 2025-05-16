@@ -11,7 +11,7 @@ import Courses from "@/pages/Courses";
 import Programs from "@/pages/Programs";
 import Calendar from "@/pages/Calendar";
 import Attendance from "@/pages/Attendance";
-import Grading from "@/pages/Cijfers";
+import Cijfers from "@/pages/Cijfers";
 import Reports from "@/pages/Reports";
 import Guardians from "@/pages/Guardians";
 import Teachers from "@/pages/Teachers";
@@ -38,7 +38,7 @@ function Router() {
         <Route path="/scheduling" component={Scheduling} />
         <Route path="/calendar" component={Calendar} />
         <Route path="/attendance" component={Attendance} />
-        <Route path="/grading" component={Grading} />
+        <Route path="/grading" component={Cijfers} />
         <Route path="/fees" component={Fees} />
         <Route path="/reports" component={Reports} />
         <Route path="/settings" component={Settings} />

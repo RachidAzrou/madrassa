@@ -48,6 +48,7 @@ type StudentType = {
 export default function Guardians() {
   // States
   const [searchTerm, setSearchTerm] = useState('');
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
@@ -636,12 +637,22 @@ export default function Guardians() {
                 </div>
               </TabsContent>
               
-              <TabsContent value="students" className="space-y-4">
-                <div className="space-y-2">
-                  <h3 className="text-md font-medium mb-2">Studenten toewijzen</h3>
-                  <p className="text-sm text-gray-500 mb-4">
+              <TabsContent value="students" className="space-y-4 pt-4">
+                <div className="space-y-4">
+                  <h3 className="text-md font-medium">Studenten toewijzen</h3>
+                  <p className="text-sm text-gray-500">
                     Selecteer de studenten die aan deze voogd moeten worden toegewezen.
                   </p>
+                  
+                  <div className="relative">
+                    <Input
+                      placeholder="Zoek studenten..."
+                      value={studentSearchTerm}
+                      onChange={(e) => setStudentSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  </div>
                   
                   {isLoadingAllStudents ? (
                     <div className="flex justify-center my-4">
@@ -653,16 +664,22 @@ export default function Guardians() {
                     </div>
                   ) : (
                     <div className="border rounded-md divide-y">
-                      {allStudents.map((student: StudentType) => (
-                        <div key={student.id} className="p-3 flex items-center justify-between hover:bg-gray-50">
-                          <div className="flex items-center">
-                            <Checkbox 
-                              id={`student-${student.id}`}
-                              checked={selectedStudentIds.includes(student.id)}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setSelectedStudentIds([...selectedStudentIds, student.id]);
-                                } else {
+                      {allStudents
+                        .filter((student: StudentType) => 
+                          studentSearchTerm === '' || 
+                          `${student.firstName} ${student.lastName}`.toLowerCase().includes(studentSearchTerm.toLowerCase()) ||
+                          student.studentId.toLowerCase().includes(studentSearchTerm.toLowerCase())
+                        )
+                        .map((student: StudentType) => (
+                          <div key={student.id} className="p-3 flex items-center justify-between hover:bg-gray-50">
+                            <div className="flex items-center">
+                              <Checkbox 
+                                id={`student-${student.id}`}
+                                checked={selectedStudentIds.includes(student.id)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedStudentIds([...selectedStudentIds, student.id]);
+                                  } else {
                                   setSelectedStudentIds(selectedStudentIds.filter(id => id !== student.id));
                                 }
                               }}

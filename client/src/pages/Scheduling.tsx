@@ -246,7 +246,7 @@ export default function Scheduling() {
       </div>
 
       {/* Dashboard Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center">
@@ -254,8 +254,8 @@ export default function Scheduling() {
                 <Calendar className="h-6 w-6 text-blue-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Totaal Lessen</p>
-                <p className="text-2xl font-semibold">458</p>
+                <p className="text-sm font-medium text-gray-500">Lessen Vandaag</p>
+                <p className="text-2xl font-semibold">12</p>
               </div>
             </div>
           </CardContent>
@@ -264,11 +264,11 @@ export default function Scheduling() {
           <CardContent className="p-4">
             <div className="flex items-center">
               <div className="p-2 bg-green-50 rounded-full mr-4">
-                <Users className="h-6 w-6 text-green-500" />
+                <GraduationCap className="h-6 w-6 text-green-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Actieve Lokalen</p>
-                <p className="text-2xl font-semibold">24</p>
+                <p className="text-sm font-medium text-gray-500">Docenten Aanwezig</p>
+                <p className="text-2xl font-semibold">8</p>
               </div>
             </div>
           </CardContent>
@@ -277,11 +277,25 @@ export default function Scheduling() {
           <CardContent className="p-4">
             <div className="flex items-center">
               <div className="p-2 bg-purple-50 rounded-full mr-4">
-                <Repeat className="h-6 w-6 text-purple-500" />
+                <Building className="h-6 w-6 text-purple-500" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Wekelijkse Lessen</p>
-                <p className="text-2xl font-semibold">187</p>
+                <p className="text-sm font-medium text-gray-500">Beschikbare Lokalen</p>
+                <p className="text-2xl font-semibold">5</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center">
+              <div className="p-2 bg-amber-50 rounded-full mr-4">
+                <Clock className="h-6 w-6 text-amber-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Volgende Les</p>
+                <p className="text-xl font-semibold">14:30</p>
+                <p className="text-xs text-gray-400">Arabische Taal - Lokaal B201</p>
               </div>
             </div>
           </CardContent>
@@ -295,16 +309,143 @@ export default function Scheduling() {
         </TabsList>
         
         <TabsContent value="room-allocation">
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-            <h3 className="text-lg font-medium text-gray-700">Lokalentoewijzing</h3>
-            <p className="mt-2 text-gray-500">Bekijk en beheer lokaalverdeling en apparatuur</p>
+          <div className="grid grid-cols-1 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Lokalentoewijzing</CardTitle>
+                <div className="flex gap-2">
+                  <Select defaultValue="all">
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Filter op gebouw" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Alle gebouwen</SelectItem>
+                      <SelectItem value="a">Gebouw A</SelectItem>
+                      <SelectItem value="b">Gebouw B</SelectItem>
+                      <SelectItem value="c">Gebouw C</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button variant="outline" size="icon">
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-md border">
+                  <div className="grid grid-cols-5 bg-slate-50 p-3 text-xs font-medium">
+                    <div>Lokaal</div>
+                    <div>Capaciteit</div>
+                    <div>Status</div>
+                    <div>Huidig gebruik</div>
+                    <div className="text-right">Acties</div>
+                  </div>
+                  <div className="divide-y">
+                    <div className="grid grid-cols-5 items-center p-3">
+                      <div className="font-medium">A101</div>
+                      <div>30 personen</div>
+                      <div><Badge className="bg-green-100 text-green-800 hover:bg-green-100">Beschikbaar</Badge></div>
+                      <div>-</div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-5 items-center p-3">
+                      <div className="font-medium">B201</div>
+                      <div>25 personen</div>
+                      <div><Badge className="bg-red-100 text-red-800 hover:bg-red-100">Bezet</Badge></div>
+                      <div>Arabische Taal (14:30-16:00)</div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-5 items-center p-3">
+                      <div className="font-medium">C305</div>
+                      <div>45 personen</div>
+                      <div><Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Gereserveerd</Badge></div>
+                      <div>Fiqh (vanaf 16:15)</div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
         
         <TabsContent value="instructor-schedule">
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-            <h3 className="text-lg font-medium text-gray-700">Docentenrooster</h3>
-            <p className="mt-2 text-gray-500">Bekijk en beheer docentenschema's en beschikbaarheid</p>
+          <div className="grid grid-cols-1 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Docentenrooster</CardTitle>
+                <div className="flex gap-2">
+                  <Select defaultValue="today">
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Filter op datum" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="today">Vandaag</SelectItem>
+                      <SelectItem value="week">Deze week</SelectItem>
+                      <SelectItem value="month">Deze maand</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button variant="outline" size="icon">
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-md border">
+                  <div className="grid grid-cols-6 bg-slate-50 p-3 text-xs font-medium">
+                    <div>Docent</div>
+                    <div>Vak</div>
+                    <div>Klas</div>
+                    <div>Tijd</div>
+                    <div>Lokaal</div>
+                    <div className="text-right">Acties</div>
+                  </div>
+                  <div className="divide-y">
+                    <div className="grid grid-cols-6 items-center p-3">
+                      <div className="font-medium">Mohammed Youssef</div>
+                      <div>Arabische Taal</div>
+                      <div>Klas 2B</div>
+                      <div>14:30 - 16:00</div>
+                      <div>B201</div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-6 items-center p-3">
+                      <div className="font-medium">Ahmed Hassan</div>
+                      <div>Fiqh</div>
+                      <div>Klas 3C</div>
+                      <div>16:15 - 17:45</div>
+                      <div>C305</div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-6 items-center p-3">
+                      <div className="font-medium">Fatima Al-Zahra</div>
+                      <div>Koranwetenschappen</div>
+                      <div>Klas 1A</div>
+                      <div>09:00 - 10:30</div>
+                      <div>A101</div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
       </Tabs>

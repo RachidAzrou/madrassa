@@ -59,10 +59,18 @@ interface AttendanceSession {
   id: string;
   courseId: string;
   courseName: string;
+  classId?: string;
+  className?: string;
   date: string;
 }
 
 interface Course {
+  id: number;
+  name: string;
+  code: string;
+}
+
+interface Class {
   id: number;
   name: string;
   code: string;
@@ -79,6 +87,7 @@ export default function Attendance() {
   // Algemene state
   const [selectedTab, setSelectedTab] = useState<'students' | 'teachers'>('students');
   const [selectedCourse, setSelectedCourse] = useState('');
+  const [selectedClass, setSelectedClass] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   
   // Student aanwezigheid state
@@ -99,6 +108,14 @@ export default function Attendance() {
   });
 
   const courses: Course[] = coursesData?.courses || [];
+  
+  // Fetch classes for dropdown
+  const { data: classesData } = useQuery<Class[]>({
+    queryKey: ['/api/student-groups'],
+    staleTime: 300000,
+  });
+  
+  const classes: Class[] = classesData || [];
   
   // Fetch teachers for replacement dropdown
   const { data: teachersData } = useQuery<{ teachers: Teacher[], totalCount: number }>({

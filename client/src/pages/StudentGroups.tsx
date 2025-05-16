@@ -835,24 +835,10 @@ export default function StudentGroups() {
                             </tr>
                           </thead>
                           <tbody className="divide-y">
-                            <tr className="hover:bg-gray-50 text-sm">
-                              <td className="px-2 py-3">S001</td>
-                              <td className="px-2 py-3">
-                                <div className="flex items-center">
-                                  <Avatar className="h-7 w-7 mr-2">
-                                    <AvatarFallback>ZM</AvatarFallback>
-                                  </Avatar>
-                                  <span>Zaina El-Mouden</span>
-                                </div>
-                              </td>
-                              <td className="px-2 py-3">zaina@example.com</td>
-                              <td className="px-2 py-3">
-                                <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50">Actief</Badge>
-                              </td>
-                              <td className="px-2 py-3">
-                                <Button type="button" variant="ghost" size="sm">
-                                  <Plus className="h-4 w-4" />
-                                </Button>
+                            {/* Studenten zullen hier dynamisch geladen worden */}
+                            <tr className="text-center h-16">
+                              <td colSpan={5} className="text-gray-500 text-sm">
+                                Zoek studenten om toe te voegen aan de klas
                               </td>
                             </tr>
                           </tbody>
@@ -921,24 +907,10 @@ export default function StudentGroups() {
                             </tr>
                           </thead>
                           <tbody className="divide-y">
-                            <tr className="hover:bg-gray-50 text-sm">
-                              <td className="px-2 py-3">T001</td>
-                              <td className="px-2 py-3">
-                                <div className="flex items-center">
-                                  <Avatar className="h-7 w-7 mr-2">
-                                    <AvatarFallback>AK</AvatarFallback>
-                                  </Avatar>
-                                  <span>Ahmed Khalid</span>
-                                </div>
-                              </td>
-                              <td className="px-2 py-3">Arabisch, Fiqh</td>
-                              <td className="px-2 py-3">
-                                <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50">Actief</Badge>
-                              </td>
-                              <td className="px-2 py-3">
-                                <Button type="button" variant="ghost" size="sm">
-                                  <Plus className="h-4 w-4" />
-                                </Button>
+                            {/* Docenten zullen hier dynamisch geladen worden */}
+                            <tr className="text-center h-16">
+                              <td colSpan={5} className="text-gray-500 text-sm">
+                                Zoek docenten om toe te voegen aan de klas
                               </td>
                             </tr>
                           </tbody>
@@ -1014,19 +986,9 @@ export default function StudentGroups() {
                           <div className="border rounded-md p-3">
                             <h5 className="font-medium mb-2">Lesrooster</h5>
                             <div className="space-y-2">
-                              <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                                <div>
-                                  <p className="font-medium">Arabisch</p>
-                                  <p className="text-xs text-gray-500">Zaterdag 10:00 - 12:00</p>
-                                </div>
-                                <Badge>2 uur / week</Badge>
-                              </div>
-                              <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                                <div>
-                                  <p className="font-medium">Fiqh</p>
-                                  <p className="text-xs text-gray-500">Zondag 13:00 - 15:00</p>
-                                </div>
-                                <Badge>2 uur / week</Badge>
+                              {/* Lesrooster items zullen hier dynamisch geladen worden */}
+                              <div className="text-center text-gray-500 p-3">
+                                <p className="text-sm">Er zijn nog geen vakken toegevoegd aan het rooster</p>
                               </div>
                             </div>
                             <Button type="button" variant="outline" size="sm" className="mt-3 w-full">
@@ -1193,19 +1155,9 @@ export default function StudentGroups() {
                       </div>
                       <div className="p-4">
                         <div className="space-y-2">
-                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                            <div>
-                              <p className="font-medium">Tentamen Arabisch</p>
-                              <p className="text-xs text-gray-500">18-12-2024</p>
-                            </div>
-                            <Badge variant="outline" className="bg-blue-50 text-blue-700">Tentamen</Badge>
-                          </div>
-                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
-                            <div>
-                              <p className="font-medium">Wintervakantie</p>
-                              <p className="text-xs text-gray-500">23-12-2024 tot 05-01-2025</p>
-                            </div>
-                            <Badge variant="outline" className="bg-green-50 text-green-700">Vakantie</Badge>
+                          {/* Belangrijke datums zullen hier dynamisch geladen worden */}
+                          <div className="text-center text-gray-500 p-3">
+                            <p className="text-sm">Er zijn nog geen belangrijke datums toegevoegd</p>
                           </div>
                         </div>
                         <Button type="button" variant="outline" size="sm" className="mt-3 w-full">

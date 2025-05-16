@@ -560,7 +560,7 @@ export default function Cijfers() {
                 <div className="w-full md:w-auto max-w-md">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
                   <Select value={selectedClass} onValueChange={handleClassChange}>
-                    <SelectTrigger className="w-full md:w-[250px] bg-blue-900/10 border-0 focus:ring-1 focus:ring-[#1e3a8a] focus:ring-offset-0">
+                    <SelectTrigger className="w-full md:w-[250px]">
                       <SelectValue placeholder="Selecteer een klas" />
                     </SelectTrigger>
                     <SelectContent>
@@ -877,7 +877,7 @@ export default function Cijfers() {
                                         value={behaviorScore.toString()} 
                                         onValueChange={(value) => handleBehaviorScoreChange(student.id, value)}
                                       >
-                                        <SelectTrigger className="w-20 bg-blue-900/10 border-0 focus:ring-1 focus:ring-[#1e3a8a] focus:ring-offset-0">
+                                        <SelectTrigger className="w-20 border-gray-300 focus:border-blue-500">
                                           <SelectValue placeholder="Score" />
                                         </SelectTrigger>
                                         <SelectContent>

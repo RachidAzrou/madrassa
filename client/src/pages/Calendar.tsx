@@ -654,6 +654,18 @@ export default function Calendar() {
                   </h3>
                 </TabsContent>
                 
+                {/* Beschrijving veld */}
+                <div className="space-y-2">
+                  <Label htmlFor="description">Beschrijving</Label>
+                  <Textarea
+                    id="description"
+                    value={newEvent.description}
+                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                    placeholder="Optionele beschrijving"
+                    rows={3}
+                  />
+                </div>
+                
                 {/* Herhalingsopties - beschikbaar voor alle evenementtypes */}
                 <div className="space-y-4 pt-4 border-t">
                   <h3 className="text-lg font-medium flex items-center mb-2">
@@ -705,17 +717,6 @@ export default function Calendar() {
                       </div>
                     </div>
                   )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="description">Beschrijving</Label>
-                  <Textarea
-                    id="description"
-                    value={newEvent.description}
-                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                    placeholder="Optionele beschrijving"
-                    rows={3}
-                  />
                 </div>
                 
                 <DialogFooter className="pt-4">

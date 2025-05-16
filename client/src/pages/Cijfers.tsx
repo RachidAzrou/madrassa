@@ -553,7 +553,7 @@ export default function Cijfers() {
               }}
             >
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-                <TabsList className="grid w-full max-w-md grid-cols-2 p-1 bg-blue-50">
+                <TabsList className="grid w-full max-w-md grid-cols-2 p-1 bg-blue-900/10">
                   <TabsTrigger value="grades" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Cijfers</TabsTrigger>
                   <TabsTrigger value="behavior" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Gedragsbeoordelingen</TabsTrigger>
                 </TabsList>
@@ -624,7 +624,7 @@ export default function Cijfers() {
                         <Table className="border-collapse">
                           <TableHeader>
                             <TableRow className="bg-gray-50">
-                              <TableHead className="w-[240px] bg-blue-50 sticky left-0 z-10 border-r border-gray-200">Student</TableHead>
+                              <TableHead className="w-[240px] bg-blue-900/5 sticky left-0 z-10 border-r border-gray-200">Student</TableHead>
                               {courses.map((course: any) => (
                                 <TableHead key={course.id} className="text-center px-6 min-w-[120px]">
                                   <div className="font-semibold">{course.name}</div>
@@ -642,7 +642,7 @@ export default function Cijfers() {
                               </TableRow>
                             ) : (
                               filteredStudents.map((student: any) => (
-                                <TableRow key={student.id} className="hover:bg-blue-50/30">
+                                <TableRow key={student.id} className="hover:bg-blue-900/5">
                                   <TableCell className="bg-white sticky left-0 z-10 border-r border-gray-200 shadow-sm">
                                     <div className="flex items-center">
                                       <Avatar className="h-10 w-10 mr-3">
@@ -787,7 +787,7 @@ export default function Cijfers() {
                         <Table className="border-collapse">
                           <TableHeader>
                             <TableRow className="bg-gray-50">
-                              <TableHead className="w-[240px] bg-blue-50 sticky left-0 z-10 border-r border-gray-200">
+                              <TableHead className="w-[240px] bg-blue-900/5 sticky left-0 z-10 border-r border-gray-200">
                                 Student
                               </TableHead>
                               <TableHead className="text-left px-6 min-w-[150px]">
@@ -835,7 +835,7 @@ export default function Cijfers() {
                                 const lateCount = student.lateCount || Math.floor(Math.random() * 8);
                                 
                                 return (
-                                  <TableRow key={student.id} className="hover:bg-blue-50/30">
+                                  <TableRow key={student.id} className="hover:bg-blue-900/5">
                                     <TableCell className="bg-white sticky left-0 z-10 border-r border-gray-200 shadow-sm">
                                       <div className="flex items-center">
                                         <Avatar className="h-10 w-10 mr-3">

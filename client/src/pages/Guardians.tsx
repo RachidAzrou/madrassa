@@ -301,11 +301,21 @@ export default function Guardians() {
       {/* Page Title */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Voogdenbeheer</h1>
-          <p className="text-sm text-gray-500 mt-1">Beheer voogden en hun relaties met studenten</p>
+          <div className="flex items-center">
+            <Users className="h-6 w-6 text-primary mr-3" />
+            <h1 className="text-2xl font-semibold text-primary">Voogden</h1>
+          </div>
+          <p className="text-gray-500 text-sm mt-1 ml-9">
+            Beheer voogden en hun relaties met studenten
+          </p>
         </div>
         <div className="flex flex-col md:flex-row gap-3">
-          <Button onClick={handleAddNewGuardian} className="flex items-center bg-[#3b5998] hover:bg-[#2d4373]">
+          <Button 
+            onClick={handleAddNewGuardian} 
+            variant="default" 
+            size="default" 
+            className="bg-primary hover:bg-primary/90"
+          >
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Voogd Toevoegen</span>
           </Button>

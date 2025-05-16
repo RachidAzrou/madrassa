@@ -396,8 +396,16 @@ export default function Students() {
 
   return (
     <div className="container mx-auto p-4 max-w-7xl">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800">Studenten</h1>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div>
+          <div className="flex items-center">
+            <Users className="h-6 w-6 text-primary mr-3" />
+            <h1 className="text-2xl font-semibold text-primary">Studenten</h1>
+          </div>
+          <p className="text-gray-500 text-sm mt-1 ml-9">
+            Bekijk en beheer alle studentgegevens
+          </p>
+        </div>
         <Button 
           variant="default" 
           size="default" 

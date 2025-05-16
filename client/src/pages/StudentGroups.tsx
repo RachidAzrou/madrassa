@@ -663,11 +663,26 @@ export default function StudentGroups() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <Tabs defaultValue="algemeen" className="w-full">
                 <TabsList className="grid grid-cols-5 w-full">
-                  <TabsTrigger value="algemeen">Algemeen</TabsTrigger>
-                  <TabsTrigger value="studenten">Studenten</TabsTrigger>
-                  <TabsTrigger value="docenten">Docenten</TabsTrigger>
-                  <TabsTrigger value="vakken">Vakken</TabsTrigger>
-                  <TabsTrigger value="planning">Planning</TabsTrigger>
+                  <TabsTrigger value="algemeen" className="flex items-center gap-2">
+                    <School className="h-4 w-4" />
+                    <span>Algemeen</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="studenten" className="flex items-center gap-2">
+                    <UsersRound className="h-4 w-4" />
+                    <span>Studenten</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="docenten" className="flex items-center gap-2">
+                    <GraduationCap className="h-4 w-4" />
+                    <span>Docenten</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="vakken" className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" />
+                    <span>Vakken</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="planning" className="flex items-center gap-2">
+                    <CalendarIcon className="h-4 w-4" />
+                    <span>Planning</span>
+                  </TabsTrigger>
                 </TabsList>
 
                 {/* Algemeen tabblad */}
@@ -678,7 +693,7 @@ export default function StudentGroups() {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Naam *</FormLabel>
+                          <FormLabel>Klasnaam *</FormLabel>
                           <FormControl>
                             <Input placeholder="Voer klasnaam in" {...field} />
                           </FormControl>
@@ -705,60 +720,6 @@ export default function StudentGroups() {
                               <SelectItem value="2025-2026">2025-2026</SelectItem>
                               <SelectItem value="2024-2025">2024-2025</SelectItem>
                               <SelectItem value="2023-2024">2023-2024</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="programId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Opleiding</FormLabel>
-                          <Select 
-                            onValueChange={(value) => field.onChange(Number(value))}
-                            value={field.value?.toString()}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecteer opleiding" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {Array.isArray(programs) ? programs.map((program: any) => (
-                                <SelectItem key={program.id} value={program.id.toString()}>
-                                  {program.name}
-                                </SelectItem>
-                              )) : null}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="courseId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Vak</FormLabel>
-                          <Select 
-                            onValueChange={(value) => field.onChange(Number(value))}
-                            value={field.value?.toString()}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecteer vak" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {Array.isArray(courses) ? courses.map((course: any) => (
-                                <SelectItem key={course.id} value={course.id.toString()}>
-                                  {course.name}
-                                </SelectItem>
-                              )) : null}
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -929,9 +890,9 @@ export default function StudentGroups() {
                           name="instructor"
                           render={({ field }) => (
                             <FormItem className="mb-4">
-                              <FormLabel>Hoofddocent</FormLabel>
+                              <FormLabel>Docent</FormLabel>
                               <FormControl>
-                                <Input placeholder="Naam van hoofddocent" {...field} />
+                                <Input placeholder="Naam van docent" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -1015,7 +976,7 @@ export default function StudentGroups() {
                           name="courseId"
                           render={({ field }) => (
                             <FormItem className="mb-4">
-                              <FormLabel>Hoofdvak</FormLabel>
+                              <FormLabel>Vak</FormLabel>
                               <Select 
                                 onValueChange={(value) => field.onChange(Number(value))}
                                 value={field.value?.toString()}
@@ -1073,23 +1034,7 @@ export default function StudentGroups() {
                               Vak toevoegen aan rooster
                             </Button>
                           </div>
-                          <div className="border rounded-md p-3">
-                            <h5 className="font-medium mb-2">Studiebelasting</h5>
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span>Totaal contacturen:</span>
-                                <span className="font-medium">4 uur / week</span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span>Zelfstudie-uren:</span>
-                                <span className="font-medium">6 uur / week</span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span>Totale studiebelasting:</span>
-                                <span className="font-medium">10 uur / week</span>
-                              </div>
-                            </div>
-                          </div>
+                          {/* Studiebelasting is verwijderd op verzoek */}
                         </div>
                       </div>
                     </div>

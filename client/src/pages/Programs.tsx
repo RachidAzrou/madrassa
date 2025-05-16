@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsHeader, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Program {
   id: number;
@@ -35,7 +36,7 @@ export default function Programs() {
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedProgram, setExpandedProgram] = useState<string | null>(null);
   
-  // State voor programma dialogen
+  // State voor vak dialogen
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -47,13 +48,24 @@ export default function Programs() {
     duration: 4,
     department: '',
     isActive: true,
-    assignedClasses: [],
-    assignedTeachers: [],
+    assignedClasses: [] as { id: string; name: string; selected: boolean }[],
+    assignedTeachers: [] as { id: string; name: string; selected: boolean }[],
   });
 
   // Fetch programs
   const { data, isLoading, isError } = useQuery<Program[] | { programs: Program[] }>({
     queryKey: ['/api/programs', { searchTerm }],
+    staleTime: 30000,
+  });
+
+  // Fetch klassen en docenten voor het vak formulier
+  const { data: classesData } = useQuery({
+    queryKey: ['/api/student-groups'],
+    staleTime: 30000,
+  });
+
+  const { data: teachersData } = useQuery({
+    queryKey: ['/api/teachers'],
     staleTime: 30000,
   });
 
@@ -72,7 +84,7 @@ export default function Programs() {
     }
   };
 
-  // Mutatie om een programma toe te voegen
+  // Mutatie om een vak toe te voegen
   const createProgramMutation = useMutation({
     mutationFn: async (programData: typeof programFormData) => {
       return apiRequest('POST', '/api/programs', programData);
@@ -89,20 +101,22 @@ export default function Programs() {
         duration: 4,
         department: '',
         isActive: true,
+        assignedClasses: [],
+        assignedTeachers: [],
       });
       setIsAddDialogOpen(false);
       
       // Toon succes melding
       toast({
-        title: "Programma toegevoegd",
-        description: "Het programma is succesvol toegevoegd aan het systeem.",
+        title: "Vak toegevoegd",
+        description: "Het vak is succesvol toegevoegd aan het systeem.",
         variant: "default",
       });
     },
     onError: (error: any) => {
       toast({
         title: "Fout bij toevoegen",
-        description: error.message || "Er is een fout opgetreden bij het toevoegen van het programma.",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van het vak.",
         variant: "destructive",
       });
     }
@@ -128,13 +142,15 @@ export default function Programs() {
         description: program.description || '',
         duration: program.duration || 4,
         department: program.department || '',
-        isActive: true, // Assuming all existing programs are active
+        isActive: program.isActive,
+        assignedClasses: [],
+        assignedTeachers: [],
       });
       setIsEditDialogOpen(true);
     }
   };
   
-  // Mutatie voor het bijwerken van een programma
+  // Mutatie voor het bijwerken van een vak
   const updateProgramMutation = useMutation({
     mutationFn: async (data: { id: string; programData: typeof programFormData }) => {
       return apiRequest('PUT', `/api/programs/${data.id}`, data.programData);
@@ -149,15 +165,15 @@ export default function Programs() {
       
       // Toon succes melding
       toast({
-        title: "Programma bijgewerkt",
-        description: "Het programma is succesvol bijgewerkt.",
+        title: "Vak bijgewerkt",
+        description: "Het vak is succesvol bijgewerkt.",
         variant: "default",
       });
     },
     onError: (error: any) => {
       toast({
         title: "Fout bij bijwerken",
-        description: error.message || "Er is een fout opgetreden bij het bijwerken van het programma.",
+        description: error.message || "Er is een fout opgetreden bij het bijwerken van het vak.",
         variant: "destructive",
       });
     }
@@ -181,7 +197,7 @@ export default function Programs() {
     }
   };
 
-  // Mutatie voor het verwijderen van een programma
+  // Mutatie voor het verwijderen van een vak
   const deleteProgramMutation = useMutation({
     mutationFn: async (id: string) => {
       return apiRequest('DELETE', `/api/programs/${id}`);
@@ -196,15 +212,15 @@ export default function Programs() {
       
       // Toon succes melding
       toast({
-        title: "Programma verwijderd",
-        description: "Het programma is succesvol verwijderd uit het systeem.",
+        title: "Vak verwijderd",
+        description: "Het vak is succesvol verwijderd uit het systeem.",
         variant: "default",
       });
     },
     onError: (error: any) => {
       toast({
         title: "Fout bij verwijderen",
-        description: error.message || "Er is een fout opgetreden bij het verwijderen van het programma.",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van het vak.",
         variant: "destructive",
       });
     }
@@ -214,6 +230,24 @@ export default function Programs() {
     if (selectedProgram) {
       deleteProgramMutation.mutate(selectedProgram.id);
     }
+  };
+
+  const handleClassSelection = (classId: string, selected: boolean) => {
+    setProgramFormData(prev => {
+      const updatedClasses = prev.assignedClasses.map(c => 
+        c.id === classId ? { ...c, selected } : c
+      );
+      return { ...prev, assignedClasses: updatedClasses };
+    });
+  };
+
+  const handleTeacherSelection = (teacherId: string, selected: boolean) => {
+    setProgramFormData(prev => {
+      const updatedTeachers = prev.assignedTeachers.map(t => 
+        t.id === teacherId ? { ...t, selected } : t
+      );
+      return { ...prev, assignedTeachers: updatedTeachers };
+    });
   };
 
   return (
@@ -254,7 +288,7 @@ export default function Programs() {
         </div>
       </div>
 
-      {/* Program list */}
+      {/* Programs list */}
       <div className="space-y-4">
         {isLoading ? (
           <div className="flex justify-center py-8">
@@ -262,11 +296,11 @@ export default function Programs() {
           </div>
         ) : isError ? (
           <div className="text-center py-8 text-red-500">
-            Fout bij het laden van programma's. Probeer het opnieuw.
+            Fout bij het laden van vakken. Probeer het opnieuw.
           </div>
         ) : programs.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            Geen programma's gevonden. Pas je zoekopdracht aan of voeg een nieuw programma toe.
+            Geen vakken gevonden. Pas je zoekopdracht aan of voeg een nieuw vak toe.
           </div>
         ) : (
           programs.map((program: Program) => (
@@ -285,7 +319,7 @@ export default function Programs() {
                 <div className="flex items-center space-x-6">
                   <div className="text-center hidden md:block">
                     <span className="text-gray-500 text-xs block">Duur</span>
-                    <span className="text-gray-800 font-medium">{program.duration} jaar</span>
+                    <span className="text-gray-800 font-medium">{program.duration} periodes</span>
                   </div>
                   <div className="text-center hidden md:block">
                     <span className="text-gray-500 text-xs block">Totaal Studiepunten</span>
@@ -335,7 +369,7 @@ export default function Programs() {
                       <Clock className="h-5 w-5 text-primary mr-3" />
                       <div>
                         <span className="text-xs text-gray-500 block">Duur</span>
-                        <span className="text-sm font-medium">{program.duration} jaar {program.totalCredits ? `(${program.totalCredits} studiepunten)` : ''}</span>
+                        <span className="text-sm font-medium">{program.duration} periodes {program.totalCredits ? `(${program.totalCredits} studiepunten)` : ''}</span>
                       </div>
                     </div>
                     <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">
@@ -348,37 +382,9 @@ export default function Programs() {
                     <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">
                       <Calendar className="h-5 w-5 text-primary mr-3" />
                       <div>
-                        <span className="text-xs text-gray-500 block">Volgende Startdatum</span>
-                        <span className="text-sm font-medium">{program.startDate}</span>
+                        <span className="text-xs text-gray-500 block">Status</span>
+                        <span className="text-sm font-medium">{program.isActive ? 'Actief' : 'Inactief'}</span>
                       </div>
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-lg border border-gray-200 p-4">
-                    <h4 className="text-md font-medium text-gray-800 mb-3 flex items-center">
-                      <BookOpen className="h-5 w-5 text-primary mr-2" />
-                      Cursusstructuur
-                    </h4>
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cursuscode</th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cursusnaam</th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Studiepunten</th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Semester</th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {program.courses.map((course) => (
-                            <tr key={course.id} className="hover:bg-gray-50">
-                              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{course.code}</td>
-                              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{course.name}</td>
-                              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{course.credits}</td>
-                              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{course.semester}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
                     </div>
                   </div>
                   <div className="mt-4">
@@ -392,7 +398,7 @@ export default function Programs() {
         )}
       </div>
 
-      {/* Add Program Dialog */}
+      {/* Vak Toevoegen Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -402,229 +408,320 @@ export default function Programs() {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmitProgram}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="name" className="text-right">
-                    Programmanaam
-                  </Label>
-                  <Input
-                    id="name"
-                    required
-                    value={programFormData.name}
-                    onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
-                    className="mt-1"
-                  />
+            <div className="space-y-6 py-4">
+              <div>
+                <h3 className="text-lg font-medium mb-4 border-b pb-2">Algemene Informatie</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-right">
+                      Naam van het vak <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="name"
+                      required
+                      value={programFormData.name}
+                      onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="code" className="text-right">
+                      Vakcode <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="code"
+                      required
+                      value={programFormData.code}
+                      onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
-                <div className="col-span-1">
-                  <Label htmlFor="code" className="text-right">
-                    Programmacode
-                  </Label>
-                  <Input
-                    id="code"
-                    required
-                    value={programFormData.code}
-                    onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
-                    className="mt-1"
-                  />
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="duration" className="text-right">
+                      Duur (in periodes)
+                    </Label>
+                    <Select
+                      value={programFormData.duration.toString()}
+                      onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
+                    >
+                      <SelectTrigger id="duration" className="mt-1">
+                        <SelectValue placeholder="Selecteer duur" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 periode</SelectItem>
+                        <SelectItem value="2">2 periodes</SelectItem>
+                        <SelectItem value="3">3 periodes</SelectItem>
+                        <SelectItem value="4">4 periodes</SelectItem>
+                        <SelectItem value="5">5 periodes</SelectItem>
+                        <SelectItem value="6">Volledig jaar</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="status" className="text-right">
+                      Status
+                    </Label>
+                    <Select
+                      value={programFormData.isActive ? "true" : "false"}
+                      onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
+                    >
+                      <SelectTrigger id="status" className="mt-1">
+                        <SelectValue placeholder="Selecteer status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="true">Actief</SelectItem>
+                        <SelectItem value="false">Inactief</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="department" className="text-right">
-                    Afdeling
-                  </Label>
-                  <Input
-                    id="department"
-                    required
-                    value={programFormData.department}
-                    onChange={(e) => setProgramFormData({ ...programFormData, department: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="duration" className="text-right">
-                    Duur (jaren)
-                  </Label>
-                  <Select
-                    value={programFormData.duration.toString()}
-                    onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer duur" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 jaar</SelectItem>
-                      <SelectItem value="2">2 jaar</SelectItem>
-                      <SelectItem value="3">3 jaar</SelectItem>
-                      <SelectItem value="4">4 jaar</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
+                
+                <div className="space-y-2 mt-4">
                   <Label htmlFor="description" className="text-right">
-                    Beschrijving
+                    Beschrijving van het vak
                   </Label>
-                  <Input
+                  <textarea
                     id="description"
+                    className="w-full min-h-[100px] p-2 mt-1 border rounded-md"
                     value={programFormData.description}
                     onChange={(e) => setProgramFormData({ ...programFormData, description: e.target.value })}
-                    className="mt-1"
+                    placeholder="Geef een korte beschrijving van de lesstof en leerdoelen van dit vak"
                   />
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="isActive" className="text-right mr-2">
-                    Status
-                  </Label>
-                  <Select
-                    value={programFormData.isActive ? "true" : "false"}
-                    onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Actief</SelectItem>
-                      <SelectItem value="false">Inactief</SelectItem>
-                    </SelectContent>
-                  </Select>
+              
+              <div>
+                <h3 className="text-lg font-medium mb-4 border-b pb-2">Toewijzing</h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="classes">Klassen waarin dit vak wordt gegeven</Label>
+                    <div className="p-4 border rounded-md bg-gray-50">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm text-gray-500">Selecteer één of meerdere klassen</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {/* Hier zouden normaal checkboxen komen voor beschikbare klassen */}
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="class1" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="class1" className="text-sm">Klas 1A</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="class2" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="class2" className="text-sm">Klas 2B</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="class3" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="class3" className="text-sm">Klas 3C</Label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="teachers">Docenten die dit vak geven</Label>
+                    <div className="p-4 border rounded-md bg-gray-50">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm text-gray-500">Selecteer één of meerdere docenten</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {/* Hier zouden normaal checkboxen komen voor beschikbare docenten */}
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="teacher1" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="teacher1" className="text-sm">Mohammed Youssef</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="teacher2" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="teacher2" className="text-sm">Fatima El Amrani</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="teacher3" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="teacher3" className="text-sm">Ibrahim Bouali</Label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setIsAddDialogOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                 Annuleren
               </Button>
               <Button 
-                type="submit"
+                type="submit" 
                 disabled={createProgramMutation.isPending}
               >
-                {createProgramMutation.isPending ? 'Bezig met toevoegen...' : 'Programma toevoegen'}
+                {createProgramMutation.isPending ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+                    Bezig met toevoegen...
+                  </>
+                ) : (
+                  "Toevoegen"
+                )}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Programma bewerken dialoogvenster */}
+      {/* Vak bewerken dialoogvenster */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Programma bewerken</DialogTitle>
+            <DialogTitle>Vak bewerken</DialogTitle>
             <DialogDescription>
-              Vul de onderstaande velden in om dit programma bij te werken.
+              Vul de onderstaande velden in om dit vak bij te werken.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmitEditProgram}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="name" className="text-right">
-                    Naam *
-                  </Label>
-                  <Input
-                    id="name"
-                    value={programFormData.name}
-                    onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
-                    className="mt-1"
-                    required
-                  />
+            <div className="space-y-6 py-4">
+              <div>
+                <h3 className="text-lg font-medium mb-4 border-b pb-2">Algemene Informatie</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-name" className="text-right">
+                      Naam van het vak <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="edit-name"
+                      required
+                      value={programFormData.name}
+                      onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-code" className="text-right">
+                      Vakcode <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="edit-code"
+                      required
+                      value={programFormData.code}
+                      onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
-                <div className="col-span-1">
-                  <Label htmlFor="code" className="text-right">
-                    Code *
-                  </Label>
-                  <Input
-                    id="code"
-                    value={programFormData.code}
-                    onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
-                    className="mt-1"
-                    required
-                  />
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-duration" className="text-right">
+                      Duur (in periodes)
+                    </Label>
+                    <Select
+                      value={programFormData.duration.toString()}
+                      onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
+                    >
+                      <SelectTrigger id="edit-duration" className="mt-1">
+                        <SelectValue placeholder="Selecteer duur" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 periode</SelectItem>
+                        <SelectItem value="2">2 periodes</SelectItem>
+                        <SelectItem value="3">3 periodes</SelectItem>
+                        <SelectItem value="4">4 periodes</SelectItem>
+                        <SelectItem value="5">5 periodes</SelectItem>
+                        <SelectItem value="6">Volledig jaar</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-status" className="text-right">
+                      Status
+                    </Label>
+                    <Select
+                      value={programFormData.isActive ? "true" : "false"}
+                      onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
+                    >
+                      <SelectTrigger id="edit-status" className="mt-1">
+                        <SelectValue placeholder="Selecteer status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="true">Actief</SelectItem>
+                        <SelectItem value="false">Inactief</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="department" className="text-right">
-                    Afdeling
+                
+                <div className="space-y-2 mt-4">
+                  <Label htmlFor="edit-description" className="text-right">
+                    Beschrijving van het vak
                   </Label>
-                  <Input
-                    id="department"
-                    value={programFormData.department}
-                    onChange={(e) => setProgramFormData({ ...programFormData, department: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <Label htmlFor="duration" className="text-right">
-                    Duur (jaren)
-                  </Label>
-                  <Select
-                    value={programFormData.duration.toString()}
-                    onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer duur" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 jaar</SelectItem>
-                      <SelectItem value="2">2 jaar</SelectItem>
-                      <SelectItem value="3">3 jaar</SelectItem>
-                      <SelectItem value="4">4 jaar</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="description" className="text-right">
-                    Beschrijving
-                  </Label>
-                  <Input
-                    id="description"
+                  <textarea
+                    id="edit-description"
+                    className="w-full min-h-[100px] p-2 mt-1 border rounded-md"
                     value={programFormData.description}
                     onChange={(e) => setProgramFormData({ ...programFormData, description: e.target.value })}
-                    className="mt-1"
+                    placeholder="Geef een korte beschrijving van de lesstof en leerdoelen van dit vak"
                   />
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="col-span-1">
-                  <Label htmlFor="isActive" className="text-right mr-2">
-                    Status
-                  </Label>
-                  <Select
-                    value={programFormData.isActive ? "true" : "false"}
-                    onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecteer status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Actief</SelectItem>
-                      <SelectItem value="false">Inactief</SelectItem>
-                    </SelectContent>
-                  </Select>
+              
+              <div>
+                <h3 className="text-lg font-medium mb-4 border-b pb-2">Toewijzing</h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-classes">Klassen waarin dit vak wordt gegeven</Label>
+                    <div className="p-4 border rounded-md bg-gray-50">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm text-gray-500">Selecteer één of meerdere klassen</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {/* Hier zouden normaal checkboxen komen voor beschikbare klassen */}
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="edit-class1" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="edit-class1" className="text-sm">Klas 1A</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="edit-class2" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="edit-class2" className="text-sm">Klas 2B</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="edit-class3" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="edit-class3" className="text-sm">Klas 3C</Label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-teachers">Docenten die dit vak geven</Label>
+                    <div className="p-4 border rounded-md bg-gray-50">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm text-gray-500">Selecteer één of meerdere docenten</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {/* Hier zouden normaal checkboxen komen voor beschikbare docenten */}
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="edit-teacher1" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="edit-teacher1" className="text-sm">Mohammed Youssef</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="edit-teacher2" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="edit-teacher2" className="text-sm">Fatima El Amrani</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="edit-teacher3" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="edit-teacher3" className="text-sm">Ibrahim Bouali</Label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             <DialogFooter>
               <Button 
-                type="button" 
                 variant="outline" 
                 onClick={() => setIsEditDialogOpen(false)}
               >
@@ -641,13 +738,13 @@ export default function Programs() {
         </DialogContent>
       </Dialog>
 
-      {/* Programma verwijderen dialoogvenster */}
+      {/* Vak verwijderen dialoogvenster */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Programma verwijderen</DialogTitle>
+            <DialogTitle>Vak verwijderen</DialogTitle>
             <DialogDescription>
-              Weet je zeker dat je dit programma wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+              Weet je zeker dat je dit vak wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">

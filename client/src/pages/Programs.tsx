@@ -217,8 +217,16 @@ export default function Programs() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">Vakkenbeheer</h1>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+        <div>
+          <div className="flex items-center">
+            <Building className="h-6 w-6 text-primary mr-3" />
+            <h1 className="text-2xl font-semibold text-primary">Vakken</h1>
+          </div>
+          <p className="text-gray-500 text-sm mt-1 ml-9">
+            Beheer en organiseer alle vakken in het curriculum
+          </p>
+        </div>
         <div className="flex flex-col md:flex-row gap-3">
           <div className="relative">
             <Input
@@ -230,7 +238,12 @@ export default function Programs() {
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
-          <Button onClick={handleAddProgram} className="flex items-center">
+          <Button 
+            onClick={handleAddProgram} 
+            variant="default"
+            size="default"
+            className="bg-primary hover:bg-primary/90 flex items-center"
+          >
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Programma Toevoegen</span>
           </Button>

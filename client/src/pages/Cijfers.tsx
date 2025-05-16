@@ -516,7 +516,7 @@ export default function Cijfers() {
               className="w-full"
               onValueChange={(value) => {
                 setActiveTab(value);
-                setSelectedClass('');
+                // Behoud de geselecteerde klas bij het wisselen van tabs
                 setSubjectGrades({});
                 setBehaviorScores({});
                 setBehaviorRemarks({});
@@ -524,46 +524,56 @@ export default function Cijfers() {
                 setIsBehaviorModified(false);
               }}
             >
-              <TabsList className="grid w-full max-w-md grid-cols-2">
-                <TabsTrigger value="grades">Cijfers</TabsTrigger>
-                <TabsTrigger value="behavior">Gedragsbeoordelingen</TabsTrigger>
-              </TabsList>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                <TabsList className="grid w-full max-w-md grid-cols-2 p-1 bg-blue-50">
+                  <TabsTrigger value="grades" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Cijfers</TabsTrigger>
+                  <TabsTrigger value="behavior" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Gedragsbeoordelingen</TabsTrigger>
+                </TabsList>
+                <div className="w-full md:w-auto max-w-md">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
+                  <Select value={selectedClass} onValueChange={handleClassChange}>
+                    <SelectTrigger className="w-full md:w-[250px]">
+                      <SelectValue placeholder="Selecteer een klas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {classes.length === 0 ? (
+                        <SelectItem value="empty-class">Geen klassen gevonden</SelectItem>
+                      ) : (
+                        classes.map((cls: any) => (
+                          <SelectItem key={cls.id} value={cls.id.toString()}>
+                            {cls.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
               <TabsContent value="grades" className="pt-4">
                 <div className="flex flex-col space-y-4">
                   <div className="flex flex-col md:flex-row gap-4">
-                    <div className="w-full md:w-1/3">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
-                      <Select value={selectedClass} onValueChange={handleClassChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer een klas" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {classes.length === 0 ? (
-                            <SelectItem value="empty-class">Geen klassen gevonden</SelectItem>
-                          ) : (
-                            classes.map((cls: any) => (
-                              <SelectItem key={cls.id} value={cls.id.toString()}>
-                                {cls.name}
-                              </SelectItem>
-                            ))
+                    {selectedClass && (
+                      <div className="w-full md:w-[350px]">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Student zoeken</label>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                          <Input
+                            type="search"
+                            placeholder="Zoek op naam..."
+                            className="w-full pl-9 pr-9 border-gray-300 focus:border-blue-500"
+                            value={studentFilter}
+                            onChange={(e) => setStudentFilter(e.target.value)}
+                          />
+                          {studentFilter && (
+                            <XCircle
+                              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                              onClick={() => setStudentFilter('')}
+                            />
                           )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="w-full md:w-1/3">
-                      <div className="relative flex items-center mt-6">
-                        <Search className="absolute left-2.5 h-4 w-4 text-gray-500" />
-                        <Input
-                          type="search"
-                          placeholder="Zoek studenten..."
-                          className="pl-8"
-                          value={studentFilter}
-                          onChange={(e) => setStudentFilter(e.target.value)}
-                        />
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Cijferstabel */}
@@ -583,13 +593,14 @@ export default function Cijfers() {
                       </div>
                     ) : (
                       <div className="overflow-x-auto">
-                        <Table>
+                        <Table className="border-collapse">
                           <TableHeader>
-                            <TableRow>
-                              <TableHead className="w-[200px]">Student</TableHead>
+                            <TableRow className="bg-gray-50">
+                              <TableHead className="w-[240px] bg-blue-50 sticky left-0 z-10 border-r border-gray-200">Student</TableHead>
                               {courses.map((course: any) => (
-                                <TableHead key={course.id} className="text-center">
-                                  {course.name}
+                                <TableHead key={course.id} className="text-center px-6 min-w-[120px]">
+                                  <div className="font-semibold">{course.name}</div>
+                                  <div className="text-xs text-gray-500 font-normal">{course.code}</div>
                                 </TableHead>
                               ))}
                             </TableRow>
@@ -597,16 +608,16 @@ export default function Cijfers() {
                           <TableBody>
                             {filteredStudents.length === 0 ? (
                               <TableRow>
-                                <TableCell colSpan={courses.length + 1} className="text-center text-sm text-gray-500">
+                                <TableCell colSpan={courses.length + 1} className="text-center text-sm text-gray-500 py-8">
                                   Geen studenten gevonden voor deze klas of zoekopdracht.
                                 </TableCell>
                               </TableRow>
                             ) : (
                               filteredStudents.map((student: any) => (
-                                <TableRow key={student.id}>
-                                  <TableCell>
+                                <TableRow key={student.id} className="hover:bg-blue-50/30">
+                                  <TableCell className="bg-white sticky left-0 z-10 border-r border-gray-200 shadow-sm">
                                     <div className="flex items-center">
-                                      <Avatar className="h-8 w-8 mr-3">
+                                      <Avatar className="h-10 w-10 mr-3">
                                         <AvatarFallback className="bg-[#1e3a8a] text-white">
                                           {student.firstName.charAt(0)}
                                           {student.lastName.charAt(0)}
@@ -629,18 +640,20 @@ export default function Cijfers() {
                                     const grade = studentGrades[courseId];
                                     
                                     return (
-                                      <TableCell key={`${student.id}-${courseId}`} className="text-center">
+                                      <TableCell key={`${student.id}-${courseId}`} className="text-center p-4">
                                         <div className="flex flex-col items-center">
                                           <Input
-                                            type="number"
+                                            type="text"
+                                            inputMode="numeric"
+                                            pattern="[0-9]*"
                                             min="0"
                                             max="100"
-                                            className="w-20 text-center"
+                                            className="w-20 text-center text-lg font-medium border-gray-300 focus:border-blue-500"
                                             value={grade !== undefined ? grade : ''}
                                             onChange={(e) => handleGradeChange(student.id, courseId, e.target.value)}
                                           />
                                           {grade !== undefined && (
-                                            <Badge className={`mt-1 ${getGradeStatus(grade).color}`}>
+                                            <Badge className={`mt-2 ${getGradeStatus(grade).color}`}>
                                               {getGradeStatus(grade).text}
                                             </Badge>
                                           )}
@@ -703,38 +716,27 @@ export default function Cijfers() {
               <TabsContent value="behavior" className="pt-4">
                 <div className="flex flex-col space-y-4">
                   <div className="flex flex-col md:flex-row gap-4">
-                    <div className="w-full md:w-1/3">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
-                      <Select value={selectedClass} onValueChange={handleClassChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer een klas" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {classes.length === 0 ? (
-                            <SelectItem value="empty-class">Geen klassen gevonden</SelectItem>
-                          ) : (
-                            classes.map((cls: any) => (
-                              <SelectItem key={cls.id} value={cls.id.toString()}>
-                                {cls.name}
-                              </SelectItem>
-                            ))
+                    {selectedClass && (
+                      <div className="w-full md:w-[350px]">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Student zoeken</label>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                          <Input
+                            type="search"
+                            placeholder="Zoek op naam..."
+                            className="w-full pl-9 pr-9 border-gray-300 focus:border-blue-500"
+                            value={studentFilter}
+                            onChange={(e) => setStudentFilter(e.target.value)}
+                          />
+                          {studentFilter && (
+                            <XCircle
+                              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                              onClick={() => setStudentFilter('')}
+                            />
                           )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="w-full md:w-1/3">
-                      <div className="relative flex items-center mt-6">
-                        <Search className="absolute left-2.5 h-4 w-4 text-gray-500" />
-                        <Input
-                          type="search"
-                          placeholder="Zoek studenten..."
-                          className="pl-8"
-                          value={studentFilter}
-                          onChange={(e) => setStudentFilter(e.target.value)}
-                        />
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Gedragstabel */}
@@ -754,43 +756,45 @@ export default function Cijfers() {
                       </div>
                     ) : (
                       <div className="overflow-x-auto">
-                        <table className="w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <Table className="border-collapse">
+                          <TableHeader>
+                            <TableRow className="bg-gray-50">
+                              <TableHead className="w-[240px] bg-blue-50 sticky left-0 z-10 border-r border-gray-200">
                                 Student
-                              </th>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Punctualiteit 
-                                <span className="ml-1 text-gray-400">(Auto)</span>
-                              </th>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              </TableHead>
+                              <TableHead className="text-left px-6 min-w-[150px]">
+                                <div className="flex items-center">
+                                  Punctualiteit
+                                  <span className="ml-2 text-gray-400 text-xs">(Auto)</span>
+                                </div>
+                              </TableHead>
+                              <TableHead className="text-left px-6 min-w-[100px]">
                                 <div className="flex items-center">
                                   <span>Afwezig</span>
                                   <span className="ml-2 inline-block w-3 h-3 rounded-full bg-orange-400"></span>
                                 </div>
-                              </th>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              </TableHead>
+                              <TableHead className="text-left px-6 min-w-[100px]">
                                 <div className="flex items-center">
                                   <span>Te Laat</span>
                                   <span className="ml-2 inline-block w-3 h-3 rounded-full bg-red-400"></span>
                                 </div>
-                              </th>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              </TableHead>
+                              <TableHead className="text-left px-6 min-w-[120px]">
                                 Gedrag (1-5)
-                              </th>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              </TableHead>
+                              <TableHead className="text-left px-6 min-w-[300px]">
                                 Opmerking
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
                             {filteredStudents.length === 0 ? (
-                              <tr>
-                                <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                              <TableRow>
+                                <TableCell colSpan={6} className="text-center text-sm text-gray-500 py-8">
                                   Geen studenten gevonden voor deze klas.
-                                </td>
-                              </tr>
+                                </TableCell>
+                              </TableRow>
                             ) : (
                               filteredStudents.map((student: any) => {
                                 // Get behavior score or default to 3
@@ -803,10 +807,10 @@ export default function Cijfers() {
                                 const lateCount = student.lateCount || Math.floor(Math.random() * 8);
                                 
                                 return (
-                                  <tr key={student.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                  <TableRow key={student.id} className="hover:bg-blue-50/30">
+                                    <TableCell className="bg-white sticky left-0 z-10 border-r border-gray-200 shadow-sm">
                                       <div className="flex items-center">
-                                        <Avatar className="h-8 w-8 mr-3">
+                                        <Avatar className="h-10 w-10 mr-3">
                                           <AvatarFallback className="bg-[#1e3a8a] text-white">
                                             {student.firstName.charAt(0)}
                                             {student.lastName.charAt(0)}
@@ -821,56 +825,56 @@ export default function Cijfers() {
                                           </div>
                                         </div>
                                       </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                      <div className="flex items-center space-x-2">
-                                        <Progress value={behaviorScore * 20} className="w-20 h-2" />
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="flex items-center space-x-3">
+                                        <Progress value={behaviorScore * 20} className="w-24 h-3" />
                                         <span className="text-sm font-medium">
                                           {behaviorScore}/5
                                         </span>
                                       </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                      <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
+                                    </TableCell>
+                                    <TableCell>
+                                      <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 px-2 py-1 text-sm">
                                         {absentCount}x
                                       </Badge>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                      <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                                    </TableCell>
+                                    <TableCell>
+                                      <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 px-2 py-1 text-sm">
                                         {lateCount}x
                                       </Badge>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    </TableCell>
+                                    <TableCell>
                                       <Select 
                                         value={behaviorScore.toString()} 
                                         onValueChange={(value) => handleBehaviorScoreChange(student.id, value)}
                                       >
-                                        <SelectTrigger className="w-16">
+                                        <SelectTrigger className="w-20 border-gray-300 focus:border-blue-500">
                                           <SelectValue placeholder="Score" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="1">1</SelectItem>
-                                          <SelectItem value="2">2</SelectItem>
-                                          <SelectItem value="3">3</SelectItem>
-                                          <SelectItem value="4">4</SelectItem>
-                                          <SelectItem value="5">5</SelectItem>
+                                          <SelectItem value="1">1 - Slecht</SelectItem>
+                                          <SelectItem value="2">2 - Matig</SelectItem>
+                                          <SelectItem value="3">3 - Voldoende</SelectItem>
+                                          <SelectItem value="4">4 - Goed</SelectItem>
+                                          <SelectItem value="5">5 - Uitstekend</SelectItem>
                                         </SelectContent>
                                       </Select>
-                                    </td>
-                                    <td className="px-6 py-4">
+                                    </TableCell>
+                                    <TableCell>
                                       <Input
                                         placeholder="Opmerkingen..."
-                                        className="max-w-xs"
+                                        className="w-full border-gray-300 focus:border-blue-500"
                                         value={behaviorRemark}
                                         onChange={(e) => handleBehaviorRemarkChange(student.id, e.target.value)}
                                       />
-                                    </td>
-                                  </tr>
+                                    </TableCell>
+                                  </TableRow>
                                 );
                               })
                             )}
-                          </tbody>
-                        </table>
+                          </TableBody>
+                        </Table>
                       </div>
                     )}
                     

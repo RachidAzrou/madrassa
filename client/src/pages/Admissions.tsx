@@ -361,10 +361,8 @@ export default function Admissions() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-2.5 rounded-lg border border-sky-200 shadow-sm">
-            <FileText className="h-6 w-6 text-sky-700" />
-          </div>
+        <div className="flex items-center gap-3">
+          <FileText className="h-6 w-6 text-primary" />
           <div>
             <h1 className="text-2xl font-semibold text-gray-800">Aanmeldingen</h1>
             <p className="text-gray-500 text-sm">

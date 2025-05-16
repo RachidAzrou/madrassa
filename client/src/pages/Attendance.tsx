@@ -38,7 +38,8 @@ interface Teacher {
 interface StudentAttendanceRecord {
   id: number;
   studentId: number;
-  courseId: number;
+  courseId?: number;
+  classId?: number;
   date: string;
   status: string; // aanwezig, afwezig, te laat
   notes?: string;
@@ -48,20 +49,22 @@ interface StudentAttendanceRecord {
 interface TeacherAttendanceRecord {
   id: number;
   teacherId: number;
-  courseId: number;
+  courseId?: number;
+  classId?: number;
   date: string;
-  status: string; // aanwezig, afwezig, vervangen
+  status: string; // aanwezig, afwezig
   replacementTeacherId?: number;
   notes?: string;
 }
 
 interface AttendanceSession {
   id: string;
-  courseId: string;
-  courseName: string;
+  courseId?: string;
+  courseName?: string;
   classId?: string;
   className?: string;
   date: string;
+  type: 'vak' | 'klas';
 }
 
 interface Course {
@@ -86,6 +89,7 @@ export default function Attendance() {
   
   // Algemene state
   const [selectedTab, setSelectedTab] = useState<'students' | 'teachers'>('students');
+  const [selectedType, setSelectedType] = useState<'vak' | 'klas'>('vak');
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -125,36 +129,66 @@ export default function Attendance() {
   
   const teachers: Teacher[] = teachersData?.teachers || [];
 
-  // Fetch student attendance data for selected course and date
+  // Fetch student attendance data based on selected type (vak or klas)
   const { 
     data: attendanceRecords, 
     isLoading: isLoadingStudentAttendance, 
     isError: isErrorStudentAttendance, 
     refetch: refetchStudentAttendance 
   } = useQuery({
-    queryKey: ['/api/courses', selectedCourse, 'attendance', 'date', selectedDate],
+    queryKey: [
+      selectedType === 'vak' ? '/api/courses' : '/api/student-groups', 
+      selectedType === 'vak' ? selectedCourse : selectedClass, 
+      'attendance', 
+      'date', 
+      selectedDate
+    ],
     queryFn: async () => {
-      const response = await apiRequest('GET', `/api/courses/${selectedCourse}/attendance/date/${selectedDate}`);
+      let url = '';
+      if (selectedType === 'vak' && selectedCourse) {
+        url = `/api/courses/${selectedCourse}/attendance/date/${selectedDate}`;
+      } else if (selectedType === 'klas' && selectedClass) {
+        url = `/api/student-groups/${selectedClass}/attendance/date/${selectedDate}`;
+      }
+      
+      if (!url) return [];
+      
+      const response = await apiRequest('GET', url);
       return response;
     },
     staleTime: 60000,
-    enabled: !!selectedCourse && selectedTab === 'students',
+    enabled: (!!selectedCourse || !!selectedClass) && selectedTab === 'students',
   });
   
-  // Fetch teacher attendance data for selected course and date
+  // Fetch teacher attendance data based on selected type (vak or klas)
   const {
     data: teacherAttendanceRecord,
     isLoading: isLoadingTeacherAttendance,
     isError: isErrorTeacherAttendance,
     refetch: refetchTeacherAttendance
   } = useQuery({
-    queryKey: ['/api/courses', selectedCourse, 'teacher-attendance', 'date', selectedDate],
+    queryKey: [
+      selectedType === 'vak' ? '/api/courses' : '/api/student-groups', 
+      selectedType === 'vak' ? selectedCourse : selectedClass, 
+      'teacher-attendance', 
+      'date', 
+      selectedDate
+    ],
     queryFn: async () => {
-      const response = await apiRequest('GET', `/api/courses/${selectedCourse}/teacher-attendance/date/${selectedDate}`);
+      let url = '';
+      if (selectedType === 'vak' && selectedCourse) {
+        url = `/api/courses/${selectedCourse}/teacher-attendance/date/${selectedDate}`;
+      } else if (selectedType === 'klas' && selectedClass) {
+        url = `/api/student-groups/${selectedClass}/teacher-attendance/date/${selectedDate}`;
+      }
+      
+      if (!url) return [];
+      
+      const response = await apiRequest('GET', url);
       return response;
     },
     staleTime: 60000,
-    enabled: !!selectedCourse && selectedTab === 'teachers',
+    enabled: (!!selectedCourse || !!selectedClass) && selectedTab === 'teachers',
   });
 
   // API retourneert een array, dus we moeten het omzetten naar de juiste formaten
@@ -171,28 +205,48 @@ export default function Attendance() {
       })) : [] 
     : [];
   
-  // Sessie-informatie samenstellen op basis van geselecteerde cursus
-  const session: AttendanceSession | null = selectedCourse ? {
-    id: `session-${selectedCourse}-${selectedDate}`,
-    courseId: selectedCourse,
-    courseName: Array.isArray(courses) && courses.length > 0 ? 
-      (courses.find((c: Course) => c.id.toString() === selectedCourse)?.name || 'Onbekende cursus') : 
-      'Onbekende cursus',
-    date: selectedDate
-  } : null;
+  // Sessie-informatie samenstellen op basis van geselecteerd vak/klas
+  const session: AttendanceSession | null = selectedType === 'vak' ? 
+    (selectedCourse ? {
+      id: `session-course-${selectedCourse}-${selectedDate}`,
+      courseId: selectedCourse,
+      courseName: Array.isArray(courses) && courses.length > 0 ? 
+        (courses.find((c: Course) => c.id.toString() === selectedCourse)?.name || 'Onbekend vak') : 
+        'Onbekend vak',
+      date: selectedDate,
+      type: 'vak'
+    } : null) :
+    (selectedClass ? {
+      id: `session-class-${selectedClass}-${selectedDate}`,
+      classId: selectedClass,
+      className: Array.isArray(classes) && classes.length > 0 ?
+        (classes.find((c: Class) => c.id.toString() === selectedClass)?.name || 'Onbekende klas') :
+        'Onbekende klas',
+      date: selectedDate,
+      type: 'klas'
+    } : null);
 
   // Mutation for saving student attendance
   const saveStudentAttendanceMutation = useMutation({
     mutationFn: async () => {
       // Verzamel de attendance records voor batch verwerking
-      const attendanceRecords = Object.entries(studentAttendance).map(([studentId, status]) => ({
-        studentId: parseInt(studentId),
-        courseId: parseInt(selectedCourse),
-        date: selectedDate,
-        status,
-        notes: studentNotes[studentId] || null,
-        teacherId: 1, // Momenteel hardcoded, later uit sessie halen
-      }));
+      const attendanceRecords = Object.entries(studentAttendance).map(([studentId, status]) => {
+        const record: any = {
+          studentId: parseInt(studentId),
+          date: selectedDate,
+          status,
+          notes: studentNotes[studentId] || null,
+          teacherId: 1, // Momenteel hardcoded, later uit sessie halen
+        };
+        
+        if (selectedType === 'vak' && selectedCourse) {
+          record.courseId = parseInt(selectedCourse);
+        } else if (selectedType === 'klas' && selectedClass) {
+          record.classId = parseInt(selectedClass);
+        }
+        
+        return record;
+      });
       
       return await apiRequest('POST', '/api/attendance/batch', attendanceRecords);
     },
@@ -202,7 +256,13 @@ export default function Attendance() {
         description: 'Aanwezigheidsregistraties zijn succesvol bijgewerkt.',
         variant: 'default',
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/attendance'] });
+      
+      // Invalidate the correct query path based on selected type
+      if (selectedType === 'vak') {
+        queryClient.invalidateQueries({ queryKey: ['/api/courses', selectedCourse, 'attendance'] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['/api/student-groups', selectedClass, 'attendance'] });
+      }
     },
     onError: (error) => {
       toast({
@@ -216,14 +276,19 @@ export default function Attendance() {
   // Mutation for saving teacher attendance
   const saveTeacherAttendanceMutation = useMutation({
     mutationFn: async () => {
-      const teacherAttendanceData = {
+      const teacherAttendanceData: any = {
         teacherId: 1, // Hardcoded voor nu, later uit sessie halen
-        courseId: parseInt(selectedCourse),
         date: selectedDate,
         status: teacherAttendance,
         replacementTeacherId: replacementTeacherId ? parseInt(replacementTeacherId) : null,
         notes: teacherNote || null,
       };
+      
+      if (selectedType === 'vak' && selectedCourse) {
+        teacherAttendanceData.courseId = parseInt(selectedCourse);
+      } else if (selectedType === 'klas' && selectedClass) {
+        teacherAttendanceData.classId = parseInt(selectedClass);
+      }
       
       return await apiRequest('POST', '/api/teacher-attendance', teacherAttendanceData);
     },
@@ -233,7 +298,13 @@ export default function Attendance() {
         description: 'Uw aanwezigheid is succesvol geregistreerd.',
         variant: 'default',
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/teacher-attendance'] });
+      
+      // Invalidate the correct query path based on selected type
+      if (selectedType === 'vak') {
+        queryClient.invalidateQueries({ queryKey: ['/api/courses', selectedCourse, 'teacher-attendance'] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['/api/student-groups', selectedClass, 'teacher-attendance'] });
+      }
     },
     onError: (error) => {
       toast({
@@ -246,6 +317,19 @@ export default function Attendance() {
 
   const handleCourseChange = (value: string) => {
     setSelectedCourse(value);
+    setSelectedType('vak');
+    setSelectedClass('');
+    setStudentAttendance({});
+    setStudentNotes({});
+    setTeacherAttendance('present');
+    setTeacherNote('');
+    setReplacementTeacherId(null);
+  };
+  
+  const handleClassChange = (value: string) => {
+    setSelectedClass(value);
+    setSelectedType('klas');
+    setSelectedCourse('');
     setStudentAttendance({});
     setStudentNotes({});
     setTeacherAttendance('present');
@@ -404,26 +488,63 @@ export default function Attendance() {
 
       {/* Selection and filters */}
       <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Cursus</label>
-            <Select value={selectedCourse} onValueChange={handleCourseChange}>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+            <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecteer cursus" />
+                <SelectValue placeholder="Selecteer type" />
               </SelectTrigger>
               <SelectContent>
-                {Array.isArray(courses) && courses.length > 0 ? (
-                  courses.map(course => (
-                    <SelectItem key={course.id} value={course.id.toString()}>
-                      {course.code} - {course.name}
-                    </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="none" disabled>Geen cursussen beschikbaar</SelectItem>
-                )}
+                <SelectItem value="vak">Vak</SelectItem>
+                <SelectItem value="klas">Klas</SelectItem>
               </SelectContent>
             </Select>
           </div>
+          
+          {selectedType === 'vak' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Vak</label>
+              <Select value={selectedCourse} onValueChange={handleCourseChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecteer vak" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.isArray(courses) && courses.length > 0 ? (
+                    courses.map(course => (
+                      <SelectItem key={course.id} value={course.id.toString()}>
+                        {course.code} - {course.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>Geen vakken beschikbaar</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          
+          {selectedType === 'klas' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
+              <Select value={selectedClass} onValueChange={handleClassChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecteer klas" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.isArray(classes) && classes.length > 0 ? (
+                    classes.map(cls => (
+                      <SelectItem key={cls.id} value={cls.id.toString()}>
+                        {cls.code} - {cls.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>Geen klassen beschikbaar</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Datum</label>
             <input
@@ -458,7 +579,11 @@ export default function Attendance() {
       {session && (
         <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-lg font-medium text-blue-800">{session.courseName}</h2>
+            {session.type === 'vak' ? (
+              <h2 className="text-lg font-medium text-blue-800">Vak: {session.courseName}</h2>
+            ) : (
+              <h2 className="text-lg font-medium text-blue-800">Klas: {session.className}</h2>
+            )}
             <p className="text-blue-600">{formatDate(session.date)}</p>
           </div>
         </div>

@@ -47,6 +47,8 @@ export default function Programs() {
     duration: 4,
     department: '',
     isActive: true,
+    assignedClasses: [],
+    assignedTeachers: [],
   });
 
   // Fetch programs
@@ -233,7 +235,7 @@ export default function Programs() {
           <div className="relative">
             <Input
               type="text"
-              placeholder="Zoek programma's..."
+              placeholder="Zoek vakken..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full md:w-64 pl-10"
@@ -247,7 +249,7 @@ export default function Programs() {
             className="bg-primary hover:bg-primary/90 flex items-center"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Programma Toevoegen</span>
+            <span>Vak Toevoegen</span>
           </Button>
         </div>
       </div>

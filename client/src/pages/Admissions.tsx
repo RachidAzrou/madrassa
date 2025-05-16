@@ -361,14 +361,24 @@ export default function Admissions() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Toelatingsbeheer</h1>
-          <p className="text-gray-500 mt-1">
-            Beoordeel en verwerk studentaanmeldingen en toelatingen
-          </p>
+        <div className="flex items-center gap-2">
+          <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-2.5 rounded-lg border border-sky-200 shadow-sm">
+            <FileText className="h-6 w-6 text-sky-700" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-800">Aanmeldingen</h1>
+            <p className="text-gray-500 text-sm">
+              Beoordeel en verwerk studentaanmeldingen en toelatingen
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={handleAddApplicant} className="flex items-center">
+          <Button 
+            onClick={handleAddApplicant} 
+            variant="default" 
+            size="default" 
+            className="bg-primary hover:bg-primary/90"
+          >
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Nieuwe Aanmelding</span>
           </Button>

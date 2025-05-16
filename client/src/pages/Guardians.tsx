@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, X } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, X, UserCircle, Mail, Home, BookOpen } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -540,10 +540,19 @@ export default function Guardians() {
           {selectedGuardian && (
             <div className="mt-4">
               <Tabs defaultValue="personal" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="personal">Persoonlijke Informatie</TabsTrigger>
-                  <TabsTrigger value="contact">Contactgegevens</TabsTrigger>
-                  <TabsTrigger value="students">Gekoppelde Studenten</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-3 mb-6">
+                  <TabsTrigger value="personal" className="flex gap-2 items-center">
+                    <UserCircle className="h-4 w-4" />
+                    Persoonlijk
+                  </TabsTrigger>
+                  <TabsTrigger value="contact" className="flex gap-2 items-center">
+                    <Mail className="h-4 w-4" />
+                    Contact
+                  </TabsTrigger>
+                  <TabsTrigger value="students" className="flex gap-2 items-center">
+                    <Users className="h-4 w-4" />
+                    Studenten
+                  </TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="personal" className="space-y-4 pt-4">

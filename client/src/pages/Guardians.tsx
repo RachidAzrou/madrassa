@@ -469,9 +469,9 @@ export default function Guardians() {
         </div>
       </div>
       
-      {/* Add Guardian Dialog */}
+      {/* Add/Edit Guardian Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="w-[95vw] max-w-4xl h-[85vh] max-h-[85vh] overflow-auto">
+        <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-primary flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
@@ -489,16 +489,16 @@ export default function Guardians() {
 
           <form onSubmit={handleSubmitGuardian} className="mt-4 space-y-6">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-3 mb-4">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="personal">Persoonlijke Informatie</TabsTrigger>
                 <TabsTrigger value="contact">Contactgegevens</TabsTrigger>
                 <TabsTrigger value="students">Studenten</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="personal" className="space-y-4">
+              <TabsContent value="personal" className="space-y-4 pt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">Voornaam</Label>
+                    <Label htmlFor="firstName">Voornaam <span className="text-[#3b5998]">*</span></Label>
                     <Input 
                       id="firstName"
                       name="firstName"
@@ -508,7 +508,7 @@ export default function Guardians() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">Achternaam</Label>
+                    <Label htmlFor="lastName">Achternaam <span className="text-[#3b5998]">*</span></Label>
                     <Input 
                       id="lastName"
                       name="lastName"
@@ -520,7 +520,7 @@ export default function Guardians() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="relationship">Relatie tot student<span className="text-[#3b5998]">*</span></Label>
+                  <Label htmlFor="relationship">Relatie tot student <span className="text-[#3b5998]">*</span></Label>
                   <Select 
                     name="relationship" 
                     defaultValue={newGuardian.relationship}

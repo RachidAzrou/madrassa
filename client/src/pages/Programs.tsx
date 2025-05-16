@@ -220,7 +220,7 @@ export default function Programs() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
-            <Building className="h-6 w-6 text-primary mr-3" />
+            <Glasses className="h-6 w-6 text-primary mr-3" />
             <h1 className="text-2xl font-semibold text-primary">Vakken</h1>
           </div>
           <p className="text-gray-500 text-sm mt-1 ml-9">

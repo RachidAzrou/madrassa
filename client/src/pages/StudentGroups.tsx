@@ -702,247 +702,618 @@ export default function StudentGroups() {
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Naam *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Voer klasnaam in" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="academicYear"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Academisch Jaar *</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer academisch jaar" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="2025-2026">2025-2026</SelectItem>
-                          <SelectItem value="2024-2025">2024-2025</SelectItem>
-                          <SelectItem value="2023-2024">2023-2024</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="programId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Opleiding</FormLabel>
-                      <Select 
-                        onValueChange={(value) => field.onChange(Number(value))}
-                        value={field.value?.toString()}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer opleiding" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {programs.map((program) => (
-                            <SelectItem key={program.id} value={program.id.toString()}>
-                              {program.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="courseId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Vak</FormLabel>
-                      <Select 
-                        onValueChange={(value) => field.onChange(Number(value))}
-                        value={field.value?.toString()}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer vak" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {courses.map((course) => (
-                            <SelectItem key={course.id} value={course.id.toString()}>
-                              {course.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="instructor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Docent</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Naam van docent" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="maxCapacity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Maximale Capaciteit</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="30"
-                          {...field}
-                          onChange={(e) => {
-                            const value = parseInt(e.target.value);
-                            field.onChange(isNaN(value) ? undefined : value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="startDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Startdatum</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
+              <Tabs defaultValue="algemeen" className="w-full">
+                <TabsList className="grid grid-cols-5 w-full">
+                  <TabsTrigger value="algemeen">Algemeen</TabsTrigger>
+                  <TabsTrigger value="studenten">Studenten</TabsTrigger>
+                  <TabsTrigger value="docenten">Docenten</TabsTrigger>
+                  <TabsTrigger value="vakken">Vakken</TabsTrigger>
+                  <TabsTrigger value="planning">Planning</TabsTrigger>
+                </TabsList>
+
+                {/* Algemeen tabblad */}
+                <TabsContent value="algemeen" className="pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Naam *</FormLabel>
                           <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "dd-MM-yyyy")
-                              ) : (
-                                <span>Kies een datum</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
+                            <Input placeholder="Voer klasnaam in" {...field} />
                           </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="endDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Einddatum</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="academicYear"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Academisch Jaar *</FormLabel>
+                          <Select 
+                            onValueChange={field.onChange} 
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecteer academisch jaar" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="2025-2026">2025-2026</SelectItem>
+                              <SelectItem value="2024-2025">2024-2025</SelectItem>
+                              <SelectItem value="2023-2024">2023-2024</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="programId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Opleiding</FormLabel>
+                          <Select 
+                            onValueChange={(value) => field.onChange(Number(value))}
+                            value={field.value?.toString()}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecteer opleiding" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {programs.map((program) => (
+                                <SelectItem key={program.id} value={program.id.toString()}>
+                                  {program.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="courseId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Vak</FormLabel>
+                          <Select 
+                            onValueChange={(value) => field.onChange(Number(value))}
+                            value={field.value?.toString()}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecteer vak" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {courses.map((course) => (
+                                <SelectItem key={course.id} value={course.id.toString()}>
+                                  {course.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="maxCapacity"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Maximale Capaciteit</FormLabel>
                           <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "dd-MM-yyyy")
-                              ) : (
-                                <span>Kies een datum</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
+                            <Input
+                              type="number"
+                              placeholder="30"
+                              {...field}
+                              onChange={(e) => {
+                                const value = parseInt(e.target.value);
+                                field.onChange(isNaN(value) ? undefined : value);
+                              }}
+                            />
                           </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2">
-                      <FormLabel>Beschrijving</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Geef een beschrijving van de klas en doelstellingen"
-                          className="min-h-24"
-                          {...field} 
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem className="col-span-2">
+                          <FormLabel>Beschrijving</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Geef een beschrijving van de klas en doelstellingen"
+                              className="min-h-24"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="isActive"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                          <div className="space-y-0.5">
+                            <FormLabel>Status Actief</FormLabel>
+                            <FormDescription>
+                              Als dit niet actief is, kan de klas niet worden gebruikt voor nieuwe inschrijvingen.
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </TabsContent>
+
+                {/* Studenten tabblad */}
+                <TabsContent value="studenten" className="pt-4">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-medium">Studenten toewijzen</h3>
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          placeholder="Zoek studenten..." 
+                          className="w-64"
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="isActive"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                      <div className="space-y-0.5">
-                        <FormLabel>Status Actief</FormLabel>
-                        <FormDescription>
-                          Als dit niet actief is, kan de klas niet worden gebruikt voor nieuwe inschrijvingen.
-                        </FormDescription>
+                        <Button type="button" variant="outline" size="sm">
+                          <Search className="h-4 w-4 mr-2" />
+                          Zoeken
+                        </Button>
                       </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
+                    </div>
+
+                    <div className="border rounded-md">
+                      <div className="p-3 bg-gray-50 border-b">
+                        <h4 className="font-medium">Toegewezen studenten</h4>
+                        <p className="text-sm text-gray-500">Sleep studenten naar deze sectie om ze toe te wijzen aan de klas.</p>
+                      </div>
+                      <div className="p-4 min-h-[150px] bg-gray-50/30">
+                        <div className="text-center text-gray-500 py-10">
+                          <UsersRound className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                          <p>Er zijn nog geen studenten toegewezen</p>
+                          <p className="text-sm mt-1">Gebruik de zoekfunctie om studenten te vinden en toe te wijzen</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-md mt-4">
+                      <div className="p-3 bg-gray-50 border-b">
+                        <h4 className="font-medium">Beschikbare studenten</h4>
+                        <p className="text-sm text-gray-500">Selecteer en sleep de studenten die je wilt toewijzen aan deze klas.</p>
+                      </div>
+                      <div className="p-3">
+                        <table className="w-full">
+                          <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase">
+                            <tr>
+                              <th className="px-2 py-2 text-left">ID</th>
+                              <th className="px-2 py-2 text-left">Naam</th>
+                              <th className="px-2 py-2 text-left">Email</th>
+                              <th className="px-2 py-2 text-left">Status</th>
+                              <th className="px-2 py-2 text-left">Acties</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y">
+                            <tr className="hover:bg-gray-50 text-sm">
+                              <td className="px-2 py-3">S001</td>
+                              <td className="px-2 py-3">
+                                <div className="flex items-center">
+                                  <Avatar className="h-7 w-7 mr-2">
+                                    <AvatarFallback>ZM</AvatarFallback>
+                                  </Avatar>
+                                  <span>Zaina El-Mouden</span>
+                                </div>
+                              </td>
+                              <td className="px-2 py-3">zaina@example.com</td>
+                              <td className="px-2 py-3">
+                                <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50">Actief</Badge>
+                              </td>
+                              <td className="px-2 py-3">
+                                <Button type="button" variant="ghost" size="sm">
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Docenten tabblad */}
+                <TabsContent value="docenten" className="pt-4">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-medium">Docenten toewijzen</h3>
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          placeholder="Zoek docenten..." 
+                          className="w-64"
                         />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
+                        <Button type="button" variant="outline" size="sm">
+                          <Search className="h-4 w-4 mr-2" />
+                          Zoeken
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-md">
+                      <div className="p-3 bg-gray-50 border-b">
+                        <h4 className="font-medium">Toegewezen docenten</h4>
+                        <p className="text-sm text-gray-500">Wijs docenten toe aan deze klas en geef aan welke vakken ze geven.</p>
+                      </div>
+                      <div className="p-4 min-h-[150px] bg-gray-50/30">
+                        <FormField
+                          control={form.control}
+                          name="instructor"
+                          render={({ field }) => (
+                            <FormItem className="mb-4">
+                              <FormLabel>Hoofddocent</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Naam van hoofddocent" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <div className="text-center text-gray-500 py-5">
+                          <p className="text-sm">Voeg extra docenten toe voor specifieke vakken indien nodig</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-md mt-4">
+                      <div className="p-3 bg-gray-50 border-b">
+                        <h4 className="font-medium">Beschikbare docenten</h4>
+                        <p className="text-sm text-gray-500">Selecteer docenten om toe te wijzen aan deze klas.</p>
+                      </div>
+                      <div className="p-3">
+                        <table className="w-full">
+                          <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase">
+                            <tr>
+                              <th className="px-2 py-2 text-left">ID</th>
+                              <th className="px-2 py-2 text-left">Naam</th>
+                              <th className="px-2 py-2 text-left">Specialisatie</th>
+                              <th className="px-2 py-2 text-left">Status</th>
+                              <th className="px-2 py-2 text-left">Acties</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y">
+                            <tr className="hover:bg-gray-50 text-sm">
+                              <td className="px-2 py-3">T001</td>
+                              <td className="px-2 py-3">
+                                <div className="flex items-center">
+                                  <Avatar className="h-7 w-7 mr-2">
+                                    <AvatarFallback>AK</AvatarFallback>
+                                  </Avatar>
+                                  <span>Ahmed Khalid</span>
+                                </div>
+                              </td>
+                              <td className="px-2 py-3">Arabisch, Fiqh</td>
+                              <td className="px-2 py-3">
+                                <Badge variant="outline" className="bg-green-50 text-green-700 hover:bg-green-50">Actief</Badge>
+                              </td>
+                              <td className="px-2 py-3">
+                                <Button type="button" variant="ghost" size="sm">
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Vakken tabblad */}
+                <TabsContent value="vakken" className="pt-4">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-medium">Vakken toewijzen</h3>
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          placeholder="Zoek vakken..." 
+                          className="w-64"
+                        />
+                        <Button type="button" variant="outline" size="sm">
+                          <Search className="h-4 w-4 mr-2" />
+                          Zoeken
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-md">
+                      <div className="p-3 bg-gray-50 border-b">
+                        <h4 className="font-medium">Toegewezen vakken</h4>
+                        <p className="text-sm text-gray-500">De vakken die in deze klas worden onderwezen.</p>
+                      </div>
+                      <div className="p-4 min-h-[100px] bg-gray-50/30">
+                        <FormField
+                          control={form.control}
+                          name="courseId"
+                          render={({ field }) => (
+                            <FormItem className="mb-4">
+                              <FormLabel>Hoofdvak</FormLabel>
+                              <Select 
+                                onValueChange={(value) => field.onChange(Number(value))}
+                                value={field.value?.toString()}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Selecteer hoofdvak" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {courses.map((course) => (
+                                    <SelectItem key={course.id} value={course.id.toString()}>
+                                      {course.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <div className="text-center text-gray-500 py-2">
+                          <p className="text-sm">Voeg extra vakken toe indien nodig</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-md mt-4">
+                      <div className="p-3 bg-gray-50 border-b">
+                        <h4 className="font-medium">Curriculum opbouw</h4>
+                        <p className="text-sm text-gray-500">Plan de vakken en het aantal uren per week.</p>
+                      </div>
+                      <div className="p-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="border rounded-md p-3">
+                            <h5 className="font-medium mb-2">Lesrooster</h5>
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                                <div>
+                                  <p className="font-medium">Arabisch</p>
+                                  <p className="text-xs text-gray-500">Zaterdag 10:00 - 12:00</p>
+                                </div>
+                                <Badge>2 uur / week</Badge>
+                              </div>
+                              <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                                <div>
+                                  <p className="font-medium">Fiqh</p>
+                                  <p className="text-xs text-gray-500">Zondag 13:00 - 15:00</p>
+                                </div>
+                                <Badge>2 uur / week</Badge>
+                              </div>
+                            </div>
+                            <Button type="button" variant="outline" size="sm" className="mt-3 w-full">
+                              <Plus className="h-4 w-4 mr-2" />
+                              Vak toevoegen aan rooster
+                            </Button>
+                          </div>
+                          <div className="border rounded-md p-3">
+                            <h5 className="font-medium mb-2">Studiebelasting</h5>
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span>Totaal contacturen:</span>
+                                <span className="font-medium">4 uur / week</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span>Zelfstudie-uren:</span>
+                                <span className="font-medium">6 uur / week</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span>Totale studiebelasting:</span>
+                                <span className="font-medium">10 uur / week</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Planning tabblad */}
+                <TabsContent value="planning" className="pt-4">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-medium">Planning en roosters</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="startDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Startdatum</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                      "pl-3 text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, "dd-MM-yyyy")
+                                    ) : (
+                                      <span>Kies een datum</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="endDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Einddatum</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                      "pl-3 text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, "dd-MM-yyyy")
+                                    ) : (
+                                      <span>Kies een datum</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="border rounded-md">
+                      <div className="p-3 bg-gray-50 border-b">
+                        <h4 className="font-medium">Lesdagen en tijden</h4>
+                        <p className="text-sm text-gray-500">Configureer op welke dagen en tijden lessen plaatsvinden.</p>
+                      </div>
+                      <div className="p-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                          {['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag'].map((day) => (
+                            <div key={day} className="border rounded-lg p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-medium">{day}</span>
+                                <Switch />
+                              </div>
+                              <div className="space-y-1 mt-3">
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <label className="text-xs text-gray-500 block mb-1">Van</label>
+                                    <Select disabled>
+                                      <SelectTrigger className="h-8 text-xs">
+                                        <SelectValue placeholder="09:00" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {Array.from({ length: 13 }, (_, i) => {
+                                          const hour = 8 + i;
+                                          return (
+                                            <SelectItem key={hour} value={`${hour}:00`}>
+                                              {`${hour}:00`}
+                                            </SelectItem>
+                                          )
+                                        })}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div>
+                                    <label className="text-xs text-gray-500 block mb-1">Tot</label>
+                                    <Select disabled>
+                                      <SelectTrigger className="h-8 text-xs">
+                                        <SelectValue placeholder="12:00" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {Array.from({ length: 13 }, (_, i) => {
+                                          const hour = 8 + i;
+                                          return (
+                                            <SelectItem key={hour} value={`${hour}:00`}>
+                                              {`${hour}:00`}
+                                            </SelectItem>
+                                          )
+                                        })}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-md">
+                      <div className="p-3 bg-gray-50 border-b">
+                        <h4 className="font-medium">Belangrijke datums</h4>
+                        <p className="text-sm text-gray-500">Plan tentamendata, vakanties en andere belangrijke momenten.</p>
+                      </div>
+                      <div className="p-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                            <div>
+                              <p className="font-medium">Tentamen Arabisch</p>
+                              <p className="text-xs text-gray-500">18-12-2024</p>
+                            </div>
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700">Tentamen</Badge>
+                          </div>
+                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                            <div>
+                              <p className="font-medium">Wintervakantie</p>
+                              <p className="text-xs text-gray-500">23-12-2024 tot 05-01-2025</p>
+                            </div>
+                            <Badge variant="outline" className="bg-green-50 text-green-700">Vakantie</Badge>
+                          </div>
+                        </div>
+                        <Button type="button" variant="outline" size="sm" className="mt-3 w-full">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Datum toevoegen
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+
               <DialogFooter>
                 <Button 
                   type="button" 

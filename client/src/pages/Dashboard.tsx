@@ -443,7 +443,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <div className="flex items-center bg-sky-50 px-2 py-1 rounded-md border border-sky-100">
-                    <BookText className="h-4 w-4 text-sky-600 mr-1" />
+                    <BookText className="h-4 w-4 text-[#1e3a8a] mr-1" />
                     <span className="text-sm text-sky-700">{lesson.courseName || 'Onbekende cursus'}</span>
                   </div>
                 </div>

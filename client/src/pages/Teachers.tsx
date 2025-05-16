@@ -140,7 +140,7 @@ export default function Teachers() {
     queryFn: async () => {
       if (!selectedTeacher) return [];
       try {
-        return await apiRequest('GET', `/api/teacher-course-assignments?teacherId=${selectedTeacher.id}`);
+        return await apiRequest(`/api/teacher-course-assignments?teacherId=${selectedTeacher.id}`);
       } catch (error) {
         console.error('Error fetching teacher course assignments:', error);
         return [];
@@ -152,7 +152,7 @@ export default function Teachers() {
   // Delete Mutation
   const deleteMutation = useMutation({
     mutationFn: async (teacherId: number) => {
-      return await apiRequest(`/api/teachers/${teacherId}`, 'DELETE');
+      return await apiRequest(`/api/teachers/${teacherId}`, { method: 'DELETE' });
     },
     onSuccess: () => {
       toast({

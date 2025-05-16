@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen } from "lucide-react";
+import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,6 +90,7 @@ export default function Teachers() {
     city: '',
     dateOfBirth: '',
     profession: '',
+    education: '',
     gender: '',
     notes: '',
     isActive: true
@@ -761,7 +762,7 @@ export default function Teachers() {
           </DialogHeader>
           
           <Tabs defaultValue="personal" className="mt-4">
-            <TabsList className="grid grid-cols-5 mb-4">
+            <TabsList className="grid grid-cols-6 mb-4">
               <TabsTrigger value="personal" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 <span>Persoonlijk</span>
@@ -777,6 +778,10 @@ export default function Teachers() {
               <TabsTrigger value="professional" className="flex items-center gap-2">
                 <Briefcase className="h-4 w-4" />
                 <span>Professioneel</span>
+              </TabsTrigger>
+              <TabsTrigger value="subjects" className="flex items-center gap-2">
+                <Book className="h-4 w-4" />
+                <span>Vakken</span>
               </TabsTrigger>
               <TabsTrigger value="classes" className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4" />
@@ -1007,6 +1012,35 @@ export default function Teachers() {
                       className="mt-1 bg-white"
                       placeholder="Bijv. Islamitische studies"
                     />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="education" className="text-sm font-medium text-gray-700">
+                      Gevolgde opleiding
+                    </Label>
+                    <Input
+                      id="education"
+                      value={teacherFormData.education}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, education: e.target.value })}
+                      className="mt-1 bg-white"
+                      placeholder="Bijv. Islamitische theologie"
+                    />
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+            
+            {/* Vakken tab */}
+            <TabsContent value="subjects" className="space-y-6">
+              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <h3 className="text-lg font-semibold text-primary mb-4">Vakken</h3>
+                <div className="space-y-6">
+                  <p className="text-sm text-gray-500">
+                    Wijs de docent toe aan vakken. Deze functionaliteit wordt later geïmplementeerd.
+                  </p>
+                  <div className="border border-dashed border-gray-200 rounded-md p-4 text-center text-gray-500">
+                    <Book className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>Nog geen vakken toegewezen</p>
                   </div>
                 </div>
               </div>

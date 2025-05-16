@@ -375,63 +375,54 @@ export default function Admissions() {
         </div>
       </div>
 
-      {/* Dashboard Stats */}
+      {/* Dashboard Stats - met dezelfde stijl als in Dashboard.tsx */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Totaal Aanmeldingen</p>
-                <p className="text-2xl font-bold">{stats.totalApplications}</p>
-              </div>
-              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <FileText className="h-6 w-6 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Wachtend op Beoordeling</p>
-                <p className="text-2xl font-bold">{stats.pendingReview}</p>
-              </div>
-              <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-yellow-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Goedgekeurd</p>
-                <p className="text-2xl font-bold">{stats.approved}</p>
-              </div>
-              <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Inschrijvingsgraad</p>
-                <div className="flex items-center">
-                  <p className="text-2xl font-bold">{stats.enrollmentRate}%</p>
-                </div>
-                <Progress value={stats.enrollmentRate} className="h-1.5 mt-1.5 w-32" />
-              </div>
-              <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
-                <School className="h-6 w-6 text-purple-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <FileText className="h-20 w-20 text-sky-500" />
+          </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal Aanmeldingen</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.totalApplications}</p>
+          <div className="flex justify-between mt-2 text-xs text-sky-600">
+            <span>Actief</span>
+            <span>Ingeschreven</span>
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <Clock className="h-20 w-20 text-sky-500" />
+          </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Wachtend op Beoordeling</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.pendingReview}</p>
+          <div className="flex justify-between mt-2 text-xs text-sky-600">
+            <span>In afwachting</span>
+            <span>Beoordeling</span>
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <CheckCircle className="h-20 w-20 text-sky-500" />
+          </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Goedgekeurd</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.approved}</p>
+          <div className="flex justify-between mt-2 text-xs text-sky-600">
+            <span>Geaccepteerd</span>
+            <span>Aanmeldingen</span>
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <School className="h-20 w-20 text-sky-500" />
+          </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Inschrijvingsgraad</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.enrollmentRate}%</p>
+          <div className="mt-2">
+            <Progress value={stats.enrollmentRate} className="h-1.5" />
+          </div>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">

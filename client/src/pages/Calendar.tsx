@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, 
-  FilePlus, GraduationCap, School, PartyPopper, Pencil, BookOpen, Timer  
+  FilePlus, GraduationCap, Palmtree, PartyPopper, Pencil, BookOpen, Timer  
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -434,7 +434,7 @@ export default function Calendar() {
                 <span>Les</span>
               </TabsTrigger>
               <TabsTrigger value="holiday" className="flex items-center justify-center gap-2">
-                <School className="h-4 w-4" />
+                <Palmtree className="h-4 w-4" />
                 <span>Vakantie</span>
               </TabsTrigger>
               <TabsTrigger value="event" className="flex items-center justify-center gap-2">
@@ -607,7 +607,7 @@ export default function Calendar() {
                 
                 <TabsContent value="holiday" className="space-y-4 pt-4 border-t">
                   <h3 className="text-lg font-medium flex items-center mb-2">
-                    <School className="mr-2 h-5 w-5 text-primary" />
+                    <Palmtree className="mr-2 h-5 w-5 text-primary" />
                     Vakantie details
                   </h3>
                 </TabsContent>

@@ -1047,4 +1047,177 @@ export class DatabaseStorage implements IStorage {
       .returning({ id: behaviorAssessments.id });
     return result.length > 0;
   }
+
+  // Fee Stats en Outstanding Debts
+  async getFeeStats(): Promise<{ 
+    totalCollected: number; 
+    pendingAmount: number; 
+    totalStudents: number; 
+    completionRate: number;
+    overdueAmount: number;
+    pendingInvoices: number;
+  } | undefined> {
+    try {
+      const allFees = await db.select().from(fees);
+      const allStudents = await db.select().from(students);
+      
+      // Bereken statistieken
+      const totalStudents = allStudents.length;
+      
+      let totalCollected = 0;
+      let pendingAmount = 0;
+      let overdueAmount = 0;
+      let pendingInvoices = 0;
+      
+      const currentDate = new Date().toISOString();
+      
+      allFees.forEach(fee => {
+        const amount = parseFloat(fee.amount);
+        if (fee.status === "betaald") {
+          totalCollected += amount;
+        } else {
+          pendingAmount += amount;
+          pendingInvoices++;
+          
+          // Check of de vervaldag is verstreken
+          if (fee.dueDate < currentDate) {
+            overdueAmount += amount;
+          }
+        }
+      });
+      
+      // Bereken betalingsgraad (hoeveel procent van de facturen is betaald)
+      const completionRate = allFees.length > 0 
+        ? (allFees.filter(fee => fee.status === "betaald").length / allFees.length) * 100 
+        : 0;
+      
+      return {
+        totalCollected,
+        pendingAmount,
+        totalStudents,
+        completionRate,
+        overdueAmount,
+        pendingInvoices
+      };
+    } catch (error) {
+      console.error("Error calculating fee stats:", error);
+      return undefined;
+    }
+  }
+  
+  async getOutstandingDebts(): Promise<any[]> {
+    try {
+      // Vraag alle nog niet betaalde schoolgelden op
+      const outstandingFees = await db.select().from(fees).where(eq(fees.status, "niet betaald"));
+      
+      // Voeg student- en voogdinformatie toe
+      const result = [];
+      for (const fee of outstandingFees) {
+        const student = await this.getStudent(fee.studentId);
+        
+        if (student) {
+          // Haal voogden op voor deze student
+          const guardianRelations = await this.getStudentGuardiansByStudent(student.id);
+          const guardianInfo = [];
+          
+          for (const relation of guardianRelations) {
+            const guardian = await this.getGuardian(relation.guardianId);
+            if (guardian) {
+              guardianInfo.push({
+                id: guardian.id,
+                name: `${guardian.firstName} ${guardian.lastName}`,
+                email: guardian.email,
+                phone: guardian.phone
+              });
+            }
+          }
+          
+          result.push({
+            id: fee.id,
+            studentId: student.id,
+            studentName: `${student.firstName} ${student.lastName}`,
+            invoiceNumber: fee.invoiceNumber,
+            amount: fee.amount,
+            dueDate: fee.dueDate,
+            description: fee.description,
+            guardians: guardianInfo
+          });
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error("Error fetching outstanding debts:", error);
+      return [];
+    }
+  }
+  
+  // Fee Settings operations
+  async getFeeSettings(): Promise<FeeSettings[]> {
+    return db.select().from(feeSettings);
+  }
+  
+  async getFeeSetting(id: number): Promise<FeeSettings | undefined> {
+    const result = await db.select().from(feeSettings).where(eq(feeSettings.id, id));
+    return result[0];
+  }
+  
+  async getFeeSettingByAcademicYear(academicYear: string): Promise<FeeSettings | undefined> {
+    const result = await db.select().from(feeSettings).where(eq(feeSettings.academicYear, academicYear));
+    return result[0];
+  }
+  
+  async createFeeSetting(setting: InsertFeeSettings): Promise<FeeSettings> {
+    const result = await db.insert(feeSettings).values(setting).returning();
+    return result[0];
+  }
+  
+  async updateFeeSetting(id: number, setting: Partial<FeeSettings>): Promise<FeeSettings | undefined> {
+    const result = await db.update(feeSettings)
+      .set(setting)
+      .where(eq(feeSettings.id, id))
+      .returning();
+    return result[0];
+  }
+  
+  async deleteFeeSetting(id: number): Promise<boolean> {
+    const result = await db.delete(feeSettings)
+      .where(eq(feeSettings.id, id))
+      .returning({ id: feeSettings.id });
+    return result.length > 0;
+  }
+  
+  // Fee Discount operations
+  async getFeeDiscounts(): Promise<FeeDiscount[]> {
+    return db.select().from(feeDiscounts);
+  }
+  
+  async getFeeDiscount(id: number): Promise<FeeDiscount | undefined> {
+    const result = await db.select().from(feeDiscounts).where(eq(feeDiscounts.id, id));
+    return result[0];
+  }
+  
+  async getFeeDiscountsByAcademicYear(academicYear: string): Promise<FeeDiscount[]> {
+    return db.select().from(feeDiscounts).where(eq(feeDiscounts.academicYear, academicYear));
+  }
+  
+  async createFeeDiscount(discount: InsertFeeDiscount): Promise<FeeDiscount> {
+    const result = await db.insert(feeDiscounts).values(discount).returning();
+    return result[0];
+  }
+  
+  async updateFeeDiscount(id: number, discount: Partial<FeeDiscount>): Promise<FeeDiscount | undefined> {
+    const result = await db.update(feeDiscounts)
+      .set(discount)
+      .where(eq(feeDiscounts.id, id))
+      .returning();
+    return result[0];
+  }
+  
+  async deleteFeeDiscount(id: number): Promise<boolean> {
+    const result = await db.delete(feeDiscounts)
+      .where(eq(feeDiscounts.id, id))
+      .returning({ id: feeDiscounts.id });
+    return result.length > 0;
+  }
 }

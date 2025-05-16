@@ -1480,6 +1480,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ********************
   // Fee API endpoints
   // ********************
+  
+  // Fee statistieken endpoint - Moet VóóR endpoints met parameters
+  apiRouter.get("/api/fees/stats", async (_req, res) => {
+    try {
+      const stats = await storage.getFeeStats();
+      if (!stats) {
+        return res.status(404).json({ message: "Fee stats not available" });
+      }
+      res.json({ stats });
+    } catch (error) {
+      console.error("Error fetching fee stats:", error);
+      res.status(500).json({ message: "Error fetching fee statistics" });
+    }
+  });
+  
+  // Openstaande schulden endpoint - Moet VóóR endpoints met parameters
+  apiRouter.get("/api/fees/outstanding", async (_req, res) => {
+    try {
+      const outstandingDebts = await storage.getOutstandingDebts();
+      res.json(outstandingDebts);
+    } catch (error) {
+      console.error("Error fetching outstanding debts:", error);
+      res.status(500).json({ message: "Error fetching outstanding debts" });
+    }
+  });
+  
+  // Algemene fee endpoints
   apiRouter.get("/api/fees", async (_req, res) => {
     try {
       const fees = await storage.getFees();
@@ -1599,6 +1626,194 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: "Error deleting fee" });
+    }
+  });
+  
+  // ********************
+  // Fee Settings API endpoints
+  // ********************
+  apiRouter.get("/api/fee-settings", async (_req, res) => {
+    try {
+      const settings = await storage.getFeeSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching fee settings:", error);
+      res.status(500).json({ message: "Error fetching fee settings" });
+    }
+  });
+  
+  apiRouter.get("/api/fee-settings/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const setting = await storage.getFeeSetting(id);
+      if (!setting) {
+        return res.status(404).json({ message: "Fee setting not found" });
+      }
+      
+      res.json(setting);
+    } catch (error) {
+      console.error("Error fetching fee setting:", error);
+      res.status(500).json({ message: "Error fetching fee setting" });
+    }
+  });
+  
+  apiRouter.get("/api/fee-settings/academic-year/:year", async (req, res) => {
+    try {
+      const year = req.params.year;
+      const setting = await storage.getFeeSettingByAcademicYear(year);
+      if (!setting) {
+        return res.status(404).json({ message: "Fee setting not found for academic year" });
+      }
+      
+      res.json(setting);
+    } catch (error) {
+      console.error("Error fetching fee setting by academic year:", error);
+      res.status(500).json({ message: "Error fetching fee setting by academic year" });
+    }
+  });
+  
+  apiRouter.post("/api/fee-settings", async (req, res) => {
+    try {
+      // TODO: Voeg schema validatie toe
+      const newSetting = await storage.createFeeSetting(req.body);
+      res.status(201).json(newSetting);
+    } catch (error) {
+      console.error("Error creating fee setting:", error);
+      res.status(500).json({ message: "Error creating fee setting" });
+    }
+  });
+  
+  apiRouter.put("/api/fee-settings/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const updatedSetting = await storage.updateFeeSetting(id, req.body);
+      if (!updatedSetting) {
+        return res.status(404).json({ message: "Fee setting not found" });
+      }
+      
+      res.json(updatedSetting);
+    } catch (error) {
+      console.error("Error updating fee setting:", error);
+      res.status(500).json({ message: "Error updating fee setting" });
+    }
+  });
+  
+  apiRouter.delete("/api/fee-settings/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteFeeSetting(id);
+      if (!success) {
+        return res.status(404).json({ message: "Fee setting not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting fee setting:", error);
+      res.status(500).json({ message: "Error deleting fee setting" });
+    }
+  });
+  
+  // ********************
+  // Fee Discounts API endpoints
+  // ********************
+  apiRouter.get("/api/fee-discounts", async (_req, res) => {
+    try {
+      const discounts = await storage.getFeeDiscounts();
+      res.json(discounts);
+    } catch (error) {
+      console.error("Error fetching fee discounts:", error);
+      res.status(500).json({ message: "Error fetching fee discounts" });
+    }
+  });
+  
+  apiRouter.get("/api/fee-discounts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const discount = await storage.getFeeDiscount(id);
+      if (!discount) {
+        return res.status(404).json({ message: "Fee discount not found" });
+      }
+      
+      res.json(discount);
+    } catch (error) {
+      console.error("Error fetching fee discount:", error);
+      res.status(500).json({ message: "Error fetching fee discount" });
+    }
+  });
+  
+  apiRouter.get("/api/fee-discounts/academic-year/:year", async (req, res) => {
+    try {
+      const year = req.params.year;
+      const discounts = await storage.getFeeDiscountsByAcademicYear(year);
+      res.json(discounts);
+    } catch (error) {
+      console.error("Error fetching fee discounts by academic year:", error);
+      res.status(500).json({ message: "Error fetching fee discounts by academic year" });
+    }
+  });
+  
+  apiRouter.post("/api/fee-discounts", async (req, res) => {
+    try {
+      // TODO: Voeg schema validatie toe
+      const newDiscount = await storage.createFeeDiscount(req.body);
+      res.status(201).json(newDiscount);
+    } catch (error) {
+      console.error("Error creating fee discount:", error);
+      res.status(500).json({ message: "Error creating fee discount" });
+    }
+  });
+  
+  apiRouter.put("/api/fee-discounts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const updatedDiscount = await storage.updateFeeDiscount(id, req.body);
+      if (!updatedDiscount) {
+        return res.status(404).json({ message: "Fee discount not found" });
+      }
+      
+      res.json(updatedDiscount);
+    } catch (error) {
+      console.error("Error updating fee discount:", error);
+      res.status(500).json({ message: "Error updating fee discount" });
+    }
+  });
+  
+  apiRouter.delete("/api/fee-discounts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const success = await storage.deleteFeeDiscount(id);
+      if (!success) {
+        return res.status(404).json({ message: "Fee discount not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting fee discount:", error);
+      res.status(500).json({ message: "Error deleting fee discount" });
     }
   });
 

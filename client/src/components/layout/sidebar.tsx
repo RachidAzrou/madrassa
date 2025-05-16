@@ -11,7 +11,7 @@ import {
   BookText,
   Calendar,
   ClipboardCheck,
-  Calculator,
+  Percent,
   BarChart3,
   LogOut,
   Menu,
@@ -249,7 +249,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
               />
               <SidebarLink
                 href="/grading"
-                icon={<Calculator className="h-5 w-5" />}
+                icon={<Percent className="h-5 w-5" />}
                 label="Cijfers"
                 isActive={location.startsWith("/grading")}
                 onClick={handleLinkClick}

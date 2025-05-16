@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Download, PlusCircle, History, Save, Plus, X, Edit, Trash2, AlertCircle, Calculator } from 'lucide-react';
+import { Search, Download, PlusCircle, History, Save, Plus, X, Edit, Trash2, AlertCircle, Percent } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -630,7 +630,7 @@ export default function Grading() {
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <Calculator className="h-6 w-6" />
+              <Percent className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-semibold text-[#1e3a8a]">Cijfers</h1>
           </div>

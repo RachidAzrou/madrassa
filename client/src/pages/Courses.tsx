@@ -1364,36 +1364,34 @@ export default function Courses() {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">
-              {uploadType === 'material' ? 'Lesmateriaal toevoegen' : 'Opdracht of toets toevoegen'}
+              Document toevoegen
             </DialogTitle>
             <DialogDescription>
-              Upload een bestand om toe te voegen aan de cursus
+              Upload een document voor de cursus
             </DialogDescription>
           </DialogHeader>
           
           <div className="mt-4 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="fileTitle">Titel</Label>
-              <Input id="fileTitle" placeholder="Voer een titel in voor dit bestand" />
+              <Input id="fileTitle" placeholder="Voer een titel in voor dit document" />
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="fileDescription">Beschrijving (optioneel)</Label>
-              <Textarea id="fileDescription" placeholder="Geef een korte beschrijving van dit bestand" className="resize-none h-20" />
+              <Textarea id="fileDescription" placeholder="Geef een korte beschrijving van dit document" className="resize-none h-20" />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="fileType">Bestandstype</Label>
-              <Select defaultValue="pdf">
+              <Label htmlFor="documentType">Type document</Label>
+              <Select defaultValue="assignment">
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecteer bestandstype" />
+                  <SelectValue placeholder="Selecteer documenttype" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pdf">PDF Document</SelectItem>
-                  <SelectItem value="doc">Word Document</SelectItem>
-                  <SelectItem value="ppt">PowerPoint Presentatie</SelectItem>
-                  <SelectItem value="xls">Excel Werkblad</SelectItem>
-                  <SelectItem value="other">Ander bestandstype</SelectItem>
+                  <SelectItem value="assignment">Opdracht</SelectItem>
+                  <SelectItem value="test">Test</SelectItem>
+                  <SelectItem value="exam">Examen</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1408,19 +1406,8 @@ export default function Courses() {
                 accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"
               />
               <Upload className="h-10 w-10 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm font-medium">Klik om een bestand te kiezen of sleep het hier naartoe</p>
-              <p className="text-xs text-gray-500 mt-1">PDF, Word, PowerPoint, Excel tot 10MB</p>
-            </div>
-            
-            <div className="bg-blue-50 p-3 rounded-md flex items-center">
-              <div className="bg-blue-100 rounded-full p-2 mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
-                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                </svg>
-              </div>
-              <div className="text-sm text-blue-700">
-                Bestanden worden geüpload naar de cursus en zijn zichtbaar voor alle studenten die zijn ingeschreven.
-              </div>
+              <p className="text-sm font-medium">Klik om een document te kiezen of sleep het hier naartoe</p>
+              <p className="text-xs text-gray-500 mt-1">PDF, Word of andere documentformaten tot 10MB</p>
             </div>
           </div>
           
@@ -1428,7 +1415,13 @@ export default function Courses() {
             <Button variant="outline" onClick={() => setIsUploadDialogOpen(false)}>
               Annuleren
             </Button>
-            <Button type="button">
+            <Button type="button" onClick={() => {
+              toast({
+                title: "Document geüpload",
+                description: "Het document is succesvol toegevoegd.",
+              });
+              setIsUploadDialogOpen(false);
+            }}>
               Uploaden
             </Button>
           </DialogFooter>

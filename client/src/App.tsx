@@ -11,7 +11,7 @@ import Courses from "@/pages/Courses";
 import Programs from "@/pages/Programs";
 import Calendar from "@/pages/Calendar";
 import Attendance from "@/pages/Attendance";
-import Grading from "@/pages/Grading";
+import Grading from "@/pages/Cijfers";
 import Reports from "@/pages/Reports";
 import Guardians from "@/pages/Guardians";
 import Teachers from "@/pages/Teachers";

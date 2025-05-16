@@ -841,7 +841,7 @@ export default function Courses() {
         <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">
-              {isAddDialogOpen ? 'Nieuwe Cursus Toevoegen' : 'Cursus Bewerken'}
+              {isAddDialogOpen ? 'Curriculum aanmaken' : 'Curriculum Bewerken'}
             </DialogTitle>
             <DialogDescription>
               Vul de onderstaande velden in om {isAddDialogOpen ? 'een nieuwe cursus toe te voegen' : 'de cursus bij te werken'}.
@@ -865,7 +865,7 @@ export default function Courses() {
               <TabsContent value="basic">
                 <div className="space-y-6">
                   <div className="bg-gray-50 p-5 rounded-md border mb-6">
-                    <h3 className="text-lg font-medium mb-4">Wat wilt u bewerken?</h3>
+                    <h3 className="text-lg font-medium mb-4">Waarvoor wil u een curriculum aanmaken?</h3>
                     <div className="flex space-x-4 mb-4">
                       <div className="flex items-center space-x-2">
                         <input
@@ -940,51 +940,7 @@ export default function Courses() {
                     )}
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="name" className="text-right">
-                          Naam <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          id="name"
-                          value={courseFormData.name}
-                          onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
-                          className="mt-1"
-                          required
-                          disabled={!!courseFormData.selectedCourseId || !!courseFormData.selectedClassId}
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="code" className="text-right">
-                          Code <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          id="code"
-                          value={courseFormData.code}
-                          onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
-                          className="mt-1"
-                          required
-                          disabled={!!courseFormData.selectedCourseId || !!courseFormData.selectedClassId}
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="description" className="text-right">
-                          Beschrijving
-                        </Label>
-                        <Textarea
-                          id="description"
-                          value={courseFormData.description}
-                          onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
-                          className="mt-1"
-                          rows={5}
-                          disabled={!!courseFormData.selectedCourseId || !!courseFormData.selectedClassId}
-                        />
-                      </div>
-                    </div>
-                    
+                  <div className="grid grid-cols-1 gap-6">
                     <div className="space-y-4">
                       <div>
                         <Label htmlFor="prerequisites" className="text-right">
@@ -1011,6 +967,20 @@ export default function Courses() {
                           className="mt-1"
                           rows={3}
                           placeholder="Beschrijf wat studenten na afloop moeten kunnen"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="description" className="text-right">
+                          Beschrijving
+                        </Label>
+                        <Textarea
+                          id="description"
+                          value={courseFormData.description}
+                          onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
+                          className="mt-1"
+                          rows={5}
+                          disabled={!!courseFormData.selectedCourseId || !!courseFormData.selectedClassId}
                         />
                       </div>
                     </div>
@@ -1382,19 +1352,7 @@ export default function Courses() {
               <Textarea id="fileDescription" placeholder="Geef een korte beschrijving van dit document" className="resize-none h-20" />
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="documentType">Type document</Label>
-              <Select defaultValue="assignment">
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecteer documenttype" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="assignment">Opdracht</SelectItem>
-                  <SelectItem value="test">Test</SelectItem>
-                  <SelectItem value="exam">Examen</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+
             
             <div className="border-2 border-dashed rounded-md p-6 text-center cursor-pointer hover:bg-gray-50 transition-colors"
               onClick={() => fileInputRef.current?.click()}

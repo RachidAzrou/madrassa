@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle,
   ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
-  Users
+  Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash
 } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -2442,68 +2442,258 @@ export default function Students() {
       <EditStudentDialog />
       <DeleteStudentDialog />
       
-      {/* Student Detail Dialog */}
+      {/* Student Detail Dialog - Simplified version */}
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
         <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Studentgegevens</DialogTitle>
             <DialogDescription>
-              Gedetailleerde informatie over de student en programma-inschrijvingen.
+              Gedetailleerde informatie over de student.
             </DialogDescription>
           </DialogHeader>
           
           {selectedStudent && (
-            <Tabs defaultValue="general" className="mt-4">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="general">Algemene Informatie</TabsTrigger>
-                <TabsTrigger value="family">Familie</TabsTrigger>
-                <TabsTrigger value="programs">Vakken</TabsTrigger>
-                <TabsTrigger value="payments">Betaalgegevens</TabsTrigger>
-              </TabsList>
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Linker kolom: student profiel */}
+              <div className="w-full md:w-1/4 border rounded-lg p-6 bg-card">
+                <div className="flex flex-col items-center mb-6">
+                  <Avatar className="h-24 w-24 mb-4">
+                    <AvatarFallback className="text-2xl">
+                      {selectedStudent.firstName?.charAt(0)}{selectedStudent.lastName?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <h2 className="text-2xl font-bold text-center">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
+                  <p className="text-muted-foreground text-center">{selectedStudent.studentId}</p>
+                  <Badge variant={
+                    selectedStudent.status === 'active' ? 'success' :
+                    selectedStudent.status === 'inactive' ? 'secondary' :
+                    selectedStudent.status === 'pending' ? 'warning' : 'default'
+                  } className="mt-2 px-3 py-1">
+                    {selectedStudent.status === 'active' ? 'Actief' :
+                     selectedStudent.status === 'inactive' ? 'Inactief' :
+                     selectedStudent.status === 'pending' ? 'In afwachting' :
+                     selectedStudent.status === 'graduated' ? 'Afgestudeerd' : 
+                     selectedStudent.status}
+                  </Badge>
+                </div>
+                
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
+                    <p className="font-medium">{selectedStudent.email || "Niet ingevuld"}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Telefoonnummer</h3>
+                    <p className="font-medium">{selectedStudent.phone || "Niet ingevuld"}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Geboortedatum</h3>
+                    <p className="font-medium">{selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "Niet ingevuld"}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Inschrijvingsdatum</h3>
+                    <p className="font-medium">{selectedStudent.enrollmentDate ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) : "Niet ingevuld"}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">Schooljaar</h3>
+                    <p className="font-medium">{selectedStudent.schoolYear || "Niet ingevuld"}</p>
+                  </div>
+                </div>
+                
+                <div className="mt-6 flex space-x-2">
+                  <Button 
+                    onClick={() => {
+                      handleEditStudent(selectedStudent);
+                      setIsDetailDialogOpen(false);
+                    }}
+                    className="w-full"
+                    variant="outline"
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Bewerken
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      handleDeleteStudent(selectedStudent);
+                      setIsDetailDialogOpen(false);
+                    }}
+                    className="w-full"
+                    variant="destructive"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Verwijderen
+                  </Button>
+                </div>
+              </div>
               
-              <TabsContent value="general" className="pt-4">
-                <div className="flex flex-col md:flex-row gap-6">
-                  {/* Linker kolom: student profiel */}
-                  <div className="w-full md:w-1/4 border rounded-lg p-6 bg-card">
-                    <div className="flex flex-col items-center mb-6">
-                      <Avatar className="h-24 w-24 mb-4">
-                        <AvatarFallback className="text-2xl">
-                          {selectedStudent.firstName?.charAt(0)}{selectedStudent.lastName?.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <h2 className="text-2xl font-bold text-center">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
-                      <p className="text-muted-foreground text-center">{selectedStudent.studentId}</p>
-                      <Badge variant={
-                        selectedStudent.status === 'active' ? 'success' :
-                        selectedStudent.status === 'inactive' ? 'secondary' :
-                        selectedStudent.status === 'pending' ? 'warning' : 'default'
-                      } className="mt-2 px-3 py-1">
-                        {selectedStudent.status.charAt(0).toUpperCase() + selectedStudent.status.slice(1)}
-                      </Badge>
+              {/* Rechter kolom: gedetailleerde informatie */}
+              <div className="w-full md:w-3/4 border rounded-lg p-6 bg-card">
+                <h3 className="font-semibold text-lg mb-4">Programma-informatie</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Programma</h4>
+                    <p className="font-medium">
+                      {programs.find(p => p.id === selectedStudent.programId)?.name || "Niet toegewezen"}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Klas</h4>
+                    <p className="font-medium">
+                      {studentGroups.find(g => g.id === selectedStudent.studentGroupId)?.name || "Niet toegewezen"}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Niveau</h4>
+                    <p className="font-medium">{selectedStudent.yearLevel || "Niet ingevuld"}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Schooljaar</h4>
+                    <p className="font-medium">{selectedStudent.schoolYear || "Niet ingevuld"}</p>
+                  </div>
+                </div>
+                
+                <div className="border-t pt-6 mt-6">
+                  <h3 className="font-semibold text-lg mb-4">Adresgegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground">Straatnaam</h4>
+                      <p className="font-medium">{selectedStudent.street || "Niet ingevuld"}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground">Huisnummer</h4>
+                      <p className="font-medium">{selectedStudent.houseNumber || "Niet ingevuld"}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground">Postcode</h4>
+                      <p className="font-medium">{selectedStudent.postalCode || "Niet ingevuld"}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground">Stad</h4>
+                      <p className="font-medium">{selectedStudent.city || "Niet ingevuld"}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="border-t pt-6 mt-6">
+                  <h3 className="font-semibold text-lg mb-4">Opmerkingen</h3>
+                  <p className="whitespace-pre-wrap">{selectedStudent.notes || "Geen opmerkingen"}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+                  
+                  <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="md:col-span-1">
+                        <p className="text-sm font-medium text-gray-700">Studentnummer</p>
+                        <p className="mt-1">{selectedStudent.studentId}</p>
+                      </div>
+                      <div className="md:col-span-1">
+                        <p className="text-sm font-medium text-gray-700">Status</p>
+                        <p className="mt-1">{
+                          selectedStudent.status === 'active' ? 'Actief' :
+                          selectedStudent.status === 'inactive' ? 'Inactief' :
+                          selectedStudent.status === 'pending' ? 'In afwachting' :
+                          selectedStudent.status === 'graduated' ? 'Afgestudeerd' : 
+                          selectedStudent.status
+                        }</p>
+                      </div>
+                      <div className="md:col-span-1">
+                        <p className="text-sm font-medium text-gray-700">Inschrijvingsdatum</p>
+                        <p className="mt-1">{selectedStudent.enrollmentDate ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) : "Niet ingevuld"}</p>
+                      </div>
                     </div>
                     
-                    <div className="space-y-3">
-                      <div>
-                        <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
-                        <p className="font-medium">{selectedStudent.email || "Niet ingevuld"}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="md:col-span-1">
+                        <p className="text-sm font-medium text-gray-700">Voornaam</p>
+                        <p className="mt-1">{selectedStudent.firstName}</p>
                       </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-muted-foreground">Telefoonnummer</h3>
-                        <p className="font-medium">{selectedStudent.phone || "Niet ingevuld"}</p>
+                      <div className="md:col-span-1">
+                        <p className="text-sm font-medium text-gray-700">Achternaam</p>
+                        <p className="mt-1">{selectedStudent.lastName}</p>
                       </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-muted-foreground">Geboortedatum</h3>
-                        <p className="font-medium">{selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "Niet ingevuld"}</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="md:col-span-1">
+                        <p className="text-sm font-medium text-gray-700">Geboortedatum</p>
+                        <p className="mt-1">{selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "Niet ingevuld"}</p>
                       </div>
+                      <div className="md:col-span-1">
+                        <p className="text-sm font-medium text-gray-700">Geslacht</p>
+                        <p className="mt-1">
+                          {selectedStudent.gender === 'man' ? 'Man' : 
+                           selectedStudent.gender === 'vrouw' ? 'Vrouw' : 'Niet ingevuld'}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                       <div>
-                        <h3 className="text-sm font-medium text-muted-foreground">Inschrijvingsdatum</h3>
-                        <p className="font-medium">{selectedStudent.enrollmentDate ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) : "Niet ingevuld"}</p>
+                        <p className="text-sm font-medium text-gray-700">Notities</p>
+                        <p className="mt-1 whitespace-pre-wrap">{selectedStudent.notes || "Geen notities"}</p>
                       </div>
                     </div>
                   </div>
+                </div>
+              </TabsContent>
+              
+              {/* Contact tab */}
+              <TabsContent value="contact" className="pt-2">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
                   
-                  {/* Rechter kolom: adres en extra informatie */}
-                  <div className="w-full md:w-3/4 space-y-6">
+                  <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">E-mailadres</p>
+                        <p className="mt-1">{selectedStudent.email || "Niet ingevuld"}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">Telefoonnummer</p>
+                        <p className="mt-1">{selectedStudent.phone || "Niet ingevuld"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Adres tab */}
+              <TabsContent value="address" className="pt-2">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
+                  
+                  <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="md:col-span-2">
+                        <p className="text-sm font-medium text-gray-700">Straatnaam</p>
+                        <p className="mt-1">{selectedStudent.street || "Niet ingevuld"}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">Huisnummer</p>
+                        <p className="mt-1">{selectedStudent.houseNumber || "Niet ingevuld"}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">Postcode</p>
+                        <p className="mt-1">{selectedStudent.postalCode || "Niet ingevuld"}</p>
+                      </div>
+                      <div className="md:col-span-2">
+                        <p className="text-sm font-medium text-gray-700">Stad</p>
+                        <p className="mt-1">{selectedStudent.city || "Niet ingevuld"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
                     <div className="border rounded-lg p-6 bg-card">
                       <h3 className="text-lg font-bold mb-4">Adresgegevens</h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

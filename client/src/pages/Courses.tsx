@@ -829,9 +829,12 @@ export default function Courses() {
           
           <form onSubmit={isAddDialogOpen ? handleSubmitCourse : handleSubmitEditCourse} className="space-y-6 pt-4">
             <Tabs defaultValue="basic">
-              <TabsList className="mb-4">
-                <TabsTrigger value="basic">Basisinformatie</TabsTrigger>
-                <TabsTrigger value="advanced">Geavanceerd</TabsTrigger>
+              <TabsList className="grid grid-cols-5 mb-6">
+                <TabsTrigger value="basic">Algemeen</TabsTrigger>
+                <TabsTrigger value="instroom">Instroom/Uitstroom</TabsTrigger>
+                <TabsTrigger value="leerdoelen">Leerdoelen</TabsTrigger>
+                <TabsTrigger value="materiaal">Lesmateriaal</TabsTrigger>
+                <TabsTrigger value="opdrachten">Opdrachten/Examens</TabsTrigger>
               </TabsList>
               
               <TabsContent value="basic">
@@ -969,58 +972,222 @@ export default function Courses() {
                 </div>
               </TabsContent>
               
-              <TabsContent value="advanced">
-                <div className="space-y-6">
-                  <div>
-                    <Label htmlFor="learningObjectives" className="text-right">
-                      Leerdoelen
-                    </Label>
+              {/* Tab 2: Instroom- en uitstroomcriteria */}
+              <TabsContent value="instroom" className="space-y-6">
+                <div className="grid gap-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Instroomvereisten</h3>
+                    <div className="bg-gray-50 rounded-md p-5 border">
+                      <Label htmlFor="prerequisites">Voorkennis en vereisten voor deelname</Label>
+                      <Textarea
+                        id="prerequisites"
+                        value={courseFormData.prerequisites}
+                        onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
+                        className="mt-1"
+                        rows={3}
+                        placeholder="Beschrijf welke voorkennis of vooropleiding vereist is om deel te nemen aan deze cursus"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Doorstroomopties</h3>
+                    <div className="bg-gray-50 rounded-md p-5 border">
+                      <Label htmlFor="subsequentCourses">Vervolgcursussen</Label>
+                      <Textarea
+                        id="subsequentCourses"
+                        value={courseFormData.subsequentCourses || ''}
+                        onChange={(e) => setCourseFormData({ ...courseFormData, subsequentCourses: e.target.value })}
+                        className="mt-1"
+                        rows={3}
+                        placeholder="Welke cursussen kunnen studenten volgen na het afronden van deze cursus?"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Eindniveau</h3>
+                    <div className="bg-gray-50 rounded-md p-5 border">
+                      <Label htmlFor="endLevel">Kennis en vaardigheden na afloop</Label>
+                      <Textarea
+                        id="endLevel"
+                        value={courseFormData.endLevel || ''}
+                        onChange={(e) => setCourseFormData({ ...courseFormData, endLevel: e.target.value })}
+                        className="mt-1"
+                        rows={3}
+                        placeholder="Beschrijf de kennis en vaardigheden die studenten hebben na het succesvol afronden van deze cursus"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Tab 3: Leerdoelen en competenties */}
+              <TabsContent value="leerdoelen" className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Algemene leerdoelen</h3>
+                  <div className="bg-gray-50 rounded-md p-5 border">
+                    <Label htmlFor="learningObjectives">Leerdoelen van de cursus</Label>
                     <Textarea
                       id="learningObjectives"
                       value={courseFormData.learningObjectives}
                       onChange={(e) => setCourseFormData({ ...courseFormData, learningObjectives: e.target.value })}
                       className="mt-1"
                       rows={3}
+                      placeholder="Beschrijf de algemene leerdoelen van deze cursus"
                     />
                   </div>
-                  
-                  <div>
-                    <Label htmlFor="materials" className="text-right">
-                      Lesmateriaal
-                    </Label>
-                    <Textarea
-                      id="materials"
-                      value={courseFormData.materials}
-                      onChange={(e) => setCourseFormData({ ...courseFormData, materials: e.target.value })}
-                      className="mt-1"
-                      rows={3}
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="competencies" className="text-right">
-                      Competenties
-                    </Label>
+                </div>
+                
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Competenties</h3>
+                  <div className="bg-gray-50 rounded-md p-5 border">
+                    <Label htmlFor="competencies">Te ontwikkelen competenties</Label>
                     <Textarea
                       id="competencies"
                       value={courseFormData.competencies}
                       onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
                       className="mt-1"
                       rows={3}
+                      placeholder="Welke competenties ontwikkelen studenten gedurende deze cursus?"
                     />
                   </div>
-                  
-                  <div>
-                    <Label htmlFor="prerequisites" className="text-right">
-                      Vereisten voor deelname
-                    </Label>
+                </div>
+                
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Leerdoelen per periode</h3>
+                  <div className="bg-gray-50 rounded-md p-5 border">
+                    <Label htmlFor="periodicObjectives">Doelstellingen per lesperiode</Label>
                     <Textarea
-                      id="prerequisites"
-                      value={courseFormData.prerequisites}
-                      onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
+                      id="periodicObjectives"
+                      value={courseFormData.periodicObjectives || ''}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, periodicObjectives: e.target.value })}
                       className="mt-1"
                       rows={3}
+                      placeholder="Specificeer leerdoelen per periode of lesblok"
                     />
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Tab 4: Lesmateriaal */}
+              <TabsContent value="materiaal" className="space-y-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium">Studiemateriaal</h3>
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setUploadType('material');
+                      setIsUploadDialogOpen(true);
+                    }}
+                  >
+                    <FileUp className="h-4 w-4 mr-2" /> Materiaal toevoegen
+                  </Button>
+                </div>
+                
+                <div className="bg-gray-50 rounded-md p-5 border">
+                  <Label htmlFor="materials">Beschrijving van het lesmateriaal</Label>
+                  <Textarea
+                    id="materials"
+                    value={courseFormData.materials}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, materials: e.target.value })}
+                    className="mt-1"
+                    rows={3}
+                    placeholder="Geef een overzicht van de gebruikte boeken, literatuur en andere leermiddelen"
+                  />
+                </div>
+                
+                <div>
+                  <h4 className="text-md font-medium mb-3">Geüploade leermaterialen</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Dit zal later dynamisch worden getoond op basis van opgeslagen bestanden */}
+                    <div className="border rounded-md p-4 bg-white">
+                      <div className="flex justify-between">
+                        <div className="flex items-center">
+                          <div className="bg-blue-100 rounded-full p-2 mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-700">
+                              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+                            </svg>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-sm">Voorbeeld: Hoofdstuk 1 - Introductie</h4>
+                            <p className="text-xs text-gray-500">PDF • 2.4 MB</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                          </svg>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Tab 5: Opdrachten en examens */}
+              <TabsContent value="opdrachten" className="space-y-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium">Opdrachten en toetsen</h3>
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setUploadType('assignment');
+                      setIsUploadDialogOpen(true);
+                    }}
+                  >
+                    <FileText className="h-4 w-4 mr-2" /> Opdracht/toets toevoegen
+                  </Button>
+                </div>
+                
+                <div className="bg-gray-50 rounded-md p-5 border">
+                  <Label htmlFor="assessmentDescription">Beschrijving van de beoordelingsmethode</Label>
+                  <Textarea
+                    id="assessmentDescription"
+                    value={courseFormData.assessmentDescription || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, assessmentDescription: e.target.value })}
+                    className="mt-1"
+                    rows={3}
+                    placeholder="Beschrijf hoe studenten worden beoordeeld (bijv. tentamens, opdrachten, presentaties)"
+                  />
+                </div>
+                
+                <div>
+                  <h4 className="text-md font-medium mb-3">Geüploade opdrachten en examens</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Dit zal later dynamisch worden getoond op basis van opgeslagen bestanden */}
+                    <div className="border rounded-md p-4 bg-white">
+                      <div className="flex justify-between">
+                        <div className="flex items-center">
+                          <div className="bg-red-100 rounded-full p-2 mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-700">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                              <polyline points="14 2 14 8 20 8"></polyline>
+                              <line x1="16" y1="13" x2="8" y2="13"></line>
+                              <line x1="16" y1="17" x2="8" y2="17"></line>
+                              <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-sm">Voorbeeld: Eindexamen 2025</h4>
+                            <p className="text-xs text-gray-500">PDF • 1.3 MB</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                          </svg>
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </TabsContent>

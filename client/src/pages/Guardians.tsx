@@ -173,47 +173,61 @@ export default function Guardians() {
     console.log("Add new guardian");
   };
   
-  // Add Guardian mutation
-  const addGuardianMutation = useMutation({
+  // Add/Update Guardian mutation
+  const guardianMutation = useMutation({
     mutationFn: async (data: { guardian: Partial<GuardianType>, studentIds: number[] }) => {
-      // First create the guardian
-      const guardian = await apiRequest('POST', '/api/guardians', data.guardian);
+      let guardian;
       
-      // Then assign students if any were selected
-      if (data.studentIds.length > 0 && guardian.id) {
-        const studentGuardianPromises = data.studentIds.map(studentId => 
-          apiRequest('POST', '/api/student-guardians', {
-            studentId,
-            guardianId: guardian.id
-          })
-        );
-        await Promise.all(studentGuardianPromises);
+      if (data.guardian.id) {
+        // Update existing guardian
+        guardian = await apiRequest('PUT', `/api/guardians/${data.guardian.id}`, data.guardian);
+      } else {
+        // Create new guardian
+        guardian = await apiRequest('POST', '/api/guardians', data.guardian);
+        
+        // Assign students if any were selected (only for new guardians)
+        if (data.studentIds.length > 0 && guardian.id) {
+          const studentGuardianPromises = data.studentIds.map(studentId => 
+            apiRequest('POST', '/api/student-guardians', {
+              studentId,
+              guardianId: guardian.id
+            })
+          );
+          await Promise.all(studentGuardianPromises);
+        }
       }
       
       return guardian;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      const isEdit = !!variables.guardian.id;
       toast({
-        title: "Voogd toegevoegd",
-        description: "De voogd is succesvol toegevoegd met de geselecteerde studenten",
+        title: isEdit ? "Voogd bijgewerkt" : "Voogd toegevoegd",
+        description: isEdit 
+          ? "De voogd is succesvol bijgewerkt" 
+          : "De voogd is succesvol toegevoegd met de geselecteerde studenten",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
       setShowAddDialog(false);
+      setSelectedStudentIds([]);
     },
-    onError: (error) => {
+    onError: (error, variables) => {
+      const isEdit = !!variables.guardian.id;
       toast({
-        title: "Fout bij toevoegen",
-        description: "Er is een fout opgetreden bij het toevoegen van de voogd",
+        title: isEdit ? "Fout bij bijwerken" : "Fout bij toevoegen",
+        description: isEdit 
+          ? "Er is een fout opgetreden bij het bijwerken van de voogd" 
+          : "Er is een fout opgetreden bij het toevoegen van de voogd",
         variant: "destructive",
       });
-      console.error('Add error:', error);
+      console.error(isEdit ? 'Update error:' : 'Add error:', error);
     },
   });
   
   // Handle form submission
   const handleSubmitGuardian = (e: React.FormEvent) => {
     e.preventDefault();
-    addGuardianMutation.mutate({
+    guardianMutation.mutate({
       guardian: newGuardian,
       studentIds: selectedStudentIds
     });
@@ -234,7 +248,10 @@ export default function Guardians() {
 
   // Handle editing a guardian
   const handleEditGuardian = (guardian: GuardianType) => {
-    // Implement edit guardian functionality
+    setNewGuardian({
+      ...guardian
+    });
+    setShowAddDialog(true);
     console.log("Edit guardian:", guardian);
   };
 
@@ -461,10 +478,12 @@ export default function Guardians() {
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
               </svg>
-              Nieuwe Voogd Toevoegen
+              {newGuardian.id ? 'Voogd Bewerken' : 'Nieuwe Voogd Toevoegen'}
             </DialogTitle>
             <DialogDescription>
-              Vul alle benodigde informatie in om een nieuwe voogd toe te voegen.
+              {newGuardian.id 
+                ? 'Werk de informatie bij voor deze voogd.' 
+                : 'Vul alle benodigde informatie in om een nieuwe voogd toe te voegen.'}
             </DialogDescription>
           </DialogHeader>
 
@@ -685,15 +704,15 @@ export default function Guardians() {
               <Button 
                 type="submit" 
                 className="bg-[#3b5998] hover:bg-[#2d4373]" 
-                disabled={addGuardianMutation.isPending}
+                disabled={guardianMutation.isPending}
               >
-                {addGuardianMutation.isPending ? (
+                {guardianMutation.isPending ? (
                   <>
                     <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     Bezig met opslaan...
                   </>
                 ) : (
-                  'Voogd Toevoegen'
+                  newGuardian.id ? 'Voogd Bijwerken' : 'Voogd Toevoegen'
                 )}
               </Button>
             </DialogFooter>

@@ -64,6 +64,7 @@ export default function Guardians() {
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
   const [viewMode, setViewMode] = useState<'all' | 'emergency'>('all');
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
   const [newGuardian, setNewGuardian] = useState<Partial<GuardianType>>({
     firstName: '',
     lastName: '',
@@ -126,6 +127,14 @@ export default function Guardians() {
     ? guardiansResponse.length 
     : (guardiansResponse?.totalCount || 0);
   const totalPages = Math.ceil(totalGuardians / itemsPerPage);
+
+  // Fetch all students for student assignment
+  const {
+    data: allStudents = [] as StudentType[],
+    isLoading: isLoadingAllStudents,
+  } = useQuery({
+    queryKey: ['/api/students'],
+  });
 
   // Fetch associated students for selected guardian
   const {
@@ -197,16 +206,31 @@ export default function Guardians() {
   
   // Add Guardian mutation
   const addGuardianMutation = useMutation({
-    mutationFn: async (guardian: Partial<GuardianType>) => {
-      return await apiRequest('POST', '/api/guardians', guardian);
+    mutationFn: async (data: { guardian: Partial<GuardianType>, studentIds: number[] }) => {
+      // First create the guardian
+      const guardian = await apiRequest('POST', '/api/guardians', data.guardian);
+      
+      // Then assign students if any were selected
+      if (data.studentIds.length > 0 && guardian.id) {
+        const studentGuardianPromises = data.studentIds.map(studentId => 
+          apiRequest('POST', '/api/student-guardians', {
+            studentId,
+            guardianId: guardian.id
+          })
+        );
+        await Promise.all(studentGuardianPromises);
+      }
+      
+      return guardian;
     },
     onSuccess: () => {
       toast({
         title: "Voogd toegevoegd",
-        description: "De voogd is succesvol toegevoegd",
+        description: "De voogd is succesvol toegevoegd met de geselecteerde studenten",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
       setShowAddDialog(false);
+      setSelectedStudentIds([]);
     },
     onError: (error) => {
       toast({
@@ -221,7 +245,10 @@ export default function Guardians() {
   // Handle form submission
   const handleSubmitGuardian = (e: React.FormEvent) => {
     e.preventDefault();
-    addGuardianMutation.mutate(newGuardian);
+    addGuardianMutation.mutate({
+      guardian: newGuardian,
+      studentIds: selectedStudentIds
+    });
   };
   
   // Handle input changes
@@ -466,9 +493,10 @@ export default function Guardians() {
 
           <form onSubmit={handleSubmitGuardian} className="mt-4 space-y-6">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-2 mb-4">
+              <TabsList className="grid grid-cols-3 mb-4">
                 <TabsTrigger value="personal">Persoonlijke Informatie</TabsTrigger>
                 <TabsTrigger value="contact">Contactgegevens</TabsTrigger>
+                <TabsTrigger value="students">Studenten</TabsTrigger>
               </TabsList>
 
               <TabsContent value="personal" className="space-y-4">
@@ -495,35 +523,24 @@ export default function Guardians() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="relationship">Relatie tot student</Label>
-                    <Select 
-                      name="relationship" 
-                      defaultValue={newGuardian.relationship}
-                      onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecteer relatie" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="parent">Ouder</SelectItem>
-                        <SelectItem value="guardian">Voogd</SelectItem>
-                        <SelectItem value="grandparent">Grootouder</SelectItem>
-                        <SelectItem value="sibling">Broer/Zus</SelectItem>
-                        <SelectItem value="other">Anders</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="occupation">Beroep</Label>
-                    <Input 
-                      id="occupation"
-                      name="occupation"
-                      value={newGuardian.occupation || ''}
-                      onChange={handleInputChange}
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="relationship">Relatie tot student</Label>
+                  <Select 
+                    name="relationship" 
+                    defaultValue={newGuardian.relationship}
+                    onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer relatie" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="parent">Ouder</SelectItem>
+                      <SelectItem value="guardian">Voogd</SelectItem>
+                      <SelectItem value="grandparent">Grootouder</SelectItem>
+                      <SelectItem value="sibling">Broer/Zus</SelectItem>
+                      <SelectItem value="other">Anders</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="flex items-center space-x-2 mt-4">
@@ -614,6 +631,62 @@ export default function Guardians() {
                       onChange={handleInputChange}
                     />
                   </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="students" className="space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-md font-medium mb-2">Studenten toewijzen</h3>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Selecteer de studenten die aan deze voogd moeten worden toegewezen.
+                  </p>
+                  
+                  {isLoadingAllStudents ? (
+                    <div className="flex justify-center my-4">
+                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : allStudents.length === 0 ? (
+                    <div className="text-center p-4 bg-gray-50 rounded-md">
+                      <p className="text-gray-500">Geen studenten gevonden.</p>
+                    </div>
+                  ) : (
+                    <div className="border rounded-md divide-y">
+                      {allStudents.map((student: StudentType) => (
+                        <div key={student.id} className="p-3 flex items-center justify-between hover:bg-gray-50">
+                          <div className="flex items-center">
+                            <Checkbox 
+                              id={`student-${student.id}`}
+                              checked={selectedStudentIds.includes(student.id)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedStudentIds([...selectedStudentIds, student.id]);
+                                } else {
+                                  setSelectedStudentIds(selectedStudentIds.filter(id => id !== student.id));
+                                }
+                              }}
+                            />
+                            <label 
+                              htmlFor={`student-${student.id}`}
+                              className="ml-3 flex items-center cursor-pointer"
+                            >
+                              <Avatar className="h-8 w-8 mr-2">
+                                <AvatarFallback className="bg-gradient-to-br from-sky-50 to-sky-100 text-sky-700 text-xs">
+                                  {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <div className="text-sm font-medium">{student.firstName} {student.lastName}</div>
+                                <div className="text-xs text-gray-500">Studentnr: {student.studentId}</div>
+                              </div>
+                            </label>
+                          </div>
+                          <Badge variant="outline" className="bg-gray-100">
+                            {student.status || "Actief"}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>

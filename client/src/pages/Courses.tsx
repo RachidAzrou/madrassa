@@ -387,7 +387,7 @@ export default function Courses() {
                 
                 <div className="mt-4 flex items-center">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback>
+                    <AvatarFallback className="bg-[#1e3a8a] text-white">
                       {course.instructor ? course.instructor.charAt(0) : 'D'}
                     </AvatarFallback>
                   </Avatar>

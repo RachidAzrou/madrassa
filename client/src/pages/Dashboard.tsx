@@ -378,7 +378,7 @@ export default function Dashboard() {
               {recentStudents.slice(0, 4).map((student: Student) => (
                 <div key={student.id} className="flex items-center p-2 hover:bg-sky-50/50 rounded-md transition-colors duration-200">
                   <Avatar className="h-9 w-9 border border-sky-200">
-                    <AvatarFallback className="bg-gradient-to-br from-sky-50 to-sky-100 text-sky-700">
+                    <AvatarFallback className="bg-[#1e3a8a] text-white">
                       {student.firstName?.[0]}{student.lastName?.[0]}
                     </AvatarFallback>
                   </Avatar>

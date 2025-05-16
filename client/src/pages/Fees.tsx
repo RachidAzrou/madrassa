@@ -881,7 +881,7 @@ export default function Fees() {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
                                 <Avatar className="h-8 w-8">
-                                  <AvatarFallback>{initials}</AvatarFallback>
+                                  <AvatarFallback className="bg-[#1e3a8a] text-white">{initials}</AvatarFallback>
                                 </Avatar>
                                 <div className="ml-4">
                                   <div className="font-medium text-gray-900">

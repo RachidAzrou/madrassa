@@ -153,104 +153,118 @@ export default function Dashboard() {
   return (
     <div className="container p-4 md:p-6 space-y-6">
       {/* Page Title */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Overzicht en statistieken</p>
+          <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">Overzicht van de belangrijkste statistieken en activiteiten</p>
         </div>
       </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Studenten statistiek */}
-        <div className="bg-white rounded-lg shadow-sm p-5 flex items-center">
-          <div className="bg-blue-50 p-3 rounded-lg mr-4">
-            <Users className="h-6 w-6 text-blue-500" />
+        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full bg-blue-50">
+              <Users className="h-5 w-5 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Totaal Studenten</p>
+              <h2 className="text-2xl font-bold mt-1">{stats.totalStudents}</h2>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold">{stats.totalStudents}</h2>
-            <p className="text-sm text-gray-500">Totaal Studenten</p>
+          <div className="mt-3 flex justify-end">
+            <Button 
+              variant="link" 
+              className="px-0 h-auto text-primary hover:underline"
+              onClick={navigateToStudents}
+            >
+              Bekijk alle studenten
+            </Button>
           </div>
-          <Button 
-            variant="ghost" 
-            className="ml-auto p-1 h-auto"
-            onClick={navigateToStudents}
-          >
-            <ChevronRight className="h-4 w-4 text-gray-400" />
-          </Button>
         </div>
         
         {/* Vakken statistiek */}
-        <div className="bg-white rounded-lg shadow-sm p-5 flex items-center">
-          <div className="bg-indigo-50 p-3 rounded-lg mr-4">
-            <GraduationCap className="h-6 w-6 text-indigo-500" />
+        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full bg-indigo-50">
+              <GraduationCap className="h-5 w-5 text-indigo-500" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Totaal Vakken</p>
+              <h2 className="text-2xl font-bold mt-1">{stats.programs}</h2>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold">{stats.programs}</h2>
-            <p className="text-sm text-gray-500">Totaal Vakken</p>
+          <div className="mt-3 flex justify-end">
+            <Button 
+              variant="link" 
+              className="px-0 h-auto text-primary hover:underline"
+              onClick={() => setLocation('/programs')}
+            >
+              Bekijk alle vakken
+            </Button>
           </div>
-          <Button 
-            variant="ghost" 
-            className="ml-auto p-1 h-auto"
-            onClick={() => setLocation('/programs')}
-          >
-            <ChevronRight className="h-4 w-4 text-gray-400" />
-          </Button>
         </div>
         
         {/* Klassen statistiek */}
-        <div className="bg-white rounded-lg shadow-sm p-5 flex items-center">
-          <div className="bg-green-50 p-3 rounded-lg mr-4">
-            <School className="h-6 w-6 text-green-500" />
+        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full bg-green-50">
+              <School className="h-5 w-5 text-green-500" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Totaal Klassen</p>
+              <h2 className="text-2xl font-bold mt-1">{stats.studentGroups}</h2>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold">{stats.studentGroups}</h2>
-            <p className="text-sm text-gray-500">Totaal Klassen</p>
+          <div className="mt-3 flex justify-end">
+            <Button 
+              variant="link" 
+              className="px-0 h-auto text-primary hover:underline"
+              onClick={navigateToGroups}
+            >
+              Bekijk alle klassen
+            </Button>
           </div>
-          <Button 
-            variant="ghost" 
-            className="ml-auto p-1 h-auto"
-            onClick={navigateToGroups}
-          >
-            <ChevronRight className="h-4 w-4 text-gray-400" />
-          </Button>
         </div>
         
         {/* Docenten statistiek */}
-        <div className="bg-white rounded-lg shadow-sm p-5 flex items-center">
-          <div className="bg-orange-50 p-3 rounded-lg mr-4">
-            <BookOpen className="h-6 w-6 text-orange-500" />
+        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full bg-orange-50">
+              <BookOpen className="h-5 w-5 text-orange-500" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Totaal Docenten</p>
+              <h2 className="text-2xl font-bold mt-1">{stats.totalTeachers}</h2>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold">{stats.totalTeachers}</h2>
-            <p className="text-sm text-gray-500">Totaal Docenten</p>
+          <div className="mt-3 flex justify-end">
+            <Button 
+              variant="link" 
+              className="px-0 h-auto text-primary hover:underline"
+              onClick={navigateToTeachers}
+            >
+              Bekijk alle docenten
+            </Button>
           </div>
-          <Button 
-            variant="ghost" 
-            className="ml-auto p-1 h-auto"
-            onClick={navigateToTeachers}
-          >
-            <ChevronRight className="h-4 w-4 text-gray-400" />
-          </Button>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Studenten per klas grafiek - Links */}
-        <div className="bg-white rounded-lg shadow-sm p-5 border border-gray-200 lg:col-span-2">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="font-semibold text-gray-800 flex items-center">
-              <BarChart3 className="mr-2 h-5 w-5 text-gray-600" />
+        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm lg:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-primary">
               Studenten per Klas
             </h2>
             <Button 
-              variant="outline" 
-              size="sm" 
-              className="h-8"
+              variant="link" 
+              className="px-0 h-auto text-primary hover:underline"
               onClick={navigateToGroups}
             >
-              Bekijk Klassen
+              Bekijk alle klassen
             </Button>
           </div>
           
@@ -292,19 +306,17 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Students - Rechts */}
-        <div className="bg-white rounded-lg shadow-sm p-5 border border-gray-200">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="font-semibold text-gray-800 flex items-center">
-              <Users className="mr-2 h-5 w-5 text-gray-600" />
+        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-primary">
               Recente Studenten
             </h2>
             <Button 
-              variant="outline" 
-              size="sm" 
-              className="h-8"
+              variant="link" 
+              className="px-0 h-auto text-primary hover:underline" 
               onClick={navigateToStudents}
             >
-              Bekijk Alle
+              Bekijk alle studenten
             </Button>
           </div>
           
@@ -337,19 +349,17 @@ export default function Dashboard() {
         </div>
         
         {/* Lesrooster huidige week - Onder */}
-        <div className="bg-white rounded-lg shadow-sm p-5 border border-gray-200 lg:col-span-3">
+        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm lg:col-span-3">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-gray-800 flex items-center">
-              <Calendar className="mr-2 h-5 w-5 text-gray-600" />
+            <h2 className="text-lg font-semibold text-primary">
               Lesrooster Deze Week
             </h2>
             <Button 
-              variant="outline" 
-              size="sm" 
-              className="h-8"
+              variant="link" 
+              className="px-0 h-auto text-primary hover:underline"
               onClick={navigateToCalendar}
             >
-              Volledige Planning
+              Bekijk volledige planning
             </Button>
           </div>
           
@@ -364,7 +374,7 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
-          <Separator className="mb-4" />
+          <Separator className="my-4" />
           
           {/* Lessen voor deze week */}
           {isLessonsLoading ? (

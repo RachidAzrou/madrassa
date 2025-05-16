@@ -707,6 +707,104 @@ export default function Teachers() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Create Teacher Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle>Nieuwe Docent Toevoegen</DialogTitle>
+            <DialogDescription>
+              Vul de informatie in om een nieuwe docent toe te voegen aan het systeem.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="teacherId" className="text-sm font-medium">Docent ID</label>
+                <Input 
+                  id="teacherId" 
+                  placeholder="Bijv. D001" 
+                  value={newTeacherData.teacherId}
+                  onChange={(e) => setNewTeacherData({...newTeacherData, teacherId: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="isActive" className="text-sm font-medium">Status</label>
+                <select 
+                  id="isActive" 
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                  value={newTeacherData.isActive ? "true" : "false"}
+                  onChange={(e) => setNewTeacherData({...newTeacherData, isActive: e.target.value === "true"})}
+                >
+                  <option value="true">Actief</option>
+                  <option value="false">Inactief</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="firstName" className="text-sm font-medium">Voornaam</label>
+                <Input 
+                  id="firstName" 
+                  placeholder="Voornaam" 
+                  value={newTeacherData.firstName}
+                  onChange={(e) => setNewTeacherData({...newTeacherData, firstName: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="lastName" className="text-sm font-medium">Achternaam</label>
+                <Input 
+                  id="lastName" 
+                  placeholder="Achternaam" 
+                  value={newTeacherData.lastName}
+                  onChange={(e) => setNewTeacherData({...newTeacherData, lastName: e.target.value})}
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium">Email</label>
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="email@mymadrassa.nl" 
+                  value={newTeacherData.email}
+                  onChange={(e) => setNewTeacherData({...newTeacherData, email: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="phone" className="text-sm font-medium">Telefoonnummer</label>
+                <Input 
+                  id="phone" 
+                  placeholder="06 1234 5678" 
+                  value={newTeacherData.phone}
+                  onChange={(e) => setNewTeacherData({...newTeacherData, phone: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button 
+              type="submit" 
+              onClick={() => {
+                // Hier zou je normaal een createTeacherMutation aanroepen
+                toast({
+                  title: "Functie in ontwikkeling",
+                  description: "Het toevoegen van docenten is nog niet volledig geïmplementeerd.",
+                });
+                setIsCreateDialogOpen(false);
+              }}
+            >
+              Docent toevoegen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

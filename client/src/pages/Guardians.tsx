@@ -261,6 +261,19 @@ export default function Guardians() {
     };
     return relationships[relationship] || relationship;
   };
+  
+  // Get status label in Dutch
+  const getStatusLabel = (status: string): string => {
+    const statuses: Record<string, string> = {
+      "Active": "Actief",
+      "Inactive": "Inactief",
+      "Pending": "In Afwachting",
+      "Graduated": "Afgestudeerd",
+      "Withdrawn": "Teruggetrokken",
+      "Suspended": "Geschorst"
+    };
+    return statuses[status] || status;
+  };
 
   // Render guardians page
   return (
@@ -572,30 +585,33 @@ export default function Guardians() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="houseNumber">Huisnummer</Label>
+                    <Label htmlFor="houseNumber">Huisnummer<span className="text-red-500">*</span></Label>
                     <Input 
                       id="houseNumber"
                       name="houseNumber"
                       value={newGuardian.houseNumber || ''}
                       onChange={handleInputChange}
+                      required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="postalCode">Postcode</Label>
+                    <Label htmlFor="postalCode">Postcode<span className="text-red-500">*</span></Label>
                     <Input 
                       id="postalCode"
                       name="postalCode"
                       value={newGuardian.postalCode || ''}
                       onChange={handleInputChange}
+                      required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="city">Plaats</Label>
+                    <Label htmlFor="city">Plaats<span className="text-red-500">*</span></Label>
                     <Input 
                       id="city"
                       name="city"
                       value={newGuardian.city || ''}
                       onChange={handleInputChange}
+                      required
                     />
                   </div>
                 </div>
@@ -648,7 +664,7 @@ export default function Guardians() {
                             </label>
                           </div>
                           <Badge variant="outline" className="bg-gray-100">
-                            {student.status || "Actief"}
+                            {getStatusLabel(student.status || "Active")}
                           </Badge>
                         </div>
                       ))}

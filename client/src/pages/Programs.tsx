@@ -314,7 +314,7 @@ export default function Programs() {
                     <h3 className="text-lg font-medium text-gray-800">{program.name}</h3>
                     <span className="ml-3 bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded">{program.code}</span>
                   </div>
-                  <p className="text-gray-500 text-sm mt-1">{program.department}</p>
+                  <p className="text-gray-500 text-sm mt-1">{program.description}</p>
                 </div>
                 <div className="flex items-center space-x-6">
                   <div className="text-center hidden md:block">
@@ -370,14 +370,19 @@ export default function Programs() {
                       <Clock className="h-5 w-5 text-primary mr-3" />
                       <div>
                         <span className="text-xs text-gray-500 block">Duur</span>
-                        <span className="text-sm font-medium">{program.duration} periodes {program.totalCredits ? `(${program.totalCredits} studiepunten)` : ''}</span>
+                        <span className="text-sm font-medium">
+                          {program.duration === 1 ? 'Jaar' : 
+                           program.duration === 2 ? 'Semester' : 
+                           program.duration === 3 ? 'Trimester' : 
+                           `${program.duration}`}
+                        </span>
                       </div>
                     </div>
                     <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">
-                      <Users className="h-5 w-5 text-primary mr-3" />
+                      <BookOpen className="h-5 w-5 text-primary mr-3" />
                       <div>
-                        <span className="text-xs text-gray-500 block">Ingeschreven Studenten</span>
-                        <span className="text-sm font-medium">{program.students} studenten</span>
+                        <span className="text-xs text-gray-500 block">Klas</span>
+                        <span className="text-sm font-medium">{'N/A'}</span>
                       </div>
                     </div>
                     <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">

@@ -1034,7 +1034,7 @@ export default function Students() {
                   type="text"
                   id="editEnrollmentDate"
                   placeholder="DD/MM/JJJJ"
-                  defaultValue=""
+                  value={studentFormData.enrollmentDate ? formatDateToDisplayFormat(studentFormData.enrollmentDate) : ''}
                   onChange={(e) => {
                     const inputValue = e.target.value;
                     setStudentFormData(prev => ({
@@ -1051,6 +1051,9 @@ export default function Students() {
                           ...prev,
                           enrollmentDate: formattedDate
                         }));
+                        console.log('Inschrijvingsdatum geformatteerd naar:', formattedDate);
+                      } else {
+                        console.error('Ongeldige datumnotatie. Gebruik DD/MM/JJJJ');
                       }
                     }
                   }}
@@ -1967,25 +1970,29 @@ export default function Students() {
                             id="dateOfBirth"
                             placeholder="DD/MM/JJJJ"
                             required
-                            defaultValue=""
+                            value={studentFormData.dateOfBirth ? formatDateToDisplayFormat(studentFormData.dateOfBirth) : ''}
                             onChange={(e) => {
-                              // Direct waarde opslaan zonder formattering tijdens het typen
                               const inputValue = e.target.value;
+                              // Update de state met de ingevoerde waarde
                               setStudentFormData(prev => ({
                                 ...prev,
                                 dateOfBirth: inputValue
                               }));
                             }}
                             onBlur={(e) => {
-                              // Pas formatteren bij verlaten van het veld
                               const inputValue = e.target.value;
                               if (inputValue.trim() !== '') {
+                                // Valideer en formatteer de datum naar database formaat (YYYY-MM-DD)
                                 const formattedDate = formatDateToDatabaseFormat(inputValue);
                                 if (formattedDate) {
                                   setStudentFormData(prev => ({
                                     ...prev,
                                     dateOfBirth: formattedDate
                                   }));
+                                  console.log('Geboortedatum geformatteerd naar:', formattedDate);
+                                } else {
+                                  // Toon feedback als de datum niet geldig is
+                                  console.error('Ongeldige datumnotatie. Gebruik DD/MM/JJJJ');
                                 }
                               }
                             }}

@@ -382,56 +382,49 @@ export default function Cijfers() {
     setIsBehaviorModified(true);
   };
   
-  // Fetch attendance data for student attendance analysis
+  // Genereer aanwezigheidsdata voor student (demo functie)
   const fetchAttendanceForStudent = async (studentId: string) => {
     try {
-      // Dit is een voorbeeld eindpunt, moet mogelijk aangepast worden aan de API
-      try {
-        const attendance = await apiRequest('GET', `/api/students/${studentId}/attendance`);
-        return attendance || [];
-      } catch (error) {
-        console.log("Kon geen aanwezigheidsdata ophalen, gebruik dummy data", error);
-        
-        // Genereer dummy aanwezigheidsdata voor demo doeleinden
-        const dummyAttendance = [];
-        const totalSessions = 20;
-        
-        // Gebruik de opgeslagen dummy gegevens indien beschikbaar
-        const studentAttendance = dummyAttendance[parseInt(studentId)];
-        let lateCount = studentAttendance ? studentAttendance.late : Math.floor(Math.random() * 5);
-        let absentCount = studentAttendance ? studentAttendance.absent : Math.floor(Math.random() * 3);
-        
-        // Zorg ervoor dat het aantal te laat en afwezig niet groter is dan het totaal aantal sessies
-        if (lateCount + absentCount > totalSessions) {
-          lateCount = Math.floor(totalSessions * 0.2);
-          absentCount = Math.floor(totalSessions * 0.1);
-        }
-        
-        // Genereer sessies
-        for (let i = 0; i < totalSessions; i++) {
-          let status = 'Present';
-          if (i < lateCount) {
-            status = 'Late';
-          } else if (i >= lateCount && i < lateCount + absentCount) {
-            status = 'Absent';
-          }
-          
-          const date = new Date();
-          date.setDate(date.getDate() - i * 7); // Een sessie per week terug in de tijd
-          
-          dummyAttendance.push({
-            id: i + 1,
-            studentId: parseInt(studentId),
-            date: date.toISOString().split('T')[0],
-            status: status
-          });
-        }
-        
-        return dummyAttendance;
+      console.log("Genereer aanwezigheidsdata voor demo");
+      
+      const totalSessions = 20;
+      
+      // Gebruik een vaste seed voor studentId om consistente resultaten te krijgen
+      const studentIdNum = parseInt(studentId) || 0;
+      let lateCount = (studentIdNum * 3) % 8; // 0-7 keer te laat, afhankelijk van studentId
+      let absentCount = (studentIdNum * 7) % 5; // 0-4 keer afwezig, afhankelijk van studentId
+      
+      // Zorg ervoor dat het aantal te laat en afwezig niet groter is dan het totaal aantal sessies
+      if (lateCount + absentCount > totalSessions) {
+        lateCount = Math.floor(totalSessions * 0.2);
+        absentCount = Math.floor(totalSessions * 0.1);
       }
+      
+      // Genereer sessies
+      const attendanceRecords = [];
+      for (let i = 0; i < totalSessions; i++) {
+        let status = 'Present';
+        if (i < lateCount) {
+          status = 'Late';
+        } else if (i >= lateCount && i < lateCount + absentCount) {
+          status = 'Absent';
+        }
+        
+        const date = new Date();
+        date.setDate(date.getDate() - i * 7); // Een sessie per week terug in de tijd
+        
+        attendanceRecords.push({
+          id: i + 1,
+          studentId: studentIdNum,
+          date: date.toISOString().split('T')[0],
+          status: status
+        });
+      }
+      
+      return attendanceRecords;
     } catch (error) {
-      console.error("Error fetching attendance:", error);
-      return [];
+      console.error("Fout bij genereren aanwezigheidsdata:", error);
+      return []; // Leeg array teruggeven bij fouten
     }
   };
   

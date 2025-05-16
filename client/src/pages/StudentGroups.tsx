@@ -434,7 +434,7 @@ export default function StudentGroups() {
               <div className="mt-6">
                 <Button onClick={handleAddStudentGroup}>
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Groep Aanmaken
+                  Klas Aanmaken
                 </Button>
               </div>
             </div>

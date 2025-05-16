@@ -204,16 +204,7 @@ export default function Guardians() {
           <p className="text-sm text-gray-500 mt-1">Beheer voogden en hun relaties met studenten</p>
         </div>
         <div className="flex flex-col md:flex-row gap-3">
-          <div className="relative">
-            <Input
-              placeholder="Zoek voogden..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="w-full md:w-64 pl-10"
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          </div>
-          <Button onClick={handleAddNewGuardian} className="flex items-center">
+          <Button onClick={handleAddNewGuardian} className="flex items-center bg-sky-600 hover:bg-sky-700">
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Voogd Toevoegen</span>
           </Button>
@@ -309,9 +300,9 @@ export default function Guardians() {
                 guardians.map((guardian: GuardianType) => (
                   <tr key={guardian.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center justify-center">
+                      <div className="flex items-center">
                         <Avatar className="h-9 w-9">
-                          <AvatarFallback>
+                          <AvatarFallback className="bg-gradient-to-br from-sky-50 to-sky-100 text-sky-700">
                             {guardian.firstName.charAt(0)}{guardian.lastName.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
@@ -320,12 +311,9 @@ export default function Guardians() {
                           {guardian.occupation && (
                             <div className="text-xs text-gray-500">{guardian.occupation}</div>
                           )}
+                          <div className="text-xs text-gray-500">{guardian.email}</div>
                         </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{guardian.email}</div>
-                      <div className="text-sm text-gray-500">{guardian.phone}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {getRelationshipLabel(guardian.relationship)}
@@ -333,6 +321,9 @@ export default function Guardians() {
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       {guardian.isEmergencyContact ? (
                         <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
                           Noodcontact
                         </span>
                       ) : (
@@ -348,9 +339,9 @@ export default function Guardians() {
                           size="sm" 
                           onClick={() => handleViewGuardian(guardian)}
                           title="Details bekijken"
-                          className="h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 text-sky-700 hover:text-sky-900 hover:bg-sky-50"
                         >
-                          <Eye className="h-4 w-4 text-gray-500" />
+                          <Eye className="h-4 w-4" />
                           <span className="sr-only">Bekijken</span>
                         </Button>
                         <Button 
@@ -358,15 +349,15 @@ export default function Guardians() {
                           size="sm" 
                           onClick={() => handleEditGuardian(guardian)}
                           title="Voogd bewerken"
-                          className="h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 text-sky-700 hover:text-sky-900 hover:bg-sky-50"
                         >
-                          <Pencil className="h-4 w-4 text-gray-500" />
+                          <Pencil className="h-4 w-4" />
                           <span className="sr-only">Bewerken</span>
                         </Button>
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
                           onClick={() => handleDeleteGuardian(guardian)}
                           title="Voogd verwijderen"
                         >

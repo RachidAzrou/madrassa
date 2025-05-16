@@ -117,14 +117,14 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
       )}
     >
       {/* Logo and header */}
-      <div className="flex items-center justify-center px-2 pt-4 pb-3 border-b border-gray-200">
+      <div className="flex items-center justify-center px-2 py-4 border-b border-gray-200">
         <Link href="/">
           <div className="w-full flex items-center justify-center">
             <img 
               src={myMadrassaLogo} 
               alt="myMadrassa Logo" 
-              className="w-[90%] object-contain" 
-              style={{ maxHeight: "40px" }}
+              className="w-full object-contain" 
+              style={{ maxHeight: "60px" }}
             />
             <span className="sr-only">myMadrassa</span>
           </div>

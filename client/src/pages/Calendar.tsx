@@ -195,10 +195,16 @@ export default function Calendar() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold text-gray-800">Academische Kalender</h1>
-          <div className="flex rounded-md shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+        <div>
+          <div className="flex items-center">
+            <CalendarIcon className="h-6 w-6 text-primary mr-3" />
+            <h1 className="text-2xl font-semibold text-primary">Kalender</h1>
+          </div>
+          <p className="text-gray-500 text-sm mt-1 ml-9">
+            Beheer academische evenementen en schoolactiviteiten
+          </p>
+          <div className="flex rounded-md shadow-sm mt-3 ml-9">
             <button 
               onClick={() => setView('month')} 
               className={`px-3 py-1 text-sm font-medium rounded-l-md ${
@@ -244,7 +250,12 @@ export default function Calendar() {
               <SelectItem value="event">Activiteiten</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={handleAddEvent} className="flex items-center">
+          <Button 
+            onClick={handleAddEvent}
+            variant="default"
+            size="default"
+            className="bg-primary hover:bg-primary/90 flex items-center"
+          >
             <Plus className="mr-2 h-4 w-4" />
             <span>Evenement Toevoegen</span>
           </Button>

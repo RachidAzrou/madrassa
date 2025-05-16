@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, CheckCircle, XCircle, FileText, Clock, School } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, CheckCircle, XCircle, FileText, Clock, School, User, Phone, Mail, Calendar, BookOpen, Building, Clipboard, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -11,6 +11,10 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { format } from 'date-fns';
+import { nl } from 'date-fns/locale';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
@@ -63,8 +67,15 @@ export default function Admissions() {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('applications');
   
-  // State voor aanvraagformulier
+  // State voor dialoogvensters
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [currentApplicant, setCurrentApplicant] = useState<Applicant | null>(null);
+  const [currentTabIndex, setCurrentTabIndex] = useState(0);
+  
+  // State voor aanvraagformulier
   const [applicationFormData, setApplicationFormData] = useState({
     firstName: '',
     lastName: '',
@@ -112,7 +123,7 @@ export default function Admissions() {
     enrollmentRate: 0,
   };
 
-  // Mutatie voor het toevoegen van een nieuwe aanvraag
+  // Mutaties voor CRUD operaties
   const createApplicationMutation = useMutation({
     mutationFn: async (applicationData: typeof applicationFormData) => {
       return apiRequest('POST', '/api/admissions/applications', applicationData);
@@ -152,10 +163,109 @@ export default function Admissions() {
       });
     }
   });
+  
+  const updateApplicationMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string, data: Partial<typeof applicationFormData> }) => {
+      return apiRequest('PATCH', `/api/admissions/applications/${id}`, data);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/admissions/applicants'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admissions/stats'] });
+      
+      // Close dialog
+      setIsEditDialogOpen(false);
+      
+      // Toon succesmelding
+      toast({
+        title: "Aanvraag bijgewerkt",
+        description: "De toelatingsaanvraag is succesvol bijgewerkt in het systeem.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij bewerken",
+        description: error.message || "Er is een fout opgetreden bij het bewerken van de aanvraag.",
+        variant: "destructive",
+      });
+    }
+  });
+  
+  const deleteApplicationMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest('DELETE', `/api/admissions/applications/${id}`);
+    },
+    onSuccess: () => {
+      // Invalidate query cache to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/admissions/applicants'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admissions/stats'] });
+      
+      // Close dialog
+      setIsDeleteDialogOpen(false);
+      
+      // Toon succesmelding
+      toast({
+        title: "Aanvraag verwijderd",
+        description: "De toelatingsaanvraag is succesvol verwijderd uit het systeem.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van de aanvraag.",
+        variant: "destructive",
+      });
+    }
+  });
 
+  // Handler functies voor CRUD operaties
   const handleAddApplicant = () => {
-    // Open dialoogvenster
+    // Reset form en open dialoogvenster
+    setApplicationFormData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      dateOfBirth: new Date().toISOString().split('T')[0],
+      programId: null,
+      academicYearId: null,
+      previousEducation: '',
+      personalStatement: '',
+      status: 'Pending',
+    });
+    setCurrentTabIndex(0);
     setIsAddDialogOpen(true);
+  };
+  
+  const handleViewApplicant = (applicant: Applicant) => {
+    setCurrentApplicant(applicant);
+    setCurrentTabIndex(0);
+    setIsViewDialogOpen(true);
+  };
+  
+  const handleEditApplicant = (applicant: Applicant) => {
+    setCurrentApplicant(applicant);
+    setApplicationFormData({
+      firstName: applicant.firstName,
+      lastName: applicant.lastName,
+      email: applicant.email,
+      phone: applicant.phone,
+      dateOfBirth: applicant.dateOfBirth,
+      programId: applicant.programId,
+      academicYearId: applicant.academicYearId,
+      previousEducation: applicant.previousEducation || '',
+      personalStatement: applicant.personalStatement || '',
+      status: applicant.status,
+    });
+    setCurrentTabIndex(0);
+    setIsEditDialogOpen(true);
+  };
+  
+  const handleDeleteApplicant = (applicant: Applicant) => {
+    setCurrentApplicant(applicant);
+    setIsDeleteDialogOpen(true);
   };
   
   const handleSubmitApplication = (e: React.FormEvent) => {
@@ -171,6 +281,42 @@ export default function Admissions() {
     }
     
     createApplicationMutation.mutate(applicationFormData);
+  };
+  
+  const handleUpdateApplication = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!applicationFormData.firstName || !applicationFormData.lastName || !applicationFormData.email) {
+      toast({
+        title: "Onvolledige gegevens",
+        description: "Vul alle verplichte velden in om de aanvraag bij te werken.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (currentApplicant?.id) {
+      updateApplicationMutation.mutate({ 
+        id: currentApplicant.id, 
+        data: applicationFormData 
+      });
+    }
+  };
+  
+  const handleConfirmDelete = () => {
+    if (currentApplicant?.id) {
+      deleteApplicationMutation.mutate(currentApplicant.id);
+    }
+  };
+  
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return format(date, 'dd MMMM yyyy', { locale: nl });
+    } catch (error) {
+      return dateString;
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

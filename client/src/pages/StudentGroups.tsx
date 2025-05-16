@@ -269,7 +269,7 @@ export default function StudentGroups() {
         <div className="flex items-center gap-2">
           <div className="relative">
             <Input
-              placeholder="Zoek groepen..."
+              placeholder="Zoek klassen..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full md:w-64 pl-10"
@@ -342,49 +342,7 @@ export default function StudentGroups() {
             <TabsTrigger value="grid">Rasterweergave</TabsTrigger>
             <TabsTrigger value="list">Lijstweergave</TabsTrigger>
           </TabsList>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => {
-                const filterSection = document.querySelector('.student-groups-filters');
-                if (filterSection) {
-                  filterSection.classList.toggle('hidden');
-                }
-              }}
-            >
-              <Filter className="mr-2 h-4 w-4" />
-              Filteren
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => {
-                const csvContent = 
-                  "data:text/csv;charset=utf-8," + 
-                  "ID,Naam,Academisch Jaar,Programma,Capaciteit,Status\n" + 
-                  studentGroups.map((g: any) => 
-                    `${g.id || ''},${g.name || ''},${g.academicYear || ''},${g.programName || ''},${g.maxCapacity || 0},${g.isActive ? 'Actief' : 'Inactief'}`
-                  ).join("\n");
-                
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "klassen.csv");
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                toast({
-                  title: "Exporteren voltooid",
-                  description: "Klassen zijn geëxporteerd als CSV bestand.",
-                });
-              }}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Exporteren
-            </Button>
-          </div>
+          {/* Knoppen voor filteren en exporteren verwijderd op verzoek */}
         </div>
 
         <TabsContent value="grid" className="space-y-4">
@@ -428,10 +386,6 @@ export default function StudentGroups() {
               <p className="text-gray-500 mb-4">
                 Er zijn geen klassen die overeenkomen met de geselecteerde filters.
               </p>
-              <Button onClick={handleAddStudentGroup}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Klas Aanmaken
-              </Button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

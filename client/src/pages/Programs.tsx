@@ -319,15 +319,16 @@ export default function Programs() {
                 <div className="flex items-center space-x-6">
                   <div className="text-center hidden md:block">
                     <span className="text-gray-500 text-xs block">Duur</span>
-                    <span className="text-gray-800 font-medium">{program.duration} periodes</span>
+                    <span className="text-gray-800 font-medium">
+                      {program.duration === 1 ? 'Jaar' : 
+                       program.duration === 2 ? 'Semester' : 
+                       program.duration === 3 ? 'Trimester' : 
+                       `${program.duration}`}
+                    </span>
                   </div>
                   <div className="text-center hidden md:block">
-                    <span className="text-gray-500 text-xs block">Totaal Studiepunten</span>
-                    <span className="text-gray-800 font-medium">{program.totalCredits || 'N/A'}</span>
-                  </div>
-                  <div className="text-center hidden md:block">
-                    <span className="text-gray-500 text-xs block">Studenten</span>
-                    <span className="text-gray-800 font-medium">{program.students || 0}</span>
+                    <span className="text-gray-500 text-xs block">Klas</span>
+                    <span className="text-gray-800 font-medium">{'N/A'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button 

@@ -552,29 +552,35 @@ export default function Cijfers() {
                 setIsBehaviorModified(false);
               }}
             >
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-                <TabsList className="grid w-full max-w-md grid-cols-2 p-1 bg-blue-900/10">
-                  <TabsTrigger value="grades" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Cijfers</TabsTrigger>
-                  <TabsTrigger value="behavior" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Gedragsbeoordelingen</TabsTrigger>
-                </TabsList>
-                <div className="w-full md:w-auto max-w-md">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
-                  <Select value={selectedClass} onValueChange={handleClassChange}>
-                    <SelectTrigger className="w-full md:w-[250px]">
-                      <SelectValue placeholder="Selecteer een klas" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {classes.length === 0 ? (
-                        <SelectItem value="empty-class">Geen klassen gevonden</SelectItem>
-                      ) : (
-                        classes.map((cls: any) => (
-                          <SelectItem key={cls.id} value={cls.id.toString()}>
-                            {cls.name}
-                          </SelectItem>
-                        ))
-                      )}
-                    </SelectContent>
-                  </Select>
+              <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  <div className="w-full md:w-auto order-2 md:order-1">
+                    <TabsList className="grid w-full md:w-[350px] grid-cols-2 p-1 bg-blue-900/10">
+                      <TabsTrigger value="grades" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Cijfers</TabsTrigger>
+                      <TabsTrigger value="behavior" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Gedragsbeoordelingen</TabsTrigger>
+                    </TabsList>
+                  </div>
+                  <div className="w-full md:w-auto max-w-md order-1 md:order-2">
+                    <div className="flex items-center">
+                      <label className="block text-sm font-medium text-gray-700 mr-2">Klas:</label>
+                      <Select value={selectedClass} onValueChange={handleClassChange}>
+                        <SelectTrigger className="w-full md:w-[220px]">
+                          <SelectValue placeholder="Selecteer een klas" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {classes.length === 0 ? (
+                            <SelectItem value="empty-class">Geen klassen gevonden</SelectItem>
+                          ) : (
+                            classes.map((cls: any) => (
+                              <SelectItem key={cls.id} value={cls.id.toString()}>
+                                {cls.name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
               </div>
 

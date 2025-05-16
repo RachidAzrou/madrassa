@@ -1061,9 +1061,73 @@ export default function StudentGroups() {
                           <div className="border rounded-md p-3">
                             <h5 className="font-medium mb-2">Lesrooster</h5>
                             <div className="space-y-2">
-                              {/* Lesrooster items zullen hier dynamisch geladen worden */}
-                              <div className="text-center text-gray-500 p-3">
-                                <p className="text-sm">Er zijn nog geen vakken toegevoegd aan het rooster</p>
+                              {/* Voorbeelditem dat wordt toegevoegd wanneer er een vak is geselecteerd */}
+                              <div className="border rounded p-3 bg-gray-50">
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="font-medium">Arabisch</span>
+                                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                  </Button>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 mt-2">
+                                  <div>
+                                    <label className="text-xs text-gray-500 block mb-1">Dag</label>
+                                    <Select defaultValue="maandag">
+                                      <SelectTrigger className="w-full text-sm h-8">
+                                        <SelectValue placeholder="Selecteer dag" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="maandag">Maandag</SelectItem>
+                                        <SelectItem value="dinsdag">Dinsdag</SelectItem>
+                                        <SelectItem value="woensdag">Woensdag</SelectItem>
+                                        <SelectItem value="donderdag">Donderdag</SelectItem>
+                                        <SelectItem value="vrijdag">Vrijdag</SelectItem>
+                                        <SelectItem value="zaterdag">Zaterdag</SelectItem>
+                                        <SelectItem value="zondag">Zondag</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div>
+                                    <label className="text-xs text-gray-500 block mb-1">Tijd</label>
+                                    <div className="flex items-center gap-1">
+                                      <Select defaultValue="18:00">
+                                        <SelectTrigger className="w-full text-sm h-8">
+                                          <SelectValue placeholder="Start" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {Array.from({ length: 14 }).map((_, i) => {
+                                            const hour = 8 + i;
+                                            return (
+                                              <SelectItem key={hour} value={`${hour}:00`}>
+                                                {`${hour}:00`}
+                                              </SelectItem>
+                                            );
+                                          })}
+                                        </SelectContent>
+                                      </Select>
+                                      <span>-</span>
+                                      <Select defaultValue="19:30">
+                                        <SelectTrigger className="w-full text-sm h-8">
+                                          <SelectValue placeholder="Eind" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {Array.from({ length: 14 }).map((_, i) => {
+                                            const hour = 9 + i;
+                                            return (
+                                              <SelectItem key={hour} value={`${hour}:30`}>
+                                                {`${hour}:30`}
+                                              </SelectItem>
+                                            );
+                                          })}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="text-xs text-gray-500 mt-2 italic">
+                                <p>Je kunt alleen vakken toevoegen die eerst zijn toegewezen aan deze klas</p>
                               </div>
                             </div>
                             <Button type="button" variant="outline" size="sm" className="mt-3 w-full">
@@ -1071,7 +1135,27 @@ export default function StudentGroups() {
                               Vak toevoegen aan rooster
                             </Button>
                           </div>
-                          {/* Studiebelasting is verwijderd op verzoek */}
+                          <div className="border rounded-md p-3">
+                            <h5 className="font-medium mb-2">Beschikbare vakken</h5>
+                            <div className="space-y-2">
+                              <div className="border rounded p-3 bg-blue-50">
+                                <h6 className="font-medium">Arabisch</h6>
+                                <p className="text-xs text-gray-600 mt-1">Docent: Ahmed Mustapha</p>
+                                <Button type="button" variant="ghost" size="sm" className="mt-2 h-7 px-2 text-xs">
+                                  <Plus className="h-3 w-3 mr-1" />
+                                  Toevoegen aan rooster
+                                </Button>
+                              </div>
+                              <div className="border rounded p-3 bg-blue-50">
+                                <h6 className="font-medium">Fiqh</h6>
+                                <p className="text-xs text-gray-600 mt-1">Docent: Fatima El-Zahra</p>
+                                <Button type="button" variant="ghost" size="sm" className="mt-2 h-7 px-2 text-xs">
+                                  <Plus className="h-3 w-3 mr-1" />
+                                  Toevoegen aan rooster
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1229,16 +1313,100 @@ export default function StudentGroups() {
                         <p className="text-sm text-gray-500">Plan tentamendata, vakanties en andere belangrijke momenten.</p>
                       </div>
                       <div className="p-4">
-                        <div className="space-y-2">
-                          {/* Belangrijke datums zullen hier dynamisch geladen worden */}
-                          <div className="text-center text-gray-500 p-3">
-                            <p className="text-sm">Er zijn nog geen belangrijke datums toegevoegd</p>
+                        <div className="space-y-3">
+                          {/* Voorbeeld ingevoerde datums */}
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div className="border rounded-md p-3 bg-blue-50 relative">
+                              <div className="absolute top-2 right-2">
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                  <Trash2 className="h-4 w-4 text-red-500" />
+                                </Button>
+                              </div>
+                              <div className="bg-primary text-white text-xs rounded-full px-2 py-0.5 inline-block mb-1">Les</div>
+                              <h5 className="font-medium text-sm">Eerste les</h5>
+                              <p className="text-xs text-gray-600 mt-1">05-09-2025</p>
+                            </div>
+                            
+                            <div className="border rounded-md p-3 bg-amber-50 relative">
+                              <div className="absolute top-2 right-2">
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                  <Trash2 className="h-4 w-4 text-red-500" />
+                                </Button>
+                              </div>
+                              <div className="bg-amber-500 text-white text-xs rounded-full px-2 py-0.5 inline-block mb-1">Examen</div>
+                              <h5 className="font-medium text-sm">Midterm examen</h5>
+                              <p className="text-xs text-gray-600 mt-1">15-12-2025</p>
+                            </div>
+                            
+                            <div className="border rounded-md p-3 bg-green-50 relative">
+                              <div className="absolute top-2 right-2">
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                  <Trash2 className="h-4 w-4 text-red-500" />
+                                </Button>
+                              </div>
+                              <div className="bg-green-500 text-white text-xs rounded-full px-2 py-0.5 inline-block mb-1">Vakantie</div>
+                              <h5 className="font-medium text-sm">Wintervakantie</h5>
+                              <p className="text-xs text-gray-600 mt-1">20-12-2025 - 05-01-2026</p>
+                            </div>
+                          </div>
+                          
+                          {/* Formulier voor nieuwe datum */}
+                          <div className="border rounded-md p-3 mt-4">
+                            <h5 className="font-medium text-sm mb-3">Nieuwe datum toevoegen</h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div>
+                                <label className="text-xs text-gray-500 block mb-1">Titel</label>
+                                <Input className="h-8 text-sm" placeholder="Beschrijving van deze datum" />
+                              </div>
+                              <div>
+                                <label className="text-xs text-gray-500 block mb-1">Type</label>
+                                <Select defaultValue="les">
+                                  <SelectTrigger className="h-8 text-sm">
+                                    <SelectValue placeholder="Selecteer type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="les">Les</SelectItem>
+                                    <SelectItem value="examen">Examen</SelectItem>
+                                    <SelectItem value="vakantie">Vakantie</SelectItem>
+                                    <SelectItem value="activiteit">Activiteit</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <label className="text-xs text-gray-500 block mb-1">Datum</label>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button variant={"outline"} className="h-8 text-sm w-full justify-start font-normal">
+                                      <CalendarIcon className="mr-2 h-4 w-4" />
+                                      <span>Kies een datum</span>
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar mode="single" initialFocus />
+                                  </PopoverContent>
+                                </Popover>
+                              </div>
+                              <div>
+                                <label className="text-xs text-gray-500 block mb-1">Einddatum (optioneel)</label>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button variant={"outline"} className="h-8 text-sm w-full justify-start font-normal">
+                                      <CalendarIcon className="mr-2 h-4 w-4" />
+                                      <span>Kies een datum</span>
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar mode="single" initialFocus />
+                                  </PopoverContent>
+                                </Popover>
+                              </div>
+                            </div>
+                            <Button type="button" size="sm" className="mt-3">
+                              <Plus className="h-4 w-4 mr-2" />
+                              Toevoegen
+                            </Button>
                           </div>
                         </div>
-                        <Button type="button" variant="outline" size="sm" className="mt-3 w-full">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Datum toevoegen
-                        </Button>
                       </div>
                     </div>
                   </div>

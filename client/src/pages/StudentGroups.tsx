@@ -259,7 +259,7 @@ export default function StudentGroups() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
-            <Users className="h-6 w-6 text-primary mr-3" />
+            <School className="h-6 w-6 text-primary mr-3" />
             <h1 className="text-2xl font-semibold text-primary">Klassen</h1>
           </div>
           <p className="text-gray-500 text-sm mt-1 ml-9">
@@ -426,7 +426,7 @@ export default function StudentGroups() {
             </div>
           ) : studentGroups.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="mx-auto h-12 w-12 text-gray-400" />
+              <School className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-2 text-lg font-medium text-gray-900">Geen Klassen</h3>
               <p className="mt-1 text-sm text-gray-500">
                 Begin door een nieuwe klas aan te maken.
@@ -473,7 +473,7 @@ export default function StudentGroups() {
                               });
                             }}
                           >
-                            <Users className="mr-2 h-4 w-4" />
+                            <UsersRound className="mr-2 h-4 w-4" />
                             <span>Studenten bekijken</span>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />

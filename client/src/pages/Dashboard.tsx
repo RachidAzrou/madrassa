@@ -352,7 +352,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-sky-700" />
-              <h3 className="text-lg font-semibold text-gray-800">Recente Studenten</h3>
+              <h3 className="text-lg font-semibold text-gray-800">Recent</h3>
             </div>
             <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
               <div onClick={navigateToStudents}>Bekijk alle</div>
@@ -376,11 +376,8 @@ export default function Dashboard() {
                   </Avatar>
                   <div className="ml-3 flex-grow">
                     <p className="text-sm font-medium text-gray-800">{student.firstName} {student.lastName}</p>
-                    <p className="text-xs text-gray-500">{student.program || 'Geen programma'}</p>
+                    <p className="text-xs text-gray-500">{student.program || ''}</p>
                   </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClass(student.status)}`}>
-                    {translateStatus(student.status)}
-                  </span>
                 </div>
               ))}
             </div>

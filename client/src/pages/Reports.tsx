@@ -17,7 +17,8 @@ import {
   Edit,
   X,
   Save,
-  Search
+  Search,
+  BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -377,8 +378,16 @@ export default function Reports() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">Rapporten & Analyses</h1>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+        <div>
+          <div className="flex items-center">
+            <BarChart3 className="h-6 w-6 text-primary mr-3" />
+            <h1 className="text-2xl font-semibold text-primary">Analyses</h1>
+          </div>
+          <p className="text-gray-500 text-sm mt-1 ml-9">
+            Beheer en genereer rapporten voor studenten en klassen
+          </p>
+        </div>
       </div>
 
       {/* Tabs for Report Generation and Template */}

@@ -327,16 +327,16 @@ export default function Courses() {
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
               <BookOpen className="h-6 w-6" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Cursussen</h1>
+            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Curriculum</h1>
           </div>
           <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beheer het cursusaanbod en de inschrijvingen
+            Beheer het curriculum en de inschrijvingen
           </p>
         </div>
         <div className="flex flex-col md:flex-row gap-3">
           <div className="relative">
             <Input
-              placeholder="Zoek cursussen..."
+              placeholder="Zoek curricula..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full md:w-64 pl-10"
@@ -351,7 +351,7 @@ export default function Courses() {
             className="bg-primary hover:bg-primary/90 flex items-center"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Cursus Toevoegen</span>
+            <span>Curriculum Toevoegen</span>
           </Button>
         </div>
       </div>

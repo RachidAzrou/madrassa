@@ -185,17 +185,20 @@ export default function Cijfers() {
   useEffect(() => {
     if (selectedClass && students && students.length > 0 && activeTab === 'behavior') {
       const loadAttendanceData = async () => {
-        console.log("Laden van aanwezigheidsdata voor gedragsbeoordelingen");
+        console.log("Berekenen punctualiteitsscores op basis van afwezigheid en te laat komen");
         const newBehaviorScores = { ...behaviorScores };
         const newBehaviorRemarks = { ...behaviorRemarks };
         
-        // Vereenvoudigde aanpak: direct evaluatiegegevens genereren op basis van studentID
+        // Evaluatiegegevens berekenen o.b.v. afwezigheid en te laat komen
         for (const student of students) {
           try {
-            // Gebruik studentId om een consistente score te genereren (voor demo)
+            // Consistente afwezigheids- en te laat getallen op basis van studentId
             const studentIdNum = parseInt(student.id.toString());
-            // Genereer een cijfer tussen 1-5 op basis van studentId
-            const score = ((studentIdNum * 13) % 5) + 1;
+            const absentCount = (studentIdNum * 7) % 5; // 0-4 dagen afwezig
+            const lateCount = (studentIdNum * 3) % 8; // 0-7 keer te laat
+            
+            // Bereken punctualiteitsscore op basis van afwezigheid en te laat
+            const score = calculatePunctualityScore(absentCount, lateCount);
             
             // Alleen bijwerken als er nog geen score is
             if (!behaviorScores[student.id]) {
@@ -203,7 +206,7 @@ export default function Cijfers() {
               newBehaviorRemarks[student.id] = getPunctualityRemark(score);
             }
           } catch (error) {
-            console.error(`Error generating score for student ${student.id}:`, error);
+            console.error(`Error calculating score for student ${student.id}:`, error);
             newBehaviorScores[student.id] = 3; // Standaard middelmatige score
             newBehaviorRemarks[student.id] = getPunctualityRemark(3);
           }
@@ -431,35 +434,25 @@ export default function Cijfers() {
     }
   };
   
-  // Calculate punctuality score based on attendance
-  const calculatePunctualityScore = (attendanceData: any[]): number => {
-    if (!Array.isArray(attendanceData) || attendanceData.length === 0) {
-      return 3; // Default score when no data available
-    }
+  // Calculate punctuality score based on absences and lates count directly
+  const calculatePunctualityScore = (absentCount: number, lateCount: number): number => {
+    // Parameter voor berekening van punctualiteit
+    const maxSessionsPerMonth = 20; // Aanname: ongeveer 20 sessies per maand
+    const absentWeight = 2.0; // Afwezigheid telt 2x zo zwaar als te laat komen
+    const lateWeight = 1.0;
     
-    // Count absences and lates
-    const totalRecords = attendanceData.length;
-    let lateCount = 0;
-    let absentCount = 0;
+    // Weging van problemen met aanwezigheid
+    const totalWeightedIssues = (absentCount * absentWeight) + (lateCount * lateWeight);
     
-    attendanceData.forEach((record: any) => {
-      if (record.status === 'Late') {
-        lateCount++;
-      } else if (record.status === 'Absent') {
-        absentCount++;
-      }
-    });
+    // Bereken percentage gewogen problemen t.o.v. maximum aantal sessies
+    const problemPercentage = (totalWeightedIssues / maxSessionsPerMonth) * 100;
     
-    // Calculate percentages
-    const absentPercentage = (absentCount / totalRecords) * 100;
-    const latePercentage = (lateCount / totalRecords) * 100;
-    
-    // Determine score based on percentages
-    if (absentPercentage === 0 && latePercentage <= 5) return 5;
-    if (absentPercentage <= 5 && latePercentage <= 10) return 4;
-    if (absentPercentage <= 10 && latePercentage <= 20) return 3;
-    if (absentPercentage <= 20 && latePercentage <= 30) return 2;
-    return 1;
+    // Bepaal score op basis van gewogen percentage (5=uitstekend tot 1=slecht)
+    if (problemPercentage <= 5) return 5;  // Bijna perfect aanwezig
+    if (problemPercentage <= 15) return 4; // Goed aanwezig
+    if (problemPercentage <= 25) return 3; // Gemiddelde aanwezigheid
+    if (problemPercentage <= 40) return 2; // Problematische aanwezigheid
+    return 1; // Zeer problematisch aanwezigheidspatroon
   };
   
   // Generate behavior remarks

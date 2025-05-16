@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Pencil, Trash2, Search, Plus, PlusCircle, Eye } from "lucide-react";
+import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,11 @@ type TeacherType = {
   createdAt?: Date;
   updatedAt?: Date;
 };
+
+// Interface voor de API respons met het volgende docent ID
+interface NextTeacherIdResponse {
+  nextTeacherId: string;
+}
 
 type AvailabilityType = {
   id: number;
@@ -97,7 +102,7 @@ export default function Teachers() {
   const { 
     data: nextTeacherIdData,
     isLoading: isLoadingNextId 
-  } = useQuery({
+  } = useQuery<NextTeacherIdResponse>({
     queryKey: ['/api/next-teacher-id'],
     enabled: isCreateDialogOpen, // Alleen ophalen wanneer het formulier open is
   });
@@ -757,11 +762,26 @@ export default function Teachers() {
           
           <Tabs defaultValue="personal" className="mt-4">
             <TabsList className="grid grid-cols-5 mb-4">
-              <TabsTrigger value="personal">Persoonlijk</TabsTrigger>
-              <TabsTrigger value="contact">Contact</TabsTrigger>
-              <TabsTrigger value="address">Adres</TabsTrigger>
-              <TabsTrigger value="professional">Professioneel</TabsTrigger>
-              <TabsTrigger value="classes">Klassen</TabsTrigger>
+              <TabsTrigger value="personal" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                <span>Persoonlijk</span>
+              </TabsTrigger>
+              <TabsTrigger value="contact" className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                <span>Contact</span>
+              </TabsTrigger>
+              <TabsTrigger value="address" className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                <span>Adres</span>
+              </TabsTrigger>
+              <TabsTrigger value="professional" className="flex items-center gap-2">
+                <Briefcase className="h-4 w-4" />
+                <span>Professioneel</span>
+              </TabsTrigger>
+              <TabsTrigger value="classes" className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                <span>Klassen</span>
+              </TabsTrigger>
             </TabsList>
             
             {/* Persoonlijke informatie tab */}

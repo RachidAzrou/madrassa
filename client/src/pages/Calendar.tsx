@@ -36,7 +36,7 @@ interface CalendarEvent {
   classId?: string; // Voor examen of les
   className?: string;
   isRecurring?: boolean; // Geeft aan of het een terugkerend evenement is
-  recurrencePattern?: 'weekly'; // Type herhaling, momenteel alleen wekelijks
+  recurrencePattern?: 'daily' | 'weekly' | 'monthly' | 'yearly'; // Type herhaling
   recurrenceEndDate?: string; // Einddatum van de herhaling
 }
 
@@ -59,7 +59,7 @@ export default function Calendar() {
     classId: '',
     className: '',
     isRecurring: false,
-    recurrencePattern: 'weekly' as 'weekly',
+    recurrencePattern: 'weekly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
     recurrenceEndDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0] // 3 maanden vooruit als standaard
   });
   
@@ -173,7 +173,7 @@ export default function Calendar() {
         classId: '',
         className: '',
         isRecurring: false,
-        recurrencePattern: 'weekly',
+        recurrencePattern: 'weekly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
         recurrenceEndDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0]
       });
       setActiveTab('event');
@@ -676,7 +676,7 @@ export default function Calendar() {
                         <Label htmlFor="recurrencePattern">Herhalingspatroon</Label>
                         <Select
                           value={newEvent.recurrencePattern}
-                          onValueChange={(value: 'weekly') => setNewEvent({
+                          onValueChange={(value: 'daily' | 'weekly' | 'monthly' | 'yearly') => setNewEvent({
                             ...newEvent,
                             recurrencePattern: value
                           })}
@@ -685,7 +685,10 @@ export default function Calendar() {
                             <SelectValue placeholder="Kies patroon" />
                           </SelectTrigger>
                           <SelectContent>
+                            <SelectItem value="daily">Dagelijks</SelectItem>
                             <SelectItem value="weekly">Wekelijks</SelectItem>
+                            <SelectItem value="monthly">Maandelijks</SelectItem>
+                            <SelectItem value="yearly">Jaarlijks</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

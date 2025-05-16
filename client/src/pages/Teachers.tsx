@@ -126,11 +126,11 @@ export default function Teachers() {
     }
   }, [nextTeacherIdData, isCreateDialogOpen]);
   
-  // Query voor het ophalen van beschikbare vakken
+  // Query voor het ophalen van beschikbare programma's (als vakken)
   const { 
-    data: coursesData
+    data: programsData
   } = useQuery({
-    queryKey: ['/api/courses'],
+    queryKey: ['/api/programs'],
     enabled: isCreateDialogOpen,
   });
   
@@ -142,12 +142,12 @@ export default function Teachers() {
     enabled: isCreateDialogOpen,
   });
   
-  // Effect voor het verwerken van opgehaalde vakken en klassen
+  // Effect voor het verwerken van opgehaalde programma's en klassen
   useEffect(() => {
-    if (coursesData && Array.isArray(coursesData.courses)) {
-      setAvailableSubjects(coursesData.courses.map((course: any) => ({
-        id: course.id,
-        name: course.name
+    if (programsData && Array.isArray(programsData)) {
+      setAvailableSubjects(programsData.map((program: any) => ({
+        id: program.id,
+        name: program.name
       })));
     }
     
@@ -157,7 +157,7 @@ export default function Teachers() {
         name: group.name || `Groep ${group.id}`
       })));
     }
-  }, [coursesData, classesData]);
+  }, [programsData, classesData]);
 
   // Fetching teachers data
   const {

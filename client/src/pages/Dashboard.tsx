@@ -153,36 +153,30 @@ export default function Dashboard() {
   return (
     <div className="container p-4 md:p-6 space-y-6">
       {/* Page Title */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-gray-200 pb-4">
-        <div className="flex items-center gap-2">
-          <div className="h-10 w-10 rounded-full bg-sky-500 flex items-center justify-center">
-            <BarChart3 className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">
-              <span className="text-black">my</span>
-              <span className="text-sky-700">Madrassa</span>
-              <span className="mx-2 text-gray-400">|</span>
-              <span className="text-sky-700">Dashboard</span>
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">Overzicht van de belangrijkste statistieken en activiteiten</p>
-          </div>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">Overzicht van de belangrijkste statistieken en activiteiten</p>
         </div>
       </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Studenten statistiek */}
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <Users className="h-20 w-20 text-sky-500" />
+        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full bg-blue-50">
+              <Users className="h-5 w-5 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Totaal Studenten</p>
+              <h2 className="text-2xl font-bold mt-1">{stats.totalStudents}</h2>
+            </div>
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal studenten</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.totalStudents}</p>
           <div className="mt-3 flex justify-end">
             <Button 
               variant="link" 
-              className="px-0 h-auto text-sky-600 hover:underline"
+              className="px-0 h-auto text-primary hover:underline"
               onClick={navigateToStudents}
             >
               Bekijk alle studenten
@@ -191,16 +185,20 @@ export default function Dashboard() {
         </div>
         
         {/* Vakken statistiek */}
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <BookOpen className="h-20 w-20 text-sky-500" />
+        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full bg-indigo-50">
+              <GraduationCap className="h-5 w-5 text-indigo-500" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Totaal Vakken</p>
+              <h2 className="text-2xl font-bold mt-1">{stats.programs}</h2>
+            </div>
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal vakken</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.programs}</p>
           <div className="mt-3 flex justify-end">
             <Button 
               variant="link" 
-              className="px-0 h-auto text-sky-600 hover:underline"
+              className="px-0 h-auto text-primary hover:underline"
               onClick={() => setLocation('/programs')}
             >
               Bekijk alle vakken
@@ -209,16 +207,20 @@ export default function Dashboard() {
         </div>
         
         {/* Klassen statistiek */}
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <School className="h-20 w-20 text-sky-500" />
+        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full bg-green-50">
+              <School className="h-5 w-5 text-green-500" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Totaal Klassen</p>
+              <h2 className="text-2xl font-bold mt-1">{stats.studentGroups}</h2>
+            </div>
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal klassen</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.studentGroups}</p>
           <div className="mt-3 flex justify-end">
             <Button 
               variant="link" 
-              className="px-0 h-auto text-sky-600 hover:underline"
+              className="px-0 h-auto text-primary hover:underline"
               onClick={navigateToGroups}
             >
               Bekijk alle klassen
@@ -227,16 +229,20 @@ export default function Dashboard() {
         </div>
         
         {/* Docenten statistiek */}
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <GraduationCap className="h-20 w-20 text-sky-500" />
+        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full bg-orange-50">
+              <BookOpen className="h-5 w-5 text-orange-500" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Totaal Docenten</p>
+              <h2 className="text-2xl font-bold mt-1">{stats.totalTeachers}</h2>
+            </div>
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal docenten</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.totalTeachers}</p>
           <div className="mt-3 flex justify-end">
             <Button 
               variant="link" 
-              className="px-0 h-auto text-sky-600 hover:underline"
+              className="px-0 h-auto text-primary hover:underline"
               onClick={navigateToTeachers}
             >
               Bekijk alle docenten

@@ -98,6 +98,7 @@ export default function Students() {
     city: '',
     programId: null as number | null,
     yearLevel: null as number | null,
+    schoolYear: '' as string | null,
     studentGroupId: null as number | null,
     enrollmentDate: '',
     status: 'active' as string,
@@ -2175,38 +2176,66 @@ export default function Students() {
                         Wijs de student toe aan een klas. Een student kan maar in één klas zitten.
                       </p>
                       
-                      <div className="mt-2">
-                        <Label htmlFor="studentGroupId" className="text-sm font-medium text-gray-700">
-                          Selecteer klas
-                        </Label>
-                        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
+                      <div className="grid grid-cols-1 gap-6">
+                        <div>
+                          <Label htmlFor="schoolYear" className="text-sm font-medium text-gray-700">
+                            Schooljaar <span className="text-primary">*</span>
+                          </Label>
+                          <div className="mt-2">
                             <Select
-                              value={studentFormData.studentGroupId?.toString() || 'none'}
+                              value={studentFormData.schoolYear || ''}
                               onValueChange={(value) => setStudentFormData({ 
                                 ...studentFormData, 
-                                studentGroupId: value !== 'none' ? parseInt(value) : null 
+                                schoolYear: value
                               })}
                             >
                               <SelectTrigger className="border-gray-200 bg-white">
-                                <SelectValue placeholder="Selecteer klas" />
+                                <SelectValue placeholder="Selecteer schooljaar" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="none">Geen klas</SelectItem>
-                                {studentGroups.map((group: {id: number, name: string}) => (
-                                  <SelectItem key={group.id} value={String(group.id)}>
-                                    {group.name}
-                                  </SelectItem>
-                                ))}
+                                <SelectItem value="">Selecteer schooljaar</SelectItem>
+                                <SelectItem value="2024-2025">2024-2025</SelectItem>
+                                <SelectItem value="2025-2026">2025-2026</SelectItem>
+                                <SelectItem value="2026-2027">2026-2027</SelectItem>
+                                <SelectItem value="2027-2028">2027-2028</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
-                          
-                          {studentGroups.length === 0 && (
-                            <div className="flex items-center text-sm text-amber-600">
-                              <p className="italic">Er zijn nog geen klassen aangemaakt.</p>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="studentGroupId" className="text-sm font-medium text-gray-700">
+                            Selecteer klas
+                          </Label>
+                          <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <Select
+                                value={studentFormData.studentGroupId?.toString() || 'none'}
+                                onValueChange={(value) => setStudentFormData({ 
+                                  ...studentFormData, 
+                                  studentGroupId: value !== 'none' ? parseInt(value) : null 
+                                })}
+                              >
+                                <SelectTrigger className="border-gray-200 bg-white">
+                                  <SelectValue placeholder="Selecteer klas" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="none">Geen klas</SelectItem>
+                                  {studentGroups.map((group: {id: number, name: string}) => (
+                                    <SelectItem key={group.id} value={String(group.id)}>
+                                      {group.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </div>
-                          )}
+                            
+                            {studentGroups.length === 0 && (
+                              <div className="flex items-center text-sm text-amber-600">
+                                <p className="italic">Er zijn nog geen klassen aangemaakt.</p>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                       

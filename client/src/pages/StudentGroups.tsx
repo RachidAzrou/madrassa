@@ -278,7 +278,7 @@ export default function StudentGroups() {
           </div>
           <Button onClick={handleAddStudentGroup} className="flex items-center">
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Groep Aanmaken</span>
+            <span>Klas Aanmaken</span>
           </Button>
         </div>
       </div>

@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, X } from 'lucide-react';
+import { 
+  ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, 
+  FilePlus, GraduationCap, School, PartyPopper, Pencil, BookOpen, Timer  
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { apiRequest, queryClient } from '@/lib/queryClient';
@@ -9,6 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Define types
 interface CalendarEvent {
@@ -20,6 +30,10 @@ interface CalendarEvent {
   location: string;
   type: 'exam' | 'class' | 'holiday' | 'event';
   description?: string;
+  courseId?: string; // Voor examen of les
+  courseName?: string;
+  classId?: string; // Voor examen of les
+  className?: string;
 }
 
 export default function Calendar() {
@@ -35,8 +49,14 @@ export default function Calendar() {
     endTime: '10:00',
     location: '',
     type: 'event' as 'exam' | 'class' | 'holiday' | 'event',
-    description: ''
+    description: '',
+    courseId: '',
+    courseName: '',
+    classId: '',
+    className: ''
   });
+  
+  const [activeTab, setActiveTab] = useState<'exam' | 'class' | 'holiday' | 'event'>('event');
 
   // Get month name, year - in Dutch
   const monthNames = ["Januari", "Februari", "Maart", "April", "Mei", "Juni", 
@@ -135,8 +155,13 @@ export default function Calendar() {
         endTime: '10:00',
         location: '',
         type: 'event',
-        description: ''
+        description: '',
+        courseId: '',
+        courseName: '',
+        classId: '',
+        className: ''
       });
+      setActiveTab('event');
       setIsAddEventDialogOpen(false);
       
       // Toon succesmelding
@@ -160,6 +185,14 @@ export default function Calendar() {
     setIsAddEventDialogOpen(true);
   };
   
+  const handleTabChange = (tab: 'exam' | 'class' | 'holiday' | 'event') => {
+    setActiveTab(tab);
+    setNewEvent({
+      ...newEvent,
+      type: tab
+    });
+  };
+  
   const handleSubmitEvent = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -167,6 +200,17 @@ export default function Calendar() {
       toast({
         title: "Onvolledige gegevens",
         description: "Vul een titel en datum in om het evenement toe te voegen.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Extra validatie voor examen of les
+    if ((newEvent.type === 'exam' || newEvent.type === 'class') && 
+        (!newEvent.courseId || !newEvent.classId)) {
+      toast({
+        title: "Onvolledige gegevens",
+        description: `Selecteer een vak en klas voor dit ${newEvent.type === 'exam' ? 'examen' : 'les'}.`,
         variant: "destructive",
       });
       return;

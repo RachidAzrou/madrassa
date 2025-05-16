@@ -557,42 +557,6 @@ export default function Guardians() {
                     </div>
                   </div>
                   
-                  <div className="pt-4 border-t border-gray-200 space-y-2">
-                    <h3 className="text-md font-medium mb-2">Contactgegevens</h3>
-                    <div className="flex items-center">
-                      <span className="w-32 text-sm text-gray-500">Email:</span>
-                      <span>{selectedGuardian.email}</span>
-                    </div>
-                    {selectedGuardian.phone && (
-                      <div className="flex items-center">
-                        <span className="w-32 text-sm text-gray-500">Telefoonnummer:</span>
-                        <span>{selectedGuardian.phone}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="pt-4 border-t border-gray-200 space-y-2">
-                    <h3 className="text-md font-medium mb-2">Adresgegevens</h3>
-                    {selectedGuardian.street && (
-                      <div className="flex items-center">
-                        <span className="w-32 text-sm text-gray-500">Straat:</span>
-                        <span>{selectedGuardian.street} {selectedGuardian.houseNumber}</span>
-                      </div>
-                    )}
-                    {selectedGuardian.postalCode && (
-                      <div className="flex items-center">
-                        <span className="w-32 text-sm text-gray-500">Postcode:</span>
-                        <span>{selectedGuardian.postalCode}</span>
-                      </div>
-                    )}
-                    {selectedGuardian.city && (
-                      <div className="flex items-center">
-                        <span className="w-32 text-sm text-gray-500">Plaats:</span>
-                        <span>{selectedGuardian.city}</span>
-                      </div>
-                    )}
-                  </div>
-                  
                   {selectedGuardian.notes && (
                     <div className="pt-4 border-t border-gray-200">
                       <h3 className="text-md font-medium mb-2">Notities</h3>

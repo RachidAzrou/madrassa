@@ -52,7 +52,12 @@ export default function StudentGroups() {
   const [selectedGroup, setSelectedGroup] = useState<any>(null);
 
   // Fetch student groups with filters
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<{
+    studentGroups: any[];
+    totalCount: number;
+    page: number;
+    totalPages: number;
+  }>({
     queryKey: ['/api/student-groups', { searchTerm, academicYear, program, page: currentPage }],
     staleTime: 30000,
   });
@@ -91,7 +96,7 @@ export default function StudentGroups() {
   });
 
   // Fetch programs for dropdown
-  const { data: programsData } = useQuery({
+  const { data: programsData } = useQuery<any[]>({
     queryKey: ['/api/programs'],
     staleTime: 300000,
   });
@@ -99,7 +104,7 @@ export default function StudentGroups() {
   const programs = programsData || [];
 
   // Fetch courses for dropdown
-  const { data: coursesData } = useQuery({
+  const { data: coursesData } = useQuery<{courses: any[]}>({
     queryKey: ['/api/courses'],
     staleTime: 300000,
   });
@@ -303,11 +308,11 @@ export default function StudentGroups() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Alle Opleidingen</SelectItem>
-                {programs.map((program) => (
+                {Array.isArray(programs) ? programs.map((program: any) => (
                   <SelectItem key={program.id} value={program.id.toString()}>
                     {program.name}
                   </SelectItem>
-                ))}
+                )) : null}
               </SelectContent>
             </Select>
           </div>
@@ -768,11 +773,11 @@ export default function StudentGroups() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {programs.map((program) => (
+                              {Array.isArray(programs) ? programs.map((program: any) => (
                                 <SelectItem key={program.id} value={program.id.toString()}>
                                   {program.name}
                                 </SelectItem>
-                              ))}
+                              )) : null}
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -795,11 +800,11 @@ export default function StudentGroups() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {courses.map((course) => (
+                              {Array.isArray(courses) ? courses.map((course: any) => (
                                 <SelectItem key={course.id} value={course.id.toString()}>
                                   {course.name}
                                 </SelectItem>
-                              ))}
+                              )) : null}
                             </SelectContent>
                           </Select>
                           <FormMessage />

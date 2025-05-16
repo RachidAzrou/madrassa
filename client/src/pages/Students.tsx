@@ -2583,46 +2583,6 @@ export default function Students() {
           )}
         </DialogContent>
       </Dialog>
-
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
-                  
-                  <div className="grid grid-cols-1 gap-6">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div className="md:col-span-1">
-                        <p className="text-sm font-medium text-gray-700">Studentnummer</p>
-                        <p className="mt-1">{selectedStudent.studentId}</p>
-                      </div>
-                      <div className="md:col-span-1">
-                        <p className="text-sm font-medium text-gray-700">Status</p>
-                        <p className="mt-1">{
-                          selectedStudent.status === 'active' ? 'Actief' :
-                          selectedStudent.status === 'inactive' ? 'Inactief' :
-                          selectedStudent.status === 'pending' ? 'In afwachting' :
-                          selectedStudent.status === 'graduated' ? 'Afgestudeerd' : 
-                          selectedStudent.status
-                        }</p>
-                      </div>
-                      <div className="md:col-span-1">
-                        <p className="text-sm font-medium text-gray-700">Inschrijvingsdatum</p>
-                        <p className="mt-1">{selectedStudent.enrollmentDate ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) : "Niet ingevuld"}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div className="md:col-span-1">
-                        <p className="text-sm font-medium text-gray-700">Voornaam</p>
-                        <p className="mt-1">{selectedStudent.firstName}</p>
-                      </div>
-                      <div className="md:col-span-1">
-                        <p className="text-sm font-medium text-gray-700">Achternaam</p>
-                        <p className="mt-1">{selectedStudent.lastName}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div className="md:col-span-1">
-                        <p className="text-sm font-medium text-gray-700">Geboortedatum</p>
                         <p className="mt-1">{selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "Niet ingevuld"}</p>
                       </div>
                       <div className="md:col-span-1">

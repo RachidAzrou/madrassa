@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Pencil, Trash2, Search, Plus, PlusCircle, Eye } from "lucide-react";
@@ -9,6 +9,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { formatDateToDisplayFormat } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 type TeacherType = {
   id: number;
@@ -83,6 +92,25 @@ export default function Teachers() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Query voor het ophalen van een nieuw docent ID
+  const { 
+    data: nextTeacherIdData,
+    isLoading: isLoadingNextId 
+  } = useQuery({
+    queryKey: ['/api/next-teacher-id'],
+    enabled: isCreateDialogOpen, // Alleen ophalen wanneer het formulier open is
+  });
+
+  useEffect(() => {
+    // Als er een nieuw ID is opgehaald, update dan het formulier
+    if (nextTeacherIdData?.nextTeacherId && isCreateDialogOpen) {
+      setTeacherFormData(prev => ({
+        ...prev,
+        teacherId: nextTeacherIdData.nextTeacherId
+      }));
+    }
+  }, [nextTeacherIdData, isCreateDialogOpen]);
 
   // Fetching teachers data
   const {
@@ -719,82 +747,265 @@ export default function Teachers() {
 
       {/* Create Teacher Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[550px]">
+        <DialogContent className="sm:max-w-[95vw] sm:h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Nieuwe Docent Toevoegen</DialogTitle>
             <DialogDescription>
               Vul de informatie in om een nieuwe docent toe te voegen aan het systeem.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="teacherId" className="text-sm font-medium">Docent ID</label>
-                <Input 
-                  id="teacherId" 
-                  placeholder="Bijv. D001" 
-                  value={newTeacherData.teacherId}
-                  onChange={(e) => setNewTeacherData({...newTeacherData, teacherId: e.target.value})}
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="isActive" className="text-sm font-medium">Status</label>
-                <select 
-                  id="isActive" 
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                  value={newTeacherData.isActive ? "true" : "false"}
-                  onChange={(e) => setNewTeacherData({...newTeacherData, isActive: e.target.value === "true"})}
-                >
-                  <option value="true">Actief</option>
-                  <option value="false">Inactief</option>
-                </select>
-              </div>
-            </div>
+          
+          <Tabs defaultValue="personal" className="mt-4">
+            <TabsList className="grid grid-cols-5 mb-4">
+              <TabsTrigger value="personal">Persoonlijk</TabsTrigger>
+              <TabsTrigger value="contact">Contact</TabsTrigger>
+              <TabsTrigger value="address">Adres</TabsTrigger>
+              <TabsTrigger value="professional">Professioneel</TabsTrigger>
+              <TabsTrigger value="classes">Klassen</TabsTrigger>
+            </TabsList>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="firstName" className="text-sm font-medium">Voornaam</label>
-                <Input 
-                  id="firstName" 
-                  placeholder="Voornaam" 
-                  value={newTeacherData.firstName}
-                  onChange={(e) => setNewTeacherData({...newTeacherData, firstName: e.target.value})}
-                />
+            {/* Persoonlijke informatie tab */}
+            <TabsContent value="personal" className="space-y-6">
+              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="teacherId" className="text-sm font-medium text-gray-700">
+                      Docent ID <span className="text-primary">*</span>
+                    </Label>
+                    <Input
+                      id="teacherId"
+                      value={teacherFormData.teacherId}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, teacherId: e.target.value })}
+                      className="mt-1 bg-white"
+                      placeholder="Automatisch gegenereerd..."
+                      disabled={!!nextTeacherIdData?.nextTeacherId}
+                    />
+                    {isLoadingNextId && <div className="text-xs text-gray-500 mt-1">ID wordt geladen...</div>}
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+                      Status <span className="text-primary">*</span>
+                    </Label>
+                    <Select
+                      value={teacherFormData.isActive ? "actief" : "inactief"}
+                      onValueChange={(value) => setTeacherFormData({ ...teacherFormData, isActive: value === "actief" })}
+                    >
+                      <SelectTrigger className="w-full mt-1 bg-white">
+                        <SelectValue placeholder="Selecteer status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="actief">Actief</SelectItem>
+                        <SelectItem value="inactief">Inactief</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                      Voornaam <span className="text-primary">*</span>
+                    </Label>
+                    <Input
+                      id="firstName"
+                      value={teacherFormData.firstName}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, firstName: e.target.value })}
+                      className="mt-1 bg-white"
+                      placeholder="Voornaam"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                      Achternaam <span className="text-primary">*</span>
+                    </Label>
+                    <Input
+                      id="lastName"
+                      value={teacherFormData.lastName}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, lastName: e.target.value })}
+                      className="mt-1 bg-white"
+                      placeholder="Achternaam"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
+                      Geslacht
+                    </Label>
+                    <Select
+                      value={teacherFormData.gender}
+                      onValueChange={(value) => setTeacherFormData({ ...teacherFormData, gender: value })}
+                    >
+                      <SelectTrigger className="w-full mt-1 bg-white">
+                        <SelectValue placeholder="Selecteer geslacht" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="man">Man</SelectItem>
+                        <SelectItem value="vrouw">Vrouw</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700">
+                      Geboortedatum
+                    </Label>
+                    <Input
+                      id="dateOfBirth"
+                      type="date"
+                      value={teacherFormData.dateOfBirth || ''}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, dateOfBirth: e.target.value })}
+                      className="mt-1 bg-white"
+                    />
+                  </div>
+                  
+                  <div className="md:col-span-2">
+                    <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
+                      Notities
+                    </Label>
+                    <Textarea
+                      id="notes"
+                      value={teacherFormData.notes}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, notes: e.target.value })}
+                      className="mt-1 bg-white"
+                      placeholder="Voeg hier aanvullende informatie toe..."
+                      rows={4}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <label htmlFor="lastName" className="text-sm font-medium">Achternaam</label>
-                <Input 
-                  id="lastName" 
-                  placeholder="Achternaam" 
-                  value={newTeacherData.lastName}
-                  onChange={(e) => setNewTeacherData({...newTeacherData, lastName: e.target.value})}
-                />
-              </div>
-            </div>
+            </TabsContent>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">Email</label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="email@mymadrassa.nl" 
-                  value={newTeacherData.email}
-                  onChange={(e) => setNewTeacherData({...newTeacherData, email: e.target.value})}
-                />
+            {/* Contact informatie tab */}
+            <TabsContent value="contact" className="space-y-6">
+              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                      Email <span className="text-primary">*</span>
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={teacherFormData.email}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, email: e.target.value })}
+                      className="mt-1 bg-white"
+                      placeholder="email@mymadrassa.nl"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                      Telefoonnummer <span className="text-primary">*</span>
+                    </Label>
+                    <Input
+                      id="phone"
+                      value={teacherFormData.phone}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, phone: e.target.value })}
+                      className="mt-1 bg-white"
+                      placeholder="06 1234 5678"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <label htmlFor="phone" className="text-sm font-medium">Telefoonnummer</label>
-                <Input 
-                  id="phone" 
-                  placeholder="06 1234 5678" 
-                  value={newTeacherData.phone}
-                  onChange={(e) => setNewTeacherData({...newTeacherData, phone: e.target.value})}
-                />
+            </TabsContent>
+            
+            {/* Adres informatie tab */}
+            <TabsContent value="address" className="space-y-6">
+              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="street" className="text-sm font-medium text-gray-700">
+                      Straat
+                    </Label>
+                    <Input
+                      id="street"
+                      value={teacherFormData.street}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, street: e.target.value })}
+                      className="mt-1 bg-white"
+                      placeholder="Straatnaam"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="houseNumber" className="text-sm font-medium text-gray-700">
+                      Huisnummer
+                    </Label>
+                    <Input
+                      id="houseNumber"
+                      value={teacherFormData.houseNumber}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, houseNumber: e.target.value })}
+                      className="mt-1 bg-white"
+                      placeholder="123"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
+                      Postcode
+                    </Label>
+                    <Input
+                      id="postalCode"
+                      value={teacherFormData.postalCode}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, postalCode: e.target.value })}
+                      className="mt-1 bg-white"
+                      placeholder="1234 AB"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="city" className="text-sm font-medium text-gray-700">
+                      Plaats
+                    </Label>
+                    <Input
+                      id="city"
+                      value={teacherFormData.city}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, city: e.target.value })}
+                      className="mt-1 bg-white"
+                      placeholder="Amsterdam"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <DialogFooter className="mt-4">
+            </TabsContent>
+            
+            {/* Professionele informatie tab */}
+            <TabsContent value="professional" className="space-y-6">
+              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <h3 className="text-lg font-semibold text-primary mb-4">Professionele gegevens</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="profession" className="text-sm font-medium text-gray-700">
+                      Beroep
+                    </Label>
+                    <Input
+                      id="profession"
+                      value={teacherFormData.profession}
+                      onChange={(e) => setTeacherFormData({ ...teacherFormData, profession: e.target.value })}
+                      className="mt-1 bg-white"
+                      placeholder="Bijv. Islamitische studies"
+                    />
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+            
+            {/* Klassen toewijzing tab */}
+            <TabsContent value="classes" className="space-y-6">
+              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <h3 className="text-lg font-semibold text-primary mb-4">Klas Toewijzing</h3>
+                <div className="space-y-6">
+                  <p className="text-sm text-gray-500">
+                    Wijs de docent toe aan klassen en vakken. Deze functionaliteit wordt later geïmplementeerd.
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
               Annuleren
             </Button>

@@ -96,32 +96,14 @@ export default function Students() {
 
   // Ophalen studenten
   const { data: studentsData = {}, isLoading } = useQuery({
-    queryKey: ['/api/students', page, searchTerm, selectedProgramFilter, selectedYearLevelFilter, selectedStatusFilter, selectedStudentGroupFilter],
-    queryFn: () => {
-      let url = `/api/students?page=${page}`;
-      
-      if (searchTerm) {
-        url += `&search=${encodeURIComponent(searchTerm)}`;
-      }
-      
-      if (selectedProgramFilter !== 'all') {
-        url += `&programId=${selectedProgramFilter}`;
-      }
-      
-      if (selectedYearLevelFilter !== 'all') {
-        url += `&yearLevel=${selectedYearLevelFilter}`;
-      }
-      
-      if (selectedStatusFilter !== 'all') {
-        url += `&status=${selectedStatusFilter}`;
-      }
-      
-      if (selectedStudentGroupFilter !== 'all') {
-        url += `&studentGroupId=${selectedStudentGroupFilter}`;
-      }
-      
-      return apiRequest(url);
-    }
+    queryKey: ['/api/students', { 
+      page, 
+      search: searchTerm, 
+      programId: selectedProgramFilter !== 'all' ? selectedProgramFilter : undefined, 
+      yearLevel: selectedYearLevelFilter !== 'all' ? selectedYearLevelFilter : undefined, 
+      status: selectedStatusFilter !== 'all' ? selectedStatusFilter : undefined, 
+      studentGroupId: selectedStudentGroupFilter !== 'all' ? selectedStudentGroupFilter : undefined 
+    }]
   });
 
   // Ophalen student details

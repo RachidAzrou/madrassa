@@ -9,7 +9,6 @@ import {
   Building,
   Calendar,
   ClipboardCheck,
-  GraduationCap as Medal,
   BarChart3,
   LogOut,
   Menu,
@@ -18,6 +17,7 @@ import {
   UserPlus,
   Settings,
   School,
+  Glasses,
   FileText,
   Clock,
 } from "lucide-react";
@@ -178,7 +178,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
             <div className="space-y-1.5">
               <SidebarLink
                 href="/courses"
-                icon={<BookOpen className="h-5 w-5" />}
+                icon={<Glasses className="h-5 w-5" />}
                 label="Cursussen"
                 isActive={location.startsWith("/courses")}
                 onClick={handleLinkClick}
@@ -222,7 +222,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
               />
               <SidebarLink
                 href="/grading"
-                icon={<Medal className="h-5 w-5" />}
+                icon={<GraduationCap className="h-5 w-5" />}
                 label="Beoordeling"
                 isActive={location.startsWith("/grading")}
                 onClick={handleLinkClick}

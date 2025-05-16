@@ -3,8 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle,
   ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
-  Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash
+  Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, CreditCard, AlertCircle
 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ import { formatDateToDisplayFormat } from '@/lib/utils';
 
 export default function Students() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProgramFilter, setSelectedProgramFilter] = useState('all');
@@ -39,6 +41,8 @@ export default function Students() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isStudentDetailDialogOpen, setIsStudentDetailDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [isFeeNotificationOpen, setIsFeeNotificationOpen] = useState(false);
+  const [feeDetails, setFeeDetails] = useState<any>(null);
   
   // State voor het studentformulier
   const [studentFormData, setStudentFormData] = useState({
@@ -119,10 +123,38 @@ export default function Students() {
         body: data
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
       resetForm();
       setIsCreateDialogOpen(false);
+      
+      // Controleer of er een betalingsrecord is aangemaakt
+      if (data && data.feeCreated) {
+        setFeeDetails(data.feeDetails);
+        
+        // Toon een toast notificatie
+        toast({
+          title: "Student toegevoegd",
+          description: "De student is succesvol toegevoegd en een betalingsrecord is aangemaakt.",
+        });
+        
+        // Open de specifieke notificatie dialog
+        setIsFeeNotificationOpen(true);
+      } else {
+        // Fallback bericht als er geen betalingsrecord is gemaakt
+        toast({
+          title: "Student toegevoegd",
+          description: "De student is succesvol toegevoegd.",
+        });
+      }
+    },
+    onError: (error) => {
+      console.error("Fout bij aanmaken student:", error);
+      toast({
+        title: "Fout bij aanmaken student",
+        description: error instanceof Error ? error.message : "Er is een onbekende fout opgetreden",
+        variant: "destructive",
+      });
     }
   });
 

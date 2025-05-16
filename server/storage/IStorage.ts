@@ -21,7 +21,9 @@ import {
   type TeacherLanguage, type InsertTeacherLanguage,
   type TeacherCourseAssignment, type InsertTeacherCourseAssignment,
   type TeacherAttendance, type InsertTeacherAttendance,
-  type BehaviorAssessment, type InsertBehaviorAssessment
+  type BehaviorAssessment, type InsertBehaviorAssessment,
+  type FeeSettings, type InsertFeeSettings,
+  type FeeDiscount, type InsertFeeDiscount
 } from "@shared/schema";
 
 // Storage interface for CRUD operations
@@ -115,6 +117,31 @@ export interface IStorage {
   createFee(fee: InsertFee): Promise<Fee>;
   updateFee(id: number, fee: Partial<Fee>): Promise<Fee | undefined>;
   deleteFee(id: number): Promise<boolean>;
+  getFeeStats(): Promise<{ 
+    totalCollected: number; 
+    pendingAmount: number; 
+    totalStudents: number; 
+    completionRate: number;
+    overdueAmount: number;
+    pendingInvoices: number;
+  } | undefined>;
+  getOutstandingDebts(): Promise<any[]>;
+  
+  // Fee Settings operations
+  getFeeSettings(): Promise<FeeSettings[]>;
+  getFeeSetting(id: number): Promise<FeeSettings | undefined>;
+  getFeeSettingByAcademicYear(academicYear: string): Promise<FeeSettings | undefined>;
+  createFeeSetting(setting: InsertFeeSettings): Promise<FeeSettings>;
+  updateFeeSetting(id: number, setting: Partial<FeeSettings>): Promise<FeeSettings | undefined>;
+  deleteFeeSetting(id: number): Promise<boolean>;
+  
+  // Fee Discount operations
+  getFeeDiscounts(): Promise<FeeDiscount[]>;
+  getFeeDiscount(id: number): Promise<FeeDiscount | undefined>;
+  getFeeDiscountsByAcademicYear(academicYear: string): Promise<FeeDiscount[]>;
+  createFeeDiscount(discount: InsertFeeDiscount): Promise<FeeDiscount>;
+  updateFeeDiscount(id: number, discount: Partial<FeeDiscount>): Promise<FeeDiscount | undefined>;
+  deleteFeeDiscount(id: number): Promise<boolean>;
 
   // Student Group operations
   getStudentGroups(): Promise<StudentGroup[]>;

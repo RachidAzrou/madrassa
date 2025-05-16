@@ -77,6 +77,9 @@ export default function Courses() {
     endLevel: '',
     periodicObjectives: '',
     assessmentDescription: '',
+    editType: 'vak',
+    selectedCourseId: null as number | null,
+    selectedClassId: null as number | null,
   });
   
   const { toast } = useToast();
@@ -124,10 +127,28 @@ export default function Courses() {
       }
     }
   });
+  
+  // Fetch student groups (classes)
+  const {
+    data: studentGroupsData,
+  } = useQuery({
+    queryKey: ['/api/student-groups'],
+    queryFn: async () => {
+      try {
+        return await apiRequest('GET', '/api/student-groups');
+      } catch (error) {
+        console.error('Error fetching student groups:', error);
+        return [];
+      }
+    }
+  });
 
   // Extract courses and total count from response
   const courses = coursesResponse?.courses || [];
   const totalCourses = coursesResponse?.totalCount || 0;
+  
+  // Extract student groups for dropdown
+  const studentGroups = studentGroupsData?.studentGroups || [];
   const totalPages = Math.ceil(totalCourses / itemsPerPage);
   // Zorg ervoor dat programsData een array is
   const programs = Array.isArray(programsData) ? programsData : [];
@@ -829,144 +850,169 @@ export default function Courses() {
           
           <form onSubmit={isAddDialogOpen ? handleSubmitCourse : handleSubmitEditCourse} className="space-y-6 pt-4">
             <Tabs defaultValue="basic">
-              <TabsList className="grid grid-cols-5 mb-6">
-                <TabsTrigger value="basic">Algemeen</TabsTrigger>
-                <TabsTrigger value="instroom">Instroom/Uitstroom</TabsTrigger>
-                <TabsTrigger value="leerdoelen">Leerdoelen</TabsTrigger>
-                <TabsTrigger value="materiaal">Lesmateriaal</TabsTrigger>
-                <TabsTrigger value="opdrachten">Opdrachten/Examens</TabsTrigger>
+              <TabsList className="grid grid-cols-3 mb-6">
+                <TabsTrigger value="basic">
+                  <BookOpen className="h-4 w-4 mr-2" /> Algemeen
+                </TabsTrigger>
+                <TabsTrigger value="materiaal">
+                  <FileUp className="h-4 w-4 mr-2" /> Lesmateriaal
+                </TabsTrigger>
+                <TabsTrigger value="opdrachten">
+                  <FileText className="h-4 w-4 mr-2" /> Opdrachten/Testen
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="basic">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="name" className="text-right">
-                        Cursusnaam <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="name"
-                        value={courseFormData.name}
-                        onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
-                        className="mt-1"
-                        required
-                      />
+                <div className="space-y-6">
+                  <div className="bg-gray-50 p-5 rounded-md border mb-6">
+                    <h3 className="text-lg font-medium mb-4">Wat wilt u bewerken?</h3>
+                    <div className="flex space-x-4 mb-4">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="typeVak"
+                          name="editType"
+                          className="h-4 w-4 text-primary border-gray-300 focus:ring-primary"
+                          checked={courseFormData.editType === 'vak'}
+                          onChange={() => setCourseFormData({ ...courseFormData, editType: 'vak' })}
+                        />
+                        <Label htmlFor="typeVak">Vak</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="typeKlas"
+                          name="editType"
+                          className="h-4 w-4 text-primary border-gray-300 focus:ring-primary"
+                          checked={courseFormData.editType === 'klas'}
+                          onChange={() => setCourseFormData({ ...courseFormData, editType: 'klas' })}
+                        />
+                        <Label htmlFor="typeKlas">Klas</Label>
+                      </div>
                     </div>
                     
-                    <div>
-                      <Label htmlFor="code" className="text-right">
-                        Cursuscode <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="code"
-                        value={courseFormData.code}
-                        onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
-                        className="mt-1"
-                        required
-                      />
-                    </div>
+                    {courseFormData.editType === 'vak' && (
+                      <div>
+                        <Label htmlFor="selectedCourse">Selecteer een vak</Label>
+                        <Select 
+                          value={courseFormData.selectedCourseId?.toString() || ''} 
+                          onValueChange={(val) => setCourseFormData({ 
+                            ...courseFormData, 
+                            selectedCourseId: val ? parseInt(val) : null 
+                          })}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Kies een vak" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {courses.map((course: any) => (
+                              <SelectItem key={course.id} value={course.id.toString()}>
+                                {course.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                     
-                    <div>
-                      <Label htmlFor="programId" className="text-right">
-                        Programma
-                      </Label>
-                      <Select 
-                        value={courseFormData.programId?.toString() || ''} 
-                        onValueChange={(val) => setCourseFormData({ 
-                          ...courseFormData, 
-                          programId: val ? parseInt(val) : null 
-                        })}
-                      >
-                        <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Selecteer een programma" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Geen programma</SelectItem>
-                          {programs.map((program: any) => (
-                            <SelectItem key={program.id} value={program.id.toString()}>
-                              {program.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="credits" className="text-right">
-                        Studiepunten <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="credits"
-                        type="number"
-                        min="0"
-                        max="60"
-                        value={courseFormData.credits}
-                        onChange={(e) => setCourseFormData({ ...courseFormData, credits: parseInt(e.target.value) })}
-                        className="mt-1"
-                        required
-                      />
-                    </div>
+                    {courseFormData.editType === 'klas' && (
+                      <div>
+                        <Label htmlFor="selectedClass">Selecteer een klas</Label>
+                        <Select 
+                          value={courseFormData.selectedClassId?.toString() || ''} 
+                          onValueChange={(val) => setCourseFormData({ 
+                            ...courseFormData, 
+                            selectedClassId: val ? parseInt(val) : null 
+                          })}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Kies een klas" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {studentGroups.map((group: any) => (
+                              <SelectItem key={group.id} value={group.id.toString()}>
+                                {group.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                   </div>
                   
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="instructor" className="text-right">
-                        Docent
-                      </Label>
-                      <Input
-                        id="instructor"
-                        value={courseFormData.instructor}
-                        onChange={(e) => setCourseFormData({ ...courseFormData, instructor: e.target.value })}
-                        className="mt-1"
-                      />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="name" className="text-right">
+                          Naam <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="name"
+                          value={courseFormData.name}
+                          onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
+                          className="mt-1"
+                          required
+                          disabled={!!courseFormData.selectedCourseId || !!courseFormData.selectedClassId}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="code" className="text-right">
+                          Code <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="code"
+                          value={courseFormData.code}
+                          onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
+                          className="mt-1"
+                          required
+                          disabled={!!courseFormData.selectedCourseId || !!courseFormData.selectedClassId}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="description" className="text-right">
+                          Beschrijving
+                        </Label>
+                        <Textarea
+                          id="description"
+                          value={courseFormData.description}
+                          onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
+                          className="mt-1"
+                          rows={5}
+                          disabled={!!courseFormData.selectedCourseId || !!courseFormData.selectedClassId}
+                        />
+                      </div>
                     </div>
                     
-                    <div>
-                      <Label htmlFor="maxStudents" className="text-right">
-                        Maximaal Aantal Studenten
-                      </Label>
-                      <Input
-                        id="maxStudents"
-                        type="number"
-                        min="1"
-                        value={courseFormData.maxStudents}
-                        onChange={(e) => setCourseFormData({ ...courseFormData, maxStudents: parseInt(e.target.value) })}
-                        className="mt-1"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="isActive" className="text-right">
-                        Status
-                      </Label>
-                      <Select 
-                        value={courseFormData.isActive ? "true" : "false"} 
-                        onValueChange={(val) => setCourseFormData({ 
-                          ...courseFormData, 
-                          isActive: val === "true" 
-                        })}
-                      >
-                        <SelectTrigger className="mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="true">Actief</SelectItem>
-                          <SelectItem value="false">Inactief</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="description" className="text-right">
-                        Beschrijving
-                      </Label>
-                      <Textarea
-                        id="description"
-                        value={courseFormData.description}
-                        onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
-                        className="mt-1"
-                        rows={3}
-                      />
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="prerequisites" className="text-right">
+                          Instroomvereisten
+                        </Label>
+                        <Textarea
+                          id="prerequisites"
+                          value={courseFormData.prerequisites}
+                          onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
+                          className="mt-1"
+                          rows={3}
+                          placeholder="Beschrijf welke voorkennis of vooropleiding vereist is"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="endLevel" className="text-right">
+                          Einddoelen
+                        </Label>
+                        <Textarea
+                          id="endLevel"
+                          value={courseFormData.endLevel || ''}
+                          onChange={(e) => setCourseFormData({ ...courseFormData, endLevel: e.target.value })}
+                          className="mt-1"
+                          rows={3}
+                          placeholder="Beschrijf wat studenten na afloop moeten kunnen"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1129,7 +1175,7 @@ export default function Courses() {
                 </div>
               </TabsContent>
               
-              {/* Tab 5: Opdrachten en examens */}
+              {/* Tab 3: Opdrachten en testen */}
               <TabsContent value="opdrachten" className="space-y-6">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-medium">Opdrachten en toetsen</h3>
@@ -1142,50 +1188,106 @@ export default function Courses() {
                       setIsUploadDialogOpen(true);
                     }}
                   >
-                    <FileText className="h-4 w-4 mr-2" /> Opdracht/toets toevoegen
+                    <FileText className="h-4 w-4 mr-2" /> Document toevoegen
                   </Button>
                 </div>
                 
-                <div className="bg-gray-50 rounded-md p-5 border">
-                  <Label htmlFor="assessmentDescription">Beschrijving van de beoordelingsmethode</Label>
-                  <Textarea
-                    id="assessmentDescription"
-                    value={courseFormData.assessmentDescription || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, assessmentDescription: e.target.value })}
-                    className="mt-1"
-                    rows={3}
-                    placeholder="Beschrijf hoe studenten worden beoordeeld (bijv. tentamens, opdrachten, presentaties)"
-                  />
-                </div>
-                
-                <div>
-                  <h4 className="text-md font-medium mb-3">Geüploade opdrachten en examens</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Dit zal later dynamisch worden getoond op basis van opgeslagen bestanden */}
-                    <div className="border rounded-md p-4 bg-white">
-                      <div className="flex justify-between">
-                        <div className="flex items-center">
-                          <div className="bg-red-100 rounded-full p-2 mr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-700">
-                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                              <polyline points="14 2 14 8 20 8"></polyline>
-                              <line x1="16" y1="13" x2="8" y2="13"></line>
-                              <line x1="16" y1="17" x2="8" y2="17"></line>
-                              <polyline points="10 9 9 9 8 9"></polyline>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-md font-medium">Opdrachten</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                      {/* Dit zal later dynamisch worden getoond op basis van opgeslagen bestanden */}
+                      <div className="border rounded-md p-4 bg-white">
+                        <div className="flex justify-between">
+                          <div className="flex items-center">
+                            <div className="bg-blue-100 rounded-full p-2 mr-3">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-700">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                              </svg>
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-sm">Voorbeeld: Opdracht hoofdstuk 1</h4>
+                              <p className="text-xs text-gray-500">PDF • 0.9 MB</p>
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                              <polyline points="7 10 12 15 17 10"></polyline>
+                              <line x1="12" y1="15" x2="12" y2="3"></line>
                             </svg>
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-sm">Voorbeeld: Eindexamen 2025</h4>
-                            <p className="text-xs text-gray-500">PDF • 1.3 MB</p>
-                          </div>
+                          </Button>
                         </div>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                          </svg>
-                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-md font-medium">Testen</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                      {/* Dit zal later dynamisch worden getoond op basis van opgeslagen bestanden */}
+                      <div className="border rounded-md p-4 bg-white">
+                        <div className="flex justify-between">
+                          <div className="flex items-center">
+                            <div className="bg-yellow-100 rounded-full p-2 mr-3">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-700">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                              </svg>
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-sm">Voorbeeld: Tussentoets hoofdstuk 1-3</h4>
+                              <p className="text-xs text-gray-500">PDF • 1.1 MB</p>
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                              <polyline points="7 10 12 15 17 10"></polyline>
+                              <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-md font-medium">Examens</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                      {/* Dit zal later dynamisch worden getoond op basis van opgeslagen bestanden */}
+                      <div className="border rounded-md p-4 bg-white">
+                        <div className="flex justify-between">
+                          <div className="flex items-center">
+                            <div className="bg-red-100 rounded-full p-2 mr-3">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-700">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                              </svg>
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-sm">Voorbeeld: Eindexamen 2025</h4>
+                              <p className="text-xs text-gray-500">PDF • 1.3 MB</p>
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                              <polyline points="7 10 12 15 17 10"></polyline>
+                              <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -597,7 +597,7 @@ export default function Students() {
                     <TableCell>
                       <div className="flex items-center">
                         <Avatar className="h-8 w-8 mr-2">
-                          <AvatarFallback className="bg-primary/10 text-primary">
+                          <AvatarFallback className="bg-[#1e3a8a] text-white">
                             {student.firstName[0]}{student.lastName[0]}
                           </AvatarFallback>
                         </Avatar>
@@ -1783,7 +1783,7 @@ export default function Students() {
                       <div className="md:col-span-2 flex">
                         <div className="mr-4">
                           <Avatar className="h-16 w-16">
-                            <AvatarFallback className="bg-primary/10 text-primary text-xl">
+                            <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
                               {selectedStudent.firstName[0]}{selectedStudent.lastName[0]}
                             </AvatarFallback>
                           </Avatar>

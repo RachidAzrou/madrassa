@@ -421,7 +421,7 @@ export default function Guardians() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <Avatar className="h-9 w-9">
-                          <AvatarFallback className="bg-gradient-to-br from-sky-50 to-sky-100 text-sky-700">
+                          <AvatarFallback className="bg-[#1e3a8a] text-white">
                             {guardian.firstName.charAt(0)}{guardian.lastName.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
@@ -583,7 +583,7 @@ export default function Guardians() {
                     <div className="w-full md:w-1/2 space-y-5">
                       <div className="flex items-center space-x-4">
                         <Avatar className="h-16 w-16">
-                          <AvatarFallback className="bg-gradient-to-br from-sky-50 to-sky-100 text-sky-700 text-xl">
+                          <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
                             {selectedGuardian.firstName.charAt(0)}{selectedGuardian.lastName.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
@@ -684,7 +684,7 @@ export default function Guardians() {
                             className="flex items-center p-3 hover:bg-gray-50"
                           >
                             <Avatar className="h-10 w-10">
-                              <AvatarFallback className="bg-gradient-to-br from-green-50 to-green-100 text-green-600">
+                              <AvatarFallback className="bg-[#1e3a8a] text-white">
                                 {relation.student?.firstName?.charAt(0)}{relation.student?.lastName?.charAt(0)}
                               </AvatarFallback>
                             </Avatar>

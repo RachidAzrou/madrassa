@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
+// Import nieuw logo
+import myMadrassaLogo from "../../assets/mymadrassa-new.png";
 import {
   GraduationCap,
   LayoutDashboard,
@@ -46,7 +48,7 @@ const ChalkBoard = (props: any) => (
     <path d="M8 8h8" />
   </svg>
 );
-import madrassaLogo from "@assets/myMadrassa.png";
+// Logo import already at the top
 
 type SidebarLinkProps = {
   href: string;
@@ -119,11 +121,8 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
         <div className="flex items-center space-x-2">
           <Link href="/">
             <div className="flex items-center space-x-2">
-              <img src={madrassaLogo} alt="myMadrassa Logo" className="w-9 h-9 rounded-lg object-cover" />
-              <span className="text-xl font-semibold">
-                <span className="text-gray-800">my</span>
-                <span className="text-[#3b5998]">Madrassa</span>
-              </span>
+              <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8" />
+              <span className="sr-only">myMadrassa</span>
             </div>
           </Link>
         </div>

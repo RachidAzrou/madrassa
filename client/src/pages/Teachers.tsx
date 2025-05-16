@@ -144,14 +144,14 @@ export default function Teachers() {
   
   // Effect voor het verwerken van opgehaalde vakken en klassen
   useEffect(() => {
-    if (coursesData) {
-      setAvailableSubjects(coursesData.map((course: any) => ({
+    if (coursesData && Array.isArray(coursesData.courses)) {
+      setAvailableSubjects(coursesData.courses.map((course: any) => ({
         id: course.id,
         name: course.name
       })));
     }
     
-    if (classesData) {
+    if (classesData && Array.isArray(classesData)) {
       setAvailableClasses(classesData.map((group: any) => ({
         id: group.id,
         name: group.name || `Groep ${group.id}`

@@ -45,14 +45,23 @@ export default function Scheduling() {
     // Docenten toewijzing
     teacherId: '',
     courseId: '',
-    day: 'monday',
+    classId: '',
+    selectedDays: {
+      monday: false,
+      tuesday: false,
+      wednesday: false,
+      thursday: false, 
+      friday: false,
+      saturday: false,
+      sunday: false
+    },
     startTime: '09:00',
     endTime: '10:30',
     repeat: true,
     
     // Lokalen toewijzing
-    roomId: '',
-    assignmentType: 'course',  // 'course' of 'class'
+    roomName: '',
+    toewijzingType: 'vak',  // 'vak' of 'klas'
     assignmentId: '',
     description: ''
   });
@@ -135,12 +144,21 @@ export default function Scheduling() {
       setFormData({
         teacherId: '',
         courseId: '',
-        day: 'monday',
+        classId: '',
+        selectedDays: {
+          monday: false,
+          tuesday: false,
+          wednesday: false,
+          thursday: false, 
+          friday: false,
+          saturday: false,
+          sunday: false
+        },
         startTime: '09:00',
         endTime: '10:30',
         repeat: true,
-        roomId: '',
-        assignmentType: 'course',
+        roomName: '',
+        toewijzingType: 'vak',
         assignmentId: '',
         description: ''
       });
@@ -327,7 +345,7 @@ export default function Scheduling() {
                       </div>
                     </h3>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="teacherId">Docent</Label>
                         <Select 
@@ -377,6 +395,23 @@ export default function Scheduling() {
                           </SelectContent>
                         </Select>
                       </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="classId">Klas</Label>
+                        <Select 
+                          value={formData.classId}
+                          onValueChange={(value) => handleFormChange('classId', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer een klas" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">Klas 1A</SelectItem>
+                            <SelectItem value="2">Klas 2B</SelectItem>
+                            <SelectItem value="3">Klas 3C</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
                   
@@ -388,56 +423,134 @@ export default function Scheduling() {
                       </div>
                     </h3>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="day">Dag</Label>
-                        <Select 
-                          value={formData.day}
-                          onValueChange={(value) => handleFormChange('day', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer een dag" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="monday">Maandag</SelectItem>
-                            <SelectItem value="tuesday">Dinsdag</SelectItem>
-                            <SelectItem value="wednesday">Woensdag</SelectItem>
-                            <SelectItem value="thursday">Donderdag</SelectItem>
-                            <SelectItem value="friday">Vrijdag</SelectItem>
-                            <SelectItem value="saturday">Zaterdag</SelectItem>
-                            <SelectItem value="sunday">Zondag</SelectItem>
-                          </SelectContent>
-                        </Select>
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="mb-2 block">Dagen</Label>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="monday" 
+                              checked={formData.selectedDays.monday}
+                              onCheckedChange={(checked) => {
+                                handleFormChange('selectedDays', {
+                                  ...formData.selectedDays,
+                                  monday: !!checked
+                                });
+                              }}
+                            />
+                            <Label htmlFor="monday" className="font-normal cursor-pointer">Maandag</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="tuesday" 
+                              checked={formData.selectedDays.tuesday}
+                              onCheckedChange={(checked) => {
+                                handleFormChange('selectedDays', {
+                                  ...formData.selectedDays,
+                                  tuesday: !!checked
+                                });
+                              }}
+                            />
+                            <Label htmlFor="tuesday" className="font-normal cursor-pointer">Dinsdag</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="wednesday" 
+                              checked={formData.selectedDays.wednesday}
+                              onCheckedChange={(checked) => {
+                                handleFormChange('selectedDays', {
+                                  ...formData.selectedDays,
+                                  wednesday: !!checked
+                                });
+                              }}
+                            />
+                            <Label htmlFor="wednesday" className="font-normal cursor-pointer">Woensdag</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="thursday" 
+                              checked={formData.selectedDays.thursday}
+                              onCheckedChange={(checked) => {
+                                handleFormChange('selectedDays', {
+                                  ...formData.selectedDays,
+                                  thursday: !!checked
+                                });
+                              }}
+                            />
+                            <Label htmlFor="thursday" className="font-normal cursor-pointer">Donderdag</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="friday" 
+                              checked={formData.selectedDays.friday}
+                              onCheckedChange={(checked) => {
+                                handleFormChange('selectedDays', {
+                                  ...formData.selectedDays,
+                                  friday: !!checked
+                                });
+                              }}
+                            />
+                            <Label htmlFor="friday" className="font-normal cursor-pointer">Vrijdag</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="saturday" 
+                              checked={formData.selectedDays.saturday}
+                              onCheckedChange={(checked) => {
+                                handleFormChange('selectedDays', {
+                                  ...formData.selectedDays,
+                                  saturday: !!checked
+                                });
+                              }}
+                            />
+                            <Label htmlFor="saturday" className="font-normal cursor-pointer">Zaterdag</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="sunday" 
+                              checked={formData.selectedDays.sunday}
+                              onCheckedChange={(checked) => {
+                                handleFormChange('selectedDays', {
+                                  ...formData.selectedDays,
+                                  sunday: !!checked
+                                });
+                              }}
+                            />
+                            <Label htmlFor="sunday" className="font-normal cursor-pointer">Zondag</Label>
+                          </div>
+                        </div>
                       </div>
                       
-                      <div className="space-y-2">
-                        <Label htmlFor="startTime">Starttijd</Label>
-                        <Input 
-                          type="time"
-                          value={formData.startTime}
-                          onChange={(e) => handleFormChange('startTime', e.target.value)}
-                        />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="startTime">Starttijd</Label>
+                          <Input 
+                            type="time"
+                            value={formData.startTime}
+                            onChange={(e) => handleFormChange('startTime', e.target.value)}
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="endTime">Eindtijd</Label>
+                          <Input 
+                            type="time"
+                            value={formData.endTime}
+                            onChange={(e) => handleFormChange('endTime', e.target.value)}
+                          />
+                        </div>
                       </div>
                       
-                      <div className="space-y-2">
-                        <Label htmlFor="endTime">Eindtijd</Label>
-                        <Input 
-                          type="time"
-                          value={formData.endTime}
-                          onChange={(e) => handleFormChange('endTime', e.target.value)}
+                      <div className="flex items-center space-x-2 mt-4">
+                        <Checkbox 
+                          id="repeat"
+                          checked={formData.repeat}
+                          onCheckedChange={(checked) => handleFormChange('repeat', !!checked)}
                         />
+                        <Label htmlFor="repeat" className="font-normal cursor-pointer">
+                          Wekelijks herhalen
+                        </Label>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 mt-4">
-                      <Checkbox 
-                        id="repeat"
-                        checked={formData.repeat}
-                        onCheckedChange={(checked) => handleFormChange('repeat', !!checked)}
-                      />
-                      <Label htmlFor="repeat" className="font-normal cursor-pointer">
-                        Wekelijks herhalen
-                      </Label>
                     </div>
                   </div>
                 </div>

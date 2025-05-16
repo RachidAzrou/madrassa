@@ -184,10 +184,10 @@ export default function Dashboard() {
           <div className="absolute right-0 top-0 opacity-10">
             <Users className="h-20 w-20 text-sky-500" />
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal studenten</h3>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Studenten</h3>
           <p className="text-2xl font-bold text-sky-700">{stats.totalStudents}</p>
           <div className="flex justify-between mt-2 text-xs text-sky-600">
-            <span>Actieve studenten</span>
+            <span>Actief</span>
             <span>Ingeschreven</span>
           </div>
         </div>
@@ -196,14 +196,10 @@ export default function Dashboard() {
           <div className="absolute right-0 top-0 opacity-10">
             <BookOpen className="h-20 w-20 text-sky-500" />
           </div>
-          <div className="flex justify-between">
-            <div>
-              <h3 className="text-sm font-medium text-gray-600 mb-1">Vakken</h3>
-              <p className="text-2xl font-bold text-sky-700">{stats.programs}</p>
-            </div>
-          </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Vakken</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.programs}</p>
           <div className="flex justify-between mt-2 text-xs text-sky-600">
-            <span>Actieve vakken</span>
+            <span>Actief</span>
             <span>Curriculum</span>
           </div>
         </div>
@@ -215,7 +211,7 @@ export default function Dashboard() {
           <h3 className="text-sm font-medium text-gray-600 mb-1">Klassen</h3>
           <p className="text-2xl font-bold text-sky-700">{stats.studentGroups}</p>
           <div className="flex justify-between mt-2 text-xs text-sky-600">
-            <span>Actieve klassen</span>
+            <span>Actief</span>
             <span>Studiegroepen</span>
           </div>
         </div>
@@ -227,7 +223,7 @@ export default function Dashboard() {
           <h3 className="text-sm font-medium text-gray-600 mb-1">Docenten</h3>
           <p className="text-2xl font-bold text-sky-700">{stats.totalTeachers}</p>
           <div className="flex justify-between mt-2 text-xs text-sky-600">
-            <span>Actieve docenten</span>
+            <span>Actief</span>
             <span>Personeelsleden</span>
           </div>
         </div>
@@ -240,7 +236,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-sky-700" />
-              <h3 className="text-lg font-semibold text-sky-800">Studenten per klas</h3>
+              <h3 className="text-lg font-semibold text-gray-800">Studenten per klas</h3>
             </div>
             <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
               <div onClick={() => setLocation('/student-groups')}>Details bekijken</div>
@@ -352,7 +348,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-sky-700" />
-              <h3 className="text-lg font-semibold text-sky-800">Recente Studenten</h3>
+              <h3 className="text-lg font-semibold text-gray-800">Recente Studenten</h3>
             </div>
             <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
               <div onClick={navigateToStudents}>Bekijk alle</div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, Calendar, Clock, Users, Repeat } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, Calendar, Clock, Users, Repeat, Landmark, GraduationCap, Building, BookOpen, ChevronRight, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,6 +16,16 @@ import {
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { apiRequest } from '@/lib/queryClient';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Scheduling() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,6 +35,27 @@ export default function Scheduling() {
   const [day, setDay] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('instructor-schedule');
+  
+  // Dialog state
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogActiveTab, setDialogActiveTab] = useState('instructor-schedule');
+
+  // Form state
+  const [formData, setFormData] = useState({
+    // Docenten toewijzing
+    teacherId: '',
+    courseId: '',
+    day: 'monday',
+    startTime: '09:00',
+    endTime: '10:30',
+    repeat: true,
+    
+    // Lokalen toewijzing
+    roomId: '',
+    assignmentType: 'course',  // 'course' of 'class'
+    assignmentId: '',
+    description: ''
+  });
 
   // Fetch schedules with filters
   const { data, isLoading, isError } = useQuery({
@@ -55,9 +86,68 @@ export default function Scheduling() {
   const instructors = instructorsData?.instructors || [];
   const rooms = roomsData?.rooms || [];
 
-  const handleAddSchedule = async () => {
-    // Implementation will be added for schedule creation
+  const handleAddSchedule = () => {
+    // Open the dialog
+    setIsDialogOpen(true);
     console.log('Add schedule clicked');
+  };
+  
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Form submitted with data:', formData);
+    
+    try {
+      // Submit based on active tab
+      if (dialogActiveTab === 'instructor-schedule') {
+        // Logic for adding instructor schedule
+        /*
+        await apiRequest('/api/scheduling/instructor', {
+          method: 'POST',
+          body: {
+            teacherId: formData.teacherId,
+            courseId: formData.courseId,
+            day: formData.day,
+            startTime: formData.startTime,
+            endTime: formData.endTime,
+            repeat: formData.repeat
+          }
+        });
+        */
+      } else {
+        // Logic for adding room allocation
+        /*
+        await apiRequest('/api/scheduling/room', {
+          method: 'POST',
+          body: {
+            roomId: formData.roomId,
+            type: formData.assignmentType,
+            assignmentId: formData.assignmentId,
+            description: formData.description
+          }
+        });
+        */
+      }
+      
+      // Close dialog and reset form
+      setIsDialogOpen(false);
+      
+      // Reset form
+      setFormData({
+        teacherId: '',
+        courseId: '',
+        day: 'monday',
+        startTime: '09:00',
+        endTime: '10:30',
+        repeat: true,
+        roomId: '',
+        assignmentType: 'course',
+        assignmentId: '',
+        description: ''
+      });
+      
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +177,13 @@ export default function Scheduling() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+  
+  const handleFormChange = (field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   return (
@@ -188,6 +285,282 @@ export default function Scheduling() {
           </div>
         </TabsContent>
       </Tabs>
+      
+      {/* Planning Toevoegen Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[95vw] h-[85vh] max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold flex items-center">
+              <PlusCircle className="mr-2 h-5 w-5 text-primary" />
+              Planning Toevoegen
+            </DialogTitle>
+            <DialogDescription>
+              Wijs docenten toe aan vakken of ken lokalen toe aan lessen.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleFormSubmit} className="space-y-6 mt-4">
+            <Tabs 
+              value={dialogActiveTab} 
+              onValueChange={setDialogActiveTab} 
+              className="w-full"
+            >
+              <TabsList className="grid grid-cols-2 mb-4">
+                <TabsTrigger value="instructor-schedule" className="flex items-center justify-center">
+                  <GraduationCap className="mr-2 h-4 w-4 text-primary" />
+                  Docentenrooster
+                </TabsTrigger>
+                <TabsTrigger value="room-allocation" className="flex items-center justify-center">
+                  <Building className="mr-2 h-4 w-4 text-primary" />
+                  Lokalenverdeling
+                </TabsTrigger>
+              </TabsList>
+              
+              {/* Docenten Rooster Tab Content */}
+              <TabsContent value="instructor-schedule" className="space-y-4 mt-2">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-md font-medium mb-4 border-b pb-2 text-gray-700">
+                      <div className="flex items-center">
+                        <GraduationCap className="mr-2 h-5 w-5 text-primary" />
+                        Docent Toewijzen
+                      </div>
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="teacherId">Docent</Label>
+                        <Select 
+                          value={formData.teacherId}
+                          onValueChange={(value) => handleFormChange('teacherId', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer een docent" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {instructors.length > 0 ? (
+                              instructors.map((teacher: any) => (
+                                <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                                  {teacher.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="1">Mohammed Youssef</SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="courseId">Vak</Label>
+                        <Select 
+                          value={formData.courseId}
+                          onValueChange={(value) => handleFormChange('courseId', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer een vak" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {courses.length > 0 ? (
+                              courses.map((course: any) => (
+                                <SelectItem key={course.id} value={course.id.toString()}>
+                                  {course.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <>
+                                <SelectItem value="1">Arabische Taal</SelectItem>
+                                <SelectItem value="2">Fiqh</SelectItem>
+                                <SelectItem value="3">Koranwetenschappen</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-md font-medium mb-4 border-b pb-2 text-gray-700">
+                      <div className="flex items-center">
+                        <Clock className="mr-2 h-5 w-5 text-primary" />
+                        Tijdstip
+                      </div>
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="day">Dag</Label>
+                        <Select 
+                          value={formData.day}
+                          onValueChange={(value) => handleFormChange('day', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer een dag" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="monday">Maandag</SelectItem>
+                            <SelectItem value="tuesday">Dinsdag</SelectItem>
+                            <SelectItem value="wednesday">Woensdag</SelectItem>
+                            <SelectItem value="thursday">Donderdag</SelectItem>
+                            <SelectItem value="friday">Vrijdag</SelectItem>
+                            <SelectItem value="saturday">Zaterdag</SelectItem>
+                            <SelectItem value="sunday">Zondag</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="startTime">Starttijd</Label>
+                        <Input 
+                          type="time"
+                          value={formData.startTime}
+                          onChange={(e) => handleFormChange('startTime', e.target.value)}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="endTime">Eindtijd</Label>
+                        <Input 
+                          type="time"
+                          value={formData.endTime}
+                          onChange={(e) => handleFormChange('endTime', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2 mt-4">
+                      <Checkbox 
+                        id="repeat"
+                        checked={formData.repeat}
+                        onCheckedChange={(checked) => handleFormChange('repeat', !!checked)}
+                      />
+                      <Label htmlFor="repeat" className="font-normal cursor-pointer">
+                        Wekelijks herhalen
+                      </Label>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Lokalen Toewijzing Tab Content */}
+              <TabsContent value="room-allocation" className="space-y-4 mt-2">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-md font-medium mb-4 border-b pb-2 text-gray-700">
+                      <div className="flex items-center">
+                        <MapPin className="mr-2 h-5 w-5 text-primary" />
+                        Lokaal Toewijzen
+                      </div>
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="roomId">Lokaal</Label>
+                        <Select 
+                          value={formData.roomId}
+                          onValueChange={(value) => handleFormChange('roomId', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer een lokaal" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {rooms.length > 0 ? (
+                              rooms.map((room: any) => (
+                                <SelectItem key={room.id} value={room.id.toString()}>
+                                  {room.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <>
+                                <SelectItem value="1">Lokaal A101</SelectItem>
+                                <SelectItem value="2">Lokaal B201</SelectItem>
+                                <SelectItem value="3">Lokaal C305</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="assignmentType">Type</Label>
+                        <Select 
+                          value={formData.assignmentType}
+                          onValueChange={(value) => handleFormChange('assignmentType', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="course">Vak</SelectItem>
+                            <SelectItem value="class">Klas</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 space-y-2">
+                      <Label htmlFor="assignmentId">
+                        {formData.assignmentType === 'course' ? 'Vak' : 'Klas'}
+                      </Label>
+                      <Select 
+                        value={formData.assignmentId}
+                        onValueChange={(value) => handleFormChange('assignmentId', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={`Selecteer een ${formData.assignmentType === 'course' ? 'vak' : 'klas'}`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {formData.assignmentType === 'course' ? (
+                            courses.length > 0 ? (
+                              courses.map((course: any) => (
+                                <SelectItem key={course.id} value={course.id.toString()}>
+                                  {course.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <>
+                                <SelectItem value="1">Arabische Taal</SelectItem>
+                                <SelectItem value="2">Fiqh</SelectItem>
+                                <SelectItem value="3">Koranwetenschappen</SelectItem>
+                              </>
+                            )
+                          ) : (
+                            <>
+                              <SelectItem value="1">Klas 1A</SelectItem>
+                              <SelectItem value="2">Klas 2B</SelectItem>
+                              <SelectItem value="3">Klas 3C</SelectItem>
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="mt-4 space-y-2">
+                      <Label htmlFor="description">Opmerkingen (optioneel)</Label>
+                      <textarea
+                        className="w-full min-h-[100px] p-2 rounded-md border border-gray-300"
+                        value={formData.description}
+                        onChange={(e) => handleFormChange('description', e.target.value)}
+                        placeholder="Voeg eventuele opmerkingen of instructies toe"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+            
+            <DialogFooter>
+              <Button variant="outline" type="button" onClick={() => setIsDialogOpen(false)}>
+                Annuleren
+              </Button>
+              <Button type="submit" className="bg-primary">
+                Planning Opslaan
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

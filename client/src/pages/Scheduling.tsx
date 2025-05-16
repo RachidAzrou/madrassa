@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, Calendar, Clock, Users, Repeat, Landmark, GraduationCap, Building, BookOpen, ChevronRight, MapPin } from 'lucide-react';
+import { 
+  Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, 
+  Calendar, Clock, Users, Repeat, Landmark, GraduationCap, 
+  Building, BookOpen, ChevronRight, MapPin 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -61,7 +65,7 @@ export default function Scheduling() {
     
     // Lokalen toewijzing
     roomName: '',
-    toewijzingType: 'vak',  // 'vak' of 'klas'
+    toewijzingsCategorie: 'vak',  // 'vak' of 'klas'
     assignmentId: '',
     description: ''
   });
@@ -115,7 +119,8 @@ export default function Scheduling() {
           body: {
             teacherId: formData.teacherId,
             courseId: formData.courseId,
-            day: formData.day,
+            classId: formData.classId,
+            selectedDays: formData.selectedDays,
             startTime: formData.startTime,
             endTime: formData.endTime,
             repeat: formData.repeat
@@ -128,8 +133,8 @@ export default function Scheduling() {
         await apiRequest('/api/scheduling/room', {
           method: 'POST',
           body: {
-            roomId: formData.roomId,
-            type: formData.assignmentType,
+            roomName: formData.roomName,
+            toewijzingsCategorie: formData.toewijzingsCategorie,
             assignmentId: formData.assignmentId,
             description: formData.description
           }
@@ -158,7 +163,7 @@ export default function Scheduling() {
         endTime: '10:30',
         repeat: true,
         roomName: '',
-        toewijzingType: 'vak',
+        toewijzingsCategorie: 'vak',
         assignmentId: '',
         description: ''
       });
@@ -525,6 +530,7 @@ export default function Scheduling() {
                         <div className="space-y-2">
                           <Label htmlFor="startTime">Starttijd</Label>
                           <Input 
+                            id="startTime"
                             type="time"
                             value={formData.startTime}
                             onChange={(e) => handleFormChange('startTime', e.target.value)}
@@ -534,6 +540,7 @@ export default function Scheduling() {
                         <div className="space-y-2">
                           <Label htmlFor="endTime">Eindtijd</Label>
                           <Input 
+                            id="endTime"
                             type="time"
                             value={formData.endTime}
                             onChange={(e) => handleFormChange('endTime', e.target.value)}
@@ -569,44 +576,28 @@ export default function Scheduling() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="roomId">Lokaal</Label>
-                        <Select 
-                          value={formData.roomId}
-                          onValueChange={(value) => handleFormChange('roomId', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer een lokaal" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {rooms.length > 0 ? (
-                              rooms.map((room: any) => (
-                                <SelectItem key={room.id} value={room.id.toString()}>
-                                  {room.name}
-                                </SelectItem>
-                              ))
-                            ) : (
-                              <>
-                                <SelectItem value="1">Lokaal A101</SelectItem>
-                                <SelectItem value="2">Lokaal B201</SelectItem>
-                                <SelectItem value="3">Lokaal C305</SelectItem>
-                              </>
-                            )}
-                          </SelectContent>
-                        </Select>
+                        <Label htmlFor="roomName">Lokaal</Label>
+                        <Input 
+                          id="roomName"
+                          type="text"
+                          placeholder="Voer lokaalnummer of -naam in"
+                          value={formData.roomName}
+                          onChange={(e) => handleFormChange('roomName', e.target.value)}
+                        />
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="assignmentType">Type</Label>
+                        <Label htmlFor="toewijzingsCategorie">Toewijzen aan</Label>
                         <Select 
-                          value={formData.assignmentType}
-                          onValueChange={(value) => handleFormChange('assignmentType', value)}
+                          value={formData.toewijzingsCategorie}
+                          onValueChange={(value) => handleFormChange('toewijzingsCategorie', value)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecteer type" />
+                            <SelectValue placeholder="Selecteer categorie" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="course">Vak</SelectItem>
-                            <SelectItem value="class">Klas</SelectItem>
+                            <SelectItem value="vak">Vak</SelectItem>
+                            <SelectItem value="klas">Klas</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -614,17 +605,17 @@ export default function Scheduling() {
                     
                     <div className="mt-4 space-y-2">
                       <Label htmlFor="assignmentId">
-                        {formData.assignmentType === 'course' ? 'Vak' : 'Klas'}
+                        {formData.toewijzingsCategorie === 'vak' ? 'Vak' : 'Klas'}
                       </Label>
                       <Select 
                         value={formData.assignmentId}
                         onValueChange={(value) => handleFormChange('assignmentId', value)}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder={`Selecteer een ${formData.assignmentType === 'course' ? 'vak' : 'klas'}`} />
+                          <SelectValue placeholder={`Selecteer een ${formData.toewijzingsCategorie === 'vak' ? 'vak' : 'klas'}`} />
                         </SelectTrigger>
                         <SelectContent>
-                          {formData.assignmentType === 'course' ? (
+                          {formData.toewijzingsCategorie === 'vak' ? (
                             courses.length > 0 ? (
                               courses.map((course: any) => (
                                 <SelectItem key={course.id} value={course.id.toString()}>
@@ -652,6 +643,7 @@ export default function Scheduling() {
                     <div className="mt-4 space-y-2">
                       <Label htmlFor="description">Opmerkingen (optioneel)</Label>
                       <textarea
+                        id="description"
                         className="w-full min-h-[100px] p-2 rounded-md border border-gray-300"
                         value={formData.description}
                         onChange={(e) => handleFormChange('description', e.target.value)}

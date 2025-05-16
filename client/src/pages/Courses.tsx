@@ -874,7 +874,7 @@ export default function Courses() {
                           <SelectValue placeholder="Selecteer een programma" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Geen programma</SelectItem>
+                          <SelectItem value="none">Geen programma</SelectItem>
                           {programs.map((program: any) => (
                             <SelectItem key={program.id} value={program.id.toString()}>
                               {program.name}

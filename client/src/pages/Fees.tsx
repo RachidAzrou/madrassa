@@ -133,11 +133,7 @@ export default function Fees() {
   });
 
   // Fetch fee statistics
-  const { data: statsData } = useQuery({
-    queryKey: ['/api/fees/stats'],
-  });
-  
-  type StatsType = {
+  const { data: statsData } = useQuery<{
     stats: {
       totalCollected: number;
       pendingAmount: number;
@@ -146,7 +142,9 @@ export default function Fees() {
       overdueAmount: number;
       pendingInvoices: number;
     }
-  };
+  }>({
+    queryKey: ['/api/fees/stats'],
+  });
   
   // Fetch students for the student selector
   const { data: studentsData } = useQuery({
@@ -255,7 +253,7 @@ export default function Fees() {
     if (!selectedFee) return;
     
     try {
-      await apiRequest('DELETE', `/api/fees/${selectedFee.id}`);
+      await apiRequest(`/api/fees/${selectedFee.id}`, { method: 'DELETE' });
       
       // Data refreshen
       queryClient.invalidateQueries({ queryKey: ['/api/fees'] });
@@ -291,7 +289,7 @@ export default function Fees() {
         updatedAt: new Date().toISOString()
       };
       
-      await apiRequest('PUT', `/api/fees/${selectedFee.id}`, feeData);
+      await apiRequest(`/api/fees/${selectedFee.id}`, { method: 'PUT', body: feeData });
       
       // Data refreshen
       queryClient.invalidateQueries({ queryKey: ['/api/fees'] });
@@ -325,7 +323,7 @@ export default function Fees() {
         createdAt: new Date().toISOString()
       };
       
-      await apiRequest('POST', '/api/fees', feeData);
+      await apiRequest('/api/fees', { method: 'POST', body: feeData });
       
       // Data refreshen
       queryClient.invalidateQueries({ queryKey: ['/api/fees'] });

@@ -6,7 +6,7 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { 
-  Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, Users, 
+  Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, School, 
   Pencil, MoreVertical, Plus, GraduationCap, BookOpen, UsersRound,
   CalendarIcon, Loader2, 
 } from 'lucide-react';

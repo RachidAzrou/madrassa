@@ -62,6 +62,15 @@ export default function Teachers() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherType | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newTeacherData, setNewTeacherData] = useState({
+    teacherId: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    isActive: true
+  });
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -180,8 +189,8 @@ export default function Teachers() {
 
   // Handle adding a new teacher
   const handleAddNewTeacher = () => {
-    // Implement new teacher functionality
-    console.log("Add new teacher");
+    // Open add teacher dialog
+    setIsCreateDialogOpen(true);
   };
 
   // Handle editing a teacher

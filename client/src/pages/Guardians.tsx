@@ -501,7 +501,7 @@ export default function Guardians() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="relationship">Relatie tot student<span className="text-red-500">*</span></Label>
+                  <Label htmlFor="relationship">Relatie tot student<span className="text-[#3b5998]">*</span></Label>
                   <Select 
                     name="relationship" 
                     defaultValue={newGuardian.relationship}
@@ -561,7 +561,7 @@ export default function Guardians() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Telefoonnummer<span className="text-red-500">*</span></Label>
+                    <Label htmlFor="phone">Telefoonnummer<span className="text-[#3b5998]">*</span></Label>
                     <Input 
                       id="phone"
                       name="phone"
@@ -573,7 +573,7 @@ export default function Guardians() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="street">Straat<span className="text-red-500">*</span></Label>
+                  <Label htmlFor="street">Straat<span className="text-[#3b5998]">*</span></Label>
                   <Input 
                     id="street"
                     name="street"
@@ -585,7 +585,7 @@ export default function Guardians() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="houseNumber">Huisnummer<span className="text-red-500">*</span></Label>
+                    <Label htmlFor="houseNumber">Huisnummer<span className="text-[#3b5998]">*</span></Label>
                     <Input 
                       id="houseNumber"
                       name="houseNumber"
@@ -595,7 +595,7 @@ export default function Guardians() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="postalCode">Postcode<span className="text-red-500">*</span></Label>
+                    <Label htmlFor="postalCode">Postcode<span className="text-[#3b5998]">*</span></Label>
                     <Input 
                       id="postalCode"
                       name="postalCode"
@@ -605,7 +605,7 @@ export default function Guardians() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="city">Plaats<span className="text-red-500">*</span></Label>
+                    <Label htmlFor="city">Plaats<span className="text-[#3b5998]">*</span></Label>
                     <Input 
                       id="city"
                       name="city"

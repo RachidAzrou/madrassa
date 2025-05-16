@@ -302,7 +302,10 @@ export default function Guardians() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
-            <Users className="h-6 w-6 text-primary mr-3" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary mr-3">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
+            </svg>
             <h1 className="text-2xl font-semibold text-primary">Voogden</h1>
           </div>
           <p className="text-gray-500 text-sm mt-1 ml-9">

@@ -388,7 +388,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-sky-700" />
-              <h3 className="text-lg font-semibold text-sky-800">Lesrooster Deze Week</h3>
+              <h3 className="text-lg font-semibold text-gray-800">Lesrooster Deze Week</h3>
             </div>
             <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
               <div onClick={navigateToCalendar}>Bekijk volledige planning</div>

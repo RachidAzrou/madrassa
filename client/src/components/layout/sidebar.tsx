@@ -22,6 +22,28 @@ import {
   FileText,
   Clock,
 } from "lucide-react";
+
+// Aangepast ChalkBoard icoon
+const ChalkBoard = (props: any) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg" 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    {...props}
+  >
+    <rect x="2" y="4" width="20" height="14" rx="2" />
+    <line x1="2" y1="14" x2="22" y2="14" />
+    <line x1="8" y1="2" x2="8" y2="4" />
+    <line x1="16" y1="2" x2="16" y2="4" />
+    <line x1="12" y1="18" x2="12" y2="22" />
+  </svg>
+);
 import madrassaLogo from "@assets/myMadrassa.png";
 
 type SidebarLinkProps = {
@@ -164,7 +186,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
               />
               <SidebarLink
                 href="/student-groups"
-                icon={<School className="h-5 w-5" />}
+                icon={<ChalkBoard className="h-5 w-5" />}
                 label="Klassen"
                 isActive={location.startsWith("/student-groups")}
                 onClick={handleLinkClick}

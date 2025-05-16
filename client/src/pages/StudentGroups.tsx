@@ -10,6 +10,27 @@ import {
   Pencil, MoreVertical, Plus, GraduationCap, BookOpen, UsersRound,
   CalendarIcon, Loader2, 
 } from 'lucide-react';
+// Aangepast ChalkBoard icoon
+const ChalkBoard = (props: any) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg" 
+    width="24" 
+    height="24" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    {...props}
+  >
+    <rect x="2" y="4" width="20" height="14" rx="2" />
+    <line x1="2" y1="14" x2="22" y2="14" />
+    <line x1="8" y1="2" x2="8" y2="4" />
+    <line x1="16" y1="2" x2="16" y2="4" />
+    <line x1="12" y1="18" x2="12" y2="22" />
+  </svg>
+);
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -259,7 +280,7 @@ export default function StudentGroups() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
-            <School className="h-6 w-6 text-primary mr-3" />
+            <ChalkBoard className="h-6 w-6 text-primary mr-3" />
             <h1 className="text-2xl font-semibold text-primary">Klassen</h1>
           </div>
           <p className="text-gray-500 text-sm mt-1 ml-9">
@@ -664,7 +685,7 @@ export default function StudentGroups() {
               <Tabs defaultValue="algemeen" className="w-full">
                 <TabsList className="grid grid-cols-5 w-full">
                   <TabsTrigger value="algemeen" className="flex items-center gap-2">
-                    <School className="h-4 w-4" />
+                    <ChalkBoard className="h-4 w-4" />
                     <span>Algemeen</span>
                   </TabsTrigger>
                   <TabsTrigger value="studenten" className="flex items-center gap-2">

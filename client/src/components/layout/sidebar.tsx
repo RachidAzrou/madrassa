@@ -144,7 +144,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
             <SidebarLink
               href="/"
               icon={<LayoutDashboard className="h-5 w-5" />}
-              label="Overzicht"
+              label="Dashboard"
               isActive={location === "/"}
               onClick={handleLinkClick}
             />

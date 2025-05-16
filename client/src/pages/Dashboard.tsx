@@ -10,7 +10,8 @@ import {
   Clock, 
   CheckCircle, 
   User, 
-  BookText
+  BookText,
+  LayoutDashboard
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -177,8 +178,13 @@ export default function Dashboard() {
       {/* Page Title */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">Overzicht van de belangrijkste statistieken en activiteiten</p>
+          <div className="flex items-center">
+            <LayoutDashboard className="h-6 w-6 text-primary mr-3" />
+            <h1 className="text-2xl font-semibold text-primary">Dashboard</h1>
+          </div>
+          <p className="text-gray-500 text-sm mt-1 ml-9">
+            Overzicht van de belangrijkste statistieken en activiteiten
+          </p>
         </div>
       </div>
 

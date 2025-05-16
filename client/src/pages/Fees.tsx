@@ -568,7 +568,7 @@ export default function Fees() {
         {/* Content voor Betalingen tab */}
         <TabsContent value="fee-records" className="space-y-6">
           {/* Statistieken */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardContent className="p-6 flex items-center justify-between">
                 <div>
@@ -580,7 +580,7 @@ export default function Fees() {
                   </h3>
                 </div>
                 <div className="bg-emerald-100 h-12 w-12 rounded-lg flex items-center justify-center">
-                  <DollarSign className="h-6 w-6 text-emerald-600" />
+                  <Euro className="h-6 w-6 text-emerald-600" />
                 </div>
               </CardContent>
             </Card>
@@ -596,7 +596,7 @@ export default function Fees() {
                   </h3>
                 </div>
                 <div className="bg-amber-100 h-12 w-12 rounded-lg flex items-center justify-center">
-                  <CreditCard className="h-6 w-6 text-amber-600" />
+                  <AlertCircle className="h-6 w-6 text-amber-600" />
                 </div>
               </CardContent>
             </Card>
@@ -619,22 +619,6 @@ export default function Fees() {
                 </div>
                 <div className="bg-blue-100 h-12 w-12 rounded-lg flex items-center justify-center">
                   <CheckCircle className="h-6 w-6 text-blue-600" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Te Laat Bedrag</p>
-                  <h3 className="text-2xl font-bold mt-1 text-red-600">
-                    {statsData?.stats?.overdueAmount 
-                      ? formatCurrency(statsData.stats.overdueAmount) 
-                      : "€0,00"}
-                  </h3>
-                </div>
-                <div className="bg-red-100 h-12 w-12 rounded-lg flex items-center justify-center">
-                  <AlertCircle className="h-6 w-6 text-red-600" />
                 </div>
               </CardContent>
             </Card>

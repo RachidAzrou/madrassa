@@ -309,7 +309,35 @@ export default function Cijfers() {
   };
 
   const handleGradeChange = (studentId: string, courseId: string, value: string) => {
-    const numericValue = parseFloat(value);
+    // Sta alleen getallen en lege waarden toe
+    if (value !== '' && !/^\d*\.?\d*$/.test(value)) {
+      return;
+    }
+    
+    if (value === '') {
+      // Leeg veld is toegestaan - we slaan het op als een lege string
+      setSubjectGrades(prev => {
+        const studentGrades = prev[studentId] || {};
+        // We maken een kopie van de bestaande cijfers
+        const newGrades = { ...studentGrades };
+        // We verwijderen het cijfer voor deze cursus
+        delete newGrades[courseId];
+        
+        return {
+          ...prev,
+          [studentId]: newGrades
+        };
+      });
+      setIsGradesModified(true);
+      return;
+    }
+    
+    // Converteer naar getal en valideer
+    let numericValue = parseFloat(value);
+    
+    // Valideer binnen bereik 0-100
+    if (numericValue < 0) numericValue = 0;
+    if (numericValue > 100) numericValue = 100;
     
     if (!isNaN(numericValue)) {
       setSubjectGrades(prev => {
@@ -648,7 +676,7 @@ export default function Cijfers() {
                                             pattern="[0-9]*"
                                             min="0"
                                             max="100"
-                                            className="w-20 text-center text-lg font-medium border-gray-300 focus:border-blue-500"
+                                            className="w-16 h-10 text-center text-base font-medium border-gray-300 focus:border-blue-500"
                                             value={grade !== undefined ? grade : ''}
                                             onChange={(e) => handleGradeChange(student.id, courseId, e.target.value)}
                                           />

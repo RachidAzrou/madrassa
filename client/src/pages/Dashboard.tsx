@@ -247,7 +247,7 @@ export default function Dashboard() {
         <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-sky-700" />
+              <BarChart3 className="h-5 w-5 text-[#1e3a8a]" />
               <h3 className="text-lg font-semibold text-gray-800">Studenten per klas</h3>
             </div>
             <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
@@ -359,7 +359,7 @@ export default function Dashboard() {
         <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-3">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-sky-700" />
+              <Clock className="h-5 w-5 text-[#1e3a8a]" />
               <h3 className="text-lg font-semibold text-gray-800">Recent</h3>
             </div>
             <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
@@ -396,7 +396,7 @@ export default function Dashboard() {
         <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-7">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-sky-700" />
+              <Calendar className="h-5 w-5 text-[#1e3a8a]" />
               <h3 className="text-lg font-semibold text-gray-800">Lesrooster Deze Week</h3>
             </div>
             <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
@@ -433,7 +433,7 @@ export default function Dashboard() {
               {currentWeekLessons.slice(0, 5).map((lesson: Lesson, index: number) => (
                 <div key={index} className="flex items-center p-3 hover:bg-sky-50/50 rounded-md border border-sky-100 shadow-sm transition-colors duration-200">
                   <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-2 rounded-md border border-sky-200 shadow-sm">
-                    <Clock className="h-5 w-5 text-sky-700" />
+                    <Clock className="h-5 w-5 text-[#1e3a8a]" />
                   </div>
                   <div className="ml-3 flex-grow">
                     <p className="text-sm font-medium text-gray-800">{lesson.title || 'Les ' + (index + 1)}</p>

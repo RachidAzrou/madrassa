@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
+import { Switch } from "@/components/ui/switch";
 import { 
   Card, 
   CardContent, 
@@ -34,6 +35,9 @@ interface CalendarEvent {
   courseName?: string;
   classId?: string; // Voor examen of les
   className?: string;
+  isRecurring?: boolean; // Geeft aan of het een terugkerend evenement is
+  recurrencePattern?: 'weekly'; // Type herhaling, momenteel alleen wekelijks
+  recurrenceEndDate?: string; // Einddatum van de herhaling
 }
 
 export default function Calendar() {
@@ -53,7 +57,10 @@ export default function Calendar() {
     courseId: '',
     courseName: '',
     classId: '',
-    className: ''
+    className: '',
+    isRecurring: false,
+    recurrencePattern: 'weekly' as 'weekly',
+    recurrenceEndDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0] // 3 maanden vooruit als standaard
   });
   
   const [activeTab, setActiveTab] = useState<'exam' | 'class' | 'holiday' | 'event'>('event');
@@ -164,7 +171,10 @@ export default function Calendar() {
         courseId: '',
         courseName: '',
         classId: '',
-        className: ''
+        className: '',
+        isRecurring: false,
+        recurrencePattern: 'weekly',
+        recurrenceEndDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0]
       });
       setActiveTab('event');
       setIsAddEventDialogOpen(false);
@@ -219,6 +229,31 @@ export default function Calendar() {
         variant: "destructive",
       });
       return;
+    }
+    
+    // Validatie voor wekelijkse herhaling
+    if (newEvent.isRecurring) {
+      if (!newEvent.recurrenceEndDate) {
+        toast({
+          title: "Onvolledige gegevens",
+          description: "Selecteer een einddatum voor de herhaling.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Controleer of einddatum na startdatum ligt
+      const startDate = new Date(newEvent.date);
+      const endDate = new Date(newEvent.recurrenceEndDate);
+      
+      if (endDate <= startDate) {
+        toast({
+          title: "Ongeldige datums",
+          description: "De einddatum van de herhaling moet na de startdatum liggen.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
     
     createEventMutation.mutate(newEvent);
@@ -618,6 +653,56 @@ export default function Calendar() {
                     Activiteit details
                   </h3>
                 </TabsContent>
+                
+                {/* Herhalingsopties - beschikbaar voor alle evenementtypes */}
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="text-lg font-medium flex items-center mb-2">
+                    <Timer className="mr-2 h-5 w-5 text-primary" />
+                    Herhaling
+                  </h3>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch 
+                      checked={newEvent.isRecurring}
+                      onCheckedChange={(checked) => setNewEvent({ ...newEvent, isRecurring: checked })}
+                      id="isRecurring"
+                    />
+                    <Label htmlFor="isRecurring">Dit is een terugkerend evenement</Label>
+                  </div>
+                  
+                  {newEvent.isRecurring && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6 border-l-2 border-l-gray-200 mt-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="recurrencePattern">Herhalingspatroon</Label>
+                        <Select
+                          value={newEvent.recurrencePattern}
+                          onValueChange={(value: 'weekly') => setNewEvent({
+                            ...newEvent,
+                            recurrencePattern: value
+                          })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Kies patroon" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="weekly">Wekelijks</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="recurrenceEndDate">Einddatum herhaling</Label>
+                        <Input
+                          id="recurrenceEndDate"
+                          type="date"
+                          value={newEvent.recurrenceEndDate}
+                          onChange={(e) => setNewEvent({ ...newEvent, recurrenceEndDate: e.target.value })}
+                          min={newEvent.date}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="description">Beschrijving</Label>

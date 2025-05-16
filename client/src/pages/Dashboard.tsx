@@ -179,7 +179,9 @@ export default function Dashboard() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
-            <LayoutDashboard className="h-6 w-6 text-primary mr-3" />
+            <div className="mr-3 text-primary">
+              <BarChart3 className="h-6 w-6" />
+            </div>
             <h1 className="text-2xl font-semibold text-primary">Dashboard</h1>
           </div>
           <p className="text-gray-500 text-sm mt-1 ml-9">

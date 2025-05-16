@@ -1139,8 +1139,13 @@ export default function Students() {
                   placeholder="DD/MM/JJJJ"
                   value={studentFormData.dateOfBirth ? formatDateToDisplayFormat(studentFormData.dateOfBirth) : ''}
                   onChange={(e) => {
+                    setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value });
+                  }}
+                  onBlur={(e) => {
                     const formattedDate = formatDateToDatabaseFormat(e.target.value);
-                    setStudentFormData({ ...studentFormData, dateOfBirth: formattedDate || '' });
+                    if (formattedDate) {
+                      setStudentFormData({ ...studentFormData, dateOfBirth: formattedDate });
+                    }
                   }}
                   className="mt-1"
                 />

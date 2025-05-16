@@ -53,7 +53,6 @@ interface TeacherAttendanceRecord {
   classId?: number;
   date: string;
   status: string; // aanwezig, afwezig
-  replacementTeacherId?: number;
   notes?: string;
 }
 
@@ -103,7 +102,6 @@ export default function Attendance() {
   // Docent aanwezigheid state
   const [teacherAttendance, setTeacherAttendance] = useState<string>('present');
   const [teacherNote, setTeacherNote] = useState<string>('');
-  const [replacementTeacherId, setReplacementTeacherId] = useState<string | null>(null);
 
   // Fetch courses for dropdown
   const { data: coursesData } = useQuery<{ courses: Course[] }>({
@@ -280,7 +278,6 @@ export default function Attendance() {
         teacherId: 1, // Hardcoded voor nu, later uit sessie halen
         date: selectedDate,
         status: teacherAttendance,
-        replacementTeacherId: replacementTeacherId ? parseInt(replacementTeacherId) : null,
         notes: teacherNote || null,
       };
       
@@ -323,7 +320,6 @@ export default function Attendance() {
     setStudentNotes({});
     setTeacherAttendance('present');
     setTeacherNote('');
-    setReplacementTeacherId(null);
   };
   
   const handleClassChange = (value: string) => {
@@ -334,7 +330,6 @@ export default function Attendance() {
     setStudentNotes({});
     setTeacherAttendance('present');
     setTeacherNote('');
-    setReplacementTeacherId(null);
   };
 
   const handleDateChange = (increment: number) => {
@@ -345,7 +340,6 @@ export default function Attendance() {
     setStudentNotes({});
     setTeacherAttendance('present');
     setTeacherNote('');
-    setReplacementTeacherId(null);
   };
 
   const handleStatusChange = (studentId: string, status: string) => {
@@ -376,16 +370,9 @@ export default function Attendance() {
   
   const handleTeacherAttendanceChange = (status: string) => {
     setTeacherAttendance(status);
-    
-    // Als de status niet 'replaced' is, reset dan de vervangende docent
-    if (status !== 'replaced') {
-      setReplacementTeacherId(null);
-    }
   };
   
-  const handleReplacementTeacherChange = (teacherId: string) => {
-    setReplacementTeacherId(teacherId);
-  };
+  // Vervanging functionaliteit is verwijderd
   
   const handleTeacherNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTeacherNote(e.target.value);
@@ -453,10 +440,6 @@ export default function Attendance() {
       if (record) {
         setTeacherAttendance(record.status || 'present');
         setTeacherNote(record.notes || '');
-        
-        if (record.replacementTeacherId) {
-          setReplacementTeacherId(record.replacementTeacherId.toString());
-        }
       }
     }
   }, [teacherAttendanceRecord]);
@@ -832,27 +815,7 @@ export default function Attendance() {
                   </div>
                 </div>
                 
-                {teacherAttendance === 'replaced' && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Wie vervangt u?</label>
-                    <Select value={replacementTeacherId || ''} onValueChange={handleReplacementTeacherChange}>
-                      <SelectTrigger className="w-full md:w-1/2">
-                        <SelectValue placeholder="Selecteer vervangende docent" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {teachers.length === 0 ? (
-                          <SelectItem value="none">Geen docenten beschikbaar</SelectItem>
-                        ) : (
-                          teachers.map(teacher => (
-                            <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                              {teacher.firstName} {teacher.lastName}
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                {/* Verwijderd: Vervanging optie zoals verzocht */}
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Notities (optioneel)</label>

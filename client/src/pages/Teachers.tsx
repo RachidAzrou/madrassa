@@ -327,8 +327,13 @@ export default function Teachers() {
       {/* Page Title */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Docentenbeheer</h1>
-          <p className="text-sm text-gray-500 mt-1">Beheer en monitor alle docenten en hun vaardigheden</p>
+          <div className="flex items-center">
+            <GraduationCap className="h-6 w-6 text-primary mr-3" />
+            <h1 className="text-2xl font-semibold text-primary">Docenten</h1>
+          </div>
+          <p className="text-gray-500 text-sm mt-1 ml-9">
+            Beheer en monitor alle docenten en hun vaardigheden
+          </p>
         </div>
         <div className="flex flex-col md:flex-row gap-3">
           <div className="relative">
@@ -340,7 +345,12 @@ export default function Teachers() {
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
-          <Button onClick={handleAddNewTeacher} className="flex items-center">
+          <Button 
+            onClick={handleAddNewTeacher} 
+            variant="default" 
+            size="default" 
+            className="bg-primary hover:bg-primary/90 flex items-center"
+          >
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Docent Toevoegen</span>
           </Button>

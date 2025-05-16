@@ -153,30 +153,36 @@ export default function Dashboard() {
   return (
     <div className="container p-4 md:p-6 space-y-6">
       {/* Page Title */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">Overzicht van de belangrijkste statistieken en activiteiten</p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-gray-200 pb-4">
+        <div className="flex items-center gap-2">
+          <div className="h-10 w-10 rounded-full bg-sky-500 flex items-center justify-center">
+            <BarChart3 className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">
+              <span className="text-black">my</span>
+              <span className="text-sky-700">Madrassa</span>
+              <span className="mx-2 text-gray-400">|</span>
+              <span className="text-sky-700">Dashboard</span>
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">Overzicht van de belangrijkste statistieken en activiteiten</p>
+          </div>
         </div>
       </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Studenten statistiek */}
-        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-full bg-blue-50">
-              <Users className="h-5 w-5 text-blue-500" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Totaal Studenten</p>
-              <h2 className="text-2xl font-bold mt-1">{stats.totalStudents}</h2>
-            </div>
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <Users className="h-20 w-20 text-sky-500" />
           </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal studenten</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.totalStudents}</p>
           <div className="mt-3 flex justify-end">
             <Button 
               variant="link" 
-              className="px-0 h-auto text-primary hover:underline"
+              className="px-0 h-auto text-sky-600 hover:underline"
               onClick={navigateToStudents}
             >
               Bekijk alle studenten
@@ -185,20 +191,16 @@ export default function Dashboard() {
         </div>
         
         {/* Vakken statistiek */}
-        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-full bg-indigo-50">
-              <GraduationCap className="h-5 w-5 text-indigo-500" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Totaal Vakken</p>
-              <h2 className="text-2xl font-bold mt-1">{stats.programs}</h2>
-            </div>
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <GraduationCap className="h-20 w-20 text-sky-500" />
           </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal vakken</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.programs}</p>
           <div className="mt-3 flex justify-end">
             <Button 
               variant="link" 
-              className="px-0 h-auto text-primary hover:underline"
+              className="px-0 h-auto text-sky-600 hover:underline"
               onClick={() => setLocation('/programs')}
             >
               Bekijk alle vakken
@@ -207,20 +209,16 @@ export default function Dashboard() {
         </div>
         
         {/* Klassen statistiek */}
-        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-full bg-green-50">
-              <School className="h-5 w-5 text-green-500" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Totaal Klassen</p>
-              <h2 className="text-2xl font-bold mt-1">{stats.studentGroups}</h2>
-            </div>
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <School className="h-20 w-20 text-sky-500" />
           </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal klassen</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.studentGroups}</p>
           <div className="mt-3 flex justify-end">
             <Button 
               variant="link" 
-              className="px-0 h-auto text-primary hover:underline"
+              className="px-0 h-auto text-sky-600 hover:underline"
               onClick={navigateToGroups}
             >
               Bekijk alle klassen
@@ -229,20 +227,16 @@ export default function Dashboard() {
         </div>
         
         {/* Docenten statistiek */}
-        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-full bg-orange-50">
-              <BookOpen className="h-5 w-5 text-orange-500" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Totaal Docenten</p>
-              <h2 className="text-2xl font-bold mt-1">{stats.totalTeachers}</h2>
-            </div>
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <BookOpen className="h-20 w-20 text-sky-500" />
           </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal docenten</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.totalTeachers}</p>
           <div className="mt-3 flex justify-end">
             <Button 
               variant="link" 
-              className="px-0 h-auto text-primary hover:underline"
+              className="px-0 h-auto text-sky-600 hover:underline"
               onClick={navigateToTeachers}
             >
               Bekijk alle docenten
@@ -254,14 +248,14 @@ export default function Dashboard() {
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Studenten per klas grafiek - Links */}
-        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm lg:col-span-2">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-primary">
+            <h2 className="text-lg font-semibold text-sky-700">
               Studenten per Klas
             </h2>
             <Button 
               variant="link" 
-              className="px-0 h-auto text-primary hover:underline"
+              className="px-0 h-auto text-sky-600 hover:underline"
               onClick={navigateToGroups}
             >
               Bekijk alle klassen
@@ -270,7 +264,7 @@ export default function Dashboard() {
           
           {isStudentsByGroupLoading ? (
             <div className="h-64 flex items-center justify-center">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : studentsByGroup.length === 0 ? (
             <div className="h-64 flex items-center justify-center">
@@ -287,7 +281,7 @@ export default function Dashboard() {
                 return (
                   <div key={index} className="flex flex-col items-center">
                     <div 
-                      className="w-16 bg-primary rounded-t transition-all duration-500 ease-out"
+                      className="w-16 bg-sky-500 rounded-t transition-all duration-500 ease-out"
                       style={{ 
                         height: `${Math.max(5, heightPercentage)}%` 
                       }}
@@ -295,7 +289,7 @@ export default function Dashboard() {
                     <p className="text-xs text-center text-gray-600 mt-2 w-20 truncate" title={group.groupName}>
                       {group.groupName}
                     </p>
-                    <p className="text-xs font-bold text-primary">
+                    <p className="text-xs font-bold text-sky-700">
                       {group.studentCount}
                     </p>
                   </div>
@@ -306,14 +300,14 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Students - Rechts */}
-        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-primary">
+            <h2 className="text-lg font-semibold text-sky-700">
               Recente Studenten
             </h2>
             <Button 
               variant="link" 
-              className="px-0 h-auto text-primary hover:underline" 
+              className="px-0 h-auto text-sky-600 hover:underline" 
               onClick={navigateToStudents}
             >
               Bekijk alle studenten
@@ -322,16 +316,16 @@ export default function Dashboard() {
           
           {isStudentsLoading ? (
             <div className="flex justify-center p-4">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : recentStudents.length === 0 ? (
             <p className="text-center py-4 text-gray-500">Geen recente studenten gevonden</p>
           ) : (
             <div className="space-y-3">
               {recentStudents.slice(0, 4).map((student: Student) => (
-                <div key={student.id} className="flex items-center p-2 hover:bg-gray-50 rounded-md">
+                <div key={student.id} className="flex items-center p-2 hover:bg-sky-50 rounded-md bg-white/70">
                   <Avatar className="h-9 w-9">
-                    <AvatarFallback className="bg-primary text-white">
+                    <AvatarFallback className="bg-sky-500 text-white">
                       {student.firstName?.[0]}{student.lastName?.[0]}
                     </AvatarFallback>
                   </Avatar>
@@ -349,14 +343,14 @@ export default function Dashboard() {
         </div>
         
         {/* Lesrooster huidige week - Onder */}
-        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm lg:col-span-3">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-3">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-primary">
+            <h2 className="text-lg font-semibold text-sky-700">
               Lesrooster Deze Week
             </h2>
             <Button 
               variant="link" 
-              className="px-0 h-auto text-primary hover:underline"
+              className="px-0 h-auto text-sky-600 hover:underline"
               onClick={navigateToCalendar}
             >
               Bekijk volledige planning
@@ -367,28 +361,28 @@ export default function Dashboard() {
             {weekdays.map((day, index) => (
               <div 
                 key={index} 
-                className={`text-center p-2 ${day.isToday ? 'bg-primary/10 rounded-md' : ''}`}
+                className={`text-center p-2 ${day.isToday ? 'bg-sky-100 rounded-md' : ''}`}
               >
                 <p className="text-xs font-medium">{day.dayShort}</p>
-                <p className={`text-sm mt-1 ${day.isToday ? 'font-bold' : ''}`}>{day.dayNumber}</p>
+                <p className={`text-sm mt-1 ${day.isToday ? 'font-bold text-sky-700' : ''}`}>{day.dayNumber}</p>
               </div>
             ))}
           </div>
-          <Separator className="my-4" />
+          <Separator className="my-4 bg-sky-200/50" />
           
           {/* Lessen voor deze week */}
           {isLessonsLoading ? (
             <div className="flex justify-center p-4">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : currentWeekLessons.length === 0 ? (
             <p className="text-center py-4 text-gray-500">Geen lessen gevonden voor deze week</p>
           ) : (
             <div className="space-y-3">
               {currentWeekLessons.slice(0, 5).map((lesson: Lesson, index: number) => (
-                <div key={index} className="flex items-center p-3 hover:bg-gray-50 rounded-md border border-gray-100">
-                  <div className="bg-primary/10 p-2 rounded-md">
-                    <Clock className="h-5 w-5 text-primary" />
+                <div key={index} className="flex items-center p-3 hover:bg-sky-50 rounded-md border border-sky-200 bg-white/70">
+                  <div className="bg-sky-100 p-2 rounded-md">
+                    <Clock className="h-5 w-5 text-sky-500" />
                   </div>
                   <div className="ml-3 flex-grow">
                     <p className="text-sm font-medium">{lesson.title || 'Les ' + (index + 1)}</p>

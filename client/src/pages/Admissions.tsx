@@ -362,9 +362,11 @@ export default function Admissions() {
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <FileText className="h-6 w-6 text-primary" />
+          <div className="flex items-center">
+            <FileText className="h-6 w-6 text-primary mr-3" />
+            <h1 className="text-2xl font-semibold text-primary">Aanmeldingen</h1>
+          </div>
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800">Aanmeldingen</h1>
             <p className="text-gray-500 text-sm">
               Beoordeel en verwerk studentaanmeldingen en toelatingen
             </p>

@@ -452,12 +452,7 @@ export default function Programs() {
                         <SelectValue placeholder="Selecteer duur" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">Volledig jaar</SelectItem>
-                        <SelectItem value="2">Semester 1</SelectItem>
-                        <SelectItem value="3">Semester 2</SelectItem>
-                        <SelectItem value="4">Trimester 1</SelectItem>
-                        <SelectItem value="5">Trimester 2</SelectItem>
-                        <SelectItem value="6">Trimester 3</SelectItem>
+                        <SelectItem value="1">Jaar</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

@@ -363,8 +363,16 @@ export default function Attendance() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">Aanwezigheidsregistratie</h1>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+        <div>
+          <div className="flex items-center">
+            <ClipboardCheck className="h-6 w-6 text-primary mr-3" />
+            <h1 className="text-2xl font-semibold text-primary">Aanwezigheid</h1>
+          </div>
+          <p className="text-gray-500 text-sm mt-1 ml-9">
+            Registreer en beheer aanwezigheid van studenten en docenten
+          </p>
+        </div>
         <div className="flex items-center space-x-3">
           <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Vorige dag

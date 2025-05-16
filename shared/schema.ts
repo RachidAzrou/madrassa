@@ -303,14 +303,49 @@ export const fees = pgTable("fees", {
   invoiceNumber: text("invoice_number").notNull().unique(),
   description: text("description").notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  originalAmount: decimal("original_amount", { precision: 10, scale: 2 }), // Het originele bedrag voor korting
+  discountId: integer("discount_id"), // Koppeling naar kortingsregel als die is toegepast
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }), // Kortingsbedrag
   dueDate: date("due_date").notNull(),
   paymentDate: date("payment_date"),
-  status: text("status").notNull().default("pending"), // pending, paid, overdue, partial, cancelled
-  paymentMethod: text("payment_method"), // bank, cash, online, etc.
+  paidAmount: decimal("paid_amount", { precision: 10, scale: 2 }), // Hoeveel er al betaald is (voor gedeeltelijke betalingen)
+  status: text("status").notNull().default("niet betaald"), // niet betaald, betaald, te laat, gedeeltelijk betaald, geannuleerd
+  paymentMethod: text("payment_method"), // bank, contant, online, etc.
   academicYear: text("academic_year"),
   semester: text("semester"),
+  notes: text("notes"), // Notities over betaling
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Kortingsregels voor collegegeld
+export const feeDiscounts = pgTable("fee_discounts", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(), // Naam van de korting (bijv. "Vroegboekkorting")
+  description: text("description"), // Beschrijving van de korting
+  discountType: text("discount_type").notNull(), // percentage, vast bedrag
+  discountValue: decimal("discount_value", { precision: 10, scale: 2 }).notNull(), // Percentage of bedrag
+  academicYear: text("academic_year").notNull(), // Voor welk academisch jaar geldt deze korting
+  startDate: date("start_date"), // Vanaf wanneer is de korting geldig
+  endDate: date("end_date"), // Tot wanneer is de korting geldig
+  applicableToAll: boolean("applicable_to_all").default(false), // Geldt voor alle studenten
+  minStudentsPerFamily: integer("min_students_per_family"), // Minimum aantal studenten per familie voor familiekorting
+  isActive: boolean("is_active").default(true), // Is de korting actief
+});
+
+// Collegegeld instellingen
+export const feeSettings = pgTable("fee_settings", {
+  id: serial("id").primaryKey(),
+  academicYear: text("academic_year").notNull().unique(), // Academisch jaar (bijv. "2025-2026")
+  standardTuition: decimal("standard_tuition", { precision: 10, scale: 2 }).notNull(), // Standaard collegegeld
+  registrationFee: decimal("registration_fee", { precision: 10, scale: 2 }), // Inschrijfgeld voor nieuwe studenten
+  materialsFee: decimal("materials_fee", { precision: 10, scale: 2 }), // Kosten voor lesmateriaal
+  dueDate: date("due_date"), // Standaard vervaldatum voor facturen
+  earlyPaymentDate: date("early_payment_date"), // Datum voor vroegboekkorting
+  earlyPaymentDiscount: decimal("early_payment_discount", { precision: 10, scale: 2 }), // Bedrag vroegboekkorting
+  lateFee: decimal("late_fee", { precision: 10, scale: 2 }), // Kosten voor te late betaling
+  notes: text("notes"), // Notities over collegegeld voor dit jaar
+  isActive: boolean("is_active").default(true), // Is deze instelling actief
 });
 
 export const insertFeeSchema = createInsertSchema(fees).omit({
@@ -321,6 +356,22 @@ export const insertFeeSchema = createInsertSchema(fees).omit({
 
 export type InsertFee = z.infer<typeof insertFeeSchema>;
 export type Fee = typeof fees.$inferSelect;
+
+// Insert schema voor kortingen
+export const insertFeeDiscountSchema = createInsertSchema(feeDiscounts).omit({
+  id: true
+});
+
+export type InsertFeeDiscount = z.infer<typeof insertFeeDiscountSchema>;
+export type FeeDiscount = typeof feeDiscounts.$inferSelect;
+
+// Insert schema voor collegegeld instellingen
+export const insertFeeSettingsSchema = createInsertSchema(feeSettings).omit({
+  id: true
+});
+
+export type InsertFeeSettings = z.infer<typeof insertFeeSettingsSchema>;
+export type FeeSettings = typeof feeSettings.$inferSelect;
 
 // StudentGroups (klassen)
 export const studentGroups = pgTable("student_groups", {

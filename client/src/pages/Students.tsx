@@ -453,6 +453,74 @@ export default function Students() {
         </Button>
       </div>
 
+      {/* Notification dialog voor nieuw betalingsrecord */}
+      <Dialog open={isFeeNotificationOpen} onOpenChange={setIsFeeNotificationOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-lg font-semibold">
+              <CreditCard className="mr-2 h-5 w-5 text-[#1e3a8a]" />
+              Betalingsrecord aangemaakt
+            </DialogTitle>
+            <DialogDescription>
+              Er is automatisch een betalingsrecord aangemaakt voor deze student.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {feeDetails && (
+              <div className="rounded-lg border p-4 bg-blue-50">
+                <div className="mb-4 font-medium text-blue-900">Details betalingsrecord:</div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Factuurnummer:</span>
+                    <span className="font-medium">{feeDetails.invoiceNumber}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Bedrag:</span>
+                    <span className="font-medium">{new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(feeDetails.amount)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Vervaldatum:</span>
+                    <span className="font-medium">{new Date(feeDetails.dueDate).toLocaleDateString('nl-NL')}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Status:</span>
+                    <span className="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium">Niet betaald</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div className="flex items-center bg-amber-50 p-4 rounded-lg">
+              <AlertCircle className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0" />
+              <span className="text-sm text-amber-800">
+                U kunt deze betaling beheren via de Betalingsbeheer pagina. 
+                Daar kunt u ook korting toepassen of de betaalstatus bijwerken.
+              </span>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex space-x-2 sm:justify-between">
+            <Button
+              variant="outline"
+              onClick={() => setIsFeeNotificationOpen(false)}
+            >
+              Sluiten
+            </Button>
+            <Button
+              onClick={() => {
+                setIsFeeNotificationOpen(false);
+                // Hier navigeren we naar de betalingsbeheer pagina
+                window.location.href = '/fees';
+              }}
+              className="bg-[#1e3a8a] hover:bg-blue-800"
+            >
+              Naar betalingsbeheer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
       <div className="mb-6 flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />

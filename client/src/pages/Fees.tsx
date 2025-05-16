@@ -75,6 +75,13 @@ export default function Fees() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedFee, setSelectedFee] = useState<any>(null);
+  
+  // Extra state voor de nieuwe functies
+  const [isAddTuitionSettingOpen, setIsAddTuitionSettingOpen] = useState(false);
+  const [isAddDiscountOpen, setIsAddDiscountOpen] = useState(false);
+  const [isUpdateStatusOpen, setIsUpdateStatusOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [isViewGuardiansOpen, setIsViewGuardiansOpen] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch fee records with filters
@@ -99,12 +106,35 @@ export default function Fees() {
       pendingAmount: number;
       totalStudents: number;
       completionRate: number;
+      overdueAmount: number;
+      pendingInvoices: number;
     }
   };
   
   // Fetch students for the student selector
   const { data: studentsData } = useQuery({
     queryKey: ['/api/students'],
+  });
+  
+  // Fetch fee settings (collegegeld instellingen)
+  const { data: feeSettingsData } = useQuery({
+    queryKey: ['/api/fee-settings'],
+  });
+  
+  // Fetch discounts (kortingen)
+  const { data: discountsData } = useQuery({
+    queryKey: ['/api/fee-discounts'],
+  });
+  
+  // Fetch students with outstanding debts (openstaande schulden)
+  const { data: outstandingDebtsData } = useQuery({
+    queryKey: ['/api/fees/outstanding'],
+  });
+  
+  // Fetch guardians for a specific student
+  const { data: guardianData, refetch: refetchGuardians } = useQuery({
+    queryKey: ['/api/guardians/student', selectedStudent?.id],
+    enabled: !!selectedStudent?.id && isViewGuardiansOpen,
   });
 
   // Vanwege de API structuur, is data een array van fee records
@@ -304,13 +334,13 @@ export default function Fees() {
             <h1 className="text-2xl font-semibold text-[#1e3a8a]">Betalingsbeheer</h1>
           </div>
           <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beheer van collegegelden, betalingen en beurzen
+            Beheer van collegegelden, betalingen, kortingen en schulden
           </p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
             <Input
-              placeholder="Zoek betalingsrecords..."
+              placeholder="Zoek betalingsrecords of studenten..."
               value={searchTerm}
               onChange={handleSearchChange}
               className="w-full md:w-64 pl-10"
@@ -319,9 +349,9 @@ export default function Fees() {
           </div>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={handleAddFeeRecord} className="flex items-center">
+              <Button onClick={handleAddFeeRecord} className="flex items-center bg-[#1e3a8a] hover:bg-blue-800">
                 <PlusCircle className="mr-2 h-4 w-4" />
-                <span>Betalingsrecord Toevoegen</span>
+                <span>Toevoegen</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">

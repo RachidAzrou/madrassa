@@ -318,19 +318,7 @@ export default function Courses() {
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
-          <Select value={programFilter} onValueChange={handleProgramFilterChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Alle Programma's" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Alle Programma's</SelectItem>
-              {programs.map((program: any) => (
-                <SelectItem key={program.id} value={program.id.toString()}>
-                  {program.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+
           <Button 
             onClick={handleAddCourse} 
             variant="default"

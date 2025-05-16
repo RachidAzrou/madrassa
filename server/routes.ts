@@ -262,7 +262,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Stuur de data door naar storage zonder verdere aanpassingen
       const newStudent = await storage.createStudent(validatedData);
-      res.status(201).json(newStudent);
+      
+      // Maak automatisch een collegegeldrecord aan voor de nieuwe student
+      try {
+        // Bepaal het huidige academische jaar (bijv. 2024-2025)
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const academicYear = `${currentYear}-${currentYear + 1}`;
+        
+        // Genereer uniek factuurnummer
+        const invoiceNumber = `INV-${currentYear}-${newStudent.id.toString().padStart(4, '0')}`;
+        
+        // Haal standaard collegegeld uit de instellingen of gebruik vaste waarde
+        const defaultTuition = 1250.00; // €1250 als standaard collegegeld
+        
+        // Maak het collegegeldrecord aan
+        const feeRecord = {
+          studentId: newStudent.id,
+          invoiceNumber: invoiceNumber,
+          description: `Collegegeld ${academicYear}`,
+          amount: defaultTuition,
+          dueDate: new Date(currentYear, 8, 30), // 30 september van het huidige jaar
+          status: "niet betaald", // nog niet betaald
+          academicYear: academicYear,
+          semester: "volledig jaar",
+          createdAt: new Date()
+        };
+        
+        // Sla het collegegeldrecord op
+        const newFee = await storage.createFee(feeRecord);
+        console.log("Collegegeldrecord aangemaakt:", newFee);
+        
+        // Voeg informatie over het aangemaakte collegegeldrecord toe aan de respons
+        res.status(201).json({
+          ...newStudent,
+          feeCreated: true,
+          feeDetails: {
+            id: newFee.id,
+            invoiceNumber: newFee.invoiceNumber,
+            amount: newFee.amount,
+            dueDate: newFee.dueDate
+          }
+        });
+      } catch (feeError) {
+        console.error("Fout bij aanmaken collegegeldrecord:", feeError);
+        // Als er een fout optreedt bij aanmaken collegegeldrecord, sturen we toch de student terug
+        res.status(201).json({
+          ...newStudent,
+          feeCreated: false,
+          feeError: "Kon geen collegegeldrecord aanmaken"
+        });
+      }
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         console.error("Student validation error:", error.errors);

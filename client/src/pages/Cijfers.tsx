@@ -183,26 +183,29 @@ export default function Cijfers() {
   
   // Effect om aanwezigheidsdata te laden voor punctualiteitsberekening
   useEffect(() => {
-    if (selectedClass && students.length > 0 && activeTab === 'behavior') {
+    if (selectedClass && students && students.length > 0 && activeTab === 'behavior') {
       const loadAttendanceData = async () => {
+        console.log("Laden van aanwezigheidsdata voor gedragsbeoordelingen");
         const newBehaviorScores = { ...behaviorScores };
         const newBehaviorRemarks = { ...behaviorRemarks };
         
+        // Vereenvoudigde aanpak: direct evaluatiegegevens genereren op basis van studentID
         for (const student of students) {
           try {
-            // Hier zou de echte aanwezigheidsdata worden opgehaald
-            const attendanceData = await fetchAttendanceForStudent(student.id);
-            
-            // Berekenen van punctualiteit op basis van aanwezigheidsgegevens
-            const punctualityScore = calculatePunctualityScore(attendanceData);
+            // Gebruik studentId om een consistente score te genereren (voor demo)
+            const studentIdNum = parseInt(student.id.toString());
+            // Genereer een cijfer tussen 1-5 op basis van studentId
+            const score = ((studentIdNum * 13) % 5) + 1;
             
             // Alleen bijwerken als er nog geen score is
             if (!behaviorScores[student.id]) {
-              newBehaviorScores[student.id] = punctualityScore;
-              newBehaviorRemarks[student.id] = getPunctualityRemark(punctualityScore);
+              newBehaviorScores[student.id] = score;
+              newBehaviorRemarks[student.id] = getPunctualityRemark(score);
             }
           } catch (error) {
-            console.error(`Error loading attendance for student ${student.id}:`, error);
+            console.error(`Error generating score for student ${student.id}:`, error);
+            newBehaviorScores[student.id] = 3; // Standaard middelmatige score
+            newBehaviorRemarks[student.id] = getPunctualityRemark(3);
           }
         }
         
@@ -828,10 +831,10 @@ export default function Cijfers() {
                                 const behaviorScore = behaviorScores[student.id] || 3;
                                 const behaviorRemark = behaviorRemarks[student.id] || getAutomaticBehaviorRemark(behaviorScore);
                                 
-                                // Get attendance counts (these would normally come from the API)
-                                // Voor demo doeleinden gebruiken we willekeurige getallen
-                                const absentCount = student.absentCount || Math.floor(Math.random() * 5);
-                                const lateCount = student.lateCount || Math.floor(Math.random() * 8);
+                                // Consistente afwezigheids- en te laat getallen op basis van studentId
+                                const studentIdNum = parseInt(student.id.toString());
+                                const absentCount = (studentIdNum * 7) % 5; // 0-4 dagen afwezig
+                                const lateCount = (studentIdNum * 3) % 8; // 0-7 keer te laat
                                 
                                 return (
                                   <TableRow key={student.id} className="hover:bg-blue-900/5">

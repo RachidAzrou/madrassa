@@ -290,7 +290,7 @@ export default function Guardians() {
           variant={viewMode === 'all' ? "default" : "outline"}
           size="sm"
           onClick={() => setViewMode('all')}
-          className={viewMode === 'all' ? "" : "border-primary/30 text-primary hover:bg-primary/5"}
+          className={viewMode === 'all' ? "bg-[#3b5998] hover:bg-[#2d4373]" : "border-primary/30 text-primary hover:bg-primary/5"}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4">
             <circle cx="12" cy="12" r="3"></circle>
@@ -302,7 +302,7 @@ export default function Guardians() {
           variant={viewMode === 'emergency' ? "default" : "outline"}
           size="sm"
           onClick={() => setViewMode('emergency')}
-          className={viewMode === 'emergency' ? "" : "border-primary/30 text-primary hover:bg-primary/5"}
+          className={viewMode === 'emergency' ? "bg-[#3b5998] hover:bg-[#2d4373]" : "border-primary/30 text-primary hover:bg-primary/5"}
         >
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
@@ -452,7 +452,13 @@ export default function Guardians() {
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent className="w-[95vw] max-w-4xl h-[85vh] max-h-[85vh] overflow-auto">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-primary">Nieuwe Voogd Toevoegen</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-primary flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
+              </svg>
+              Nieuwe Voogd Toevoegen
+            </DialogTitle>
             <DialogDescription>
               Vul alle benodigde informatie in om een nieuwe voogd toe te voegen.
             </DialogDescription>

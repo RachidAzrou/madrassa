@@ -179,12 +179,12 @@ export default function Dashboard() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
-            <div className="mr-3 text-primary">
+            <div className="mr-3 text-sky-600 bg-sky-100 rounded-lg p-2">
               <BarChart3 className="h-6 w-6" />
             </div>
-            <h1 className="text-2xl font-semibold text-primary">Dashboard</h1>
+            <h1 className="text-2xl font-semibold text-sky-600">Dashboard</h1>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-9">
+          <p className="text-gray-500 text-sm mt-1 ml-11">
             Overzicht van de belangrijkste statistieken en activiteiten
           </p>
         </div>

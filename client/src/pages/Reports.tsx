@@ -381,10 +381,12 @@ export default function Reports() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
-            <BarChart3 className="h-6 w-6 text-primary mr-3" />
-            <h1 className="text-2xl font-semibold text-primary">Analyses</h1>
+            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
+              <BarChart3 className="h-6 w-6" />
+            </div>
+            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Analyses</h1>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-9">
+          <p className="text-gray-500 text-sm mt-1 ml-11">
             Beheer en genereer rapporten voor studenten en klassen
           </p>
         </div>

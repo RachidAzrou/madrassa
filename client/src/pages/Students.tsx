@@ -1940,7 +1940,8 @@ export default function Students() {
                           <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700">
                             Geboortedatum <span className="text-primary">*</span>
                           </Label>
-                          <Input
+                          <input
+                            type="text"
                             id="dateOfBirth"
                             placeholder="DD/MM/JJJJ"
                             required
@@ -1954,7 +1955,7 @@ export default function Students() {
                                 setStudentFormData({ ...studentFormData, dateOfBirth: formattedDate });
                               }
                             }}
-                            className="mt-1 border-gray-200"
+                            className="flex h-10 w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm mt-1"
                           />
                         </div>
                       </div>

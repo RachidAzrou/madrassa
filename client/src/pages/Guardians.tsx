@@ -541,30 +541,103 @@ export default function Guardians() {
                   <TabsTrigger value="students">Gekoppelde Studenten</TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="personal" className="space-y-4 pt-4">
-                  <div className="flex items-start space-x-4">
-                    <Avatar className="h-16 w-16">
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        {selectedGuardian.firstName.charAt(0)}{selectedGuardian.lastName.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h2 className="text-xl font-bold">{selectedGuardian.firstName} {selectedGuardian.lastName}</h2>
-                      <p className="text-gray-500">{getRelationshipLabel(selectedGuardian.relationship)}</p>
-                      {selectedGuardian.isEmergencyContact && (
-                        <Badge variant="destructive" className="mt-1">Noodcontact</Badge>
+                <TabsContent value="personal" className="space-y-6 pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Linker kolom: profiel */}
+                    <div className="md:col-span-1 border rounded-lg p-6 bg-card">
+                      <div className="flex flex-col items-center mb-4">
+                        <Avatar className="h-24 w-24 mb-3">
+                          <AvatarFallback className="bg-gradient-to-br from-sky-50 to-sky-100 text-sky-700 text-2xl">
+                            {selectedGuardian.firstName.charAt(0)}{selectedGuardian.lastName.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <h2 className="text-xl font-bold text-center">{selectedGuardian.firstName} {selectedGuardian.lastName}</h2>
+                        <p className="text-muted-foreground text-center">{getRelationshipLabel(selectedGuardian.relationship)}</p>
+                        {selectedGuardian.isEmergencyContact && (
+                          <Badge variant="destructive" className="mt-2 px-3 py-1">Noodcontact</Badge>
+                        )}
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
+                          <p className="font-medium">{selectedGuardian.email}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Telefoonnummer</h3>
+                          <p className="font-medium">{selectedGuardian.phone || "Niet ingevuld"}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Rechter kolom: adres en notities */}
+                    <div className="md:col-span-2 space-y-6">
+                      <div className="border rounded-lg p-6 bg-card">
+                        <h3 className="text-lg font-bold mb-4">Adresgegevens</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <h3 className="text-sm font-medium text-muted-foreground">Straat</h3>
+                            <p className="font-medium">{selectedGuardian.street || "Niet ingevuld"}</p>
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-medium text-muted-foreground">Huisnummer</h3>
+                            <p className="font-medium">{selectedGuardian.houseNumber || "Niet ingevuld"}</p>
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-medium text-muted-foreground">Postcode</h3>
+                            <p className="font-medium">{selectedGuardian.postalCode || "Niet ingevuld"}</p>
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-medium text-muted-foreground">Plaats</h3>
+                            <p className="font-medium">{selectedGuardian.city || "Niet ingevuld"}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {selectedGuardian.notes && (
+                        <div className="border rounded-lg p-6 bg-card">
+                          <h3 className="text-lg font-bold mb-3">Notities</h3>
+                          <div className="p-3 bg-muted rounded-md min-h-[80px]">
+                            <p className="whitespace-pre-wrap">{selectedGuardian.notes}</p>
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>
                   
-                  {selectedGuardian.notes && (
-                    <div className="pt-4 mt-4 border-t border-gray-200">
-                      <h3 className="text-md font-medium mb-2">Notities</h3>
-                      <div className="p-3 bg-gray-50 rounded-md border border-gray-200 text-sm">
-                        {selectedGuardian.notes}
+                  {/* Gekoppelde studenten sectie */}
+                  <div className="border rounded-lg p-6 bg-card">
+                    <h3 className="text-lg font-bold mb-4">Gekoppelde Studenten</h3>
+                    
+                    {guardianStudentsLoading ? (
+                      <div className="flex justify-center my-4">
+                        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                       </div>
-                    </div>
-                  )}
+                    ) : guardianStudentsData.length === 0 ? (
+                      <div className="text-center p-6 bg-muted rounded-md text-muted-foreground">
+                        Deze voogd heeft geen gekoppelde studenten
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {guardianStudentsData.map((relation: any) => (
+                          <div
+                            key={relation.id}
+                            className="flex items-center p-4 border rounded-md hover:bg-muted/50"
+                          >
+                            <Avatar className="h-12 w-12">
+                              <AvatarFallback className="bg-gradient-to-br from-green-50 to-green-100 text-green-600">
+                                {relation.student?.firstName?.charAt(0)}{relation.student?.lastName?.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="ml-4">
+                              <div className="font-medium">{relation.student?.firstName} {relation.student?.lastName}</div>
+                              <div className="text-sm text-muted-foreground">Studentnr: {relation.student?.studentId}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </TabsContent>
                 
                 <TabsContent value="contact" className="space-y-4 pt-4">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen } from 'lucide-react';
+import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiRequest, queryClient } from '@/lib/queryClient';
@@ -116,7 +116,7 @@ export default function Programs() {
     createProgramMutation.mutate(programFormData);
   };
   
-  const handleEditProgram = (id: string) => {
+  const handleEditProgram = (id: number) => {
     const program = programs.find(p => p.id === id);
     if (program) {
       setSelectedProgram(program);

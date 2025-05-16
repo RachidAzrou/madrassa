@@ -989,17 +989,17 @@ export default function Students() {
                         </Label>
                         <div className="mt-2">
                           <Select
-                            value={studentFormData.schoolYear || ''}
+                            value={studentFormData.schoolYear || 'geen'}
                             onValueChange={(value) => setStudentFormData({ 
                               ...studentFormData, 
-                              schoolYear: value
+                              schoolYear: value === 'geen' ? '' : value
                             })}
                           >
                             <SelectTrigger className="border-gray-200 bg-white">
                               <SelectValue placeholder="Selecteer schooljaar" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">Selecteer schooljaar</SelectItem>
+                              <SelectItem value="geen">Selecteer schooljaar</SelectItem>
                               <SelectItem value="2024-2025">2024-2025</SelectItem>
                               <SelectItem value="2025-2026">2025-2026</SelectItem>
                               <SelectItem value="2026-2027">2026-2027</SelectItem>
@@ -1081,17 +1081,17 @@ export default function Students() {
                           Programma
                         </Label>
                         <Select
-                          value={studentFormData.programId?.toString() || ''}
+                          value={studentFormData.programId?.toString() || 'none'}
                           onValueChange={(value) => setStudentFormData({ 
                             ...studentFormData, 
-                            programId: value ? parseInt(value) : null 
+                            programId: value === 'none' ? null : parseInt(value) 
                           })}
                         >
                           <SelectTrigger id="programId" className="mt-1 bg-white">
                             <SelectValue placeholder="Selecteer programma" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Selecteer programma</SelectItem>
+                            <SelectItem value="none">Selecteer programma</SelectItem>
                             {programs.map((program: any) => (
                               <SelectItem key={program.id} value={program.id.toString()}>
                                 {program.name}
@@ -1485,17 +1485,17 @@ export default function Students() {
                         </Label>
                         <div className="mt-2">
                           <Select
-                            value={studentFormData.schoolYear || ''}
+                            value={studentFormData.schoolYear || 'geen'}
                             onValueChange={(value) => setStudentFormData({ 
                               ...studentFormData, 
-                              schoolYear: value
+                              schoolYear: value === 'geen' ? '' : value
                             })}
                           >
                             <SelectTrigger className="border-gray-200 bg-white">
                               <SelectValue placeholder="Selecteer schooljaar" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">Selecteer schooljaar</SelectItem>
+                              <SelectItem value="geen">Selecteer schooljaar</SelectItem>
                               <SelectItem value="2024-2025">2024-2025</SelectItem>
                               <SelectItem value="2025-2026">2025-2026</SelectItem>
                               <SelectItem value="2026-2027">2026-2027</SelectItem>
@@ -1577,17 +1577,17 @@ export default function Students() {
                           Programma
                         </Label>
                         <Select
-                          value={studentFormData.programId?.toString() || ''}
+                          value={studentFormData.programId?.toString() || 'none'}
                           onValueChange={(value) => setStudentFormData({ 
                             ...studentFormData, 
-                            programId: value ? parseInt(value) : null 
+                            programId: value === 'none' ? null : parseInt(value) 
                           })}
                         >
                           <SelectTrigger id="edit-programId" className="mt-1 bg-white">
                             <SelectValue placeholder="Selecteer programma" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Selecteer programma</SelectItem>
+                            <SelectItem value="none">Selecteer programma</SelectItem>
                             {programs.map((program: any) => (
                               <SelectItem key={program.id} value={program.id.toString()}>
                                 {program.name}

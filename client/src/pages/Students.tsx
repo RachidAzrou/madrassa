@@ -1030,20 +1030,31 @@ export default function Students() {
                 <Label htmlFor="editEnrollmentDate" className="text-right">
                   Inschrijvingsdatum
                 </Label>
-                <Input
+                <input
+                  type="text"
                   id="editEnrollmentDate"
                   placeholder="DD/MM/JJJJ"
-                  value={studentFormData.enrollmentDate ? formatDateToDisplayFormat(studentFormData.enrollmentDate) : ''}
+                  defaultValue=""
                   onChange={(e) => {
-                    setStudentFormData({ ...studentFormData, enrollmentDate: e.target.value });
+                    const inputValue = e.target.value;
+                    setStudentFormData(prev => ({
+                      ...prev,
+                      enrollmentDate: inputValue
+                    }));
                   }}
                   onBlur={(e) => {
-                    const formattedDate = formatDateToDatabaseFormat(e.target.value);
-                    if (formattedDate) {
-                      setStudentFormData({ ...studentFormData, enrollmentDate: formattedDate });
+                    const inputValue = e.target.value;
+                    if (inputValue.trim() !== '') {
+                      const formattedDate = formatDateToDatabaseFormat(inputValue);
+                      if (formattedDate) {
+                        setStudentFormData(prev => ({
+                          ...prev,
+                          enrollmentDate: formattedDate
+                        }));
+                      }
                     }
                   }}
-                  className="mt-1"
+                  className="flex h-10 w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm mt-1"
                 />
               </div>
             </div>
@@ -1134,20 +1145,31 @@ export default function Students() {
                 <Label htmlFor="editDateOfBirth" className="text-right">
                   Geboortedatum
                 </Label>
-                <Input
+                <input
+                  type="text"
                   id="editDateOfBirth"
                   placeholder="DD/MM/JJJJ"
-                  value={studentFormData.dateOfBirth ? formatDateToDisplayFormat(studentFormData.dateOfBirth) : ''}
+                  defaultValue=""
                   onChange={(e) => {
-                    setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value });
+                    const inputValue = e.target.value;
+                    setStudentFormData(prev => ({
+                      ...prev,
+                      dateOfBirth: inputValue
+                    }));
                   }}
                   onBlur={(e) => {
-                    const formattedDate = formatDateToDatabaseFormat(e.target.value);
-                    if (formattedDate) {
-                      setStudentFormData({ ...studentFormData, dateOfBirth: formattedDate });
+                    const inputValue = e.target.value;
+                    if (inputValue.trim() !== '') {
+                      const formattedDate = formatDateToDatabaseFormat(inputValue);
+                      if (formattedDate) {
+                        setStudentFormData(prev => ({
+                          ...prev,
+                          dateOfBirth: formattedDate
+                        }));
+                      }
                     }
                   }}
-                  className="mt-1"
+                  className="flex h-10 w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm mt-1"
                 />
               </div>
               <div className="col-span-1">
@@ -1945,14 +1967,26 @@ export default function Students() {
                             id="dateOfBirth"
                             placeholder="DD/MM/JJJJ"
                             required
-                            value={studentFormData.dateOfBirth ? formatDateToDisplayFormat(studentFormData.dateOfBirth) : ''}
+                            defaultValue=""
                             onChange={(e) => {
-                              setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value });
+                              // Direct waarde opslaan zonder formattering tijdens het typen
+                              const inputValue = e.target.value;
+                              setStudentFormData(prev => ({
+                                ...prev,
+                                dateOfBirth: inputValue
+                              }));
                             }}
                             onBlur={(e) => {
-                              const formattedDate = formatDateToDatabaseFormat(e.target.value);
-                              if (formattedDate) {
-                                setStudentFormData({ ...studentFormData, dateOfBirth: formattedDate });
+                              // Pas formatteren bij verlaten van het veld
+                              const inputValue = e.target.value;
+                              if (inputValue.trim() !== '') {
+                                const formattedDate = formatDateToDatabaseFormat(inputValue);
+                                if (formattedDate) {
+                                  setStudentFormData(prev => ({
+                                    ...prev,
+                                    dateOfBirth: formattedDate
+                                  }));
+                                }
                               }
                             }}
                             className="flex h-10 w-full rounded-md border border-gray-200 bg-background px-3 py-2 text-sm mt-1"

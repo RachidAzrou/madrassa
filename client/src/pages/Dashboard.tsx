@@ -178,230 +178,274 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <Card>
-          <CardContent className="p-4 flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <Users className="h-5 w-5 text-primary" />
-              </div>
-            </div>
-            <p className="text-sm text-gray-500">Totaal Studenten</p>
-            <h2 className="text-2xl font-bold mt-1">{stats.totalStudents}</h2>
-          </CardContent>
-        </Card>
+      {/* Stats Overview - met dezelfde stijl als in Students.tsx */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <Users className="h-20 w-20 text-sky-500" />
+          </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal studenten</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.totalStudents}</p>
+          <div className="flex justify-between mt-2 text-xs text-sky-600">
+            <span>Actieve studenten</span>
+            <span>Ingeschreven</span>
+          </div>
+        </div>
         
-        <Card>
-          <CardContent className="p-4 flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <BookOpen className="h-5 w-5 text-primary" />
-              </div>
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <GraduationCap className="h-20 w-20 text-sky-500" />
+          </div>
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 mb-1">Vakken</h3>
+              <p className="text-2xl font-bold text-sky-700">{stats.programs}</p>
             </div>
-            <p className="text-sm text-gray-500">Actieve Cursussen</p>
-            <h2 className="text-2xl font-bold mt-1">{stats.activeCourses}</h2>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="flex justify-between mt-2 text-xs text-sky-600">
+            <span>Actieve vakken</span>
+            <span>Curriculum</span>
+          </div>
+        </div>
         
-        <Card>
-          <CardContent className="p-4 flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <GraduationCap className="h-5 w-5 text-primary" />
-              </div>
-            </div>
-            <p className="text-sm text-gray-500">Vakken</p>
-            <h2 className="text-2xl font-bold mt-1">{stats.programs}</h2>
-          </CardContent>
-        </Card>
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <School className="h-20 w-20 text-sky-500" />
+          </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Klassen</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.studentGroups}</p>
+          <div className="flex justify-between mt-2 text-xs text-sky-600">
+            <span>Actieve klassen</span>
+            <span>Studiegroepen</span>
+          </div>
+        </div>
         
-        <Card>
-          <CardContent className="p-4 flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <User className="h-5 w-5 text-primary" />
-              </div>
-            </div>
-            <p className="text-sm text-gray-500">Docenten</p>
-            <h2 className="text-2xl font-bold mt-1">{stats.totalTeachers}</h2>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4 flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <School className="h-5 w-5 text-primary" />
-              </div>
-            </div>
-            <p className="text-sm text-gray-500">Klassen</p>
-            <h2 className="text-2xl font-bold mt-1">{stats.studentGroups}</h2>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4 flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <CheckCircle className="h-5 w-5 text-primary" />
-              </div>
-            </div>
-            <p className="text-sm text-gray-500">Aanwezigheid</p>
-            <h2 className="text-2xl font-bold mt-1">{stats.attendanceRate}%</h2>
-          </CardContent>
-        </Card>
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <User className="h-20 w-20 text-sky-500" />
+          </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Docenten</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.totalTeachers}</p>
+          <div className="flex justify-between mt-2 text-xs text-sky-600">
+            <span>Actieve docenten</span>
+            <span>Personeelsleden</span>
+          </div>
+        </div>
       </div>
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
-        {/* Inschrijvingstrend Grafiek - Links (4 kolommen) */}
-        <Card className="lg:col-span-4">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-semibold">
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
-                  <span>Inschrijvingstrend</span>
-                </div>
-              </CardTitle>
-              <Button variant="link" className="p-0 h-auto text-sm" asChild>
-                <div onClick={() => setLocation('/admissions')}>Details bekijken</div>
-              </Button>
+        {/* Studenten per klas grafiek - Links (4 kolommen) */}
+        <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-sky-700" />
+              <h3 className="text-lg font-semibold text-sky-800">Studenten per klas</h3>
             </div>
-          </CardHeader>
-          <CardContent>
-            {isEnrollmentLoading ? (
-              <div className="h-48 flex items-center justify-center">
-                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            ) : (
-              <div className="h-48 relative">
-                <div className="flex justify-between items-end h-40 pt-4">
-                  {enrollmentTrend.map((item: EnrollmentPoint, index: number) => (
-                    <div key={index} className="flex flex-col items-center">
-                      <div 
-                        className="w-8 md:w-12 bg-primary rounded-t transition-all duration-500 ease-out"
-                        style={{ 
-                          height: `${Math.max(8, (item.count / Math.max(...enrollmentTrend.map((d) => d.count))) * 130)}px` 
-                        }}
-                      ></div>
-                      <div className="text-xs text-gray-500 mt-2">{item.month}</div>
+            <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
+              <div onClick={() => setLocation('/student-groups')}>Details bekijken</div>
+            </Button>
+          </div>
+          
+          {/* Fetch studentGroups data */}
+          {(() => {
+            // We gebruiken de student-groups API om de data op te halen
+            const { data: studentGroupsData = [], isLoading: isGroupsLoading } = useQuery({
+              queryKey: ['/api/student-groups'],
+              staleTime: 60000,
+            });
+            
+            // We gebruiken de students API om alle studenten op te halen
+            const { data: allStudents = [], isLoading: isAllStudentsLoading } = useQuery({
+              queryKey: ['/api/students'],
+              staleTime: 60000,
+            });
+            
+            // Interface voor studentengroep
+            interface StudentGroup {
+              id: number;
+              name: string;
+              // andere velden...
+            }
+            
+            // Interface voor student-groep enrollments
+            interface StudentGroupEnrollment {
+              id: number;
+              studentId: number;
+              studentGroupId: number;
+              // andere velden...
+            }
+            
+            // Haal groepsinschrijvingen op
+            const { data: groupEnrollments = [], isLoading: isEnrollmentsLoading } = useQuery({
+              queryKey: ['/api/student-group-enrollments'],
+              staleTime: 60000,
+            });
+            
+            // Tel het aantal studenten per groep
+            const studentCountsPerGroup = (studentGroupsData as StudentGroup[]).map((group) => {
+              const count = (groupEnrollments as StudentGroupEnrollment[]).filter(
+                enrollment => enrollment.studentGroupId === group.id
+              ).length;
+              
+              return {
+                name: group.name,
+                count: count
+              };
+            });
+            
+            // Voeg dummy data toe als er geen echte data is
+            const chartData = studentCountsPerGroup.length > 0 ? studentCountsPerGroup : [
+              { name: "Klas 1", count: 0 },
+              { name: "Klas 2", count: 0 },
+              { name: "Klas 3", count: 0 }
+            ];
+            
+            // Bereken de maximumwaarde voor het schalen van de grafiek
+            const maxCount = Math.max(...chartData.map(item => item.count), 1);
+            
+            return (
+              <div>
+                {isGroupsLoading || isAllStudentsLoading || isEnrollmentsLoading ? (
+                  <div className="h-48 flex items-center justify-center">
+                    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                ) : chartData.length === 0 ? (
+                  <div className="h-48 flex items-center justify-center text-gray-500">
+                    Geen klasgegevens beschikbaar
+                  </div>
+                ) : (
+                  <div className="h-48 relative">
+                    <div className="flex justify-between items-end h-40 pt-4">
+                      {chartData.map((item, index) => (
+                        <div key={index} className="flex flex-col items-center">
+                          <div className="bg-gradient-to-t from-sky-600 to-sky-400 rounded-t shadow-md transition-all duration-500 ease-out px-2 md:px-6 relative group">
+                            <div 
+                              className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                            ></div>
+                            <div
+                              className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            >
+                              {item.count} studenten
+                            </div>
+                            <div
+                              style={{ 
+                                height: `${Math.max(30, (item.count / maxCount) * 130)}px`
+                              }}
+                            ></div>
+                          </div>
+                          <div className="text-xs text-gray-500 mt-2 max-w-[80px] text-center truncate" title={item.name}>
+                            {item.name}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            );
+          })()}
+        </div>
 
         {/* Recent Students - Rechts (3 kolommen) */}
-        <Card className="lg:col-span-3">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-semibold">
-                <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  <span>Recente Studenten</span>
-                </div>
-              </CardTitle>
-              <Button variant="link" className="p-0 h-auto text-sm" asChild>
-                <div onClick={navigateToStudents}>Bekijk alle</div>
-              </Button>
+        <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-3">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-sky-700" />
+              <h3 className="text-lg font-semibold text-sky-800">Recente Studenten</h3>
             </div>
-          </CardHeader>
-          <CardContent>
-            {isStudentsLoading ? (
-              <div className="flex justify-center p-4">
-                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            ) : recentStudents.length === 0 ? (
-              <p className="text-center py-4 text-gray-500">Geen recente studenten gevonden</p>
-            ) : (
-              <div className="space-y-3">
-                {recentStudents.slice(0, 4).map((student: Student) => (
-                  <div key={student.id} className="flex items-center p-2 hover:bg-gray-50 rounded-md">
-                    <Avatar className="h-9 w-9">
-                      <AvatarFallback>
-                        {student.firstName?.[0]}{student.lastName?.[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="ml-3 flex-grow">
-                      <p className="text-sm font-medium">{student.firstName} {student.lastName}</p>
-                      <p className="text-xs text-gray-500">{student.program || 'Geen programma'}</p>
-                    </div>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClass(student.status)}`}>
-                      {translateStatus(student.status)}
-                    </span>
+            <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
+              <div onClick={navigateToStudents}>Bekijk alle</div>
+            </Button>
+          </div>
+          
+          {isStudentsLoading ? (
+            <div className="flex justify-center p-4">
+              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : recentStudents.length === 0 ? (
+            <p className="text-center py-4 text-gray-500">Geen recente studenten gevonden</p>
+          ) : (
+            <div className="space-y-3">
+              {recentStudents.slice(0, 4).map((student: Student) => (
+                <div key={student.id} className="flex items-center p-2 hover:bg-sky-50/50 rounded-md transition-colors duration-200">
+                  <Avatar className="h-9 w-9 border border-sky-200">
+                    <AvatarFallback className="bg-gradient-to-br from-sky-50 to-sky-100 text-sky-700">
+                      {student.firstName?.[0]}{student.lastName?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="ml-3 flex-grow">
+                    <p className="text-sm font-medium text-gray-800">{student.firstName} {student.lastName}</p>
+                    <p className="text-xs text-gray-500">{student.program || 'Geen programma'}</p>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        
-        {/* Lesrooster huidige week - Onder */}
-        <Card className="lg:col-span-7">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-semibold">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  <span>Lesrooster Deze Week</span>
-                </div>
-              </CardTitle>
-              <Button variant="link" className="p-0 h-auto text-sm" asChild>
-                <div onClick={navigateToCalendar}>Bekijk volledige planning</div>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-7 gap-1">
-              {weekdays.map((day, index) => (
-                <div 
-                  key={index} 
-                  className={`text-center p-2 ${day.isToday ? 'bg-primary/10 rounded-md' : ''}`}
-                >
-                  <p className="text-xs font-medium">{day.dayShort}</p>
-                  <p className={`text-sm mt-1 ${day.isToday ? 'font-bold' : ''}`}>{day.dayNumber}</p>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClass(student.status)}`}>
+                    {translateStatus(student.status)}
+                  </span>
                 </div>
               ))}
             </div>
-            <Separator className="my-4" />
-            
-            {/* Lessen voor deze week */}
-            {isLessonsLoading ? (
-              <div className="flex justify-center p-4">
-                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+          )}
+        </div>
+        
+        {/* Lesrooster huidige week - Onder */}
+        <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-7">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-sky-700" />
+              <h3 className="text-lg font-semibold text-sky-800">Lesrooster Deze Week</h3>
+            </div>
+            <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
+              <div onClick={navigateToCalendar}>Bekijk volledige planning</div>
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-7 gap-1 bg-white rounded-md p-2 mb-3 shadow-sm">
+            {weekdays.map((day, index) => (
+              <div 
+                key={index} 
+                className={`text-center p-2 ${day.isToday ? 'bg-sky-50 rounded-md' : ''}`}
+              >
+                <p className="text-xs font-medium text-sky-800">{day.dayShort}</p>
+                <p className={`text-sm mt-1 ${day.isToday ? 'font-bold text-sky-700' : 'text-gray-600'}`}>{day.dayNumber}</p>
               </div>
-            ) : currentWeekLessons.length === 0 ? (
-              <p className="text-center py-4 text-gray-500">Geen lessen gevonden voor deze week</p>
-            ) : (
-              <div className="space-y-3">
-                {currentWeekLessons.slice(0, 5).map((lesson: any, index: number) => (
-                  <div key={index} className="flex items-center p-3 hover:bg-gray-50 rounded-md border border-gray-100">
-                    <div className="bg-primary/10 p-2 rounded-md">
-                      <Clock className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="ml-3 flex-grow">
-                      <p className="text-sm font-medium">{lesson.title || 'Les ' + (index + 1)}</p>
-                      <p className="text-xs text-gray-500">
-                        {lesson.date ? format(parseISO(lesson.date), 'EEEE d MMMM', { locale: nl }) : ''} 
-                        {lesson.startTime && lesson.endTime ? ` • ${lesson.startTime} - ${lesson.endTime}` : ''}
-                      </p>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="bg-primary/5 p-1 rounded mr-2">
-                        <BookText className="h-4 w-4 text-primary" />
-                      </div>
-                      <span className="text-sm">{lesson.courseName || 'Onbekende cursus'}</span>
-                    </div>
+            ))}
+          </div>
+          
+          {/* Lessen voor deze week */}
+          {isLessonsLoading ? (
+            <div className="flex justify-center p-4">
+              <div className="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : currentWeekLessons.length === 0 ? (
+            <div className="text-center py-4 space-y-2">
+              <p className="text-gray-500">Geen lessen gevonden voor deze week</p>
+              <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
+                <div onClick={() => setLocation('/lessons/new')}>Les toevoegen</div>
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {currentWeekLessons.slice(0, 5).map((lesson: Lesson, index: number) => (
+                <div key={index} className="flex items-center p-3 hover:bg-sky-50/50 rounded-md border border-sky-100 shadow-sm transition-colors duration-200">
+                  <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-2 rounded-md border border-sky-200 shadow-sm">
+                    <Clock className="h-5 w-5 text-sky-700" />
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  <div className="ml-3 flex-grow">
+                    <p className="text-sm font-medium text-gray-800">{lesson.title || 'Les ' + (index + 1)}</p>
+                    <p className="text-xs text-gray-500">
+                      {lesson.date ? format(parseISO(lesson.date), 'EEEE d MMMM', { locale: nl }) : ''} 
+                      {lesson.startTime && lesson.endTime ? ` • ${lesson.startTime} - ${lesson.endTime}` : ''}
+                    </p>
+                  </div>
+                  <div className="flex items-center bg-sky-50 px-2 py-1 rounded-md border border-sky-100">
+                    <BookText className="h-4 w-4 text-sky-600 mr-1" />
+                    <span className="text-sm text-sky-700">{lesson.courseName || 'Onbekende cursus'}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

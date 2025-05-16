@@ -87,7 +87,10 @@ export default function Guardians() {
       }
       
       try {
-        return await apiRequest('GET', `/api/guardians?${params.toString()}`);
+        console.log('Fetching guardians with params:', params.toString());
+        const response = await apiRequest('GET', `/api/guardians?${params.toString()}`);
+        console.log('Guardians API response:', response);
+        return response;
       } catch (error) {
         console.error('Error fetching guardians:', error);
         return { guardians: [], totalCount: 0 };
@@ -96,8 +99,16 @@ export default function Guardians() {
   });
 
   // Extract guardians and total count from response
-  const guardians = guardiansResponse?.guardians || [];
-  const totalGuardians = guardiansResponse?.totalCount || 0;
+  console.log('Guardians response type:', typeof guardiansResponse, Array.isArray(guardiansResponse));
+  
+  // Check if response is already an array or needs to be extracted
+  const guardians = Array.isArray(guardiansResponse) 
+    ? guardiansResponse 
+    : (guardiansResponse?.guardians || []);
+    
+  const totalGuardians = Array.isArray(guardiansResponse) 
+    ? guardiansResponse.length 
+    : (guardiansResponse?.totalCount || 0);
   const totalPages = Math.ceil(totalGuardians / itemsPerPage);
 
   // Fetch associated students for selected guardian

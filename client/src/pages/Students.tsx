@@ -399,10 +399,12 @@ export default function Students() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
           <div className="flex items-center">
-            <Users className="h-6 w-6 text-primary mr-3" />
-            <h1 className="text-2xl font-semibold text-primary">Studenten</h1>
+            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
+              <Users className="h-6 w-6" />
+            </div>
+            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Studenten</h1>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-9">
+          <p className="text-gray-500 text-sm mt-1 ml-11">
             Bekijk en beheer alle studentgegevens
           </p>
         </div>

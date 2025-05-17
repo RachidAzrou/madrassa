@@ -579,10 +579,7 @@ export default function Fees() {
                   ? formatCurrency(statsData.stats.totalCollected) 
                   : "€0,00"}
               </p>
-              <div className="flex justify-between mt-2 text-xs text-sky-600">
-                <span>Betalingen</span>
-                <span>Collegeperiode</span>
-              </div>
+
             </div>
 
             <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
@@ -595,10 +592,7 @@ export default function Fees() {
                   ? formatCurrency(statsData.stats.pendingAmount) 
                   : "€0,00"}
               </p>
-              <div className="flex justify-between mt-2 text-xs text-sky-600">
-                <span>Wachtend</span>
-                <span>Te ontvangen</span>
-              </div>
+
             </div>
 
             <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
@@ -611,10 +605,9 @@ export default function Fees() {
                   ? `${statsData.stats.completionRate}%` 
                   : "0%"}
               </p>
-              <div className="flex justify-between mt-2 text-xs text-sky-600">
-                <span>Voltooiing</span>
+              <div className="mt-2">
                 <Progress 
-                  className="h-2 w-16" 
+                  className="h-2 w-full" 
                   value={statsData?.stats?.completionRate || 0} 
                 />
               </div>

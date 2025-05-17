@@ -49,6 +49,7 @@ export interface IStorage {
   getCourse(id: number): Promise<Course | undefined>;
   getCourseByCode(code: string): Promise<Course | undefined>;
   getCoursesByProgram(programId: number): Promise<Course[]>;
+  getCoursesByFilter(filter: { isActive?: boolean }): Promise<Course[]>;
   createCourse(course: InsertCourse): Promise<Course>;
   updateCourse(id: number, course: Partial<Course>): Promise<Course | undefined>;
   deleteCourse(id: number): Promise<boolean>;

@@ -118,6 +118,17 @@ export class DatabaseStorage implements IStorage {
   async getCoursesByProgram(programId: number): Promise<Course[]> {
     return db.select().from(courses).where(eq(courses.programId, programId));
   }
+  
+  async getCoursesByFilter(filter: { isActive?: boolean }): Promise<Course[]> {
+    const allCourses = await db.select().from(courses);
+    
+    // Filter de cursussen op basis van isActive indien opgegeven
+    if (filter.isActive !== undefined) {
+      return allCourses.filter(course => course.isActive === filter.isActive);
+    }
+    
+    return allCourses;
+  }
 
   async createCourse(course: InsertCourse): Promise<Course> {
     const result = await db.insert(courses).values(course).returning();

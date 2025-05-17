@@ -514,14 +514,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ********************
   // Course API endpoints
   // ********************
-  apiRouter.get("/api/courses", async (_req, res) => {
+  apiRouter.get("/api/courses", async (req, res) => {
     try {
-      const courses = await storage.getCourses();
-      console.log("Fetched courses:", courses);
-      res.json({ courses });
+      // Ondersteuning voor filteren op isActive
+      const isActive = req.query.isActive;
+      let courses;
+      
+      if (isActive !== undefined) {
+        const activeFilter = isActive === 'true';
+        courses = await storage.getCoursesByFilter({ isActive: activeFilter });
+      } else {
+        courses = await storage.getCourses();
+      }
+      
+      res.json({ courses, totalCount: courses.length });
     } catch (error) {
       console.error("Error fetching courses:", error);
       res.status(500).json({ message: "Error fetching courses" });
+    }
+  });
+  
+  // Endpoint voor dashboard om actieve cursussen op te halen
+  apiRouter.get("/api/dashboard/active-courses", async (_req, res) => {
+    try {
+      const courses = await storage.getCoursesByFilter({ isActive: true });
+      res.json(courses);
+    } catch (error) {
+      console.error("Error fetching active courses:", error);
+      res.status(500).json({ message: "Error fetching active courses" });
     }
   });
 

@@ -235,7 +235,7 @@ export default function Scheduling() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Lessen Vandaag</p>
-                <p className="text-2xl font-semibold">12</p>
+                <p className="text-2xl font-semibold">{data?.lessonsToday || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -248,7 +248,7 @@ export default function Scheduling() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Docenten Aanwezig</p>
-                <p className="text-2xl font-semibold">8</p>
+                <p className="text-2xl font-semibold">{data?.teachersPresent || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -261,7 +261,7 @@ export default function Scheduling() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Beschikbare Lokalen</p>
-                <p className="text-2xl font-semibold">5</p>
+                <p className="text-2xl font-semibold">{data?.availableRooms || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -274,8 +274,8 @@ export default function Scheduling() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Volgende Les</p>
-                <p className="text-xl font-semibold">14:30</p>
-                <p className="text-xs text-gray-400">Arabische Taal - Lokaal B201</p>
+                <p className="text-xl font-semibold">{data?.nextLesson?.time || '-'}</p>
+                <p className="text-xs text-gray-400">{data?.nextLesson?.title || 'Geen les gepland'}</p>
               </div>
             </div>
           </CardContent>
@@ -343,36 +343,33 @@ export default function Scheduling() {
                     <div className="text-right">Acties</div>
                   </div>
                   <div className="divide-y">
-                    <div className="grid grid-cols-5 items-center p-3">
-                      <div className="font-medium">A101</div>
-                      <div>30 personen</div>
-                      <div><Badge className="bg-green-100 text-green-800 hover:bg-green-100">Beschikbaar</Badge></div>
-                      <div>-</div>
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                    {rooms && rooms.length > 0 ? (
+                      rooms.map((room: any) => (
+                        <div key={room.id} className="grid grid-cols-5 items-center p-3">
+                          <div className="font-medium">{room.name}</div>
+                          <div>{room.capacity} personen</div>
+                          <div>
+                            <Badge className={
+                              room.status === 'available' ? "bg-green-100 text-green-800 hover:bg-green-100" :
+                              room.status === 'occupied' ? "bg-red-100 text-red-800 hover:bg-red-100" :
+                              "bg-amber-100 text-amber-800 hover:bg-amber-100"
+                            }>
+                              {room.status === 'available' ? 'Beschikbaar' : 
+                               room.status === 'occupied' ? 'Bezet' : 'Gereserveerd'}
+                            </Badge>
+                          </div>
+                          <div>{room.currentUse || '-'}</div>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-6 text-center text-gray-500">
+                        Geen lokaalgegevens beschikbaar
                       </div>
-                    </div>
-                    <div className="grid grid-cols-5 items-center p-3">
-                      <div className="font-medium">B201</div>
-                      <div>25 personen</div>
-                      <div><Badge className="bg-red-100 text-red-800 hover:bg-red-100">Bezet</Badge></div>
-                      <div>Arabische Taal (14:30-16:00)</div>
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-5 items-center p-3">
-                      <div className="font-medium">C305</div>
-                      <div>45 personen</div>
-                      <div><Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Gereserveerd</Badge></div>
-                      <div>Fiqh (vanaf 16:15)</div>
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -412,39 +409,25 @@ export default function Scheduling() {
                     <div className="text-right">Acties</div>
                   </div>
                   <div className="divide-y">
-                    <div className="grid grid-cols-6 items-center p-3">
-                      <div className="font-medium">Mohammed Youssef</div>
-                      <div>Arabische Taal</div>
-                      <div>Klas 2B</div>
-                      <div>14:30 - 16:00</div>
-                      <div>B201</div>
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                    {schedules && schedules.length > 0 ? (
+                      schedules.map((schedule: any) => (
+                        <div key={schedule.id} className="grid grid-cols-6 items-center p-3">
+                          <div className="font-medium">{schedule.instructorName}</div>
+                          <div>{schedule.courseName}</div>
+                          <div>{schedule.className}</div>
+                          <div>{schedule.startTime} - {schedule.endTime}</div>
+                          <div>{schedule.roomName}</div>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-6 text-center text-gray-500">
+                        Geen docentroosters beschikbaar
                       </div>
-                    </div>
-                    <div className="grid grid-cols-6 items-center p-3">
-                      <div className="font-medium">Ahmed Hassan</div>
-                      <div>Fiqh</div>
-                      <div>Klas 3C</div>
-                      <div>16:15 - 17:45</div>
-                      <div>C305</div>
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-6 items-center p-3">
-                      <div className="font-medium">Fatima Al-Zahra</div>
-                      <div>Koranwetenschappen</div>
-                      <div>Klas 1A</div>
-                      <div>09:00 - 10:30</div>
-                      <div>A101</div>
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </CardContent>

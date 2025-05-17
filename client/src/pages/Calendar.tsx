@@ -453,7 +453,7 @@ export default function Calendar() {
               targetDay.setDate(currentWeekDay.getDate() - diff);
               
               // Filter evenementen voor deze dag
-              const dayEvents = (filteredEvents || []).filter(event => {
+              const dayEvents = (events || []).filter(event => {
                 const eventDate = new Date(event.date);
                 return eventDate.toDateString() === targetDay.toDateString();
               });
@@ -536,7 +536,7 @@ export default function Calendar() {
               ))}
               
               {/* Evenementen van deze dag */}
-              {filteredEvents
+              {(events || [])
                 .filter(event => {
                   const eventDate = new Date(event.date);
                   return eventDate.toDateString() === currentDate.toDateString();

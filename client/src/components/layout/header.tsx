@@ -27,19 +27,19 @@ const Header = ({ onMenuClick, title }: HeaderProps) => {
           <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <div className="relative hidden md:block">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
             <Input
               type="search"
               placeholder="Zoeken..."
-              className="w-[200px] pl-8 md:w-[260px] rounded-md border border-gray-200"
+              className="w-[160px] pl-8 lg:w-[260px] rounded-md border border-gray-200"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
-          <Button variant="ghost" size="icon" className="text-gray-500">
+          <Button variant="ghost" size="icon" className="text-gray-500 hidden sm:flex">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Meldingen</span>
           </Button>

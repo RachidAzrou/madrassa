@@ -72,8 +72,10 @@ const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps)
             : "text-gray-600 hover:text-primary hover:bg-gray-100"
         )}
       >
-        {icon}
-        <span>{label}</span>
+        <div className="flex-shrink-0">
+          {icon}
+        </div>
+        <span className="truncate whitespace-nowrap">{label}</span>
       </div>
     </Link>
   );

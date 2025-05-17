@@ -78,26 +78,30 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         } border-l border-gray-200`}
       >
         <Header onMenuClick={toggleSidebar} title={pageTitle} />
-        <main className="flex-1 p-4 sm:p-6 overflow-x-hidden">
-          {children}
+        <main className="flex-1 p-2 sm:p-4 md:p-6 overflow-x-hidden">
+          <div className="max-w-7xl mx-auto w-full">
+            {children}
+          </div>
         </main>
         
         {/* Footer */}
-        <footer className="py-4 px-6 border-t border-gray-200 bg-white mt-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <p className="text-sm text-gray-500">
-              © {new Date().getFullYear()} <span className="text-gray-600">my</span><span className="text-[#3b5998]">Madrassa</span>. Alle rechten voorbehouden.
-            </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-sm text-gray-500 hover:text-primary">
-                Privacybeleid
-              </a>
-              <a href="#" className="text-sm text-gray-500 hover:text-primary">
-                Gebruiksvoorwaarden
-              </a>
-              <a href="#" className="text-sm text-gray-500 hover:text-primary">
-                Hulp
-              </a>
+        <footer className="py-3 px-4 sm:py-4 sm:px-6 border-t border-gray-200 bg-white mt-auto">
+          <div className="max-w-7xl mx-auto w-full">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
+                © {new Date().getFullYear()} <span className="text-gray-600">my</span><span className="text-[#3b5998]">Madrassa</span>. Alle rechten voorbehouden.
+              </p>
+              <div className="flex justify-center sm:justify-end space-x-3 sm:space-x-4">
+                <a href="#" className="text-xs sm:text-sm text-gray-500 hover:text-primary">
+                  Privacybeleid
+                </a>
+                <a href="#" className="text-xs sm:text-sm text-gray-500 hover:text-primary">
+                  Gebruiksvoorwaarden
+                </a>
+                <a href="#" className="text-xs sm:text-sm text-gray-500 hover:text-primary">
+                  Hulp
+                </a>
+              </div>
             </div>
           </div>
         </footer>

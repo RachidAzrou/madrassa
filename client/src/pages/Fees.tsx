@@ -480,7 +480,7 @@ export default function Fees() {
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <CreditCard className="h-6 w-6" />
+              <Coins className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-semibold text-[#1e3a8a]">Betalingsbeheer</h1>
           </div>
@@ -523,7 +523,7 @@ export default function Fees() {
                 <DropdownMenuLabel>Toevoegen...</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setIsAddDialogOpen(true)}>
-                  <CreditCard className="mr-2 h-4 w-4" />
+                  <Coins className="mr-2 h-4 w-4" />
                   <span>Betalingsrecord</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setIsAddTuitionSettingOpen(true)}>
@@ -1516,7 +1516,7 @@ export default function Fees() {
                             </h3>
                           </div>
                           <div className="bg-amber-100 h-12 w-12 rounded-lg flex items-center justify-center">
-                            <CreditCard className="h-6 w-6 text-amber-600" />
+                            <Coins className="h-6 w-6 text-amber-600" />
                           </div>
                         </div>
                       </CardContent>
@@ -1635,7 +1635,7 @@ export default function Fees() {
                                       setIsUpdateStatusOpen(true);
                                     }}
                                   >
-                                    <CreditCard className="mr-1 h-4 w-4" />
+                                    <Coins className="mr-1 h-4 w-4" />
                                     Update
                                   </Button>
                                 </div>

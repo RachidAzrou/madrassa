@@ -83,168 +83,202 @@ export default function Attendance() {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-          <div className="flex flex-col mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">{formatDate(selectedDate)}</h2>
-            <p className="text-sm text-gray-500 mt-1">Selecteer een datum om aanwezigheid te registreren</p>
-          </div>
-          
-          <div className="flex space-x-3">
-            <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)}>
-              <ArrowLeft className="h-4 w-4 mr-1" /> Vorige dag
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => handleDateChange(1)}>
-              Volgende dag <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
-          </div>
-        </div>
+        {/* Datum selectie paneel */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-blue-900 flex items-center">
+              <Clock className="h-5 w-5 mr-2 text-blue-900" />
+              {formatDate(selectedDate)}
+            </CardTitle>
+            <p className="text-sm text-gray-500">Selecteer een datum om aanwezigheid te registreren</p>
+          </CardHeader>
+          <CardContent>
+            <div className="flex space-x-3">
+              <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)} className="flex-1">
+                <ArrowLeft className="h-4 w-4 mr-1" /> Vorige dag
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => handleDateChange(1)} className="flex-1">
+                Volgende dag <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
         
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Selecteer gegevens om te filteren</h3>
-          
-          <Tabs defaultValue="vak" onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
-            <TabsList className="w-full mb-4 bg-blue-900/10">
-              <TabsTrigger value="vak">Vak</TabsTrigger>
-              <TabsTrigger value="klas">Klas</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="vak">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Vak</label>
-                <Select value={selectedCourse} onValueChange={handleCourseChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecteer vak" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {courses.map(course => (
-                      <SelectItem key={course.id} value={course.id.toString()}>
-                        {course.code} - {course.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="klas">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
-                <Select value={selectedClass} onValueChange={handleClassChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecteer klas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {classes.map(classroom => (
-                      <SelectItem key={classroom.id} value={classroom.id.toString()}>
-                        {classroom.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-blue-900 flex items-center">
+              <Filter className="h-5 w-5 mr-2 text-blue-900" />
+              Filters
+            </CardTitle>
+            <p className="text-sm text-gray-500">Selecteer gegevens om de aanwezigheid te filteren</p>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="vak" onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
+              <TabsList className="w-full mb-4 bg-blue-900/10">
+                <TabsTrigger value="vak">Vak</TabsTrigger>
+                <TabsTrigger value="klas">Klas</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="vak">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Vak</label>
+                  <Select value={selectedCourse} onValueChange={handleCourseChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecteer vak" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {courses.map(course => (
+                        <SelectItem key={course.id} value={course.id.toString()}>
+                          {course.code} - {course.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="klas">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
+                  <Select value={selectedClass} onValueChange={handleClassChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecteer klas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {classes.map(classroom => (
+                        <SelectItem key={classroom.id} value={classroom.id.toString()}>
+                          {classroom.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Attendance Content */}
-      <Tabs defaultValue="students" className="mt-6">
-        <TabsList className="grid w-full max-w-md grid-cols-2 bg-blue-900/10 mb-6">
-          <TabsTrigger value="students" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Studenten
-          </TabsTrigger>
-          <TabsTrigger value="teachers" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Docenten
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="students">
-          <div className="space-y-4">
-            <div className="flex justify-between mb-4">
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => console.log('Mark all present')}>
-                  <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                  Allen aanwezig
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => console.log('Mark all absent')}>
-                  <XCircle className="h-4 w-4 mr-2 text-red-500" />
-                  Allen afwezig
-                </Button>
-              </div>
-              
-              <Button variant="default" size="sm" className="bg-primary" onClick={() => console.log('Save attendance')}>
-                <Save className="h-4 w-4 mr-2" />
-                Opslaan
-              </Button>
-            </div>
+      <Card className="mt-6">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-blue-900 flex items-center">
+            <ClipboardCheck className="h-5 w-5 mr-2 text-blue-900" />
+            Aanwezigheidsregistratie
+          </CardTitle>
+          <p className="text-sm text-gray-500">Registreer en beheer de aanwezigheid van studenten en docenten</p>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="students">
+            <TabsList className="grid w-full max-w-md grid-cols-2 bg-blue-900/10 mb-6">
+              <TabsTrigger value="students" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Studenten
+              </TabsTrigger>
+              <TabsTrigger value="teachers" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Docenten
+              </TabsTrigger>
+            </TabsList>
             
-            <div className="rounded-md border">
-              <div className="grid grid-cols-6 bg-slate-50 p-3 text-xs font-medium">
-                <div>Student</div>
-                <div>Status</div>
-                <div>Opmerking</div>
-                <div>Aanwezigheid</div>
-                <div className="col-span-2 text-right">Acties</div>
-              </div>
-              <div className="divide-y">
-                {students.map(student => (
-                  <div key={student.id} className="grid grid-cols-6 items-center p-3">
-                    <div className="font-medium">{student.firstName} {student.lastName}</div>
-                    <div>
-                      {student.status === 'present' ? (
-                        <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Aanwezig</Badge>
-                      ) : student.status === 'absent' ? (
-                        <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Afwezig</Badge>
-                      ) : (
-                        <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Te laat</Badge>
-                      )}
-                    </div>
-                    <div>
-                      <Button variant="ghost" size="icon" onClick={() => console.log('Add note')}>
-                        <MessageSquare className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div>
-                      <span className="text-sm text-gray-600">{student.attendanceRate}%</span>
-                    </div>
-                    <div className="col-span-2 flex justify-end gap-2">
-                      <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => console.log('Mark present')}>
-                        Aanwezig
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-amber-600 border-amber-600 hover:bg-amber-50" onClick={() => console.log('Mark late')}>
-                        Te laat
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50" onClick={() => console.log('Mark absent')}>
-                        Afwezig
-                      </Button>
-                    </div>
+            <TabsContent value="students">
+              <div className="space-y-4">
+                <div className="flex justify-between mb-4">
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all present')} className="border-green-600 text-green-600 hover:bg-green-50">
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Allen aanwezig
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all absent')} className="border-red-600 text-red-600 hover:bg-red-50">
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Allen afwezig
+                    </Button>
                   </div>
-                ))}
+                  
+                  <Button variant="default" size="sm" className="bg-blue-900 hover:bg-blue-800" onClick={() => console.log('Save attendance')}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Opslaan
+                  </Button>
+                </div>
+                
+                <div className="rounded-md border shadow-sm overflow-hidden">
+                  <div className="grid grid-cols-6 bg-slate-100 p-3 text-xs font-medium text-slate-700">
+                    <div>Student</div>
+                    <div>Status</div>
+                    <div>Opmerking</div>
+                    <div>Aanwezigheid</div>
+                    <div className="col-span-2 text-right">Acties</div>
+                  </div>
+                  <div className="divide-y bg-white">
+                    {students.map(student => (
+                      <div key={student.id} className="grid grid-cols-6 items-center p-3 hover:bg-gray-50">
+                        <div className="font-medium">{student.firstName} {student.lastName}</div>
+                        <div>
+                          {student.status === 'present' ? (
+                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Aanwezig</Badge>
+                          ) : student.status === 'absent' ? (
+                            <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Afwezig</Badge>
+                          ) : (
+                            <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Te laat</Badge>
+                          )}
+                        </div>
+                        <div>
+                          <Button variant="ghost" size="icon" onClick={() => console.log('Add note')} className="h-8 w-8">
+                            <MessageSquare className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div>
+                          <span className="text-sm text-gray-600">{student.attendanceRate}%</span>
+                        </div>
+                        <div className="col-span-2 flex justify-end gap-2">
+                          <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => console.log('Mark present')}>
+                            Aanwezig
+                          </Button>
+                          <Button variant="outline" size="sm" className="text-amber-600 border-amber-600 hover:bg-amber-50" onClick={() => console.log('Mark late')}>
+                            Te laat
+                          </Button>
+                          <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50" onClick={() => console.log('Mark absent')}>
+                            Afwezig
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="teachers">
-          <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Docent Aanwezigheid</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-md border">
-                  <div className="grid grid-cols-4 bg-slate-50 p-3 text-xs font-medium">
+            </TabsContent>
+            
+            <TabsContent value="teachers">
+              <div className="space-y-4">
+                <div className="flex justify-between mb-4">
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all present')} className="border-green-600 text-green-600 hover:bg-green-50">
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Allen aanwezig
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all absent')} className="border-red-600 text-red-600 hover:bg-red-50">
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Allen afwezig
+                    </Button>
+                  </div>
+                  
+                  <Button variant="default" size="sm" className="bg-blue-900 hover:bg-blue-800" onClick={() => console.log('Save attendance')}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Opslaan
+                  </Button>
+                </div>
+                
+                <div className="rounded-md border shadow-sm overflow-hidden">
+                  <div className="grid grid-cols-4 bg-slate-100 p-3 text-xs font-medium text-slate-700">
                     <div>Docent</div>
                     <div>Specialisatie</div>
                     <div>Status</div>
                     <div className="text-right">Acties</div>
                   </div>
-                  <div className="divide-y">
+                  <div className="divide-y bg-white">
                     {teachers.map(teacher => (
-                      <div key={teacher.id} className="grid grid-cols-4 items-center p-3">
+                      <div key={teacher.id} className="grid grid-cols-4 items-center p-3 hover:bg-gray-50">
                         <div className="font-medium">{teacher.firstName} {teacher.lastName}</div>
                         <div>{teacher.specialty}</div>
                         <div>
@@ -257,7 +291,7 @@ export default function Attendance() {
                           <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50" onClick={() => console.log('Mark absent')}>
                             Afwezig
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => console.log('Add note')}>
+                          <Button variant="ghost" size="icon" onClick={() => console.log('Add note')} className="h-8 w-8">
                             <MessageSquare className="h-4 w-4" />
                           </Button>
                         </div>
@@ -265,11 +299,11 @@ export default function Attendance() {
                     ))}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 }

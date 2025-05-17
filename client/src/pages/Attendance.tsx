@@ -105,22 +105,7 @@ export default function Attendance() {
                 </Button>
               </div>
               
-              <div className="flex justify-between text-sm text-gray-500 px-1">
-                <div>
-                  {(() => {
-                    const prevDate = new Date(selectedDate);
-                    prevDate.setDate(prevDate.getDate() - 1);
-                    return formatDate(prevDate);
-                  })()}
-                </div>
-                <div>
-                  {(() => {
-                    const nextDate = new Date(selectedDate);
-                    nextDate.setDate(nextDate.getDate() + 1);
-                    return formatDate(nextDate);
-                  })()}
-                </div>
-              </div>
+
             </div>
           </CardContent>
         </Card>
@@ -205,13 +190,13 @@ export default function Attendance() {
             
             <TabsContent value="students">
               <div className="space-y-4">
-                <div className="flex justify-between mb-4">
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all present')} className="border-green-600 text-green-600 hover:bg-green-50">
+                <div className="flex justify-between mb-6">
+                  <div className="flex gap-3 bg-slate-50 p-2 px-3 rounded-md border shadow-sm">
+                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all present')} className="bg-white border-green-600 text-green-600 hover:bg-green-50 min-w-[140px]">
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Allen aanwezig
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all absent')} className="border-red-600 text-red-600 hover:bg-red-50">
+                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all absent')} className="bg-white border-red-600 text-red-600 hover:bg-red-50 min-w-[140px]">
                       <XCircle className="h-4 w-4 mr-2" />
                       Allen afwezig
                     </Button>
@@ -224,25 +209,16 @@ export default function Attendance() {
                 </div>
                 
                 <div className="rounded-md border shadow-sm overflow-hidden">
-                  <div className="grid grid-cols-5 bg-slate-100 p-3 text-xs font-medium text-slate-700">
+                  <div className="grid grid-cols-3 bg-slate-100 p-3 text-xs font-medium text-slate-700">
                     <div>Student</div>
-                    <div>Opmerking</div>
-                    <div>Aanwezigheid %</div>
-                    <div className="col-span-2 text-right">Acties</div>
+                    <div className="text-center">Acties</div>
+                    <div className="text-right">Status</div>
                   </div>
                   <div className="divide-y bg-white">
                     {students.map(student => (
-                      <div key={student.id} className="grid grid-cols-5 items-center p-3 hover:bg-gray-50">
+                      <div key={student.id} className="grid grid-cols-3 items-center p-3 hover:bg-gray-50">
                         <div className="font-medium">{student.firstName} {student.lastName}</div>
-                        <div>
-                          <Button variant="ghost" size="icon" onClick={() => console.log('Add note')} className="h-8 w-8">
-                            <MessageSquare className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div>
-                          <span className="text-sm text-gray-600">{student.attendanceRate}%</span>
-                        </div>
-                        <div className="col-span-2 flex justify-end gap-2">
+                        <div className="flex justify-center gap-2">
                           <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => console.log('Mark present')}>
                             Aanwezig
                           </Button>
@@ -253,6 +229,15 @@ export default function Attendance() {
                             Afwezig
                           </Button>
                         </div>
+                        <div className="text-right">
+                          {student.status === 'present' ? (
+                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Aanwezig</Badge>
+                          ) : student.status === 'absent' ? (
+                            <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Afwezig</Badge>
+                          ) : (
+                            <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Te laat</Badge>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -262,13 +247,13 @@ export default function Attendance() {
             
             <TabsContent value="teachers">
               <div className="space-y-4">
-                <div className="flex justify-between mb-4">
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all present')} className="border-green-600 text-green-600 hover:bg-green-50">
+                <div className="flex justify-between mb-6">
+                  <div className="flex gap-3 bg-slate-50 p-2 px-3 rounded-md border shadow-sm">
+                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all present')} className="bg-white border-green-600 text-green-600 hover:bg-green-50 min-w-[140px]">
                       <CheckCircle className="h-4 w-4 mr-2" />
                       Allen aanwezig
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all absent')} className="border-red-600 text-red-600 hover:bg-red-50">
+                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all absent')} className="bg-white border-red-600 text-red-600 hover:bg-red-50 min-w-[140px]">
                       <XCircle className="h-4 w-4 mr-2" />
                       Allen afwezig
                     </Button>
@@ -283,24 +268,23 @@ export default function Attendance() {
                 <div className="rounded-md border shadow-sm overflow-hidden">
                   <div className="grid grid-cols-3 bg-slate-100 p-3 text-xs font-medium text-slate-700">
                     <div>Docent</div>
-                    <div>Specialisatie</div>
-                    <div className="text-right">Acties</div>
+                    <div className="text-center">Acties</div>
+                    <div className="text-right">Status</div>
                   </div>
                   <div className="divide-y bg-white">
                     {teachers.map(teacher => (
                       <div key={teacher.id} className="grid grid-cols-3 items-center p-3 hover:bg-gray-50">
                         <div className="font-medium">{teacher.firstName} {teacher.lastName}</div>
-                        <div>{teacher.specialty}</div>
-                        <div className="flex justify-end gap-2">
+                        <div className="flex justify-center gap-2">
                           <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => console.log('Mark present')}>
                             Aanwezig
                           </Button>
                           <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50" onClick={() => console.log('Mark absent')}>
                             Afwezig
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => console.log('Add note')} className="h-8 w-8">
-                            <MessageSquare className="h-4 w-4" />
-                          </Button>
+                        </div>
+                        <div className="text-right">
+                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Aanwezig</Badge>
                         </div>
                       </div>
                     ))}

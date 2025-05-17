@@ -308,6 +308,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                 isActive={location.startsWith("/settings")}
                 onClick={handleLinkClick}
               />
+              <div className="my-4 border-t border-gray-200"></div>
               <SidebarLink
                 href="/api/logout"
                 icon={<LogOut className="h-5 w-5" />}

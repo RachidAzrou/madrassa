@@ -337,26 +337,29 @@ export default function Teachers() {
             Beheer en monitor alle docenten en hun vaardigheden
           </p>
         </div>
-        <div className="flex flex-col md:flex-row gap-3">
-          <div className="relative">
-            <Input
-              placeholder="Zoek docenten..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="w-full md:w-64 pl-10"
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          </div>
-          <Button 
-            onClick={handleAddNewTeacher} 
-            variant="default" 
-            size="default" 
-            className="bg-primary hover:bg-primary/90 flex items-center"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Docent Toevoegen</span>
-          </Button>
+      </div>
+      
+      {/* Zoek en acties */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        <div className="relative w-full md:w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Zoek docenten..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="w-full pl-10"
+          />
         </div>
+        
+        <Button 
+          onClick={handleAddNewTeacher} 
+          variant="default" 
+          size="default" 
+          className="bg-primary hover:bg-primary/90 flex items-center"
+        >
+          <PlusCircle className="mr-2 h-4 w-4" />
+          <span>Docent Toevoegen</span>
+        </Button>
       </div>
       
       {/* Docenten lijst */}

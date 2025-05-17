@@ -24,6 +24,7 @@ import {
   FileText,
   Clock,
   Coins,
+  BookMarked,
 } from "lucide-react";
 
 // Aangepast ChalkboardTeacher icoon
@@ -256,25 +257,17 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
                 onClick={handleLinkClick}
               />
               <SidebarLink
+                href="/reports"
+                icon={<BookMarked className="h-5 w-5" />}
+                label="Rapport"
+                isActive={location.startsWith("/reports")}
+                onClick={handleLinkClick}
+              />
+              <SidebarLink
                 href="/fees"
                 icon={<Coins className="h-5 w-5" />}
                 label="Betalingsbeheer"
                 isActive={location.startsWith("/fees")}
-                onClick={handleLinkClick}
-              />
-            </div>
-          </div>
-
-          <div className="pt-2">
-            <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Rapportages
-            </p>
-            <div className="space-y-1.5">
-              <SidebarLink
-                href="/reports"
-                icon={<BarChart3 className="h-5 w-5" />}
-                label="Analyses"
-                isActive={location.startsWith("/reports")}
                 onClick={handleLinkClick}
               />
             </div>

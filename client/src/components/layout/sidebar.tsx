@@ -148,14 +148,20 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         <div className="space-y-4">
           {/* Ingelogde gebruiker informatie */}
           <div className="pt-1 pb-3">
-            <div className="bg-blue-50 rounded-md p-3 mb-2">
+            <div 
+              className="bg-blue-50 rounded-md p-3 mb-2 cursor-pointer hover:bg-blue-100 transition-colors"
+              onClick={() => {
+                window.location.href = "/my-account";
+                if (onClose) onClose();
+              }}
+            >
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
                   <span className="font-semibold">JD</span>
                 </div>
                 <div>
-                  <div className="font-medium">Beheerder</div>
-                  <div className="text-xs text-gray-500">admin@mymadrassa.nl</div>
+                  <div className="font-medium">Jan Doe</div>
+                  <div className="text-xs text-gray-500">Beheerder</div>
                 </div>
               </div>
             </div>

@@ -291,73 +291,77 @@ export default function StudentGroups() {
             Beheer klassen, secties en activiteitengroepen
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
+      </div>
+
+      {/* Zoek en acties */}
+      <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
+        <div className="flex-1 flex flex-col md:flex-row gap-4">
+          <div className="relative w-full md:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Zoek klassen..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="w-full md:w-64 pl-10"
+              className="pl-10 w-full"
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
-          <Button onClick={handleAddStudentGroup} className="flex items-center">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Klas Aanmaken</span>
-          </Button>
-        </div>
-      </div>
 
-      {/* Filters */}
-      <div className="student-groups-filters bg-white rounded-lg shadow-sm p-4 border border-gray-200 mb-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Academisch Jaar</label>
-            <Select value={academicYear} onValueChange={handleAcademicYearChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Alle Jaren" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Jaren</SelectItem>
-                <SelectItem value="2025-2026">2025-2026</SelectItem>
-                <SelectItem value="2024-2025">2024-2025</SelectItem>
-                <SelectItem value="2023-2024">2023-2024</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Opleiding</label>
-            <Select value={program} onValueChange={handleProgramChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Alle Opleidingen" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Opleidingen</SelectItem>
-                {Array.isArray(programs) ? programs.map((program: any) => (
-                  <SelectItem key={program.id} value={program.id.toString()}>
-                    {program.name}
-                  </SelectItem>
-                )) : null}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <Select defaultValue="all" onValueChange={(value) => {
-              // Status filter handler
-              setCurrentPage(1);
-            }}>
-              <SelectTrigger>
-                <SelectValue placeholder="Alle Statussen" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Statussen</SelectItem>
-                <SelectItem value="active">Actief</SelectItem>
-                <SelectItem value="inactive">Inactief</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="student-groups-filters bg-white rounded-lg shadow-sm p-4 border border-gray-200 flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Academisch Jaar</label>
+                <Select value={academicYear} onValueChange={handleAcademicYearChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Alle Jaren" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle Jaren</SelectItem>
+                    <SelectItem value="2025-2026">2025-2026</SelectItem>
+                    <SelectItem value="2024-2025">2024-2025</SelectItem>
+                    <SelectItem value="2023-2024">2023-2024</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Opleiding</label>
+                <Select value={program} onValueChange={handleProgramChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Alle Opleidingen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle Opleidingen</SelectItem>
+                    {Array.isArray(programs) ? programs.map((program: any) => (
+                      <SelectItem key={program.id} value={program.id.toString()}>
+                        {program.name}
+                      </SelectItem>
+                    )) : null}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <Select defaultValue="all" onValueChange={(value) => {
+                  // Status filter handler
+                  setCurrentPage(1);
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Alle Statussen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle Statussen</SelectItem>
+                    <SelectItem value="active">Actief</SelectItem>
+                    <SelectItem value="inactive">Inactief</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
         </div>
+        
+        <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">
+          <PlusCircle className="mr-2 h-4 w-4" />
+          <span>Klas Aanmaken</span>
+        </Button>
       </div>
 
       {/* Main content area */}

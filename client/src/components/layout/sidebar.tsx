@@ -146,6 +146,24 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
       {/* Navigation links */}
       <nav className="flex-1 py-6 px-3 overflow-y-auto">
         <div className="space-y-4">
+          {/* Ingelogde gebruiker informatie */}
+          <div className="pt-1 pb-3">
+            <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Ingelogd als
+            </p>
+            <div className="bg-blue-50 rounded-md p-3 mb-2">
+              <div className="flex items-center">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
+                  <span className="font-semibold">JD</span>
+                </div>
+                <div>
+                  <div className="font-medium">Beheerder</div>
+                  <div className="text-xs text-gray-500">admin@mymadrassa.nl</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-1.5">
             <SidebarLink
               href="/"

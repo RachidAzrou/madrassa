@@ -210,7 +210,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               <SidebarLink
                 href="/courses"
                 icon={<BookOpen className="h-5 w-5" />}
-                label="Cursussen"
+                label="Curriculum"
                 isActive={location.startsWith("/courses")}
                 onClick={handleLinkClick}
               />

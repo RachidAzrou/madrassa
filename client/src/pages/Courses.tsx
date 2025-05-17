@@ -404,7 +404,7 @@ export default function Courses() {
         </div>
       </div>
       
-      {/* Cursus overzicht */}
+      {/* Curriculum overzicht */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
           <div className="col-span-full flex justify-center py-8">
@@ -412,11 +412,11 @@ export default function Courses() {
           </div>
         ) : isError ? (
           <div className="col-span-full text-center py-8 text-red-500">
-            Fout bij het laden van cursussen. Probeer het opnieuw.
+            Fout bij het laden van curriculum. Probeer het opnieuw.
           </div>
         ) : courses.length === 0 ? (
           <div className="col-span-full text-center py-8 text-gray-500">
-            Geen cursussen gevonden. Pas uw filters aan of voeg een nieuwe cursus toe.
+            Geen curriculum gevonden. Pas uw filters aan of voeg een nieuw curriculum toe.
           </div>
         ) : (
           courses.map((course: CourseType) => (
@@ -892,7 +892,7 @@ export default function Courses() {
               {isAddDialogOpen ? 'Curriculum aanmaken' : 'Curriculum Bewerken'}
             </DialogTitle>
             <DialogDescription>
-              Vul de onderstaande velden in om {isAddDialogOpen ? 'een nieuwe cursus toe te voegen' : 'de cursus bij te werken'}.
+              Vul de onderstaande velden in om {isAddDialogOpen ? 'een nieuw curriculum toe te voegen' : 'het curriculum bij te werken'}.
             </DialogDescription>
           </DialogHeader>
           

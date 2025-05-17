@@ -736,7 +736,7 @@ export default function Teachers() {
                 <TabsContent value="cursussen">
                   <div className="bg-gray-50 p-4 rounded-md">
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-md font-medium">Cursussen</h3>
+                      <h3 className="text-md font-medium">Curriculum</h3>
                       <Button variant="outline" size="sm" className="h-8">
                         <Plus className="h-4 w-4 mr-1" />
                         Toevoegen

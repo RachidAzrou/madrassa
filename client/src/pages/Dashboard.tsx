@@ -220,17 +220,7 @@ export default function Dashboard() {
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <BookOpen className="h-20 w-20 text-sky-500" />
-          </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Vakken</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.programs}</p>
-          <div className="flex justify-between mt-2 text-xs text-sky-600">
-            <span>Actief</span>
-            <span>Curriculum</span>
-          </div>
-        </div>
+
         
         <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10">
@@ -253,6 +243,19 @@ export default function Dashboard() {
           <div className="flex justify-between mt-2 text-xs text-sky-600">
             <span>Actief</span>
             <span>Personeelsleden</span>
+          </div>
+        </div>
+        
+        {/* Programma's widget als vervanger voor Vakken */}
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <BookOpen className="h-20 w-20 text-sky-500" />
+          </div>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Programma's</h3>
+          <p className="text-2xl font-bold text-sky-700">{stats.programs}</p>
+          <div className="flex justify-between mt-2 text-xs text-sky-600">
+            <span>Actief</span>
+            <span>Curriculum</span>
           </div>
         </div>
       </div>
@@ -371,63 +374,7 @@ export default function Dashboard() {
           })()}
         </div>
 
-        {/* Vakken - Rechts (3 kolommen) */}
-        <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-3">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <BookText className="h-5 w-5 text-[#1e3a8a]" />
-              <h3 className="text-lg font-semibold text-gray-800">Vakken</h3>
-            </div>
-            <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
-              <div onClick={navigateToCourses}>Bekijk alle</div>
-            </Button>
-          </div>
-          
-          {isStatsLoading || isActiveCoursesLoading ? (
-            <div className="flex justify-center p-4">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="relative p-5 rounded-lg bg-gradient-to-br from-sky-50 to-sky-100 border border-sky-200 shadow-sm">
-                <div className="absolute top-3 right-3 p-1.5 bg-sky-100 rounded-full border border-sky-200">
-                  <BookText className="h-5 w-5 text-[#1e3a8a]" />
-                </div>
-                <h4 className="text-sm font-medium text-gray-600 mb-1">Actieve vakken</h4>
-                <p className="text-2xl font-bold text-[#1e3a8a]">{stats.activeCourses}</p>
-              </div>
-              
-              {/* Actieve vakken lijst */}
-              {activeCourses.length > 0 ? (
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-gray-600">Recente actieve vakken</h4>
-                  <div className="grid grid-cols-1 gap-2">
-                    {activeCourses.slice(0, 3).map((course) => (
-                      <div key={course.id} className="flex justify-between items-center p-3 bg-white rounded-md border border-sky-100 shadow-sm">
-                        <div className="flex items-center">
-                          <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-2 rounded-md border border-sky-200">
-                            <BookOpen className="h-5 w-5 text-[#1e3a8a]" />
-                          </div>
-                          <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-800">{course.name}</p>
-                            <p className="text-xs text-gray-500">{course.code}</p>
-                          </div>
-                        </div>
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-medium">
-                          Actief
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center p-4 bg-white rounded-md border border-sky-100">
-                  <p className="text-sm text-gray-500">Geen actieve vakken gevonden</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+
         
         {/* Lesrooster huidige week - Onder */}
         <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-7">

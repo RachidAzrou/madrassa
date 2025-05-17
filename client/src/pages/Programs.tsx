@@ -268,8 +268,8 @@ export default function Programs() {
       </div>
       
       {/* Zoek en Voeg toe knoppen - onder de streep */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
-        <div className="relative w-full md:w-64">
+      <div className="flex flex-col md:flex-row justify-end items-center gap-4 mb-4">
+        <div className="relative w-full md:w-64 order-2 md:order-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             type="text"
@@ -283,7 +283,7 @@ export default function Programs() {
           onClick={handleAddProgram} 
           variant="default"
           size="default"
-          className="bg-primary hover:bg-primary/90 flex items-center"
+          className="bg-primary hover:bg-primary/90 flex items-center w-full md:w-auto order-1 md:order-2"
         >
           <PlusCircle className="mr-2 h-4 w-4" />
           <span>Vak Toevoegen</span>

@@ -75,18 +75,14 @@ export default function StudentGroups() {
   const [selectedGroup, setSelectedGroup] = useState<any>(null);
 
   // Fetch student groups with filters
-  const { data, isLoading, isError } = useQuery<{
-    studentGroups: any[];
-    totalCount: number;
-    page: number;
-    totalPages: number;
-  }>({
+  const { data: studentGroupsData, isLoading, isError } = useQuery({
     queryKey: ['/api/student-groups', { searchTerm, academicYear, program, page: currentPage }],
-    staleTime: 30000,
+    staleTime: 1000, // Kortere stale time om updates sneller te zien
   });
 
-  const studentGroups = data?.studentGroups || [];
-  const totalStudentGroups = data?.totalCount || 0;
+  // Direct gebruik van de data uit de API response
+  const studentGroups = Array.isArray(studentGroupsData) ? studentGroupsData : [];
+  const totalStudentGroups = studentGroups.length;
   const totalPages = Math.ceil(totalStudentGroups / 9);
 
   // Form validation schema
@@ -143,7 +139,10 @@ export default function StudentGroups() {
         startDate: data.startDate ? data.startDate.toISOString() : undefined,
         endDate: data.endDate ? data.endDate.toISOString() : undefined,
       };
-      return await apiRequest('POST', '/api/student-groups', formattedData);
+      return await apiRequest('/api/student-groups', { 
+        method: 'POST', 
+        body: formattedData 
+      });
     },
     onSuccess: () => {
       toast({
@@ -172,7 +171,10 @@ export default function StudentGroups() {
         startDate: data.startDate ? data.startDate.toISOString() : undefined,
         endDate: data.endDate ? data.endDate.toISOString() : undefined,
       };
-      return await apiRequest('PUT', `/api/student-groups/${id}`, formattedData);
+      return await apiRequest(`/api/student-groups/${id}`, {
+        method: 'PUT',
+        body: formattedData
+      });
     },
     onSuccess: () => {
       toast({
@@ -194,7 +196,9 @@ export default function StudentGroups() {
   // Mutation for deleting a student group
   const deleteStudentGroupMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest('DELETE', `/api/student-groups/${id}`);
+      return await apiRequest(`/api/student-groups/${id}`, {
+        method: 'DELETE'
+      });
     },
     onSuccess: () => {
       toast({

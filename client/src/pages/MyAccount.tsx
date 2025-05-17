@@ -124,8 +124,10 @@ const MyAccount = () => {
   const isTeacher = currentUser.role === "Docent";
   const [isSaving, setIsSaving] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isSavingNotifications, setIsSavingNotifications] = useState(false);
   const [showSavedMessage, setShowSavedMessage] = useState(false);
   const [showPasswordChangedMessage, setShowPasswordChangedMessage] = useState(false);
+  const [showNotificationSavedMessage, setShowNotificationSavedMessage] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(currentUser.twoFactorEnabled);
   const [darkMode, setDarkMode] = useState(currentUser.darkMode);
   const [selectedDefaultPage, setSelectedDefaultPage] = useState(currentUser.defaultPage);
@@ -149,7 +151,9 @@ const MyAccount = () => {
   // Toggle voor demonstratie (alleen voor deze demo)
   const toggleUserRole = () => {
     const newUser = currentUser.id === adminUser.id ? teacherUser : adminUser;
-    setCurrentUser(newUser);
+    
+    // Het type conversie probleem oplossen door een specifieke casting te doen
+    setCurrentUser(newUser as typeof currentUser);
     setTwoFactorEnabled(newUser.twoFactorEnabled);
     setDarkMode(newUser.darkMode);
     setSelectedDefaultPage(newUser.defaultPage);
@@ -330,18 +334,18 @@ const MyAccount = () => {
 
   // Opslaan van notificatie-instellingen
   const saveNotificationSettings = () => {
-    setIsSaving(true);
+    setIsSavingNotifications(true);
     
     // Simuleer een API call
     setTimeout(() => {
       console.log("Notificatie-instellingen opgeslagen:", notificationSettings);
       
-      setIsSaving(false);
-      setShowSavedMessage(true);
+      setIsSavingNotifications(false);
+      setShowNotificationSavedMessage(true);
       
       // Verberg het bericht na 3 seconden
       setTimeout(() => {
-        setShowSavedMessage(false);
+        setShowNotificationSavedMessage(false);
       }, 3000);
     }, 800);
   };
@@ -929,8 +933,22 @@ const MyAccount = () => {
                   </div>
                 </div>
 
-                <Button className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90">
-                  Meldingsinstellingen opslaan
+                {showNotificationSavedMessage && (
+                  <p className="text-sm text-green-600 mb-2">Meldingsinstellingen succesvol opgeslagen!</p>
+                )}
+                <Button 
+                  className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                  onClick={saveNotificationSettings}
+                  disabled={isSavingNotifications}
+                >
+                  {isSavingNotifications ? (
+                    <>
+                      <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                      Opslaan...
+                    </>
+                  ) : (
+                    "Meldingsinstellingen opslaan"
+                  )}
                 </Button>
               </TabsContent>
             </Tabs>

@@ -290,37 +290,29 @@ export default function Calendar() {
           <p className="text-gray-500 text-sm mt-1 ml-11">
             Beheer academische evenementen en schoolactiviteiten
           </p>
-          <div className="flex rounded-md shadow-sm mt-3 ml-9">
-            <button 
-              onClick={() => setView('month')} 
-              className={`px-3 py-1 text-sm font-medium rounded-l-md ${
-                view === 'month' 
-                  ? 'bg-primary text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
-              }`}
-            >
-              Maand
-            </button>
-            <button 
-              onClick={() => setView('week')} 
-              className={`px-3 py-1 text-sm font-medium ${
-                view === 'week' 
-                  ? 'bg-primary text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border-t border-b border-gray-300'
-              }`}
-            >
-              Week
-            </button>
-            <button 
-              onClick={() => setView('day')} 
-              className={`px-3 py-1 text-sm font-medium rounded-r-md ${
-                view === 'day' 
-                  ? 'bg-primary text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
-              }`}
-            >
-              Dag
-            </button>
+          <div className="mt-3 ml-9">
+            <Tabs value={view} onValueChange={(value) => setView(value as 'month' | 'week' | 'day')}>
+              <TabsList className="p-1 bg-blue-900/10">
+                <TabsTrigger 
+                  value="month" 
+                  className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
+                >
+                  Maand
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="week" 
+                  className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
+                >
+                  Week
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="day" 
+                  className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
+                >
+                  Dag
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         </div>
         <div className="flex items-center space-x-3">

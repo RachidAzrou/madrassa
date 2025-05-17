@@ -314,55 +314,56 @@ export default function Guardians() {
             Beheer voogden en hun relaties met studenten
           </p>
         </div>
-        <div className="flex flex-col md:flex-row gap-3">
-          <Button 
-            onClick={handleAddNewGuardian} 
-            variant="default" 
-            size="default" 
-            className="bg-primary hover:bg-primary/90"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Voogd Toevoegen</span>
-          </Button>
-        </div>
       </div>
       
-      {/* View tabs */}
-      <div>
-        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'all' | 'emergency')}>
-          <TabsList className="p-1 bg-blue-900/10">
-            <TabsTrigger 
-              value="all" 
-              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
-              </svg>
-              Alle Voogden
-            </TabsTrigger>
-            <TabsTrigger 
-              value="emergency" 
-              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
-            >
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                width="16" 
-                height="16" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                className="h-4 w-4"
+      {/* View tabs & Actions */}
+      <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+        <div>
+          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'all' | 'emergency')}>
+            <TabsList className="p-1 bg-blue-900/10">
+              <TabsTrigger 
+                value="all" 
+                className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
               >
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-              </svg>
-              Noodcontacten
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
+                </svg>
+                Alle Voogden
+              </TabsTrigger>
+              <TabsTrigger 
+                value="emergency" 
+                className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  className="h-4 w-4"
+                >
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                Noodcontacten
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+        
+        <Button 
+          onClick={handleAddNewGuardian} 
+          variant="default" 
+          size="default" 
+          className="bg-primary hover:bg-primary/90"
+        >
+          <PlusCircle className="mr-2 h-4 w-4" />
+          <span>Voogd Toevoegen</span>
+        </Button>
       </div>
       
       {/* Voogden lijst */}

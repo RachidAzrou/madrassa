@@ -226,60 +226,39 @@ export default function Scheduling() {
       </div>
       
       {/* Dashboard Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-50 rounded-full mr-4">
-                <Calendar className="h-6 w-6 text-blue-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Lessen Vandaag</p>
-                <p className="text-2xl font-semibold">{data?.lessonsToday || 0}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-50 rounded-full mr-4">
-                <GraduationCap className="h-6 w-6 text-green-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Docenten Aanwezig</p>
-                <p className="text-2xl font-semibold">{data?.teachersPresent || 0}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-50 rounded-full mr-4">
-                <Building className="h-6 w-6 text-purple-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Beschikbare Lokalen</p>
-                <p className="text-2xl font-semibold">{data?.availableRooms || 0}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center">
-              <div className="p-2 bg-amber-50 rounded-full mr-4">
-                <Clock className="h-6 w-6 text-amber-500" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Volgende Les</p>
-                <p className="text-xl font-semibold">{data?.nextLesson?.time || '-'}</p>
-                <p className="text-xs text-gray-400">{data?.nextLesson?.title || 'Geen les gepland'}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <Calendar className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
+          </div>
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Lessen Vandaag</h3>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{data?.lessonsToday || 0}</p>
+        </div>
+        
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <GraduationCap className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
+          </div>
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Docenten Aanwezig</h3>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{data?.teachersPresent || 0}</p>
+        </div>
+        
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <Building className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
+          </div>
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Beschikbare Lokalen</h3>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{data?.availableRooms || 0}</p>
+        </div>
+        
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <Clock className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
+          </div>
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Volgende Les</h3>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{data?.nextLesson?.time || '-'}</p>
+          <p className="text-xs text-gray-500">{data?.nextLesson?.title || 'Geen les gepland'}</p>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">

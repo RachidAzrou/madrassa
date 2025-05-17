@@ -94,6 +94,12 @@ export default function Calendar() {
   });
 
   const events: CalendarEvent[] = data?.events || [];
+  
+  // Filter evenementen gebaseerd op filter
+  const filteredEvents = events.filter(event => {
+    if (filter === 'all') return true;
+    return event.type === filter;
+  });
 
   // Navigate to previous/next period based on current view
   const navigatePrevious = () => {

@@ -39,7 +39,7 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { User, Lock, Bell, Shield } from "lucide-react";
+import { User, Lock, Bell, Shield, UserCircle, KeyRound, BellRing } from "lucide-react";
 
 // Schema voor het formulier
 const profileFormSchema = z.object({
@@ -155,12 +155,15 @@ const MyAccount = () => {
             <Tabs defaultValue="profiel" className="w-full">
               <TabsList className="grid grid-cols-3 mb-6 bg-blue-900/10">
                 <TabsTrigger value="profiel" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <UserCircle className="h-4 w-4 mr-2" />
                   Profiel
                 </TabsTrigger>
                 <TabsTrigger value="wachtwoord" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <KeyRound className="h-4 w-4 mr-2" />
                   Wachtwoord
                 </TabsTrigger>
                 <TabsTrigger value="notificaties" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <BellRing className="h-4 w-4 mr-2" />
                   Notificaties
                 </TabsTrigger>
               </TabsList>

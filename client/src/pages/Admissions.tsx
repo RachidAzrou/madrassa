@@ -426,11 +426,13 @@ export default function Admissions() {
 
       <div className="mb-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <TabsList className="p-1 bg-blue-900/10">
-            <TabsTrigger value="applications" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Aanmeldingen</TabsTrigger>
-            <TabsTrigger value="admission-programs" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Toelatingsprogramma's</TabsTrigger>
-            <TabsTrigger value="settings" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Instellingen</TabsTrigger>
-          </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="p-1 bg-blue-900/10">
+              <TabsTrigger value="applications" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Aanmeldingen</TabsTrigger>
+              <TabsTrigger value="admission-programs" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Toelatingsprogramma's</TabsTrigger>
+              <TabsTrigger value="settings" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Instellingen</TabsTrigger>
+            </TabsList>
+          </Tabs>
           
           <Button 
             onClick={handleAddApplicant} 

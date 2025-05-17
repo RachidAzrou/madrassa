@@ -37,28 +37,28 @@ export default function Settings() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-2 h-auto">
-          <TabsTrigger value="algemeen" className="flex items-center gap-2 py-2 px-3">
+        <TabsList className="grid grid-cols-2 md:grid-cols-6 gap-2 p-1 bg-blue-900/10">
+          <TabsTrigger value="algemeen" className="flex items-center gap-2 py-2 px-3 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
             <SettingsIcon className="h-4 w-4" />
             <span>Algemeen</span>
           </TabsTrigger>
-          <TabsTrigger value="academisch" className="flex items-center gap-2 py-2 px-3">
+          <TabsTrigger value="academisch" className="flex items-center gap-2 py-2 px-3 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
             <Globe className="h-4 w-4" />
             <span>Academisch</span>
           </TabsTrigger>
-          <TabsTrigger value="gebruikers" className="flex items-center gap-2 py-2 px-3">
+          <TabsTrigger value="gebruikers" className="flex items-center gap-2 py-2 px-3 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
             <Users className="h-4 w-4" />
             <span>Gebruikers</span>
           </TabsTrigger>
-          <TabsTrigger value="meldingen" className="flex items-center gap-2 py-2 px-3">
+          <TabsTrigger value="meldingen" className="flex items-center gap-2 py-2 px-3 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
             <Bell className="h-4 w-4" />
             <span>Meldingen</span>
           </TabsTrigger>
-          <TabsTrigger value="beveiliging" className="flex items-center gap-2 py-2 px-3">
+          <TabsTrigger value="beveiliging" className="flex items-center gap-2 py-2 px-3 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
             <Shield className="h-4 w-4" />
             <span>Beveiliging</span>
           </TabsTrigger>
-          <TabsTrigger value="integraties" className="flex items-center gap-2 py-2 px-3">
+          <TabsTrigger value="integraties" className="flex items-center gap-2 py-2 px-3 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
             <Server className="h-4 w-4" />
             <span>Integraties</span>
           </TabsTrigger>

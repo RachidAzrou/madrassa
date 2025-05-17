@@ -741,16 +741,16 @@ export default function Guardians() {
 
           <form onSubmit={handleSubmitGuardian} className="mt-4 space-y-6">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="personal" className="flex items-center gap-2">
+              <TabsList className="grid w-full grid-cols-3 p-1 bg-blue-900/10">
+                <TabsTrigger value="personal" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                   <UserCircle className="h-4 w-4" />
                   <span>Persoonlijke Informatie</span>
                 </TabsTrigger>
-                <TabsTrigger value="contact" className="flex items-center gap-2">
+                <TabsTrigger value="contact" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                   <Phone className="h-4 w-4" />
                   <span>Contactgegevens</span>
                 </TabsTrigger>
-                <TabsTrigger value="students" className="flex items-center gap-2">
+                <TabsTrigger value="students" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                   <Users className="h-4 w-4" />
                   <span>Studenten</span>
                 </TabsTrigger>

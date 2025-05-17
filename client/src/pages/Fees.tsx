@@ -488,55 +488,58 @@ export default function Fees() {
             Beheer van collegegelden, betalingen, kortingen en schulden
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Input
-              placeholder="Zoek betalingsrecords of studenten..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="w-full md:w-64 pl-10"
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          </div>
-          <div className="flex items-center gap-1">
-            <Button onClick={() => {
-              // Actie afhankelijk van het huidige tabblad
-              if (activeTab === 'fee-records') {
-                setIsAddDialogOpen(true);
-              } else if (activeTab === 'tuition-settings') {
-                setIsAddTuitionSettingOpen(true);
-              } else if (activeTab === 'discounts') {
-                setIsAddDiscountOpen(true);
-              }
-            }} className="flex items-center bg-[#1e3a8a] hover:bg-blue-800">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              <span>Toevoegen</span>
-            </Button>
-          
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="h-9 w-9 p-0 ml-1">
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Toevoegen...</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setIsAddDialogOpen(true)}>
-                  <Coins className="mr-2 h-4 w-4" />
-                  <span>Betalingsrecord</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsAddTuitionSettingOpen(true)}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Collegegeld Instelling</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsAddDiscountOpen(true)}>
-                  <Percent className="mr-2 h-4 w-4" />
-                  <span>Kortingsregel</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+      </div>
+
+      {/* Zoek en acties */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        <div className="relative w-full md:w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Zoek betalingsrecords of studenten..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="w-full pl-10"
+          />
+        </div>
+        
+        <div className="flex items-center gap-1">
+          <Button onClick={() => {
+            // Actie afhankelijk van het huidige tabblad
+            if (activeTab === 'fee-records') {
+              setIsAddDialogOpen(true);
+            } else if (activeTab === 'tuition-settings') {
+              setIsAddTuitionSettingOpen(true);
+            } else if (activeTab === 'discounts') {
+              setIsAddDiscountOpen(true);
+            }
+          }} className="flex items-center bg-[#1e3a8a] hover:bg-blue-800">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            <span>Toevoegen</span>
+          </Button>
+        
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-9 w-9 p-0 ml-1">
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Toevoegen...</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setIsAddDialogOpen(true)}>
+                <Coins className="mr-2 h-4 w-4" />
+                <span>Betalingsrecord</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsAddTuitionSettingOpen(true)}>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Collegegeld Instelling</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsAddDiscountOpen(true)}>
+                <Percent className="mr-2 h-4 w-4" />
+                <span>Kortingsregel</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

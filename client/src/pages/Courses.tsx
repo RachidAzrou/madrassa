@@ -345,17 +345,22 @@ export default function Courses() {
             Beheer het curriculum en de inschrijvingen
           </p>
         </div>
-        <div className="flex flex-col md:flex-row gap-3">
-          <div className="relative">
+      </div>
+      
+      {/* Zoek, filter en acties */}
+      <div className="mb-6">
+        {/* Zoeken en Curriculum toevoegen */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+          <div className="relative w-full md:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Zoek curricula..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="w-full md:w-64 pl-10"
+              className="w-full pl-10"
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
-
+          
           <Button 
             onClick={handleAddCourse} 
             variant="default"
@@ -366,41 +371,41 @@ export default function Courses() {
             <span>Curriculum Toevoegen</span>
           </Button>
         </div>
-      </div>
-      
-      {/* Filter opties */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">Status:</span>
-          <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
-            <SelectTrigger className="w-[140px] h-9">
-              <SelectValue placeholder="Filter op status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="active">Actief</SelectItem>
-              <SelectItem value="inactive">Inactief</SelectItem>
-              <SelectItem value="all">Alle vakken</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
         
-        <div className="flex items-center gap-2">
-          <GraduationCap className="h-4 w-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">Programma:</span>
-          <Select value={programFilter} onValueChange={handleProgramFilterChange}>
-            <SelectTrigger className="w-[180px] h-9">
-              <SelectValue placeholder="Filter op programma" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Alle programma's</SelectItem>
-              {programs.map((program: any) => (
-                <SelectItem key={program.id} value={program.id.toString()}>
-                  {program.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* Filter opties */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">Status:</span>
+            <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+              <SelectTrigger className="w-[140px] h-9">
+                <SelectValue placeholder="Filter op status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Actief</SelectItem>
+                <SelectItem value="inactive">Inactief</SelectItem>
+                <SelectItem value="all">Alle vakken</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <GraduationCap className="h-4 w-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">Programma:</span>
+            <Select value={programFilter} onValueChange={handleProgramFilterChange}>
+              <SelectTrigger className="w-[180px] h-9">
+                <SelectValue placeholder="Filter op programma" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle programma's</SelectItem>
+                {programs.map((program: any) => (
+                  <SelectItem key={program.id} value={program.id.toString()}>
+                    {program.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
       

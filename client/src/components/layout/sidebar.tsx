@@ -313,17 +313,17 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
       </nav>
 
-      {/* Afmelden knop */}
+      {/* Afmelden link */}
       <div className="border-t border-gray-200 p-4">
         <button 
-          className="flex items-center justify-center w-full p-2 bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white rounded-md transition-colors"
+          className="flex items-center px-2 py-1.5 w-full text-[#1e3a8a] hover:bg-gray-100 rounded transition-colors"
           onClick={() => {
             // Implementatie van afmelden logica
             console.log('Afmelden...');
             // Window.location.href = '/api/logout'; // Uncomment wanneer API-eindpunt beschikbaar is
           }}
         >
-          <LogOut className="h-4 w-4 mr-2" />
+          <LogOut className="h-4 w-4 mr-2 text-[#1e3a8a]" />
           <span className="font-medium">Afmelden</span>
         </button>
       </div>

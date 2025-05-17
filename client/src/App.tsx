@@ -17,6 +17,7 @@ import Guardians from "@/pages/Guardians";
 import Teachers from "@/pages/Teachers";
 import Admissions from "@/pages/Admissions";
 import StudentGroups from "@/pages/StudentGroups";
+import MyAccount from "@/pages/MyAccount";
 
 import Scheduling from "@/pages/Scheduling";
 import Fees from "@/pages/Fees";
@@ -42,6 +43,7 @@ function Router() {
         <Route path="/fees" component={Fees} />
         <Route path="/reports" component={Reports} />
         <Route path="/settings" component={Settings} />
+        <Route path="/mijn-account" component={MyAccount} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>

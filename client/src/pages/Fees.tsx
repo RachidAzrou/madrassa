@@ -571,7 +571,7 @@ export default function Fees() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
               <div className="absolute right-0 top-0 opacity-10">
-                <Euro className="h-20 w-20 text-sky-500" />
+                <CheckCircle className="h-20 w-20 text-sky-500" />
               </div>
               <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal Geïnd</h3>
               <p className="text-2xl font-bold text-sky-700">

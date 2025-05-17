@@ -58,9 +58,9 @@ const Header = ({ onMenuClick }: HeaderProps) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-white">
-      <div className="px-2 py-4 flex items-center justify-between border-b border-gray-200">
-        <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-30 w-full bg-white border-b border-gray-200">
+      <div className="flex justify-between items-center h-14">
+        <div className="flex-1 flex justify-start pl-2">
           <Button
             variant="ghost"
             size="icon"
@@ -70,10 +70,13 @@ const Header = ({ onMenuClick }: HeaderProps) => {
             <Menu className="h-5 w-5" />
             <span className="sr-only">Menu</span>
           </Button>
-          {/* Titel is verwijderd */}
         </div>
-
-        <div className="flex items-center gap-2 sm:gap-4">
+        
+        <div className="flex-1 flex justify-center">
+          {/* Lege centrale ruimte */}
+        </div>
+        
+        <div className="flex-1 flex justify-end gap-1 pr-2">
           {/* Meldingen belletje met dropdown */}
           <Popover>
             <PopoverTrigger asChild>

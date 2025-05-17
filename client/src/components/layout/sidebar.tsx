@@ -148,9 +148,6 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         <div className="space-y-4">
           {/* Ingelogde gebruiker informatie */}
           <div className="pt-1 pb-3">
-            <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Ingelogd als
-            </p>
             <div className="bg-blue-50 rounded-md p-3 mb-2">
               <div className="flex items-center">
                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">

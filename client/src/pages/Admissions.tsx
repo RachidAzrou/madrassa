@@ -360,7 +360,7 @@ export default function Admissions() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
@@ -372,17 +372,19 @@ export default function Admissions() {
             Beoordeel en verwerk studentaanmeldingen en toelatingen
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button 
-            onClick={handleAddApplicant} 
-            variant="default" 
-            size="default" 
-            className="bg-primary hover:bg-primary/90"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Nieuwe Aanmelding</span>
-          </Button>
-        </div>
+      </div>
+      
+      {/* Actie knoppen onder de streep */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+        <Button 
+          onClick={handleAddApplicant} 
+          variant="default" 
+          size="default" 
+          className="bg-primary hover:bg-primary/90 w-full md:w-auto"
+        >
+          <PlusCircle className="mr-2 h-4 w-4" />
+          <span>Nieuwe Aanmelding</span>
+        </Button>
       </div>
 
       {/* Dashboard Stats - met dezelfde stijl als in Dashboard.tsx */}

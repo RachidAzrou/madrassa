@@ -260,6 +260,12 @@ export default function Courses() {
     setProgramFilter(value);
     setCurrentPage(1);
   };
+  
+  // Handle status filter change
+  const handleStatusFilterChange = (value: string) => {
+    setStatusFilter(value);
+    setCurrentPage(1);
+  };
 
   // Handle adding new course
   const handleAddCourse = () => {
@@ -359,6 +365,42 @@ export default function Courses() {
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Curriculum Toevoegen</span>
           </Button>
+        </div>
+      </div>
+      
+      {/* Filter opties */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-gray-500" />
+          <span className="text-sm font-medium text-gray-700">Status:</span>
+          <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+            <SelectTrigger className="w-[140px] h-9">
+              <SelectValue placeholder="Filter op status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="active">Actief</SelectItem>
+              <SelectItem value="inactive">Inactief</SelectItem>
+              <SelectItem value="all">Alle vakken</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <GraduationCap className="h-4 w-4 text-gray-500" />
+          <span className="text-sm font-medium text-gray-700">Programma:</span>
+          <Select value={programFilter} onValueChange={handleProgramFilterChange}>
+            <SelectTrigger className="w-[180px] h-9">
+              <SelectValue placeholder="Filter op programma" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Alle programma's</SelectItem>
+              {programs.map((program: any) => (
+                <SelectItem key={program.id} value={program.id.toString()}>
+                  {program.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       

@@ -1,16 +1,13 @@
-import { useState } from "react";
-import { Search, Bell, Settings, Menu } from "lucide-react";
+import { Bell, Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Link } from "wouter";
 
 type HeaderProps = {
   onMenuClick: () => void;
-  title: string;
+  title: string; // We behouden de prop maar gebruiken hem niet in de weergave
 };
 
-const Header = ({ onMenuClick, title }: HeaderProps) => {
-  const [searchQuery, setSearchQuery] = useState("");
-
+const Header = ({ onMenuClick }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-30 w-full bg-white">
       <div className="px-2 py-4 flex items-center justify-between border-b border-gray-200">
@@ -24,29 +21,23 @@ const Header = ({ onMenuClick, title }: HeaderProps) => {
             <Menu className="h-5 w-5" />
             <span className="sr-only">Menu</span>
           </Button>
-          <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
+          {/* Titel is verwijderd */}
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">
-          <div className="relative hidden md:block">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-            <Input
-              type="search"
-              placeholder="Zoeken..."
-              className="w-[160px] pl-8 lg:w-[260px] rounded-md border border-gray-200"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+          {/* Zoekbalk is verwijderd */}
 
           <Button variant="ghost" size="icon" className="text-gray-500 hidden sm:flex">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Meldingen</span>
           </Button>
 
-          <Button variant="ghost" size="icon" className="text-gray-500">
-            <Settings className="h-5 w-5" />
-            <span className="sr-only">Instellingen</span>
+          {/* Profielsymbool toegevoegd */}
+          <Button variant="ghost" size="icon" className="text-gray-500" asChild>
+            <Link href="/mijn-account">
+              <User className="h-5 w-5" />
+              <span className="sr-only">Mijn Account</span>
+            </Link>
           </Button>
         </div>
       </div>

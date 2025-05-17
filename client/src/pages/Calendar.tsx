@@ -518,8 +518,10 @@ export default function Calendar() {
                     key={hourIndex} 
                     className="h-12 border-b border-gray-200 relative"
                   >
-                    <div className="absolute right-2 top-0 -translate-y-1/2 text-xs text-gray-500 font-medium">
-                      {hour}:00
+                    <div className="h-full flex items-center justify-center">
+                      <span className="text-xs text-gray-600 font-medium">
+                        {hour}:00
+                      </span>
                     </div>
                   </div>
                 );
@@ -573,50 +575,46 @@ export default function Calendar() {
                     const height = Math.max(20, duration * 48); // Minimale hoogte
                     
                     // Bepaal de kleur gebaseerd op event type
-                    let eventStyle = {};
-                    let textColor = "text-gray-800";
-                    let borderStyle = "";
+                    let bgColor = "#E3F2FD"; // Default lichtblauw
+                    let borderColor = "#1E88E5"; // Default blauw
                     
                     switch (event.type) {
                       case 'exam':
-                        eventStyle = { backgroundColor: '#FFEBEE' }; // Lichtroze
-                        borderStyle = "border-l-4 border-red-400";
+                        bgColor = "#FFEBEE"; // Lichtroze
+                        borderColor = "#E53935"; // Rood
                         break;
                       case 'class':
-                        eventStyle = { backgroundColor: '#E3F2FD' }; // Lichtblauw
-                        borderStyle = "border-l-4 border-blue-400";
+                        bgColor = "#E3F2FD"; // Lichtblauw
+                        borderColor = "#1E88E5"; // Blauw
                         break;
                       case 'holiday':
-                        eventStyle = { backgroundColor: '#E8F5E9' }; // Lichtgroen
-                        borderStyle = "border-l-4 border-green-400";
+                        bgColor = "#E8F5E9"; // Lichtgroen
+                        borderColor = "#43A047"; // Groen
                         break;
                       case 'event':
-                        eventStyle = { backgroundColor: '#FFF9C4' }; // Lichtgeel
-                        borderStyle = "border-l-4 border-yellow-400";
+                        bgColor = "#FFF9C4"; // Lichtgeel
+                        borderColor = "#FDD835"; // Geel
                         break;
-                      default:
-                        eventStyle = { backgroundColor: '#E0E0E0' };
-                        borderStyle = "border-l-4 border-gray-400";
                     }
                     
                     return (
                       <div 
                         key={event.id}
-                        className={`absolute w-[95%] overflow-hidden shadow-sm ${borderStyle} ${textColor}`}
+                        className="absolute w-[95%] overflow-hidden transition-shadow hover:shadow-md"
                         style={{ 
-                          ...eventStyle,
+                          backgroundColor: bgColor,
                           top: `${top}px`, 
                           height: `${height}px`,
                           left: '2.5%',
+                          borderLeft: `4px solid ${borderColor}`,
                         }}
                       >
                         <div className="px-2 py-1 h-full flex flex-col">
-                          <div className="text-xs font-medium flex items-center">
-                            <Clock className="h-3 w-3 inline mr-1" />
-                            {event.startTime} - {event.endTime}
-                          </div>
-                          <div className="font-medium text-xs mt-1">
+                          <div className="text-xs font-medium flex items-start text-gray-800 mb-1">
                             {event.title}
+                          </div>
+                          <div className="text-[10px] text-gray-700">
+                            {event.startTime} - {event.endTime}
                           </div>
                         </div>
                       </div>

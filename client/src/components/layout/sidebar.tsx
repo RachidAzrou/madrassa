@@ -23,6 +23,7 @@ import {
   Glasses,
   FileText,
   Clock,
+  Coins,
 } from "lucide-react";
 
 // Aangepast ChalkboardTeacher icoon
@@ -256,7 +257,7 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
               />
               <SidebarLink
                 href="/fees"
-                icon={<CreditCard className="h-5 w-5" />}
+                icon={<Coins className="h-5 w-5" />}
                 label="Betalingsbeheer"
                 isActive={location.startsWith("/fees")}
                 onClick={handleLinkClick}

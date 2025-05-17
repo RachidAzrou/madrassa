@@ -647,7 +647,6 @@ export default function Fees() {
                       <SelectItem value="all">Alle statussen</SelectItem>
                       <SelectItem value="betaald">Betaald</SelectItem>
                       <SelectItem value="niet betaald">Niet betaald</SelectItem>
-                      <SelectItem value="te laat">Te laat</SelectItem>
                       <SelectItem value="gedeeltelijk betaald">Gedeeltelijk betaald</SelectItem>
                     </SelectContent>
                   </Select>

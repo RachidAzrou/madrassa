@@ -687,24 +687,24 @@ export default function StudentGroups() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <Tabs defaultValue="algemeen" className="w-full">
-                <TabsList className="grid grid-cols-5 w-full">
-                  <TabsTrigger value="algemeen" className="flex items-center gap-2">
+                <TabsList className="grid grid-cols-5 w-full p-1 bg-blue-900/10">
+                  <TabsTrigger value="algemeen" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <ChalkBoard className="h-4 w-4" />
                     <span>Algemeen</span>
                   </TabsTrigger>
-                  <TabsTrigger value="studenten" className="flex items-center gap-2">
+                  <TabsTrigger value="studenten" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <UsersRound className="h-4 w-4" />
                     <span>Studenten</span>
                   </TabsTrigger>
-                  <TabsTrigger value="docenten" className="flex items-center gap-2">
+                  <TabsTrigger value="docenten" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <GraduationCap className="h-4 w-4" />
                     <span>Docenten</span>
                   </TabsTrigger>
-                  <TabsTrigger value="vakken" className="flex items-center gap-2">
+                  <TabsTrigger value="vakken" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <BookOpen className="h-4 w-4" />
                     <span>Vakken</span>
                   </TabsTrigger>
-                  <TabsTrigger value="planning" className="flex items-center gap-2">
+                  <TabsTrigger value="planning" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <CalendarIcon className="h-4 w-4" />
                     <span>Planning</span>
                   </TabsTrigger>

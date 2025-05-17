@@ -866,21 +866,33 @@ const MyAccount = () => {
                             <Label htmlFor="notifyNewUsers">Nieuwe gebruikers</Label>
                             <p className="text-sm text-muted-foreground">Ontvang een e-mail wanneer een nieuwe gebruiker zich registreert</p>
                           </div>
-                          <Switch id="notifyNewUsers" checked={adminUser.notifyNewUsers} />
+                          <Switch 
+                            id="notifyNewUsers" 
+                            checked={notificationSettings.emailNotifications.newUsers} 
+                            onCheckedChange={() => handleToggleNotification('email', 'newUsers')}
+                          />
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
                             <Label htmlFor="notifySystemUpdates">Systeemupdates</Label>
                             <p className="text-sm text-muted-foreground">Ontvang een e-mail bij belangrijke systeemupdates</p>
                           </div>
-                          <Switch id="notifySystemUpdates" checked={adminUser.notifySystemUpdates} />
+                          <Switch 
+                            id="notifySystemUpdates" 
+                            checked={notificationSettings.emailNotifications.systemUpdates} 
+                            onCheckedChange={() => handleToggleNotification('email', 'systemUpdates')}
+                          />
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
                             <Label htmlFor="notifySecurityAlerts">Beveiligingswaarschuwingen</Label>
                             <p className="text-sm text-muted-foreground">Ontvang een e-mail bij beveiligingswaarschuwingen</p>
                           </div>
-                          <Switch id="notifySecurityAlerts" checked={adminUser.notifySecurityAlerts} />
+                          <Switch 
+                            id="notifySecurityAlerts" 
+                            checked={notificationSettings.emailNotifications.securityAlerts} 
+                            onCheckedChange={() => handleToggleNotification('email', 'securityAlerts')}
+                          />
                         </div>
                       </>
                     )}
@@ -897,14 +909,22 @@ const MyAccount = () => {
                         <Label htmlFor="pushNotifications">Push-meldingen</Label>
                         <p className="text-sm text-muted-foreground">Schakel push-meldingen in of uit voor de mobiele app</p>
                       </div>
-                      <Switch id="pushNotifications" defaultChecked />
+                      <Switch 
+                        id="pushNotifications" 
+                        checked={notificationSettings.pushNotifications}
+                        onCheckedChange={() => handleToggleNotification('pushNotifications', '')} 
+                      />
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label htmlFor="desktopNotifications">Bureaubladmeldingen</Label>
                         <p className="text-sm text-muted-foreground">Schakel bureaubladmeldingen in of uit</p>
                       </div>
-                      <Switch id="desktopNotifications" defaultChecked />
+                      <Switch 
+                        id="desktopNotifications" 
+                        checked={notificationSettings.desktopNotifications}
+                        onCheckedChange={() => handleToggleNotification('desktopNotifications', '')} 
+                      />
                     </div>
                   </div>
                 </div>

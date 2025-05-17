@@ -341,11 +341,7 @@ export default function Scheduling() {
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>
-                  <div className="flex justify-end">
-                    <Button variant="outline" size="icon">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </div>
+
                 </div>
               </CardHeader>
               <CardContent>

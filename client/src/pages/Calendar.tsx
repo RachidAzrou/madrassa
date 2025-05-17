@@ -611,10 +611,11 @@ export default function Calendar() {
                         }}
                       >
                         <div className="px-2 py-1 h-full flex flex-col">
-                          <div className="text-xs font-medium">
-                            {event.startTime}
+                          <div className="text-xs font-medium flex items-center">
+                            <Clock className="h-3 w-3 inline mr-1" />
+                            {event.startTime} - {event.endTime}
                           </div>
-                          <div className="font-medium text-xs mt-0.5">
+                          <div className="font-medium text-xs mt-1">
                             {event.title}
                           </div>
                         </div>

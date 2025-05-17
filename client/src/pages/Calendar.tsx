@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, 
-  FilePlus, GraduationCap, Palmtree, PartyPopper, Pencil, BookOpen, Timer  
+  FilePlus, GraduationCap, Palmtree, PartyPopper, Pencil, BookOpen, Timer,
+  MapPin, Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -362,19 +363,19 @@ export default function Calendar() {
       </div>
 
       {/* Calendar navigation */}
-      <div className="flex items-center justify-between bg-white rounded-lg shadow-sm px-4 py-3 border border-gray-200">
+      <div className="flex items-center justify-between bg-white rounded-lg shadow-md px-4 py-4 border border-sky-200">
         <button 
           onClick={navigatePrevious}
-          className="p-1.5 rounded-md text-gray-500 hover:bg-gray-100"
+          className="p-2 rounded-md text-sky-600 hover:bg-sky-50 transition-colors"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <h2 className="text-xl font-semibold text-gray-800">
+        <h2 className="text-xl font-semibold text-sky-900">
           {month} {year}
         </h2>
         <button 
           onClick={navigateNext}
-          className="p-1.5 rounded-md text-gray-500 hover:bg-gray-100"
+          className="p-2 rounded-md text-sky-600 hover:bg-sky-50 transition-colors"
         >
           <ChevronRight className="h-5 w-5" />
         </button>
@@ -382,43 +383,90 @@ export default function Calendar() {
 
       {/* Calendar Content */}
       {view === 'month' ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-lg shadow-md border border-sky-200 overflow-hidden">
           {/* Week days header */}
-          <div className="grid grid-cols-7 border-b border-gray-200">
-            {['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'].map((day) => (
-              <div key={day} className="py-2 text-center text-gray-500 text-sm font-medium">
+          <div className="grid grid-cols-7 border-b border-sky-200">
+            {['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'].map((day, index) => (
+              <div 
+                key={day} 
+                className={`py-3 text-center ${
+                  index === 0 || index === 6 
+                    ? 'bg-gradient-to-b from-sky-50 to-sky-100/40 text-sky-700' 
+                    : 'bg-white text-gray-700'
+                } text-sm font-semibold border-b border-sky-100`}
+              >
                 {day}
               </div>
             ))}
           </div>
           
           {/* Calendar grid */}
-          <div className="grid grid-cols-7 grid-rows-6 divide-x divide-y divide-gray-200">
-            {calendarDays.map((dayData, index) => (
-              <div key={index} className={`min-h-24 p-1 ${dayData.day ? 'bg-white' : 'bg-gray-50'}`}>
-                {dayData.day && (
-                  <>
-                    <div className={`text-sm font-medium ${
-                      new Date().toDateString() === dayData.date?.toDateString() 
-                        ? 'bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center' 
-                        : 'text-gray-700'
-                    }`}>
-                      {dayData.day}
-                    </div>
-                    <div className="mt-1 space-y-1 max-h-20 overflow-y-auto">
-                      {dayData.events.map((event) => (
-                        <div 
-                          key={event.id} 
-                          className={`px-1.5 py-0.5 text-xs truncate rounded border ${getEventColor(event.type)}`}
-                        >
-                          {event.startTime.slice(0, 5)} {event.title}
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
+          <div className="grid grid-cols-7 grid-rows-6 divide-y divide-gray-100">
+            {calendarDays.map((dayData, index) => {
+              // Bepaal of het weekend is
+              const isWeekend = index % 7 === 0 || index % 7 === 6;
+              
+              // Pas stijl aan op basis van of de dag in de huidige maand zit
+              let cellBaseClass = "min-h-[110px] p-2 relative transition-colors duration-200 hover:bg-sky-50/50 border border-sky-50";
+              
+              if (!dayData.day) {
+                cellBaseClass = "min-h-[110px] p-2 relative bg-gray-50/40 border border-gray-100";
+              } else if (dayData.date && new Date().toDateString() === dayData.date.toDateString()) {
+                cellBaseClass = "min-h-[110px] p-2 relative transition-colors duration-200 bg-sky-50 hover:bg-sky-100/60 border border-sky-300";
+              } else if (isWeekend && dayData.day) {
+                cellBaseClass = "min-h-[110px] p-2 relative transition-colors duration-200 bg-sky-50/20 hover:bg-sky-50/50 border border-sky-50";
+              }
+              
+              return (
+                <div 
+                  key={index} 
+                  className={cellBaseClass}
+                  onClick={() => {
+                    if (dayData.day && dayData.date) {
+                      setCurrentDate(dayData.date);
+                      setView('day');
+                    }
+                  }}
+                >
+                  {dayData.day && (
+                    <>
+                      <div className={`text-right ${
+                        dayData.date && new Date().toDateString() === dayData.date.toDateString() 
+                          ? 'bg-sky-500 text-white w-6 h-6 rounded-full flex items-center justify-center ml-auto' 
+                          : 'font-medium text-gray-700'
+                      }`}>
+                        {dayData.date && new Date().toDateString() === dayData.date.toDateString() ? (
+                          <span>{dayData.day}</span>
+                        ) : (
+                          dayData.day
+                        )}
+                      </div>
+                      <div className="mt-2 space-y-1.5 max-h-24 overflow-y-auto">
+                        {dayData.events.slice(0, 3).map((event) => (
+                          <div 
+                            key={event.id} 
+                            className={`px-2 py-1 text-xs rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer ${getEventColor(event.type)}`}
+                          >
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              <span className="font-medium">{event.startTime.slice(0, 5)}</span>
+                            </div>
+                            <div className="font-medium truncate mt-0.5">{event.title}</div>
+                          </div>
+                        ))}
+                        
+                        {/* Indicator voor meer evenementen */}
+                        {dayData.events.length > 3 && (
+                          <div className="text-xs bg-gray-100 text-gray-700 rounded-md p-1 text-center font-medium shadow-sm">
+                            +{dayData.events.length - 3} meer
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : view === 'week' ? (

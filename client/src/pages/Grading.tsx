@@ -626,7 +626,7 @@ export default function Grading() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
@@ -638,20 +638,22 @@ export default function Grading() {
             Beheer cijfers, beoordelingen en leerlingprestaties
           </p>
         </div>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" className="flex items-center">
-            <Download className="mr-2 h-4 w-4" />
-            Cijfers Exporteren
-          </Button>
-          <Button 
-            className="flex items-center"
-            onClick={handleOpenAddAssessment}
-            disabled={!selectedCourse}
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Nieuwe Beoordeling
-          </Button>
-        </div>
+      </div>
+      
+      {/* Acties onder de streep */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+        <Button variant="outline" className="flex items-center w-full md:w-auto">
+          <Download className="mr-2 h-4 w-4" />
+          Cijfers Exporteren
+        </Button>
+        <Button 
+          className="flex items-center w-full md:w-auto bg-primary"
+          onClick={handleOpenAddAssessment}
+          disabled={!selectedCourse}
+        >
+          <PlusCircle className="mr-2 h-4 w-4" />
+          Nieuwe Beoordeling
+        </Button>
       </div>
 
       {/* Tabs */}

@@ -447,7 +447,7 @@ export default function Attendance() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
@@ -459,11 +459,15 @@ export default function Attendance() {
             Registreer en beheer aanwezigheid van studenten en docenten
           </p>
         </div>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)}>
+      </div>
+      
+      {/* Navigatieknoppen onder de streep */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+        <div className="flex items-center space-x-3 w-full md:w-auto">
+          <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)} className="w-full md:w-auto">
             <ArrowLeft className="h-4 w-4 mr-1" /> Vorige dag
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleDateChange(1)}>
+          <Button variant="outline" size="sm" onClick={() => handleDateChange(1)} className="w-full md:w-auto">
             Volgende dag <ArrowRight className="h-4 w-4 ml-1" />
           </Button>
         </div>

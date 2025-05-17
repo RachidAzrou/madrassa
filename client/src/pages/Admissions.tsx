@@ -718,24 +718,24 @@ export default function Admissions() {
           {currentApplicant && (
             <ScrollArea className="flex-1 px-1">
               <Tabs value={String(currentTabIndex)} onValueChange={(value) => setCurrentTabIndex(Number(value))}>
-                <TabsList className="mb-4">
-                  <TabsTrigger value="0" className="flex items-center">
+                <TabsList className="mb-4 p-1 bg-blue-900/10">
+                  <TabsTrigger value="0" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <User className="w-4 h-4 mr-2" />
                     Persoonlijk
                   </TabsTrigger>
-                  <TabsTrigger value="1" className="flex items-center">
+                  <TabsTrigger value="1" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <Mail className="w-4 h-4 mr-2" />
                     Contact
                   </TabsTrigger>
-                  <TabsTrigger value="2" className="flex items-center">
+                  <TabsTrigger value="2" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <BookOpen className="w-4 h-4 mr-2" />
                     Programma
                   </TabsTrigger>
-                  <TabsTrigger value="3" className="flex items-center">
+                  <TabsTrigger value="3" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <Clipboard className="w-4 h-4 mr-2" />
                     Motivatie
                   </TabsTrigger>
-                  <TabsTrigger value="4" className="flex items-center">
+                  <TabsTrigger value="4" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <Info className="w-4 h-4 mr-2" />
                     Status
                   </TabsTrigger>
@@ -845,24 +845,24 @@ export default function Admissions() {
           <form onSubmit={handleSubmitApplication} className="flex-1 flex flex-col">
             <ScrollArea className="flex-1 px-1">
               <Tabs value={String(currentTabIndex)} onValueChange={(value) => setCurrentTabIndex(Number(value))}>
-                <TabsList className="mb-4">
-                  <TabsTrigger value="0" className="flex items-center">
+                <TabsList className="mb-4 p-1 bg-blue-900/10">
+                  <TabsTrigger value="0" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <User className="w-4 h-4 mr-2" />
                     Persoonlijk
                   </TabsTrigger>
-                  <TabsTrigger value="1" className="flex items-center">
+                  <TabsTrigger value="1" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <Mail className="w-4 h-4 mr-2" />
                     Contact
                   </TabsTrigger>
-                  <TabsTrigger value="2" className="flex items-center">
+                  <TabsTrigger value="2" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <BookOpen className="w-4 h-4 mr-2" />
                     Programma
                   </TabsTrigger>
-                  <TabsTrigger value="3" className="flex items-center">
+                  <TabsTrigger value="3" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <Clipboard className="w-4 h-4 mr-2" />
                     Motivatie
                   </TabsTrigger>
-                  <TabsTrigger value="4" className="flex items-center">
+                  <TabsTrigger value="4" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <Info className="w-4 h-4 mr-2" />
                     Status
                   </TabsTrigger>
@@ -1068,24 +1068,24 @@ export default function Admissions() {
           <form onSubmit={handleUpdateApplication} className="flex-1 flex flex-col">
             <ScrollArea className="flex-1 px-1">
               <Tabs value={String(currentTabIndex)} onValueChange={(value) => setCurrentTabIndex(Number(value))}>
-                <TabsList className="mb-4">
-                  <TabsTrigger value="0" className="flex items-center">
+                <TabsList className="mb-4 p-1 bg-blue-900/10">
+                  <TabsTrigger value="0" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <User className="w-4 h-4 mr-2" />
                     Persoonlijk
                   </TabsTrigger>
-                  <TabsTrigger value="1" className="flex items-center">
+                  <TabsTrigger value="1" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <Mail className="w-4 h-4 mr-2" />
                     Contact
                   </TabsTrigger>
-                  <TabsTrigger value="2" className="flex items-center">
+                  <TabsTrigger value="2" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <BookOpen className="w-4 h-4 mr-2" />
                     Programma
                   </TabsTrigger>
-                  <TabsTrigger value="3" className="flex items-center">
+                  <TabsTrigger value="3" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <Clipboard className="w-4 h-4 mr-2" />
                     Motivatie
                   </TabsTrigger>
-                  <TabsTrigger value="4" className="flex items-center">
+                  <TabsTrigger value="4" className="flex items-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <Info className="w-4 h-4 mr-2" />
                     Status
                   </TabsTrigger>

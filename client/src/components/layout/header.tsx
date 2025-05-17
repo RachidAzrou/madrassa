@@ -13,8 +13,8 @@ const Header = ({ onMenuClick, title }: HeaderProps) => {
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-gray-200 bg-white">
-      <div className="px-4 sm:px-6 flex h-16 items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="px-2 sm:px-4 flex h-[68px] items-center justify-between">
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"

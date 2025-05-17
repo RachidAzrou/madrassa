@@ -75,7 +75,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <div
         className={`flex flex-col min-h-screen transition-all duration-300 ${
           sidebarOpen && !isMobile ? "md:ml-64" : ""
-        }`}
+        } border-l border-gray-200`}
       >
         <Header onMenuClick={toggleSidebar} title={pageTitle} />
         <main className="flex-1 p-4 sm:p-6 overflow-x-hidden">

@@ -122,10 +122,59 @@ const MyAccount = () => {
   const [currentUser, setCurrentUser] = useState(adminUser); // of teacherUser
   const isAdmin = currentUser.role === "Administrator";
   const isTeacher = currentUser.role === "Docent";
+  const [isSaving, setIsSaving] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showSavedMessage, setShowSavedMessage] = useState(false);
+  const [showPasswordChangedMessage, setShowPasswordChangedMessage] = useState(false);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(currentUser.twoFactorEnabled);
+  const [darkMode, setDarkMode] = useState(currentUser.darkMode);
+  const [selectedDefaultPage, setSelectedDefaultPage] = useState(currentUser.defaultPage);
+  const [notificationSettings, setNotificationSettings] = useState({
+    emailNotifications: isTeacher 
+      ? {
+          messages: teacherUser.notifyMessages,
+          scheduleChanges: teacherUser.notifyScheduleChanges,
+          grades: teacherUser.notifyGrades,
+          attendance: teacherUser.notifyAttendance
+        }
+      : {
+          newUsers: adminUser.notifyNewUsers,
+          systemUpdates: adminUser.notifySystemUpdates,
+          securityAlerts: adminUser.notifySecurityAlerts
+        },
+    pushNotifications: true,
+    desktopNotifications: true
+  });
 
   // Toggle voor demonstratie (alleen voor deze demo)
   const toggleUserRole = () => {
-    setCurrentUser(currentUser.id === adminUser.id ? teacherUser : adminUser);
+    const newUser = currentUser.id === adminUser.id ? teacherUser : adminUser;
+    setCurrentUser(newUser);
+    setTwoFactorEnabled(newUser.twoFactorEnabled);
+    setDarkMode(newUser.darkMode);
+    setSelectedDefaultPage(newUser.defaultPage);
+    
+    // Update notificatie-instellingen op basis van de nieuwe gebruikersrol
+    if (newUser.role === "Docent") {
+      setNotificationSettings({
+        ...notificationSettings,
+        emailNotifications: {
+          messages: teacherUser.notifyMessages,
+          scheduleChanges: teacherUser.notifyScheduleChanges,
+          grades: teacherUser.notifyGrades,
+          attendance: teacherUser.notifyAttendance
+        }
+      });
+    } else {
+      setNotificationSettings({
+        ...notificationSettings,
+        emailNotifications: {
+          newUsers: adminUser.notifyNewUsers,
+          systemUpdates: adminUser.notifySystemUpdates,
+          securityAlerts: adminUser.notifySecurityAlerts
+        }
+      });
+    }
   };
   
   // Formulier voor profielgegevens
@@ -152,14 +201,149 @@ const MyAccount = () => {
     },
   });
 
-  const onProfileSubmit = (data: ProfileFormValues) => {
-    console.log("Profielgegevens bijgewerkt:", data);
-    // Hier zou je normaal een API-call doen om de gegevens op te slaan
+  // Uitloggen
+  const handleLogout = () => {
+    alert("Uitloggen gesimuleerd voor demonstratie");
+    // In een echte applicatie zou je hier de auth service gebruiken
+    // authService.logout().then(() => navigate('/login'));
   };
 
+  // Upload profielfoto
+  const handleProfilePhotoUpload = () => {
+    // Normaal zou dit een bestandskiezer openen
+    alert("Profielfoto uploaden gesimuleerd voor demonstratie");
+  };
+
+  // Profiel opslaan
+  const onProfileSubmit = (data: ProfileFormValues) => {
+    setIsSaving(true);
+    
+    // Simuleer een API call
+    setTimeout(() => {
+      console.log("Profielgegevens bijgewerkt:", data);
+      
+      // Update de gebruiker met de nieuwe gegevens
+      setCurrentUser({
+        ...currentUser,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone || "",
+      });
+      
+      setIsSaving(false);
+      setShowSavedMessage(true);
+      
+      // Verberg het bericht na 3 seconden
+      setTimeout(() => {
+        setShowSavedMessage(false);
+      }, 3000);
+    }, 800);
+  };
+
+  // Wachtwoord wijzigen
   const onPasswordSubmit = (data: PasswordFormValues) => {
-    console.log("Wachtwoord bijgewerkt:", data);
-    // Hier zou je normaal een API-call doen om het wachtwoord te wijzigen
+    setIsChangingPassword(true);
+    
+    // Simuleer een API call
+    setTimeout(() => {
+      console.log("Wachtwoord bijgewerkt:", data);
+      
+      setIsChangingPassword(false);
+      setShowPasswordChangedMessage(true);
+      
+      // Reset form
+      passwordForm.reset({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+      });
+      
+      // Verberg het bericht na 3 seconden
+      setTimeout(() => {
+        setShowPasswordChangedMessage(false);
+      }, 3000);
+    }, 800);
+  };
+
+  // Toggle tweefactorauthenticatie
+  const handleToggleTwoFactor = () => {
+    setTwoFactorEnabled(!twoFactorEnabled);
+  };
+
+  // Toggle donkere modus
+  const handleToggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  // Verander standaardpagina
+  const handleSelectDefaultPage = (page: string) => {
+    setSelectedDefaultPage(page);
+  };
+
+  // Update notificatie-instellingen
+  const handleToggleNotification = (type: string, subtype: string) => {
+    if (type === 'email') {
+      setNotificationSettings({
+        ...notificationSettings,
+        emailNotifications: {
+          ...notificationSettings.emailNotifications,
+          [subtype]: !notificationSettings.emailNotifications[subtype as keyof typeof notificationSettings.emailNotifications]
+        }
+      });
+    } else {
+      setNotificationSettings({
+        ...notificationSettings,
+        [type]: !notificationSettings[type as keyof typeof notificationSettings]
+      });
+    }
+  };
+
+  // Opslaan van voorkeuren
+  const savePreferences = () => {
+    setIsSaving(true);
+    
+    // Simuleer een API call
+    setTimeout(() => {
+      console.log("Voorkeuren opgeslagen:", {
+        darkMode,
+        defaultPage: selectedDefaultPage,
+        language: profileForm.getValues().language
+      });
+      
+      // Update de gebruiker met de nieuwe voorkeuren
+      setCurrentUser({
+        ...currentUser,
+        darkMode,
+        defaultPage: selectedDefaultPage
+      });
+      
+      setIsSaving(false);
+      setShowSavedMessage(true);
+      
+      // Verberg het bericht na 3 seconden
+      setTimeout(() => {
+        setShowSavedMessage(false);
+      }, 3000);
+    }, 800);
+  };
+
+  // Opslaan van notificatie-instellingen
+  const saveNotificationSettings = () => {
+    setIsSaving(true);
+    
+    // Simuleer een API call
+    setTimeout(() => {
+      console.log("Notificatie-instellingen opgeslagen:", notificationSettings);
+      
+      setIsSaving(false);
+      setShowSavedMessage(true);
+      
+      // Verberg het bericht na 3 seconden
+      setTimeout(() => {
+        setShowSavedMessage(false);
+      }, 3000);
+    }, 800);
   };
 
   return (
@@ -184,7 +368,12 @@ const MyAccount = () => {
                 {currentUser.firstName[0]}{currentUser.lastName[0]}
               </AvatarFallback>
             </Avatar>
-            <Button variant="outline" size="sm" className="absolute top-4 right-4 rounded-full p-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="absolute top-4 right-4 rounded-full p-2"
+              onClick={handleProfilePhotoUpload}
+            >
               <UploadCloud className="h-4 w-4" />
             </Button>
             <CardTitle>{currentUser.firstName} {currentUser.lastName}</CardTitle>
@@ -222,7 +411,7 @@ const MyAccount = () => {
               </>
             )}
             <div className="mt-4">
-              <Button variant="outline" size="sm" className="w-full">
+              <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
                 Afmelden
               </Button>
             </div>
@@ -360,8 +549,22 @@ const MyAccount = () => {
                       </>
                     )}
 
-                    <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90">
-                      Wijzigingen opslaan
+                    {showSavedMessage && (
+                      <p className="text-sm text-green-600 mb-2">Profielgegevens succesvol opgeslagen!</p>
+                    )}
+                    <Button 
+                      type="submit" 
+                      className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                      disabled={isSaving}
+                    >
+                      {isSaving ? (
+                        <>
+                          <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                          Opslaan...
+                        </>
+                      ) : (
+                        "Wijzigingen opslaan"
+                      )}
                     </Button>
                   </form>
                 </Form>
@@ -416,8 +619,22 @@ const MyAccount = () => {
                           )}
                         />
 
-                        <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90">
-                          Wachtwoord wijzigen
+                        {showPasswordChangedMessage && (
+                          <p className="text-sm text-green-600 mb-2">Wachtwoord succesvol gewijzigd!</p>
+                        )}
+                        <Button 
+                          type="submit" 
+                          className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                          disabled={isChangingPassword}
+                        >
+                          {isChangingPassword ? (
+                            <>
+                              <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                              Wijzigen...
+                            </>
+                          ) : (
+                            "Wachtwoord wijzigen"
+                          )}
                         </Button>
                       </form>
                     </Form>
@@ -433,8 +650,12 @@ const MyAccount = () => {
                         <p className="text-sm text-gray-500">Verhoog de beveiliging van uw account door tweestapsverificatie in te schakelen</p>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Switch id="twofa" checked={currentUser.twoFactorEnabled} />
-                        <Label htmlFor="twofa">{currentUser.twoFactorEnabled ? 'Aan' : 'Uit'}</Label>
+                        <Switch 
+                          id="twofa" 
+                          checked={twoFactorEnabled} 
+                          onCheckedChange={handleToggleTwoFactor}
+                        />
+                        <Label htmlFor="twofa">{twoFactorEnabled ? 'Aan' : 'Uit'}</Label>
                       </div>
                     </div>
 

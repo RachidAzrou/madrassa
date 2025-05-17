@@ -63,13 +63,13 @@ const Header = ({ onMenuClick }: HeaderProps) => {
         variant="ghost"
         size="icon"
         onClick={onMenuClick}
-        className="md:hidden bg-white/50 hover:bg-white/80 text-gray-700"
+        className="md:hidden bg-blue-50 hover:bg-blue-100 text-blue-800 shadow-sm"
       >
         <Menu className="h-5 w-5" />
       </Button>
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size="icon" className="bg-white/50 hover:bg-white/80 text-gray-700 relative">
+          <Button variant="ghost" size="icon" className="bg-blue-50 hover:bg-blue-100 text-blue-800 relative shadow-sm">
             <Bell className="h-5 w-5" />
             {unreadCount > 0 && (
               <Badge 
@@ -120,7 +120,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
         </PopoverContent>
       </Popover>
       
-      <Button variant="ghost" size="icon" className="bg-white/50 hover:bg-white/80 text-gray-700" asChild>
+      <Button variant="ghost" size="icon" className="bg-blue-50 hover:bg-blue-100 text-blue-800 shadow-sm" asChild>
         <Link href="/settings">
           <Settings className="h-5 w-5" />
         </Link>

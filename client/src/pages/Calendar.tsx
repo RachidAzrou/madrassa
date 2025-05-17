@@ -422,9 +422,9 @@ export default function Calendar() {
           </div>
         </div>
       ) : view === 'week' ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-lg shadow-md border border-sky-200 overflow-hidden">
           {/* Weekdagen header */}
-          <div className="grid grid-cols-7 border-b border-gray-200">
+          <div className="grid grid-cols-7 border-b border-sky-200">
             {['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'].map((day, index) => {
               // Bereken datum voor elke dag van de huidige week
               const currentWeekDay = new Date(currentDate);
@@ -432,10 +432,18 @@ export default function Calendar() {
               const diff = currentWeekDay.getDay() - index;
               firstDayOfWeek.setDate(currentWeekDay.getDate() - diff);
               
+              // Check of dag vandaag is
+              const isToday = firstDayOfWeek.toDateString() === new Date().toDateString();
+              
               return (
-                <div key={day} className="p-2 text-center border-b border-gray-200 bg-gray-50">
-                  <div className="text-sm font-medium text-gray-700">{day}</div>
-                  <div className="text-xs text-gray-500">
+                <div 
+                  key={day} 
+                  className={`p-3 text-center border-b ${isToday 
+                    ? 'bg-sky-50 border-sky-300' 
+                    : 'bg-gradient-to-b from-gray-50 to-gray-100 border-gray-200'}`}
+                >
+                  <div className={`text-sm font-semibold ${isToday ? 'text-sky-700' : 'text-gray-800'}`}>{day}</div>
+                  <div className={`text-xs ${isToday ? 'text-sky-600' : 'text-gray-500'}`}>
                     {formatDate(firstDayOfWeek)}
                   </div>
                 </div>
@@ -444,13 +452,16 @@ export default function Calendar() {
           </div>
           
           {/* Week view tijdslots */}
-          <div className="grid grid-cols-7 divide-x divide-gray-200">
+          <div className="grid grid-cols-7 divide-x divide-sky-100">
             {Array.from({ length: 7 }).map((_, dayIndex) => {
               // Bereken datum voor elke dag
               const currentWeekDay = new Date(currentDate);
               const targetDay = new Date(currentWeekDay);
               const diff = currentWeekDay.getDay() - dayIndex;
               targetDay.setDate(currentWeekDay.getDate() - diff);
+              
+              // Check of dag vandaag is
+              const isToday = targetDay.toDateString() === new Date().toDateString();
               
               // Filter evenementen voor deze dag
               const dayEvents = (events || []).filter(event => {
@@ -460,17 +471,19 @@ export default function Calendar() {
               
               // Genereer tijdslots (8:00 - 20:00)
               return (
-                <div key={dayIndex} className="min-h-[600px] relative">
+                <div key={dayIndex} className={`min-h-[650px] relative ${isToday ? 'bg-sky-50/30' : ''}`}>
                   {Array.from({ length: 13 }).map((_, hourIndex) => {
                     const hour = hourIndex + 8; // Start vanaf 8:00
                     return (
                       <div 
                         key={hourIndex} 
-                        className="h-12 border-b border-gray-200 relative px-1"
+                        className="h-12 border-b border-sky-100 relative px-1"
                       >
-                        <div className="absolute left-0 -translate-y-1/2 text-xs text-gray-400 w-8 pl-1">
-                          {hour}:00
-                        </div>
+                        {dayIndex === 0 && (
+                          <div className="absolute left-1 -translate-y-1/2 text-xs text-gray-400 w-8">
+                            {hour}:00
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -484,18 +497,24 @@ export default function Calendar() {
                     // Bereken hoogte gebaseerd op duur
                     const [endHours, endMinutes] = event.endTime.split(':').map(Number);
                     const duration = (endHours - hours) + (endMinutes - minutes) / 60;
-                    const height = duration * 48;
+                    const height = Math.max(20, duration * 48); // Minimale hoogte
                     
                     return (
                       <div 
                         key={event.id}
-                        className={`absolute rounded px-1 py-0.5 text-xs w-[95%] overflow-hidden shadow-sm ${getEventColor(event.type)}`}
+                        className={`absolute rounded-md px-2 py-1 m-1 text-xs w-[90%] overflow-hidden shadow-md ${getEventColor(event.type)} hover:opacity-90 transition-opacity`}
                         style={{ top: `${top}px`, height: `${height}px` }}
                       >
                         <div className="font-medium truncate">{event.title}</div>
                         <div className="text-xs truncate">
                           {event.startTime} - {event.endTime}
                         </div>
+                        {event.location && (
+                          <div className="text-xs truncate mt-1">
+                            <MapPin className="h-3 w-3 inline mr-1" />
+                            {event.location}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -505,10 +524,10 @@ export default function Calendar() {
           </div>
         </div>
       ) : view === 'day' ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-lg shadow-md border border-sky-200 overflow-hidden">
           {/* Dag header */}
-          <div className="p-3 text-center border-b border-gray-200 bg-gray-50">
-            <div className="text-base font-medium text-gray-800">
+          <div className="p-4 text-center border-b border-sky-200 bg-gradient-to-r from-sky-50 to-sky-100/50">
+            <div className="text-base font-medium text-sky-800">
               {formatDayDate(currentDate)}
             </div>
           </div>
@@ -516,12 +535,12 @@ export default function Calendar() {
           {/* Dag tijdslots */}
           <div className="min-h-[700px] relative p-4">
             {/* Tijdsaanduidingen */}
-            <div className="absolute top-0 left-0 w-12 bottom-0 border-r border-gray-200">
+            <div className="absolute top-0 left-0 w-16 bottom-0 border-r border-sky-100">
               {Array.from({ length: 13 }).map((_, index) => {
                 const hour = index + 8; // Start vanaf 8:00
                 return (
                   <div key={index} className="h-14 relative">
-                    <div className="absolute right-2 top-0 -translate-y-1/2 text-xs text-gray-500">
+                    <div className="absolute right-2 top-0 -translate-y-1/2 text-xs font-medium text-gray-600">
                       {hour}:00
                     </div>
                   </div>
@@ -530,10 +549,17 @@ export default function Calendar() {
             </div>
             
             {/* Horizontale lijnen voor de uren */}
-            <div className="ml-12 relative">
-              {Array.from({ length: 13 }).map((_, index) => (
-                <div key={index} className="h-14 border-b border-gray-100"></div>
-              ))}
+            <div className="ml-16 relative">
+              {Array.from({ length: 13 }).map((_, index) => {
+                // Even uren donkerder maken
+                const isEvenHour = (index + 8) % 2 === 0;
+                return (
+                  <div 
+                    key={index} 
+                    className={`h-14 border-b ${isEvenHour ? 'border-sky-100' : 'border-sky-50'}`}
+                  />
+                );
+              })}
               
               {/* Evenementen van deze dag */}
               {(events || [])
@@ -549,19 +575,25 @@ export default function Calendar() {
                   // Bereken hoogte gebaseerd op duur
                   const [endHours, endMinutes] = event.endTime.split(':').map(Number);
                   const duration = (endHours - hours) + (endMinutes - minutes) / 60;
-                  const height = duration * 56;
+                  const height = Math.max(30, duration * 56); // Minimale hoogte
                   
                   return (
                     <div 
                       key={event.id}
-                      className={`absolute left-14 right-4 rounded px-3 py-2 ${getEventColor(event.type)}`}
+                      className={`absolute left-16 right-4 rounded-md px-4 py-2.5 shadow-md hover:shadow-lg transition-shadow ${getEventColor(event.type)}`}
                       style={{ top: `${top}px`, height: `${height}px` }}
                     >
-                      <div className="font-medium">{event.title}</div>
-                      <div className="text-xs">
+                      <div className="font-medium text-sm">{event.title}</div>
+                      <div className="text-xs font-medium mt-1">
+                        <Clock className="h-3 w-3 inline mr-1" /> 
                         {event.startTime} - {event.endTime}
-                        {event.location && ` • ${event.location}`}
                       </div>
+                      {event.location && (
+                        <div className="text-xs mt-1">
+                          <MapPin className="h-3 w-3 inline mr-1" />
+                          {event.location}
+                        </div>
+                      )}
                     </div>
                   );
                 })

@@ -139,7 +139,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
 
           {/* Instellingen icoon met link naar Instellingen pagina */}
           <Button variant="ghost" size="icon" className="text-gray-500" asChild>
-            <Link href="/instellingen">
+            <Link href="/settings">
               <Settings className="h-5 w-5" />
               <span className="sr-only">Instellingen</span>
             </Link>

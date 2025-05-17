@@ -1054,7 +1054,7 @@ export default function StudentGroups() {
                     <div className="border rounded-md mt-4">
                       <div className="p-3 bg-gray-50 border-b">
                         <h4 className="font-medium">Curriculum opbouw</h4>
-                        <p className="text-sm text-gray-500">Plan de vakken en het aantal uren per week.</p>
+                        <p className="text-sm text-gray-500">Plan het curriculum en het aantal uren per week.</p>
                       </div>
                       <div className="p-3">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

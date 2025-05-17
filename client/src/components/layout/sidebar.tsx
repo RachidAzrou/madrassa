@@ -66,7 +66,7 @@ const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps)
       <div
         onClick={onClick}
         className={cn(
-          "flex items-center justify-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer",
+          "flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer",
           isActive
             ? "bg-primary text-white font-medium"
             : "text-gray-600 hover:text-primary hover:bg-gray-100"
@@ -309,13 +309,17 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                 onClick={handleLinkClick}
               />
               <div className="my-4 border-t border-gray-200"></div>
-              <SidebarLink
-                href="/api/logout"
-                icon={<LogOut className="h-5 w-5" />}
-                label="Afmelden"
-                isActive={false}
-                onClick={handleLinkClick}
-              />
+              <Link href="/api/logout">
+                <div
+                  onClick={handleLinkClick}
+                  className="flex items-center justify-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer text-gray-600 hover:text-primary hover:bg-gray-100"
+                >
+                  <div className="flex-shrink-0">
+                    <LogOut className="h-5 w-5" />
+                  </div>
+                  <span className="truncate whitespace-nowrap">Afmelden</span>
+                </div>
+              </Link>
             </div>
           </div>
         </div>

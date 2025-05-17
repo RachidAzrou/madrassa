@@ -303,9 +303,9 @@ export default function Scheduling() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="instructor-schedule">Docentenrooster</TabsTrigger>
-          <TabsTrigger value="room-allocation">Lokalenverdeling</TabsTrigger>
+        <TabsList className="p-1 bg-blue-900/10">
+          <TabsTrigger value="instructor-schedule" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Docentenrooster</TabsTrigger>
+          <TabsTrigger value="room-allocation" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lokalenverdeling</TabsTrigger>
         </TabsList>
         
         <TabsContent value="room-allocation">
@@ -469,12 +469,12 @@ export default function Scheduling() {
               onValueChange={setDialogActiveTab} 
               className="w-full"
             >
-              <TabsList className="grid grid-cols-2 mb-4">
-                <TabsTrigger value="instructor-schedule" className="flex items-center justify-center">
+              <TabsList className="grid grid-cols-2 mb-4 p-1 bg-blue-900/10">
+                <TabsTrigger value="instructor-schedule" className="flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                   <GraduationCap className="mr-2 h-4 w-4 text-primary" />
                   Docentenrooster
                 </TabsTrigger>
-                <TabsTrigger value="room-allocation" className="flex items-center justify-center">
+                <TabsTrigger value="room-allocation" className="flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                   <Building className="mr-2 h-4 w-4 text-primary" />
                   Lokalenverdeling
                 </TabsTrigger>

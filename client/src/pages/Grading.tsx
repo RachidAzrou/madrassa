@@ -40,7 +40,7 @@ import { Progress } from "@/components/ui/progress";
 // Assessment schema
 const assessmentSchema = z.object({
   courseId: z.coerce.number({
-    required_error: "Selecteer een cursus",
+    required_error: "Selecteer een curriculum",
   }),
   name: z.string().min(2, {
     message: "Naam moet minimaal 2 tekens bevatten",
@@ -668,11 +668,11 @@ export default function Grading() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <Select value={selectedCourse} onValueChange={handleCourseChange}>
                   <SelectTrigger className="w-full sm:w-[300px]">
-                    <SelectValue placeholder="Selecteer een cursus" />
+                    <SelectValue placeholder="Selecteer een curriculum" />
                   </SelectTrigger>
                   <SelectContent>
                     {courses.length === 0 ? (
-                      <SelectItem value="loading" disabled>Cursussen laden...</SelectItem>
+                      <SelectItem value="loading" disabled>Curriculum laden...</SelectItem>
                     ) : (
                       courses.map((course: any) => (
                         <SelectItem key={course.id} value={course.id.toString()}>
@@ -1207,7 +1207,7 @@ export default function Grading() {
 
           {selectedCourse && (
             <div className="bg-white border rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Cursusoverzicht</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Curriculumoverzicht</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <Card>

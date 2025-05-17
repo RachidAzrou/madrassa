@@ -642,9 +642,10 @@ export default function Students() {
         </div>
       )}
 
-      {/* Studenten tabel */}
+      {/* Studenten tabel - responsieve weergave */}
       <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop weergave */}
+        <div className="hidden md:block overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>

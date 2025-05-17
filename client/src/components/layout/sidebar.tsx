@@ -151,7 +151,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
             <div 
               className="bg-blue-50 rounded-md p-3 mb-2 cursor-pointer hover:bg-blue-100 transition-colors"
               onClick={() => {
-                window.location.href = "/my-account";
+                window.location.href = "/mijn-account";
                 if (onClose) onClose();
               }}
             >

@@ -314,12 +314,13 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
       </nav>
 
       {/* Afmelden link */}
-      <div className="border-t border-gray-200 p-4">
-        <Link href="/api/logout" className="flex items-center px-3 py-2 text-[#1e3a8a] hover:bg-blue-50 rounded-md">
-          <LogOut className="h-5 w-5 mr-3 text-[#1e3a8a]" />
-          <span className="font-medium">Afmelden</span>
-        </Link>
-      </div>
+      <Link 
+        href="/api/logout" 
+        className="flex items-center px-3 py-2 text-[#1e3a8a] hover:bg-blue-50 rounded-md border-t border-gray-200 mt-4 mx-4 pt-4"
+      >
+        <LogOut className="h-5 w-5 mr-3 text-[#1e3a8a]" />
+        <span className="font-medium">Afmelden</span>
+      </Link>
     </aside>
   );
 };

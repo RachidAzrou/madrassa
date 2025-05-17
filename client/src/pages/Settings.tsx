@@ -31,6 +31,7 @@ import {
   Building2, 
   UploadCloud
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const Settings = () => {
   const [isSaving, setIsSaving] = useState(false);
@@ -38,7 +39,6 @@ const Settings = () => {
   // Demo gebruiker voor rolgebaseerde weergave
   const [userRole, setUserRole] = useState("admin"); // 'admin' of 'teacher'
   const isAdmin = userRole === "admin";
-  const isTeacher = userRole === "teacher";
   
   // Systeeminstellingen
   const [language, setLanguage] = useState("nl");
@@ -443,45 +443,41 @@ const Settings = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="schoolName">Naam van de school</Label>
-                    <input
+                    <Input
                       type="text"
                       id="schoolName"
                       value={schoolSettings.schoolName}
                       onChange={(e) => setSchoolSettings({...schoolSettings, schoolName: e.target.value})}
-                      className="w-full p-2 rounded-md border border-gray-300"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="contactEmail">Contact e-mail</Label>
-                    <input
+                    <Input
                       type="email"
                       id="contactEmail"
                       value={schoolSettings.contactEmail}
                       onChange={(e) => setSchoolSettings({...schoolSettings, contactEmail: e.target.value})}
-                      className="w-full p-2 rounded-md border border-gray-300"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="phone">Telefoonnummer</Label>
-                    <input
+                    <Input
                       type="tel"
                       id="phone"
                       value={schoolSettings.phone}
                       onChange={(e) => setSchoolSettings({...schoolSettings, phone: e.target.value})}
-                      className="w-full p-2 rounded-md border border-gray-300"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="address">Adres</Label>
-                    <input
+                    <Input
                       type="text"
                       id="address"
                       value={schoolSettings.address}
                       onChange={(e) => setSchoolSettings({...schoolSettings, address: e.target.value})}
-                      className="w-full p-2 rounded-md border border-gray-300"
                     />
                   </div>
                 </div>

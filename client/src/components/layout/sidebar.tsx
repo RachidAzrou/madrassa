@@ -84,9 +84,10 @@ const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps)
 type SidebarProps = {
   isMobile?: boolean;
   onClose?: () => void;
+  className?: string;
 };
 
-const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
+const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) => {
   const [location] = useLocation();
   const [expanded, setExpanded] = useState(!isMobile);
 
@@ -116,8 +117,8 @@ const Sidebar = ({ isMobile = false, onClose }: SidebarProps) => {
       className={cn(
         "fixed inset-y-0 left-0 z-40 bg-white border-r border-gray-200",
         "w-64 transition-transform duration-300 ease-in-out",
-        isMobile && !expanded && "-translate-x-full",
-        "flex flex-col"
+        "flex flex-col",
+        className
       )}
     >
       {/* Logo and header */}

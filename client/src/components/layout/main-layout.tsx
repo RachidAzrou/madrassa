@@ -63,13 +63,12 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         />
       )}
 
-      {/* Sidebar component */}
-      {sidebarOpen && (
-        <Sidebar
-          isMobile={isMobile}
-          onClose={() => setSidebarOpen(false)}
-        />
-      )}
+      {/* Sidebar component - altijd renderen maar met conditionele styling */}
+      <Sidebar
+        isMobile={isMobile}
+        onClose={() => setSidebarOpen(false)}
+        className={`transform transition-transform duration-300 ${!sidebarOpen ? '-translate-x-full' : 'translate-x-0'}`}
+      />
 
       {/* Main content area */}
       <div

@@ -13,6 +13,30 @@ import {
   BookText,
   LayoutDashboard
 } from 'lucide-react';
+
+// Aangepast ChalkBoard icoon
+const ChalkBoard = (props: any) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg" 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    {...props}
+  >
+    <rect x="2" y="2" width="20" height="14" rx="2" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <line x1="6" y1="12" x2="6" y2="20" />
+    <line x1="18" y1="12" x2="18" y2="20" />
+    <ellipse cx="12" cy="18" rx="3" ry="2" />
+    <path d="M10 4h4" />
+    <path d="M8 8h8" />
+  </svg>
+);
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -221,7 +245,7 @@ export default function Dashboard() {
         
         <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10">
-            <School className="h-20 w-20 text-sky-500" />
+            <ChalkBoard className="h-20 w-20 text-sky-500" />
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Klassen</h3>
           <p className="text-2xl font-bold text-sky-700">{stats.studentGroups}</p>
@@ -254,7 +278,7 @@ export default function Dashboard() {
         <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-7">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <School className="h-5 w-5 text-[#1e3a8a]" />
+              <ChalkBoard className="h-5 w-5 text-[#1e3a8a]" />
               <h3 className="text-lg font-semibold text-gray-800">Studenten per klas</h3>
             </div>
             <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>

@@ -382,10 +382,7 @@ export default function Admissions() {
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal Aanmeldingen</h3>
           <p className="text-2xl font-bold text-sky-700">{stats.totalApplications}</p>
-          <div className="flex justify-between mt-2 text-xs text-sky-600">
-            <span>Actief</span>
-            <span>Ingeschreven</span>
-          </div>
+
         </div>
         
         <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">

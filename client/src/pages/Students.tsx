@@ -234,9 +234,10 @@ export default function Students() {
       return;
     }
 
-    // Maak een kopie van de data om te versturen
+    // Maak een kopie van de data om te versturen, zonder studentId (wordt automatisch gegenereerd door server)
+    const { studentId, ...restData } = studentFormData;
     const dataToSubmit = {
-      ...studentFormData,
+      ...restData,
       programs: selectedPrograms.length > 0 ? selectedPrograms : 
         (studentFormData.programId ? [{ 
           programId: studentFormData.programId, 
@@ -965,14 +966,13 @@ export default function Students() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="studentId" className="text-sm font-medium text-gray-700">
-                        Studentnummer <span className="text-primary">*</span>
+                        StudentID <span className="text-muted-foreground text-xs">(wordt automatisch gegenereerd)</span>
                       </Label>
                       <Input
                         id="studentId"
-                        value={studentFormData.studentId}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, studentId: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Bijv. S12345"
+                        value="Wordt automatisch toegekend"
+                        disabled
+                        className="mt-1 bg-gray-100 text-gray-500"
                       />
                     </div>
                     

@@ -97,6 +97,12 @@ export default function Students() {
   const { data: studentGroupsData = {} } = useQuery({
     queryKey: ['/api/student-groups'],
   });
+  
+  // Ophalen van het volgende beschikbare studentID
+  const { data: nextStudentIdData } = useQuery({
+    queryKey: ['/api/next-student-id'],
+    enabled: isCreateDialogOpen, // Laad alleen als het dialoogvenster geopend is
+  });
 
   // Ophalen studenten
   const { data: studentsData = {}, isLoading } = useQuery({
@@ -970,9 +976,9 @@ export default function Students() {
                       </Label>
                       <Input
                         id="studentId"
-                        value="Wordt automatisch toegekend"
+                        value={nextStudentIdData?.nextStudentId || "Wordt geladen..."}
                         disabled
-                        className="mt-1 bg-gray-100 text-gray-500"
+                        className="mt-1 bg-gray-100 text-gray-500 font-medium"
                       />
                     </div>
                     

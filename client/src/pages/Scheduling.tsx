@@ -327,20 +327,25 @@ export default function Scheduling() {
             <Card>
               <CardHeader>
                 <CardTitle>Docentenrooster</CardTitle>
-                <div className="flex gap-2">
-                  <Select defaultValue="today">
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Filter op datum" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="today">Vandaag</SelectItem>
-                      <SelectItem value="week">Deze week</SelectItem>
-                      <SelectItem value="month">Deze maand</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline" size="icon">
-                    <Download className="h-4 w-4" />
-                  </Button>
+                <div className="flex flex-col gap-3">
+                  <Tabs defaultValue="today" className="w-full">
+                    <TabsList className="p-1 bg-blue-900/10">
+                      <TabsTrigger value="today" className="flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                        Vandaag
+                      </TabsTrigger>
+                      <TabsTrigger value="week" className="flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                        Deze week
+                      </TabsTrigger>
+                      <TabsTrigger value="month" className="flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                        Deze maand
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  <div className="flex justify-end">
+                    <Button variant="outline" size="icon">
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>

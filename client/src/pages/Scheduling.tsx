@@ -282,39 +282,34 @@ export default function Scheduling() {
         </Card>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
-        <div className="w-full">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <TabsList className="p-1 bg-blue-900/10">
-              <TabsTrigger value="instructor-schedule" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Docentenrooster</TabsTrigger>
-              <TabsTrigger value="room-allocation" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lokalenverdeling</TabsTrigger>
-            </TabsList>
-            
-            <div className="flex flex-col md:flex-row items-center gap-4">
-              <div className="relative w-full md:w-64 order-2 md:order-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Zoek planning..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  className="w-full pl-10"
-                />
-              </div>
-              <Button 
-                onClick={handleAddSchedule} 
-                variant="default"
-                size="default"
-                className="bg-primary hover:bg-primary/90 flex items-center w-full md:w-auto order-1 md:order-2"
-              >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                <span>Planning Toevoegen</span>
-              </Button>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+          <TabsList className="p-1 bg-blue-900/10">
+            <TabsTrigger value="instructor-schedule" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Docentenrooster</TabsTrigger>
+            <TabsTrigger value="room-allocation" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lokalenverdeling</TabsTrigger>
+          </TabsList>
+          
+          <div className="flex items-center gap-4">
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Zoek planning..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="pl-10 w-full"
+              />
             </div>
+            <Button 
+              onClick={handleAddSchedule} 
+              variant="default"
+              size="default"
+              className="bg-primary hover:bg-primary/90 flex items-center"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              <span>Planning Toevoegen</span>
+            </Button>
           </div>
         </div>
-      </div>
-      
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         
         <TabsContent value="room-allocation">
           <div className="grid grid-cols-1 gap-4">

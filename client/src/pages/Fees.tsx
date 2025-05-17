@@ -569,59 +569,56 @@ export default function Fees() {
         <TabsContent value="fee-records" className="space-y-6">
           {/* Statistieken */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="p-6 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Totaal Geïnd</p>
-                  <h3 className="text-2xl font-bold mt-1">
-                    {statsData?.stats?.totalCollected 
-                      ? formatCurrency(statsData.stats.totalCollected) 
-                      : "€0,00"}
-                  </h3>
-                </div>
-                <div className="bg-emerald-100 h-12 w-12 rounded-lg flex items-center justify-center">
-                  <Euro className="h-6 w-6 text-emerald-600" />
-                </div>
-              </CardContent>
-            </Card>
+            <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+              <div className="absolute right-0 top-0 opacity-10">
+                <Euro className="h-20 w-20 text-sky-500" />
+              </div>
+              <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal Geïnd</h3>
+              <p className="text-2xl font-bold text-sky-700">
+                {statsData?.stats?.totalCollected 
+                  ? formatCurrency(statsData.stats.totalCollected) 
+                  : "€0,00"}
+              </p>
+              <div className="flex justify-between mt-2 text-xs text-sky-600">
+                <span>Betalingen</span>
+                <span>Collegeperiode</span>
+              </div>
+            </div>
 
-            <Card>
-              <CardContent className="p-6 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Openstaand Bedrag</p>
-                  <h3 className="text-2xl font-bold mt-1 text-amber-600">
-                    {statsData?.stats?.pendingAmount 
-                      ? formatCurrency(statsData.stats.pendingAmount) 
-                      : "€0,00"}
-                  </h3>
-                </div>
-                <div className="bg-amber-100 h-12 w-12 rounded-lg flex items-center justify-center">
-                  <AlertCircle className="h-6 w-6 text-amber-600" />
-                </div>
-              </CardContent>
-            </Card>
+            <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+              <div className="absolute right-0 top-0 opacity-10">
+                <AlertCircle className="h-20 w-20 text-sky-500" />
+              </div>
+              <h3 className="text-sm font-medium text-gray-600 mb-1">Openstaand Bedrag</h3>
+              <p className="text-2xl font-bold text-sky-700">
+                {statsData?.stats?.pendingAmount 
+                  ? formatCurrency(statsData.stats.pendingAmount) 
+                  : "€0,00"}
+              </p>
+              <div className="flex justify-between mt-2 text-xs text-sky-600">
+                <span>Wachtend</span>
+                <span>Te ontvangen</span>
+              </div>
+            </div>
 
-            <Card>
-              <CardContent className="p-6 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Betalingsgraad</p>
-                  <div className="flex items-center mt-1">
-                    <h3 className="text-2xl font-bold">
-                      {statsData?.stats?.completionRate 
-                        ? `${statsData.stats.completionRate}%` 
-                        : "0%"}
-                    </h3>
-                    <Progress 
-                      className="h-2 ml-2 w-16" 
-                      value={statsData?.stats?.completionRate || 0} 
-                    />
-                  </div>
-                </div>
-                <div className="bg-blue-100 h-12 w-12 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="h-6 w-6 text-blue-600" />
-                </div>
-              </CardContent>
-            </Card>
+            <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+              <div className="absolute right-0 top-0 opacity-10">
+                <CheckCircle className="h-20 w-20 text-sky-500" />
+              </div>
+              <h3 className="text-sm font-medium text-gray-600 mb-1">Betalingsgraad</h3>
+              <p className="text-2xl font-bold text-sky-700">
+                {statsData?.stats?.completionRate 
+                  ? `${statsData.stats.completionRate}%` 
+                  : "0%"}
+              </p>
+              <div className="flex justify-between mt-2 text-xs text-sky-600">
+                <span>Voltooiing</span>
+                <Progress 
+                  className="h-2 w-16" 
+                  value={statsData?.stats?.completionRate || 0} 
+                />
+              </div>
+            </div>
           </div>
 
           {/* Tabel met betalingen */}

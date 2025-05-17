@@ -82,27 +82,29 @@ export default function Attendance() {
         </div>
       </div>
       
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-        <div className="w-full text-center md:text-left">
-          <h2 className="text-xl font-semibold text-gray-800">{formatDate(selectedDate)}</h2>
-          <p className="text-sm text-gray-500 mt-1">Selecteer een datum om aanwezigheid te registreren</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+          <div className="flex flex-col mb-4">
+            <h2 className="text-xl font-semibold text-gray-800">{formatDate(selectedDate)}</h2>
+            <p className="text-sm text-gray-500 mt-1">Selecteer een datum om aanwezigheid te registreren</p>
+          </div>
+          
+          <div className="flex space-x-3">
+            <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)}>
+              <ArrowLeft className="h-4 w-4 mr-1" /> Vorige dag
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => handleDateChange(1)}>
+              Volgende dag <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
         </div>
-      </div>
         
-      <div className="flex justify-center space-x-3 mb-6">
-        <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)}>
-          <ArrowLeft className="h-4 w-4 mr-1" /> Vorige dag
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => handleDateChange(1)}>
-          Volgende dag <ArrowRight className="h-4 w-4 ml-1" />
-        </Button>
-      </div>
-
-      {/* Selection and filters */}
-      <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 mb-6">
-        <div className="grid grid-cols-1 gap-4">
+        {/* Filters */}
+        <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Selecteer gegevens om te filteren</h3>
+          
           <Tabs defaultValue="vak" onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
-            <TabsList className="w-full max-w-md mb-4 bg-blue-900/10">
+            <TabsList className="w-full mb-4 bg-blue-900/10">
               <TabsTrigger value="vak">Vak</TabsTrigger>
               <TabsTrigger value="klas">Klas</TabsTrigger>
             </TabsList>

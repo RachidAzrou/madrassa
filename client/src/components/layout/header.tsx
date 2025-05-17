@@ -59,24 +59,8 @@ const Header = ({ onMenuClick }: HeaderProps) => {
 
   return (
     <header className="sticky top-0 z-30 w-full bg-white border-b border-gray-200">
-      <div className="flex justify-between items-center h-14">
-        <div className="flex-1 flex justify-start pl-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onMenuClick}
-            className="md:hidden"
-          >
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Menu</span>
-          </Button>
-        </div>
-        
-        <div className="flex-1 flex justify-center">
-          {/* Lege centrale ruimte */}
-        </div>
-        
-        <div className="flex-1 flex justify-end gap-1 pr-2">
+      <div className="flex justify-end items-center h-14">
+        <div className="flex items-center gap-1 pr-2">
           {/* Meldingen belletje met dropdown */}
           <Popover>
             <PopoverTrigger asChild>
@@ -131,14 +115,6 @@ const Header = ({ onMenuClick }: HeaderProps) => {
               </ScrollArea>
             </PopoverContent>
           </Popover>
-
-          {/* Profielsymbool met link naar Mijn Account pagina */}
-          <Button variant="ghost" size="icon" className="text-gray-500" asChild>
-            <Link href="/mijn-account">
-              <User className="h-5 w-5" />
-              <span className="sr-only">Mijn Account</span>
-            </Link>
-          </Button>
 
           {/* Instellingen icoon met link naar Instellingen pagina */}
           <Button variant="ghost" size="icon" className="text-gray-500" asChild>

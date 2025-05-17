@@ -374,19 +374,6 @@ export default function Admissions() {
         </div>
       </div>
       
-      {/* Actie knoppen onder de streep */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
-        <Button 
-          onClick={handleAddApplicant} 
-          variant="default" 
-          size="default" 
-          className="bg-primary hover:bg-primary/90 w-full md:w-auto"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          <span>Nieuwe Aanmelding</span>
-        </Button>
-      </div>
-
       {/* Dashboard Stats - met dezelfde stijl als in Dashboard.tsx */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
@@ -437,12 +424,27 @@ export default function Admissions() {
         </div>
       </div>
 
+      <div className="mb-4">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <TabsList className="p-1 bg-blue-900/10">
+            <TabsTrigger value="applications" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Aanmeldingen</TabsTrigger>
+            <TabsTrigger value="admission-programs" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Toelatingsprogramma's</TabsTrigger>
+            <TabsTrigger value="settings" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Instellingen</TabsTrigger>
+          </TabsList>
+          
+          <Button 
+            onClick={handleAddApplicant} 
+            variant="default" 
+            size="default" 
+            className="bg-primary hover:bg-primary/90 md:w-auto"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            <span>Nieuwe Aanmelding</span>
+          </Button>
+        </div>
+      </div>
+      
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="p-1 bg-blue-900/10">
-          <TabsTrigger value="applications" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Aanmeldingen</TabsTrigger>
-          <TabsTrigger value="admission-programs" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Toelatingsprogramma's</TabsTrigger>
-          <TabsTrigger value="settings" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Instellingen</TabsTrigger>
-        </TabsList>
         
         <TabsContent value="applications" className="space-y-4">
           {/* Filters */}

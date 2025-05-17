@@ -123,44 +123,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Haal alle bestaande studenten op
       const allStudents = await storage.getStudents();
       
-      // Als er geen studenten zijn, begin met 1
+      // Als er geen studenten zijn, begin met ST001
       if (!allStudents || allStudents.length === 0) {
-        return "1";
+        return "ST001";
       }
       
-      // Filter alle geldige numerieke IDs
-      const validIds = allStudents
+      // Filter alle geldige IDs die beginnen met ST gevolgd door nummers
+      const validNums = allStudents
         .map(student => student.studentId)
-        .filter(id => /^\d+$/.test(id))
-        .map(id => parseInt(id, 10))
-        .filter(id => !isNaN(id))
+        .filter(id => /^ST\d+$/.test(id))
+        .map(id => parseInt(id.substring(2), 10)) // Verwijder "ST" en converteren naar nummer
+        .filter(num => !isNaN(num))
         .sort((a, b) => a - b); // Sorteer op numerieke volgorde
       
-      // Als er geen geldige numerieke IDs zijn, begin met 1
-      if (validIds.length === 0) {
-        return "1";
+      // Als er geen geldige numerieke IDs zijn, begin met ST001
+      if (validNums.length === 0) {
+        return "ST001";
       }
 
       // Zoek naar "gaten" in de reeks
       // Begin te zoeken vanaf 1
-      let expectedId = 1;
+      let expectedNum = 1;
       
-      // Loop door de gesorteerde IDs om het eerste ontbrekende nummer te vinden
-      for (const id of validIds) {
-        if (id > expectedId) {
+      // Loop door de gesorteerde nummers om het eerste ontbrekende nummer te vinden
+      for (const num of validNums) {
+        if (num > expectedNum) {
           // We hebben een gat gevonden
-          return expectedId.toString();
+          return `ST${expectedNum.toString().padStart(3, '0')}`;
         }
         // Ga door naar het volgende verwachte nummer
-        expectedId = id + 1;
+        expectedNum = num + 1;
       }
       
       // Als er geen gaten zijn, gebruik dan het volgende nummer na het hoogste ID
-      return expectedId.toString();
+      return `ST${expectedNum.toString().padStart(3, '0')}`;
     } catch (error) {
       console.error("Fout bij genereren studentnummer:", error);
       // Fallback naar gewoon oplopend nummer als er een fout optreedt
-      return Math.floor(Math.random() * 1000 + 1).toString();
+      return `ST${Math.floor(Math.random() * 999 + 1).toString().padStart(3, '0')}`;
     }
   }
   

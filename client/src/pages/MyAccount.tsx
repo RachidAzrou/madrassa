@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { 
   Card, 
   CardContent, 
   CardDescription, 
   CardHeader, 
-  CardTitle 
+  CardTitle,
+  CardFooter
 } from "@/components/ui/card";
 import { 
   Avatar, 
@@ -23,7 +24,8 @@ import {
   FormField, 
   FormItem, 
   FormLabel, 
-  FormMessage 
+  FormMessage,
+  FormDescription 
 } from "@/components/ui/form";
 import { 
   Input 
@@ -36,10 +38,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { User, Lock, Bell, Shield, UserCircle, KeyRound, BellRing } from "lucide-react";
+import { 
+  User, Lock, Bell, Shield, UserCircle, KeyRound, BellRing, 
+  Settings, BookOpen, FileText, School, UploadCloud, Moon, 
+  Sun, Calendar, Home, History, Terminal, Languages
+} from "lucide-react";
 
 // Schema voor het formulier
 const profileFormSchema = z.object({
@@ -47,7 +56,10 @@ const profileFormSchema = z.object({
   lastName: z.string().min(1, { message: "Achternaam is verplicht" }),
   email: z.string().email({ message: "Ongeldig e-mailadres" }),
   phone: z.string().optional(),
-  role: z.string().min(1, { message: "Rol is verplicht" }),
+  profileImageUrl: z.string().optional(),
+  language: z.string().optional(),
+  darkMode: z.boolean().optional(),
+  defaultPage: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -64,26 +76,69 @@ const passwordFormSchema = z.object({
 
 type PasswordFormValues = z.infer<typeof passwordFormSchema>;
 
-// Demo gebruiker
-const demoUser = {
+// Demo gebruiker voor Administrator
+const adminUser = {
+  id: 1,
   firstName: "Ahmed",
   lastName: "Hassan",
   email: "ahmed.hassan@mymadrassa.nl",
   phone: "+31 6 12345678",
   role: "Administrator",
-  avatar: "" // URL voor avatar indien beschikbaar
+  avatar: "", // URL voor avatar indien beschikbaar
+  language: "Nederlands",
+  darkMode: false,
+  defaultPage: "Dashboard",
+  twoFactorEnabled: false,
+  lastLogin: "10 mei 2025 14:30",
+  notifyNewUsers: true,
+  notifySystemUpdates: true,
+  notifySecurityAlerts: true
+};
+
+// Demo gebruiker voor Docent
+const teacherUser = {
+  id: 2,
+  firstName: "Fatima",
+  lastName: "El Amrani",
+  email: "fatima.elamrani@mymadrassa.nl",
+  phone: "+31 6 87654321",
+  role: "Docent",
+  avatar: "", // URL voor avatar indien beschikbaar
+  subjects: ["Arabisch", "Islamitische Studies"],
+  classes: ["Groep 3A", "Groep 4B", "Groep 5A"],
+  language: "Nederlands",
+  darkMode: true,
+  defaultPage: "Rooster",
+  twoFactorEnabled: true,
+  lastLogin: "11 mei 2025 09:15",
+  notifyMessages: true,
+  notifyScheduleChanges: true,
+  notifyGrades: false,
+  notifyAttendance: true
 };
 
 const MyAccount = () => {
+  // Demonstratie: in een echte applicatie zou je deze informatie uit een API of auth context halen
+  const [currentUser, setCurrentUser] = useState(adminUser); // of teacherUser
+  const isAdmin = currentUser.role === "Administrator";
+  const isTeacher = currentUser.role === "Docent";
+
+  // Toggle voor demonstratie (alleen voor deze demo)
+  const toggleUserRole = () => {
+    setCurrentUser(currentUser.id === adminUser.id ? teacherUser : adminUser);
+  };
+  
   // Formulier voor profielgegevens
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      firstName: demoUser.firstName,
-      lastName: demoUser.lastName,
-      email: demoUser.email,
-      phone: demoUser.phone,
-      role: demoUser.role,
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName,
+      email: currentUser.email,
+      phone: currentUser.phone,
+      language: currentUser.language,
+      darkMode: currentUser.darkMode,
+      defaultPage: currentUser.defaultPage,
     },
   });
 
@@ -113,6 +168,10 @@ const MyAccount = () => {
         <h1 className="text-2xl font-bold tracking-tight flex items-center">
           <User className="mr-2 h-6 w-6 text-[#1e3a8a]" /> Mijn Account
         </h1>
+        {/* Demo-schakelaar tussen admin/docent - alleen voor demonstratie */}
+        <Button variant="outline" size="sm" onClick={toggleUserRole} className="mb-4">
+          Wissel naar {currentUser.role === "Administrator" ? "Docent" : "Administrator"} weergave
+        </Button>
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
@@ -120,21 +179,48 @@ const MyAccount = () => {
         <Card className="w-full md:w-1/3">
           <CardHeader className="text-center">
             <Avatar className="w-24 h-24 mx-auto mb-4">
-              <AvatarImage src={demoUser.avatar} />
+              <AvatarImage src={currentUser.avatar} />
               <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
-                {demoUser.firstName[0]}{demoUser.lastName[0]}
+                {currentUser.firstName[0]}{currentUser.lastName[0]}
               </AvatarFallback>
             </Avatar>
-            <CardTitle>{demoUser.firstName} {demoUser.lastName}</CardTitle>
-            <CardDescription>{demoUser.role}</CardDescription>
+            <Button variant="outline" size="sm" className="absolute top-4 right-4 rounded-full p-2">
+              <UploadCloud className="h-4 w-4" />
+            </Button>
+            <CardTitle>{currentUser.firstName} {currentUser.lastName}</CardTitle>
+            <CardDescription>{currentUser.role}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="text-sm">
-              <span className="font-medium text-gray-500">Email:</span> {demoUser.email}
+              <span className="font-medium text-gray-500">Email:</span> {currentUser.email}
             </div>
             <div className="text-sm">
-              <span className="font-medium text-gray-500">Telefoon:</span> {demoUser.phone}
+              <span className="font-medium text-gray-500">Telefoon:</span> {currentUser.phone}
             </div>
+            {isTeacher && (
+              <>
+                <div className="text-sm mt-4">
+                  <span className="font-medium text-gray-500">Vakken:</span> 
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {teacherUser.subjects.map((subject, index) => (
+                      <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                        {subject}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-sm mt-2">
+                  <span className="font-medium text-gray-500">Klassen:</span>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {teacherUser.classes.map((className, index) => (
+                      <span key={index} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                        {className}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
             <div className="mt-4">
               <Button variant="outline" size="sm" className="w-full">
                 Afmelden
@@ -153,18 +239,22 @@ const MyAccount = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="profiel" className="w-full">
-              <TabsList className="grid grid-cols-3 mb-6 bg-blue-900/10">
+              <TabsList className="grid grid-cols-4 mb-6 bg-blue-900/10">
                 <TabsTrigger value="profiel" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <UserCircle className="h-4 w-4 mr-2" />
                   Profiel
                 </TabsTrigger>
-                <TabsTrigger value="wachtwoord" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                <TabsTrigger value="beveiliging" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <KeyRound className="h-4 w-4 mr-2" />
-                  Wachtwoord
+                  Beveiliging
+                </TabsTrigger>
+                <TabsTrigger value="voorkeuren" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Voorkeuren
                 </TabsTrigger>
                 <TabsTrigger value="notificaties" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <BellRing className="h-4 w-4 mr-2" />
-                  Notificaties
+                  Meldingen
                 </TabsTrigger>
               </TabsList>
 
@@ -224,6 +314,7 @@ const MyAccount = () => {
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
+                          <FormDescription>Optioneel</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -232,10 +323,42 @@ const MyAccount = () => {
                     <FormItem>
                       <FormLabel>Rol</FormLabel>
                       <div className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-500 ring-offset-background">
-                        {demoUser.role}
+                        {currentUser.role}
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">De rol kan niet worden gewijzigd</p>
                     </FormItem>
+
+                    {isTeacher && (
+                      <>
+                        <FormItem>
+                          <FormLabel>Vakken</FormLabel>
+                          <div className="flex h-min-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-500 ring-offset-background">
+                            <div className="flex flex-wrap gap-1">
+                              {teacherUser.subjects.map((subject, index) => (
+                                <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                  {subject}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">Vakken worden toegewezen door een beheerder</p>
+                        </FormItem>
+
+                        <FormItem>
+                          <FormLabel>Gekoppelde klassen</FormLabel>
+                          <div className="flex h-min-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-500 ring-offset-background">
+                            <div className="flex flex-wrap gap-1">
+                              {teacherUser.classes.map((className, index) => (
+                                <span key={index} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                                  {className}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">Klassen worden toegewezen door een beheerder</p>
+                        </FormItem>
+                      </>
+                    )}
 
                     <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90">
                       Wijzigingen opslaan
@@ -244,109 +367,288 @@ const MyAccount = () => {
                 </Form>
               </TabsContent>
 
-              {/* Wachtwoord tab inhoud */}
-              <TabsContent value="wachtwoord" className="space-y-4">
-                <Form {...passwordForm}>
-                  <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
-                    <FormField
-                      control={passwordForm.control}
-                      name="currentPassword"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Huidig wachtwoord</FormLabel>
-                          <FormControl>
-                            <Input type="password" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+              {/* Beveiliging tab inhoud */}
+              <TabsContent value="beveiliging" className="space-y-4">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Wachtwoord wijzigen</h3>
+                    <Form {...passwordForm}>
+                      <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
+                        <FormField
+                          control={passwordForm.control}
+                          name="currentPassword"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Huidig wachtwoord</FormLabel>
+                              <FormControl>
+                                <Input type="password" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                    <FormField
-                      control={passwordForm.control}
-                      name="newPassword"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nieuw wachtwoord</FormLabel>
-                          <FormControl>
-                            <Input type="password" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        <FormField
+                          control={passwordForm.control}
+                          name="newPassword"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Nieuw wachtwoord</FormLabel>
+                              <FormControl>
+                                <Input type="password" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                    <FormField
-                      control={passwordForm.control}
-                      name="confirmPassword"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Bevestig nieuw wachtwoord</FormLabel>
-                          <FormControl>
-                            <Input type="password" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        <FormField
+                          control={passwordForm.control}
+                          name="confirmPassword"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Bevestig nieuw wachtwoord</FormLabel>
+                              <FormControl>
+                                <Input type="password" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
+                        <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90">
+                          Wachtwoord wijzigen
+                        </Button>
+                      </form>
+                    </Form>
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Tweestapsverificatie</h3>
                     <div className="flex items-center justify-between">
-                      <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90">
-                        Wachtwoord wijzigen
-                      </Button>
+                      <div className="space-y-1">
+                        <p className="font-medium">Tweestapsverificatie is {currentUser.twoFactorEnabled ? 'ingeschakeld' : 'uitgeschakeld'}</p>
+                        <p className="text-sm text-gray-500">Verhoog de beveiliging van uw account door tweestapsverificatie in te schakelen</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Switch id="twofa" checked={currentUser.twoFactorEnabled} />
+                        <Label htmlFor="twofa">{currentUser.twoFactorEnabled ? 'Aan' : 'Uit'}</Label>
+                      </div>
                     </div>
-                  </form>
-                </Form>
-              </TabsContent>
 
-              {/* Notificaties tab inhoud */}
-              <TabsContent value="notificaties" className="space-y-4">
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-4">
-                    <Bell className="h-5 w-5 mt-0.5 text-gray-500" />
-                    <div className="space-y-1 flex-1">
-                      <h4 className="font-medium">Email notificaties</h4>
-                      <p className="text-sm text-gray-500">
-                        Ontvang belangrijke updates over uw account, betalingen en meer via e-mail.
-                      </p>
-                    </div>
-                    <div>
+                    <div className="mt-4">
                       <Button variant="outline" size="sm">
-                        Beheren
+                        {currentUser.twoFactorEnabled ? 'Beheren' : 'Instellen'}
                       </Button>
                     </div>
                   </div>
 
-                  <div className="flex items-start space-x-4">
-                    <Shield className="h-5 w-5 mt-0.5 text-gray-500" />
-                    <div className="space-y-1 flex-1">
-                      <h4 className="font-medium">Beveiliging</h4>
-                      <p className="text-sm text-gray-500">
-                        Beheer uw beveiligingsinstellingen en gekoppelde apparaten.
-                      </p>
-                    </div>
-                    <div>
-                      <Button variant="outline" size="sm">
-                        Bekijken
-                      </Button>
-                    </div>
-                  </div>
+                  <Separator />
 
-                  <div className="flex items-start space-x-4">
-                    <Lock className="h-5 w-5 mt-0.5 text-gray-500" />
-                    <div className="space-y-1 flex-1">
-                      <h4 className="font-medium">Account privacy</h4>
-                      <p className="text-sm text-gray-500">
-                        Beheer uw persoonlijke informatie en zichtbaarheid.
-                      </p>
-                    </div>
-                    <div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Recente aanmeldingen</h3>
+                    <div className="space-y-3">
+                      <div className="bg-muted/50 p-3 rounded-md">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <History className="h-4 w-4 mr-2 text-gray-500" />
+                            <span>Laatste aanmelding: {currentUser.lastLogin}</span>
+                          </div>
+                          <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">Succesvol</span>
+                        </div>
+                      </div>
                       <Button variant="outline" size="sm">
-                        Aanpassen
+                        Alle aanmeldingen bekijken
                       </Button>
                     </div>
                   </div>
                 </div>
+              </TabsContent>
+
+              {/* Voorkeuren tab inhoud */}
+              <TabsContent value="voorkeuren" className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Taal en weergave</h3>
+                  <div className="space-y-4">
+                    <div className="flex flex-col space-y-1.5">
+                      <Label htmlFor="language">Taal</Label>
+                      <Select defaultValue={currentUser.language}>
+                        <SelectTrigger id="language">
+                          <SelectValue placeholder="Selecteer een taal" />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                          <SelectItem value="Nederlands">Nederlands</SelectItem>
+                          <SelectItem value="Engels">Engels</SelectItem>
+                          <SelectItem value="Arabisch">Arabisch</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="darkmode">Donkere modus</Label>
+                        <p className="text-sm text-muted-foreground">Schakel tussen lichte en donkere weergave</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Switch id="darkmode" checked={currentUser.darkMode} />
+                        <div className="flex items-center space-x-1">
+                          {currentUser.darkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Startpagina</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div 
+                      className={`flex flex-col items-center p-4 border rounded-lg ${currentUser.defaultPage === "Dashboard" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
+                    >
+                      <Home className="h-8 w-8 mb-2" />
+                      <span>Dashboard</span>
+                    </div>
+                    
+                    <div 
+                      className={`flex flex-col items-center p-4 border rounded-lg ${currentUser.defaultPage === "Rooster" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
+                    >
+                      <Calendar className="h-8 w-8 mb-2" />
+                      <span>Rooster</span>
+                    </div>
+                    
+                    <div 
+                      className={`flex flex-col items-center p-4 border rounded-lg ${currentUser.defaultPage === "Mijn Klassen" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
+                    >
+                      <School className="h-8 w-8 mb-2" />
+                      <span>Mijn Klassen</span>
+                    </div>
+                    
+                    <div 
+                      className={`flex flex-col items-center p-4 border rounded-lg ${currentUser.defaultPage === "Mijn Vakken" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
+                    >
+                      <BookOpen className="h-8 w-8 mb-2" />
+                      <span>Mijn Vakken</span>
+                    </div>
+                  </div>
+                </div>
+
+                {isAdmin && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Systeemvoorkeuren</h3>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Switch id="systemLogs" />
+                          <Label htmlFor="systemLogs">Uitgebreide systeemlogboeken weergeven</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Switch id="developerMode" />
+                          <Label htmlFor="developerMode">Ontwikkelaarsmodus</Label>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <Button className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90">
+                  Voorkeuren opslaan
+                </Button>
+              </TabsContent>
+
+              {/* Notificaties tab inhoud */}
+              <TabsContent value="notificaties" className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-4">E-mailnotificaties</h3>
+                  <div className="space-y-3">
+                    {isTeacher ? (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="notifyMessages">Nieuwe berichten</Label>
+                            <p className="text-sm text-muted-foreground">Ontvang een e-mail wanneer u een nieuw bericht ontvangt</p>
+                          </div>
+                          <Switch id="notifyMessages" checked={teacherUser.notifyMessages} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="notifySchedule">Roosterwijzigingen</Label>
+                            <p className="text-sm text-muted-foreground">Ontvang een e-mail bij wijzigingen in het rooster</p>
+                          </div>
+                          <Switch id="notifySchedule" checked={teacherUser.notifyScheduleChanges} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="notifyGrades">Cijferregistratie</Label>
+                            <p className="text-sm text-muted-foreground">Ontvang een e-mail bij bevestiging van cijferregistratie</p>
+                          </div>
+                          <Switch id="notifyGrades" checked={teacherUser.notifyGrades} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="notifyAttendance">Aanwezigheidsregistratie</Label>
+                            <p className="text-sm text-muted-foreground">Ontvang een e-mail met een overzicht van aanwezigheidsregistratie</p>
+                          </div>
+                          <Switch id="notifyAttendance" checked={teacherUser.notifyAttendance} />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="notifyNewUsers">Nieuwe gebruikers</Label>
+                            <p className="text-sm text-muted-foreground">Ontvang een e-mail wanneer een nieuwe gebruiker zich registreert</p>
+                          </div>
+                          <Switch id="notifyNewUsers" checked={adminUser.notifyNewUsers} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="notifySystemUpdates">Systeemupdates</Label>
+                            <p className="text-sm text-muted-foreground">Ontvang een e-mail bij belangrijke systeemupdates</p>
+                          </div>
+                          <Switch id="notifySystemUpdates" checked={adminUser.notifySystemUpdates} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="notifySecurityAlerts">Beveiligingswaarschuwingen</Label>
+                            <p className="text-sm text-muted-foreground">Ontvang een e-mail bij beveiligingswaarschuwingen</p>
+                          </div>
+                          <Switch id="notifySecurityAlerts" checked={adminUser.notifySecurityAlerts} />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h3 className="text-lg font-medium mb-4">App-meldingen</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="pushNotifications">Push-meldingen</Label>
+                        <p className="text-sm text-muted-foreground">Schakel push-meldingen in of uit voor de mobiele app</p>
+                      </div>
+                      <Switch id="pushNotifications" defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="desktopNotifications">Bureaubladmeldingen</Label>
+                        <p className="text-sm text-muted-foreground">Schakel bureaubladmeldingen in of uit</p>
+                      </div>
+                      <Switch id="desktopNotifications" defaultChecked />
+                    </div>
+                  </div>
+                </div>
+
+                <Button className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90">
+                  Meldingsinstellingen opslaan
+                </Button>
               </TabsContent>
             </Tabs>
           </CardContent>

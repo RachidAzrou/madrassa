@@ -632,10 +632,10 @@ export default function Teachers() {
           {selectedTeacher && (
             <div className="mt-6">
               <Tabs defaultValue="beschikbaarheid">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="beschikbaarheid">Beschikbaarheid</TabsTrigger>
-                  <TabsTrigger value="talen">Talen</TabsTrigger>
-                  <TabsTrigger value="cursussen">Cursussen</TabsTrigger>
+                <TabsList className="mb-4 p-1 bg-blue-900/10">
+                  <TabsTrigger value="beschikbaarheid" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Beschikbaarheid</TabsTrigger>
+                  <TabsTrigger value="talen" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Talen</TabsTrigger>
+                  <TabsTrigger value="cursussen" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Cursussen</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="beschikbaarheid">

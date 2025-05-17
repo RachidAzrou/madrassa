@@ -40,6 +40,15 @@ interface CalendarEvent {
   recurrenceEndDate?: string; // Einddatum van de herhaling
 }
 
+// Helper functies voor datumformatering
+const formatDate = (date: Date): string => {
+  return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'numeric' });
+};
+
+const formatDayDate = (date: Date): string => {
+  return date.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+};
+
 export default function Calendar() {
   const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -406,12 +415,160 @@ export default function Calendar() {
             ))}
           </div>
         </div>
+      ) : view === 'week' ? (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          {/* Weekdagen header */}
+          <div className="grid grid-cols-7 border-b border-gray-200">
+            {['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'].map((day, index) => {
+              // Bereken datum voor elke dag van de huidige week
+              const currentWeekDay = new Date(currentDate);
+              const firstDayOfWeek = new Date(currentWeekDay);
+              const diff = currentWeekDay.getDay() - index;
+              firstDayOfWeek.setDate(currentWeekDay.getDate() - diff);
+              
+              return (
+                <div key={day} className="p-2 text-center border-b border-gray-200 bg-gray-50">
+                  <div className="text-sm font-medium text-gray-700">{day}</div>
+                  <div className="text-xs text-gray-500">
+                    {formatDate(firstDayOfWeek)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* Week view tijdslots */}
+          <div className="grid grid-cols-7 divide-x divide-gray-200">
+            {Array.from({ length: 7 }).map((_, dayIndex) => {
+              // Bereken datum voor elke dag
+              const currentWeekDay = new Date(currentDate);
+              const targetDay = new Date(currentWeekDay);
+              const diff = currentWeekDay.getDay() - dayIndex;
+              targetDay.setDate(currentWeekDay.getDate() - diff);
+              
+              // Filter evenementen voor deze dag
+              const dayEvents = (filteredEvents || []).filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate.toDateString() === targetDay.toDateString();
+              });
+              
+              // Genereer tijdslots (8:00 - 20:00)
+              return (
+                <div key={dayIndex} className="min-h-[600px] relative">
+                  {Array.from({ length: 13 }).map((_, hourIndex) => {
+                    const hour = hourIndex + 8; // Start vanaf 8:00
+                    return (
+                      <div 
+                        key={hourIndex} 
+                        className="h-12 border-b border-gray-200 relative px-1"
+                      >
+                        <div className="absolute left-0 -translate-y-1/2 text-xs text-gray-400 w-8 pl-1">
+                          {hour}:00
+                        </div>
+                      </div>
+                    );
+                  })}
+                  
+                  {/* Plaats evenementen */}
+                  {dayEvents.map((event) => {
+                    // Bereken positie gebaseerd op starttijd
+                    const [hours, minutes] = event.startTime.split(':').map(Number);
+                    const top = (hours - 8) * 48 + (minutes / 60) * 48; // 48px per uur
+                    
+                    // Bereken hoogte gebaseerd op duur
+                    const [endHours, endMinutes] = event.endTime.split(':').map(Number);
+                    const duration = (endHours - hours) + (endMinutes - minutes) / 60;
+                    const height = duration * 48;
+                    
+                    return (
+                      <div 
+                        key={event.id}
+                        className={`absolute rounded px-1 py-0.5 text-xs w-[95%] overflow-hidden shadow-sm ${getEventColor(event.type)}`}
+                        style={{ top: `${top}px`, height: `${height}px` }}
+                      >
+                        <div className="font-medium truncate">{event.title}</div>
+                        <div className="text-xs truncate">
+                          {event.startTime} - {event.endTime}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : view === 'day' ? (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          {/* Dag header */}
+          <div className="p-3 text-center border-b border-gray-200 bg-gray-50">
+            <div className="text-base font-medium text-gray-800">
+              {formatDayDate(currentDate)}
+            </div>
+          </div>
+          
+          {/* Dag tijdslots */}
+          <div className="min-h-[700px] relative p-4">
+            {/* Tijdsaanduidingen */}
+            <div className="absolute top-0 left-0 w-12 bottom-0 border-r border-gray-200">
+              {Array.from({ length: 13 }).map((_, index) => {
+                const hour = index + 8; // Start vanaf 8:00
+                return (
+                  <div key={index} className="h-14 relative">
+                    <div className="absolute right-2 top-0 -translate-y-1/2 text-xs text-gray-500">
+                      {hour}:00
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Horizontale lijnen voor de uren */}
+            <div className="ml-12 relative">
+              {Array.from({ length: 13 }).map((_, index) => (
+                <div key={index} className="h-14 border-b border-gray-100"></div>
+              ))}
+              
+              {/* Evenementen van deze dag */}
+              {filteredEvents
+                .filter(event => {
+                  const eventDate = new Date(event.date);
+                  return eventDate.toDateString() === currentDate.toDateString();
+                })
+                .map((event) => {
+                  // Bereken positie gebaseerd op starttijd
+                  const [hours, minutes] = event.startTime.split(':').map(Number);
+                  const top = (hours - 8) * 56 + (minutes / 60) * 56; // 56px per uur
+                  
+                  // Bereken hoogte gebaseerd op duur
+                  const [endHours, endMinutes] = event.endTime.split(':').map(Number);
+                  const duration = (endHours - hours) + (endMinutes - minutes) / 60;
+                  const height = duration * 56;
+                  
+                  return (
+                    <div 
+                      key={event.id}
+                      className={`absolute left-14 right-4 rounded px-3 py-2 ${getEventColor(event.type)}`}
+                      style={{ top: `${top}px`, height: `${height}px` }}
+                    >
+                      <div className="font-medium">{event.title}</div>
+                      <div className="text-xs">
+                        {event.startTime} - {event.endTime}
+                        {event.location && ` • ${event.location}`}
+                      </div>
+                    </div>
+                  );
+                })
+              }
+            </div>
+          </div>
+        </div>
       ) : (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
           <CalendarIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">Binnenkort Beschikbaar</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">Geen Weergave Geselecteerd</h3>
           <p className="mt-1 text-sm text-gray-500">
-            Week- en dagweergaven zijn in ontwikkeling. Gebruik voorlopig de maandweergave.
+            Selecteer maand, week of dag om de kalender te bekijken.
           </p>
         </div>
       )}

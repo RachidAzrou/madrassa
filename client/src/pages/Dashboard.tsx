@@ -196,7 +196,7 @@ export default function Dashboard() {
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <BarChart3 className="h-6 w-6" />
+              <LayoutDashboard className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-semibold text-[#1e3a8a]">Dashboard</h1>
           </div>
@@ -214,10 +214,7 @@ export default function Dashboard() {
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Studenten</h3>
           <p className="text-2xl font-bold text-sky-700">{stats.totalStudents}</p>
-          <div className="flex justify-between mt-2 text-xs text-sky-600">
-            <span>Actief</span>
-            <span>Ingeschreven</span>
-          </div>
+
         </div>
         
 
@@ -228,10 +225,7 @@ export default function Dashboard() {
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Klassen</h3>
           <p className="text-2xl font-bold text-sky-700">{stats.studentGroups}</p>
-          <div className="flex justify-between mt-2 text-xs text-sky-600">
-            <span>Actief</span>
-            <span>Studiegroepen</span>
-          </div>
+
         </div>
         
         <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
@@ -240,10 +234,7 @@ export default function Dashboard() {
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Docenten</h3>
           <p className="text-2xl font-bold text-sky-700">{stats.totalTeachers}</p>
-          <div className="flex justify-between mt-2 text-xs text-sky-600">
-            <span>Actief</span>
-            <span>Personeelsleden</span>
-          </div>
+
         </div>
         
         {/* Programma's widget als vervanger voor Vakken */}
@@ -251,22 +242,19 @@ export default function Dashboard() {
           <div className="absolute right-0 top-0 opacity-10">
             <BookOpen className="h-20 w-20 text-sky-500" />
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Programma's</h3>
+          <h3 className="text-sm font-medium text-gray-600 mb-1">Vakken</h3>
           <p className="text-2xl font-bold text-sky-700">{stats.programs}</p>
-          <div className="flex justify-between mt-2 text-xs text-sky-600">
-            <span>Actief</span>
-            <span>Curriculum</span>
-          </div>
+
         </div>
       </div>
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
-        {/* Studenten per klas grafiek - Links (4 kolommen) */}
-        <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-4">
+        {/* Studenten per klas grafiek - Links (7 kolommen) */}
+        <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-7">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-[#1e3a8a]" />
+              <School className="h-5 w-5 text-[#1e3a8a]" />
               <h3 className="text-lg font-semibold text-gray-800">Studenten per klas</h3>
             </div>
             <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>

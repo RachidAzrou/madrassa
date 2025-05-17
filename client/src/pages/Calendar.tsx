@@ -471,8 +471,8 @@ export default function Calendar() {
         </div>
       ) : view === 'week' ? (
         <div className="bg-white rounded-lg shadow-md border border-sky-200 overflow-hidden">
-          {/* Weekdagen header */}
-          <div className="grid grid-cols-7 border-b border-sky-200">
+          {/* Weekdagen header - Nieuwe stijl */}
+          <div className="grid grid-cols-7 bg-white">
             {['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].map((day, index) => {
               // Bereken datum voor elke dag van de huidige week (maandag als start)
               const currentWeekDay = new Date(currentDate);
@@ -493,22 +493,16 @@ export default function Calendar() {
               return (
                 <div 
                   key={day} 
-                  className={`p-3 text-center border-b ${isToday 
-                    ? 'bg-sky-50 border-sky-300' 
-                    : (index >= 5) ? 'bg-gradient-to-b from-sky-50 to-sky-100/40 border-gray-200' 
-                      : 'bg-gradient-to-b from-gray-50 to-gray-100 border-gray-200'}`}
+                  className="text-center border-r border-b border-gray-200 py-2"
                 >
-                  <div className={`text-sm font-semibold ${isToday ? 'text-sky-700' : (index >= 5) ? 'text-sky-700' : 'text-gray-800'}`}>{day}</div>
-                  <div className={`text-xs ${isToday ? 'text-sky-600' : 'text-gray-500'}`}>
-                    {formatDate(targetDay)}
-                  </div>
+                  <div className="text-sm font-medium text-gray-600">{day} {targetDay.getDate()}</div>
                 </div>
               );
             })}
           </div>
           
-          {/* Week view tijdslots */}
-          <div className="grid grid-cols-7 divide-x divide-sky-100">
+          {/* Week view tijdslots - Nieuwe stijl zoals in afbeelding */}
+          <div className="grid grid-cols-7 overflow-hidden">
             {Array.from({ length: 7 }).map((_, dayIndex) => {
               // Bereken datum voor elke dag startend op maandag
               const currentWeekDay = new Date(currentDate);
@@ -533,60 +527,83 @@ export default function Calendar() {
                 return eventDate.toDateString() === targetDay.toDateString();
               });
               
-              // Genereer tijdslots (8:00 - 20:00)
               return (
-                <div key={dayIndex} className={`min-h-[650px] relative ${isToday ? 'bg-sky-50/30' : isWeekend ? 'bg-sky-50/10' : ''}`}>
-                  {Array.from({ length: 13 }).map((_, hourIndex) => {
-                    const hour = hourIndex + 8; // Start vanaf 8:00
-                    const isEvenHour = hour % 2 === 0;
+                <div key={dayIndex} className="border-r border-gray-200 relative">
+                  {/* Genereer tijdslots (7:00 - 20:00) */}
+                  {Array.from({ length: 14 }).map((_, hourIndex) => {
+                    const hour = hourIndex + 7; // Start vanaf 7:00
                     return (
                       <div 
                         key={hourIndex} 
-                        className={`h-12 border-b ${isEvenHour ? 'border-sky-100' : 'border-sky-50'} relative px-1`}
+                        className="h-12 border-b border-gray-200 relative"
                       >
+                        {/* Tijdsaanduiding alleen in eerste kolom */}
                         {dayIndex === 0 && (
-                          <div className="absolute left-1 -translate-y-1/2 text-xs font-medium bg-sky-50 px-1 py-0.5 rounded text-gray-600 w-10 text-center">
-                            {hour}:00
-                          </div>
-                        )}
-                        {/* Voeg halve uren toe */}
-                        {dayIndex === 0 && hour < 20 && (
-                          <div className="absolute left-1 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 w-10 text-center">
-                            {hour}:30
+                          <div className="absolute left-1 top-0 text-xs text-gray-500 font-medium">
+                            {hour} AM
                           </div>
                         )}
                       </div>
                     );
                   })}
                   
-                  {/* Plaats evenementen */}
+                  {/* Plaats evenementen - Nieuwe stijl */}
                   {dayEvents.map((event) => {
                     // Bereken positie gebaseerd op starttijd
                     const [hours, minutes] = event.startTime.split(':').map(Number);
-                    const top = (hours - 8) * 48 + (minutes / 60) * 48; // 48px per uur
+                    const top = (hours - 7) * 48 + (minutes / 60) * 48; // 48px per uur
                     
                     // Bereken hoogte gebaseerd op duur
                     const [endHours, endMinutes] = event.endTime.split(':').map(Number);
                     const duration = (endHours - hours) + (endMinutes - minutes) / 60;
                     const height = Math.max(20, duration * 48); // Minimale hoogte
                     
+                    // Bepaal de kleur gebaseerd op event type
+                    let eventStyle = {};
+                    let textColor = "text-gray-800";
+                    let borderStyle = "";
+                    
+                    switch (event.type) {
+                      case 'exam':
+                        eventStyle = { backgroundColor: '#FFEBEE' }; // Lichtroze
+                        borderStyle = "border-l-4 border-red-400";
+                        break;
+                      case 'class':
+                        eventStyle = { backgroundColor: '#E3F2FD' }; // Lichtblauw
+                        borderStyle = "border-l-4 border-blue-400";
+                        break;
+                      case 'holiday':
+                        eventStyle = { backgroundColor: '#E8F5E9' }; // Lichtgroen
+                        borderStyle = "border-l-4 border-green-400";
+                        break;
+                      case 'event':
+                        eventStyle = { backgroundColor: '#FFF9C4' }; // Lichtgeel
+                        borderStyle = "border-l-4 border-yellow-400";
+                        break;
+                      default:
+                        eventStyle = { backgroundColor: '#E0E0E0' };
+                        borderStyle = "border-l-4 border-gray-400";
+                    }
+                    
                     return (
                       <div 
                         key={event.id}
-                        className={`absolute rounded-md px-2 py-1 m-1 text-xs w-[90%] overflow-hidden shadow-md ${getEventColor(event.type)} hover:opacity-90 transition-opacity`}
-                        style={{ top: `${top}px`, height: `${height}px` }}
+                        className={`absolute w-[95%] overflow-hidden shadow-sm ${borderStyle} ${textColor}`}
+                        style={{ 
+                          ...eventStyle,
+                          top: `${top}px`, 
+                          height: `${height}px`,
+                          left: '2.5%',
+                        }}
                       >
-                        <div className="font-medium truncate">{event.title}</div>
-                        <div className="text-xs truncate">
-                          <Clock className="h-3 w-3 inline mr-1" />
-                          {event.startTime} - {event.endTime}
-                        </div>
-                        {event.location && (
-                          <div className="text-xs truncate mt-1">
-                            <MapPin className="h-3 w-3 inline mr-1" />
-                            {event.location}
+                        <div className="px-2 py-1 h-full flex flex-col">
+                          <div className="text-xs font-medium">
+                            {event.startTime}
                           </div>
-                        )}
+                          <div className="font-medium text-xs mt-0.5">
+                            {event.title}
+                          </div>
+                        </div>
                       </div>
                     );
                   })}

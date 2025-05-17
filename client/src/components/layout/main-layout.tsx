@@ -54,37 +54,39 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Mobile sidebar (overlay) */}
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Mobile sidebar backdrop */}
       {isMobile && sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/50"
+          className="fixed inset-0 z-20 bg-black bg-opacity-50"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar component - altijd renderen maar met conditionele styling */}
-      <Sidebar
-        isMobile={isMobile}
-        onClose={() => setSidebarOpen(false)}
-        className={`transform transition-transform duration-300 ${!sidebarOpen ? '-translate-x-full' : 'translate-x-0'}`}
-      />
-
-      {/* Main content area */}
-      <div
-        className={`flex flex-col min-h-screen transition-all duration-300 ${
-          sidebarOpen && !isMobile ? "md:ml-64" : ""
-        } border-l border-gray-200`}
+      {/* Sidebar for both mobile and desktop */}
+      <div 
+        className={`fixed md:static inset-y-0 left-0 transform ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 z-30 transition duration-200 ease-in-out`}
       >
+        <Sidebar 
+          isMobile={isMobile} 
+          onClose={() => setSidebarOpen(false)} 
+        />
+      </div>
+
+      {/* Main content */}
+      <div className="flex flex-col flex-1 min-h-screen overflow-hidden">
         <Header onMenuClick={toggleSidebar} title={pageTitle} />
-        <main className="flex-1 p-2 sm:p-4 md:p-6 overflow-x-hidden">
+        
+        <main className="flex-1 p-2 sm:p-4 md:p-6 overflow-x-auto">
           <div className="max-w-7xl mx-auto w-full">
             {children}
           </div>
         </main>
         
         {/* Footer */}
-        <footer className="py-3 px-4 sm:py-4 sm:px-6 border-t border-gray-200 bg-white mt-auto">
+        <footer className="py-3 px-4 sm:py-4 sm:px-6 border-t border-gray-200 bg-white">
           <div className="max-w-7xl mx-auto w-full">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">

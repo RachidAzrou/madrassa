@@ -753,6 +753,108 @@ export default function Students() {
             </TableBody>
           </Table>
         </div>
+        
+        {/* Mobiele kaartweergave */}
+        <div className="md:hidden">
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <span className="ml-2">Laden...</span>
+            </div>
+          ) : (studentsData.students || []).length === 0 ? (
+            <div className="text-center py-8">
+              Geen studenten gevonden
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-200">
+              {(studentsData.students || []).map((student: any) => (
+                <div key={student.id} className="p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-start">
+                      <Checkbox 
+                        className="mt-1 mr-2"
+                        checked={selectedStudents.includes(student.id)}
+                        onCheckedChange={() => handleSelectStudent(student.id)}
+                        aria-label={`Select ${student.firstName}`}
+                      />
+                      <div>
+                        <div className="flex items-center">
+                          <Avatar className="h-10 w-10 mr-2">
+                            <AvatarFallback className="bg-[#1e3a8a] text-white">
+                              {student.firstName?.[0] || ""}{student.lastName?.[0] || ""}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-medium text-gray-900">
+                              {student.firstName} {student.lastName}
+                            </div>
+                            <div className="text-xs text-gray-500">{student.studentId}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center">
+                      {renderStatusBadge(student.status)}
+                      <div className="flex ml-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleViewStudent(student.id)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleEditStudent(student.id)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => {
+                            setSelectedStudent(student);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="ml-10 space-y-1 text-sm">
+                    <div className="flex items-baseline">
+                      <span className="text-gray-500 w-24">Email:</span>
+                      <span className="text-sm text-gray-900 truncate">{student.email}</span>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="text-gray-500 w-24">Programma:</span>
+                      <span className="text-sm text-gray-900">
+                        {student.programs && student.programs[0] 
+                          ? programs.find((p: any) => p.id === student.programs[0].programId)?.name 
+                          : '-'}
+                      </span>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="text-gray-500 w-24">Leerjaar:</span>
+                      <span className="text-sm text-gray-900">
+                        {student.programs && student.programs[0] 
+                          ? student.programs[0].yearLevel 
+                          : '-'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Batch acties */}
         {selectedStudents.length > 0 && (

@@ -279,14 +279,34 @@ export default function Calendar() {
     setFilter(value);
   };
 
-  // Get event color based on event type
-  const getEventColor = (type: string) => {
+  // Get event colors based on event type
+  const getEventColors = (type: string) => {
     switch (type) {
-      case 'exam': return 'bg-red-100 text-red-800 border-red-200';
-      case 'class': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'holiday': return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'event': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'exam':
+        return { 
+          bgColor: "#FFEBEE", // Lichtroze 
+          borderColor: "#E53935" // Rood
+        };
+      case 'class':
+        return { 
+          bgColor: "#E3F2FD", // Lichtblauw
+          borderColor: "#1E88E5" // Blauw
+        };
+      case 'holiday':
+        return { 
+          bgColor: "#E8F5E9", // Lichtgroen
+          borderColor: "#43A047" // Groen
+        };
+      case 'event':
+        return { 
+          bgColor: "#FFF9C4", // Lichtgeel
+          borderColor: "#FDD835" // Geel
+        };
+      default:
+        return { 
+          bgColor: "#E0E0E0", // Lichtgrijs
+          borderColor: "#757575" // Grijs
+        };
     }
   };
 
@@ -445,7 +465,11 @@ export default function Calendar() {
                         {dayData.events.slice(0, 3).map((event) => (
                           <div 
                             key={event.id} 
-                            className={`px-2 py-1 text-xs rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer ${getEventColor(event.type)}`}
+                            className="px-2 py-1 text-xs rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                            style={{ 
+                              backgroundColor: getEventColors(event.type).bgColor,
+                              borderLeft: `3px solid ${getEventColors(event.type).borderColor}`,
+                            }}
                           >
                             <div className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
@@ -457,7 +481,7 @@ export default function Calendar() {
                         
                         {/* Indicator voor meer evenementen */}
                         {dayData.events.length > 3 && (
-                          <div className="text-xs bg-gray-100 text-gray-700 rounded-md p-1 text-center font-medium shadow-sm">
+                          <div className="text-xs bg-gray-50 text-gray-600 rounded-md p-1 text-center font-medium shadow-sm">
                             +{dayData.events.length - 3} meer
                           </div>
                         )}

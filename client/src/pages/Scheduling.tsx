@@ -211,7 +211,7 @@ export default function Scheduling() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
@@ -223,26 +223,28 @@ export default function Scheduling() {
             Beheer cursusroosters, lokalen en lesschema's
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Input
-              placeholder="Zoek planning..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="w-full md:w-64 pl-10"
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          </div>
-          <Button 
-            onClick={handleAddSchedule} 
-            variant="default"
-            size="default"
-            className="bg-primary hover:bg-primary/90 flex items-center"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Planning Toevoegen</span>
-          </Button>
+      </div>
+      
+      {/* Zoek en toevoegen van planning - onder de streep */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+        <div className="relative w-full md:w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Zoek planning..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="w-full pl-10"
+          />
         </div>
+        <Button 
+          onClick={handleAddSchedule} 
+          variant="default"
+          size="default"
+          className="bg-primary hover:bg-primary/90 flex items-center"
+        >
+          <PlusCircle className="mr-2 h-4 w-4" />
+          <span>Planning Toevoegen</span>
+        </Button>
       </div>
 
       {/* Dashboard Stats */}

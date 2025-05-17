@@ -279,7 +279,7 @@ export default function Calendar() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
@@ -290,7 +290,13 @@ export default function Calendar() {
           <p className="text-gray-500 text-sm mt-1 ml-11">
             Beheer academische evenementen en schoolactiviteiten
           </p>
-          <div className="mt-3 ml-9">
+        </div>
+      </div>
+      
+      {/* Controls and filters - onder de streep */}
+      <div className="flex flex-col gap-4 mb-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
             <Tabs value={view} onValueChange={(value) => setView(value as 'month' | 'week' | 'day')}>
               <TabsList className="p-1 bg-blue-900/10">
                 <TabsTrigger 
@@ -314,29 +320,29 @@ export default function Calendar() {
               </TabsList>
             </Tabs>
           </div>
-        </div>
-        <div className="flex items-center space-x-3">
-          <Select value={filter} onValueChange={handleFilterChange}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Filter Evenementen" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Alle Evenementen</SelectItem>
-              <SelectItem value="exam">Examens</SelectItem>
-              <SelectItem value="class">Lessen</SelectItem>
-              <SelectItem value="holiday">Vakanties</SelectItem>
-              <SelectItem value="event">Activiteiten</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button 
-            onClick={handleAddEvent}
-            variant="default"
-            size="default"
-            className="bg-primary hover:bg-primary/90 flex items-center"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            <span>Evenement Toevoegen</span>
-          </Button>
+          <div className="flex items-center space-x-3">
+            <Select value={filter} onValueChange={handleFilterChange}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Filter Evenementen" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Evenementen</SelectItem>
+                <SelectItem value="exam">Examens</SelectItem>
+                <SelectItem value="class">Lessen</SelectItem>
+                <SelectItem value="holiday">Vakanties</SelectItem>
+                <SelectItem value="event">Activiteiten</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button 
+              onClick={handleAddEvent}
+              variant="default"
+              size="default"
+              className="bg-primary hover:bg-primary/90 flex items-center"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              <span>Evenement Toevoegen</span>
+            </Button>
+          </div>
         </div>
       </div>
 

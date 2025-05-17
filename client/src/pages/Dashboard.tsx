@@ -214,74 +214,68 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
+    <div className="p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
       {/* Page Title */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 sm:gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <LayoutDashboard className="h-6 w-6" />
+            <div className="mr-2 sm:mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-1.5 sm:p-2">
+              <LayoutDashboard className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Dashboard</h1>
+            <h1 className="text-xl sm:text-2xl font-semibold text-[#1e3a8a]">Dashboard</h1>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
+          <p className="text-gray-500 text-xs sm:text-sm mt-1 ml-9 sm:ml-11">
             Overzicht van de belangrijkste statistieken en activiteiten
           </p>
         </div>
       </div>
 
-      {/* Stats Overview - met dezelfde stijl als in Students.tsx */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+      {/* Stats Overview */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10">
-            <Users className="h-20 w-20 text-sky-500" />
+            <Users className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Studenten</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.totalStudents}</p>
-
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Studenten</h3>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.totalStudents}</p>
         </div>
         
-
-        
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10">
-            <ChalkBoard className="h-20 w-20 text-sky-500" />
+            <ChalkBoard className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Klassen</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.studentGroups}</p>
-
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Klassen</h3>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.studentGroups}</p>
         </div>
         
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10">
-            <GraduationCap className="h-20 w-20 text-sky-500" />
+            <GraduationCap className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Docenten</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.totalTeachers}</p>
-
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Docenten</h3>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.totalTeachers}</p>
         </div>
         
         {/* Programma's widget als vervanger voor Vakken */}
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10">
-            <BookOpen className="h-20 w-20 text-sky-500" />
+            <BookOpen className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Vakken</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.programs}</p>
-
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Vakken</h3>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.programs}</p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
-        {/* Studenten per klas grafiek - Links (7 kolommen) */}
-        <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-7">
-          <div className="flex items-center justify-between mb-4">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6">
+        {/* Studenten per klas grafiek */}
+        <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 gap-2">
             <div className="flex items-center gap-2">
-              <ChalkBoard className="h-5 w-5 text-[#1e3a8a]" />
-              <h3 className="text-lg font-semibold text-gray-800">Studenten per klas</h3>
+              <ChalkBoard className="h-4 w-4 sm:h-5 sm:w-5 text-[#1e3a8a]" />
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800">Studenten per klas</h3>
             </div>
-            <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
+            <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50 w-full sm:w-auto text-xs sm:text-sm" asChild>
               <div onClick={() => setLocation('/student-groups')}>Details bekijken</div>
             </Button>
           </div>

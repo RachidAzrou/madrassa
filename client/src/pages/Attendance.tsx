@@ -203,26 +203,16 @@ export default function Attendance() {
                 </div>
                 
                 <div className="rounded-md border shadow-sm overflow-hidden">
-                  <div className="grid grid-cols-6 bg-slate-100 p-3 text-xs font-medium text-slate-700">
+                  <div className="grid grid-cols-5 bg-slate-100 p-3 text-xs font-medium text-slate-700">
                     <div>Student</div>
-                    <div>Status</div>
                     <div>Opmerking</div>
-                    <div>Aanwezigheid</div>
+                    <div>Aanwezigheid %</div>
                     <div className="col-span-2 text-right">Acties</div>
                   </div>
                   <div className="divide-y bg-white">
                     {students.map(student => (
-                      <div key={student.id} className="grid grid-cols-6 items-center p-3 hover:bg-gray-50">
+                      <div key={student.id} className="grid grid-cols-5 items-center p-3 hover:bg-gray-50">
                         <div className="font-medium">{student.firstName} {student.lastName}</div>
-                        <div>
-                          {student.status === 'present' ? (
-                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Aanwezig</Badge>
-                          ) : student.status === 'absent' ? (
-                            <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Afwezig</Badge>
-                          ) : (
-                            <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Te laat</Badge>
-                          )}
-                        </div>
                         <div>
                           <Button variant="ghost" size="icon" onClick={() => console.log('Add note')} className="h-8 w-8">
                             <MessageSquare className="h-4 w-4" />
@@ -270,20 +260,16 @@ export default function Attendance() {
                 </div>
                 
                 <div className="rounded-md border shadow-sm overflow-hidden">
-                  <div className="grid grid-cols-4 bg-slate-100 p-3 text-xs font-medium text-slate-700">
+                  <div className="grid grid-cols-3 bg-slate-100 p-3 text-xs font-medium text-slate-700">
                     <div>Docent</div>
                     <div>Specialisatie</div>
-                    <div>Status</div>
                     <div className="text-right">Acties</div>
                   </div>
                   <div className="divide-y bg-white">
                     {teachers.map(teacher => (
-                      <div key={teacher.id} className="grid grid-cols-4 items-center p-3 hover:bg-gray-50">
+                      <div key={teacher.id} className="grid grid-cols-3 items-center p-3 hover:bg-gray-50">
                         <div className="font-medium">{teacher.firstName} {teacher.lastName}</div>
                         <div>{teacher.specialty}</div>
-                        <div>
-                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Aanwezig</Badge>
-                        </div>
                         <div className="flex justify-end gap-2">
                           <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => console.log('Mark present')}>
                             Aanwezig

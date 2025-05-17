@@ -394,9 +394,9 @@ export default function Reports() {
 
       {/* Tabs for Report Generation and Template */}
       <Tabs defaultValue="generate" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-2 md:w-[400px]">
-          <TabsTrigger value="generate">Rapporten genereren</TabsTrigger>
-          <TabsTrigger value="template">Template</TabsTrigger>
+        <TabsList className="grid grid-cols-2 md:w-[400px] p-1 bg-blue-900/10">
+          <TabsTrigger value="generate" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Rapporten genereren</TabsTrigger>
+          <TabsTrigger value="template" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Template</TabsTrigger>
         </TabsList>
 
         {/* Report Generation Tab */}

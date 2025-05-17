@@ -471,8 +471,14 @@ export default function Calendar() {
         </div>
       ) : view === 'week' ? (
         <div className="bg-white rounded-lg shadow-md border border-sky-200 overflow-hidden">
-          {/* Weekdagen header - Nieuwe stijl */}
-          <div className="grid grid-cols-7 bg-white">
+          {/* Weekdagen header - Nieuwe stijl met tijden in aparte kolom */}
+          <div className="grid grid-cols-8 bg-white">
+            {/* Lege cel voor de tijdskolom */}
+            <div className="text-center border-r border-b border-gray-200 py-2">
+              <div className="text-sm font-medium text-gray-500">Tijd</div>
+            </div>
+          
+            {/* Weekdagen */}
             {['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].map((day, index) => {
               // Bereken datum voor elke dag van de huidige week (maandag als start)
               const currentWeekDay = new Date(currentDate);
@@ -493,16 +499,34 @@ export default function Calendar() {
               return (
                 <div 
                   key={day} 
-                  className="text-center border-r border-b border-gray-200 py-2"
+                  className={`text-center border-r border-b border-gray-200 py-2 ${isToday ? 'bg-sky-50' : ''}`}
                 >
-                  <div className="text-sm font-medium text-gray-600">{day} {targetDay.getDate()}</div>
+                  <div className={`text-sm font-medium ${isToday ? 'text-sky-600' : 'text-gray-600'}`}>{day} {targetDay.getDate()}</div>
                 </div>
               );
             })}
           </div>
           
-          {/* Week view tijdslots - Nieuwe stijl zoals in afbeelding */}
-          <div className="grid grid-cols-7 overflow-hidden">
+          {/* Week view tijdslots - Nieuwe stijl met tijden in aparte kolom */}
+          <div className="grid grid-cols-8 overflow-hidden">
+            {/* Tijdskolom */}
+            <div className="border-r border-gray-200 relative">
+              {Array.from({ length: 14 }).map((_, hourIndex) => {
+                const hour = hourIndex + 7; // Start vanaf 7:00
+                return (
+                  <div 
+                    key={hourIndex} 
+                    className="h-12 border-b border-gray-200 relative"
+                  >
+                    <div className="absolute right-2 top-0 -translate-y-1/2 text-xs text-gray-500 font-medium">
+                      {hour}:00
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Weekdagen kolommen */}
             {Array.from({ length: 7 }).map((_, dayIndex) => {
               // Bereken datum voor elke dag startend op maandag
               const currentWeekDay = new Date(currentDate);
@@ -533,17 +557,7 @@ export default function Calendar() {
                   {Array.from({ length: 14 }).map((_, hourIndex) => {
                     const hour = hourIndex + 7; // Start vanaf 7:00
                     return (
-                      <div 
-                        key={hourIndex} 
-                        className="h-12 border-b border-gray-200 relative"
-                      >
-                        {/* Tijdsaanduiding alleen in eerste kolom */}
-                        {dayIndex === 0 && (
-                          <div className="absolute left-1 top-0 text-xs text-gray-500 font-medium">
-                            {hour} AM
-                          </div>
-                        )}
-                      </div>
+                      <div key={hourIndex} className="h-12 border-b border-gray-200 relative" />
                     );
                   })}
                   

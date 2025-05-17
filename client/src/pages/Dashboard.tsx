@@ -340,34 +340,34 @@ export default function Dashboard() {
             return (
               <div>
                 {isGroupsLoading || isAllStudentsLoading || isEnrollmentsLoading ? (
-                  <div className="h-48 flex items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  <div className="h-32 sm:h-48 flex items-center justify-center">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 border-3 sm:border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                   </div>
                 ) : chartData.length === 0 ? (
-                  <div className="h-48 flex items-center justify-center text-gray-500">
+                  <div className="h-32 sm:h-48 flex items-center justify-center text-gray-500 text-sm">
                     Geen klasgegevens beschikbaar
                   </div>
                 ) : (
-                  <div className="h-48 relative">
-                    <div className="flex justify-between items-end h-40 pt-4">
+                  <div className="h-32 sm:h-48 relative">
+                    <div className="flex justify-between items-end h-28 sm:h-40 pt-2 sm:pt-4">
                       {chartData.map((item, index) => (
                         <div key={index} className="flex flex-col items-center">
-                          <div className="bg-gradient-to-t from-sky-600 to-sky-400 rounded-t shadow-md transition-all duration-500 ease-out px-2 md:px-6 relative group">
+                          <div className="bg-gradient-to-t from-sky-600 to-sky-400 rounded-t shadow-md transition-all duration-500 ease-out px-1 sm:px-2 md:px-6 relative group">
                             <div 
                               className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"
                             ></div>
                             <div
-                              className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              className="absolute bottom-full mb-1 sm:mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-[10px] sm:text-xs py-0.5 sm:py-1 px-1 sm:px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                             >
                               {item.count} studenten
                             </div>
                             <div
                               style={{ 
-                                height: `${Math.max(30, (item.count / maxCount) * 130)}px`
+                                height: `${Math.max(20, (item.count / maxCount) * (window.innerWidth < 640 ? 90 : 130))}px`
                               }}
                             ></div>
                           </div>
-                          <div className="text-xs text-gray-500 mt-2 max-w-[80px] text-center truncate" title={item.name}>
+                          <div className="text-[10px] sm:text-xs text-gray-500 mt-1 sm:mt-2 max-w-[60px] sm:max-w-[80px] text-center truncate" title={item.name}>
                             {item.name}
                           </div>
                         </div>
@@ -382,59 +382,61 @@ export default function Dashboard() {
 
 
         
-        {/* Lesrooster huidige week - Onder */}
-        <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-7">
-          <div className="flex items-center justify-between mb-4">
+        {/* Lesrooster huidige week */}
+        <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 gap-2">
             <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-[#1e3a8a]" />
-              <h3 className="text-lg font-semibold text-gray-800">Lesrooster Deze Week</h3>
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-[#1e3a8a]" />
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800">Lesrooster Deze Week</h3>
             </div>
-            <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
+            <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50 w-full sm:w-auto text-xs sm:text-sm" asChild>
               <div onClick={navigateToCalendar}>Bekijk volledige planning</div>
             </Button>
           </div>
           
-          <div className="grid grid-cols-7 gap-1 bg-white rounded-md p-2 mb-3 shadow-sm">
+          <div className="grid grid-cols-7 gap-1 bg-white rounded-md p-1 sm:p-2 mb-3 shadow-sm">
             {weekdays.map((day, index) => (
               <div 
                 key={index} 
-                className={`text-center p-2 ${day.isToday ? 'bg-sky-50 rounded-md' : ''}`}
+                className={`text-center p-1 sm:p-2 ${day.isToday ? 'bg-sky-50 rounded-md' : ''}`}
               >
                 <p className="text-xs font-medium text-sky-800">{day.dayShort}</p>
-                <p className={`text-sm mt-1 ${day.isToday ? 'font-bold text-sky-700' : 'text-gray-600'}`}>{day.dayNumber}</p>
+                <p className={`text-xs sm:text-sm mt-0.5 sm:mt-1 ${day.isToday ? 'font-bold text-sky-700' : 'text-gray-600'}`}>{day.dayNumber}</p>
               </div>
             ))}
           </div>
           
           {/* Lessen voor deze week */}
           {isLessonsLoading ? (
-            <div className="flex justify-center p-4">
-              <div className="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="flex justify-center p-3 sm:p-4">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : currentWeekLessons.length === 0 ? (
-            <div className="text-center py-4 space-y-2">
-              <p className="text-gray-500">Geen lessen gevonden voor deze week</p>
-              <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
+            <div className="text-center py-3 sm:py-4 space-y-2">
+              <p className="text-gray-500 text-sm">Geen lessen gevonden voor deze week</p>
+              <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50 text-xs sm:text-sm" asChild>
                 <div onClick={() => setLocation('/lessons/new')}>Les toevoegen</div>
               </Button>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {currentWeekLessons.slice(0, 5).map((lesson: Lesson, index: number) => (
-                <div key={index} className="flex items-center p-3 hover:bg-sky-50/50 rounded-md border border-sky-100 shadow-sm transition-colors duration-200">
-                  <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-2 rounded-md border border-sky-200 shadow-sm">
-                    <Clock className="h-5 w-5 text-[#1e3a8a]" />
+                <div key={index} className="flex flex-col sm:flex-row sm:items-center p-2 sm:p-3 hover:bg-sky-50/50 rounded-md border border-sky-100 shadow-sm transition-colors duration-200 gap-2">
+                  <div className="flex items-center">
+                    <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-1.5 sm:p-2 rounded-md border border-sky-200 shadow-sm">
+                      <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-[#1e3a8a]" />
+                    </div>
+                    <div className="ml-2 sm:ml-3 flex-grow">
+                      <p className="text-xs sm:text-sm font-medium text-gray-800">{lesson.title || 'Les ' + (index + 1)}</p>
+                      <p className="text-xs text-gray-500">
+                        {lesson.date ? format(parseISO(lesson.date), 'EEEE d MMMM', { locale: nl }) : ''} 
+                        {lesson.startTime && lesson.endTime ? ` • ${lesson.startTime} - ${lesson.endTime}` : ''}
+                      </p>
+                    </div>
                   </div>
-                  <div className="ml-3 flex-grow">
-                    <p className="text-sm font-medium text-gray-800">{lesson.title || 'Les ' + (index + 1)}</p>
-                    <p className="text-xs text-gray-500">
-                      {lesson.date ? format(parseISO(lesson.date), 'EEEE d MMMM', { locale: nl }) : ''} 
-                      {lesson.startTime && lesson.endTime ? ` • ${lesson.startTime} - ${lesson.endTime}` : ''}
-                    </p>
-                  </div>
-                  <div className="flex items-center bg-sky-50 px-2 py-1 rounded-md border border-sky-100">
-                    <BookText className="h-4 w-4 text-[#1e3a8a] mr-1" />
-                    <span className="text-sm text-sky-700">{lesson.courseName || 'Onbekende cursus'}</span>
+                  <div className="flex items-center bg-sky-50 px-2 py-1 rounded-md border border-sky-100 text-xs sm:text-sm mt-1 sm:mt-0 self-start sm:self-auto">
+                    <BookText className="h-3 w-3 sm:h-4 sm:w-4 text-[#1e3a8a] mr-1" />
+                    <span className="text-sky-700 truncate max-w-[120px] sm:max-w-none">{lesson.courseName || 'Onbekende cursus'}</span>
                   </div>
                 </div>
               ))}

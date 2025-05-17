@@ -440,17 +440,6 @@ export default function Students() {
             Bekijk en beheer alle studentgegevens
           </p>
         </div>
-        <Button 
-          variant="default" 
-          size="default" 
-          className="bg-primary hover:bg-primary/90"
-          onClick={() => {
-            resetForm();
-            setIsCreateDialogOpen(true);
-          }}
-        >
-          <PlusCircle className="mr-2 h-4 w-4" /> Student Toevoegen
-        </Button>
       </div>
 
       {/* Notification dialog voor nieuw betalingsrecord */}
@@ -521,37 +510,51 @@ export default function Students() {
         </DialogContent>
       </Dialog>
       
-      <div className="mb-6 flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            type="search"
-            placeholder="Zoek studenten..."
-            className="pl-8 bg-white"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      <div className="mb-6 flex flex-col md:flex-row gap-4 justify-between">
+        <div className="flex flex-col md:flex-row gap-4 flex-1">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="search"
+              placeholder="Zoek studenten..."
+              className="pl-8 bg-white"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="default"
+              className="border-gray-300 text-gray-700"
+              onClick={() => setShowFilterOptions(!showFilterOptions)}
+            >
+              <Filter className="mr-2 h-4 w-4" /> Filteren
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="default"
+              className="border-gray-300 text-gray-700"
+              onClick={exportStudentsAsPDF}
+            >
+              <Download className="mr-2 h-4 w-4" /> Exporteren
+            </Button>
+          </div>
         </div>
         
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="default"
-            className="border-gray-300 text-gray-700"
-            onClick={() => setShowFilterOptions(!showFilterOptions)}
-          >
-            <Filter className="mr-2 h-4 w-4" /> Filteren
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="default"
-            className="border-gray-300 text-gray-700"
-            onClick={exportStudentsAsPDF}
-          >
-            <Download className="mr-2 h-4 w-4" /> Exporteren
-          </Button>
-        </div>
+        <Button 
+          variant="default" 
+          size="default" 
+          className="bg-primary hover:bg-primary/90"
+          onClick={() => {
+            resetForm();
+            setIsCreateDialogOpen(true);
+          }}
+        >
+          <PlusCircle className="mr-2 h-4 w-4" /> Student Toevoegen
+        </Button>
       </div>
 
       {/* Filter opties */}

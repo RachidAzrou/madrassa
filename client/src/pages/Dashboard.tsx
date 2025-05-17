@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { format, startOfWeek, endOfWeek, addDays, parseISO, isToday, isWithinInterval } from 'date-fns';
 import { nl } from 'date-fns/locale';
 
@@ -71,6 +72,12 @@ export default function Dashboard() {
     staleTime: 60000,
   });
 
+  // Actieve cursussen ophalen
+  const { data: activeCourses = [], isLoading: isActiveCoursesLoading } = useQuery({
+    queryKey: ['/api/dashboard/active-courses'],
+    staleTime: 60000,
+  });
+
   // Interfaces voor typering
   interface StatsData {
     totalStudents: number;
@@ -78,6 +85,15 @@ export default function Dashboard() {
     activePrograms: number;
     totalTeachers: number;
     studentGroups: number;
+  }
+
+  interface Course {
+    id: number;
+    name: string;
+    code: string;
+    description: string;
+    credits: number;
+    programId: number | null;
   }
 
   interface Student {
@@ -367,7 +383,7 @@ export default function Dashboard() {
             </Button>
           </div>
           
-          {isStatsLoading ? (
+          {isStatsLoading || isActiveCoursesLoading ? (
             <div className="flex justify-center p-4">
               <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
@@ -380,6 +396,35 @@ export default function Dashboard() {
                 <h4 className="text-sm font-medium text-gray-600 mb-1">Actieve vakken</h4>
                 <p className="text-2xl font-bold text-[#1e3a8a]">{stats.activeCourses}</p>
               </div>
+              
+              {/* Actieve vakken lijst */}
+              {activeCourses.length > 0 ? (
+                <div className="space-y-3 mb-3">
+                  <h4 className="text-sm font-medium text-gray-600">Recente actieve vakken</h4>
+                  <div className="grid grid-cols-1 gap-2">
+                    {activeCourses.slice(0, 3).map((course) => (
+                      <div key={course.id} className="flex justify-between items-center p-3 bg-white rounded-md border border-sky-100 shadow-sm">
+                        <div className="flex items-center">
+                          <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-2 rounded-md border border-sky-200">
+                            <BookOpen className="h-5 w-5 text-[#1e3a8a]" />
+                          </div>
+                          <div className="ml-3">
+                            <p className="text-sm font-medium text-gray-800">{course.name}</p>
+                            <p className="text-xs text-gray-500">{course.code}</p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-medium">
+                          Actief
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center p-4 bg-white rounded-md border border-sky-100">
+                  <p className="text-sm text-gray-500">Geen actieve vakken gevonden</p>
+                </div>
+              )}
               
               <div className="grid grid-cols-1 gap-3">
                 <div className="flex items-center p-3 bg-white rounded-md border border-sky-100 shadow-sm hover:bg-sky-50/50 transition-colors duration-200">

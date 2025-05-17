@@ -491,8 +491,8 @@ export default function Fees() {
       </div>
 
       {/* Zoek en acties */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-        <div className="relative w-full md:w-64">
+      <div className="flex flex-col md:flex-row justify-end items-center gap-4 mb-6">
+        <div className="relative w-full md:w-64 order-2 md:order-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Zoek betalingsrecords of studenten..."
@@ -502,7 +502,7 @@ export default function Fees() {
           />
         </div>
         
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 order-1 md:order-2">
           <Button onClick={() => {
             // Actie afhankelijk van het huidige tabblad
             if (activeTab === 'fee-records') {

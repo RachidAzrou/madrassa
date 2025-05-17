@@ -461,13 +461,18 @@ export default function Attendance() {
         </div>
       </div>
       
-      {/* Navigatieknoppen onder de streep */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
-        <div className="flex items-center space-x-3 w-full md:w-auto">
-          <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)} className="w-full md:w-auto">
+      {/* Datum weergave en navigatie */}
+      <div className="flex flex-col items-center gap-4 mb-6">
+        <div className="w-full text-center">
+          <h2 className="text-xl font-semibold text-gray-800">{formatDate(selectedDate)}</h2>
+          <p className="text-sm text-gray-500 mt-1">Selecteer een datum om aanwezigheid te registreren</p>
+        </div>
+        
+        <div className="flex items-center space-x-3">
+          <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Vorige dag
           </Button>
-          <Button variant="outline" size="sm" onClick={() => handleDateChange(1)} className="w-full md:w-auto">
+          <Button variant="outline" size="sm" onClick={() => handleDateChange(1)}>
             Volgende dag <ArrowRight className="h-4 w-4 ml-1" />
           </Button>
         </div>

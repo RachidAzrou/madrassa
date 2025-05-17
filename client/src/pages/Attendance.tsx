@@ -543,13 +543,13 @@ export default function Attendance() {
               onValueChange={(value) => setSelectedTab(value as 'students' | 'teachers')}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="students" className="flex items-center">
-                  <User className="h-4 w-4 mr-1" />
+              <TabsList className="grid w-full grid-cols-2 p-1 bg-blue-900/10">
+                <TabsTrigger value="students" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                  <User className="h-4 w-4" />
                   Studenten
                 </TabsTrigger>
-                <TabsTrigger value="teachers" className="flex items-center">
-                  <UserCheck className="h-4 w-4 mr-1" />
+                <TabsTrigger value="teachers" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                  <UserCheck className="h-4 w-4" />
                   Docent
                 </TabsTrigger>
               </TabsList>

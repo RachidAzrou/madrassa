@@ -459,20 +459,20 @@ export default function Calendar() {
           </DialogHeader>
           
           <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value as 'exam' | 'class' | 'holiday' | 'event')}>
-            <TabsList className="grid grid-cols-4 mt-2">
-              <TabsTrigger value="exam" className="flex items-center justify-center gap-2">
+            <TabsList className="grid grid-cols-4 mt-2 p-1 bg-blue-900/10">
+              <TabsTrigger value="exam" className="flex items-center justify-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                 <FilePlus className="h-4 w-4" />
                 <span>Examen</span>
               </TabsTrigger>
-              <TabsTrigger value="class" className="flex items-center justify-center gap-2">
+              <TabsTrigger value="class" className="flex items-center justify-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                 <BookOpen className="h-4 w-4" />
                 <span>Les</span>
               </TabsTrigger>
-              <TabsTrigger value="holiday" className="flex items-center justify-center gap-2">
+              <TabsTrigger value="holiday" className="flex items-center justify-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                 <Palmtree className="h-4 w-4" />
                 <span>Vakantie</span>
               </TabsTrigger>
-              <TabsTrigger value="event" className="flex items-center justify-center gap-2">
+              <TabsTrigger value="event" className="flex items-center justify-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                 <PartyPopper className="h-4 w-4" />
                 <span>Activiteit</span>
               </TabsTrigger>

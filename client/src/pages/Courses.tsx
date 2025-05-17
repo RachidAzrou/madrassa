@@ -505,12 +505,12 @@ export default function Courses() {
               
               <div className="mt-6">
                 <Tabs defaultValue="details">
-                  <TabsList className="mb-4">
-                    <TabsTrigger value="details">Details</TabsTrigger>
-                    <TabsTrigger value="content">Inhoud</TabsTrigger>
-                    <TabsTrigger value="requirements">Vereisten</TabsTrigger>
-                    <TabsTrigger value="materials">Lesmateriaal</TabsTrigger>
-                    <TabsTrigger value="curriculum">Leerplan</TabsTrigger>
+                  <TabsList className="mb-4 p-1 bg-blue-900/10">
+                    <TabsTrigger value="details" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Details</TabsTrigger>
+                    <TabsTrigger value="content" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Inhoud</TabsTrigger>
+                    <TabsTrigger value="requirements" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Vereisten</TabsTrigger>
+                    <TabsTrigger value="materials" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lesmateriaal</TabsTrigger>
+                    <TabsTrigger value="curriculum" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Leerplan</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="details">
@@ -850,14 +850,14 @@ export default function Courses() {
           
           <form onSubmit={isAddDialogOpen ? handleSubmitCourse : handleSubmitEditCourse} className="space-y-6 pt-4">
             <Tabs defaultValue="basic">
-              <TabsList className="grid grid-cols-3 mb-6">
-                <TabsTrigger value="basic">
+              <TabsList className="grid grid-cols-3 mb-6 p-1 bg-blue-900/10">
+                <TabsTrigger value="basic" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                   <BookOpen className="h-4 w-4 mr-2" /> Algemeen
                 </TabsTrigger>
-                <TabsTrigger value="materiaal">
+                <TabsTrigger value="materiaal" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                   <FileUp className="h-4 w-4 mr-2" /> Lesmateriaal
                 </TabsTrigger>
-                <TabsTrigger value="opdrachten">
+                <TabsTrigger value="opdrachten" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                   <FileText className="h-4 w-4 mr-2" /> Opdrachten/Testen
                 </TabsTrigger>
               </TabsList>

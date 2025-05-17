@@ -366,20 +366,22 @@ const MyAccount = () => {
         {/* Profielkaart */}
         <Card className="w-full md:w-1/3">
           <CardHeader className="text-center">
-            <Avatar className="w-24 h-24 mx-auto mb-4">
-              <AvatarImage src={currentUser.avatar} />
-              <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
-                {currentUser.firstName[0]}{currentUser.lastName[0]}
-              </AvatarFallback>
-            </Avatar>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="absolute top-4 right-4 rounded-full p-2"
-              onClick={handleProfilePhotoUpload}
-            >
-              <UploadCloud className="h-4 w-4" />
-            </Button>
+            <div className="relative mx-auto w-24 h-24 mb-4">
+              <Avatar className="w-24 h-24">
+                <AvatarImage src={currentUser.avatar} />
+                <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
+                  {currentUser.firstName[0]}{currentUser.lastName[0]}
+                </AvatarFallback>
+              </Avatar>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="absolute bottom-0 right-0 rounded-full p-1.5 bg-white/90"
+                onClick={handleProfilePhotoUpload}
+              >
+                <UploadCloud className="h-4 w-4" />
+              </Button>
+            </div>
             <CardTitle>{currentUser.firstName} {currentUser.lastName}</CardTitle>
             <CardDescription>{currentUser.role}</CardDescription>
           </CardHeader>

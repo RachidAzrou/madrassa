@@ -83,28 +83,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             {children}
           </div>
         </main>
-        
-        {/* Footer */}
-        <footer className="py-3 px-4 sm:py-4 sm:px-6 border-t border-gray-200 bg-white">
-          <div className="max-w-7xl mx-auto w-full">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
-                © {new Date().getFullYear()} <span className="text-gray-600">my</span><span className="text-[#3b5998]">Madrassa</span>. Alle rechten voorbehouden.
-              </p>
-              <div className="flex justify-center sm:justify-end space-x-3 sm:space-x-4">
-                <a href="#" className="text-xs sm:text-sm text-gray-500 hover:text-primary">
-                  Privacybeleid
-                </a>
-                <a href="#" className="text-xs sm:text-sm text-gray-500 hover:text-primary">
-                  Gebruiksvoorwaarden
-                </a>
-                <a href="#" className="text-xs sm:text-sm text-gray-500 hover:text-primary">
-                  Hulp
-                </a>
-              </div>
-            </div>
-          </div>
-        </footer>
       </div>
     </div>
   );

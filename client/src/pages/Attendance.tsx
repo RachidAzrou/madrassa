@@ -173,112 +173,116 @@ export default function Attendance() {
           <p className="text-sm text-gray-500">Registreer en beheer de aanwezigheid van studenten en docenten</p>
         </CardHeader>
         <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <TabsList className="w-3/4 grid grid-cols-2 bg-blue-900/10">
-              <TabsTrigger value="students">
-                <Users2 className="h-4 w-4 mr-2" />
-                Studenten
-              </TabsTrigger>
-              <TabsTrigger value="teachers">
-                <GraduationCap className="h-4 w-4 mr-2" />
-                Docenten
-              </TabsTrigger>
-            </TabsList>
-            
-            <Button variant="default" size="sm" className="bg-blue-900 hover:bg-blue-800" onClick={() => console.log('Save attendance')}>
-              <Save className="h-4 w-4 mr-2" />
-              Opslaan
-            </Button>
+          <div className="mb-6">
+            <div className="flex justify-between items-center">
+              <Tabs defaultValue="students" className="w-full">
+                <div className="flex justify-between items-center">
+                  <TabsList className="w-3/4 grid grid-cols-2 bg-blue-900/10">
+                    <TabsTrigger value="students">
+                      <Users2 className="h-4 w-4 mr-2" />
+                      Studenten
+                    </TabsTrigger>
+                    <TabsTrigger value="teachers">
+                      <GraduationCap className="h-4 w-4 mr-2" />
+                      Docenten
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <Button variant="default" size="sm" className="bg-blue-900 hover:bg-blue-800" onClick={() => console.log('Save attendance')}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Opslaan
+                  </Button>
+                </div>
+
+                <TabsContent value="students">
+                  <div className="space-y-4 mt-6">
+                    <div className="bg-slate-50 p-3 px-4 rounded-md border shadow-sm mb-6">
+                      <div className="text-center">
+                        <div className="text-sm font-medium text-gray-700 mb-3">Groepsacties</div>
+                      </div>
+                      <div className="flex gap-3 justify-around">
+                        <Button variant="outline" size="sm" onClick={() => console.log('Mark all present')} className="bg-white border-green-600 text-green-600 hover:bg-green-50 flex-1">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Allen aanwezig
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => console.log('Mark all absent')} className="bg-white border-red-600 text-red-600 hover:bg-red-50 flex-1">
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Allen afwezig
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="rounded-md border shadow-sm overflow-hidden">
+                      <div className="grid grid-cols-2 bg-slate-100 p-3 text-xs font-medium text-slate-700">
+                        <div>Student</div>
+                        <div className="text-right">Acties</div>
+                      </div>
+                      <div className="divide-y bg-white">
+                        {students.map(student => (
+                          <div key={student.id} className="grid grid-cols-2 items-center p-3 hover:bg-gray-50">
+                            <div className="font-medium">{student.firstName} {student.lastName}</div>
+                            <div className="flex justify-end gap-2">
+                              <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => console.log('Mark present')}>
+                                Aanwezig
+                              </Button>
+                              <Button variant="outline" size="sm" className="text-amber-600 border-amber-600 hover:bg-amber-50" onClick={() => console.log('Mark late')}>
+                                Te laat
+                              </Button>
+                              <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50" onClick={() => console.log('Mark absent')}>
+                                Afwezig
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="teachers">
+                  <div className="space-y-4 mt-6">
+                    <div className="bg-slate-50 p-3 px-4 rounded-md border shadow-sm mb-6">
+                      <div className="text-center">
+                        <div className="text-sm font-medium text-gray-700 mb-3">Groepsacties</div>
+                      </div>
+                      <div className="flex gap-3 justify-around">
+                        <Button variant="outline" size="sm" onClick={() => console.log('Mark all present')} className="bg-white border-green-600 text-green-600 hover:bg-green-50 flex-1">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Allen aanwezig
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => console.log('Mark all absent')} className="bg-white border-red-600 text-red-600 hover:bg-red-50 flex-1">
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Allen afwezig
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="rounded-md border shadow-sm overflow-hidden">
+                      <div className="grid grid-cols-2 bg-slate-100 p-3 text-xs font-medium text-slate-700">
+                        <div>Docent</div>
+                        <div className="text-right">Acties</div>
+                      </div>
+                      <div className="divide-y bg-white">
+                        {teachers.map(teacher => (
+                          <div key={teacher.id} className="grid grid-cols-2 items-center p-3 hover:bg-gray-50">
+                            <div className="font-medium">{teacher.firstName} {teacher.lastName}</div>
+                            <div className="flex justify-end gap-2">
+                              <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => console.log('Mark present')}>
+                                Aanwezig
+                              </Button>
+                              <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50" onClick={() => console.log('Mark absent')}>
+                                Afwezig
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
           </div>
-          
-          <Tabs defaultValue="students">
-            <TabsContent value="students">
-              <div className="space-y-4">
-                <div className="bg-slate-50 p-3 px-4 rounded-md border shadow-sm mb-6">
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-gray-700 mb-3">Groepsacties</div>
-                  </div>
-                  <div className="flex gap-3 justify-around">
-                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all present')} className="bg-white border-green-600 text-green-600 hover:bg-green-50 flex-1">
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Allen aanwezig
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all absent')} className="bg-white border-red-600 text-red-600 hover:bg-red-50 flex-1">
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Allen afwezig
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="rounded-md border shadow-sm overflow-hidden">
-                  <div className="grid grid-cols-2 bg-slate-100 p-3 text-xs font-medium text-slate-700">
-                    <div>Student</div>
-                    <div className="text-right">Acties</div>
-                  </div>
-                  <div className="divide-y bg-white">
-                    {students.map(student => (
-                      <div key={student.id} className="grid grid-cols-2 items-center p-3 hover:bg-gray-50">
-                        <div className="font-medium">{student.firstName} {student.lastName}</div>
-                        <div className="flex justify-end gap-2">
-                          <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => console.log('Mark present')}>
-                            Aanwezig
-                          </Button>
-                          <Button variant="outline" size="sm" className="text-amber-600 border-amber-600 hover:bg-amber-50" onClick={() => console.log('Mark late')}>
-                            Te laat
-                          </Button>
-                          <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50" onClick={() => console.log('Mark absent')}>
-                            Afwezig
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="teachers">
-              <div className="space-y-4">
-                <div className="bg-slate-50 p-3 px-4 rounded-md border shadow-sm mb-6">
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-gray-700 mb-3">Groepsacties</div>
-                  </div>
-                  <div className="flex gap-3 justify-around">
-                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all present')} className="bg-white border-green-600 text-green-600 hover:bg-green-50 flex-1">
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Allen aanwezig
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => console.log('Mark all absent')} className="bg-white border-red-600 text-red-600 hover:bg-red-50 flex-1">
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Allen afwezig
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="rounded-md border shadow-sm overflow-hidden">
-                  <div className="grid grid-cols-2 bg-slate-100 p-3 text-xs font-medium text-slate-700">
-                    <div>Docent</div>
-                    <div className="text-right">Acties</div>
-                  </div>
-                  <div className="divide-y bg-white">
-                    {teachers.map(teacher => (
-                      <div key={teacher.id} className="grid grid-cols-2 items-center p-3 hover:bg-gray-50">
-                        <div className="font-medium">{teacher.firstName} {teacher.lastName}</div>
-                        <div className="flex justify-end gap-2">
-                          <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => console.log('Mark present')}>
-                            Aanwezig
-                          </Button>
-                          <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50" onClick={() => console.log('Mark absent')}>
-                            Afwezig
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
         </CardContent>
       </Card>
     </div>

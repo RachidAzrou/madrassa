@@ -261,22 +261,7 @@ export default function Scheduling() {
             <Card>
               <CardHeader>
                 <CardTitle>Lokalentoewijzing</CardTitle>
-                <div className="flex gap-2">
-                  <Select defaultValue="all">
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Filter op gebouw" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Alle gebouwen</SelectItem>
-                      <SelectItem value="a">Gebouw A</SelectItem>
-                      <SelectItem value="b">Gebouw B</SelectItem>
-                      <SelectItem value="c">Gebouw C</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline" size="icon">
-                    <Download className="h-4 w-4" />
-                  </Button>
-                </div>
+
               </CardHeader>
               <CardContent>
                 <div className="rounded-md border">

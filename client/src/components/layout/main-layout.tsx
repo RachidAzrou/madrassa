@@ -78,7 +78,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       {/* Main content */}
       <div className="flex flex-col flex-1 min-h-screen overflow-hidden">
         <Header onMenuClick={toggleSidebar} title={pageTitle} />
-        
         <main className="flex-1 p-2 sm:p-4 md:p-6 overflow-x-auto">
           <div className="max-w-7xl mx-auto w-full">
             {children}

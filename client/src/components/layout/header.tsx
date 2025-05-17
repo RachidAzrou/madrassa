@@ -58,74 +58,74 @@ const Header = ({ onMenuClick }: HeaderProps) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-white border-b border-gray-200">
-      <div className="flex justify-end items-center h-14">
-        <div className="flex items-center gap-1 pr-2">
-          {/* Meldingen belletje met dropdown */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-gray-500 relative">
-                <Bell className="h-5 w-5" />
-                {unreadCount > 0 && (
-                  <Badge 
-                    className="absolute -top-1 -right-1 px-1.5 py-0.5 h-5 min-w-[20px] flex items-center justify-center bg-red-500 text-white"
-                  >
-                    {unreadCount}
-                  </Badge>
-                )}
-                <span className="sr-only">Meldingen</span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80 p-0" align="end">
-              <div className="p-3 border-b flex items-center justify-between">
-                <h3 className="font-medium">Meldingen</h3>
-                {unreadCount > 0 && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={markAllAsRead} 
-                    className="text-xs h-8 px-2 py-1"
-                  >
-                    Alles als gelezen markeren
-                  </Button>
-                )}
-              </div>
-              <ScrollArea className="max-h-[300px]">
-                {notifications.length > 0 ? (
-                  <div className="divide-y">
-                    {notifications.map((notification) => (
-                      <div 
-                        key={notification.id} 
-                        className={`p-3 hover:bg-gray-50 ${notification.read ? '' : 'bg-blue-50'}`}
-                        onClick={() => markAsRead(notification.id)}
-                      >
-                        <div className="flex justify-between items-start">
-                          <h4 className="font-medium text-sm">{notification.title}</h4>
-                          <span className="text-xs text-gray-500">{notification.time}</span>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="p-4 text-center text-gray-500">
-                    Geen meldingen
-                  </div>
-                )}
-              </ScrollArea>
-            </PopoverContent>
-          </Popover>
-
-          {/* Instellingen icoon met link naar Instellingen pagina */}
-          <Button variant="ghost" size="icon" className="text-gray-500" asChild>
-            <Link href="/settings">
-              <Settings className="h-5 w-5" />
-              <span className="sr-only">Instellingen</span>
-            </Link>
+    <div className="absolute top-2 right-2 z-50 flex items-center gap-1.5">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onMenuClick}
+        className="md:hidden bg-white/50 hover:bg-white/80 text-gray-700"
+      >
+        <Menu className="h-5 w-5" />
+      </Button>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="ghost" size="icon" className="bg-white/50 hover:bg-white/80 text-gray-700 relative">
+            <Bell className="h-5 w-5" />
+            {unreadCount > 0 && (
+              <Badge 
+                className="absolute -top-1 -right-1 px-1.5 py-0.5 h-5 min-w-[20px] flex items-center justify-center bg-red-500 text-white"
+              >
+                {unreadCount}
+              </Badge>
+            )}
           </Button>
-        </div>
-      </div>
-    </header>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-0" align="end">
+          <div className="p-3 border-b flex items-center justify-between">
+            <h3 className="font-medium">Meldingen</h3>
+            {unreadCount > 0 && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={markAllAsRead} 
+                className="text-xs h-8 px-2 py-1"
+              >
+                Alles als gelezen markeren
+              </Button>
+            )}
+          </div>
+          <ScrollArea className="max-h-[300px]">
+            {notifications.length > 0 ? (
+              <div className="divide-y">
+                {notifications.map((notification) => (
+                  <div 
+                    key={notification.id} 
+                    className={`p-3 hover:bg-gray-50 ${notification.read ? '' : 'bg-blue-50'}`}
+                    onClick={() => markAsRead(notification.id)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <h4 className="font-medium text-sm">{notification.title}</h4>
+                      <span className="text-xs text-gray-500">{notification.time}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-4 text-center text-gray-500">
+                Geen meldingen
+              </div>
+            )}
+          </ScrollArea>
+        </PopoverContent>
+      </Popover>
+      
+      <Button variant="ghost" size="icon" className="bg-white/50 hover:bg-white/80 text-gray-700" asChild>
+        <Link href="/settings">
+          <Settings className="h-5 w-5" />
+        </Link>
+      </Button>
+    </div>
   );
 };
 

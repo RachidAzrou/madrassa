@@ -313,20 +313,19 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
       </nav>
 
-      {/* User profile */}
+      {/* Afmelden knop */}
       <div className="border-t border-gray-200 p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-            <span className="font-semibold">JD</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-800 truncate">Beheerder</p>
-            <p className="text-xs text-gray-500 truncate">admin@mymadrassa.nl</p>
-          </div>
-          <button className="p-1.5 rounded text-gray-500 hover:bg-gray-100">
-            <LogOut className="h-4 w-4" />
-          </button>
-        </div>
+        <button 
+          className="flex items-center justify-center w-full p-2 bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white rounded-md transition-colors"
+          onClick={() => {
+            // Implementatie van afmelden logica
+            console.log('Afmelden...');
+            // Window.location.href = '/api/logout'; // Uncomment wanneer API-eindpunt beschikbaar is
+          }}
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          <span className="font-medium">Afmelden</span>
+        </button>
       </div>
     </aside>
   );

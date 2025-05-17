@@ -386,11 +386,11 @@ export default function Calendar() {
         <div className="bg-white rounded-lg shadow-md border border-sky-200 overflow-hidden">
           {/* Week days header */}
           <div className="grid grid-cols-7 border-b border-sky-200">
-            {['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'].map((day, index) => (
+            {['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].map((day, index) => (
               <div 
                 key={day} 
                 className={`py-3 text-center ${
-                  index === 0 || index === 6 
+                  index === 5 || index === 6 
                     ? 'bg-gradient-to-b from-sky-50 to-sky-100/40 text-sky-700' 
                     : 'bg-white text-gray-700'
                 } text-sm font-semibold border-b border-sky-100`}
@@ -473,26 +473,34 @@ export default function Calendar() {
         <div className="bg-white rounded-lg shadow-md border border-sky-200 overflow-hidden">
           {/* Weekdagen header */}
           <div className="grid grid-cols-7 border-b border-sky-200">
-            {['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'].map((day, index) => {
-              // Bereken datum voor elke dag van de huidige week
+            {['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].map((day, index) => {
+              // Bereken datum voor elke dag van de huidige week (maandag als start)
               const currentWeekDay = new Date(currentDate);
-              const firstDayOfWeek = new Date(currentWeekDay);
-              const diff = currentWeekDay.getDay() - index;
-              firstDayOfWeek.setDate(currentWeekDay.getDate() - diff);
+              // Pas aan voor maandag als startdag van de week (1 = Ma, 2 = Di, etc.)
+              // Zondag wordt 0, dus bij zondag zorgen we dat het 7 wordt
+              const currentDay = currentWeekDay.getDay() || 7; // Zondag van 0 naar 7
+              const distanceFromMonday = currentDay - 1; // Verschil met maandag
+              const mondayOfWeek = new Date(currentWeekDay);
+              mondayOfWeek.setDate(currentWeekDay.getDate() - distanceFromMonday);
+              
+              // Nu berekenen we de datum voor elke weekdag, startend bij maandag (0 = ma, 1 = di, etc.)
+              const targetDay = new Date(mondayOfWeek);
+              targetDay.setDate(mondayOfWeek.getDate() + index);
               
               // Check of dag vandaag is
-              const isToday = firstDayOfWeek.toDateString() === new Date().toDateString();
+              const isToday = targetDay.toDateString() === new Date().toDateString();
               
               return (
                 <div 
                   key={day} 
                   className={`p-3 text-center border-b ${isToday 
                     ? 'bg-sky-50 border-sky-300' 
-                    : 'bg-gradient-to-b from-gray-50 to-gray-100 border-gray-200'}`}
+                    : (index >= 5) ? 'bg-gradient-to-b from-sky-50 to-sky-100/40 border-gray-200' 
+                      : 'bg-gradient-to-b from-gray-50 to-gray-100 border-gray-200'}`}
                 >
-                  <div className={`text-sm font-semibold ${isToday ? 'text-sky-700' : 'text-gray-800'}`}>{day}</div>
+                  <div className={`text-sm font-semibold ${isToday ? 'text-sky-700' : (index >= 5) ? 'text-sky-700' : 'text-gray-800'}`}>{day}</div>
                   <div className={`text-xs ${isToday ? 'text-sky-600' : 'text-gray-500'}`}>
-                    {formatDate(firstDayOfWeek)}
+                    {formatDate(targetDay)}
                   </div>
                 </div>
               );
@@ -502,14 +510,22 @@ export default function Calendar() {
           {/* Week view tijdslots */}
           <div className="grid grid-cols-7 divide-x divide-sky-100">
             {Array.from({ length: 7 }).map((_, dayIndex) => {
-              // Bereken datum voor elke dag
+              // Bereken datum voor elke dag startend op maandag
               const currentWeekDay = new Date(currentDate);
-              const targetDay = new Date(currentWeekDay);
-              const diff = currentWeekDay.getDay() - dayIndex;
-              targetDay.setDate(currentWeekDay.getDate() - diff);
+              // Pas aan voor maandag als startdag van de week
+              const currentDay = currentWeekDay.getDay() || 7; // Zondag van 0 naar 7
+              const distanceFromMonday = currentDay - 1; // Verschil met maandag
+              const mondayOfWeek = new Date(currentWeekDay);
+              mondayOfWeek.setDate(currentWeekDay.getDate() - distanceFromMonday);
+              
+              // Dan berekenen we de datum voor elke weekdag, startend bij maandag
+              const targetDay = new Date(mondayOfWeek);
+              targetDay.setDate(mondayOfWeek.getDate() + dayIndex);
               
               // Check of dag vandaag is
               const isToday = targetDay.toDateString() === new Date().toDateString();
+              // Check of dag weekend is
+              const isWeekend = dayIndex >= 5;
               
               // Filter evenementen voor deze dag
               const dayEvents = (events || []).filter(event => {
@@ -519,17 +535,24 @@ export default function Calendar() {
               
               // Genereer tijdslots (8:00 - 20:00)
               return (
-                <div key={dayIndex} className={`min-h-[650px] relative ${isToday ? 'bg-sky-50/30' : ''}`}>
+                <div key={dayIndex} className={`min-h-[650px] relative ${isToday ? 'bg-sky-50/30' : isWeekend ? 'bg-sky-50/10' : ''}`}>
                   {Array.from({ length: 13 }).map((_, hourIndex) => {
                     const hour = hourIndex + 8; // Start vanaf 8:00
+                    const isEvenHour = hour % 2 === 0;
                     return (
                       <div 
                         key={hourIndex} 
-                        className="h-12 border-b border-sky-100 relative px-1"
+                        className={`h-12 border-b ${isEvenHour ? 'border-sky-100' : 'border-sky-50'} relative px-1`}
                       >
                         {dayIndex === 0 && (
-                          <div className="absolute left-1 -translate-y-1/2 text-xs text-gray-400 w-8">
+                          <div className="absolute left-1 -translate-y-1/2 text-xs font-medium bg-sky-50 px-1 py-0.5 rounded text-gray-600 w-10 text-center">
                             {hour}:00
+                          </div>
+                        )}
+                        {/* Voeg halve uren toe */}
+                        {dayIndex === 0 && hour < 20 && (
+                          <div className="absolute left-1 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 w-10 text-center">
+                            {hour}:30
                           </div>
                         )}
                       </div>
@@ -555,6 +578,7 @@ export default function Calendar() {
                       >
                         <div className="font-medium truncate">{event.title}</div>
                         <div className="text-xs truncate">
+                          <Clock className="h-3 w-3 inline mr-1" />
                           {event.startTime} - {event.endTime}
                         </div>
                         {event.location && (
@@ -575,7 +599,7 @@ export default function Calendar() {
         <div className="bg-white rounded-lg shadow-md border border-sky-200 overflow-hidden">
           {/* Dag header */}
           <div className="p-4 text-center border-b border-sky-200 bg-gradient-to-r from-sky-50 to-sky-100/50">
-            <div className="text-base font-medium text-sky-800">
+            <div className="text-base font-semibold text-sky-800">
               {formatDayDate(currentDate)}
             </div>
           </div>
@@ -583,29 +607,43 @@ export default function Calendar() {
           {/* Dag tijdslots */}
           <div className="min-h-[700px] relative p-4">
             {/* Tijdsaanduidingen */}
-            <div className="absolute top-0 left-0 w-16 bottom-0 border-r border-sky-100">
+            <div className="absolute top-0 left-0 w-20 bottom-0 border-r border-sky-100">
               {Array.from({ length: 13 }).map((_, index) => {
                 const hour = index + 8; // Start vanaf 8:00
                 return (
                   <div key={index} className="h-14 relative">
-                    <div className="absolute right-2 top-0 -translate-y-1/2 text-xs font-medium text-gray-600">
+                    <div className="absolute right-2 top-0 -translate-y-1/2 bg-sky-50 px-2 py-0.5 rounded-md text-xs font-medium text-gray-600">
                       {hour}:00
                     </div>
+                    {/* Voeg halve uren toe */}
+                    {hour < 20 && (
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-medium text-gray-400">
+                        {hour}:30
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
             
             {/* Horizontale lijnen voor de uren */}
-            <div className="ml-16 relative">
+            <div className="ml-20 relative">
               {Array.from({ length: 13 }).map((_, index) => {
                 // Even uren donkerder maken
                 const isEvenHour = (index + 8) % 2 === 0;
+                const hour = index + 8;
+                
                 return (
-                  <div 
-                    key={index} 
-                    className={`h-14 border-b ${isEvenHour ? 'border-sky-100' : 'border-sky-50'}`}
-                  />
+                  <div key={index} className="relative">
+                    {/* Hoofduur lijn */}
+                    <div 
+                      className={`h-7 border-b ${isEvenHour ? 'border-sky-100' : 'border-sky-50'}`}
+                    />
+                    {/* Half uur lijn (alleen als niet het laatste uur) */}
+                    {hour < 20 && (
+                      <div className="h-7 border-b border-dashed border-sky-50" />
+                    )}
+                  </div>
                 );
               })}
               
@@ -628,18 +666,29 @@ export default function Calendar() {
                   return (
                     <div 
                       key={event.id}
-                      className={`absolute left-16 right-4 rounded-md px-4 py-2.5 shadow-md hover:shadow-lg transition-shadow ${getEventColor(event.type)}`}
+                      className={`absolute left-0 right-4 rounded-md px-4 py-2.5 shadow-md hover:shadow-lg transition-shadow ${getEventColor(event.type)}`}
                       style={{ top: `${top}px`, height: `${height}px` }}
                     >
-                      <div className="font-medium text-sm">{event.title}</div>
-                      <div className="text-xs font-medium mt-1">
-                        <Clock className="h-3 w-3 inline mr-1" /> 
-                        {event.startTime} - {event.endTime}
+                      <div className="font-medium text-sm flex items-center">
+                        {event.type === 'exam' && <BookOpen className="h-4 w-4 mr-2" />}
+                        {event.type === 'class' && <GraduationCap className="h-4 w-4 mr-2" />}
+                        {event.type === 'holiday' && <Palmtree className="h-4 w-4 mr-2" />}
+                        {event.type === 'event' && <PartyPopper className="h-4 w-4 mr-2" />}
+                        {event.title}
+                      </div>
+                      <div className="text-xs font-medium mt-1.5 flex items-center gap-1.5">
+                        <Clock className="h-3 w-3" /> 
+                        <span>{event.startTime} - {event.endTime}</span>
                       </div>
                       {event.location && (
-                        <div className="text-xs mt-1">
-                          <MapPin className="h-3 w-3 inline mr-1" />
-                          {event.location}
+                        <div className="text-xs mt-1.5 flex items-center gap-1.5">
+                          <MapPin className="h-3 w-3" />
+                          <span>{event.location}</span>
+                        </div>
+                      )}
+                      {event.description && (
+                        <div className="text-xs mt-2 pt-1.5 border-t border-current border-opacity-20">
+                          {event.description}
                         </div>
                       )}
                     </div>

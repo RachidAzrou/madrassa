@@ -660,8 +660,12 @@ const MyAccount = () => {
                     </div>
 
                     <div className="mt-4">
-                      <Button variant="outline" size="sm">
-                        {currentUser.twoFactorEnabled ? 'Beheren' : 'Instellen'}
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => alert(twoFactorEnabled ? 'Tweestapsverificatie beheren' : 'Tweestapsverificatie instellen')}
+                      >
+                        {twoFactorEnabled ? 'Beheren' : 'Instellen'}
                       </Button>
                     </div>
                   </div>
@@ -713,9 +717,13 @@ const MyAccount = () => {
                         <p className="text-sm text-muted-foreground">Schakel tussen lichte en donkere weergave</p>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Switch id="darkmode" checked={currentUser.darkMode} />
+                        <Switch 
+                          id="darkmode" 
+                          checked={darkMode} 
+                          onCheckedChange={handleToggleDarkMode}
+                        />
                         <div className="flex items-center space-x-1">
-                          {currentUser.darkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                          {darkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
                         </div>
                       </div>
                     </div>
@@ -728,28 +736,32 @@ const MyAccount = () => {
                   <h3 className="text-lg font-medium mb-4">Startpagina</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div 
-                      className={`flex flex-col items-center p-4 border rounded-lg ${currentUser.defaultPage === "Dashboard" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
+                      className={`flex flex-col items-center p-4 border rounded-lg ${selectedDefaultPage === "Dashboard" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
+                      onClick={() => handleSelectDefaultPage("Dashboard")}
                     >
                       <Home className="h-8 w-8 mb-2" />
                       <span>Dashboard</span>
                     </div>
                     
                     <div 
-                      className={`flex flex-col items-center p-4 border rounded-lg ${currentUser.defaultPage === "Rooster" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
+                      className={`flex flex-col items-center p-4 border rounded-lg ${selectedDefaultPage === "Rooster" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
+                      onClick={() => handleSelectDefaultPage("Rooster")}
                     >
                       <Calendar className="h-8 w-8 mb-2" />
                       <span>Rooster</span>
                     </div>
                     
                     <div 
-                      className={`flex flex-col items-center p-4 border rounded-lg ${currentUser.defaultPage === "Mijn Klassen" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
+                      className={`flex flex-col items-center p-4 border rounded-lg ${selectedDefaultPage === "Mijn Klassen" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
+                      onClick={() => handleSelectDefaultPage("Mijn Klassen")}
                     >
                       <School className="h-8 w-8 mb-2" />
                       <span>Mijn Klassen</span>
                     </div>
                     
                     <div 
-                      className={`flex flex-col items-center p-4 border rounded-lg ${currentUser.defaultPage === "Mijn Vakken" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
+                      className={`flex flex-col items-center p-4 border rounded-lg ${selectedDefaultPage === "Mijn Vakken" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
+                      onClick={() => handleSelectDefaultPage("Mijn Vakken")}
                     >
                       <BookOpen className="h-8 w-8 mb-2" />
                       <span>Mijn Vakken</span>
@@ -776,8 +788,22 @@ const MyAccount = () => {
                   </>
                 )}
 
-                <Button className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90">
-                  Voorkeuren opslaan
+                {showSavedMessage && (
+                  <p className="text-sm text-green-600 mb-2">Voorkeuren succesvol opgeslagen!</p>
+                )}
+                <Button 
+                  className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                  onClick={savePreferences}
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                      Opslaan...
+                    </>
+                  ) : (
+                    "Voorkeuren opslaan"
+                  )}
                 </Button>
               </TabsContent>
 
@@ -793,28 +819,44 @@ const MyAccount = () => {
                             <Label htmlFor="notifyMessages">Nieuwe berichten</Label>
                             <p className="text-sm text-muted-foreground">Ontvang een e-mail wanneer u een nieuw bericht ontvangt</p>
                           </div>
-                          <Switch id="notifyMessages" checked={teacherUser.notifyMessages} />
+                          <Switch 
+                            id="notifyMessages" 
+                            checked={notificationSettings.emailNotifications.messages} 
+                            onCheckedChange={() => handleToggleNotification('email', 'messages')}
+                          />
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
                             <Label htmlFor="notifySchedule">Roosterwijzigingen</Label>
                             <p className="text-sm text-muted-foreground">Ontvang een e-mail bij wijzigingen in het rooster</p>
                           </div>
-                          <Switch id="notifySchedule" checked={teacherUser.notifyScheduleChanges} />
+                          <Switch 
+                            id="notifySchedule" 
+                            checked={notificationSettings.emailNotifications.scheduleChanges} 
+                            onCheckedChange={() => handleToggleNotification('email', 'scheduleChanges')}
+                          />
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
                             <Label htmlFor="notifyGrades">Cijferregistratie</Label>
                             <p className="text-sm text-muted-foreground">Ontvang een e-mail bij bevestiging van cijferregistratie</p>
                           </div>
-                          <Switch id="notifyGrades" checked={teacherUser.notifyGrades} />
+                          <Switch 
+                            id="notifyGrades" 
+                            checked={notificationSettings.emailNotifications.grades} 
+                            onCheckedChange={() => handleToggleNotification('email', 'grades')}
+                          />
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
                             <Label htmlFor="notifyAttendance">Aanwezigheidsregistratie</Label>
                             <p className="text-sm text-muted-foreground">Ontvang een e-mail met een overzicht van aanwezigheidsregistratie</p>
                           </div>
-                          <Switch id="notifyAttendance" checked={teacherUser.notifyAttendance} />
+                          <Switch 
+                            id="notifyAttendance" 
+                            checked={notificationSettings.emailNotifications.attendance} 
+                            onCheckedChange={() => handleToggleNotification('email', 'attendance')}
+                          />
                         </div>
                       </>
                     ) : (

@@ -225,41 +225,7 @@ export default function Scheduling() {
         </div>
       </div>
       
-      {/* Dashboard Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <Calendar className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
-          </div>
-          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Lessen Vandaag</h3>
-          <p className="text-xl sm:text-2xl font-bold text-sky-700">{data?.lessonsToday || 0}</p>
-        </div>
-        
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <GraduationCap className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
-          </div>
-          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Docenten Aanwezig</h3>
-          <p className="text-xl sm:text-2xl font-bold text-sky-700">{data?.teachersPresent || 0}</p>
-        </div>
-        
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <Building className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
-          </div>
-          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Beschikbare Lokalen</h3>
-          <p className="text-xl sm:text-2xl font-bold text-sky-700">{data?.availableRooms || 0}</p>
-        </div>
-        
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <Clock className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
-          </div>
-          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Volgende Les</h3>
-          <p className="text-xl sm:text-2xl font-bold text-sky-700">{data?.nextLesson?.time || '-'}</p>
-          <p className="text-xs text-gray-500">{data?.nextLesson?.title || 'Geen les gepland'}</p>
-        </div>
-      </div>
+      {/* Geen widgets op verzoek van gebruiker */}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">

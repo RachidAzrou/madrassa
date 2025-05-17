@@ -49,6 +49,7 @@ export default function Courses() {
   // States
   const [searchTerm, setSearchTerm] = useState('');
   const [programFilter, setProgramFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('active'); // Standaard alleen actieve vakken tonen
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(6);
   const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(null);
@@ -92,7 +93,7 @@ export default function Courses() {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ['/api/courses', { page: currentPage, search: searchTerm, program: programFilter }],
+    queryKey: ['/api/courses', { page: currentPage, search: searchTerm, program: programFilter, status: statusFilter }],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: currentPage.toString(),
@@ -102,6 +103,11 @@ export default function Courses() {
       
       if (programFilter !== 'all') {
         params.append('programId', programFilter);
+      }
+      
+      // Filter op status (active, inactive, all)
+      if (statusFilter !== 'all') {
+        params.append('isActive', statusFilter === 'active' ? 'true' : 'false');
       }
       
       try {

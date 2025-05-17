@@ -366,15 +366,7 @@ export default function Calendar() {
       </div>
 
       {/* Calendar Content */}
-      {isLoading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      ) : isError ? (
-        <div className="text-center py-12 text-red-500">
-          Fout bij het laden van agenda evenementen. Probeer het opnieuw.
-        </div>
-      ) : view === 'month' ? (
+      {view === 'month' ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           {/* Week days header */}
           <div className="grid grid-cols-7 border-b border-gray-200">

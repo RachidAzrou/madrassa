@@ -568,7 +568,7 @@ export default function Cijfers() {
                 
                 <Button variant="outline" className="flex items-center">
                   <Download className="mr-2 h-4 w-4" />
-                  Rapportages Exporteren
+                  Exporteren
                 </Button>
               </div>
 

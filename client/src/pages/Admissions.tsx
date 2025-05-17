@@ -391,10 +391,7 @@ export default function Admissions() {
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Wachtend op Beoordeling</h3>
           <p className="text-2xl font-bold text-sky-700">{stats.pendingReview}</p>
-          <div className="flex justify-between mt-2 text-xs text-sky-600">
-            <span>In afwachting</span>
-            <span>Beoordeling</span>
-          </div>
+
         </div>
         
         <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
@@ -403,10 +400,7 @@ export default function Admissions() {
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Goedgekeurd</h3>
           <p className="text-2xl font-bold text-sky-700">{stats.approved}</p>
-          <div className="flex justify-between mt-2 text-xs text-sky-600">
-            <span>Geaccepteerd</span>
-            <span>Aanmeldingen</span>
-          </div>
+
         </div>
         
         <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">

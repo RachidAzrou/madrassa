@@ -226,31 +226,13 @@ const MyAccount = () => {
                       )}
                     />
 
-                    <FormField
-                      control={profileForm.control}
-                      name="role"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Rol</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecteer een rol" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="Administrator">Administrator</SelectItem>
-                              <SelectItem value="Docent">Docent</SelectItem>
-                              <SelectItem value="Administratief Medewerker">Administratief Medewerker</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <FormItem>
+                      <FormLabel>Rol</FormLabel>
+                      <div className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-500 ring-offset-background">
+                        {demoUser.role}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">De rol kan niet worden gewijzigd</p>
+                    </FormItem>
 
                     <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90">
                       Wijzigingen opslaan

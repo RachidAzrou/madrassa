@@ -355,39 +355,53 @@ export default function Dashboard() {
           })()}
         </div>
 
-        {/* Recent Students - Rechts (3 kolommen) */}
+        {/* Vakken - Rechts (3 kolommen) */}
         <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-5 lg:col-span-3">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-[#1e3a8a]" />
-              <h3 className="text-lg font-semibold text-gray-800">Recent</h3>
+              <BookText className="h-5 w-5 text-[#1e3a8a]" />
+              <h3 className="text-lg font-semibold text-gray-800">Vakken</h3>
             </div>
             <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50" asChild>
-              <div onClick={navigateToStudents}>Bekijk alle</div>
+              <div onClick={navigateToCourses}>Bekijk alle</div>
             </Button>
           </div>
           
-          {isStudentsLoading ? (
+          {isStatsLoading ? (
             <div className="flex justify-center p-4">
               <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
-          ) : recentStudents.length === 0 ? (
-            <p className="text-center py-4 text-gray-500">Geen recente studenten gevonden</p>
           ) : (
-            <div className="space-y-3">
-              {recentStudents.slice(0, 4).map((student: Student) => (
-                <div key={student.id} className="flex items-center p-2 hover:bg-sky-50/50 rounded-md transition-colors duration-200">
-                  <Avatar className="h-9 w-9 border border-sky-200">
-                    <AvatarFallback className="bg-[#1e3a8a] text-white">
-                      {student.firstName?.[0]}{student.lastName?.[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="ml-3 flex-grow">
-                    <p className="text-sm font-medium text-gray-800">{student.firstName} {student.lastName}</p>
-                    <p className="text-xs text-gray-500">{student.program || ''}</p>
+            <div className="space-y-4">
+              <div className="relative p-5 rounded-lg bg-gradient-to-br from-sky-50 to-sky-100 border border-sky-200 shadow-sm">
+                <div className="absolute top-3 right-3 p-1.5 bg-sky-100 rounded-full border border-sky-200">
+                  <BookText className="h-5 w-5 text-[#1e3a8a]" />
+                </div>
+                <h4 className="text-sm font-medium text-gray-600 mb-1">Actieve vakken</h4>
+                <p className="text-2xl font-bold text-[#1e3a8a]">{stats.activeCourses}</p>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-3">
+                <div className="flex items-center p-3 bg-white rounded-md border border-sky-100 shadow-sm hover:bg-sky-50/50 transition-colors duration-200">
+                  <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-2 rounded-md border border-sky-200">
+                    <BookOpen className="h-5 w-5 text-[#1e3a8a]" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-800">Curricula beheren</p>
+                    <p className="text-xs text-gray-500">Vakken en leermaterialen bijwerken</p>
                   </div>
                 </div>
-              ))}
+                
+                <div className="flex items-center p-3 bg-white rounded-md border border-sky-100 shadow-sm hover:bg-sky-50/50 transition-colors duration-200">
+                  <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-2 rounded-md border border-sky-200">
+                    <GraduationCap className="h-5 w-5 text-[#1e3a8a]" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-800">Docenten toewijzen</p>
+                    <p className="text-xs text-gray-500">Docenten koppelen aan vakken</p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>

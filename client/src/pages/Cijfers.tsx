@@ -503,7 +503,7 @@ export default function Cijfers() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
+      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
@@ -514,12 +514,6 @@ export default function Cijfers() {
           <p className="text-gray-500 text-sm mt-1 ml-11">
             Beheer cijfers en gedragsbeoordelingen van studenten
           </p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" className="flex items-center">
-            <Download className="mr-2 h-4 w-4" />
-            Rapportages Exporteren
-          </Button>
         </div>
       </div>
 
@@ -571,6 +565,11 @@ export default function Cijfers() {
                     </div>
                   </div>
                 </div>
+                
+                <Button variant="outline" className="flex items-center">
+                  <Download className="mr-2 h-4 w-4" />
+                  Rapportages Exporteren
+                </Button>
               </div>
 
               <TabsContent value="grades" className="pt-4">

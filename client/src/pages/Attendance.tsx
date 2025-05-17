@@ -60,8 +60,8 @@ export default function Attendance() {
   };
 
   // Format date as "Day Month Year" in Dutch format
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (dateInput: string | Date) => {
+    const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
     return date.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
@@ -88,18 +88,39 @@ export default function Attendance() {
           <CardHeader className="pb-2">
             <CardTitle className="text-blue-900 flex items-center">
               <Clock className="h-5 w-5 mr-2 text-blue-900" />
-              {formatDate(selectedDate)}
+              Datum
             </CardTitle>
+            <p className="text-sm font-medium text-gray-700">{formatDate(selectedDate)}</p>
             <p className="text-sm text-gray-500">Selecteer een datum om aanwezigheid te registreren</p>
           </CardHeader>
           <CardContent>
-            <div className="flex space-x-3">
-              <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)} className="flex-1">
-                <ArrowLeft className="h-4 w-4 mr-1" /> Vorige dag
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => handleDateChange(1)} className="flex-1">
-                Volgende dag <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
+            <div className="flex flex-col space-y-6">
+              <div className="flex space-x-3">
+                <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)} className="flex-1">
+                  <ArrowLeft className="h-4 w-4 mr-1" /> 
+                  <span>Vorige dag</span>
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => handleDateChange(1)} className="flex-1">
+                  <span>Volgende dag</span> <ArrowRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+              
+              <div className="flex justify-between text-sm text-gray-500 px-1">
+                <div>
+                  {(() => {
+                    const prevDate = new Date(selectedDate);
+                    prevDate.setDate(prevDate.getDate() - 1);
+                    return formatDate(prevDate);
+                  })()}
+                </div>
+                <div>
+                  {(() => {
+                    const nextDate = new Date(selectedDate);
+                    nextDate.setDate(nextDate.getDate() + 1);
+                    return formatDate(nextDate);
+                  })()}
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

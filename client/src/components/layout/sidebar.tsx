@@ -66,7 +66,7 @@ const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps)
       <div
         onClick={onClick}
         className={cn(
-          "flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer",
+          "flex items-center justify-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer",
           isActive
             ? "bg-primary text-white font-medium"
             : "text-gray-600 hover:text-primary hover:bg-gray-100"

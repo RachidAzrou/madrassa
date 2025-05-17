@@ -399,7 +399,7 @@ export default function Dashboard() {
               
               {/* Actieve vakken lijst */}
               {activeCourses.length > 0 ? (
-                <div className="space-y-3 mb-3">
+                <div className="space-y-3">
                   <h4 className="text-sm font-medium text-gray-600">Recente actieve vakken</h4>
                   <div className="grid grid-cols-1 gap-2">
                     {activeCourses.slice(0, 3).map((course) => (
@@ -425,28 +425,6 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-500">Geen actieve vakken gevonden</p>
                 </div>
               )}
-              
-              <div className="grid grid-cols-1 gap-3">
-                <div className="flex items-center p-3 bg-white rounded-md border border-sky-100 shadow-sm hover:bg-sky-50/50 transition-colors duration-200">
-                  <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-2 rounded-md border border-sky-200">
-                    <BookOpen className="h-5 w-5 text-[#1e3a8a]" />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-800">Curricula beheren</p>
-                    <p className="text-xs text-gray-500">Vakken en leermaterialen bijwerken</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center p-3 bg-white rounded-md border border-sky-100 shadow-sm hover:bg-sky-50/50 transition-colors duration-200">
-                  <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-2 rounded-md border border-sky-200">
-                    <GraduationCap className="h-5 w-5 text-[#1e3a8a]" />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-800">Docenten toewijzen</p>
-                    <p className="text-xs text-gray-500">Docenten koppelen aan vakken</p>
-                  </div>
-                </div>
-              </div>
             </div>
           )}
         </div>

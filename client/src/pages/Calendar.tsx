@@ -626,56 +626,38 @@ export default function Calendar() {
           </div>
         </div>
       ) : view === 'day' ? (
-        <div className="bg-white rounded-lg shadow-md border border-sky-200 overflow-hidden">
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
           {/* Dag header */}
-          <div className="p-4 text-center border-b border-sky-200 bg-gradient-to-r from-sky-50 to-sky-100/50">
-            <div className="text-base font-semibold text-sky-800">
+          <div className="p-4 text-center border-b border-gray-200">
+            <div className="text-base font-medium text-gray-700">
               {formatDayDate(currentDate)}
             </div>
           </div>
           
-          {/* Dag tijdslots */}
-          <div className="min-h-[700px] relative p-4">
-            {/* Tijdsaanduidingen */}
-            <div className="absolute top-0 left-0 w-20 bottom-0 border-r border-sky-100">
-              {Array.from({ length: 13 }).map((_, index) => {
-                const hour = index + 8; // Start vanaf 8:00
+          {/* Dag tijdslots in dezelfde stijl als de week */}
+          <div className="min-h-[700px] relative grid grid-cols-8">
+            {/* Tijdskolom */}
+            <div className="border-r border-gray-200 relative">
+              {Array.from({ length: 14 }).map((_, hourIndex) => {
+                const hour = hourIndex + 7; // Start vanaf 7:00
                 return (
-                  <div key={index} className="h-14 relative">
-                    <div className="absolute right-2 top-0 -translate-y-1/2 bg-sky-50 px-2 py-0.5 rounded-md text-xs font-medium text-gray-600">
-                      {hour}:00
+                  <div key={hourIndex} className="h-12 border-b border-gray-200 relative">
+                    <div className="h-full flex items-center justify-center">
+                      <span className="text-xs text-gray-600 font-medium">
+                        {hour}:00
+                      </span>
                     </div>
-                    {/* Voeg halve uren toe */}
-                    {hour < 20 && (
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-medium text-gray-400">
-                        {hour}:30
-                      </div>
-                    )}
                   </div>
                 );
               })}
             </div>
             
-            {/* Horizontale lijnen voor de uren */}
-            <div className="ml-20 relative">
-              {Array.from({ length: 13 }).map((_, index) => {
-                // Even uren donkerder maken
-                const isEvenHour = (index + 8) % 2 === 0;
-                const hour = index + 8;
-                
-                return (
-                  <div key={index} className="relative">
-                    {/* Hoofduur lijn */}
-                    <div 
-                      className={`h-7 border-b ${isEvenHour ? 'border-sky-100' : 'border-sky-50'}`}
-                    />
-                    {/* Half uur lijn (alleen als niet het laatste uur) */}
-                    {hour < 20 && (
-                      <div className="h-7 border-b border-dashed border-sky-50" />
-                    )}
-                  </div>
-                );
-              })}
+            {/* Contentkolom */}
+            <div className="col-span-7 relative">
+              {/* Uurlijnen */}
+              {Array.from({ length: 14 }).map((_, hourIndex) => (
+                <div key={hourIndex} className="h-12 border-b border-gray-200 relative" />
+              ))}
               
               {/* Evenementen van deze dag */}
               {(events || [])
@@ -686,41 +668,66 @@ export default function Calendar() {
                 .map((event) => {
                   // Bereken positie gebaseerd op starttijd
                   const [hours, minutes] = event.startTime.split(':').map(Number);
-                  const top = (hours - 8) * 56 + (minutes / 60) * 56; // 56px per uur
+                  const top = (hours - 7) * 48 + (minutes / 60) * 48; // 48px per uur
                   
                   // Bereken hoogte gebaseerd op duur
                   const [endHours, endMinutes] = event.endTime.split(':').map(Number);
                   const duration = (endHours - hours) + (endMinutes - minutes) / 60;
-                  const height = Math.max(30, duration * 56); // Minimale hoogte
+                  const height = Math.max(30, duration * 48); // Minimale hoogte
+                  
+                  // Bepaal de kleur gebaseerd op event type
+                  let bgColor = "#E3F2FD"; // Default lichtblauw
+                  let borderColor = "#1E88E5"; // Default blauw
+                  
+                  switch (event.type) {
+                    case 'exam':
+                      bgColor = "#FFEBEE"; // Lichtroze
+                      borderColor = "#E53935"; // Rood
+                      break;
+                    case 'class':
+                      bgColor = "#E3F2FD"; // Lichtblauw
+                      borderColor = "#1E88E5"; // Blauw
+                      break;
+                    case 'holiday':
+                      bgColor = "#E8F5E9"; // Lichtgroen
+                      borderColor = "#43A047"; // Groen
+                      break;
+                    case 'event':
+                      bgColor = "#FFF9C4"; // Lichtgeel
+                      borderColor = "#FDD835"; // Geel
+                      break;
+                  }
                   
                   return (
                     <div 
                       key={event.id}
-                      className={`absolute left-0 right-4 rounded-md px-4 py-2.5 shadow-md hover:shadow-lg transition-shadow ${getEventColor(event.type)}`}
-                      style={{ top: `${top}px`, height: `${height}px` }}
+                      className="absolute w-[98%] left-[1%] overflow-hidden transition-shadow hover:shadow-md"
+                      style={{ 
+                        backgroundColor: bgColor,
+                        top: `${top}px`, 
+                        height: `${height}px`,
+                        borderLeft: `4px solid ${borderColor}`,
+                      }}
                     >
-                      <div className="font-medium text-sm flex items-center">
-                        {event.type === 'exam' && <BookOpen className="h-4 w-4 mr-2" />}
-                        {event.type === 'class' && <GraduationCap className="h-4 w-4 mr-2" />}
-                        {event.type === 'holiday' && <Palmtree className="h-4 w-4 mr-2" />}
-                        {event.type === 'event' && <PartyPopper className="h-4 w-4 mr-2" />}
-                        {event.title}
-                      </div>
-                      <div className="text-xs font-medium mt-1.5 flex items-center gap-1.5">
-                        <Clock className="h-3 w-3" /> 
-                        <span>{event.startTime} - {event.endTime}</span>
-                      </div>
-                      {event.location && (
-                        <div className="text-xs mt-1.5 flex items-center gap-1.5">
-                          <MapPin className="h-3 w-3" />
-                          <span>{event.location}</span>
+                      <div className="px-3 py-1.5 h-full flex flex-col">
+                        <div className="text-sm font-medium text-gray-800">
+                          {event.title}
                         </div>
-                      )}
-                      {event.description && (
-                        <div className="text-xs mt-2 pt-1.5 border-t border-current border-opacity-20">
-                          {event.description}
+                        <div className="text-xs text-gray-700 mt-1">
+                          {event.startTime} - {event.endTime}
                         </div>
-                      )}
+                        {event.location && (
+                          <div className="text-xs text-gray-700 mt-1">
+                            <MapPin className="h-3 w-3 inline mr-1" />
+                            {event.location}
+                          </div>
+                        )}
+                        {event.description && (
+                          <div className="text-xs mt-2 pt-1.5 border-t border-gray-200 text-gray-600">
+                            {event.description}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })

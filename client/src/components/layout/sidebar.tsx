@@ -144,7 +144,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
       </div>
 
       {/* Navigation links */}
-      <nav className="flex-1 py-6 px-3 overflow-y-auto h-full min-h-0">
+      <nav className="flex-1 py-4 px-3 overflow-y-auto flex flex-col h-full justify-between">
         <div className="space-y-4">
           {/* Ingelogde gebruiker informatie */}
           <div className="pt-1 pb-3">
@@ -296,20 +296,22 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
             </div>
           </div>
 
-          <div className="pt-6">
-            <div className="border-t border-gray-200 mt-2 pt-4"></div>
-            <Link href="/api/logout">
-              <div
-                onClick={handleLinkClick}
-                className="flex items-center justify-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer text-gray-600 hover:text-primary hover:bg-gray-100"
-              >
-                <div className="flex-shrink-0">
-                  <LogOut className="h-5 w-5" />
-                </div>
-                <span className="truncate whitespace-nowrap">Afmelden</span>
+        </div>
+        
+        {/* Afmelden knop aan einde van de sidebar */}
+        <div className="mt-auto pt-2 pb-4">
+          <div className="border-t border-gray-200 pt-4"></div>
+          <Link href="/api/logout">
+            <div
+              onClick={handleLinkClick}
+              className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50 bg-gray-50"
+            >
+              <div className="flex-shrink-0">
+                <LogOut className="h-5 w-5" />
               </div>
-            </Link>
-          </div>
+              <span className="truncate whitespace-nowrap font-medium">Afmelden</span>
+            </div>
+          </Link>
         </div>
       </nav>
     </aside>

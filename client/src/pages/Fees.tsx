@@ -2093,6 +2093,120 @@ export default function Fees() {
       </Dialog>
       
       {/* Verwijder dialog */}
+      {/* Collegegeld toevoegen dialog */}
+      <Dialog open={isAddTuitionSettingOpen} onOpenChange={setIsAddTuitionSettingOpen}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader className="flex flex-row items-center gap-2 text-left">
+            <div className="bg-blue-100 p-2 rounded-full">
+              <Euro className="h-6 w-6 text-blue-700" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl">Collegegeld Toevoegen</DialogTitle>
+              <DialogDescription>
+                Voeg een nieuw collegegeld toe voor een academisch jaar.
+              </DialogDescription>
+            </div>
+          </DialogHeader>
+
+          <Form {...tuitionForm}>
+            <form onSubmit={tuitionForm.handleSubmit(onSubmitTuitionSetting)} className="space-y-4">
+              <FormField
+                control={tuitionForm.control}
+                name="academicYear"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Academisch Jaar</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input {...field} className="pl-10" placeholder="bijv. 2024-2025" />
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      Geef het academisch jaar op in formaat YYYY-YYYY
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={tuitionForm.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Collegegeld Bedrag (€)</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Euro className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input {...field} className="pl-10" placeholder="bijv. 250" />
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      Voer het collegegeld bedrag in euro's in (gebruik komma voor decimalen)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={tuitionForm.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Vervaldatum</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={
+                              "w-full pl-3 text-left font-normal " +
+                              (!field.value && "text-muted-foreground")
+                            }
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4 opacity-70" />
+                            {field.value ? (
+                              format(field.value, "PPP", { locale: nl })
+                            ) : (
+                              <span>Kies een datum</span>
+                            )}
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>
+                      De uiterste datum waarop het collegegeld betaald moet zijn
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter className="mt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAddTuitionSettingOpen(false)}
+                >
+                  Annuleren
+                </Button>
+                <Button type="submit">Toevoegen</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

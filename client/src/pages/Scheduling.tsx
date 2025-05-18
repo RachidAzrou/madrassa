@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, 
   Calendar, Clock, Users, Repeat, Landmark, GraduationCap, 
-  Building, BookOpen, ChevronRight, MapPin 
+  Building, BookOpen, ChevronRight, MapPin, Check, X,
+  AlertCircle, Calendar as CalendarIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,7 +20,8 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -31,7 +33,61 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 
+// Type definities voor betere type veiligheid
+interface TeacherSchedule {
+  id: number;
+  teacherId: string;
+  instructorName: string;
+  courseId: number;
+  courseName: string;
+  classId: number;
+  className: string;
+  startTime: string;
+  endTime: string;
+  dayOfWeek: string;
+  roomId: number;
+  roomName: string;
+  isRecurring: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Room {
+  id: number;
+  name: string;
+  capacity: number;
+  location: string;
+  status: 'available' | 'occupied' | 'reserved';
+  currentUse?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Teacher {
+  id: number;
+  teacherId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  fullName: string;
+}
+
+interface Course {
+  id: number;
+  name: string;
+  code: string;
+  programId: number | null;
+}
+
+interface StudentGroup {
+  id: number;
+  name: string;
+  academicYear: string;
+}
+
 export default function Scheduling() {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [course, setCourse] = useState('all');
   const [instructor, setInstructor] = useState('all');
@@ -39,10 +95,15 @@ export default function Scheduling() {
   const [day, setDay] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [activeTab, setActiveTab] = useState('instructor-schedule');
+  const [viewMode, setViewMode] = useState<'today' | 'week' | 'month'>('today');
   
   // Dialog state
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [dialogActiveTab, setDialogActiveTab] = useState('instructor-schedule');
+  const [selectedSchedule, setSelectedSchedule] = useState<TeacherSchedule | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -59,44 +120,154 @@ export default function Scheduling() {
       saturday: false,
       sunday: false
     },
+    roomId: '',
     startTime: '09:00',
     endTime: '10:30',
     repeat: true,
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0],
     
     // Lokalen toewijzing
     roomName: '',
+    capacity: 30,
+    location: '',
+    status: 'available' as 'available' | 'occupied' | 'reserved',
     toewijzingsCategorie: 'vak',  // 'vak' of 'klas'
     assignmentId: '',
-    description: ''
+    description: '',
+    notes: ''
   });
 
   // Fetch schedules with filters
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['/api/scheduling', { searchTerm, course, instructor, room, day, page: currentPage, type: activeTab }],
+  const { data: schedulesData, isLoading, isError } = useQuery({
+    queryKey: ['/api/scheduling', { 
+      searchTerm, 
+      course, 
+      instructor, 
+      room, 
+      day, 
+      page: currentPage, 
+      type: activeTab,
+      viewMode 
+    }],
+    queryFn: async () => {
+      try {
+        const params = new URLSearchParams({
+          searchTerm,
+          page: currentPage.toString(),
+          type: activeTab,
+          viewMode
+        });
+        
+        if (course !== 'all') params.append('courseId', course);
+        if (instructor !== 'all') params.append('teacherId', instructor);
+        if (room !== 'all') params.append('roomId', room);
+        if (day !== 'all') params.append('day', day);
+        
+        const result = await apiRequest(`/api/scheduling?${params.toString()}`, {
+          method: 'GET'
+        });
+        return result;
+      } catch (error: any) {
+        console.error('Error fetching scheduling data:', error);
+        toast({
+          title: "Fout bij ophalen planning",
+          description: error?.message || "Er is een fout opgetreden bij het ophalen van de planningsgegevens.",
+          variant: "destructive",
+        });
+        return { schedules: [], totalCount: 0 };
+      }
+    },
     staleTime: 30000,
   });
 
   // Fetch courses for filter
   const { data: coursesData } = useQuery({
     queryKey: ['/api/courses'],
+    queryFn: async () => {
+      try {
+        return await apiRequest('/api/courses', {
+          method: 'GET'
+        });
+      } catch (error: any) {
+        console.error('Error fetching courses:', error);
+        toast({
+          title: "Fout bij ophalen cursussen",
+          description: error?.message || "Er is een fout opgetreden bij het ophalen van de cursussen.",
+          variant: "destructive",
+        });
+        return { courses: [] };
+      }
+    },
   });
 
-  // Fetch instructors for filter
-  const { data: instructorsData } = useQuery({
-    queryKey: ['/api/instructors'],
+  // Fetch teachers for filter
+  const { data: teachersData } = useQuery({
+    queryKey: ['/api/teachers'],
+    queryFn: async () => {
+      try {
+        return await apiRequest('/api/teachers', {
+          method: 'GET'
+        });
+      } catch (error: any) {
+        console.error('Error fetching teachers:', error);
+        toast({
+          title: "Fout bij ophalen docenten",
+          description: error?.message || "Er is een fout opgetreden bij het ophalen van de docenten.",
+          variant: "destructive",
+        });
+        return { teachers: [] };
+      }
+    },
+  });
+
+  // Fetch student groups for filter
+  const { data: studentGroupsData } = useQuery({
+    queryKey: ['/api/student-groups'],
+    queryFn: async () => {
+      try {
+        return await apiRequest('/api/student-groups', {
+          method: 'GET'
+        });
+      } catch (error: any) {
+        console.error('Error fetching student groups:', error);
+        toast({
+          title: "Fout bij ophalen klassen",
+          description: error?.message || "Er is een fout opgetreden bij het ophalen van de klassen.",
+          variant: "destructive",
+        });
+        return [];
+      }
+    },
   });
 
   // Fetch rooms for filter
   const { data: roomsData } = useQuery({
     queryKey: ['/api/rooms'],
+    queryFn: async () => {
+      try {
+        return await apiRequest('/api/rooms', {
+          method: 'GET'
+        });
+      } catch (error: any) {
+        console.error('Error fetching rooms:', error);
+        toast({
+          title: "Fout bij ophalen lokalen",
+          description: error?.message || "Er is een fout opgetreden bij het ophalen van de lokalen.",
+          variant: "destructive",
+        });
+        return { rooms: [] };
+      }
+    },
   });
 
-  const schedules = data?.schedules || [];
-  const totalSchedules = data?.totalCount || 0;
+  const schedules = schedulesData?.schedules || [];
+  const totalSchedules = schedulesData?.totalCount || 0;
   const totalPages = Math.ceil(totalSchedules / 10);
   
   const courses = coursesData?.courses || [];
-  const instructors = instructorsData?.instructors || [];
+  const teachers = teachersData?.teachers || [];
+  const studentGroups = studentGroupsData || [];
   const rooms = roomsData?.rooms || [];
 
   const handleAddSchedule = () => {
@@ -105,71 +276,196 @@ export default function Scheduling() {
     console.log('Add schedule clicked');
   };
   
+  // Mutation voor het toevoegen van een docentrooster
+  const createTeacherScheduleMutation = useMutation({
+    mutationFn: async (data: any) => {
+      try {
+        return await apiRequest('/api/scheduling/instructor', {
+          method: 'POST',
+          body: data
+        });
+      } catch (error: any) {
+        console.error('Error creating teacher schedule:', error);
+        throw new Error(error?.message || 'Fout bij het aanmaken van het docentrooster');
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Docentrooster toegevoegd",
+        description: "Het docentrooster is succesvol toegevoegd aan het systeem.",
+        variant: "default",
+      });
+      setIsDialogOpen(false);
+      resetFormData();
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/scheduling'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij toevoegen",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van het docentrooster.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation voor het toevoegen van een lokaal
+  const createRoomMutation = useMutation({
+    mutationFn: async (data: any) => {
+      try {
+        return await apiRequest('/api/rooms', {
+          method: 'POST',
+          body: data
+        });
+      } catch (error: any) {
+        console.error('Error creating room:', error);
+        throw new Error(error?.message || 'Fout bij het aanmaken van het lokaal');
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Lokaal toegevoegd",
+        description: "Het lokaal is succesvol toegevoegd aan het systeem.",
+        variant: "default",
+      });
+      setIsDialogOpen(false);
+      resetFormData();
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/rooms'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/scheduling'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij toevoegen",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van het lokaal.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Reset form data
+  const resetFormData = () => {
+    setFormData({
+      teacherId: '',
+      courseId: '',
+      classId: '',
+      selectedDays: {
+        monday: false,
+        tuesday: false,
+        wednesday: false,
+        thursday: false, 
+        friday: false,
+        saturday: false,
+        sunday: false
+      },
+      roomId: '',
+      startTime: '09:00',
+      endTime: '10:30',
+      repeat: true,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0],
+      
+      // Lokalen toewijzing
+      roomName: '',
+      capacity: 30,
+      location: '',
+      status: 'available' as 'available' | 'occupied' | 'reserved',
+      toewijzingsCategorie: 'vak',
+      assignmentId: '',
+      description: '',
+      notes: ''
+    });
+  };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted with data:', formData);
     
     try {
-      // Submit based on active tab
+      // Valideer formulier
       if (dialogActiveTab === 'instructor-schedule') {
-        // Logic for adding instructor schedule
-        /*
-        await apiRequest('/api/scheduling/instructor', {
-          method: 'POST',
-          body: {
-            teacherId: formData.teacherId,
-            courseId: formData.courseId,
-            classId: formData.classId,
-            selectedDays: formData.selectedDays,
-            startTime: formData.startTime,
-            endTime: formData.endTime,
-            repeat: formData.repeat
-          }
-        });
-        */
+        if (!formData.teacherId || !formData.courseId || !formData.classId || !formData.roomId) {
+          toast({
+            title: "Onvolledige gegevens",
+            description: "Vul alle verplichte velden in om een docentrooster toe te voegen.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // Controleer of er minstens één dag is geselecteerd
+        const hasSelectedDay = Object.values(formData.selectedDays).some(day => day);
+        if (!hasSelectedDay) {
+          toast({
+            title: "Geen dagen geselecteerd",
+            description: "Selecteer ten minste één dag voor het rooster.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // Valideer tijden
+        if (formData.startTime >= formData.endTime) {
+          toast({
+            title: "Ongeldige tijd",
+            description: "De eindtijd moet na de starttijd liggen.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // Submit instructor schedule
+        const selectedTeacher = teachers.find(t => t.id.toString() === formData.teacherId);
+        const selectedCourse = courses.find(c => c.id.toString() === formData.courseId);
+        const selectedClass = studentGroups.find(g => g.id.toString() === formData.classId);
+        const selectedRoom = rooms.find(r => r.id.toString() === formData.roomId);
+        
+        const scheduleData = {
+          teacherId: formData.teacherId,
+          instructorName: selectedTeacher ? `${selectedTeacher.firstName} ${selectedTeacher.lastName}` : '',
+          courseId: formData.courseId,
+          courseName: selectedCourse?.name || '',
+          classId: formData.classId,
+          className: selectedClass?.name || '',
+          roomId: formData.roomId,
+          roomName: selectedRoom?.name || '',
+          selectedDays: formData.selectedDays,
+          startTime: formData.startTime,
+          endTime: formData.endTime,
+          startDate: formData.startDate,
+          endDate: formData.repeat ? formData.endDate : formData.startDate,
+          isRecurring: formData.repeat
+        };
+        
+        createTeacherScheduleMutation.mutate(scheduleData);
+        
       } else {
-        // Logic for adding room allocation
-        /*
-        await apiRequest('/api/scheduling/room', {
-          method: 'POST',
-          body: {
-            roomName: formData.roomName,
-            toewijzingsCategorie: formData.toewijzingsCategorie,
-            assignmentId: formData.assignmentId,
-            description: formData.description
-          }
-        });
-        */
+        // Valideer voor lokalen
+        if (!formData.roomName || !formData.capacity) {
+          toast({
+            title: "Onvolledige gegevens",
+            description: "Vul alle verplichte velden in om een lokaal toe te voegen.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        const roomData = {
+          name: formData.roomName,
+          capacity: formData.capacity,
+          location: formData.location,
+          status: formData.status,
+          notes: formData.notes
+        };
+        
+        createRoomMutation.mutate(roomData);
       }
-      
-      // Close dialog and reset form
-      setIsDialogOpen(false);
-      
-      // Reset form
-      setFormData({
-        teacherId: '',
-        courseId: '',
-        classId: '',
-        selectedDays: {
-          monday: false,
-          tuesday: false,
-          wednesday: false,
-          thursday: false, 
-          friday: false,
-          saturday: false,
-          sunday: false
-        },
-        startTime: '09:00',
-        endTime: '10:30',
-        repeat: true,
-        roomName: '',
-        toewijzingsCategorie: 'vak',
-        assignmentId: '',
-        description: ''
-      });
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting form:', error);
+      toast({
+        title: "Fout bij verwerken",
+        description: error?.message || "Er is een fout opgetreden bij het verwerken van het formulier.",
+        variant: "destructive",
+      });
     }
   };
 

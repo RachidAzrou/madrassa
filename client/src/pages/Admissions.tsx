@@ -299,7 +299,7 @@ export default function Admissions() {
   };
   
   // Bevestig verwijdering van de aanmelding
-  const confirmDeleteApplicant = () => {
+  const handleConfirmDelete = () => {
     if (currentApplicant?.id) {
       deleteApplicationMutation.mutate(currentApplicant.id);
     }
@@ -1301,7 +1301,7 @@ export default function Admissions() {
         </DialogContent>
       </Dialog>
       
-      {/* Dialoogvenster voor het verwijderen van een aanmelding */}
+      {/* Verbeterde dialoog voor het verwijderen van een aanmelding */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -1311,11 +1311,24 @@ export default function Admissions() {
               Deze actie kan niet ongedaan gemaakt worden.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
+          <div className="py-4 space-y-3">
             {currentApplicant && (
-              <p className="text-sm text-gray-700">
-                Je staat op het punt om de aanmelding van <strong>{currentApplicant.firstName} {currentApplicant.lastName}</strong> te verwijderen.
-              </p>
+              <>
+                <div className="border rounded-md p-3 bg-red-50">
+                  <p className="text-sm text-gray-700 font-medium">
+                    Je staat op het punt om de volgende aanmelding te verwijderen:
+                  </p>
+                  <div className="mt-2 space-y-1">
+                    <p className="text-sm"><span className="font-medium">Naam:</span> {currentApplicant.firstName} {currentApplicant.lastName}</p>
+                    <p className="text-sm"><span className="font-medium">Email:</span> {currentApplicant.email}</p>
+                    <p className="text-sm"><span className="font-medium">Programma:</span> {currentApplicant.programName}</p>
+                    <p className="text-sm"><span className="font-medium">Status:</span> {currentApplicant.status}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500">
+                  * Bij het verwijderen worden alle gegevens van deze aanmelding permanent uit het systeem verwijderd.
+                </p>
+              </>
             )}
           </div>
           <DialogFooter className="gap-2">
@@ -1323,7 +1336,7 @@ export default function Admissions() {
               Annuleren
             </Button>
             <Button
-              onClick={confirmDeleteApplicant}
+              onClick={handleConfirmDelete}
               disabled={deleteApplicationMutation.isPending}
               variant="destructive"
             >

@@ -707,7 +707,7 @@ export default function Fees() {
         onValueChange={setActiveTab}
         className="mb-6"
       >
-        <TabsList className="grid w-full grid-cols-4 p-1 mb-4 bg-blue-900/10">
+        <TabsList className="grid w-full grid-cols-5 p-1 mb-4 bg-blue-900/10">
           <TabsTrigger value="fee-records" className="text-sm data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
             <FileText className="w-4 h-4 mr-2" />
             Betalingen
@@ -719,6 +719,10 @@ export default function Fees() {
           <TabsTrigger value="tuition-settings" className="text-sm data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
             <Euro className="w-4 h-4 mr-2" />
             Collegegeld
+          </TabsTrigger>
+          <TabsTrigger value="activities" className="text-sm data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+            <MapPin className="w-4 h-4 mr-2" />
+            Activiteiten
           </TabsTrigger>
           <TabsTrigger value="discounts" className="text-sm data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
             <Percent className="w-4 h-4 mr-2" />

@@ -1270,7 +1270,7 @@ export default function Teachers() {
             <TabsContent value="personal" className="space-y-6">
               <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
                 <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
-                <div className="flex mb-4 justify-end">
+                <div className="flex mb-4 justify-end gap-2">
                   <Button 
                     variant="outline" 
                     size="sm"
@@ -1349,8 +1349,90 @@ export default function Teachers() {
                       }, 1500);
                     }}
                   >
-                    <span className="mr-2 bg-[#77CC9A] text-white rounded-md px-1 font-bold text-xs py-0.5">be|ID</span>
+                    <img src="@assets/eid_logo.svg" alt="eID" className="h-4 w-4 mr-2" />
                     Gegevens laden via eID
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex items-center border border-gray-300"
+                    onClick={() => {
+                      // Get access to toast context within this function
+                      const localToast = toast;
+                      
+                      localToast({
+                        title: "itsme® app",
+                        description: "Open de itsme® app op uw smartphone om verder te gaan...",
+                      });
+                      
+                      // Simuleer itsme detectie
+                      setTimeout(() => {
+                        localToast({
+                          title: "itsme® verbinding",
+                          description: "Verbinding gemaakt met itsme®. Gegevens worden opgehaald...",
+                        });
+                        
+                        // Simuleer laden van itsme gegevens na 2 seconden
+                        setTimeout(() => {
+                          // Hier zouden we de itsme-gegevens verwerken
+                          // In een echte implementatie zou dit komen van de itsme API
+                          const itsmeData = {
+                            firstName: "Mohamed",
+                            lastName: "Ben Ali",
+                            birthDate: "1980-03-12",
+                            nationalRegisterNumber: "80031215987",
+                            gender: "Mannelijk",
+                            street: "Antwerpsesteenweg",
+                            houseNumber: "24",
+                            postalCode: "2800",
+                            city: "Mechelen",
+                            photoUrl: "https://placehold.co/400x400/eee/FF4D27?text=Foto+itsme"
+                          };
+                          
+                          // Simuleer het laden van de foto uit itsme
+                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                          
+                          if (photoPreview && photoPlaceholder) {
+                            photoPreview.src = itsmeData.photoUrl;
+                            photoPreview.classList.remove('hidden');
+                            photoPlaceholder.classList.add('hidden');
+                          }
+                          
+                          // Vul het formulier in met itsme-gegevens
+                          setTeacherFormData({
+                            ...teacherFormData,
+                            firstName: itsmeData.firstName,
+                            lastName: itsmeData.lastName,
+                            dateOfBirth: itsmeData.birthDate,
+                            gender: itsmeData.gender === "Mannelijk" ? "man" : "vrouw",
+                            street: itsmeData.street,
+                            houseNumber: itsmeData.houseNumber,
+                            postalCode: itsmeData.postalCode,
+                            city: itsmeData.city
+                          });
+                          
+                          // Voeg een extra bericht toe dat de foto ook beschikbaar is in de foto-tab
+                          localToast({
+                            title: "Gegevens geladen",
+                            description: "De itsme® gegevens zijn succesvol ingeladen. De foto is ook zichtbaar in de foto-tab.",
+                          });
+                          
+                          // Toon een visuele hint dat er ook naar de foto tab gekeken moet worden
+                          const photoTabTrigger = document.querySelector('button[value="photo"]');
+                          if (photoTabTrigger) {
+                            photoTabTrigger.classList.add('animate-pulse');
+                            setTimeout(() => {
+                              photoTabTrigger.classList.remove('animate-pulse');
+                            }, 3000);
+                          }
+                        }, 2500);
+                      }, 2000);
+                    }}
+                  >
+                    <img src="@assets/itsme_logo.svg" alt="itsme" className="h-4 w-4 mr-2" />
+                    Gegevens laden via itsme®
                   </Button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

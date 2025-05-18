@@ -128,17 +128,47 @@ export default function Teachers() {
   
   // Query voor het ophalen van beschikbare programma's (als vakken)
   const { 
-    data: programsData
+    data: programsData,
+    isLoading: isLoadingPrograms,
+    isError: isErrorPrograms
   } = useQuery({
     queryKey: ['/api/programs'],
+    queryFn: async () => {
+      try {
+        return await apiRequest('/api/programs');
+      } catch (error) {
+        console.error('Error fetching programs:', error);
+        toast({
+          title: "Fout bij ophalen programma's",
+          description: "Kon de vakgegevens niet laden voor de docent.",
+          variant: "destructive",
+        });
+        return [];
+      }
+    },
     enabled: isCreateDialogOpen,
   });
   
   // Query voor het ophalen van beschikbare klassen (student groups)
   const { 
-    data: classesData
+    data: classesData,
+    isLoading: isLoadingClasses,
+    isError: isErrorClasses
   } = useQuery({
     queryKey: ['/api/student-groups'],
+    queryFn: async () => {
+      try {
+        return await apiRequest('/api/student-groups');
+      } catch (error) {
+        console.error('Error fetching student groups:', error);
+        toast({
+          title: "Fout bij ophalen klasgroepen",
+          description: "Kon de klasgroepgegevens niet laden voor de docent.",
+          variant: "destructive",
+        });
+        return [];
+      }
+    },
     enabled: isCreateDialogOpen,
   });
   
@@ -197,6 +227,7 @@ export default function Teachers() {
   const {
     data: availabilityData = [],
     isLoading: isLoadingAvailabilityData,
+    isError: isAvailabilityError,
   } = useQuery({
     queryKey: ['/api/teacher-availability', selectedTeacher?.id],
     queryFn: async () => {
@@ -205,6 +236,11 @@ export default function Teachers() {
         return await apiRequest(`/api/teacher-availability?teacherId=${selectedTeacher.id}`);
       } catch (error) {
         console.error('Error fetching teacher availability:', error);
+        toast({
+          title: "Fout bij ophalen beschikbaarheid",
+          description: "Kon de beschikbaarheidsgegevens van de docent niet laden.",
+          variant: "destructive",
+        });
         return [];
       }
     },
@@ -215,6 +251,7 @@ export default function Teachers() {
   const {
     data: languageData = [],
     isLoading: isLoadingLanguageData,
+    isError: isLanguageError,
   } = useQuery({
     queryKey: ['/api/teacher-languages', selectedTeacher?.id],
     queryFn: async () => {
@@ -223,6 +260,11 @@ export default function Teachers() {
         return await apiRequest(`/api/teacher-languages?teacherId=${selectedTeacher.id}`);
       } catch (error) {
         console.error('Error fetching teacher languages:', error);
+        toast({
+          title: "Fout bij ophalen taalvaardigheden",
+          description: "Kon de taalvaardigheidsgegevens van de docent niet laden.",
+          variant: "destructive",
+        });
         return [];
       }
     },
@@ -233,6 +275,7 @@ export default function Teachers() {
   const {
     data: courseAssignmentsData = [],
     isLoading: isLoadingCourseAssignmentsData,
+    isError: isCourseAssignmentsError,
   } = useQuery({
     queryKey: ['/api/teacher-course-assignments', selectedTeacher?.id],
     queryFn: async () => {
@@ -241,6 +284,11 @@ export default function Teachers() {
         return await apiRequest(`/api/teacher-course-assignments?teacherId=${selectedTeacher.id}`);
       } catch (error) {
         console.error('Error fetching teacher course assignments:', error);
+        toast({
+          title: "Fout bij ophalen curriculum",
+          description: "Kon de cursustoewijzingen van de docent niet laden.",
+          variant: "destructive",
+        });
         return [];
       }
     },
@@ -250,20 +298,29 @@ export default function Teachers() {
   // Delete Mutation
   const deleteMutation = useMutation({
     mutationFn: async (teacherId: number) => {
-      return await apiRequest(`/api/teachers/${teacherId}`, { method: 'DELETE' });
+      try {
+        return await apiRequest(`/api/teachers/${teacherId}`, { method: 'DELETE' });
+      } catch (error: any) {
+        console.error('Delete teacher error:', error);
+        throw new Error(error?.message || 'Fout bij het verwijderen van docent');
+      }
     },
-    onSuccess: () => {
+    onSuccess: (_, teacherId) => {
       toast({
         title: "Docent verwijderd",
-        description: "De docent is succesvol verwijderd",
+        description: "De docent is succesvol verwijderd uit het systeem",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+      // Ook gerelateerde docent-data invalideren
+      queryClient.invalidateQueries({ queryKey: ['/api/teacher-availability'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/teacher-languages'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/teacher-course-assignments'] });
       setSelectedTeacher(null);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Fout bij verwijderen",
-        description: "Er is een fout opgetreden bij het verwijderen van de docent",
+        description: error?.message || "Er is een fout opgetreden bij het verwijderen van de docent. Mogelijk zijn er nog actieve relaties met andere gegevens.",
         variant: "destructive",
       });
       console.error('Delete error:', error);
@@ -279,24 +336,29 @@ export default function Teachers() {
   // Create Teacher Mutation
   const createTeacherMutation = useMutation({
     mutationFn: async (formData: any) => {
-      return await apiRequest('/api/teachers', {
-        method: 'POST',
-        body: formData
-      });
+      try {
+        return await apiRequest('/api/teachers', {
+          method: 'POST',
+          body: formData
+        });
+      } catch (error: any) {
+        console.error('Create teacher error:', error);
+        throw new Error(error?.message || 'Fout bij het aanmaken van docent');
+      }
     },
     onSuccess: () => {
       toast({
         title: "Docent toegevoegd",
-        description: "De docent is succesvol toegevoegd",
+        description: "De nieuwe docent is succesvol toegevoegd aan het systeem",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
       setIsCreateDialogOpen(false);
       resetTeacherForm();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Fout bij toevoegen",
-        description: "Er is een fout opgetreden bij het toevoegen van de docent",
+        description: error?.message || "Er is een fout opgetreden bij het toevoegen van de docent. Controleer de ingevoerde gegevens en probeer het opnieuw.",
         variant: "destructive",
       });
       console.error('Create error:', error);
@@ -306,24 +368,34 @@ export default function Teachers() {
   // Update Teacher Mutation
   const updateTeacherMutation = useMutation({
     mutationFn: async (data: { id: number, formData: any }) => {
-      return await apiRequest(`/api/teachers/${data.id}`, {
-        method: 'PUT',
-        body: data.formData
-      });
+      try {
+        return await apiRequest(`/api/teachers/${data.id}`, {
+          method: 'PUT',
+          body: data.formData
+        });
+      } catch (error: any) {
+        console.error('Update teacher error:', error);
+        throw new Error(error?.message || 'Fout bij het bijwerken van docent');
+      }
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      const teacherName = `${variables.formData.firstName} ${variables.formData.lastName}`;
       toast({
         title: "Docent bijgewerkt",
-        description: "De docent is succesvol bijgewerkt",
+        description: `Docent ${teacherName} is succesvol bijgewerkt`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/teacher-availability', selectedTeacher?.id] });
+      queryClient.invalidateQueries({ queryKey: ['/api/teacher-languages', selectedTeacher?.id] });
+      queryClient.invalidateQueries({ queryKey: ['/api/teacher-course-assignments', selectedTeacher?.id] });
       setIsCreateDialogOpen(false);
       resetTeacherForm();
+      setSelectedTeacher(null);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Fout bij bijwerken",
-        description: "Er is een fout opgetreden bij het bijwerken van de docent",
+        description: error?.message || "Er is een fout opgetreden bij het bijwerken van de docent. Controleer de ingevoerde gegevens en probeer het opnieuw.",
         variant: "destructive",
       });
       console.error('Update error:', error);

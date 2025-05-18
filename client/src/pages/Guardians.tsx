@@ -35,6 +35,9 @@ type GuardianType = {
   postalCode?: string;
   city?: string;
   isEmergencyContact: boolean;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelation?: string;
   notes?: string;
 };
 

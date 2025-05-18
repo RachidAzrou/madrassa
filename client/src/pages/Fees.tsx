@@ -598,10 +598,11 @@ export default function Fees() {
                       className="mt-4 bg-[#3b5998] hover:bg-[#2d4373]"
                       onClick={() => {
                         setShowAddOptionsDialog(false);
+                        setTimeout(() => setIsAddTuitionSettingOpen(true), 100);
                       }}
                     >
-                      <X className="h-4 w-4 mr-2" />
-                      Sluiten
+                      <Plus className="h-4 w-4 mr-2" />
+                      Collegegeld toevoegen
                     </Button>
                   </div>
                 </div>
@@ -656,10 +657,11 @@ export default function Fees() {
                       className="mt-4 bg-[#3b5998] hover:bg-[#2d4373]"
                       onClick={() => {
                         setShowAddOptionsDialog(false);
+                        setTimeout(() => setIsAddDiscountOpen(true), 100);
                       }}
                     >
-                      <X className="h-4 w-4 mr-2" />
-                      Sluiten
+                      <Plus className="h-4 w-4 mr-2" />
+                      Kortingsregel toevoegen
                     </Button>
                   </div>
                 </div>

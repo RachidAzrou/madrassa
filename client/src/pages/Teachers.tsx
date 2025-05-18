@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users } from "lucide-react";
+import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1143,7 +1143,11 @@ export default function Teachers() {
           </DialogHeader>
           
           <Tabs defaultValue="personal" className="mt-4">
-            <TabsList className="grid grid-cols-6 mb-4">
+            <TabsList className="grid grid-cols-7 mb-4">
+              <TabsTrigger value="photo" className="flex items-center gap-2">
+                <img src="#" alt="" className="h-4 w-4" />
+                <span>Foto</span>
+              </TabsTrigger>
               <TabsTrigger value="personal" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 <span>Persoonlijk</span>
@@ -1170,10 +1174,185 @@ export default function Teachers() {
               </TabsTrigger>
             </TabsList>
             
+            {/* Foto upload tab */}
+            <TabsContent value="photo" className="space-y-6">
+              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                <h3 className="text-lg font-semibold text-primary mb-4">Foto uploaden</h3>
+                <div className="flex flex-col items-center justify-center gap-4">
+                  <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center overflow-hidden bg-gray-50 relative group cursor-pointer">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Upload className="h-8 w-8 text-gray-500" />
+                      <p className="text-sm text-gray-500 mt-2">Bestand kiezen</p>
+                    </div>
+                    <img id="teacher-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
+                    <div id="teacher-photo-placeholder" className="flex flex-col items-center justify-center">
+                      <User className="h-12 w-12 text-gray-300" />
+                      <p className="text-sm text-gray-400 mt-2">Geen foto</p>
+                    </div>
+                  </div>
+                  
+                  <input 
+                    type="file" 
+                    id="teacher-photo" 
+                    accept="image/*" 
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                          
+                          if (photoPreview && photoPlaceholder && event.target?.result) {
+                            photoPreview.src = event.target.result as string;
+                            photoPreview.classList.remove('hidden');
+                            photoPlaceholder.classList.add('hidden');
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                  
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-2"
+                      onClick={() => {
+                        const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
+                        fileInput?.click();
+                      }}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Foto uploaden
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => {
+                        const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                        const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                        const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
+                        
+                        if (photoPreview && photoPlaceholder && fileInput) {
+                          photoPreview.src = '';
+                          photoPreview.classList.add('hidden');
+                          photoPlaceholder.classList.remove('hidden');
+                          fileInput.value = '';
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Verwijderen
+                    </Button>
+                  </div>
+
+                  <div className="w-full mt-4">
+                    <Label className="text-sm font-medium text-gray-700">
+                      Richtlijnen voor foto's
+                    </Label>
+                    <ul className="mt-2 text-sm text-gray-600 space-y-1 list-disc list-inside">
+                      <li>Upload een duidelijke, recente foto</li>
+                      <li>Foto moet het volledige gezicht tonen</li>
+                      <li>Neutrale achtergrond</li>
+                      <li>Maximum bestandsgrootte: 5MB</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+            
             {/* Persoonlijke informatie tab */}
             <TabsContent value="personal" className="space-y-6">
               <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
                 <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+                <div className="flex mb-4 justify-end">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex items-center border border-gray-300"
+                    onClick={() => {
+                      // Get access to toast context within this function
+                      const localToast = toast;
+                      
+                      localToast({
+                        title: "eID detectie",
+                        description: "Zoeken naar eID-kaartlezer...",
+                      });
+                      
+                      // Simuleer eID detectie (in werkelijkheid zou dit een echte API-integratie zijn)
+                      setTimeout(() => {
+                        localToast({
+                          title: "eID gedetecteerd",
+                          description: "Gegevens worden geladen van de identiteitskaart...",
+                        });
+                        
+                        // Simuleer laden van eID gegevens na 2 seconden
+                        setTimeout(() => {
+                          // Hier zouden we de kaartgegevens verwerken
+                          // In een echte implementatie zou dit komen van de eID API
+                          const eidData = {
+                            firstName: "Ahmed",
+                            lastName: "El Khatib",
+                            birthDate: "1985-08-21",
+                            nationalRegisterNumber: "850821378914",
+                            gender: "Mannelijk",
+                            street: "Leuvensestraat",
+                            houseNumber: "12B",
+                            postalCode: "1030",
+                            city: "Schaarbeek",
+                            photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID"
+                          };
+                          
+                          // Simuleer het laden van de foto uit de eID
+                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                          
+                          if (photoPreview && photoPlaceholder) {
+                            photoPreview.src = eidData.photoUrl;
+                            photoPreview.classList.remove('hidden');
+                            photoPlaceholder.classList.add('hidden');
+                          }
+                          
+                          // Vul het formulier in met eID-gegevens
+                          setTeacherFormData({
+                            ...teacherFormData,
+                            firstName: eidData.firstName,
+                            lastName: eidData.lastName,
+                            dateOfBirth: eidData.birthDate,
+                            gender: eidData.gender === "Mannelijk" ? "man" : "vrouw",
+                            street: eidData.street,
+                            houseNumber: eidData.houseNumber,
+                            postalCode: eidData.postalCode,
+                            city: eidData.city
+                          });
+                          
+                          // Voeg een extra bericht toe dat de foto ook beschikbaar is in de foto-tab
+                          localToast({
+                            title: "Gegevens geladen",
+                            description: "De gegevens van de eID zijn succesvol ingeladen. De foto is ook zichtbaar in de foto-tab.",
+                          });
+                          
+                          // Toon een visuele hint dat er ook naar de foto tab gekeken moet worden
+                          const photoTabTrigger = document.querySelector('button[value="photo"]');
+                          if (photoTabTrigger) {
+                            photoTabTrigger.classList.add('animate-pulse');
+                            setTimeout(() => {
+                              photoTabTrigger.classList.remove('animate-pulse');
+                            }, 3000);
+                          }
+                        }, 2000);
+                      }, 1500);
+                    }}
+                  >
+                    <span className="mr-2 bg-[#77CC9A] text-white rounded-md px-1 font-bold text-xs py-0.5">be|ID</span>
+                    Gegevens laden via eID
+                  </Button>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <Label htmlFor="teacherId" className="text-sm font-medium text-gray-700">

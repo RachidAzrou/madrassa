@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, DollarSign, CreditCard, CheckCircle, 
   Users, Settings, Percent, AlertCircle, ChevronDown, FileText, UserPlus, Euro, Coins, 
-  Mail, Phone, Home, CalendarIcon, Plus, User, Textarea, X
+  Mail, Phone, Home, CalendarIcon, Plus, User, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -360,7 +360,7 @@ export default function Fees() {
         isActive: values.isActive
       };
       
-      await apiRequest('POST', '/api/fee-settings', tuitionData);
+      await apiRequest('/api/fee-settings', { method: 'POST', body: tuitionData });
       
       // Data refreshen
       queryClient.invalidateQueries({ queryKey: ['/api/fee-settings'] });
@@ -400,7 +400,7 @@ export default function Fees() {
         isActive: values.isActive
       };
       
-      await apiRequest('POST', '/api/fee-discounts', discountData);
+      await apiRequest('/api/fee-discounts', { method: 'POST', body: discountData });
       
       // Data refreshen
       queryClient.invalidateQueries({ queryKey: ['/api/fee-discounts'] });
@@ -621,38 +621,37 @@ export default function Fees() {
           <div className="bg-white overflow-hidden rounded-lg border border-gray-200">
             <div className="px-4 py-5 sm:p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-                <div className="flex flex-wrap gap-2">
-                  <Select
-                    value={program}
-                    onValueChange={handleProgramChange}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Alle programma's" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Alle programma's</SelectItem>
-                      {programs.map((prog: any) => (
-                        <SelectItem key={prog.id} value={prog.id.toString()}>
-                          {prog.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                  <Select
-                    value={status}
-                    onValueChange={handleStatusChange}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Alle statussen" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Alle statussen</SelectItem>
-                      <SelectItem value="betaald">Betaald</SelectItem>
-                      <SelectItem value="niet betaald">Niet betaald</SelectItem>
-                      <SelectItem value="gedeeltelijk betaald">Gedeeltelijk betaald</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="flex flex-col gap-4">
+                  <TabsList className="bg-blue-900/10">
+                    <TabsTrigger 
+                      value="all" 
+                      onClick={() => handleStatusChange('all')}
+                      className={status === 'all' ? 'bg-white text-[#1e3a8a] shadow-md' : ''}
+                    >
+                      Alle statussen
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="betaald" 
+                      onClick={() => handleStatusChange('betaald')}
+                      className={status === 'betaald' ? 'bg-white text-[#1e3a8a] shadow-md' : ''}
+                    >
+                      Betaald
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="niet betaald" 
+                      onClick={() => handleStatusChange('niet betaald')}
+                      className={status === 'niet betaald' ? 'bg-white text-[#1e3a8a] shadow-md' : ''}
+                    >
+                      Niet betaald
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="gedeeltelijk betaald" 
+                      onClick={() => handleStatusChange('gedeeltelijk betaald')}
+                      className={status === 'gedeeltelijk betaald' ? 'bg-white text-[#1e3a8a] shadow-md' : ''}
+                    >
+                      Gedeeltelijk betaald
+                    </TabsTrigger>
+                  </TabsList>
                 </div>
 
                 <Button 
@@ -854,149 +853,281 @@ export default function Fees() {
           
           {/* Dialog voor toevoegen betalingsrecord */}
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Nieuwe Betaling Toevoegen</DialogTitle>
-                <DialogDescription>
-                  Voeg een nieuwe betalingsrecord toe voor een student.
-                </DialogDescription>
+            <DialogContent className="sm:max-w-[95vw] sm:h-[85vh] overflow-y-auto">
+              <DialogHeader className="flex flex-row items-center gap-2 text-left">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  <DollarSign className="h-6 w-6 text-blue-700" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl">Nieuwe Betaling Toevoegen</DialogTitle>
+                  <DialogDescription>
+                    Voeg een nieuwe betalingsrecord toe voor een student.
+                  </DialogDescription>
+                </div>
               </DialogHeader>
+              
+              <Tabs defaultValue="algemeen" className="mt-4">
+                <TabsList className="grid grid-cols-3 mb-6 bg-blue-900/10">
+                  <TabsTrigger value="algemeen" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                    <User className="h-4 w-4 mr-2" />
+                    Student & Factuur
+                  </TabsTrigger>
+                  <TabsTrigger value="bedrag" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                    <Euro className="h-4 w-4 mr-2" />
+                    Bedragen
+                  </TabsTrigger>
+                  <TabsTrigger value="betalingsdetails" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Betalingsdetails
+                  </TabsTrigger>
+                </TabsList>
                 
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="studentId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Student</FormLabel>
-                        <Select
-                          onValueChange={(value) => field.onChange(parseInt(value))}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecteer een student" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {students.map((student: any) => (
-                              <SelectItem key={student.id} value={student.id.toString()}>
-                                {student.firstName} {student.lastName} ({student.studentId})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Beschrijving</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="amount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Bedrag (€)</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="dueDate"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Vervaldatum</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={
-                                  "w-full pl-3 text-left font-normal " +
-                                  (!field.value && "text-muted-foreground")
-                                }
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <TabsContent value="algemeen" className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="studentId"
+                          render={({ field }) => (
+                            <FormItem className="col-span-2">
+                              <FormLabel>Student</FormLabel>
+                              <Select
+                                onValueChange={(value) => field.onChange(parseInt(value))}
                               >
-                                {field.value ? (
-                                  format(field.value, "PPP", { locale: nl })
-                                ) : (
-                                  <span>Kies een datum</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
+                                <FormControl>
+                                  <SelectTrigger className="flex items-center">
+                                    <User className="h-4 w-4 mr-2 text-gray-400" />
+                                    <SelectValue placeholder="Selecteer een student" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {students.map((student: any) => (
+                                    <SelectItem key={student.id} value={student.id.toString()}>
+                                      {student.firstName} {student.lastName} ({student.studentId})
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="description"
+                          render={({ field }) => (
+                            <FormItem className="col-span-2">
+                              <FormLabel>Beschrijving</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                  <Input {...field} className="pl-10" />
+                                </div>
+                              </FormControl>
+                              <FormDescription>
+                                Bijvoorbeeld: "Collegegeld 2024-2025" of "Inschrijfgeld"
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="dueDate"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                              <FormLabel>Vervaldatum</FormLabel>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <FormControl>
+                                    <Button
+                                      variant={"outline"}
+                                      className={
+                                        "w-full pl-3 text-left font-normal " +
+                                        (!field.value && "text-muted-foreground")
+                                      }
+                                    >
+                                      <CalendarIcon className="mr-2 h-4 w-4 opacity-70" />
+                                      {field.value ? (
+                                        format(field.value, "PPP", { locale: nl })
+                                      ) : (
+                                        <span>Kies een datum</span>
+                                      )}
+                                    </Button>
+                                  </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <Calendar
+                                    mode="single"
+                                    selected={field.value}
+                                    onSelect={field.onChange}
+                                    initialFocus
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="bedrag" className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="amount"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Bedrag (€)</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Euro className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                  <Input {...field} className="pl-10" />
+                                </div>
+                              </FormControl>
+                              <FormDescription>
+                                Voer het bedrag in (gebruik komma voor decimalen)
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <div className="space-y-4">
+                          <FormItem>
+                            <FormLabel>Kortingstype</FormLabel>
+                            <Select disabled>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <Percent className="h-4 w-4 mr-2 text-gray-400" />
+                                  <SelectValue placeholder="Geen korting" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="none">Geen korting</SelectItem>
+                                <SelectItem value="family">Familiekorting</SelectItem>
+                                <SelectItem value="early">Vroegboekkorting</SelectItem>
+                                <SelectItem value="special">Speciale korting</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormDescription>
+                              Kortingen kunnen worden toegepast in het tabblad Kortingen
+                            </FormDescription>
+                          </FormItem>
+                        </div>
+                        
+                        <div className="col-span-2">
+                          <Card>
+                            <CardHeader className="pb-2">
+                              <CardTitle className="text-sm">Overzicht bedragen</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-2">
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-gray-600">Origineel bedrag:</span>
+                                  <span>€ {form.watch("amount") || "0,00"}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-gray-600">Korting:</span>
+                                  <span>€ 0,00</span>
+                                </div>
+                                <Separator className="my-2" />
+                                <div className="flex justify-between font-medium">
+                                  <span>Totaal te betalen:</span>
+                                  <span>€ {form.watch("amount") || "0,00"}</span>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="betalingsdetails" className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="status"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Status</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <AlertCircle className="h-4 w-4 mr-2 text-gray-400" />
+                                    <SelectValue placeholder="Selecteer een status" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="niet betaald">Niet betaald</SelectItem>
+                                  <SelectItem value="betaald">Betaald</SelectItem>
+                                  <SelectItem value="gedeeltelijk betaald">Gedeeltelijk betaald</SelectItem>
+                                  <SelectItem value="te laat">Te laat</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormItem>
+                          <FormLabel>Betalingsmethode</FormLabel>
+                          <Select disabled={form.watch("status") === "niet betaald"}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <CreditCard className="h-4 w-4 mr-2 text-gray-400" />
+                                <SelectValue placeholder="Selecteer een methode" />
+                              </SelectTrigger>
                             </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
+                            <SelectContent>
+                              <SelectItem value="bank">Bankoverschrijving</SelectItem>
+                              <SelectItem value="cash">Contant</SelectItem>
+                              <SelectItem value="card">Pinpas / Creditcard</SelectItem>
+                              <SelectItem value="online">Online betaling</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Alleen beschikbaar als de status niet "Niet betaald" is
+                          </FormDescription>
+                        </FormItem>
+                        
+                        <FormItem className="col-span-2">
+                          <FormLabel>Notities</FormLabel>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecteer een status" />
-                            </SelectTrigger>
+                            <Input placeholder="Voeg eventuele notities toe over deze betaling..." disabled />
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="niet betaald">Niet betaald</SelectItem>
-                            <SelectItem value="betaald">Betaald</SelectItem>
-                            <SelectItem value="te laat">Te laat</SelectItem>
-                            <SelectItem value="gedeeltelijk betaald">Gedeeltelijk betaald</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsAddDialogOpen(false)}
-                    >
-                      Annuleren
-                    </Button>
-                    <Button type="submit">Toevoegen</Button>
-                  </DialogFooter>
-                </form>
-              </Form>
+                          <FormDescription>
+                            Notities zijn zichtbaar voor administratief personeel
+                          </FormDescription>
+                        </FormItem>
+                      </div>
+                    </TabsContent>
+                    
+                    <div className="flex justify-between items-center border-t pt-4 mt-6">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsAddDialogOpen(false)}
+                        className="px-3"
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Annuleren
+                      </Button>
+                      <Button type="submit" className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        Betaling toevoegen
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </Tabs>
             </DialogContent>
           </Dialog>
         </TabsContent>

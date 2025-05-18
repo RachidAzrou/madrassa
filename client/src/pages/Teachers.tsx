@@ -110,9 +110,23 @@ export default function Teachers() {
   // Query voor het ophalen van een nieuw docent ID
   const { 
     data: nextTeacherIdData,
-    isLoading: isLoadingNextId 
+    isLoading: isLoadingNextId,
+    isError: isNextIdError
   } = useQuery<NextTeacherIdResponse>({
     queryKey: ['/api/next-teacher-id'],
+    queryFn: async () => {
+      try {
+        return await apiRequest('/api/next-teacher-id');
+      } catch (error) {
+        console.error('Error fetching next teacher ID:', error);
+        toast({
+          title: "Fout bij ophalen docent ID",
+          description: "Kon geen nieuw docent ID genereren. Probeer het later opnieuw.",
+          variant: "destructive",
+        });
+        return { nextTeacherId: '' };
+      }
+    },
     enabled: isCreateDialogOpen, // Alleen ophalen wanneer het formulier open is
   });
 
@@ -484,15 +498,46 @@ export default function Teachers() {
   const handleSubmitTeacherForm = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields
-    if (!teacherFormData.firstName || !teacherFormData.lastName || !teacherFormData.email) {
+    // Uitgebreide validatie van verplichte velden
+    const requiredFields = {
+      firstName: "Voornaam",
+      lastName: "Achternaam",
+      email: "E-mailadres"
+    };
+    
+    const missingFields: string[] = [];
+    
+    Object.entries(requiredFields).forEach(([field, label]) => {
+      if (!teacherFormData[field as keyof typeof teacherFormData]) {
+        missingFields.push(label);
+      }
+    });
+    
+    if (missingFields.length > 0) {
       toast({
-        title: "Ontbrekende velden",
-        description: "Vul alle verplichte velden in (naam en email)",
+        title: "Ontbrekende verplichte velden",
+        description: `Vul de volgende verplichte velden in: ${missingFields.join(", ")}`,
         variant: "destructive",
       });
       return;
     }
+    
+    // E-mail validatie
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(teacherFormData.email)) {
+      toast({
+        title: "Ongeldig e-mailadres",
+        description: "Voer een geldig e-mailadres in",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Laat gebruiker weten dat we bezig zijn met verwerken
+    toast({
+      title: selectedTeacher ? "Docent bijwerken..." : "Docent toevoegen...",
+      description: "Een moment geduld terwijl we uw verzoek verwerken",
+    });
     
     if (selectedTeacher) {
       // Update existing teacher
@@ -543,10 +588,26 @@ export default function Teachers() {
     setIsCreateDialogOpen(true);
   };
 
-  // Handle deleting a teacher
+  // State voor bevestigingsdialoog
+  const [teacherToDelete, setTeacherToDelete] = useState<TeacherType | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  // Handle het openen van de bevestigingsdialoog voor het verwijderen
   const handleDeleteTeacher = (teacher: TeacherType) => {
-    if (window.confirm(`Weet je zeker dat je ${teacher.firstName} ${teacher.lastName} wilt verwijderen?`)) {
-      deleteMutation.mutate(teacher.id);
+    setTeacherToDelete(teacher);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  // Handle de daadwerkelijke verwijdering na bevestiging
+  const confirmDeleteTeacher = () => {
+    if (teacherToDelete) {
+      toast({
+        title: "Bezig met verwijderen...",
+        description: `Docent ${teacherToDelete.firstName} ${teacherToDelete.lastName} wordt verwijderd`,
+      });
+      deleteMutation.mutate(teacherToDelete.id);
+      setIsDeleteDialogOpen(false);
+      setTeacherToDelete(null);
     }
   };
 

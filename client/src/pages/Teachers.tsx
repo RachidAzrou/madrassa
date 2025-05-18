@@ -271,16 +271,199 @@ export default function Teachers() {
     setCurrentPage(1); // Reset to first page when search changes
   };
 
+  // Create Teacher Mutation
+  const createTeacherMutation = useMutation({
+    mutationFn: async (formData: any) => {
+      return await apiRequest('/api/teachers', {
+        method: 'POST',
+        body: formData
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Docent toegevoegd",
+        description: "De docent is succesvol toegevoegd",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+      setIsCreateDialogOpen(false);
+      resetTeacherForm();
+    },
+    onError: (error) => {
+      toast({
+        title: "Fout bij toevoegen",
+        description: "Er is een fout opgetreden bij het toevoegen van de docent",
+        variant: "destructive",
+      });
+      console.error('Create error:', error);
+    },
+  });
+  
+  // Update Teacher Mutation
+  const updateTeacherMutation = useMutation({
+    mutationFn: async (data: { id: number, formData: any }) => {
+      return await apiRequest(`/api/teachers/${data.id}`, {
+        method: 'PUT',
+        body: data.formData
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Docent bijgewerkt",
+        description: "De docent is succesvol bijgewerkt",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+      setIsCreateDialogOpen(false);
+      resetTeacherForm();
+    },
+    onError: (error) => {
+      toast({
+        title: "Fout bij bijwerken",
+        description: "Er is een fout opgetreden bij het bijwerken van de docent",
+        variant: "destructive",
+      });
+      console.error('Update error:', error);
+    },
+  });
+
+  // Reset teacher form
+  const resetTeacherForm = () => {
+    setTeacherFormData({
+      teacherId: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      street: '',
+      houseNumber: '',
+      postalCode: '',
+      city: '',
+      dateOfBirth: '',
+      profession: '',
+      education: '',
+      gender: '',
+      notes: '',
+      isActive: true,
+      assignedSubjects: [],
+      assignedClasses: []
+    });
+  };
+
+  // Handle form input change
+  const handleFormInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setTeacherFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handle checkbox change
+  const handleCheckboxChange = (checked: boolean) => {
+    setTeacherFormData(prev => ({
+      ...prev,
+      isActive: checked
+    }));
+  };
+
+  // Handle subject selection
+  const handleSubjectSelection = (subjectId: number) => {
+    setTeacherFormData(prev => {
+      const currentSubjects = [...prev.assignedSubjects];
+      
+      if (currentSubjects.includes(subjectId)) {
+        return {
+          ...prev,
+          assignedSubjects: currentSubjects.filter(id => id !== subjectId)
+        };
+      } else {
+        return {
+          ...prev,
+          assignedSubjects: [...currentSubjects, subjectId]
+        };
+      }
+    });
+  };
+
+  // Handle class selection
+  const handleClassSelection = (classId: number) => {
+    setTeacherFormData(prev => {
+      const currentClasses = [...prev.assignedClasses];
+      
+      if (currentClasses.includes(classId)) {
+        return {
+          ...prev,
+          assignedClasses: currentClasses.filter(id => id !== classId)
+        };
+      } else {
+        return {
+          ...prev,
+          assignedClasses: [...currentClasses, classId]
+        };
+      }
+    });
+  };
+
+  // Handle form submission
+  const handleSubmitTeacherForm = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate required fields
+    if (!teacherFormData.firstName || !teacherFormData.lastName || !teacherFormData.email) {
+      toast({
+        title: "Ontbrekende velden",
+        description: "Vul alle verplichte velden in (naam en email)",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (selectedTeacher) {
+      // Update existing teacher
+      updateTeacherMutation.mutate({
+        id: selectedTeacher.id,
+        formData: teacherFormData
+      });
+    } else {
+      // Create new teacher
+      createTeacherMutation.mutate(teacherFormData);
+    }
+  };
+
   // Handle adding a new teacher
   const handleAddNewTeacher = () => {
-    // Open add teacher dialog
+    // Reset form and open dialog
+    resetTeacherForm();
+    setSelectedTeacher(null);
     setIsCreateDialogOpen(true);
   };
 
   // Handle editing a teacher
   const handleEditTeacher = (teacher: TeacherType) => {
-    // Implement edit teacher functionality
-    console.log("Edit teacher:", teacher);
+    setSelectedTeacher(teacher);
+    
+    // Populate form with teacher data
+    setTeacherFormData({
+      teacherId: teacher.teacherId,
+      firstName: teacher.firstName,
+      lastName: teacher.lastName,
+      email: teacher.email,
+      phone: teacher.phone || '',
+      street: teacher.street || '',
+      houseNumber: teacher.houseNumber || '',
+      postalCode: teacher.postalCode || '',
+      city: teacher.city || '',
+      dateOfBirth: teacher.dateOfBirth ? new Date(teacher.dateOfBirth).toISOString().split('T')[0] : '',
+      profession: teacher.profession || '',
+      education: '',
+      gender: teacher.gender || '',
+      notes: teacher.notes || '',
+      isActive: teacher.isActive,
+      assignedSubjects: [],
+      assignedClasses: []
+    });
+    
+    // Open edit dialog
+    setIsCreateDialogOpen(true);
   };
 
   // Handle deleting a teacher

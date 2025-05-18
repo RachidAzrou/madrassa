@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 
 // Type definities voor betere type veiligheid
 interface TeacherSchedule {
@@ -273,7 +274,6 @@ export default function Scheduling() {
   const handleAddSchedule = () => {
     // Open the dialog
     setIsDialogOpen(true);
-    console.log('Add schedule clicked');
   };
   
   // Mutation voor het toevoegen van een docentrooster
@@ -570,7 +570,7 @@ export default function Scheduling() {
                   </div>
                   <div className="divide-y">
                     {rooms && rooms.length > 0 ? (
-                      rooms.map((room: any) => (
+                      rooms.map((room: Room) => (
                         <div key={room.id} className="grid grid-cols-5 items-center p-3">
                           <div className="font-medium">{room.name}</div>
                           <div>{room.capacity} personen</div>
@@ -637,7 +637,7 @@ export default function Scheduling() {
                   </div>
                   <div className="divide-y">
                     {schedules && schedules.length > 0 ? (
-                      schedules.map((schedule: any) => (
+                      schedules.map((schedule: TeacherSchedule) => (
                         <div key={schedule.id} className="grid grid-cols-6 items-center p-3">
                           <div className="font-medium">{schedule.instructorName}</div>
                           <div>{schedule.courseName}</div>
@@ -706,7 +706,7 @@ export default function Scheduling() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="teacherId">Docent</Label>
+                        <Label htmlFor="teacherId">Docent <span className="text-red-500">*</span></Label>
                         <Select 
                           value={formData.teacherId}
                           onValueChange={(value) => handleFormChange('teacherId', value)}
@@ -715,21 +715,20 @@ export default function Scheduling() {
                             <SelectValue placeholder="Selecteer een docent" />
                           </SelectTrigger>
                           <SelectContent>
-                            {instructors.length > 0 ? (
-                              instructors.map((teacher: any) => (
+                            {teachers && teachers.length > 0 ? 
+                              teachers.map((teacher: Teacher) => (
                                 <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                                  {teacher.name}
+                                  {teacher.firstName} {teacher.lastName}
                                 </SelectItem>
-                              ))
-                            ) : (
-                              <SelectItem value="1">Mohammed Youssef</SelectItem>
-                            )}
+                              )) :
+                              <SelectItem value="no-teachers">Geen docenten beschikbaar</SelectItem>
+                            }
                           </SelectContent>
                         </Select>
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="courseId">Vak</Label>
+                        <Label htmlFor="courseId">Vak <span className="text-red-500">*</span></Label>
                         <Select 
                           value={formData.courseId}
                           onValueChange={(value) => handleFormChange('courseId', value)}
@@ -738,25 +737,20 @@ export default function Scheduling() {
                             <SelectValue placeholder="Selecteer een vak" />
                           </SelectTrigger>
                           <SelectContent>
-                            {courses.length > 0 ? (
-                              courses.map((course: any) => (
+                            {courses && courses.length > 0 ? 
+                              courses.map((course: Course) => (
                                 <SelectItem key={course.id} value={course.id.toString()}>
                                   {course.name}
                                 </SelectItem>
-                              ))
-                            ) : (
-                              <>
-                                <SelectItem value="1">Arabische Taal</SelectItem>
-                                <SelectItem value="2">Fiqh</SelectItem>
-                                <SelectItem value="3">Koranwetenschappen</SelectItem>
-                              </>
-                            )}
+                              )) :
+                              <SelectItem value="no-courses">Geen vakken beschikbaar</SelectItem>
+                            }
                           </SelectContent>
                         </Select>
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="classId">Klas</Label>
+                        <Label htmlFor="classId">Klas <span className="text-red-500">*</span></Label>
                         <Select 
                           value={formData.classId}
                           onValueChange={(value) => handleFormChange('classId', value)}
@@ -765,243 +759,274 @@ export default function Scheduling() {
                             <SelectValue placeholder="Selecteer een klas" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="1">Klas 1A</SelectItem>
-                            <SelectItem value="2">Klas 2B</SelectItem>
-                            <SelectItem value="3">Klas 3C</SelectItem>
+                            {studentGroups && studentGroups.length > 0 ? 
+                              studentGroups.map((group: StudentGroup) => (
+                                <SelectItem key={group.id} value={group.id.toString()}>
+                                  {group.name}
+                                </SelectItem>
+                              )) :
+                              <SelectItem value="no-groups">Geen klassen beschikbaar</SelectItem>
+                            }
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-md font-medium mb-4 border-b pb-2 text-gray-700">
-                      <div className="flex items-center">
-                        <Clock className="mr-2 h-5 w-5 text-primary" />
-                        Tijdstip
-                      </div>
-                    </h3>
                     
-                    <div className="space-y-4">
-                      <div>
-                        <Label className="mb-2 block">Dagen</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="monday" 
-                              checked={formData.selectedDays.monday}
-                              onCheckedChange={(checked) => {
-                                handleFormChange('selectedDays', {
-                                  ...formData.selectedDays,
-                                  monday: !!checked
-                                });
-                              }}
-                            />
-                            <Label htmlFor="monday" className="font-normal cursor-pointer">Maandag</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="tuesday" 
-                              checked={formData.selectedDays.tuesday}
-                              onCheckedChange={(checked) => {
-                                handleFormChange('selectedDays', {
-                                  ...formData.selectedDays,
-                                  tuesday: !!checked
-                                });
-                              }}
-                            />
-                            <Label htmlFor="tuesday" className="font-normal cursor-pointer">Dinsdag</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="wednesday" 
-                              checked={formData.selectedDays.wednesday}
-                              onCheckedChange={(checked) => {
-                                handleFormChange('selectedDays', {
-                                  ...formData.selectedDays,
-                                  wednesday: !!checked
-                                });
-                              }}
-                            />
-                            <Label htmlFor="wednesday" className="font-normal cursor-pointer">Woensdag</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="thursday" 
-                              checked={formData.selectedDays.thursday}
-                              onCheckedChange={(checked) => {
-                                handleFormChange('selectedDays', {
-                                  ...formData.selectedDays,
-                                  thursday: !!checked
-                                });
-                              }}
-                            />
-                            <Label htmlFor="thursday" className="font-normal cursor-pointer">Donderdag</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="friday" 
-                              checked={formData.selectedDays.friday}
-                              onCheckedChange={(checked) => {
-                                handleFormChange('selectedDays', {
-                                  ...formData.selectedDays,
-                                  friday: !!checked
-                                });
-                              }}
-                            />
-                            <Label htmlFor="friday" className="font-normal cursor-pointer">Vrijdag</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="saturday" 
-                              checked={formData.selectedDays.saturday}
-                              onCheckedChange={(checked) => {
-                                handleFormChange('selectedDays', {
-                                  ...formData.selectedDays,
-                                  saturday: !!checked
-                                });
-                              }}
-                            />
-                            <Label htmlFor="saturday" className="font-normal cursor-pointer">Zaterdag</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="sunday" 
-                              checked={formData.selectedDays.sunday}
-                              onCheckedChange={(checked) => {
-                                handleFormChange('selectedDays', {
-                                  ...formData.selectedDays,
-                                  sunday: !!checked
-                                });
-                              }}
-                            />
-                            <Label htmlFor="sunday" className="font-normal cursor-pointer">Zondag</Label>
-                          </div>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="roomId">Lokaal <span className="text-red-500">*</span></Label>
+                        <Select 
+                          value={formData.roomId}
+                          onValueChange={(value) => handleFormChange('roomId', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer een lokaal" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {rooms && rooms.length > 0 ? 
+                              rooms.map((room: Room) => (
+                                <SelectItem key={room.id} value={room.id.toString()}>
+                                  {room.name} ({room.capacity} pers.)
+                                </SelectItem>
+                              )) :
+                              <SelectItem value="no-rooms">Geen lokalen beschikbaar</SelectItem>
+                            }
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="startTime">Starttijd <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="startTime"
+                          type="time"
+                          value={formData.startTime}
+                          onChange={(e) => handleFormChange('startTime', e.target.value)}
+                        />
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="startTime">Starttijd</Label>
-                          <Input 
-                            id="startTime"
-                            type="time"
-                            value={formData.startTime}
-                            onChange={(e) => handleFormChange('startTime', e.target.value)}
+                      <div className="space-y-2">
+                        <Label htmlFor="endTime">Eindtijd <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="endTime"
+                          type="time"
+                          value={formData.endTime}
+                          onChange={(e) => handleFormChange('endTime', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 border-t pt-4">
+                      <h4 className="font-medium mb-3 text-gray-700 flex items-center">
+                        <Calendar className="mr-2 h-4 w-4 text-primary" />
+                        Lesdag(en) <span className="text-red-500 ml-1">*</span>
+                      </h4>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-7 gap-4">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="monday" 
+                            checked={formData.selectedDays.monday}
+                            onCheckedChange={(checked) => {
+                              const newSelectedDays = { ...formData.selectedDays, monday: !!checked };
+                              handleFormChange('selectedDays', newSelectedDays);
+                            }}
                           />
+                          <Label htmlFor="monday">Maandag</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="tuesday" 
+                            checked={formData.selectedDays.tuesday}
+                            onCheckedChange={(checked) => {
+                              const newSelectedDays = { ...formData.selectedDays, tuesday: !!checked };
+                              handleFormChange('selectedDays', newSelectedDays);
+                            }}
+                          />
+                          <Label htmlFor="tuesday">Dinsdag</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="wednesday" 
+                            checked={formData.selectedDays.wednesday}
+                            onCheckedChange={(checked) => {
+                              const newSelectedDays = { ...formData.selectedDays, wednesday: !!checked };
+                              handleFormChange('selectedDays', newSelectedDays);
+                            }}
+                          />
+                          <Label htmlFor="wednesday">Woensdag</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="thursday" 
+                            checked={formData.selectedDays.thursday}
+                            onCheckedChange={(checked) => {
+                              const newSelectedDays = { ...formData.selectedDays, thursday: !!checked };
+                              handleFormChange('selectedDays', newSelectedDays);
+                            }}
+                          />
+                          <Label htmlFor="thursday">Donderdag</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="friday" 
+                            checked={formData.selectedDays.friday}
+                            onCheckedChange={(checked) => {
+                              const newSelectedDays = { ...formData.selectedDays, friday: !!checked };
+                              handleFormChange('selectedDays', newSelectedDays);
+                            }}
+                          />
+                          <Label htmlFor="friday">Vrijdag</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="saturday" 
+                            checked={formData.selectedDays.saturday}
+                            onCheckedChange={(checked) => {
+                              const newSelectedDays = { ...formData.selectedDays, saturday: !!checked };
+                              handleFormChange('selectedDays', newSelectedDays);
+                            }}
+                          />
+                          <Label htmlFor="saturday">Zaterdag</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="sunday" 
+                            checked={formData.selectedDays.sunday}
+                            onCheckedChange={(checked) => {
+                              const newSelectedDays = { ...formData.selectedDays, sunday: !!checked };
+                              handleFormChange('selectedDays', newSelectedDays);
+                            }}
+                          />
+                          <Label htmlFor="sunday">Zondag</Label>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 border-t pt-4">
+                      <h4 className="font-medium mb-3 text-gray-700 flex items-center">
+                        <Repeat className="mr-2 h-4 w-4 text-primary" />
+                        Herhaling
+                      </h4>
+                      
+                      <div className="space-y-4">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="repeat" 
+                            checked={formData.repeat}
+                            onCheckedChange={(checked) => {
+                              handleFormChange('repeat', !!checked);
+                            }}
+                          />
+                          <Label htmlFor="repeat">Wekelijks herhalen</Label>
                         </div>
                         
-                        <div className="space-y-2">
-                          <Label htmlFor="endTime">Eindtijd</Label>
-                          <Input 
-                            id="endTime"
-                            type="time"
-                            value={formData.endTime}
-                            onChange={(e) => handleFormChange('endTime', e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2 mt-4">
-                        <Checkbox 
-                          id="repeat"
-                          checked={formData.repeat}
-                          onCheckedChange={(checked) => handleFormChange('repeat', !!checked)}
-                        />
-                        <Label htmlFor="repeat" className="font-normal cursor-pointer">
-                          Wekelijks herhalen
-                        </Label>
+                        {formData.repeat && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-7">
+                            <div className="space-y-2">
+                              <Label htmlFor="startDate">Startdatum <span className="text-red-500">*</span></Label>
+                              <Input
+                                id="startDate"
+                                type="date"
+                                value={formData.startDate}
+                                onChange={(e) => handleFormChange('startDate', e.target.value)}
+                              />
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label htmlFor="endDate">Einddatum <span className="text-red-500">*</span></Label>
+                              <Input
+                                id="endDate"
+                                type="date"
+                                value={formData.endDate}
+                                min={formData.startDate}
+                                onChange={(e) => handleFormChange('endDate', e.target.value)}
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
               </TabsContent>
               
-              {/* Lokalen Toewijzing Tab Content */}
+              {/* Lokalen Tab Content */}
               <TabsContent value="room-allocation" className="space-y-4 mt-2">
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-md font-medium mb-4 border-b pb-2 text-gray-700">
                       <div className="flex items-center">
-                        <MapPin className="mr-2 h-5 w-5 text-primary" />
-                        Lokaal Toewijzen
+                        <Building className="mr-2 h-5 w-5 text-primary" />
+                        Lokaal Toevoegen
                       </div>
                     </h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="roomName">Lokaal</Label>
-                        <Input 
+                        <Label htmlFor="roomName">Lokaal naam <span className="text-red-500">*</span></Label>
+                        <Input
                           id="roomName"
-                          type="text"
-                          placeholder="Voer lokaalnummer of -naam in"
                           value={formData.roomName}
                           onChange={(e) => handleFormChange('roomName', e.target.value)}
+                          placeholder="Bijv. Lokaal 1.01"
+                          required
                         />
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="toewijzingsCategorie">Toewijzen aan</Label>
+                        <Label htmlFor="capacity">Capaciteit <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="capacity"
+                          type="number"
+                          min="1"
+                          value={formData.capacity}
+                          onChange={(e) => handleFormChange('capacity', parseInt(e.target.value) || 1)}
+                          placeholder="Aantal personen"
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="location">Locatie</Label>
+                        <Input
+                          id="location"
+                          value={formData.location}
+                          onChange={(e) => handleFormChange('location', e.target.value)}
+                          placeholder="Bijv. 1e verdieping, noordvleugel"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="status">Status</Label>
                         <Select 
-                          value={formData.toewijzingsCategorie}
-                          onValueChange={(value) => handleFormChange('toewijzingsCategorie', value)}
+                          value={formData.status}
+                          onValueChange={(value: 'available' | 'occupied' | 'reserved') => handleFormChange('status', value)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecteer categorie" />
+                            <SelectValue placeholder="Selecteer status" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="vak">Vak</SelectItem>
-                            <SelectItem value="klas">Klas</SelectItem>
+                            <SelectItem value="available">Beschikbaar</SelectItem>
+                            <SelectItem value="occupied">Bezet</SelectItem>
+                            <SelectItem value="reserved">Gereserveerd</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
                     
-                    <div className="mt-4 space-y-2">
-                      <Label htmlFor="assignmentId">
-                        {formData.toewijzingsCategorie === 'vak' ? 'Vak' : 'Klas'}
-                      </Label>
-                      <Select 
-                        value={formData.assignmentId}
-                        onValueChange={(value) => handleFormChange('assignmentId', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={`Selecteer een ${formData.toewijzingsCategorie === 'vak' ? 'vak' : 'klas'}`} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {formData.toewijzingsCategorie === 'vak' ? (
-                            courses.length > 0 ? (
-                              courses.map((course: any) => (
-                                <SelectItem key={course.id} value={course.id.toString()}>
-                                  {course.name}
-                                </SelectItem>
-                              ))
-                            ) : (
-                              <>
-                                <SelectItem value="1">Arabische Taal</SelectItem>
-                                <SelectItem value="2">Fiqh</SelectItem>
-                                <SelectItem value="3">Koranwetenschappen</SelectItem>
-                              </>
-                            )
-                          ) : (
-                            <>
-                              <SelectItem value="1">Klas 1A</SelectItem>
-                              <SelectItem value="2">Klas 2B</SelectItem>
-                              <SelectItem value="3">Klas 3C</SelectItem>
-                            </>
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="mt-4 space-y-2">
-                      <Label htmlFor="description">Opmerkingen (optioneel)</Label>
-                      <textarea
-                        id="description"
-                        className="w-full min-h-[100px] p-2 rounded-md border border-gray-300"
-                        value={formData.description}
-                        onChange={(e) => handleFormChange('description', e.target.value)}
-                        placeholder="Voeg eventuele opmerkingen of instructies toe"
+                    <div className="mt-4">
+                      <Label htmlFor="notes">Notities</Label>
+                      <Textarea
+                        id="notes"
+                        value={formData.notes}
+                        onChange={(e) => handleFormChange('notes', e.target.value)}
+                        placeholder="Bijzonderheden over dit lokaal"
+                        rows={3}
                       />
                     </div>
                   </div>
@@ -1009,12 +1034,14 @@ export default function Scheduling() {
               </TabsContent>
             </Tabs>
             
-            <DialogFooter>
-              <Button variant="outline" type="button" onClick={() => setIsDialogOpen(false)}>
+            <DialogFooter className="flex items-center justify-end space-x-2 pt-4 border-t">
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Annuleren
               </Button>
-              <Button type="submit" className="bg-primary">
-                Planning Opslaan
+              <Button type="submit">
+                {dialogActiveTab === 'instructor-schedule' 
+                  ? 'Docentrooster Opslaan' 
+                  : 'Lokaal Opslaan'}
               </Button>
             </DialogFooter>
           </form>

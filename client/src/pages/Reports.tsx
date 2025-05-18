@@ -395,10 +395,22 @@ export default function Reports() {
 
       {/* Tabs for Report Generation and Template */}
       <Tabs defaultValue="generate" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-2 md:w-[400px] p-1 bg-blue-900/10">
-          <TabsTrigger value="generate" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Rapporten genereren</TabsTrigger>
-          <TabsTrigger value="template" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Template</TabsTrigger>
-        </TabsList>
+        <div className="flex justify-between items-center mb-4">
+          <TabsList className="grid grid-cols-3 md:w-[550px] p-1 bg-blue-900/10">
+            <TabsTrigger value="generate" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+              <FileText className="h-4 w-4 mr-2" />
+              Rapporten genereren
+            </TabsTrigger>
+            <TabsTrigger value="template" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+              <ClipboardList className="h-4 w-4 mr-2" />
+              Template
+            </TabsTrigger>
+            <TabsTrigger value="archive" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Statistieken
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Report Generation Tab */}
         <TabsContent value="generate" className="space-y-6">

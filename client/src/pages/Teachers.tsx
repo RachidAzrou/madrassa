@@ -1145,7 +1145,7 @@ export default function Teachers() {
           <Tabs defaultValue="personal" className="mt-4">
             <TabsList className="grid grid-cols-7 mb-4">
               <TabsTrigger value="photo" className="flex items-center gap-2">
-                <img src="#" alt="" className="h-4 w-4" />
+                <Image className="h-4 w-4" />
                 <span>Foto</span>
               </TabsTrigger>
               <TabsTrigger value="personal" className="flex items-center gap-2">

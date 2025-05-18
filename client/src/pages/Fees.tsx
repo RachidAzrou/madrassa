@@ -1018,7 +1018,7 @@ export default function Fees() {
             <DialogContent className="sm:max-w-[95vw] sm:h-[85vh] overflow-y-auto">
               <DialogHeader className="flex flex-row items-center gap-2 text-left">
                 <div className="bg-blue-100 p-2 rounded-full">
-                  <DollarSign className="h-6 w-6 text-blue-700" />
+                  <Euro className="h-6 w-6 text-blue-700" />
                 </div>
                 <div>
                   <DialogTitle className="text-xl">Nieuwe Betaling Toevoegen</DialogTitle>
@@ -1362,13 +1362,20 @@ export default function Fees() {
                     <Button 
                       className="bg-[#1e3a8a] hover:bg-blue-800"
                       onClick={() => {
+                        // Haal de DOM elementen op en converteer ze naar de juiste waarden
+                        const academicYearEl = document.getElementById('academic-year') as HTMLInputElement;
+                        const standardTuitionEl = document.getElementById('standard-tuition') as HTMLInputElement;
+                        const registrationFeeEl = document.getElementById('registration-fee') as HTMLInputElement;
+                        const dueDateEl = document.getElementById('due-date') as HTMLInputElement;
+                        const isActiveEl = document.getElementById('tuition-active') as HTMLInputElement;
+                        
                         // Maak een object aan met de juiste velden inclusief standard_tuition
                         const data = {
-                          academicYear: document.getElementById('academic-year')?.value || "2025-2026",
-                          standardTuition: document.getElementById('standard-tuition')?.value || "350,00",
-                          registrationFee: document.getElementById('registration-fee')?.value || "",
-                          dueDate: document.getElementById('due-date')?.value || "",
-                          isActive: (document.getElementById('tuition-active') as HTMLInputElement)?.checked || true
+                          academicYear: academicYearEl?.value || "2025-2026",
+                          standardTuition: standardTuitionEl?.value || "350,00",
+                          registrationFee: registrationFeeEl?.value || "",
+                          dueDate: dueDateEl?.value || "",
+                          isActive: isActiveEl?.checked || true
                         };
                         
                         // Log voor debugging
@@ -1376,15 +1383,14 @@ export default function Fees() {
                         
                         // API call naar de backend
                         apiRequest('POST', '/api/fee-settings', data)
-                          .then(response => {
-                            if (response.ok) {
-                              toast({
-                                title: "Collegegeld toegevoegd",
-                                description: "Het nieuwe collegegeld is succesvol toegevoegd."
-                              });
-                            } else {
-                              throw new Error("Fout bij toevoegen van collegegeld");
-                            }
+                          .then(response => response.json())
+                          .then(data => {
+                            toast({
+                              title: "Collegegeld toegevoegd",
+                              description: "Het nieuwe collegegeld is succesvol toegevoegd."
+                            });
+                            // Herlaad de fee settings data
+                            queryClient.invalidateQueries(['/api/fee-settings']);
                           })
                           .catch(error => {
                             console.error("Error:", error);

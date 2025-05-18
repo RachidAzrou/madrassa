@@ -339,14 +339,12 @@ export default function Fees() {
     }
   };
   
-  const handleSubmitTuitionSetting = async (values: TuitionSettingFormValues) => {
+  const onSubmitTuitionSetting = async (values: TuitionSettingFormValues) => {
     try {
       // Converteren naar juiste formaat voor de API
       const tuitionData = {
         academicYear: values.academicYear,
-        standardTuition: parseFloat(values.standardTuition),
-        registrationFee: values.registrationFee ? parseFloat(values.registrationFee) : null,
-        materialsFee: values.materialsFee ? parseFloat(values.materialsFee) : null,
+        amount: parseFloat(values.amount),
         dueDate: values.dueDate.toISOString(),
         isActive: values.isActive
       };

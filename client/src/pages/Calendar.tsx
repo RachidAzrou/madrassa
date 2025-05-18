@@ -132,7 +132,11 @@ export default function Calendar() {
     const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
     const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
     
-    const startingDayOfWeek = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    // Correct for Monday as first day of week (European standard)
+    // Sunday is 0 in JS Date, we want to display Monday (1) as first day
+    let startingDayOfWeek = firstDay.getDay() - 1; // subtract 1 to start from Monday
+    if (startingDayOfWeek === -1) startingDayOfWeek = 6; // If Sunday (0-1=-1), make it the 7th column (index 6)
+    
     const daysInMonth = lastDay.getDate();
     
     // Create array of day objects
@@ -140,7 +144,20 @@ export default function Calendar() {
     
     // Add empty cells for days before the first day of month
     for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push({ day: null, date: null, events: [] });
+      // Als eerste dag van de maand niet op maandag valt, voeg dagen toe van vorige maand
+      const prevMonthLastDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+      const prevMonthDay = new Date(prevMonthLastDay);
+      prevMonthDay.setDate(prevMonthLastDay.getDate() - startingDayOfWeek + i + 1);
+      
+      const dateStr = prevMonthDay.toISOString().split('T')[0];
+      const dayEvents = events.filter(event => event.date.startsWith(dateStr));
+      
+      days.push({ 
+        day: prevMonthDay.getDate(), 
+        date: prevMonthDay, 
+        events: dayEvents,
+        isCurrentMonth: false 
+      });
     }
     
     // Add days of the month
@@ -151,11 +168,35 @@ export default function Calendar() {
       // Find events for this day
       const dayEvents = events.filter(event => event.date.startsWith(dateStr));
       
+      // Check if this is today
+      const isToday = new Date().toDateString() === date.toDateString();
+      
       days.push({
         day,
         date,
-        events: dayEvents
+        events: dayEvents,
+        isCurrentMonth: true,
+        isToday
       });
+    }
+    
+    // Add days from next month to complete the calendar grid (42 cells for 6 rows)
+    const remainingCells = 42 - days.length;
+    if (remainingCells > 0) {
+      for (let day = 1; day <= remainingCells; day++) {
+        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, day);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        // Find events for this day
+        const dayEvents = events.filter(event => event.date.startsWith(dateStr));
+        
+        days.push({
+          day,
+          date,
+          events: dayEvents,
+          isCurrentMonth: false
+        });
+      }
     }
     
     return days;
@@ -423,18 +464,27 @@ export default function Calendar() {
           {/* Calendar grid */}
           <div className="grid grid-cols-7 grid-rows-6 divide-y divide-gray-100">
             {calendarDays.map((dayData, index) => {
-              // Bepaal of het weekend is
-              const isWeekend = index % 7 === 0 || index % 7 === 6;
+              // Bepaal of het weekend is (zaterdag of zondag)
+              const isWeekend = index % 7 === 5 || index % 7 === 6;
               
-              // Pas stijl aan op basis van of de dag in de huidige maand zit
-              let cellBaseClass = "min-h-[110px] p-2 relative transition-colors duration-200 hover:bg-sky-50/50 border border-sky-50";
+              // Bouw dynamische stijl op voor de cel
+              let cellBaseClass = "min-h-[110px] p-2 relative transition-colors duration-200 cursor-pointer border";
               
               if (!dayData.day) {
-                cellBaseClass = "min-h-[110px] p-2 relative bg-gray-50/40 border border-gray-100";
-              } else if (dayData.date && new Date().toDateString() === dayData.date.toDateString()) {
-                cellBaseClass = "min-h-[110px] p-2 relative transition-colors duration-200 bg-sky-50 hover:bg-sky-100/60 border border-sky-300";
-              } else if (isWeekend && dayData.day) {
-                cellBaseClass = "min-h-[110px] p-2 relative transition-colors duration-200 bg-sky-50/20 hover:bg-sky-50/50 border border-sky-50";
+                // Lege dag (zou niet meer moeten voorkomen met onze nieuwe genereerlogica)
+                cellBaseClass += " bg-gray-50/40 border-gray-100";
+              } else if (dayData.isToday) {
+                // Huidige dag
+                cellBaseClass += " bg-blue-50 hover:bg-blue-100/60 border-blue-300";
+              } else if (!dayData.isCurrentMonth) {
+                // Dag van vorige of volgende maand
+                cellBaseClass += " bg-gray-50/30 hover:bg-gray-50 border-gray-100 opacity-70";
+              } else if (isWeekend) {
+                // Weekend dag
+                cellBaseClass += " bg-sky-50/20 hover:bg-sky-50/50 border-sky-50";
+              } else {
+                // Normale dag in huidige maand
+                cellBaseClass += " hover:bg-sky-50/50 border-sky-50";
               }
               
               return (

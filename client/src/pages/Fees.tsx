@@ -514,74 +514,190 @@ export default function Fees() {
         </div>
       </div>
 
-      {/* Dialog voor "Wat wilt u toevoegen" */}
+      {/* Dialog voor "Toevoegen" in studentformulier stijl */}
       <Dialog open={showAddOptionsDialog} onOpenChange={setShowAddOptionsDialog}>
         <DialogContent className="sm:max-w-[95vw] sm:h-[85vh] overflow-y-auto">
-          <DialogHeader className="mb-4">
-            <DialogTitle className="text-xl flex items-center">
-              <Plus className="h-5 w-5 mr-2 text-[#1e3a8a]" />
-              Wat wilt u toevoegen?
-            </DialogTitle>
-            <DialogDescription>
-              Kies een optie om toe te voegen aan het betalingsbeheer.
-            </DialogDescription>
+          <DialogHeader className="flex flex-row items-center gap-2 text-left">
+            <div className="bg-blue-100 p-2 rounded-full">
+              <Plus className="h-6 w-6 text-blue-700" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl">Nieuwe gegevens toevoegen</DialogTitle>
+              <DialogDescription>
+                Selecteer het type gegevens dat u wilt toevoegen aan het betalingssysteem.
+              </DialogDescription>
+            </div>
           </DialogHeader>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
-            {/* Betalingsrecord */}
-            <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer" onClick={() => {
-              setShowAddOptionsDialog(false);
-              setTimeout(() => setIsAddDialogOpen(true), 100);
-            }}>
-              <CardHeader className="bg-gradient-to-b from-blue-50 to-blue-100 pb-2">
-                <div className="bg-[#1e3a8a] text-white p-2 rounded-full w-10 h-10 flex items-center justify-center mb-2">
-                  <Coins className="h-5 w-5" />
+
+          <Tabs defaultValue="payment" className="mt-6">
+            <TabsList className="grid grid-cols-3 mb-6 bg-blue-900/10">
+              <TabsTrigger value="payment" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                <Coins className="h-4 w-4 mr-2" />
+                Betalingsrecord
+              </TabsTrigger>
+              <TabsTrigger value="tuition" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                <Settings className="h-4 w-4 mr-2" />
+                Collegegeld
+              </TabsTrigger>
+              <TabsTrigger value="discount" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                <Percent className="h-4 w-4 mr-2" />
+                Korting
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Betalingsrecord Tab */}
+            <TabsContent value="payment" className="space-y-4">
+              <div className="bg-blue-50 rounded-lg p-6">
+                <div className="flex items-start space-x-4">
+                  <div className="bg-[#1e3a8a] text-white p-3 rounded-full">
+                    <Coins className="h-8 w-8" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-[#1e3a8a]">Nieuw betalingsrecord</h3>
+                    <p className="text-gray-600 mt-1">
+                      Voeg een nieuwe betaling toe voor een specifieke student met bedrag, beschrijving en vervaldatum.
+                    </p>
+                    <Button 
+                      className="mt-4 bg-[#3b5998] hover:bg-[#2d4373]"
+                      onClick={() => {
+                        setShowAddOptionsDialog(false);
+                        setTimeout(() => setIsAddDialogOpen(true), 100);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Betalingsrecord toevoegen
+                    </Button>
+                  </div>
                 </div>
-                <CardTitle className="text-[#1e3a8a]">Betalingsrecord</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <p className="text-gray-600 text-sm">
-                  Voeg een nieuwe betaling toe voor een student met bedragen en vervaldatum.
-                </p>
-              </CardContent>
-            </Card>
-            
-            {/* Collegegeld Instelling */}
-            <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer" onClick={() => {
-              setShowAddOptionsDialog(false);
-              setTimeout(() => setIsAddTuitionSettingOpen(true), 100);
-            }}>
-              <CardHeader className="bg-gradient-to-b from-blue-50 to-blue-100 pb-2">
-                <div className="bg-[#1e3a8a] text-white p-2 rounded-full w-10 h-10 flex items-center justify-center mb-2">
-                  <Settings className="h-5 w-5" />
+                
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white p-4 rounded-lg border border-blue-100">
+                    <h4 className="font-medium text-[#1e3a8a] mb-2 flex items-center">
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Registreer betalingen
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Registreer collegegelden, eenmalige kosten of terugkerende betalingen voor studenten.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-white p-4 rounded-lg border border-blue-100">
+                    <h4 className="font-medium text-[#1e3a8a] mb-2 flex items-center">
+                      <CalendarIcon className="h-4 w-4 mr-2" />
+                      Stel vervaldata in
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Definieer wanneer betalingen moeten worden voldaan en volg de betalingsstatus.
+                    </p>
+                  </div>
                 </div>
-                <CardTitle className="text-[#1e3a8a]">Collegegeld Instelling</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <p className="text-gray-600 text-sm">
-                  Stel nieuwe collegegeldtarieven in voor programma's of klassen.
-                </p>
-              </CardContent>
-            </Card>
-            
-            {/* Kortingsregel */}
-            <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer" onClick={() => {
-              setShowAddOptionsDialog(false);
-              setTimeout(() => setIsAddDiscountOpen(true), 100);
-            }}>
-              <CardHeader className="bg-gradient-to-b from-blue-50 to-blue-100 pb-2">
-                <div className="bg-[#1e3a8a] text-white p-2 rounded-full w-10 h-10 flex items-center justify-center mb-2">
-                  <Percent className="h-5 w-5" />
+              </div>
+            </TabsContent>
+
+            {/* Collegegeld Tab */}
+            <TabsContent value="tuition" className="space-y-4">
+              <div className="bg-blue-50 rounded-lg p-6">
+                <div className="flex items-start space-x-4">
+                  <div className="bg-[#1e3a8a] text-white p-3 rounded-full">
+                    <Settings className="h-8 w-8" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-[#1e3a8a]">Nieuwe collegegeld instelling</h3>
+                    <p className="text-gray-600 mt-1">
+                      Definieer collegegeld tarieven voor specifieke programma's, klassen of academische jaren.
+                    </p>
+                    <Button 
+                      className="mt-4 bg-[#3b5998] hover:bg-[#2d4373]"
+                      onClick={() => {
+                        setShowAddOptionsDialog(false);
+                        setTimeout(() => setIsAddTuitionSettingOpen(true), 100);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Collegegeld instelling toevoegen
+                    </Button>
+                  </div>
                 </div>
-                <CardTitle className="text-[#1e3a8a]">Kortingsregel</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <p className="text-gray-600 text-sm">
-                  Maak nieuwe kortingsregels voor specifieke situaties of studentengroepen.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+                
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white p-4 rounded-lg border border-blue-100">
+                    <h4 className="font-medium text-[#1e3a8a] mb-2 flex items-center">
+                      <Euro className="h-4 w-4 mr-2" />
+                      Tariefstructuur
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Stel basistarieven, inschrijfkosten en materiaalkosten in voor verschillende programma's.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-white p-4 rounded-lg border border-blue-100">
+                    <h4 className="font-medium text-[#1e3a8a] mb-2 flex items-center">
+                      <CalendarIcon className="h-4 w-4 mr-2" />
+                      Academische jaren
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Specificeer geldigheidsduur en definieer tarieven per academisch jaar.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Korting Tab */}
+            <TabsContent value="discount" className="space-y-4">
+              <div className="bg-blue-50 rounded-lg p-6">
+                <div className="flex items-start space-x-4">
+                  <div className="bg-[#1e3a8a] text-white p-3 rounded-full">
+                    <Percent className="h-8 w-8" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-[#1e3a8a]">Nieuwe kortingsregel</h3>
+                    <p className="text-gray-600 mt-1">
+                      Creëer kortingsregels voor specifieke groepen studenten of situaties zoals familiekortingen.
+                    </p>
+                    <Button 
+                      className="mt-4 bg-[#3b5998] hover:bg-[#2d4373]"
+                      onClick={() => {
+                        setShowAddOptionsDialog(false);
+                        setTimeout(() => setIsAddDiscountOpen(true), 100);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Kortingsregel toevoegen
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white p-4 rounded-lg border border-blue-100">
+                    <h4 className="font-medium text-[#1e3a8a] mb-2 flex items-center">
+                      <Users className="h-4 w-4 mr-2" />
+                      Familiekortingen
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Stel kortingen in voor gezinnen met meerdere kinderen op de school.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-white p-4 rounded-lg border border-blue-100">
+                    <h4 className="font-medium text-[#1e3a8a] mb-2 flex items-center">
+                      <CalendarIcon className="h-4 w-4 mr-2" />
+                      Tijdelijke kortingen
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Definieer seizoenskortingen of vroegboekvoordelen met geldigheidsperiodes.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setShowAddOptionsDialog(false)}>
+              Annuleren
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
       

@@ -828,6 +828,7 @@ export default function Guardians() {
                         <div className="space-y-1 mt-2">
                           <Label className="text-xs text-gray-500">Relatie tot student</Label>
                           <div className="p-2 border rounded-md bg-white">
+                            {selectedGuardian.emergencyContactRelation === 'parent' && 'Ouder'}
                             {selectedGuardian.emergencyContactRelation === 'family' && 'Familielid'}
                             {selectedGuardian.emergencyContactRelation === 'friend' && 'Vriend(in)'}
                             {selectedGuardian.emergencyContactRelation === 'neighbor' && 'Buur'}
@@ -1076,6 +1077,7 @@ export default function Guardians() {
                                 <SelectValue placeholder="Selecteer relatie" />
                               </SelectTrigger>
                               <SelectContent>
+                                <SelectItem value="parent">Ouder</SelectItem>
                                 <SelectItem value="family">Familielid</SelectItem>
                                 <SelectItem value="friend">Vriend(in)</SelectItem>
                                 <SelectItem value="neighbor">Buur</SelectItem>

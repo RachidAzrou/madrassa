@@ -708,10 +708,37 @@ export default function Grading() {
 
       {/* Tabs */}
       <Tabs defaultValue="grades" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-2 w-full md:w-[400px]">
-          <TabsTrigger value="grades">Cijfers</TabsTrigger>
-          <TabsTrigger value="behavior">Beoordelingen</TabsTrigger>
-        </TabsList>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <TabsList className="grid grid-cols-3 w-full md:w-[550px] p-1 bg-blue-900/10">
+            <TabsTrigger value="grades" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+              <Calculator className="h-4 w-4 mr-2" />
+              Cijfers
+            </TabsTrigger>
+            <TabsTrigger value="behavior" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+              <History className="h-4 w-4 mr-2" />
+              Beoordelingen
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+              <BarChart className="h-4 w-4 mr-2" />
+              Analyse
+            </TabsTrigger>
+          </TabsList>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              toast({
+                title: "Exporteren gestart",
+                description: "Cijferoverzicht wordt geëxporteerd naar Excel...",
+              });
+            }}
+            className="hidden md:flex items-center gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Exporteren
+          </Button>
+        </div>
         
         <TabsContent value="grades" className="space-y-4">
           {/* Course and assessment selector */}

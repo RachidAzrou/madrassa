@@ -178,6 +178,11 @@ export default function Teachers() {
         return await apiRequest(`/api/teachers?${params.toString()}`);
       } catch (error) {
         console.error('Error fetching teachers:', error);
+        toast({
+          title: "Fout bij ophalen docenten",
+          description: "Er is een probleem opgetreden bij het laden van de docentengegevens. Probeer het later opnieuw.",
+          variant: "destructive",
+        });
         return { teachers: [], totalCount: 0 };
       }
     },

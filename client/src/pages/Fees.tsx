@@ -778,36 +778,40 @@ export default function Fees() {
             <div className="px-4 py-5 sm:p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
                 <div className="flex flex-col gap-4">
-                  <TabsList className="bg-blue-900/10">
-                    <TabsTrigger 
-                      value="all" 
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant={status === 'all' ? 'default' : 'outline'}
                       onClick={() => handleStatusChange('all')}
-                      className={status === 'all' ? 'bg-white text-[#1e3a8a] shadow-md' : ''}
+                      className={status === 'all' ? 'bg-[#1e3a8a]' : ''}
+                      size="sm"
                     >
                       Alle statussen
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="betaald" 
+                    </Button>
+                    <Button 
+                      variant={status === 'betaald' ? 'default' : 'outline'}
                       onClick={() => handleStatusChange('betaald')}
-                      className={status === 'betaald' ? 'bg-white text-[#1e3a8a] shadow-md' : ''}
+                      className={status === 'betaald' ? 'bg-[#1e3a8a]' : ''}
+                      size="sm"
                     >
                       Betaald
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="niet betaald" 
+                    </Button>
+                    <Button 
+                      variant={status === 'niet betaald' ? 'default' : 'outline'}
                       onClick={() => handleStatusChange('niet betaald')}
-                      className={status === 'niet betaald' ? 'bg-white text-[#1e3a8a] shadow-md' : ''}
+                      className={status === 'niet betaald' ? 'bg-[#1e3a8a]' : ''}
+                      size="sm"
                     >
                       Niet betaald
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="gedeeltelijk betaald" 
+                    </Button>
+                    <Button 
+                      variant={status === 'gedeeltelijk betaald' ? 'default' : 'outline'}
                       onClick={() => handleStatusChange('gedeeltelijk betaald')}
-                      className={status === 'gedeeltelijk betaald' ? 'bg-white text-[#1e3a8a] shadow-md' : ''}
+                      className={status === 'gedeeltelijk betaald' ? 'bg-[#1e3a8a]' : ''}
+                      size="sm"
                     >
                       Gedeeltelijk betaald
-                    </TabsTrigger>
-                  </TabsList>
+                    </Button>
+                  </div>
                 </div>
 
                 <Button 
@@ -1291,25 +1295,27 @@ export default function Fees() {
         {/* Content voor Collegegeld Instellingen tab */}
         <TabsContent value="tuition-settings" className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Settings className="h-5 w-5 mr-2 text-[#1e3a8a]" />
-                Collegegeld Instellingen
-              </CardTitle>
-              <CardDescription>
-                Beheer de standaard bedragen en instellingen voor collegegeld per academisch jaar.
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center">
+                  <Euro className="h-5 w-5 mr-2 text-[#1e3a8a]" />
+                  Collegegeld
+                </CardTitle>
+                <CardDescription>
+                  Beheer de standaard bedragen en instellingen voor collegegeld per academisch jaar.
+                </CardDescription>
+              </div>
+              <Button 
+                onClick={() => setIsAddTuitionSettingOpen(true)}
+                className="bg-[#1e3a8a] hover:bg-blue-800">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Collegegeld Toevoegen
+              </Button>
             </CardHeader>
             <CardContent>
               {feeSettings.length === 0 ? (
                 <div className="py-8 text-center">
                   <p className="text-gray-500">Geen collegegeld instellingen gevonden.</p>
-                  <Button 
-                    onClick={() => setIsAddTuitionSettingOpen(true)}
-                    className="mt-4 bg-[#1e3a8a] hover:bg-blue-800">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Instelling Toevoegen
-                  </Button>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -1395,25 +1401,27 @@ export default function Fees() {
         {/* Content voor Kortingen tab */}
         <TabsContent value="discounts" className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Percent className="h-5 w-5 mr-2 text-[#1e3a8a]" />
-                Kortingsregels
-              </CardTitle>
-              <CardDescription>
-                Beheer de verschillende kortingen die toegepast kunnen worden op collegegeld.
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center">
+                  <Percent className="h-5 w-5 mr-2 text-[#1e3a8a]" />
+                  Kortingsregels
+                </CardTitle>
+                <CardDescription>
+                  Beheer de verschillende kortingen die toegepast kunnen worden op collegegeld.
+                </CardDescription>
+              </div>
+              <Button 
+                onClick={() => setIsAddDiscountOpen(true)}
+                className="bg-[#1e3a8a] hover:bg-blue-800">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Korting Toevoegen
+              </Button>
             </CardHeader>
             <CardContent>
               {discounts.length === 0 ? (
                 <div className="py-8 text-center">
                   <p className="text-gray-500">Geen kortingsregels gevonden.</p>
-                  <Button 
-                    onClick={() => setIsAddDiscountOpen(true)}
-                    className="mt-4 bg-[#1e3a8a] hover:bg-blue-800">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Korting Toevoegen
-                  </Button>
                 </div>
               ) : (
                 <div className="overflow-x-auto">

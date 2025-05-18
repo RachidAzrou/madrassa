@@ -1004,13 +1004,13 @@ export default function Students() {
           <div className="py-4">
             <Tabs defaultValue="personal" className="w-full">
               <TabsList className="grid grid-cols-6 mb-4">
-                <TabsTrigger value="personal">
-                  <User className="mr-2 h-4 w-4" />
-                  Persoonlijk
-                </TabsTrigger>
                 <TabsTrigger value="photo">
                   <Image className="mr-2 h-4 w-4" />
                   Foto
+                </TabsTrigger>
+                <TabsTrigger value="personal">
+                  <User className="mr-2 h-4 w-4" />
+                  Persoonlijk
                 </TabsTrigger>
                 <TabsTrigger value="contact">
                   <Phone className="mr-2 h-4 w-4" />

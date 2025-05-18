@@ -119,6 +119,7 @@ export default function Fees() {
   const [isUpdateStatusOpen, setIsUpdateStatusOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [isViewGuardiansOpen, setIsViewGuardiansOpen] = useState(false);
+  const [showAddOptionsDialog, setShowAddOptionsDialog] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch fee records with filters
@@ -503,46 +504,87 @@ export default function Fees() {
         </div>
         
         <div className="flex items-center gap-1 order-1 md:order-2">
-          <Button onClick={() => {
-            // Actie afhankelijk van het huidige tabblad
-            if (activeTab === 'fee-records') {
-              setIsAddDialogOpen(true);
-            } else if (activeTab === 'tuition-settings') {
-              setIsAddTuitionSettingOpen(true);
-            } else if (activeTab === 'discounts') {
-              setIsAddDiscountOpen(true);
-            }
-          }} className="flex items-center bg-[#1e3a8a] hover:bg-blue-800">
+          <Button 
+            onClick={() => setShowAddOptionsDialog(true)} 
+            className="flex items-center bg-[#1e3a8a] hover:bg-blue-800"
+          >
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Toevoegen</span>
           </Button>
-        
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-9 w-9 p-0 ml-1">
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Toevoegen...</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setIsAddDialogOpen(true)}>
-                <Coins className="mr-2 h-4 w-4" />
-                <span>Betalingsrecord</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsAddTuitionSettingOpen(true)}>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Collegegeld Instelling</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsAddDiscountOpen(true)}>
-                <Percent className="mr-2 h-4 w-4" />
-                <span>Kortingsregel</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 
+      {/* Dialog voor "Wat wilt u toevoegen" */}
+      <Dialog open={showAddOptionsDialog} onOpenChange={setShowAddOptionsDialog}>
+        <DialogContent className="sm:max-w-[95vw] sm:h-[85vh] overflow-y-auto">
+          <DialogHeader className="mb-4">
+            <DialogTitle className="text-xl flex items-center">
+              <Plus className="h-5 w-5 mr-2 text-[#1e3a8a]" />
+              Wat wilt u toevoegen?
+            </DialogTitle>
+            <DialogDescription>
+              Kies een optie om toe te voegen aan het betalingsbeheer.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
+            {/* Betalingsrecord */}
+            <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer" onClick={() => {
+              setShowAddOptionsDialog(false);
+              setTimeout(() => setIsAddDialogOpen(true), 100);
+            }}>
+              <CardHeader className="bg-gradient-to-b from-blue-50 to-blue-100 pb-2">
+                <div className="bg-[#1e3a8a] text-white p-2 rounded-full w-10 h-10 flex items-center justify-center mb-2">
+                  <Coins className="h-5 w-5" />
+                </div>
+                <CardTitle className="text-[#1e3a8a]">Betalingsrecord</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <p className="text-gray-600 text-sm">
+                  Voeg een nieuwe betaling toe voor een student met bedragen en vervaldatum.
+                </p>
+              </CardContent>
+            </Card>
+            
+            {/* Collegegeld Instelling */}
+            <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer" onClick={() => {
+              setShowAddOptionsDialog(false);
+              setTimeout(() => setIsAddTuitionSettingOpen(true), 100);
+            }}>
+              <CardHeader className="bg-gradient-to-b from-blue-50 to-blue-100 pb-2">
+                <div className="bg-[#1e3a8a] text-white p-2 rounded-full w-10 h-10 flex items-center justify-center mb-2">
+                  <Settings className="h-5 w-5" />
+                </div>
+                <CardTitle className="text-[#1e3a8a]">Collegegeld Instelling</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <p className="text-gray-600 text-sm">
+                  Stel nieuwe collegegeldtarieven in voor programma's of klassen.
+                </p>
+              </CardContent>
+            </Card>
+            
+            {/* Kortingsregel */}
+            <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer" onClick={() => {
+              setShowAddOptionsDialog(false);
+              setTimeout(() => setIsAddDiscountOpen(true), 100);
+            }}>
+              <CardHeader className="bg-gradient-to-b from-blue-50 to-blue-100 pb-2">
+                <div className="bg-[#1e3a8a] text-white p-2 rounded-full w-10 h-10 flex items-center justify-center mb-2">
+                  <Percent className="h-5 w-5" />
+                </div>
+                <CardTitle className="text-[#1e3a8a]">Kortingsregel</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <p className="text-gray-600 text-sm">
+                  Maak nieuwe kortingsregels voor specifieke situaties of studentengroepen.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
       {/* Tabs voor verschillende onderdelen van betalingsbeheer */}
       <Tabs
         value={activeTab}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Download, PlusCircle, History, Save, Plus, X, Edit, Trash2, AlertCircle, Calculator } from 'lucide-react';
+import { Search, Download, PlusCircle, History, Save, Plus, X, Edit, Trash2, AlertCircle, Calculator, BarChart, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -88,7 +88,7 @@ export default function Grading() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [activeTab, setActiveTab] = useState('grades'); // 'grades' of 'behavior'
+  const [activeTab, setActiveTab] = useState('grades'); // 'grades', 'behavior' of 'analytics'
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedAssessment, setSelectedAssessment] = useState('');
   const [selectedClass, setSelectedClass] = useState(''); // Voor klassen (studentengroepen)

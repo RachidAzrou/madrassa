@@ -34,7 +34,7 @@ interface Program {
 export default function Programs() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
-  const [expandedProgram, setExpandedProgram] = useState<string | null>(null);
+  const [expandedProgram, setExpandedProgram] = useState<number | null>(null);
   
   // State voor vak dialogen
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -76,7 +76,7 @@ export default function Programs() {
     setSearchTerm(e.target.value);
   };
 
-  const toggleExpand = (programId: string) => {
+  const toggleExpand = (programId: number) => {
     if (expandedProgram === programId) {
       setExpandedProgram(null);
     } else {

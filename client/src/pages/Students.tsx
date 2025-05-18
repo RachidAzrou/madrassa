@@ -1190,10 +1190,20 @@ export default function Students() {
                               city: eidData.city
                             });
                             
+                            // Voeg een extra bericht toe dat de foto ook beschikbaar is in de foto-tab
                             localToast({
                               title: "Gegevens geladen",
-                              description: "De gegevens van de eID zijn succesvol ingeladen.",
+                              description: "De gegevens van de eID zijn succesvol ingeladen. De foto is ook zichtbaar in de foto-tab.",
                             });
+                            
+                            // Toon een visuele hint dat er ook naar de foto tab gekeken moet worden
+                            const photoTabTrigger = document.querySelector('button[value="photo"]');
+                            if (photoTabTrigger) {
+                              photoTabTrigger.classList.add('animate-pulse');
+                              setTimeout(() => {
+                                photoTabTrigger.classList.remove('animate-pulse');
+                              }, 3000);
+                            }
                           }, 2000);
                         }, 1500);
                       }}

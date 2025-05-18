@@ -59,18 +59,10 @@ const tuitionSettingSchema = z.object({
   academicYear: z.string({
     required_error: "Academisch jaar is verplicht"
   }),
-  standardTuition: z.string().refine(
+  amount: z.string().refine(
     (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, 
     { message: "Bedrag moet een positief getal zijn" }
   ),
-  registrationFee: z.string().refine(
-    (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, 
-    { message: "Bedrag moet een positief getal zijn of 0" }
-  ).optional(),
-  materialsFee: z.string().refine(
-    (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, 
-    { message: "Bedrag moet een positief getal zijn of 0" }
-  ).optional(),
   dueDate: z.date({
     required_error: "Vervaldatum is verplicht",
   }),
@@ -208,9 +200,7 @@ export default function Fees() {
     resolver: zodResolver(tuitionSettingSchema),
     defaultValues: {
       academicYear: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`,
-      standardTuition: '',
-      registrationFee: '',
-      materialsFee: '',
+      amount: '',
       dueDate: new Date(new Date().getFullYear(), 7, 1), // 1 augustus van huidige jaar
       isActive: true
     }

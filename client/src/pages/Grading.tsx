@@ -145,7 +145,9 @@ export default function Grading() {
     queryKey: ['/api/student-groups', selectedClass, 'students'],
     queryFn: async () => {
       if (!selectedClass) return [];
-      const response = await apiRequest('GET', `/api/student-groups/${selectedClass}/students`);
+      const response = await apiRequest(`/api/student-groups/${selectedClass}/students`, {
+        method: 'GET'
+      });
       return response;
     },
     staleTime: 60000,
@@ -227,9 +229,14 @@ export default function Grading() {
   // Mutation for creating a new assessment
   const createAssessmentMutation = useMutation({
     mutationFn: async (values: AssessmentFormValues) => {
-      return await apiRequest('POST', '/api/assessments', {
+      const formattedData = {
         ...values,
         dueDate: values.dueDate.toISOString().split('T')[0], // Format date for API
+      };
+      
+      return await apiRequest('/api/assessments', {
+        method: 'POST',
+        body: formattedData
       });
     },
     onSuccess: () => {
@@ -237,11 +244,16 @@ export default function Grading() {
         title: 'Beoordeling aangemaakt',
         description: 'De nieuwe beoordeling is succesvol aangemaakt.',
       });
+      
+      // Invalideer relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/assessments'] });
+      
+      // Reset en sluit form
       setIsAddAssessmentOpen(false);
       assessmentForm.reset();
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Error creating assessment:', error);
       toast({
         title: 'Fout bij aanmaken beoordeling',
         description: 'Er is een fout opgetreden bij het aanmaken van de beoordeling.',

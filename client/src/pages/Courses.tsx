@@ -186,7 +186,10 @@ export default function Courses() {
   // Update course mutation
   const updateCourseMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number, data: typeof courseFormData }) => {
-      return await apiRequest('PUT', `/api/courses/${id}`, data);
+      return await apiRequest(`/api/courses/${id}`, {
+        method: 'PUT',
+        body: data
+      });
     },
     onSuccess: () => {
       toast({
@@ -195,7 +198,12 @@ export default function Courses() {
       });
       setIsEditDialogOpen(false);
       resetFormData();
+      
+      // Invalideer relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/active-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/teacher-course-assignments'] });
     },
     onError: (error) => {
       toast({
@@ -210,7 +218,9 @@ export default function Courses() {
   // Delete course mutation
   const deleteCourseMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest('DELETE', `/api/courses/${id}`);
+      return await apiRequest(`/api/courses/${id}`, {
+        method: 'DELETE'
+      });
     },
     onSuccess: () => {
       toast({
@@ -219,7 +229,14 @@ export default function Courses() {
       });
       setIsDeleteDialogOpen(false);
       setSelectedCourse(null);
+      
+      // Invalideer alle relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/active-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/enrollments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/teacher-course-assignments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/lessons'] });
     },
     onError: (error) => {
       toast({

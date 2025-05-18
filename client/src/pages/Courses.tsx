@@ -435,45 +435,182 @@ export default function Courses() {
           </Button>
         </div>
         
-        {/* Filter opties */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Status:</span>
-            <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
-              <SelectTrigger className="w-[140px] h-9">
-                <SelectValue placeholder="Filter op status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Actief</SelectItem>
-                <SelectItem value="inactive">Inactief</SelectItem>
-                <SelectItem value="all">Alle vakken</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <GraduationCap className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Programma:</span>
-            <Select value={programFilter} onValueChange={handleProgramFilterChange}>
-              <SelectTrigger className="w-[180px] h-9">
-                <SelectValue placeholder="Filter op programma" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle programma's</SelectItem>
-                {programs.map((program: any) => (
-                  <SelectItem key={program.id} value={program.id.toString()}>
-                    {program.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Filter opties met TabsList */}
+        <div className="mb-5">
+          <Tabs defaultValue="courses" className="w-full">
+            <div className="flex justify-between items-center">
+              <TabsList className="p-1 bg-blue-900/10">
+                <TabsTrigger value="courses" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                  Vakken
+                </TabsTrigger>
+                <TabsTrigger value="classes" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                  Klassen
+                </TabsTrigger>
+              </TabsList>
+              
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Status:</span>
+                <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+                  <SelectTrigger className="w-[140px] h-9">
+                    <SelectValue placeholder="Filter op status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Actief</SelectItem>
+                    <SelectItem value="inactive">Inactief</SelectItem>
+                    <SelectItem value="all">Alle vakken</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <TabsContent value="courses" className="pt-4">
+              {/* Vakken/Curriculum overzicht */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {isLoading ? (
+                  <div className="col-span-full flex justify-center py-8">
+                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                ) : isError ? (
+                  <div className="col-span-full text-center py-8 text-red-500">
+                    Fout bij het laden van curriculum. Probeer het opnieuw.
+                  </div>
+                ) : courses.length === 0 ? (
+                  <div className="col-span-full text-center py-8 text-gray-500">
+                    Geen curriculum gevonden. Pas uw filters aan of voeg een nieuw curriculum toe.
+                  </div>
+                ) : (
+                  courses.map((course: CourseType) => (
+                    <div key={course.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="p-5">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-semibold text-lg text-gray-800">{course.name}</h3>
+                            <p className="text-gray-500 text-sm mt-1">{course.code} • {course.credits} Studiepunten</p>
+                          </div>
+                          <Badge variant={course.isActive ? "default" : "secondary"}>
+                            {course.isActive ? "Actief" : "Inactief"}
+                          </Badge>
+                        </div>
+                        <p className="mt-3 text-gray-600 text-sm line-clamp-2">{course.description || 'Geen beschrijving beschikbaar'}</p>
+                        
+                        <div className="mt-4 flex items-center">
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className="bg-[#1e3a8a] text-white">
+                              {course.instructor ? course.instructor.charAt(0) : 'D'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="ml-2">
+                            <p className="text-xs font-medium text-gray-800">{course.instructor || 'Nog geen docent toegewezen'}</p>
+                            <p className="text-xs text-gray-500">Docent</p>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                          <Badge variant="outline" className="text-xs">
+                            {getProgramNameById(course.programId)}
+                          </Badge>
+                          
+                          <div className="flex space-x-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => handleViewCourse(course)}
+                              title="Details bekijken"
+                              className="h-8 w-8 p-0"
+                            >
+                              <Eye className="h-4 w-4 text-gray-500" />
+                              <span className="sr-only">Bekijken</span>
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => handleEditCourse(course)}
+                              title="Cursus bewerken"
+                              className="h-8 w-8 p-0"
+                            >
+                              <Pencil className="h-4 w-4 text-gray-500" />
+                              <span className="sr-only">Bewerken</span>
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                              onClick={() => handleDeleteCourse(course)}
+                              title="Cursus verwijderen"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Verwijderen</span>
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="classes" className="pt-4">
+              {/* Klassen overzicht */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {studentGroups?.length > 0 ? (
+                  studentGroups.map((group: any) => (
+                    <div key={group.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="p-5">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-semibold text-lg text-gray-800">{group.name}</h3>
+                            <p className="text-gray-500 text-sm mt-1">Academisch jaar: {group.academicYear}</p>
+                          </div>
+                          <Badge variant={group.isActive ? "default" : "secondary"}>
+                            {group.isActive ? "Actief" : "Inactief"}
+                          </Badge>
+                        </div>
+                        
+                        <div className="mt-4 flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Users className="h-4 w-4 text-primary mr-1" />
+                            <span className="text-xs text-gray-700">
+                              {group.enrolledStudents || 0} studenten
+                            </span>
+                          </div>
+                          
+                          <Badge variant="outline" className="text-xs">
+                            {programs.find((p: any) => p.id === group.programId)?.name || 'Geen programma'}
+                          </Badge>
+                        </div>
+                        
+                        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-end">
+                          <div className="flex space-x-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              title="Details bekijken"
+                              className="h-8 w-8 p-0"
+                              onClick={() => window.location.href = '/student-groups'}
+                            >
+                              <Eye className="h-4 w-4 text-gray-500" />
+                              <span className="sr-only">Bekijken</span>
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-8 text-gray-500">
+                    Geen klassen gevonden. Ga naar de Klassen pagina om klassen toe te voegen.
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
       
-      {/* Curriculum overzicht */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Paginering container */}
+      <div>
         {isLoading ? (
           <div className="col-span-full flex justify-center py-8">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>

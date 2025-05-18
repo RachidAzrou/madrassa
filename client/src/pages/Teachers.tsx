@@ -1576,6 +1576,56 @@ export default function Teachers() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Verwijderbevestiging Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-red-600">
+              Docent verwijderen
+            </DialogTitle>
+            <DialogDescription>
+              {teacherToDelete && (
+                <p>
+                  Weet u zeker dat u docent <span className="font-semibold">{teacherToDelete.firstName} {teacherToDelete.lastName}</span> wilt verwijderen? 
+                  Deze actie kan niet ongedaan worden gemaakt.
+                </p>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4 flex flex-col space-y-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-md p-3 text-amber-700 text-sm">
+              <div className="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 mr-2 mt-0.5 text-amber-500">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <div>
+                  Als deze docent nog gerelateerd is aan klassen, vakken of andere gegevens, zal de verwijdering mogelijk niet kunnen worden uitgevoerd zonder eerst die relaties te verbreken.
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex flex-row space-x-3 justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Annuleren
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeleteTeacher}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Verwijderen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

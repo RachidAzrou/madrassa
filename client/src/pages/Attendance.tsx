@@ -69,25 +69,25 @@ export default function Attendance() {
   const [isSaving, setIsSaving] = useState(false);
   
   // Fetch courses/programs
-  const { data: coursesData, isLoading: isLoadingCourses } = useQuery({
+  const { data: coursesData, isLoading: isLoadingCourses } = useQuery<Program[]>({
     queryKey: ['/api/programs'],
     staleTime: 60000,
   });
   
   // Fetch classes/student groups
-  const { data: classesData, isLoading: isLoadingClasses } = useQuery({
+  const { data: classesData, isLoading: isLoadingClasses } = useQuery<StudentGroup[]>({
     queryKey: ['/api/student-groups'],
     staleTime: 60000,
   });
   
   // Fetch students
-  const { data: studentsData, isLoading: isLoadingStudents } = useQuery({
+  const { data: studentsData, isLoading: isLoadingStudents } = useQuery<Student[]>({
     queryKey: ['/api/students'],
     staleTime: 60000,
   });
   
   // Fetch teachers
-  const { data: teachersData, isLoading: isLoadingTeachers } = useQuery({
+  const { data: teachersData, isLoading: isLoadingTeachers } = useQuery<Teacher[]>({
     queryKey: ['/api/teachers'],
     staleTime: 60000,
   });
@@ -566,11 +566,23 @@ export default function Attendance() {
 
                 <TabsContent value="students">
                   <div className="space-y-4 mt-6">
-                    <div className="bg-slate-50 p-3 px-4 rounded-md border shadow-sm mb-6">
-                      <div className="text-center">
-                        <div className="text-sm font-medium text-gray-700 mb-3">Groepsacties</div>
+                    <div className="bg-slate-50 p-4 rounded-md border shadow-sm mb-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3">
+                        <div className="text-base font-medium text-blue-800 mb-2 sm:mb-0">Groepsacties</div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                            {selectedType === 'vak' 
+                              ? `Vak: ${coursesData?.find((c: any) => c.id.toString() === selectedCourse)?.name || ''}` 
+                              : `Klas: ${classesData?.find((c: any) => c.id.toString() === selectedClass)?.name || ''}`}
+                          </span>
+                          <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                            Datum: {formatDate(selectedDate)}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex gap-3 justify-around">
+                      
+                      <div className="flex flex-col sm:flex-row gap-3">
                         <Button 
                           variant="outline" 
                           size="sm" 
@@ -591,6 +603,15 @@ export default function Attendance() {
                           <XCircle className="h-4 w-4 mr-2" />
                           Allen afwezig
                         </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 flex-1"
+                          disabled={!studentsData || !Array.isArray(studentsData) || studentsData.length === 0}
+                        >
+                          <Clock className="h-4 w-4 mr-2" />
+                          Allen te laat
+                        </Button>
                       </div>
                     </div>
                     
@@ -601,45 +622,79 @@ export default function Attendance() {
                       </div>
                     ) : studentsData && Array.isArray(studentsData) && studentsData.length > 0 ? (
                       <div className="rounded-md border shadow-sm overflow-hidden">
-                        <div className="grid grid-cols-2 bg-slate-100 p-3 text-xs font-medium text-slate-700">
-                          <div>Student</div>
-                          <div className="text-right">Acties</div>
+                        <div className="grid grid-cols-12 bg-slate-100 p-3 text-xs font-medium text-slate-700">
+                          <div className="col-span-4 sm:col-span-4">Student</div>
+                          <div className="hidden sm:block col-span-3">Studentnummer</div>
+                          <div className="col-span-8 sm:col-span-5 text-right">Aanwezigheidsstatus</div>
                         </div>
                         <div className="divide-y bg-white">
-                          {studentsData.map((student: Student) => (
-                            <div key={student.id} className="grid grid-cols-2 items-center p-3 hover:bg-gray-50">
-                              <div className="font-medium">
-                                {student.firstName} {student.lastName}
-                                <span className="ml-2 text-xs text-gray-500">{student.studentId}</span>
+                          {studentsData.map((student: Student) => {
+                            const status = studentAttendance[student.id]?.status;
+                            const statusBadge = status === 'present' 
+                              ? <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" /> Aanwezig</span>
+                              : status === 'late'
+                                ? <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800"><Clock className="h-3 w-3 mr-1" /> Te laat</span>
+                                : status === 'absent'
+                                  ? <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><XCircle className="h-3 w-3 mr-1" /> Afwezig</span>
+                                  : <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Niet ingevuld</span>;
+                            
+                            return (
+                              <div key={student.id} className="grid grid-cols-12 items-center p-4 hover:bg-gray-50">
+                                <div className="col-span-4 sm:col-span-4 font-medium flex items-center">
+                                  <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-medium mr-2">
+                                    {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                                  </div>
+                                  <div>
+                                    <div>{student.firstName} {student.lastName}</div>
+                                    <div className="text-xs text-gray-500 sm:hidden">{student.studentId}</div>
+                                  </div>
+                                </div>
+                                
+                                <div className="hidden sm:block col-span-3 text-sm text-gray-600">
+                                  {student.studentId}
+                                </div>
+                                
+                                <div className="col-span-8 sm:col-span-5 flex flex-wrap justify-end gap-2">
+                                  <div className="flex-shrink-0 sm:hidden mb-2 mr-auto ml-1">
+                                    {statusBadge}
+                                  </div>
+                                  <div className="hidden sm:block mr-auto">
+                                    {statusBadge}
+                                  </div>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    {...getStudentButtonStyle(student.id, 'present')}
+                                    onClick={() => markStudentPresent(student.id)}
+                                    className="flex-1 sm:flex-initial max-w-[90px]"
+                                  >
+                                    <CheckCircle className="h-4 w-4 sm:mr-1" />
+                                    <span className="hidden sm:inline">Aanwezig</span>
+                                  </Button>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    {...getStudentButtonStyle(student.id, 'late')}
+                                    onClick={() => markStudentLate(student.id)}
+                                    className="flex-1 sm:flex-initial max-w-[90px]"
+                                  >
+                                    <Clock className="h-4 w-4 sm:mr-1" />
+                                    <span className="hidden sm:inline">Te laat</span>
+                                  </Button>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    {...getStudentButtonStyle(student.id, 'absent')}
+                                    onClick={() => markStudentAbsent(student.id)}
+                                    className="flex-1 sm:flex-initial max-w-[90px]"
+                                  >
+                                    <XCircle className="h-4 w-4 sm:mr-1" />
+                                    <span className="hidden sm:inline">Afwezig</span>
+                                  </Button>
+                                </div>
                               </div>
-                              <div className="flex justify-end gap-2">
-                                <Button 
-                                  variant={studentAttendance[student.id]?.status === 'present' ? 'default' : 'outline'} 
-                                  size="sm" 
-                                  {...getStudentButtonStyle(student.id, 'present')}
-                                  onClick={() => markStudentPresent(student.id)}
-                                >
-                                  Aanwezig
-                                </Button>
-                                <Button 
-                                  variant={studentAttendance[student.id]?.status === 'late' ? 'default' : 'outline'} 
-                                  size="sm" 
-                                  {...getStudentButtonStyle(student.id, 'late')}
-                                  onClick={() => markStudentLate(student.id)}
-                                >
-                                  Te laat
-                                </Button>
-                                <Button 
-                                  variant={studentAttendance[student.id]?.status === 'absent' ? 'default' : 'outline'} 
-                                  size="sm" 
-                                  {...getStudentButtonStyle(student.id, 'absent')}
-                                  onClick={() => markStudentAbsent(student.id)}
-                                >
-                                  Afwezig
-                                </Button>
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     ) : (
@@ -652,17 +707,29 @@ export default function Attendance() {
                 
                 <TabsContent value="teachers">
                   <div className="space-y-4 mt-6">
-                    <div className="bg-slate-50 p-3 px-4 rounded-md border shadow-sm mb-6">
-                      <div className="text-center">
-                        <div className="text-sm font-medium text-gray-700 mb-3">Groepsacties</div>
+                    <div className="bg-slate-50 p-4 rounded-md border shadow-sm mb-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3">
+                        <div className="text-base font-medium text-blue-800 mb-2 sm:mb-0">Docentacties</div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                            {selectedType === 'vak' 
+                              ? `Vak: ${coursesData?.find((c) => c.id.toString() === selectedCourse)?.name || ''}` 
+                              : `Klas: ${classesData?.find((c) => c.id.toString() === selectedClass)?.name || ''}`}
+                          </span>
+                          <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                            Datum: {formatDate(selectedDate)}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex gap-3 justify-around">
+                      
+                      <div className="flex flex-col sm:flex-row gap-3">
                         <Button 
                           variant="outline" 
                           size="sm" 
                           onClick={markAllTeachersPresent} 
                           className="bg-white border-green-600 text-green-600 hover:bg-green-50 flex-1"
-                          disabled={!teachersData || !Array.isArray(teachersData) || teachersData.length === 0}
+                          disabled={!teachersData || teachersData.length === 0}
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Allen aanwezig
@@ -672,7 +739,7 @@ export default function Attendance() {
                           size="sm" 
                           onClick={markAllTeachersAbsent} 
                           className="bg-white border-red-600 text-red-600 hover:bg-red-50 flex-1"
-                          disabled={!teachersData || !Array.isArray(teachersData) || teachersData.length === 0}
+                          disabled={!teachersData || teachersData.length === 0}
                         >
                           <XCircle className="h-4 w-4 mr-2" />
                           Allen afwezig
@@ -685,39 +752,69 @@ export default function Attendance() {
                         <Loader2 className="h-8 w-8 mx-auto animate-spin text-blue-500" />
                         <p className="mt-2 text-sm text-gray-500">Docenten laden...</p>
                       </div>
-                    ) : teachersData && Array.isArray(teachersData) && teachersData.length > 0 ? (
+                    ) : teachersData && teachersData.length > 0 ? (
                       <div className="rounded-md border shadow-sm overflow-hidden">
-                        <div className="grid grid-cols-2 bg-slate-100 p-3 text-xs font-medium text-slate-700">
-                          <div>Docent</div>
-                          <div className="text-right">Acties</div>
+                        <div className="grid grid-cols-12 bg-slate-100 p-3 text-xs font-medium text-slate-700">
+                          <div className="col-span-5 sm:col-span-4">Docent</div>
+                          <div className="hidden sm:block col-span-3">Docentnummer</div>
+                          <div className="col-span-7 sm:col-span-5 text-right">Aanwezigheidsstatus</div>
                         </div>
                         <div className="divide-y bg-white">
-                          {teachersData.map((teacher: Teacher) => (
-                            <div key={teacher.id} className="grid grid-cols-2 items-center p-3 hover:bg-gray-50">
-                              <div className="font-medium">
-                                {teacher.firstName} {teacher.lastName}
-                                <span className="ml-2 text-xs text-gray-500">{teacher.teacherId}</span>
+                          {teachersData.map((teacher) => {
+                            const status = teacherAttendance[teacher.id]?.status;
+                            const statusBadge = status === 'present' 
+                              ? <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" /> Aanwezig</span>
+                              : status === 'absent'
+                                ? <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><XCircle className="h-3 w-3 mr-1" /> Afwezig</span>
+                                : <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Niet ingevuld</span>;
+                            
+                            return (
+                              <div key={teacher.id} className="grid grid-cols-12 items-center p-4 hover:bg-gray-50">
+                                <div className="col-span-5 sm:col-span-4 font-medium flex items-center">
+                                  <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-medium mr-2">
+                                    {teacher.firstName.charAt(0)}{teacher.lastName.charAt(0)}
+                                  </div>
+                                  <div>
+                                    <div>{teacher.firstName} {teacher.lastName}</div>
+                                    <div className="text-xs text-gray-500 sm:hidden">{teacher.teacherId}</div>
+                                  </div>
+                                </div>
+                                
+                                <div className="hidden sm:block col-span-3 text-sm text-gray-600">
+                                  {teacher.teacherId}
+                                </div>
+                                
+                                <div className="col-span-7 sm:col-span-5 flex flex-wrap justify-end gap-2">
+                                  <div className="flex-shrink-0 sm:hidden mb-2 mr-auto ml-1">
+                                    {statusBadge}
+                                  </div>
+                                  <div className="hidden sm:block mr-auto">
+                                    {statusBadge}
+                                  </div>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    {...getTeacherButtonStyle(teacher.id, 'present')}
+                                    onClick={() => markTeacherPresent(teacher.id)}
+                                    className="flex-1 sm:flex-initial max-w-[100px]"
+                                  >
+                                    <CheckCircle className="h-4 w-4 sm:mr-1" />
+                                    <span className="hidden sm:inline">Aanwezig</span>
+                                  </Button>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    {...getTeacherButtonStyle(teacher.id, 'absent')}
+                                    onClick={() => markTeacherAbsent(teacher.id)}
+                                    className="flex-1 sm:flex-initial max-w-[100px]"
+                                  >
+                                    <XCircle className="h-4 w-4 sm:mr-1" />
+                                    <span className="hidden sm:inline">Afwezig</span>
+                                  </Button>
+                                </div>
                               </div>
-                              <div className="flex justify-end gap-2">
-                                <Button 
-                                  variant={teacherAttendance[teacher.id]?.status === 'present' ? 'default' : 'outline'} 
-                                  size="sm" 
-                                  {...getTeacherButtonStyle(teacher.id, 'present')}
-                                  onClick={() => markTeacherPresent(teacher.id)}
-                                >
-                                  Aanwezig
-                                </Button>
-                                <Button 
-                                  variant={teacherAttendance[teacher.id]?.status === 'absent' ? 'default' : 'outline'} 
-                                  size="sm" 
-                                  {...getTeacherButtonStyle(teacher.id, 'absent')}
-                                  onClick={() => markTeacherAbsent(teacher.id)}
-                                >
-                                  Afwezig
-                                </Button>
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     ) : (

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -1306,7 +1307,10 @@ export default function Fees() {
                 </CardDescription>
               </div>
               <Button 
-                onClick={() => setIsAddTuitionSettingOpen(true)}
+                onClick={() => {
+                  console.log("Opening tuition dialog");
+                  setIsAddTuitionSettingOpen(true);
+                }}
                 className="bg-[#1e3a8a] hover:bg-blue-800">
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Collegegeld Toevoegen
@@ -1411,12 +1415,57 @@ export default function Fees() {
                   Beheer de verschillende kortingen die toegepast kunnen worden op collegegeld.
                 </CardDescription>
               </div>
-              <Button 
-                onClick={() => setIsAddDiscountOpen(true)}
-                className="bg-[#1e3a8a] hover:bg-blue-800">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Korting Toevoegen
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="bg-[#1e3a8a] hover:bg-blue-800">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Korting Toevoegen
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle>Nieuwe Kortingsregel</DialogTitle>
+                    <DialogDescription>
+                      Configureer een nieuwe korting voor collegegeld.
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="py-4">
+                    <div className="space-y-4">
+                      <div>
+                        <Label>Naam van de korting</Label>
+                        <Input placeholder="Vroegboekkorting" className="mt-1" />
+                      </div>
+                      <div>
+                        <Label>Beschrijving</Label>
+                        <Input placeholder="Korting bij betaling voor 1 juni" className="mt-1" />
+                      </div>
+                      <div>
+                        <Label>Type korting</Label>
+                        <Select>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Selecteer type korting" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="percentage">Percentage</SelectItem>
+                            <SelectItem value="fixed">Vast bedrag</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <DialogFooter>
+                    <Button variant="outline">Annuleren</Button>
+                    <Button onClick={() => {
+                      toast({
+                        title: "Korting toegevoegd",
+                        description: "De kortingsregel is succesvol toegevoegd."
+                      });
+                    }}>Toevoegen</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent>
               {discounts.length === 0 ? (

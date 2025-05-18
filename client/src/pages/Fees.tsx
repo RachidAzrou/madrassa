@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, DollarSign, CreditCard, CheckCircle, 
   Users, Settings, Percent, AlertCircle, ChevronDown, FileText, UserPlus, Euro, Coins, 
-  Mail, Phone, Home, CalendarIcon, Plus, User, X
+  Mail, Phone, Home, CalendarIcon, Plus, User, X, MapPin, School
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1499,6 +1499,221 @@ export default function Fees() {
         </TabsContent>
 
         {/* Content voor Kortingen tab */}
+        {/* Activiteiten tab content */}
+        <TabsContent value="activities" className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center">
+                  <MapPin className="h-5 w-5 mr-2 text-[#1e3a8a]" />
+                  Eenmalige Activiteiten
+                </CardTitle>
+                <CardDescription>
+                  Beheer eenmalige kosten voor activiteiten en uitstappen die aan klassen kunnen worden toegewezen.
+                </CardDescription>
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="bg-[#1e3a8a] hover:bg-blue-800">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Activiteit Toevoegen
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle>Nieuwe Activiteit</DialogTitle>
+                    <DialogDescription>
+                      Voeg een nieuwe activiteit of uitstap toe en wijs deze toe aan een klas.
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="py-4">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="activity-name">Naam activiteit</Label>
+                        <Input id="activity-name" placeholder="Museumbezoek" className="mt-1" />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="activity-date">Datum</Label>
+                        <Input id="activity-date" type="date" className="mt-1" />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="activity-description">Beschrijving</Label>
+                        <Input id="activity-description" placeholder="Korte beschrijving van de activiteit" className="mt-1" />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="activity-location">Locatie</Label>
+                        <Input id="activity-location" placeholder="Naam en adres locatie" className="mt-1" />
+                      </div>
+                      
+                      <div className="flex items-center space-x-2 mt-4">
+                        <Checkbox id="activity-paid" />
+                        <Label htmlFor="activity-paid" className="text-sm cursor-pointer">Betalende activiteit</Label>
+                      </div>
+                      
+                      <div className="paid-activity-fields">
+                        <Label htmlFor="activity-price">Kostprijs per student (€)</Label>
+                        <div className="relative mt-1">
+                          <Euro className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Input id="activity-price" placeholder="15,00" className="pl-10" />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="activity-class">Toewijzen aan klas</Label>
+                        <Select>
+                          <SelectTrigger id="activity-class">
+                            <School className="h-4 w-4 mr-2 text-gray-400" />
+                            <SelectValue placeholder="Selecteer een klas" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Alle klassen</SelectItem>
+                            {Array.isArray(programsData) && programsData.map((program: any) => (
+                              <SelectItem key={program.id} value={program.id.toString()}>
+                                {program.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <DialogFooter>
+                    <Button variant="outline">Annuleren</Button>
+                    <Button 
+                      className="bg-[#1e3a8a] hover:bg-blue-800"
+                      onClick={() => {
+                        // Haal de DOM elementen op en converteer ze naar de juiste waarden
+                        const nameEl = document.getElementById('activity-name') as HTMLInputElement;
+                        const dateEl = document.getElementById('activity-date') as HTMLInputElement;
+                        const descriptionEl = document.getElementById('activity-description') as HTMLInputElement;
+                        const locationEl = document.getElementById('activity-location') as HTMLInputElement;
+                        const isPaidEl = document.getElementById('activity-paid') as HTMLInputElement;
+                        const priceEl = document.getElementById('activity-price') as HTMLInputElement;
+                        const classEl = document.getElementById('activity-class') as HTMLSelectElement;
+                        
+                        // Maak een object aan met de juiste velden
+                        const data = {
+                          name: nameEl?.value || "",
+                          date: dateEl?.value || "",
+                          description: descriptionEl?.value || "",
+                          location: locationEl?.value || "",
+                          isPaid: isPaidEl?.checked || false,
+                          price: isPaidEl?.checked ? priceEl?.value || "0,00" : "0,00",
+                          classId: classEl?.value || "all"
+                        };
+                        
+                        // Log voor debugging
+                        console.log("Versturen van activiteit data:", data);
+                        
+                        // API call naar de backend
+                        apiRequest('POST', '/api/activities', data)
+                          .then(response => response.json())
+                          .then(data => {
+                            toast({
+                              title: "Activiteit toegevoegd",
+                              description: "De nieuwe activiteit is succesvol toegevoegd."
+                            });
+                            // Herlaad de activiteiten data
+                            queryClient.invalidateQueries({ queryKey: ['/api/activities'] });
+                          })
+                          .catch(error => {
+                            console.error("Error:", error);
+                            toast({
+                              title: "Fout",
+                              description: "Er is een fout opgetreden bij het toevoegen van de activiteit.",
+                              variant: "destructive"
+                            });
+                          });
+                      }}
+                    >
+                      Activiteit Toevoegen
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </CardHeader>
+            <CardContent>
+              <div className="py-4">
+                <div className="space-y-4">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Activiteit
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Datum
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Locatie
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Klas
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Kostprijs
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Acties
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {/* Bij geen data dit weergeven: */}
+                        <tr>
+                          <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                            Geen activiteiten gevonden. Voeg een nieuwe activiteit toe met de knop hierboven.
+                          </td>
+                        </tr>
+                        
+                        {/* Hier zou normaal de activiteiten data komen
+                        {activities.map((activity: any) => (
+                          <tr key={activity.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">{activity.name}</div>
+                              <div className="text-xs text-gray-500">{activity.description}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {new Date(activity.date).toLocaleDateString('nl-NL')}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {activity.location}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {activity.className}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {activity.isPaid ? formatCurrency(activity.price) : '-'}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                              <div className="flex justify-end space-x-2">
+                                <Button variant="ghost" size="icon">
+                                  <Edit className="h-4 w-4 text-blue-500" />
+                                  <span className="sr-only">Bewerken</span>
+                                </Button>
+                                <Button variant="ghost" size="icon">
+                                  <Trash2 className="h-4 w-4 text-red-500" />
+                                  <span className="sr-only">Verwijderen</span>
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))} */}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
         <TabsContent value="discounts" className="space-y-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">

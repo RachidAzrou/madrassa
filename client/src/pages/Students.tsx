@@ -1112,7 +1112,7 @@ export default function Students() {
                         Richtlijnen voor foto's
                       </Label>
                       <ul className="mt-2 text-sm text-gray-600 space-y-1 list-disc list-inside">
-                        <li>Upload een duidelijke, recente pasfoto</li>
+                        <li>Upload een duidelijke, recente foto</li>
                         <li>Foto moet het volledige gezicht tonen</li>
                         <li>Neutrale achtergrond</li>
                         <li>Maximum bestandsgrootte: 5MB</li>

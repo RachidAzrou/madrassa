@@ -1349,7 +1349,7 @@ export default function Teachers() {
                       }, 1500);
                     }}
                   >
-                    <img src="@assets/eid_logo.svg" alt="eID" className="h-4 w-4 mr-2" />
+                    <span className="mr-2 bg-[#77CC9A] text-white rounded-md px-1 font-bold text-xs py-0.5">be|ID</span>
                     Gegevens laden via eID
                   </Button>
                   
@@ -1431,7 +1431,7 @@ export default function Teachers() {
                       }, 2000);
                     }}
                   >
-                    <img src="@assets/itsme_logo.svg" alt="itsme" className="h-4 w-4 mr-2" />
+                    <span className="mr-2 bg-[#FF4D27] text-white rounded-md px-2 font-bold text-xs py-0.5">itsme</span>
                     Gegevens laden via itsme®
                   </Button>
                 </div>

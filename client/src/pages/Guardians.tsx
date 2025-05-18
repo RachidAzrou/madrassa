@@ -128,14 +128,20 @@ export default function Guardians() {
   // Delete Guardian mutation
   const deleteGuardianMutation = useMutation({
     mutationFn: async (guardianId: number) => {
-      return await apiRequest('DELETE', `/api/guardians/${guardianId}`);
+      return await apiRequest(`/api/guardians/${guardianId}`, {
+        method: 'DELETE'
+      });
     },
     onSuccess: () => {
       toast({
         title: "Voogd verwijderd",
         description: "De voogd is succesvol verwijderd",
       });
+      // Invalideer alle relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/guardian-students'] });
+      
       setSelectedGuardian(null);
     },
     onError: (error) => {

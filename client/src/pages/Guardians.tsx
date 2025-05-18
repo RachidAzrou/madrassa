@@ -317,10 +317,16 @@ export default function Guardians() {
     console.log("Edit guardian:", guardian);
   };
 
-  // Handle deleting a guardian
+  // Handle deleting a guardian - open confirmation dialog
   const handleDeleteGuardian = (guardian: GuardianType) => {
-    if (window.confirm(`Weet je zeker dat je ${guardian.firstName} ${guardian.lastName} wilt verwijderen?`)) {
-      deleteGuardianMutation.mutate(guardian.id);
+    setGuardianToDelete(guardian);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  // Confirm guardian deletion after dialog confirmation
+  const confirmDeleteGuardian = () => {
+    if (guardianToDelete) {
+      deleteGuardianMutation.mutate(guardianToDelete.id);
     }
   };
 

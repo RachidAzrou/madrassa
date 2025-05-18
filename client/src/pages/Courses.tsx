@@ -86,7 +86,7 @@ export default function Courses() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch courses data
+  // Verbeterde fetch courses data
   const {
     data: coursesResponse,
     isLoading,
@@ -111,9 +111,16 @@ export default function Courses() {
       }
       
       try {
-        return await apiRequest('GET', `/api/courses?${params.toString()}`);
-      } catch (error) {
+        return await apiRequest(`/api/courses?${params.toString()}`, {
+          method: 'GET'
+        });
+      } catch (error: any) {
         console.error('Error fetching courses:', error);
+        toast({
+          title: "Fout bij ophalen van data",
+          description: error?.message || "Er is een fout opgetreden bij het ophalen van de curriculum gegevens.",
+          variant: "destructive",
+        });
         return { courses: [], totalCount: 0 };
       }
     },
@@ -159,42 +166,60 @@ export default function Courses() {
   // Zorg ervoor dat programsData een array is
   const programs = Array.isArray(programsData) ? programsData : [];
 
-  // Create course mutation
+  // Verbeterde create course mutation
   const createCourseMutation = useMutation({
     mutationFn: async (data: typeof courseFormData) => {
-      return await apiRequest('POST', '/api/courses', data);
+      try {
+        return await apiRequest('/api/courses', {
+          method: 'POST',
+          body: data
+        });
+      } catch (error: any) {
+        console.error('Error creating course:', error);
+        throw new Error(error?.message || 'Fout bij het aanmaken van de cursus');
+      }
     },
     onSuccess: () => {
       toast({
         title: "Cursus toegevoegd",
-        description: "De cursus is succesvol toegevoegd",
+        description: "De cursus is succesvol toegevoegd aan het systeem.",
+        variant: "default",
       });
       setIsAddDialogOpen(false);
       resetFormData();
+      
+      // Invalideer relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Fout bij toevoegen",
-        description: "Er is een fout opgetreden bij het toevoegen van de cursus",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van de cursus. Controleer of de code uniek is en alle verplichte velden correct zijn ingevuld.",
         variant: "destructive",
       });
       console.error('Error creating course:', error);
     },
   });
 
-  // Update course mutation
+  // Verbeterde update course mutation
   const updateCourseMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number, data: typeof courseFormData }) => {
-      return await apiRequest(`/api/courses/${id}`, {
-        method: 'PUT',
-        body: data
-      });
+      try {
+        return await apiRequest(`/api/courses/${id}`, {
+          method: 'PUT',
+          body: data
+        });
+      } catch (error: any) {
+        console.error('Error updating course:', error);
+        throw new Error(error?.message || 'Fout bij het bijwerken van de cursus');
+      }
     },
     onSuccess: () => {
       toast({
         title: "Cursus bijgewerkt",
-        description: "De cursus is succesvol bijgewerkt",
+        description: "De cursus is succesvol bijgewerkt in het systeem.",
+        variant: "default",
       });
       setIsEditDialogOpen(false);
       resetFormData();
@@ -205,27 +230,33 @@ export default function Courses() {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       queryClient.invalidateQueries({ queryKey: ['/api/teacher-course-assignments'] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Fout bij bijwerken",
-        description: "Er is een fout opgetreden bij het bijwerken van de cursus",
+        description: error.message || "Er is een fout opgetreden bij het bijwerken van de cursus. Controleer of alle verplichte velden correct zijn ingevuld.",
         variant: "destructive",
       });
       console.error('Error updating course:', error);
     },
   });
 
-  // Delete course mutation
+  // Verbeterde delete course mutation
   const deleteCourseMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/courses/${id}`, {
-        method: 'DELETE'
-      });
+      try {
+        return await apiRequest(`/api/courses/${id}`, {
+          method: 'DELETE'
+        });
+      } catch (error: any) {
+        console.error('Error deleting course:', error);
+        throw new Error(error?.message || 'Fout bij het verwijderen van de cursus');
+      }
     },
     onSuccess: () => {
       toast({
         title: "Cursus verwijderd",
-        description: "De cursus is succesvol verwijderd",
+        description: "De cursus is succesvol verwijderd uit het systeem.",
+        variant: "default",
       });
       setIsDeleteDialogOpen(false);
       setSelectedCourse(null);
@@ -238,13 +269,14 @@ export default function Courses() {
       queryClient.invalidateQueries({ queryKey: ['/api/teacher-course-assignments'] });
       queryClient.invalidateQueries({ queryKey: ['/api/lessons'] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Fout bij verwijderen",
-        description: "Er is een fout opgetreden bij het verwijderen van de cursus",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van de cursus. Mogelijk zijn er nog actieve inschrijvingen of lessen gekoppeld aan deze cursus.",
         variant: "destructive",
       });
       console.error('Error deleting course:', error);
+      setIsDeleteDialogOpen(false);
     },
   });
 
@@ -1362,16 +1394,45 @@ export default function Courses() {
       
       {/* Delete confirmation dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">Cursus verwijderen</DialogTitle>
             <DialogDescription>
-              Weet u zeker dat u de cursus "{selectedCourse?.name}" wilt verwijderen? 
+              Weet u zeker dat u deze cursus wilt verwijderen? 
               Deze actie kan niet ongedaan worden gemaakt.
             </DialogDescription>
           </DialogHeader>
           
-          <DialogFooter className="mt-6">
+          {selectedCourse && (
+            <div className="py-4 space-y-3">
+              <div className="border rounded-md p-3 bg-red-50">
+                <p className="text-sm text-gray-700 font-medium">
+                  Je staat op het punt om de volgende cursus te verwijderen:
+                </p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-sm"><span className="font-medium">Naam:</span> {selectedCourse.name}</p>
+                  <p className="text-sm"><span className="font-medium">Code:</span> {selectedCourse.code}</p>
+                  <p className="text-sm">
+                    <span className="font-medium">Programma:</span> {getProgramNameById(selectedCourse.programId)}
+                  </p>
+                  <p className="text-sm">
+                    <span className="font-medium">Studiepunten:</span> {selectedCourse.credits}
+                  </p>
+                  <p className="text-sm">
+                    <span className="font-medium">Docent:</span> {selectedCourse.instructor || 'Niet toegewezen'}
+                  </p>
+                  <p className="text-sm">
+                    <span className="font-medium">Status:</span> {selectedCourse.isActive ? 'Actief' : 'Inactief'}
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-red-600">
+                Let op: Bij het verwijderen van een cursus worden alle hieraan gekoppelde lessen, inschrijvingen en beoordelingen verwijderd. Controleer of er geen actieve studenten meer ingeschreven staan voor deze cursus.
+              </p>
+            </div>
+          )}
+          
+          <DialogFooter className="mt-2">
             <Button 
               variant="outline" 
               onClick={() => setIsDeleteDialogOpen(false)}
@@ -1386,14 +1447,12 @@ export default function Courses() {
                 }
               }}
               disabled={deleteCourseMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
             >
               {deleteCourseMutation.isPending && (
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
               )}
-              Verwijderen
+              {deleteCourseMutation.isPending ? 'Bezig met verwijderen...' : 'Verwijderen'}
             </Button>
           </DialogFooter>
         </DialogContent>

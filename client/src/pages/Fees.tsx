@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { apiRequest } from '@/lib/queryClient';
 import { Progress } from '@/components/ui/progress';
@@ -1433,13 +1434,15 @@ export default function Fees() {
                   <div className="py-4">
                     <div className="space-y-4">
                       <div>
-                        <Label>Naam van de korting</Label>
-                        <Input placeholder="Vroegboekkorting" className="mt-1" />
+                        <Label htmlFor="discount-name">Naam van de korting</Label>
+                        <Input id="discount-name" placeholder="Vroegboekkorting" className="mt-1" />
                       </div>
+                      
                       <div>
-                        <Label>Beschrijving</Label>
-                        <Input placeholder="Korting bij betaling voor 1 juni" className="mt-1" />
+                        <Label htmlFor="discount-description">Beschrijving</Label>
+                        <Input id="discount-description" placeholder="Korting bij betaling voor 1 juni" className="mt-1" />
                       </div>
+                      
                       <div>
                         <Label htmlFor="discount-type">Type korting</Label>
                         <Select defaultValue="percentage">
@@ -1452,17 +1455,43 @@ export default function Fees() {
                           </SelectContent>
                         </Select>
                       </div>
+                      
+                      <div>
+                        <Label htmlFor="discount-value">Waarde</Label>
+                        <div className="relative mt-1">
+                          <Input id="discount-value" placeholder="10" />
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 pointer-events-none">
+                            %
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">Voer een percentage in of een bedrag in euro's</p>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="discount-year">Academisch jaar</Label>
+                        <Input id="discount-year" placeholder="2025-2026" className="mt-1" />
+                      </div>
+                      
+                      <div className="flex items-center space-x-2 mt-1">
+                        <Checkbox id="discount-active" defaultChecked />
+                        <Label htmlFor="discount-active" className="text-sm cursor-pointer">Korting actief</Label>
+                      </div>
                     </div>
                   </div>
                   
                   <DialogFooter>
                     <Button variant="outline">Annuleren</Button>
-                    <Button onClick={() => {
-                      toast({
-                        title: "Korting toegevoegd",
-                        description: "De kortingsregel is succesvol toegevoegd."
-                      });
-                    }}>Toevoegen</Button>
+                    <Button 
+                      className="bg-[#1e3a8a] hover:bg-blue-800"
+                      onClick={() => {
+                        toast({
+                          title: "Korting toegevoegd",
+                          description: "De kortingsregel is succesvol toegevoegd."
+                        });
+                      }}
+                    >
+                      Toevoegen
+                    </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>

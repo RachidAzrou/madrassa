@@ -536,7 +536,7 @@ export default function Fees() {
                 Betalingsrecord
               </TabsTrigger>
               <TabsTrigger value="tuition" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-                <Settings className="h-4 w-4 mr-2" />
+                <Euro className="h-4 w-4 mr-2" />
                 Collegegeld
               </TabsTrigger>
               <TabsTrigger value="discount" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
@@ -599,12 +599,12 @@ export default function Fees() {
               <div className="bg-blue-50 rounded-lg p-6">
                 <div className="flex items-start space-x-4">
                   <div className="bg-[#1e3a8a] text-white p-3 rounded-full">
-                    <Settings className="h-8 w-8" />
+                    <Euro className="h-8 w-8" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-[#1e3a8a]">Nieuwe collegegeld instelling</h3>
+                    <h3 className="text-lg font-semibold text-[#1e3a8a]">Nieuw collegegeld</h3>
                     <p className="text-gray-600 mt-1">
-                      Definieer collegegeld tarieven voor specifieke programma's, klassen of academische jaren.
+                      Definieer het collegegeldbedrag voor een specifiek academisch jaar.
                     </p>
                     <Button 
                       className="mt-4 bg-[#3b5998] hover:bg-[#2d4373]"
@@ -614,7 +614,7 @@ export default function Fees() {
                       }}
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      Collegegeld instelling toevoegen
+                      Collegegeld toevoegen
                     </Button>
                   </div>
                 </div>
@@ -622,21 +622,31 @@ export default function Fees() {
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-white p-4 rounded-lg border border-blue-100">
                     <h4 className="font-medium text-[#1e3a8a] mb-2 flex items-center">
-                      <Euro className="h-4 w-4 mr-2" />
-                      Tariefstructuur
+                      <CalendarIcon className="h-4 w-4 mr-2" />
+                      Academisch jaar
                     </h4>
                     <p className="text-sm text-gray-600">
-                      Stel basistarieven, inschrijfkosten en materiaalkosten in voor verschillende programma's.
+                      Kies het academisch jaar waarvoor dit collegegeld geldt.
                     </p>
                   </div>
                   
                   <div className="bg-white p-4 rounded-lg border border-blue-100">
                     <h4 className="font-medium text-[#1e3a8a] mb-2 flex items-center">
-                      <CalendarIcon className="h-4 w-4 mr-2" />
-                      Academische jaren
+                      <Euro className="h-4 w-4 mr-2" />
+                      Bedrag
                     </h4>
                     <p className="text-sm text-gray-600">
-                      Specificeer geldigheidsduur en definieer tarieven per academisch jaar.
+                      Stel het collegegeldbedrag in voor het gekozen academisch jaar.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-white p-4 rounded-lg border border-blue-100 col-span-2">
+                    <h4 className="font-medium text-[#1e3a8a] mb-2 flex items-center">
+                      <CalendarIcon className="h-4 w-4 mr-2" />
+                      Vervaldatum
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      Stel de uiterste betaaldatum in voor het collegegeld.
                     </p>
                   </div>
                 </div>
@@ -712,17 +722,17 @@ export default function Fees() {
             <FileText className="w-4 h-4 mr-2" />
             Betalingen
           </TabsTrigger>
+          <TabsTrigger value="debt-management" className="text-sm data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+            <AlertCircle className="w-4 h-4 mr-2" />
+            Schuldbeheer
+          </TabsTrigger>
           <TabsTrigger value="tuition-settings" className="text-sm data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-            <Settings className="w-4 h-4 mr-2" />
+            <Euro className="w-4 h-4 mr-2" />
             Collegegeld
           </TabsTrigger>
           <TabsTrigger value="discounts" className="text-sm data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
             <Percent className="w-4 h-4 mr-2" />
             Kortingen
-          </TabsTrigger>
-          <TabsTrigger value="debt-management" className="text-sm data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-            <AlertCircle className="w-4 h-4 mr-2" />
-            Schuldbeheer
           </TabsTrigger>
         </TabsList>
 

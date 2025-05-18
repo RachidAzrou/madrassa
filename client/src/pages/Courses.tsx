@@ -126,31 +126,45 @@ export default function Courses() {
     },
   });
 
-  // Fetch programs for dropdown
+  // Verbeterde fetch programs voor dropdown
   const {
     data: programsData,
   } = useQuery({
     queryKey: ['/api/programs'],
     queryFn: async () => {
       try {
-        return await apiRequest('GET', '/api/programs');
-      } catch (error) {
+        return await apiRequest('/api/programs', {
+          method: 'GET'
+        });
+      } catch (error: any) {
         console.error('Error fetching programs:', error);
+        toast({
+          title: "Fout bij ophalen van programma's",
+          description: error?.message || "Er is een fout opgetreden bij het ophalen van de programma's.",
+          variant: "destructive",
+        });
         return [];
       }
     }
   });
   
-  // Fetch student groups (classes)
+  // Verbeterde fetch student groups (classes)
   const {
     data: studentGroupsData,
   } = useQuery({
     queryKey: ['/api/student-groups'],
     queryFn: async () => {
       try {
-        return await apiRequest('GET', '/api/student-groups');
-      } catch (error) {
+        return await apiRequest('/api/student-groups', {
+          method: 'GET'
+        });
+      } catch (error: any) {
         console.error('Error fetching student groups:', error);
+        toast({
+          title: "Fout bij ophalen van klassen",
+          description: error?.message || "Er is een fout opgetreden bij het ophalen van de klassen.",
+          variant: "destructive",
+        });
         return [];
       }
     }

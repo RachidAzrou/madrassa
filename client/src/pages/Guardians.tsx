@@ -1019,7 +1019,16 @@ export default function Guardians() {
                           id="hasSecondaryContact" 
                           checked={!!(newGuardian.emergencyContactName || newGuardian.emergencyContactPhone || newGuardian.emergencyContactRelation)}
                           onCheckedChange={(checked) => {
-                            if (!checked) {
+                            if (checked) {
+                              // Als het vakje wordt aangevinkt, zet lege waarden
+                              setNewGuardian({
+                                ...newGuardian,
+                                emergencyContactName: ' ', // Spatie om te zorgen dat de velden verschijnen
+                                emergencyContactPhone: '',
+                                emergencyContactRelation: ''
+                              });
+                            } else {
+                              // Als het vakje wordt uitgevinkt, verwijder de waarden
                               setNewGuardian({
                                 ...newGuardian,
                                 emergencyContactName: '',

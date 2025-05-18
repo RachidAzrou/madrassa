@@ -75,6 +75,9 @@ export default function Guardians() {
     postalCode: '',
     city: '',
     isEmergencyContact: false,
+    emergencyContactName: '',
+    emergencyContactPhone: '',
+    emergencyContactRelation: '',
     notes: ''
   });
   
@@ -230,6 +233,9 @@ export default function Guardians() {
       postalCode: '',
       city: '',
       isEmergencyContact: false,
+      emergencyContactName: '',
+      emergencyContactPhone: '',
+      emergencyContactRelation: '',
       notes: ''
     });
     setSelectedStudentIds([]);
@@ -790,6 +796,48 @@ export default function Guardians() {
                     </div>
                   </div>
                   
+                  {(selectedGuardian.emergencyContactName || selectedGuardian.emergencyContactPhone) && (
+                    <div className="mt-4 p-4 border rounded-md bg-blue-50">
+                      <div className="flex items-center mb-2">
+                        <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mr-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-700">
+                            <path d="M13.73 21a9.97 9.97 0 0 1-10.5-10.05C3.25 6.75 6.8 3.25 11 3.25v2a.75.75 0 0 0 1.5 0v-2a.75.75 0 0 0-1.5 0" />
+                            <path d="m12.92 6.74 5.56 5.56a1 1 0 0 1-1.41 1.41l-5.56-5.56a.997.997 0 0 1 0-1.41.997.997 0 0 1 1.41 0Z" />
+                            <path d="M16.24 20.25 3.75 7.76" />
+                          </svg>
+                        </div>
+                        <Label className="text-sm font-medium text-blue-700">Secundair Noodcontact</Label>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        <div className="space-y-1">
+                          <Label className="text-xs text-gray-500">Naam</Label>
+                          <div className="p-2 border rounded-md bg-white">
+                            {selectedGuardian.emergencyContactName || 'Niet ingevuld'}
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs text-gray-500">Telefoonnummer</Label>
+                          <div className="p-2 border rounded-md bg-white">
+                            {selectedGuardian.emergencyContactPhone || 'Niet ingevuld'}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {selectedGuardian.emergencyContactRelation && (
+                        <div className="space-y-1 mt-2">
+                          <Label className="text-xs text-gray-500">Relatie tot student</Label>
+                          <div className="p-2 border rounded-md bg-white">
+                            {selectedGuardian.emergencyContactRelation === 'family' && 'Familielid'}
+                            {selectedGuardian.emergencyContactRelation === 'friend' && 'Vriend(in)'}
+                            {selectedGuardian.emergencyContactRelation === 'neighbor' && 'Buur'}
+                            {selectedGuardian.emergencyContactRelation === 'other' && 'Anders'}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
                   <div className="space-y-2 mt-4">
                     <Label className="text-sm font-medium">Adres</Label>
                     <div className="p-2 border rounded-md bg-gray-50">
@@ -998,6 +1046,65 @@ export default function Guardians() {
                       onChange={handleInputChange}
                       required
                     />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="bg-blue-50 p-4 rounded-md mb-4">
+                    <div className="flex items-center mb-2">
+                      <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-700">
+                          <path d="M13.73 21a9.97 9.97 0 0 1-10.5-10.05C3.25 6.75 6.8 3.25 11 3.25v2a.75.75 0 0 0 1.5 0v-2a.75.75 0 0 0-1.5 0" />
+                          <path d="m12.92 6.74 5.56 5.56a1 1 0 0 1-1.41 1.41l-5.56-5.56a.997.997 0 0 1 0-1.41.997.997 0 0 1 1.41 0Z" />
+                          <path d="M16.24 20.25 3.75 7.76" />
+                        </svg>
+                      </div>
+                      <Label className="font-medium text-blue-700">Secundair Noodcontact</Label>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Voeg een secundair noodcontact toe dat gebeld kan worden als de primaire voogd niet bereikbaar is.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="emergencyContactName">Naam</Label>
+                        <Input 
+                          id="emergencyContactName"
+                          name="emergencyContactName"
+                          value={newGuardian.emergencyContactName || ''}
+                          onChange={handleInputChange}
+                          placeholder="Volledige naam van noodcontact"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="emergencyContactPhone">Telefoonnummer</Label>
+                        <Input 
+                          id="emergencyContactPhone"
+                          name="emergencyContactPhone"
+                          value={newGuardian.emergencyContactPhone || ''}
+                          onChange={handleInputChange}
+                          placeholder="06-12345678"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2 mt-3">
+                      <Label htmlFor="emergencyContactRelation">Relatie tot student</Label>
+                      <Select 
+                        name="emergencyContactRelation"
+                        defaultValue={newGuardian.emergencyContactRelation}
+                        onValueChange={(value) => setNewGuardian({...newGuardian, emergencyContactRelation: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecteer relatie" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="family">Familielid</SelectItem>
+                          <SelectItem value="friend">Vriend(in)</SelectItem>
+                          <SelectItem value="neighbor">Buur</SelectItem>
+                          <SelectItem value="other">Anders</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
 

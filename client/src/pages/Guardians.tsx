@@ -237,52 +237,87 @@ export default function Guardians() {
   // Add/Update Guardian mutation
   const guardianMutation = useMutation({
     mutationFn: async (data: { guardian: Partial<GuardianType>, studentIds: number[] }) => {
-      let guardian;
-      
-      if (data.guardian.id) {
-        // Update existing guardian
-        guardian = await apiRequest('PUT', `/api/guardians/${data.guardian.id}`, data.guardian);
-      } else {
-        // Create new guardian
-        guardian = await apiRequest('POST', '/api/guardians', data.guardian);
+      try {
+        let guardian;
         
-        // Assign students if any were selected (only for new guardians)
-        if (data.studentIds.length > 0 && guardian.id) {
-          const studentGuardianPromises = data.studentIds.map(studentId => 
-            apiRequest('POST', '/api/student-guardians', {
-              studentId,
-              guardianId: guardian.id
-            })
-          );
-          await Promise.all(studentGuardianPromises);
+        if (data.guardian.id) {
+          // Update existing guardian
+          guardian = await apiRequest(`/api/guardians/${data.guardian.id}`, {
+            method: 'PUT',
+            body: data.guardian
+          });
+        } else {
+          // Create new guardian
+          guardian = await apiRequest('/api/guardians', {
+            method: 'POST',
+            body: data.guardian
+          });
+          
+          // Assign students if any were selected (only for new guardians)
+          if (data.studentIds.length > 0 && guardian.id) {
+            const studentGuardianPromises = data.studentIds.map(studentId => 
+              apiRequest('/api/student-guardians', {
+                method: 'POST',
+                body: {
+                  studentId,
+                  guardianId: guardian.id
+                }
+              })
+            );
+            await Promise.all(studentGuardianPromises);
+          }
         }
+        
+        return guardian;
+      } catch (error: any) {
+        console.error('Guardian mutation error:', error);
+        throw new Error(error?.message || 'Fout bij het opslaan van voogdgegevens');
       }
-      
-      return guardian;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (result, variables) => {
       const isEdit = !!variables.guardian.id;
       toast({
         title: isEdit ? "Voogd bijgewerkt" : "Voogd toegevoegd",
         description: isEdit 
-          ? "De voogd is succesvol bijgewerkt" 
-          : "De voogd is succesvol toegevoegd met de geselecteerde studenten",
+          ? `De gegevens van ${variables.guardian.firstName} ${variables.guardian.lastName} zijn succesvol bijgewerkt.` 
+          : `${variables.guardian.firstName} ${variables.guardian.lastName} is succesvol toegevoegd${variables.studentIds.length > 0 ? ' en gekoppeld aan de geselecteerde studenten' : ''}.`,
       });
+      
+      // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
       queryClient.invalidateQueries({ queryKey: ['/api/guardian-students'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
+      
+      // Reset UI state
       setShowAddDialog(false);
       setSelectedStudentIds([]);
+      
+      // Reset form data
+      setNewGuardian({
+        firstName: '',
+        lastName: '',
+        relationship: 'parent',
+        email: '',
+        phone: '',
+        address: '',
+        street: '',
+        houseNumber: '',
+        postalCode: '',
+        city: '',
+        isEmergencyContact: false,
+        notes: ''
+      });
     },
-    onError: (error, variables) => {
+    onError: (error: any, variables) => {
       const isEdit = !!variables.guardian.id;
       toast({
         title: isEdit ? "Fout bij bijwerken" : "Fout bij toevoegen",
-        description: isEdit 
-          ? "Er is een fout opgetreden bij het bijwerken van de voogd" 
-          : "Er is een fout opgetreden bij het toevoegen van de voogd",
+        description: error?.message || (isEdit 
+          ? "Er is een fout opgetreden bij het bijwerken van de voogdgegevens. Controleer of alle verplichte velden correct zijn ingevuld." 
+          : "Er is een fout opgetreden bij het toevoegen van de voogd. Controleer of alle verplichte velden correct zijn ingevuld."),
         variant: "destructive",
       });
-      console.error(isEdit ? 'Update error:' : 'Add error:', error);
+      console.error(isEdit ? 'Update guardian error:' : 'Add guardian error:', error);
     },
   });
   
@@ -363,6 +398,53 @@ export default function Guardians() {
   // Render guardians page
   return (
     <div className="p-4 md:p-6 space-y-6">
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Voogd verwijderen</DialogTitle>
+            <DialogDescription>
+              Weet u zeker dat u {guardianToDelete?.firstName} {guardianToDelete?.lastName} wilt verwijderen?
+              {guardianStudentsData && guardianStudentsData.length > 0 && (
+                <div className="mt-2 text-red-500">
+                  <span className="font-semibold">Let op:</span> Deze voogd is aan {guardianStudentsData.length} student{guardianStudentsData.length !== 1 ? 'en' : ''} gekoppeld.
+                </div>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-between">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={deleteGuardianMutation.isPending}
+            >
+              Annuleren
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeleteGuardian}
+              disabled={deleteGuardianMutation.isPending}
+              className="gap-1"
+            >
+              {deleteGuardianMutation.isPending ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Bezig met verwijderen...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4" />
+                  Verwijderen
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
       {/* Page Title */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>

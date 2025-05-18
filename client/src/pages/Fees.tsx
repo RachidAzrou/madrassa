@@ -1441,9 +1441,9 @@ export default function Fees() {
                         <Input placeholder="Korting bij betaling voor 1 juni" className="mt-1" />
                       </div>
                       <div>
-                        <Label>Type korting</Label>
-                        <Select>
-                          <SelectTrigger className="mt-1">
+                        <Label htmlFor="discount-type">Type korting</Label>
+                        <Select defaultValue="percentage">
+                          <SelectTrigger className="mt-1" id="discount-type">
                             <SelectValue placeholder="Selecteer type korting" />
                           </SelectTrigger>
                           <SelectContent>

@@ -840,14 +840,14 @@ export default function Courses() {
                 <div>
                   <Label htmlFor="programId" className="mb-1 block">Programma</Label>
                   <Select 
-                    value={courseFormData.programId?.toString() || ""}
-                    onValueChange={(value) => setCourseFormData({ ...courseFormData, programId: value ? Number(value) : null })}
+                    value={courseFormData.programId?.toString() || "null"}
+                    onValueChange={(value) => setCourseFormData({ ...courseFormData, programId: value !== "null" ? Number(value) : null })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecteer een programma" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Geen programma</SelectItem>
+                      <SelectItem value="null">Geen programma</SelectItem>
                       {programs.map((program) => (
                         <SelectItem key={program.id} value={program.id.toString()}>
                           {program.name}

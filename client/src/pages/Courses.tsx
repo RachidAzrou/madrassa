@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Eye, Pencil, Trash2, BookOpen, GraduationCap, Glasses, Upload, FileText, Calendar, BookMarked, FileUp } from 'lucide-react';
+import { Search, PlusCircle, Filter, Eye, Pencil, Trash2, BookOpen, GraduationCap, Glasses, Upload, FileText, Calendar, BookMarked, FileUp, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -37,12 +37,25 @@ type CourseType = {
   competencies: string | null; // Eindcompetenties
   prerequisites: string | null; // Voorwaarden voor deelname
   enrolledStudents?: number;
+  subsequentCourses?: string | null; // Vervolgcursussen
+  endLevel?: string | null; // Eindniveau
+  periodicObjectives?: string | null; // Periodieke doelstellingen
+  assessmentDescription?: string | null; // Omschrijving beoordeling
 };
 
 type ProgramType = {
   id: number;
   name: string;
   code: string;
+};
+
+type StudentGroupType = {
+  id: number;
+  name: string;
+  academicYear: string;
+  programId: number | null;
+  isActive: boolean;
+  enrolledStudents?: number;
 };
 
 export default function Courses() {
@@ -61,10 +74,10 @@ export default function Courses() {
   const [uploadType, setUploadType] = useState<'material' | 'assignment' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [courseFormData, setCourseFormData] = useState({
+  const [courseFormData, setCourseFormData] = useState<Partial<CourseType> & { selectedClassId?: number | null }>({
     name: '',
     code: '',
-    programId: null as number | null,
+    programId: null,
     description: '',
     credits: 6,
     instructor: '',
@@ -78,9 +91,7 @@ export default function Courses() {
     endLevel: '',
     periodicObjectives: '',
     assessmentDescription: '',
-    editType: 'vak',
-    selectedCourseId: null as number | null,
-    selectedClassId: null as number | null,
+    selectedClassId: null,
   });
   
   const { toast } = useToast();
@@ -151,6 +162,8 @@ export default function Courses() {
   // Verbeterde fetch student groups (classes)
   const {
     data: studentGroupsData,
+    isLoading: isLoadingGroups,
+    isError: isErrorGroups,
   } = useQuery({
     queryKey: ['/api/student-groups'],
     queryFn: async () => {
@@ -175,7 +188,7 @@ export default function Courses() {
   const totalCourses = coursesResponse?.totalCount || 0;
   
   // Extract student groups for dropdown
-  const studentGroups = studentGroupsData?.studentGroups || [];
+  const studentGroups = studentGroupsData || [];
   const totalPages = Math.ceil(totalCourses / itemsPerPage);
   // Zorg ervoor dat programsData een array is
   const programs = Array.isArray(programsData) ? programsData : [];
@@ -309,6 +322,11 @@ export default function Courses() {
       materials: '',
       competencies: '',
       prerequisites: '',
+      subsequentCourses: '',
+      endLevel: '',
+      periodicObjectives: '',
+      assessmentDescription: '',
+      selectedClassId: null,
     });
   };
 
@@ -358,6 +376,11 @@ export default function Courses() {
       materials: course.materials || '',
       competencies: course.competencies || '',
       prerequisites: course.prerequisites || '',
+      subsequentCourses: course.subsequentCourses || '',
+      endLevel: course.endLevel || '',
+      periodicObjectives: course.periodicObjectives || '',
+      assessmentDescription: course.assessmentDescription || '',
+      selectedClassId: null,
     });
     setIsEditDialogOpen(true);
   };
@@ -410,9 +433,8 @@ export default function Courses() {
         </div>
       </div>
       
-      {/* Zoek, filter en acties */}
+      {/* Zoek en Curriculum toevoegen */}
       <div className="mb-6">
-        {/* Zoeken en Curriculum toevoegen */}
         <div className="flex flex-col md:flex-row justify-end items-center gap-4 mb-4">
           <div className="relative w-full md:w-64 order-2 md:order-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -435,325 +457,231 @@ export default function Courses() {
           </Button>
         </div>
         
-        {/* Filter opties */}
-        <div className="mb-5">
-          <Tabs defaultValue="courses" className="w-full">
-            <div className="flex justify-between items-center mb-4">
-              <TabsList className="p-1 bg-blue-900/10">
-                <TabsTrigger value="courses" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-                  Vakken
-                </TabsTrigger>
-                <TabsTrigger value="classes" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-                  Klassen
-                </TabsTrigger>
-              </TabsList>
-              
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Status:</span>
-                <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
-                  <SelectTrigger className="w-[140px] h-9">
-                    <SelectValue placeholder="Filter op status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Actief</SelectItem>
-                    <SelectItem value="inactive">Inactief</SelectItem>
-                    <SelectItem value="all">Alle vakken</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+        {/* Tabs voor Vakken en Klassen */}
+        <Tabs defaultValue="courses" className="w-full">
+          <div className="flex justify-between items-center mb-4">
+            <TabsList className="p-1 bg-blue-900/10">
+              <TabsTrigger value="courses" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                Vakken
+              </TabsTrigger>
+              <TabsTrigger value="classes" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                Klassen
+              </TabsTrigger>
+            </TabsList>
             
-            <TabsContent value="courses">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {isLoading ? (
-                  <div className="col-span-full flex justify-center py-8">
-                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                ) : isError ? (
-                  <div className="col-span-full text-center py-8 text-red-500">
-                    Fout bij het laden van curriculum. Probeer het opnieuw.
-                  </div>
-                ) : courses.length === 0 ? (
-                  <div className="col-span-full text-center py-8 text-gray-500">
-                    Geen curriculum gevonden. Pas uw filters aan of voeg een nieuw curriculum toe.
-                  </div>
-                ) : (
-                  courses.map((course: CourseType) => (
-                    <div key={course.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                      <div className="p-5">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-semibold text-lg text-gray-800">{course.name}</h3>
-                            <p className="text-gray-500 text-sm mt-1">{course.code} • {course.credits} Studiepunten</p>
-                          </div>
-                          <Badge variant={course.isActive ? "default" : "secondary"}>
-                            {course.isActive ? "Actief" : "Inactief"}
-                          </Badge>
-                        </div>
-                        <p className="mt-3 text-gray-600 text-sm line-clamp-2">{course.description || 'Geen beschrijving beschikbaar'}</p>
-                        
-                        <div className="mt-4 flex items-center">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback className="bg-[#1e3a8a] text-white">
-                              {course.instructor ? course.instructor.charAt(0) : 'D'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="ml-2">
-                            <p className="text-xs font-medium text-gray-800">{course.instructor || 'Nog geen docent toegewezen'}</p>
-                            <p className="text-xs text-gray-500">Docent</p>
-                          </div>
-                        </div>
-                        
-                        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                          <Badge variant="outline" className="text-xs">
-                            {getProgramNameById(course.programId)}
-                          </Badge>
-                          
-                          <div className="flex space-x-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => handleViewCourse(course)}
-                              title="Details bekijken"
-                              className="h-8 w-8 p-0"
-                            >
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => handleEditCourse(course)}
-                              title="Cursus bewerken"
-                              className="h-8 w-8 p-0"
-                            >
-                              <Pencil className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bewerken</span>
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                              onClick={() => handleDeleteCourse(course)}
-                              title="Cursus verwijderen"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Verwijderen</span>
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-              
-              {/* Pagination - alleen tonen in de Vakken tab */}
-              {totalPages > 1 && (
-                <div className="bg-white mt-4 px-4 py-3 flex items-center justify-between border border-gray-200 rounded-lg sm:px-6">
-                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-sm text-gray-700">
-                        Tonen <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> tot <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalCourses)}</span> van <span className="font-medium">{totalCourses}</span> resultaten
-                      </p>
-                    </div>
-                    <div>
-                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Paginering">
-                        <button
-                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                          disabled={currentPage === 1}
-                          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                        >
-                          <span className="sr-only">Vorige</span>
-                          &larr;
-                        </button>
-                        {Array.from({ length: totalPages }).map((_, i) => (
-                          <button
-                            key={i}
-                            onClick={() => setCurrentPage(i + 1)}
-                            className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
-                              currentPage === i + 1
-                                ? 'bg-primary text-white'
-                                : 'bg-white text-gray-700 hover:bg-gray-50'
-                            }`}
-                          >
-                            {i + 1}
-                          </button>
-                        ))}
-                        <button
-                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                          disabled={currentPage === totalPages}
-                          className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                        >
-                          <span className="sr-only">Volgende</span>
-                          &rarr;
-                        </button>
-                      </nav>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </TabsContent>
-            
-            <TabsContent value="classes">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {studentGroups?.length > 0 ? (
-                  studentGroups.map((group: any) => (
-                    <div key={group.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                      <div className="p-5">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-semibold text-lg text-gray-800">{group.name}</h3>
-                            <p className="text-gray-500 text-sm mt-1">Academisch jaar: {group.academicYear}</p>
-                          </div>
-                          <Badge variant={group.isActive ? "default" : "secondary"}>
-                            {group.isActive ? "Actief" : "Inactief"}
-                          </Badge>
-                        </div>
-                        
-                        <div className="mt-4 flex items-center justify-between">
-                          <div className="flex items-center">
-                            <BookOpen className="h-4 w-4 text-primary mr-1" />
-                            <span className="text-xs text-gray-700">
-                              {group.enrolledStudents || 0} studenten
-                            </span>
-                          </div>
-                          
-                          <Badge variant="outline" className="text-xs">
-                            {programs.find((p: any) => p.id === group.programId)?.name || 'Geen programma'}
-                          </Badge>
-                        </div>
-                        
-                        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-end">
-                          <div className="flex space-x-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              title="Details bekijken"
-                              className="h-8 w-8 p-0"
-                              onClick={() => window.location.href = '/student-groups'}
-                            >
-                              <Eye className="h-4 w-4 text-gray-500" />
-                              <span className="sr-only">Bekijken</span>
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="col-span-full text-center py-8 text-gray-500">
-                    Geen klassen gevonden. Ga naar de Klassen pagina om klassen toe te voegen.
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-      
-                <div className="mt-4 flex items-center">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-[#1e3a8a] text-white">
-                      {course.instructor ? course.instructor.charAt(0) : 'D'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="ml-2">
-                    <p className="text-xs font-medium text-gray-800">{course.instructor || 'Nog geen docent toegewezen'}</p>
-                    <p className="text-xs text-gray-500">Docent</p>
-                  </div>
-                </div>
-                
-                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <Badge variant="outline" className="text-xs">
-                    {getProgramNameById(course.programId)}
-                  </Badge>
-                  
-                  <div className="flex space-x-2">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleViewCourse(course)}
-                      title="Details bekijken"
-                      className="h-8 w-8 p-0"
-                    >
-                      <Eye className="h-4 w-4 text-gray-500" />
-                      <span className="sr-only">Bekijken</span>
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleEditCourse(course)}
-                      title="Cursus bewerken"
-                      className="h-8 w-8 p-0"
-                    >
-                      <Pencil className="h-4 w-4 text-gray-500" />
-                      <span className="sr-only">Bewerken</span>
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                      onClick={() => handleDeleteCourse(course)}
-                      title="Cursus verwijderen"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Verwijderen</span>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-      
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="bg-white mt-4 px-4 py-3 flex items-center justify-between border border-gray-200 rounded-lg sm:px-6">
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700">
-                Tonen <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> tot <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalCourses)}</span> van <span className="font-medium">{totalCourses}</span> resultaten
-              </p>
-            </div>
-            <div>
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Paginering">
-                <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                >
-                  <span className="sr-only">Vorige</span>
-                  &larr;
-                </button>
-                {Array.from({ length: totalPages }).map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
-                      currentPage === i + 1
-                        ? 'bg-primary text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                >
-                  <span className="sr-only">Volgende</span>
-                  &rarr;
-                </button>
-              </nav>
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">Status:</span>
+              <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+                <SelectTrigger className="w-[140px] h-9">
+                  <SelectValue placeholder="Filter op status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Actief</SelectItem>
+                  <SelectItem value="inactive">Inactief</SelectItem>
+                  <SelectItem value="all">Alle vakken</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-        </div>
-      )}
+          
+          {/* Vakken Tab Inhoud */}
+          <TabsContent value="courses">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {isLoading ? (
+                <div className="col-span-full flex justify-center py-8">
+                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : isError ? (
+                <div className="col-span-full text-center py-8 text-red-500">
+                  Fout bij het laden van curriculum. Probeer het opnieuw.
+                </div>
+              ) : courses.length === 0 ? (
+                <div className="col-span-full text-center py-8 text-gray-500">
+                  Geen curriculum gevonden. Pas uw filters aan of voeg een nieuw curriculum toe.
+                </div>
+              ) : (
+                courses.map((course: CourseType) => (
+                  <div key={course.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                    <div className="p-5">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-lg text-gray-800">{course.name}</h3>
+                          <p className="text-gray-500 text-sm mt-1">{course.code} • {course.credits} Studiepunten</p>
+                        </div>
+                        <Badge variant={course.isActive ? "default" : "secondary"}>
+                          {course.isActive ? "Actief" : "Inactief"}
+                        </Badge>
+                      </div>
+                      <p className="mt-3 text-gray-600 text-sm line-clamp-2">{course.description || 'Geen beschrijving beschikbaar'}</p>
+                      
+                      <div className="mt-4 flex items-center">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="bg-[#1e3a8a] text-white">
+                            {course.instructor ? course.instructor.charAt(0) : 'D'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="ml-2">
+                          <p className="text-xs font-medium text-gray-800">{course.instructor || 'Nog geen docent toegewezen'}</p>
+                          <p className="text-xs text-gray-500">Docent</p>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs">
+                          {getProgramNameById(course.programId)}
+                        </Badge>
+                        
+                        <div className="flex space-x-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleViewCourse(course)}
+                            title="Details bekijken"
+                            className="h-8 w-8 p-0"
+                          >
+                            <Eye className="h-4 w-4 text-gray-500" />
+                            <span className="sr-only">Bekijken</span>
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleEditCourse(course)}
+                            title="Cursus bewerken"
+                            className="h-8 w-8 p-0"
+                          >
+                            <Pencil className="h-4 w-4 text-gray-500" />
+                            <span className="sr-only">Bewerken</span>
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                            onClick={() => handleDeleteCourse(course)}
+                            title="Cursus verwijderen"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Verwijderen</span>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            
+            {/* Pagination - alleen tonen in de Vakken tab */}
+            {totalPages > 1 && (
+              <div className="bg-white mt-4 px-4 py-3 flex items-center justify-between border border-gray-200 rounded-lg sm:px-6">
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      Tonen <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> tot <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalCourses)}</span> van <span className="font-medium">{totalCourses}</span> resultaten
+                    </p>
+                  </div>
+                  <div>
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Paginering">
+                      <button
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        disabled={currentPage === 1}
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        <span className="sr-only">Vorige</span>
+                        &larr;
+                      </button>
+                      {Array.from({ length: totalPages }).map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setCurrentPage(i + 1)}
+                          className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
+                            currentPage === i + 1
+                              ? 'bg-primary text-white'
+                              : 'bg-white text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                        disabled={currentPage === totalPages}
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        <span className="sr-only">Volgende</span>
+                        &rarr;
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+          
+          {/* Klassen Tab Inhoud */}
+          <TabsContent value="classes">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {isLoadingGroups ? (
+                <div className="col-span-full flex justify-center py-8">
+                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : isErrorGroups ? (
+                <div className="col-span-full text-center py-8 text-red-500">
+                  Fout bij het laden van klassen. Probeer het opnieuw.
+                </div>
+              ) : studentGroups.length === 0 ? (
+                <div className="col-span-full text-center py-8 text-gray-500">
+                  Geen klassen gevonden. Ga naar de Klassen pagina om klassen toe te voegen.
+                </div>
+              ) : (
+                studentGroups.map((group: StudentGroupType) => (
+                  <div key={group.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                    <div className="p-5">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-lg text-gray-800">{group.name}</h3>
+                          <p className="text-gray-500 text-sm mt-1">Academisch jaar: {group.academicYear}</p>
+                        </div>
+                        <Badge variant={group.isActive ? "default" : "secondary"}>
+                          {group.isActive ? "Actief" : "Inactief"}
+                        </Badge>
+                      </div>
+                      
+                      <div className="mt-4 flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Users className="h-4 w-4 text-primary mr-1" />
+                          <span className="text-xs text-gray-700">
+                            {group.enrolledStudents || 0} studenten
+                          </span>
+                        </div>
+                        
+                        <Badge variant="outline" className="text-xs">
+                          {programs.find((p: ProgramType) => p.id === group.programId)?.name || 'Geen programma'}
+                        </Badge>
+                      </div>
+                      
+                      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-end">
+                        <div className="flex space-x-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            title="Details bekijken"
+                            className="h-8 w-8 p-0"
+                            onClick={() => window.location.href = '/student-groups'}
+                          >
+                            <Eye className="h-4 w-4 text-gray-500" />
+                            <span className="sr-only">Bekijken</span>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
       
       {/* Cursus detail dialoog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
@@ -1134,410 +1062,255 @@ export default function Courses() {
                 <div className="space-y-6">
                   <div className="bg-gray-50 p-5 rounded-md border mb-6">
                     <h3 className="text-lg font-medium mb-4">Waarvoor wil u een curriculum aanmaken?</h3>
-                    <div className="flex space-x-4 mb-4">
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="radio"
-                          id="typeVak"
-                          name="editType"
-                          className="h-4 w-4 text-primary border-gray-300 focus:ring-primary"
-                          checked={courseFormData.editType === 'vak'}
-                          onChange={() => setCourseFormData({ ...courseFormData, editType: 'vak' })}
-                        />
-                        <Label htmlFor="typeVak">Vak</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="name" className="mb-1 block">Cursus naam <span className="text-red-500">*</span></Label>
+                          <Input
+                            id="name"
+                            value={courseFormData.name}
+                            onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
+                            placeholder="Bijv. Arabische Grammatica Niveau 1"
+                            required
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="code" className="mb-1 block">Cursuscode <span className="text-red-500">*</span></Label>
+                          <Input
+                            id="code"
+                            value={courseFormData.code}
+                            onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
+                            placeholder="Bijv. ARA101"
+                            required
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="credits" className="mb-1 block">Studiepunten</Label>
+                          <Input
+                            id="credits"
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={courseFormData.credits}
+                            onChange={(e) => setCourseFormData({ ...courseFormData, credits: Number(e.target.value) })}
+                          />
+                        </div>
+                        
+                        <div>
+                          <div className="flex items-center space-x-2 mb-1">
+                            <Label htmlFor="isActive">Status</Label>
+                          </div>
+                          <Select 
+                            value={courseFormData.isActive ? "active" : "inactive"}
+                            onValueChange={(value) => setCourseFormData({ ...courseFormData, isActive: value === "active" })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="active">Actief</SelectItem>
+                              <SelectItem value="inactive">Inactief</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="radio"
-                          id="typeKlas"
-                          name="editType"
-                          className="h-4 w-4 text-primary border-gray-300 focus:ring-primary"
-                          checked={courseFormData.editType === 'klas'}
-                          onChange={() => setCourseFormData({ ...courseFormData, editType: 'klas' })}
-                        />
-                        <Label htmlFor="typeKlas">Klas</Label>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="programId" className="mb-1 block">Programma</Label>
+                          <Select 
+                            value={courseFormData.programId?.toString() || ""}
+                            onValueChange={(value) => setCourseFormData({ ...courseFormData, programId: value ? Number(value) : null })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer een programma" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="">Geen programma</SelectItem>
+                              {programs.map((program: any) => (
+                                <SelectItem key={program.id} value={program.id.toString()}>
+                                  {program.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="instructor" className="mb-1 block">Docent</Label>
+                          <Input
+                            id="instructor"
+                            value={courseFormData.instructor || ''}
+                            onChange={(e) => setCourseFormData({ ...courseFormData, instructor: e.target.value })}
+                            placeholder="Naam van de docent"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="maxStudents" className="mb-1 block">Maximum aantal studenten</Label>
+                          <Input
+                            id="maxStudents"
+                            type="number"
+                            min="1"
+                            value={courseFormData.maxStudents || ''}
+                            onChange={(e) => setCourseFormData({ ...courseFormData, maxStudents: Number(e.target.value) || null })}
+                            placeholder="Laat leeg voor onbeperkt"
+                          />
+                        </div>
                       </div>
                     </div>
-                    
-                    {courseFormData.editType === 'vak' && (
-                      <div>
-                        <Label htmlFor="selectedCourse">Selecteer een vak</Label>
-                        <Select 
-                          value={courseFormData.selectedCourseId?.toString() || ''} 
-                          onValueChange={(val) => setCourseFormData({ 
-                            ...courseFormData, 
-                            selectedCourseId: val ? parseInt(val) : null 
-                          })}
-                        >
-                          <SelectTrigger className="mt-1">
-                            <SelectValue placeholder="Kies een vak" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {courses.map((course: any) => (
-                              <SelectItem key={course.id} value={course.id.toString()}>
-                                {course.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-                    
-                    {courseFormData.editType === 'klas' && (
-                      <div>
-                        <Label htmlFor="selectedClass">Selecteer een klas</Label>
-                        <Select 
-                          value={courseFormData.selectedClassId?.toString() || ''} 
-                          onValueChange={(val) => setCourseFormData({ 
-                            ...courseFormData, 
-                            selectedClassId: val ? parseInt(val) : null 
-                          })}
-                        >
-                          <SelectTrigger className="mt-1">
-                            <SelectValue placeholder="Kies een klas" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {studentGroups.map((group: any) => (
-                              <SelectItem key={group.id} value={group.id.toString()}>
-                                {group.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
                   </div>
                   
-                  <div className="grid grid-cols-1 gap-6">
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="prerequisites" className="text-right">
-                          Instroomvereisten
-                        </Label>
-                        <Textarea
-                          id="prerequisites"
-                          value={courseFormData.prerequisites}
-                          onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
-                          className="mt-1"
-                          rows={3}
-                          placeholder="Beschrijf welke voorkennis of vooropleiding vereist is"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="endLevel" className="text-right">
-                          Einddoelen
-                        </Label>
-                        <Textarea
-                          id="endLevel"
-                          value={courseFormData.endLevel || ''}
-                          onChange={(e) => setCourseFormData({ ...courseFormData, endLevel: e.target.value })}
-                          className="mt-1"
-                          rows={3}
-                          placeholder="Beschrijf wat studenten na afloop moeten kunnen"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="description" className="text-right">
-                          Beschrijving
-                        </Label>
-                        <Textarea
-                          id="description"
-                          value={courseFormData.description}
-                          onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
-                          className="mt-1"
-                          rows={5}
-                          disabled={!!courseFormData.selectedCourseId || !!courseFormData.selectedClassId}
-                        />
-                      </div>
-                    </div>
+                  <div className="space-y-4">
+                    <Label htmlFor="description">Beschrijving</Label>
+                    <Textarea
+                      id="description"
+                      value={courseFormData.description || ''}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
+                      rows={5}
+                      placeholder="Geef een beschrijving van de cursus"
+                    />
                   </div>
                 </div>
               </TabsContent>
               
-              {/* Tab 2: Instroom- en uitstroomcriteria */}
-              <TabsContent value="instroom" className="space-y-6">
-                <div className="grid gap-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Instroomvereisten</h3>
-                    <div className="bg-gray-50 rounded-md p-5 border">
-                      <Label htmlFor="prerequisites">Voorkennis en vereisten voor deelname</Label>
-                      <Textarea
-                        id="prerequisites"
-                        value={courseFormData.prerequisites}
-                        onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
-                        className="mt-1"
-                        rows={3}
-                        placeholder="Beschrijf welke voorkennis of vooropleiding vereist is om deel te nemen aan deze cursus"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Doorstroomopties</h3>
-                    <div className="bg-gray-50 rounded-md p-5 border">
-                      <Label htmlFor="subsequentCourses">Vervolgcursussen</Label>
-                      <Textarea
-                        id="subsequentCourses"
-                        value={courseFormData.subsequentCourses || ''}
-                        onChange={(e) => setCourseFormData({ ...courseFormData, subsequentCourses: e.target.value })}
-                        className="mt-1"
-                        rows={3}
-                        placeholder="Welke cursussen kunnen studenten volgen na het afronden van deze cursus?"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Eindniveau</h3>
-                    <div className="bg-gray-50 rounded-md p-5 border">
-                      <Label htmlFor="endLevel">Kennis en vaardigheden na afloop</Label>
-                      <Textarea
-                        id="endLevel"
-                        value={courseFormData.endLevel || ''}
-                        onChange={(e) => setCourseFormData({ ...courseFormData, endLevel: e.target.value })}
-                        className="mt-1"
-                        rows={3}
-                        placeholder="Beschrijf de kennis en vaardigheden die studenten hebben na het succesvol afronden van deze cursus"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              {/* Tab 3: Leerdoelen en competenties */}
-              <TabsContent value="leerdoelen" className="space-y-6">
+              <TabsContent value="materiaal" className="space-y-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Algemene leerdoelen</h3>
+                  <h3 className="text-lg font-medium">Leerdoelen en competenties</h3>
                   <div className="bg-gray-50 rounded-md p-5 border">
                     <Label htmlFor="learningObjectives">Leerdoelen van de cursus</Label>
                     <Textarea
                       id="learningObjectives"
-                      value={courseFormData.learningObjectives}
+                      value={courseFormData.learningObjectives || ''}
                       onChange={(e) => setCourseFormData({ ...courseFormData, learningObjectives: e.target.value })}
                       className="mt-1"
                       rows={3}
-                      placeholder="Beschrijf de algemene leerdoelen van deze cursus"
+                      placeholder="Wat bereikt de student na het volgen van deze cursus"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Competenties</h3>
+                  <h3 className="text-lg font-medium">Lesmateriaal</h3>
                   <div className="bg-gray-50 rounded-md p-5 border">
-                    <Label htmlFor="competencies">Te ontwikkelen competenties</Label>
+                    <Label htmlFor="materials">Lesmateriaal en bronnen</Label>
                     <Textarea
-                      id="competencies"
-                      value={courseFormData.competencies}
-                      onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
+                      id="materials"
+                      value={courseFormData.materials || ''}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, materials: e.target.value })}
                       className="mt-1"
                       rows={3}
-                      placeholder="Welke competenties ontwikkelen studenten gedurende deze cursus?"
+                      placeholder="Boeken, readers, handouts en andere leermaterialen"
+                    />
+                  </div>
+                </div>
+                
+                {courseFormData.programId && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Programma informatie</h3>
+                    <div className="bg-gray-50 rounded-md p-5 border">
+                      <Label htmlFor="competencies">Vereiste competenties</Label>
+                      <Textarea
+                        id="competencies"
+                        value={courseFormData.competencies || ''}
+                        onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
+                        className="mt-1"
+                        rows={3}
+                        placeholder="Welke competenties verwerft de student"
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Eindniveau</h3>
+                  <div className="bg-gray-50 rounded-md p-5 border">
+                    <Label htmlFor="endLevel">Kennis en vaardigheden na afloop</Label>
+                    <Textarea
+                      id="endLevel"
+                      value={courseFormData.endLevel || ''}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, endLevel: e.target.value })}
+                      className="mt-1"
+                      rows={3}
+                      placeholder="Beschrijf de kennis en vaardigheden die studenten hebben na het succesvol afronden van deze cursus"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="opdrachten" className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Vereisten</h3>
+                  <div className="bg-gray-50 rounded-md p-5 border">
+                    <Label htmlFor="prerequisites">Voorkennis en vereisten</Label>
+                    <Textarea
+                      id="prerequisites"
+                      value={courseFormData.prerequisites || ''}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
+                      className="mt-1"
+                      rows={3}
+                      placeholder="Welke voorkennis of afgeronde cursussen zijn vereist"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Leerdoelen per periode</h3>
+                  <h3 className="text-lg font-medium">Vervolgcursussen</h3>
                   <div className="bg-gray-50 rounded-md p-5 border">
-                    <Label htmlFor="periodicObjectives">Doelstellingen per lesperiode</Label>
+                    <Label htmlFor="subsequentCourses">Aanbevolen vervolgcursussen</Label>
+                    <Textarea
+                      id="subsequentCourses"
+                      value={courseFormData.subsequentCourses || ''}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, subsequentCourses: e.target.value })}
+                      className="mt-1"
+                      rows={3}
+                      placeholder="Welke cursussen kunnen na deze cursus gevolgd worden"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Beoordelingsmethoden</h3>
+                  <div className="bg-gray-50 rounded-md p-5 border">
+                    <Label htmlFor="assessmentDescription">Omschrijving beoordeling</Label>
+                    <Textarea
+                      id="assessmentDescription"
+                      value={courseFormData.assessmentDescription || ''}
+                      onChange={(e) => setCourseFormData({ ...courseFormData, assessmentDescription: e.target.value })}
+                      className="mt-1"
+                      rows={3}
+                      placeholder="Beschrijf de wijze van beoordeling (tentamens, opdrachten, etc.)"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Periodieke leerdoelen</h3>
+                  <div className="bg-gray-50 rounded-md p-5 border">
+                    <Label htmlFor="periodicObjectives">Leerdoelen per periode</Label>
                     <Textarea
                       id="periodicObjectives"
                       value={courseFormData.periodicObjectives || ''}
                       onChange={(e) => setCourseFormData({ ...courseFormData, periodicObjectives: e.target.value })}
                       className="mt-1"
                       rows={3}
-                      placeholder="Specificeer leerdoelen per periode of lesblok"
+                      placeholder="Beschrijf de leerdoelen per periode of lesblok"
                     />
-                  </div>
-                </div>
-              </TabsContent>
-              
-              {/* Tab 4: Lesmateriaal */}
-              <TabsContent value="materiaal" className="space-y-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium">Studiemateriaal</h3>
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      setUploadType('material');
-                      setIsUploadDialogOpen(true);
-                    }}
-                  >
-                    <FileUp className="h-4 w-4 mr-2" /> Materiaal toevoegen
-                  </Button>
-                </div>
-                
-                <div className="bg-gray-50 rounded-md p-5 border">
-                  <Label htmlFor="materials">Beschrijving van het lesmateriaal</Label>
-                  <Textarea
-                    id="materials"
-                    value={courseFormData.materials}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, materials: e.target.value })}
-                    className="mt-1"
-                    rows={3}
-                    placeholder="Geef een overzicht van de gebruikte boeken, literatuur en andere leermiddelen"
-                  />
-                </div>
-                
-                <div>
-                  <h4 className="text-md font-medium mb-3">Geüploade leermaterialen</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Dit zal later dynamisch worden getoond op basis van opgeslagen bestanden */}
-                    <div className="border rounded-md p-4 bg-white">
-                      <div className="flex justify-between">
-                        <div className="flex items-center">
-                          <div className="bg-blue-100 rounded-full p-2 mr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-700">
-                              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
-                            </svg>
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-sm">Voorbeeld: Hoofdstuk 1 - Introductie</h4>
-                            <p className="text-xs text-gray-500">PDF • 2.4 MB</p>
-                          </div>
-                        </div>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                          </svg>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              {/* Tab 3: Opdrachten en testen */}
-              <TabsContent value="opdrachten" className="space-y-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium">Opdrachten en toetsen</h3>
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      setUploadType('assignment');
-                      setIsUploadDialogOpen(true);
-                    }}
-                  >
-                    <FileText className="h-4 w-4 mr-2" /> Document toevoegen
-                  </Button>
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="text-md font-medium">Opdrachten</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                      {/* Dit zal later dynamisch worden getoond op basis van opgeslagen bestanden */}
-                      <div className="border rounded-md p-4 bg-white">
-                        <div className="flex justify-between">
-                          <div className="flex items-center">
-                            <div className="bg-blue-100 rounded-full p-2 mr-3">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-700">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                                <polyline points="10 9 9 9 8 9"></polyline>
-                              </svg>
-                            </div>
-                            <div>
-                              <h4 className="font-medium text-sm">Voorbeeld: Opdracht hoofdstuk 1</h4>
-                              <p className="text-xs text-gray-500">PDF • 0.9 MB</p>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                              <polyline points="7 10 12 15 17 10"></polyline>
-                              <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-md font-medium">Testen</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                      {/* Dit zal later dynamisch worden getoond op basis van opgeslagen bestanden */}
-                      <div className="border rounded-md p-4 bg-white">
-                        <div className="flex justify-between">
-                          <div className="flex items-center">
-                            <div className="bg-yellow-100 rounded-full p-2 mr-3">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-700">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                                <polyline points="10 9 9 9 8 9"></polyline>
-                              </svg>
-                            </div>
-                            <div>
-                              <h4 className="font-medium text-sm">Voorbeeld: Tussentoets hoofdstuk 1-3</h4>
-                              <p className="text-xs text-gray-500">PDF • 1.1 MB</p>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                              <polyline points="7 10 12 15 17 10"></polyline>
-                              <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="text-md font-medium">Examens</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                      {/* Dit zal later dynamisch worden getoond op basis van opgeslagen bestanden */}
-                      <div className="border rounded-md p-4 bg-white">
-                        <div className="flex justify-between">
-                          <div className="flex items-center">
-                            <div className="bg-red-100 rounded-full p-2 mr-3">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-700">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                                <polyline points="10 9 9 9 8 9"></polyline>
-                              </svg>
-                            </div>
-                            <div>
-                              <h4 className="font-medium text-sm">Voorbeeld: Eindexamen 2025</h4>
-                              <p className="text-xs text-gray-500">PDF • 1.3 MB</p>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
-                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                              <polyline points="7 10 12 15 17 10"></polyline>
-                              <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </TabsContent>
             </Tabs>
             
-            <DialogFooter>
+            <div className="pt-4 flex justify-end space-x-3 border-t">
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => isAddDialogOpen ? setIsAddDialogOpen(false) : setIsEditDialogOpen(false)}
+                onClick={() => {
+                  isAddDialogOpen ? setIsAddDialogOpen(false) : setIsEditDialogOpen(false);
+                  resetFormData();
+                }}
               >
                 Annuleren
               </Button>
@@ -1545,136 +1318,144 @@ export default function Courses() {
                 type="submit" 
                 disabled={createCourseMutation.isPending || updateCourseMutation.isPending}
               >
-                {(createCourseMutation.isPending || updateCourseMutation.isPending) && (
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
+                {createCourseMutation.isPending || updateCourseMutation.isPending ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Bezig met opslaan...
+                  </>
+                ) : (
+                  isAddDialogOpen ? 'Toevoegen' : 'Bijwerken'
                 )}
-                {isAddDialogOpen ? 'Toevoegen' : 'Opslaan'}
               </Button>
-            </DialogFooter>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
       
-      {/* Delete confirmation dialog */}
+      {/* Verwijder bevestiging */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">Cursus verwijderen</DialogTitle>
+            <DialogTitle className="text-xl font-semibold text-red-600">Curriculum verwijderen</DialogTitle>
             <DialogDescription>
-              Weet u zeker dat u deze cursus wilt verwijderen? 
-              Deze actie kan niet ongedaan worden gemaakt.
+              Weet u zeker dat u dit curriculum wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
             </DialogDescription>
           </DialogHeader>
           
           {selectedCourse && (
-            <div className="py-4 space-y-3">
-              <div className="border rounded-md p-3 bg-red-50">
-                <p className="text-sm text-gray-700 font-medium">
-                  Je staat op het punt om de volgende cursus te verwijderen:
-                </p>
-                <div className="mt-2 space-y-1">
-                  <p className="text-sm"><span className="font-medium">Naam:</span> {selectedCourse.name}</p>
-                  <p className="text-sm"><span className="font-medium">Code:</span> {selectedCourse.code}</p>
-                  <p className="text-sm">
-                    <span className="font-medium">Programma:</span> {getProgramNameById(selectedCourse.programId)}
+            <div className="py-4">
+              <div className="bg-gray-50 p-4 rounded-md border">
+                <h4 className="font-medium">{selectedCourse.name}</h4>
+                <p className="text-sm text-gray-500 mt-1">{selectedCourse.code}</p>
+                <p className="text-sm mt-2">Programma: {getProgramNameById(selectedCourse.programId)}</p>
+                {selectedCourse.enrolledStudents && selectedCourse.enrolledStudents > 0 && (
+                  <p className="text-sm text-red-500 mt-2">
+                    Let op: Er zijn {selectedCourse.enrolledStudents} studenten ingeschreven voor deze cursus
                   </p>
-                  <p className="text-sm">
-                    <span className="font-medium">Studiepunten:</span> {selectedCourse.credits}
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-medium">Docent:</span> {selectedCourse.instructor || 'Niet toegewezen'}
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-medium">Status:</span> {selectedCourse.isActive ? 'Actief' : 'Inactief'}
-                  </p>
-                </div>
+                )}
               </div>
-              <p className="text-xs text-red-600">
-                Let op: Bij het verwijderen van een cursus worden alle hieraan gekoppelde lessen, inschrijvingen en beoordelingen verwijderd. Controleer of er geen actieve studenten meer ingeschreven staan voor deze cursus.
-              </p>
             </div>
           )}
           
-          <DialogFooter className="mt-2">
-            <Button 
-              variant="outline" 
+          <DialogFooter>
+            <Button
+              variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
             >
               Annuleren
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={() => {
                 if (selectedCourse) {
                   deleteCourseMutation.mutate(selectedCourse.id);
                 }
               }}
               disabled={deleteCourseMutation.isPending}
-              className="bg-red-600 hover:bg-red-700"
             >
-              {deleteCourseMutation.isPending && (
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+              {deleteCourseMutation.isPending ? (
+                <>
+                  <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Bezig met verwijderen...
+                </>
+              ) : (
+                'Verwijderen'
               )}
-              {deleteCourseMutation.isPending ? 'Bezig met verwijderen...' : 'Verwijderen'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       
-      {/* Bestand upload dialog */}
+      {/* Upload dialoog */}
       <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">
-              Document toevoegen
+              {uploadType === 'material' ? 'Lesmateriaal toevoegen' : 'Opdracht toevoegen'}
             </DialogTitle>
             <DialogDescription>
-              Upload een document voor de cursus
+              {uploadType === 'material' 
+                ? 'Upload studiemateriaal voor deze cursus.' 
+                : 'Upload een opdracht of tentamen voor deze cursus.'}
             </DialogDescription>
           </DialogHeader>
           
-          <div className="mt-4 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="fileTitle">Titel</Label>
-              <Input id="fileTitle" placeholder="Voer een titel in voor dit document" />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="fileDescription">Beschrijving (optioneel)</Label>
-              <Textarea id="fileDescription" placeholder="Geef een korte beschrijving van dit document" className="resize-none h-20" />
-            </div>
-            
-
-            
-            <div className="border-2 border-dashed rounded-md p-6 text-center cursor-pointer hover:bg-gray-50 transition-colors"
-              onClick={() => fileInputRef.current?.click()}
-            >
+          <div className="space-y-4 py-4">
+            <div className="border-2 border-dashed rounded-md p-8 text-center">
               <input 
                 type="file" 
-                ref={fileInputRef} 
+                id="file-upload" 
                 className="hidden" 
-                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"
+                ref={fileInputRef}
+                onChange={() => {
+                  // Verwerken van het bestand zou hier gebeuren
+                }}
               />
-              <Upload className="h-10 w-10 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm font-medium">Klik om een document te kiezen of sleep het hier naartoe</p>
-              <p className="text-xs text-gray-500 mt-1">PDF, Word of andere documentformaten tot 10MB</p>
+              <label 
+                htmlFor="file-upload" 
+                className="cursor-pointer flex flex-col items-center"
+              >
+                <Upload className="h-10 w-10 text-gray-400 mb-2" />
+                <h4 className="text-sm font-medium">Klik om te uploaden</h4>
+                <p className="text-xs text-gray-500 mt-1">of sleep een bestand hierheen</p>
+                <p className="text-xs text-gray-400 mt-3">PDF, Word, PowerPoint of Excel (max. 10 MB)</p>
+              </label>
             </div>
+            
+            {uploadType === 'assignment' && (
+              <div>
+                <Label htmlFor="assignmentType">Type opdracht</Label>
+                <Select defaultValue="homework">
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecteer type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="homework">Huiswerk</SelectItem>
+                    <SelectItem value="exam">Tentamen</SelectItem>
+                    <SelectItem value="project">Project</SelectItem>
+                    <SelectItem value="quiz">Overhoring</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
           
-          <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setIsUploadDialogOpen(false)}>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsUploadDialogOpen(false)}
+            >
               Annuleren
             </Button>
-            <Button type="button" onClick={() => {
-              toast({
-                title: "Document geüpload",
-                description: "Het document is succesvol toegevoegd.",
-              });
-              setIsUploadDialogOpen(false);
-            }}>
+            <Button
+              onClick={() => {
+                toast({
+                  title: "Bestand geüpload",
+                  description: "Het bestand is succesvol geüpload.",
+                });
+                setIsUploadDialogOpen(false);
+              }}
+            >
               Uploaden
             </Button>
           </DialogFooter>

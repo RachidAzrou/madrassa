@@ -296,31 +296,19 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
             </div>
           </div>
 
-          <div className="pt-2">
-            <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Systeem
-            </p>
-            <div className="space-y-1.5">
-              <SidebarLink
-                href="/settings"
-                icon={<Settings className="h-5 w-5" />}
-                label="Instellingen"
-                isActive={location.startsWith("/settings")}
+          <div className="pt-6">
+            <div className="border-t border-gray-200 mt-2 pt-4"></div>
+            <Link href="/api/logout">
+              <div
                 onClick={handleLinkClick}
-              />
-              <div className="my-4 border-t border-gray-200"></div>
-              <Link href="/api/logout">
-                <div
-                  onClick={handleLinkClick}
-                  className="flex items-center justify-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer text-gray-600 hover:text-primary hover:bg-gray-100"
-                >
-                  <div className="flex-shrink-0">
-                    <LogOut className="h-5 w-5" />
-                  </div>
-                  <span className="truncate whitespace-nowrap">Afmelden</span>
+                className="flex items-center justify-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer text-gray-600 hover:text-primary hover:bg-gray-100"
+              >
+                <div className="flex-shrink-0">
+                  <LogOut className="h-5 w-5" />
                 </div>
-              </Link>
-            </div>
+                <span className="truncate whitespace-nowrap">Afmelden</span>
+              </div>
+            </Link>
           </div>
         </div>
       </nav>

@@ -93,7 +93,7 @@ export default function Attendance() {
             <p className="text-sm text-gray-500">Selecteer een datum om aanwezigheid te registreren</p>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col space-y-6">
+            <div className="flex flex-col space-y-4">
               <div className="flex space-x-3">
                 <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)} className="flex-1">
                   <ArrowLeft className="h-4 w-4 mr-1" /> 
@@ -102,6 +102,9 @@ export default function Attendance() {
                 <Button variant="outline" size="sm" onClick={() => handleDateChange(1)} className="flex-1">
                   <span>Volgende dag</span> <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
+              </div>
+              <div className="text-center text-sm font-medium">
+                {formatDate(selectedDate)}
               </div>
             </div>
           </CardContent>

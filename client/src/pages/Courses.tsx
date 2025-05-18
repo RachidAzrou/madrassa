@@ -403,34 +403,48 @@ export default function Courses() {
           </Button>
         </div>
         
-        {/* Filter options */}
-        <div className="flex justify-end items-center mb-5">
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Status:</span>
-            <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
-              <SelectTrigger className="w-[140px] h-9">
-                <SelectValue placeholder="Filter op status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Actief</SelectItem>
-                <SelectItem value="inactive">Inactief</SelectItem>
-                <SelectItem value="all">Alle vakken</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Main Tabs for Courses/Classes and Filter Tabs for Status */}
+        <div className="flex flex-col md:flex-row md:items-center gap-4 mb-5">
+          <Tabs defaultValue="courses" className="w-full" onValueChange={setActiveTab}>
+            <TabsList className="p-1 bg-blue-900/10 mb-0 flex w-auto">
+              <TabsTrigger value="courses" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                Vakken
+              </TabsTrigger>
+              <TabsTrigger value="classes" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                Klassen
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          
+          <Tabs defaultValue="active" className="w-auto">
+            <TabsList className="p-1 bg-blue-900/10 mb-0 flex w-auto">
+              <TabsTrigger 
+                value="active" 
+                className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
+                onClick={() => handleStatusFilterChange('active')}
+              >
+                Actief
+              </TabsTrigger>
+              <TabsTrigger 
+                value="inactive" 
+                className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
+                onClick={() => handleStatusFilterChange('inactive')}
+              >
+                Inactief
+              </TabsTrigger>
+              <TabsTrigger 
+                value="all" 
+                className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
+                onClick={() => handleStatusFilterChange('all')}
+              >
+                Alle vakken
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
         
-        {/* Tabs for Courses/Classes */}
-        <Tabs defaultValue="courses" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="p-1 bg-blue-900/10 mb-4">
-            <TabsTrigger value="courses" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-              Vakken
-            </TabsTrigger>
-            <TabsTrigger value="classes" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-              Klassen
-            </TabsTrigger>
-          </TabsList>
+        {/* Content Tabs */}
+        <Tabs defaultValue="courses" className="w-full" value={activeTab}>
           
           {/* Courses Tab Content */}
           <TabsContent value="courses">

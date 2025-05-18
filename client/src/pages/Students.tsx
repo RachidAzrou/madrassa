@@ -1163,8 +1163,18 @@ export default function Students() {
                               houseNumber: "45",
                               postalCode: "1080",
                               city: "Brussel",
-                              // Bij een echte implementatie zou de foto uit de eID komen
+                              photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID"
                             };
+                            
+                            // Simuleer het laden van de foto uit de eID
+                            const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
+                            const photoPlaceholder = document.getElementById('student-photo-placeholder');
+                            
+                            if (photoPreview && photoPlaceholder) {
+                              photoPreview.src = eidData.photoUrl;
+                              photoPreview.classList.remove('hidden');
+                              photoPlaceholder.classList.add('hidden');
+                            }
                             
                             // Vul het formulier in met eID-gegevens
                             setStudentFormData({

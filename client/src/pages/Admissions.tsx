@@ -126,7 +126,15 @@ export default function Admissions() {
   // Mutaties voor CRUD operaties
   const createApplicationMutation = useMutation({
     mutationFn: async (applicationData: typeof applicationFormData) => {
-      return apiRequest('POST', '/api/admissions/applications', applicationData);
+      try {
+        return await apiRequest('/api/admissions/applications', {
+          method: 'POST',
+          body: applicationData
+        });
+      } catch (error: any) {
+        console.error('Error creating application:', error);
+        throw new Error(error?.message || 'Fout bij het aanmaken van de aanmelding');
+      }
     },
     onSuccess: () => {
       // Invalidate query cache to refresh data
@@ -158,23 +166,33 @@ export default function Admissions() {
     onError: (error: any) => {
       toast({
         title: "Fout bij toevoegen",
-        description: error.message || "Er is een fout opgetreden bij het toevoegen van de aanvraag.",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van de aanvraag. Controleer of alle verplichte velden correct zijn ingevuld.",
         variant: "destructive",
       });
+      console.error('Create application error:', error);
     }
   });
   
   const updateApplicationMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string, data: Partial<typeof applicationFormData> }) => {
-      return apiRequest('PATCH', `/api/admissions/applications/${id}`, data);
+      try {
+        return await apiRequest(`/api/admissions/applications/${id}`, {
+          method: 'PATCH',
+          body: data
+        });
+      } catch (error: any) {
+        console.error('Error updating application:', error);
+        throw new Error(error?.message || 'Fout bij het bijwerken van de aanmelding');
+      }
     },
     onSuccess: () => {
       // Invalidate query cache to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/admissions/applicants'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admissions/stats'] });
       
-      // Close dialog
+      // Close dialog and reset currentApplicant
       setIsEditDialogOpen(false);
+      setCurrentApplicant(null);
       
       // Toon succesmelding
       toast({
@@ -186,23 +204,32 @@ export default function Admissions() {
     onError: (error: any) => {
       toast({
         title: "Fout bij bewerken",
-        description: error.message || "Er is een fout opgetreden bij het bewerken van de aanvraag.",
+        description: error.message || "Er is een fout opgetreden bij het bewerken van de aanvraag. Controleer of alle verplichte velden correct zijn ingevuld.",
         variant: "destructive",
       });
+      console.error('Update application error:', error);
     }
   });
   
   const deleteApplicationMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest('DELETE', `/api/admissions/applications/${id}`);
+      try {
+        return await apiRequest(`/api/admissions/applications/${id}`, {
+          method: 'DELETE'
+        });
+      } catch (error: any) {
+        console.error('Error deleting application:', error);
+        throw new Error(error?.message || 'Fout bij het verwijderen van de aanmelding');
+      }
     },
     onSuccess: () => {
       // Invalidate query cache to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/admissions/applicants'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admissions/stats'] });
       
-      // Close dialog
+      // Close dialog and reset current applicant
       setIsDeleteDialogOpen(false);
+      setCurrentApplicant(null);
       
       // Toon succesmelding
       toast({
@@ -214,9 +241,11 @@ export default function Admissions() {
     onError: (error: any) => {
       toast({
         title: "Fout bij verwijderen",
-        description: error.message || "Er is een fout opgetreden bij het verwijderen van de aanvraag.",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van de aanvraag. Mogelijk is deze aanvraag al verwerkt of zijn er afhankelijkheden.",
         variant: "destructive",
       });
+      console.error('Delete application error:', error);
+      setIsDeleteDialogOpen(false);
     }
   });
 
@@ -263,9 +292,17 @@ export default function Admissions() {
     setIsEditDialogOpen(true);
   };
   
+  // Open delete confirmation dialog
   const handleDeleteApplicant = (applicant: Applicant) => {
     setCurrentApplicant(applicant);
     setIsDeleteDialogOpen(true);
+  };
+  
+  // Bevestig verwijdering van de aanmelding
+  const confirmDeleteApplicant = () => {
+    if (currentApplicant?.id) {
+      deleteApplicationMutation.mutate(currentApplicant.id);
+    }
   };
   
   const handleSubmitApplication = (e: React.FormEvent) => {
@@ -303,11 +340,7 @@ export default function Admissions() {
     }
   };
   
-  const handleConfirmDelete = () => {
-    if (currentApplicant?.id) {
-      deleteApplicationMutation.mutate(currentApplicant.id);
-    }
-  };
+  // Functie is nu dubbel gedefinieerd, verwijderen we hier
   
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
@@ -1290,7 +1323,7 @@ export default function Admissions() {
               Annuleren
             </Button>
             <Button
-              onClick={handleConfirmDelete}
+              onClick={confirmDeleteApplicant}
               disabled={deleteApplicationMutation.isPending}
               variant="destructive"
             >

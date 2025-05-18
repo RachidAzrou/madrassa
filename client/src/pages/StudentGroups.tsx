@@ -130,90 +130,110 @@ export default function StudentGroups() {
 
   const courses = coursesData?.courses || [];
 
-  // Mutation for creating a new student group
+  // Verbeterde mutation voor het aanmaken van een nieuwe klas
   const createStudentGroupMutation = useMutation({
     mutationFn: async (data: z.infer<typeof studentGroupSchema>) => {
-      // Convert dates to ISO strings
-      const formattedData = {
-        ...data,
-        startDate: data.startDate ? data.startDate.toISOString() : undefined,
-        endDate: data.endDate ? data.endDate.toISOString() : undefined,
-      };
-      return await apiRequest('/api/student-groups', { 
-        method: 'POST', 
-        body: formattedData 
-      });
+      try {
+        // Convert dates to ISO strings
+        const formattedData = {
+          ...data,
+          startDate: data.startDate ? data.startDate.toISOString() : undefined,
+          endDate: data.endDate ? data.endDate.toISOString() : undefined,
+        };
+        return await apiRequest('/api/student-groups', { 
+          method: 'POST', 
+          body: formattedData 
+        });
+      } catch (error: any) {
+        console.error('Error creating student group:', error);
+        throw new Error(error?.message || 'Fout bij het aanmaken van de klas');
+      }
     },
     onSuccess: () => {
       toast({
         title: 'Klas toegevoegd',
-        description: 'De klas is succesvol aangemaakt.',
+        description: 'De klas is succesvol aangemaakt in het systeem.',
       });
       setIsAddDialogOpen(false);
       form.reset();
       queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: 'Fout bij aanmaken',
-        description: 'Er is een fout opgetreden bij het aanmaken van de klas.',
+        description: error?.message || 'Er is een fout opgetreden bij het aanmaken van de klas. Controleer of de naam uniek is en alle velden correct zijn ingevuld.',
         variant: 'destructive',
       });
+      console.error('Create student group error:', error);
     },
   });
 
-  // Mutation for updating a student group
+  // Verbeterde mutation voor het bijwerken van een klas
   const updateStudentGroupMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number, data: z.infer<typeof studentGroupSchema> }) => {
-      // Convert dates to ISO strings
-      const formattedData = {
-        ...data,
-        startDate: data.startDate ? data.startDate.toISOString() : undefined,
-        endDate: data.endDate ? data.endDate.toISOString() : undefined,
-      };
-      return await apiRequest(`/api/student-groups/${id}`, {
-        method: 'PUT',
-        body: formattedData
-      });
+      try {
+        // Convert dates to ISO strings
+        const formattedData = {
+          ...data,
+          startDate: data.startDate ? data.startDate.toISOString() : undefined,
+          endDate: data.endDate ? data.endDate.toISOString() : undefined,
+        };
+        return await apiRequest(`/api/student-groups/${id}`, {
+          method: 'PUT',
+          body: formattedData
+        });
+      } catch (error: any) {
+        console.error('Error updating student group:', error);
+        throw new Error(error?.message || 'Fout bij het bijwerken van de klas');
+      }
     },
     onSuccess: () => {
       toast({
         title: 'Klas bijgewerkt',
-        description: 'De klas is succesvol bijgewerkt.',
+        description: 'De klas is succesvol bijgewerkt in het systeem.',
       });
       setIsEditDialogOpen(false);
+      setSelectedGroup(null);
       queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: 'Fout bij bijwerken',
-        description: 'Er is een fout opgetreden bij het bijwerken van de klas.',
+        description: error?.message || 'Er is een fout opgetreden bij het bijwerken van de klas. Controleer of alle velden correct zijn ingevuld.',
         variant: 'destructive',
       });
+      console.error('Update student group error:', error);
     },
   });
 
-  // Mutation for deleting a student group
+  // Verbeterde mutation voor het verwijderen van een klas
   const deleteStudentGroupMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/student-groups/${id}`, {
-        method: 'DELETE'
-      });
+      try {
+        return await apiRequest(`/api/student-groups/${id}`, {
+          method: 'DELETE'
+        });
+      } catch (error: any) {
+        console.error('Error deleting student group:', error);
+        throw new Error(error?.message || 'Fout bij het verwijderen van de klas');
+      }
     },
     onSuccess: () => {
       toast({
         title: 'Klas verwijderd',
-        description: 'De klas is succesvol verwijderd.',
+        description: 'De klas is succesvol verwijderd uit het systeem.',
       });
       setIsDeleteDialogOpen(false);
+      setSelectedGroup(null);
       queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: 'Fout bij verwijderen',
-        description: 'Er is een fout opgetreden bij het verwijderen van de klas.',
+        description: error?.message || 'Er is een fout opgetreden bij het verwijderen van de klas. Mogelijk zijn er nog studenten aan deze klas gekoppeld.',
         variant: 'destructive',
       });
+      console.error('Delete student group error:', error);
     },
   });
 
@@ -1448,10 +1468,41 @@ export default function StudentGroups() {
           <AlertDialogHeader>
             <AlertDialogTitle>Klas verwijderen</AlertDialogTitle>
             <AlertDialogDescription>
-              Weet je zeker dat je de klas "{selectedGroup?.name}" wilt verwijderen?
-              Dit kan niet ongedaan worden gemaakt.
+              Weet je zeker dat je deze klas wilt verwijderen?
+              Deze actie kan niet ongedaan worden gemaakt.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          
+          {selectedGroup && (
+            <div className="py-4 space-y-3">
+              <div className="border rounded-md p-3 bg-red-50">
+                <p className="text-sm text-gray-700 font-medium">
+                  Je staat op het punt om de volgende klas te verwijderen:
+                </p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-sm"><span className="font-medium">Naam:</span> {selectedGroup.name}</p>
+                  <p className="text-sm"><span className="font-medium">Academisch jaar:</span> {selectedGroup.academicYear}</p>
+                  {selectedGroup.programId && (
+                    <p className="text-sm">
+                      <span className="font-medium">Opleiding:</span> {
+                        programs.find(p => p.id === selectedGroup.programId)?.name || 'Onbekend'
+                      }
+                    </p>
+                  )}
+                  {selectedGroup.maxCapacity && (
+                    <p className="text-sm"><span className="font-medium">Capaciteit:</span> {selectedGroup.maxCapacity} studenten</p>
+                  )}
+                  <p className="text-sm">
+                    <span className="font-medium">Status:</span> {selectedGroup.isActive ? 'Actief' : 'Inactief'}
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-red-600">
+                Let op: Bij het verwijderen van een klas worden alle gekoppelde studenten losgekoppeld van deze klas.
+              </p>
+            </div>
+          )}
+          
           <AlertDialogFooter>
             <AlertDialogCancel>Annuleren</AlertDialogCancel>
             <AlertDialogAction

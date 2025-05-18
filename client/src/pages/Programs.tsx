@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsHeader, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Program {
   id: number;
@@ -84,16 +84,20 @@ export default function Programs() {
     }
   };
 
-  // Mutatie om een vak toe te voegen
+  // Mutatie om een programma toe te voegen
   const createProgramMutation = useMutation({
     mutationFn: async (programData: typeof programFormData) => {
-      return apiRequest('POST', '/api/programs', programData);
+      return apiRequest('/api/programs', {
+        method: 'POST',
+        body: programData
+      });
     },
     onSuccess: () => {
-      // Invalidate query cache to refresh data
+      // Invalideer relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/programs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       
-      // Reset form and close dialog
+      // Reset form en sluit dialoog
       setProgramFormData({
         name: '',
         code: '',
@@ -108,15 +112,16 @@ export default function Programs() {
       
       // Toon succes melding
       toast({
-        title: "Vak toegevoegd",
-        description: "Het vak is succesvol toegevoegd aan het systeem.",
+        title: "Programma toegevoegd",
+        description: "Het programma is succesvol toegevoegd aan het systeem.",
         variant: "default",
       });
     },
     onError: (error: any) => {
+      console.error('Error creating program:', error);
       toast({
         title: "Fout bij toevoegen",
-        description: error.message || "Er is een fout opgetreden bij het toevoegen van het vak.",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van het programma.",
         variant: "destructive",
       });
     }
@@ -150,30 +155,36 @@ export default function Programs() {
     }
   };
   
-  // Mutatie voor het bijwerken van een vak
+  // Mutatie voor het bijwerken van een programma
   const updateProgramMutation = useMutation({
-    mutationFn: async (data: { id: string; programData: typeof programFormData }) => {
-      return apiRequest('PUT', `/api/programs/${data.id}`, data.programData);
+    mutationFn: async (data: { id: number; programData: typeof programFormData }) => {
+      return apiRequest(`/api/programs/${data.id}`, {
+        method: 'PUT',
+        body: data.programData
+      });
     },
     onSuccess: () => {
-      // Invalidate query cache to refresh data
+      // Invalideer relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/programs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       
-      // Reset form and close dialog
+      // Reset UI-state
       setIsEditDialogOpen(false);
       setSelectedProgram(null);
       
       // Toon succes melding
       toast({
-        title: "Vak bijgewerkt",
-        description: "Het vak is succesvol bijgewerkt.",
+        title: "Programma bijgewerkt",
+        description: "Het programma is succesvol bijgewerkt.",
         variant: "default",
       });
     },
     onError: (error: any) => {
+      console.error('Error updating program:', error);
       toast({
         title: "Fout bij bijwerken",
-        description: error.message || "Er is een fout opgetreden bij het bijwerken van het vak.",
+        description: error.message || "Er is een fout opgetreden bij het bijwerken van het programma.",
         variant: "destructive",
       });
     }
@@ -189,7 +200,7 @@ export default function Programs() {
     }
   };
 
-  const handleDeleteProgram = (id: string) => {
+  const handleDeleteProgram = (id: number) => {
     const program = programs.find(p => p.id === id);
     if (program) {
       setSelectedProgram(program);
@@ -197,30 +208,35 @@ export default function Programs() {
     }
   };
 
-  // Mutatie voor het verwijderen van een vak
+  // Mutatie voor het verwijderen van een programma
   const deleteProgramMutation = useMutation({
-    mutationFn: async (id: string) => {
-      return apiRequest('DELETE', `/api/programs/${id}`);
+    mutationFn: async (id: number) => {
+      return apiRequest(`/api/programs/${id}`, {
+        method: 'DELETE'
+      });
     },
     onSuccess: () => {
-      // Invalidate query cache to refresh data
+      // Invalideer relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/programs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       
-      // Reset form and close dialog
+      // Reset UI-state
       setIsDeleteDialogOpen(false);
       setSelectedProgram(null);
       
       // Toon succes melding
       toast({
-        title: "Vak verwijderd",
-        description: "Het vak is succesvol verwijderd uit het systeem.",
+        title: "Programma verwijderd",
+        description: "Het programma is succesvol verwijderd uit het systeem.",
         variant: "default",
       });
     },
     onError: (error: any) => {
+      console.error('Error deleting program:', error);
       toast({
         title: "Fout bij verwijderen",
-        description: error.message || "Er is een fout opgetreden bij het verwijderen van het vak.",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van het programma.",
         variant: "destructive",
       });
     }

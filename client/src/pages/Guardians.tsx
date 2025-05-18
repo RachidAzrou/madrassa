@@ -56,6 +56,10 @@ export default function Guardians() {
   const [viewMode, setViewMode] = useState<'all' | 'emergency'>('all');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
+  
+  // States voor verwijderbevestiging
+  const [guardianToDelete, setGuardianToDelete] = useState<GuardianType | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [newGuardian, setNewGuardian] = useState<Partial<GuardianType>>({
     firstName: '',
     lastName: '',
@@ -90,21 +94,33 @@ export default function Guardians() {
     data: guardiansResponse,
     isLoading,
     isError,
-  } = useQuery({
+    refetch
+  } = useQuery<{guardians: GuardianType[], totalCount: number}>({
     queryKey: ['/api/guardians', { page: currentPage, limit: itemsPerPage, search: debouncedSearch }],
+    queryFn: async () => {
+      try {
+        const params = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: itemsPerPage.toString(),
+          search: debouncedSearch,
+        });
+        
+        return await apiRequest(`/api/guardians?${params.toString()}`);
+      } catch (error) {
+        console.error('Error fetching guardians:', error);
+        toast({
+          title: "Fout bij ophalen voogden",
+          description: "Er is een probleem opgetreden bij het laden van de voogdgegevens. Probeer het later opnieuw.",
+          variant: "destructive",
+        });
+        return { guardians: [], totalCount: 0 };
+      }
+    },
   });
-
-  // Extract guardians and total count from response
-  console.log('Guardians response type:', typeof guardiansResponse, Array.isArray(guardiansResponse));
   
-  // Check if response is already an array or needs to be extracted
-  const guardians = Array.isArray(guardiansResponse) 
-    ? guardiansResponse 
-    : (guardiansResponse?.guardians || []);
-    
-  const totalGuardians = Array.isArray(guardiansResponse) 
-    ? guardiansResponse.length 
-    : (guardiansResponse?.totalCount || 0);
+  // Extract guardians and total count from response with proper type safety
+  const guardians: GuardianType[] = guardiansResponse?.guardians || [];
+  const totalGuardians: number = guardiansResponse?.totalCount || 0;
   
   const totalPages = Math.ceil(totalGuardians / itemsPerPage);
 
@@ -112,30 +128,64 @@ export default function Guardians() {
   const {
     data: allStudents = [] as StudentType[],
     isLoading: allStudentsLoading,
-  } = useQuery({
+    isError: isAllStudentsError,
+  } = useQuery<StudentType[]>({
     queryKey: ['/api/students'],
+    queryFn: async () => {
+      try {
+        return await apiRequest('/api/students');
+      } catch (error) {
+        console.error('Error fetching students for assignment:', error);
+        toast({
+          title: "Fout bij ophalen studenten",
+          description: "Kon de lijst met studenten niet laden voor toewijzing.",
+          variant: "destructive",
+        });
+        return [];
+      }
+    },
   });
 
   // Fetch associated students for selected guardian
   const {
-    data: guardianStudentsData = [],
+    data: guardianStudentsData = [] as StudentType[],
     isLoading: guardianStudentsLoading,
-  } = useQuery({
+    isError: isGuardianStudentsError,
+  } = useQuery<StudentType[]>({
     queryKey: ['/api/guardian-students', selectedGuardian?.id],
+    queryFn: async () => {
+      if (!selectedGuardian) return [];
+      try {
+        return await apiRequest(`/api/guardian-students?guardianId=${selectedGuardian.id}`);
+      } catch (error) {
+        console.error('Error fetching guardian students:', error);
+        toast({
+          title: "Fout bij ophalen gerelateerde studenten",
+          description: "Kon de studenten die aan deze voogd gekoppeld zijn niet laden.",
+          variant: "destructive",
+        });
+        return [];
+      }
+    },
     enabled: !!selectedGuardian,
   });
 
   // Delete Guardian mutation
   const deleteGuardianMutation = useMutation({
     mutationFn: async (guardianId: number) => {
-      return await apiRequest(`/api/guardians/${guardianId}`, {
-        method: 'DELETE'
-      });
+      try {
+        return await apiRequest(`/api/guardians/${guardianId}`, {
+          method: 'DELETE'
+        });
+      } catch (error: any) {
+        console.error('Delete guardian error:', error);
+        throw new Error(error?.message || 'Fout bij het verwijderen van voogd');
+      }
     },
     onSuccess: () => {
       toast({
         title: "Voogd verwijderd",
-        description: "De voogd is succesvol verwijderd",
+        description: "De voogd is succesvol verwijderd uit het systeem",
       });
       // Invalideer alle relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
@@ -143,14 +193,17 @@ export default function Guardians() {
       queryClient.invalidateQueries({ queryKey: ['/api/guardian-students'] });
       
       setSelectedGuardian(null);
+      setIsDeleteDialogOpen(false);
+      setGuardianToDelete(null);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Fout bij verwijderen",
-        description: "Er is een fout opgetreden bij het verwijderen van de voogd",
+        description: error?.message || "Er is een fout opgetreden bij het verwijderen van de voogd. Mogelijk zijn er nog actieve relaties met studenten.",
         variant: "destructive",
       });
       console.error('Delete error:', error);
+      setIsDeleteDialogOpen(false);
     },
   });
 

@@ -172,10 +172,27 @@ export default function Students() {
         body: data
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      // Invalideer ook gerelateerde queries
+      queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-programs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-group-enrollments'] });
+      
       resetForm();
       setIsEditDialogOpen(false);
+      toast({
+        title: "Student bijgewerkt",
+        description: "De student is succesvol bijgewerkt.",
+      });
+    },
+    onError: (error) => {
+      console.error("Fout bij bijwerken student:", error);
+      toast({
+        title: "Fout bij bijwerken student",
+        description: error instanceof Error ? error.message : "Er is een onbekende fout opgetreden",
+        variant: "destructive",
+      });
     }
   });
 
@@ -187,8 +204,30 @@ export default function Students() {
       });
     },
     onSuccess: () => {
+      // Invalideer alle relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/recent-students'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-programs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/attendance'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-group-enrollments'] });
+      
       setIsDeleteDialogOpen(false);
+      setSelectedStudent(null);
+      
+      toast({
+        title: "Student verwijderd",
+        description: "De student is succesvol verwijderd.",
+      });
+    },
+    onError: (error) => {
+      console.error("Fout bij verwijderen student:", error);
+      toast({
+        title: "Fout bij verwijderen student",
+        description: error instanceof Error ? error.message : "Er is een onbekende fout opgetreden",
+        variant: "destructive",
+      });
     }
   });
 
@@ -201,8 +240,29 @@ export default function Students() {
       });
     },
     onSuccess: () => {
+      // Invalideer alle relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard/recent-students'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-programs'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/attendance'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-group-enrollments'] });
+      
       setSelectedStudents([]);
+      
+      toast({
+        title: "Studenten verwijderd",
+        description: `${ids.length} studenten zijn succesvol verwijderd.`,
+      });
+    },
+    onError: (error) => {
+      console.error("Fout bij verwijderen van meerdere studenten:", error);
+      toast({
+        title: "Fout bij verwijderen",
+        description: error instanceof Error ? error.message : "Er is een onbekende fout opgetreden",
+        variant: "destructive",
+      });
     }
   });
 

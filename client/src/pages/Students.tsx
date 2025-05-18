@@ -1107,67 +1107,7 @@ export default function Students() {
                       </Button>
                     </div>
                     
-                    <div className="w-full mt-2 flex justify-center">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="flex items-center"
-                        onClick={() => {
-                          // Get access to toast context within this function
-                          const localToast = toast;
-                          
-                          localToast({
-                            title: "eID detectie",
-                            description: "Zoeken naar eID-kaartlezer...",
-                          });
-                          
-                          // Simuleer eID detectie (in werkelijkheid zou dit een echte API-integratie zijn)
-                          setTimeout(() => {
-                            localToast({
-                              title: "eID gedetecteerd",
-                              description: "Gegevens worden geladen van de identiteitskaart...",
-                            });
-                            
-                            // Simuleer laden van eID gegevens na 2 seconden
-                            setTimeout(() => {
-                              // Hier zouden we de kaartgegevens verwerken
-                              // In een echte implementatie zou dit komen van de eID API
-                              const eidData = {
-                                firstName: "Amina",
-                                lastName: "El Alaoui",
-                                birthDate: "2012-05-15",
-                                nationalRegisterNumber: "012051534567",
-                                gender: "Vrouwelijk",
-                                street: "Molenbeekstraat",
-                                houseNumber: "45",
-                                postalCode: "1080",
-                                city: "Brussel",
-                                // Bij een echte implementatie zou de foto uit de eID komen
-                              };
-                              
-                              // Vul het formulier in met eID-gegevens
-                              form.setValue("firstName", eidData.firstName);
-                              form.setValue("lastName", eidData.lastName);
-                              form.setValue("birthDate", new Date(eidData.birthDate));
-                              form.setValue("nationalNumber", eidData.nationalRegisterNumber);
-                              form.setValue("gender", eidData.gender);
-                              form.setValue("street", eidData.street);
-                              form.setValue("houseNumber", eidData.houseNumber);
-                              form.setValue("postalCode", eidData.postalCode);
-                              form.setValue("city", eidData.city);
-                              
-                              localToast({
-                                title: "Gegevens geladen",
-                                description: "De gegevens van de eID zijn succesvol ingeladen.",
-                              });
-                            }, 2000);
-                          }, 1500);
-                        }}
-                      >
-                        <CreditCard className="h-4 w-4 mr-2" />
-                        Gegevens laden via eID
-                      </Button>
-                    </div>
+
 
                     <div className="w-full mt-4">
                       <Label className="text-sm font-medium text-gray-700">
@@ -1188,6 +1128,70 @@ export default function Students() {
               <TabsContent value="personal" className="space-y-6">
                 <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
                   <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+                  <div className="flex mb-4 justify-end">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex items-center border border-gray-300"
+                      onClick={() => {
+                        // Get access to toast context within this function
+                        const localToast = toast;
+                        
+                        localToast({
+                          title: "eID detectie",
+                          description: "Zoeken naar eID-kaartlezer...",
+                        });
+                        
+                        // Simuleer eID detectie (in werkelijkheid zou dit een echte API-integratie zijn)
+                        setTimeout(() => {
+                          localToast({
+                            title: "eID gedetecteerd",
+                            description: "Gegevens worden geladen van de identiteitskaart...",
+                          });
+                          
+                          // Simuleer laden van eID gegevens na 2 seconden
+                          setTimeout(() => {
+                            // Hier zouden we de kaartgegevens verwerken
+                            // In een echte implementatie zou dit komen van de eID API
+                            const eidData = {
+                              firstName: "Amina",
+                              lastName: "El Alaoui",
+                              birthDate: "2012-05-15",
+                              nationalRegisterNumber: "012051534567",
+                              gender: "Vrouwelijk",
+                              street: "Molenbeekstraat",
+                              houseNumber: "45",
+                              postalCode: "1080",
+                              city: "Brussel",
+                              // Bij een echte implementatie zou de foto uit de eID komen
+                            };
+                            
+                            // Vul het formulier in met eID-gegevens
+                            setStudentFormData({
+                              ...studentFormData,
+                              firstName: eidData.firstName,
+                              lastName: eidData.lastName,
+                              dateOfBirth: eidData.birthDate,
+                              nationalNumber: eidData.nationalRegisterNumber,
+                              gender: eidData.gender === "Vrouwelijk" ? "vrouw" : "man",
+                              street: eidData.street,
+                              houseNumber: eidData.houseNumber,
+                              postalCode: eidData.postalCode,
+                              city: eidData.city
+                            });
+                            
+                            localToast({
+                              title: "Gegevens geladen",
+                              description: "De gegevens van de eID zijn succesvol ingeladen.",
+                            });
+                          }, 2000);
+                        }, 1500);
+                      }}
+                    >
+                      <span className="mr-2 bg-[#77CC9A] text-white rounded-md px-1 font-bold text-xs py-0.5">be|ID</span>
+                      Gegevens laden via eID
+                    </Button>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="studentId" className="text-sm font-medium text-gray-700">

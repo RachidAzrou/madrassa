@@ -84,13 +84,18 @@ export default function Programs() {
     }
   };
 
-  // Mutatie om een programma toe te voegen
+  // Verbeterde mutatie om een programma toe te voegen
   const createProgramMutation = useMutation({
     mutationFn: async (programData: typeof programFormData) => {
-      return apiRequest('/api/programs', {
-        method: 'POST',
-        body: programData
-      });
+      try {
+        return await apiRequest('/api/programs', {
+          method: 'POST',
+          body: programData
+        });
+      } catch (error: any) {
+        console.error('Error creating program:', error);
+        throw new Error(error?.message || 'Fout bij het aanmaken van het programma');
+      }
     },
     onSuccess: () => {
       // Invalideer relevante queries
@@ -121,7 +126,7 @@ export default function Programs() {
       console.error('Error creating program:', error);
       toast({
         title: "Fout bij toevoegen",
-        description: error.message || "Er is een fout opgetreden bij het toevoegen van het programma.",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van het programma. Controleer of de code uniek is en alle verplichte velden correct zijn ingevuld.",
         variant: "destructive",
       });
     }
@@ -155,13 +160,18 @@ export default function Programs() {
     }
   };
   
-  // Mutatie voor het bijwerken van een programma
+  // Verbeterde mutatie voor het bijwerken van een programma
   const updateProgramMutation = useMutation({
     mutationFn: async (data: { id: number; programData: typeof programFormData }) => {
-      return apiRequest(`/api/programs/${data.id}`, {
-        method: 'PUT',
-        body: data.programData
-      });
+      try {
+        return await apiRequest(`/api/programs/${data.id}`, {
+          method: 'PUT',
+          body: data.programData
+        });
+      } catch (error: any) {
+        console.error('Error updating program:', error);
+        throw new Error(error?.message || 'Fout bij het bijwerken van het programma');
+      }
     },
     onSuccess: () => {
       // Invalideer relevante queries
@@ -176,7 +186,7 @@ export default function Programs() {
       // Toon succes melding
       toast({
         title: "Programma bijgewerkt",
-        description: "Het programma is succesvol bijgewerkt.",
+        description: "Het programma is succesvol bijgewerkt in het systeem.",
         variant: "default",
       });
     },
@@ -184,7 +194,7 @@ export default function Programs() {
       console.error('Error updating program:', error);
       toast({
         title: "Fout bij bijwerken",
-        description: error.message || "Er is een fout opgetreden bij het bijwerken van het programma.",
+        description: error.message || "Er is een fout opgetreden bij het bijwerken van het programma. Controleer of alle verplichte velden correct zijn ingevuld.",
         variant: "destructive",
       });
     }
@@ -208,12 +218,17 @@ export default function Programs() {
     }
   };
 
-  // Mutatie voor het verwijderen van een programma
+  // Verbeterde mutatie voor het verwijderen van een programma
   const deleteProgramMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/programs/${id}`, {
-        method: 'DELETE'
-      });
+      try {
+        return await apiRequest(`/api/programs/${id}`, {
+          method: 'DELETE'
+        });
+      } catch (error: any) {
+        console.error('Error deleting program:', error);
+        throw new Error(error?.message || 'Fout bij het verwijderen van het programma');
+      }
     },
     onSuccess: () => {
       // Invalideer relevante queries
@@ -236,9 +251,10 @@ export default function Programs() {
       console.error('Error deleting program:', error);
       toast({
         title: "Fout bij verwijderen",
-        description: error.message || "Er is een fout opgetreden bij het verwijderen van het programma.",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van het programma. Mogelijk zijn er nog actieve cursussen of studenten gekoppeld aan dit programma.",
         variant: "destructive",
       });
+      setIsDeleteDialogOpen(false);
     }
   });
 
@@ -758,24 +774,45 @@ export default function Programs() {
 
       {/* Vak verwijderen dialoogvenster */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Vak verwijderen</DialogTitle>
             <DialogDescription>
               Weet je zeker dat je dit vak wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            {selectedProgram && (
-              <div className="space-y-2">
-                <p><strong>Naam:</strong> {selectedProgram.name}</p>
-                <p><strong>Code:</strong> {selectedProgram.code}</p>
-                {selectedProgram.department && (
-                  <p><strong>Afdeling:</strong> {selectedProgram.department}</p>
-                )}
+          
+          {selectedProgram && (
+            <div className="py-4 space-y-3">
+              <div className="border rounded-md p-3 bg-red-50">
+                <p className="text-sm text-gray-700 font-medium">
+                  Je staat op het punt om het volgende vak te verwijderen:
+                </p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-sm"><span className="font-medium">Naam:</span> {selectedProgram.name}</p>
+                  <p className="text-sm"><span className="font-medium">Code:</span> {selectedProgram.code}</p>
+                  {selectedProgram.department && (
+                    <p className="text-sm"><span className="font-medium">Afdeling:</span> {selectedProgram.department}</p>
+                  )}
+                  <p className="text-sm">
+                    <span className="font-medium">Duur:</span> {
+                      selectedProgram.duration === 1 ? 'Jaar' : 
+                      selectedProgram.duration === 2 ? 'Semester' : 
+                      selectedProgram.duration === 3 ? 'Trimester' : 
+                      `${selectedProgram.duration}`
+                    }
+                  </p>
+                  <p className="text-sm">
+                    <span className="font-medium">Status:</span> {selectedProgram.isActive ? 'Actief' : 'Inactief'}
+                  </p>
+                </div>
               </div>
-            )}
-          </div>
+              <p className="text-xs text-red-600">
+                Let op: Bij het verwijderen van een vak worden alle hieraan gekoppelde cursussen, studenten en materialen losgekoppeld. Controleer of er geen actieve cursussen meer zijn gekoppeld aan dit vak.
+              </p>
+            </div>
+          )}
+          
           <DialogFooter>
             <Button 
               variant="outline" 
@@ -787,7 +824,11 @@ export default function Programs() {
               variant="destructive" 
               onClick={confirmDeleteProgram}
               disabled={deleteProgramMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
             >
+              {deleteProgramMutation.isPending && (
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+              )}
               {deleteProgramMutation.isPending ? 'Bezig met verwijderen...' : 'Verwijderen'}
             </Button>
           </DialogFooter>

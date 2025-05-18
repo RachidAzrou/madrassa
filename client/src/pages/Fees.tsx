@@ -1307,15 +1307,100 @@ export default function Fees() {
                   Beheer de standaard bedragen en instellingen voor collegegeld per academisch jaar.
                 </CardDescription>
               </div>
-              <Button 
-                onClick={() => {
-                  console.log("Opening tuition dialog");
-                  setIsAddTuitionSettingOpen(true);
-                }}
-                className="bg-[#1e3a8a] hover:bg-blue-800">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Collegegeld Toevoegen
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="bg-[#1e3a8a] hover:bg-blue-800">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Collegegeld Toevoegen
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle>Nieuw Collegegeld</DialogTitle>
+                    <DialogDescription>
+                      Stel het collegegeld in voor het nieuwe academisch jaar.
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="py-4">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="academic-year">Academisch jaar</Label>
+                        <Input id="academic-year" placeholder="2025-2026" className="mt-1" />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="standard-tuition">Standaard collegegeld (€)</Label>
+                        <div className="relative mt-1">
+                          <Euro className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Input id="standard-tuition" placeholder="350,00" className="pl-10" />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="registration-fee">Inschrijfgeld voor nieuwe studenten (€)</Label>
+                        <div className="relative mt-1">
+                          <Euro className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Input id="registration-fee" placeholder="25,00" className="pl-10" />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="due-date">Vervaldatum</Label>
+                        <Input id="due-date" type="date" className="mt-1" />
+                      </div>
+                      
+                      <div className="flex items-center space-x-2 mt-4">
+                        <Checkbox id="tuition-active" defaultChecked />
+                        <Label htmlFor="tuition-active" className="text-sm cursor-pointer">Collegegeld actief</Label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <DialogFooter>
+                    <Button variant="outline">Annuleren</Button>
+                    <Button 
+                      className="bg-[#1e3a8a] hover:bg-blue-800"
+                      onClick={() => {
+                        // Maak een object aan met de juiste velden inclusief standard_tuition
+                        const data = {
+                          academicYear: document.getElementById('academic-year')?.value || "2025-2026",
+                          standardTuition: document.getElementById('standard-tuition')?.value || "350,00",
+                          registrationFee: document.getElementById('registration-fee')?.value || "",
+                          dueDate: document.getElementById('due-date')?.value || "",
+                          isActive: (document.getElementById('tuition-active') as HTMLInputElement)?.checked || true
+                        };
+                        
+                        // Log voor debugging
+                        console.log("Versturen van collegegeld data:", data);
+                        
+                        // API call naar de backend
+                        apiRequest('POST', '/api/fee-settings', data)
+                          .then(response => {
+                            if (response.ok) {
+                              toast({
+                                title: "Collegegeld toegevoegd",
+                                description: "Het nieuwe collegegeld is succesvol toegevoegd."
+                              });
+                            } else {
+                              throw new Error("Fout bij toevoegen van collegegeld");
+                            }
+                          })
+                          .catch(error => {
+                            console.error("Error:", error);
+                            toast({
+                              title: "Fout",
+                              description: "Er is een fout opgetreden bij het toevoegen van het collegegeld.",
+                              variant: "destructive"
+                            });
+                          });
+                      }}
+                    >
+                      Toevoegen
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent>
               {feeSettings.length === 0 ? (

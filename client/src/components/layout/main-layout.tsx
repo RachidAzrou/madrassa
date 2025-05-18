@@ -67,7 +67,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <div 
         className={`fixed md:static inset-y-0 left-0 transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 z-30 transition duration-200 ease-in-out`}
+        } md:translate-x-0 z-30 transition duration-200 ease-in-out h-screen md:h-auto flex-shrink-0`}
       >
         <Sidebar 
           isMobile={isMobile} 
@@ -78,7 +78,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       {/* Main content */}
       <div className="flex flex-col flex-1 min-h-screen overflow-hidden">
         <Header onMenuClick={toggleSidebar} title={pageTitle} />
-        <main className="flex-1 p-2 sm:p-4 md:p-6 pt-10 overflow-x-auto">
+        <main className="flex-1 p-2 sm:p-4 md:p-6 pt-10 overflow-x-auto border-l border-gray-200">
           <div className="max-w-7xl mx-auto w-full">
             {children}
           </div>

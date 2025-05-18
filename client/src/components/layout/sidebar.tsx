@@ -116,7 +116,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
     <aside
       className={cn(
         "h-screen bg-white border-r border-gray-200",
-        "w-64 flex flex-col",
+        "w-64 flex flex-col overflow-hidden",
         className
       )}
     >
@@ -144,7 +144,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
       </div>
 
       {/* Navigation links */}
-      <nav className="flex-1 py-6 px-3 overflow-y-auto">
+      <nav className="flex-1 py-6 px-3 overflow-y-auto h-full min-h-0">
         <div className="space-y-4">
           {/* Ingelogde gebruiker informatie */}
           <div className="pt-1 pb-3">

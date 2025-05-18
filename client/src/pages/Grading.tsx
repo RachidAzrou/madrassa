@@ -266,9 +266,14 @@ export default function Grading() {
   const updateAssessmentMutation = useMutation({
     mutationFn: async (values: AssessmentFormValues & { id: number }) => {
       const { id, ...data } = values;
-      return await apiRequest('PUT', `/api/assessments/${id}`, {
+      const formattedData = {
         ...data,
         dueDate: data.dueDate.toISOString().split('T')[0], // Format date for API
+      };
+      
+      return await apiRequest(`/api/assessments/${id}`, {
+        method: 'PUT',
+        body: formattedData
       });
     },
     onSuccess: () => {
@@ -276,10 +281,16 @@ export default function Grading() {
         title: 'Beoordeling bijgewerkt',
         description: 'De beoordeling is succesvol bijgewerkt.',
       });
+      
+      // Invalideer relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/assessments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/grades'] });
+      
+      // Sluit het dialoogvenster
       setIsEditAssessmentOpen(false);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Error updating assessment:', error);
       toast({
         title: 'Fout bij bijwerken beoordeling',
         description: 'Er is een fout opgetreden bij het bijwerken van de beoordeling.',
@@ -291,17 +302,26 @@ export default function Grading() {
   // Mutation for deleting an assessment
   const deleteAssessmentMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest('DELETE', `/api/assessments/${id}`);
+      return await apiRequest(`/api/assessments/${id}`, {
+        method: 'DELETE'
+      });
     },
     onSuccess: () => {
       toast({
         title: 'Beoordeling verwijderd',
         description: 'De beoordeling is succesvol verwijderd.',
       });
+      
+      // Invalideer relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/assessments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/grades'] });
+      
+      // Reset UI-state
       setIsDeleteAssessmentOpen(false);
+      setSelectedAssessmentItem(null);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Error deleting assessment:', error);
       toast({
         title: 'Fout bij verwijderen beoordeling',
         description: 'Er is een fout opgetreden bij het verwijderen van de beoordeling.',
@@ -313,17 +333,25 @@ export default function Grading() {
   // Mutation for saving grades
   const batchSaveGradesMutation = useMutation({
     mutationFn: async (grades: any[]) => {
-      return await apiRequest('POST', '/api/grades/batch', grades);
+      return await apiRequest('/api/grades/batch', {
+        method: 'POST',
+        body: grades
+      });
     },
     onSuccess: () => {
       toast({
         title: 'Cijfers opgeslagen',
         description: 'Studentcijfers zijn succesvol bijgewerkt.',
       });
+      
+      // Invalideer relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/grades'] });
+      
+      // Reset UI-state
       setIsGradesModified(false);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Error saving grades:', error);
       toast({
         title: 'Fout bij opslaan van cijfers',
         description: 'Er is een fout opgetreden bij het opslaan van cijfers. Probeer het opnieuw.',
@@ -335,17 +363,25 @@ export default function Grading() {
   // Mutation for saving behavior assessments
   const saveBehaviorAssessmentsMutation = useMutation({
     mutationFn: async (assessments: any[]) => {
-      return await apiRequest('POST', '/api/behavior-assessments/batch', assessments);
+      return await apiRequest('/api/behavior-assessments/batch', {
+        method: 'POST',
+        body: assessments
+      });
     },
     onSuccess: () => {
       toast({
         title: 'Beoordelingen opgeslagen',
         description: 'Gedragsbeoordelingen zijn succesvol bijgewerkt.',
       });
+      
+      // Invalideer relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/behavior-assessments'] });
+      
+      // Reset UI-state
       setIsBehaviorModified(false);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Error saving behavior assessments:', error);
       toast({
         title: 'Fout bij opslaan van beoordelingen',
         description: 'Er is een fout opgetreden bij het opslaan van gedragsbeoordelingen. Probeer het opnieuw.',
@@ -417,7 +453,9 @@ export default function Grading() {
   // Fetch attendance data for student attendance analysis
   const fetchAttendanceForStudent = async (studentId: string) => {
     try {
-      const attendance = await apiRequest('GET', `/api/students/${studentId}/attendance`);
+      const attendance = await apiRequest(`/api/students/${studentId}/attendance`, {
+        method: 'GET'
+      });
       return attendance || [];
     } catch (error) {
       console.error("Error fetching attendance:", error);

@@ -103,8 +103,8 @@ export default function Attendance() {
                   <span>Volgende dag</span> <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               </div>
-              <div className="text-center text-sm font-medium">
-                {formatDate(selectedDate)}
+              <div className="mt-3 text-center p-2 bg-blue-50 border border-blue-100 rounded-md">
+                <span className="text-blue-900 font-medium">{formatDate(selectedDate)}</span>
               </div>
             </div>
           </CardContent>

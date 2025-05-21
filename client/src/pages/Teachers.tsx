@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image } from "lucide-react";
+import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image, BookText } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import ManageTeacherAssignments from "@/components/teachers/ManageTeacherAssignments";
 
 type TeacherType = {
   id: number;
@@ -80,6 +81,7 @@ export default function Teachers() {
   const [itemsPerPage] = useState(10);
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherType | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isAssignmentsDialogOpen, setIsAssignmentsDialogOpen] = useState(false);
   const [teacherFormData, setTeacherFormData] = useState({
     teacherId: '',
     firstName: '',
@@ -875,10 +877,30 @@ export default function Teachers() {
             </DialogDescription>
           </DialogHeader>
           
+      {/* Docent vakken beheren dialoog */}
+      {selectedTeacher && (
+        <ManageTeacherAssignments
+          teacherId={selectedTeacher.id}
+          onClose={() => setIsAssignmentsDialogOpen(false)}
+          open={isAssignmentsDialogOpen}
+        />
+      )}
+          
           {selectedTeacher && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-md font-medium">Persoonlijke Informatie</h3>
+                <Button 
+                  onClick={() => setIsAssignmentsDialogOpen(true)}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1"
+                >
+                  <BookText className="h-4 w-4 text-[#1e3a8a]" />
+                  <span>Vakken beheren</span>
+                </Button>
+              </div>
               <div>
-                <h3 className="text-md font-medium mb-2">Persoonlijke Informatie</h3>
                 <div className="space-y-2">
                   <div className="flex items-center">
                     <span className="w-32 text-sm text-gray-500">Docent ID:</span>

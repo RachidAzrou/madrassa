@@ -26,11 +26,13 @@ import LoadingSpinner from "@/components/ui/loading-spinner";
 interface ManageTeacherAssignmentsProps {
   teacherId: number;
   onClose?: () => void;
+  open: boolean;
 }
 
 export default function ManageTeacherAssignments({
   teacherId,
   onClose,
+  open,
 }: ManageTeacherAssignmentsProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -157,7 +159,7 @@ export default function ManageTeacherAssignments({
   }
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-[95vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Vakken toewijzen aan docent</DialogTitle>

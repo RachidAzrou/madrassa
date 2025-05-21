@@ -606,8 +606,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           isPrimary: assignment.isPrimary || false,
           notes: assignment.notes || "",
           startDate: new Date(assignment.startDate || new Date()),
-          endDate: new Date(assignment.endDate || new Date(new Date().setFullYear(new Date().getFullYear() + 1))),
-          isActive: true
+          endDate: new Date(assignment.endDate || new Date(new Date().setFullYear(new Date().getFullYear() + 1)))
         };
         
         const result = await storage.createTeacherCourseAssignment(assignmentData);

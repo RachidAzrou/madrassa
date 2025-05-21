@@ -123,8 +123,6 @@ main()
   .catch(e => {
     console.error('Fout bij uitvoeren van script:', e);
   })
-  .finally(async () => {
-    // Sluit de database verbinding
-    await db.pool.end();
-    console.log('Database verbinding afgesloten');
+  .finally(() => {
+    console.log('Script uitgevoerd');
   });

@@ -135,15 +135,15 @@ export default function Guardians() {
 
   // Fetch associated students for selected guardian
   const {
-    data: guardianStudentsData = [] as StudentType[],
+    data: guardianStudentsData = [] as any[],
     isLoading: guardianStudentsLoading,
     isError: isGuardianStudentsError,
-  } = useQuery<StudentType[]>({
-    queryKey: ['/api/guardian-students', selectedGuardian?.id],
+  } = useQuery({
+    queryKey: ['/api/guardians/students', selectedGuardian?.id],
     queryFn: async () => {
       if (!selectedGuardian) return [];
       try {
-        return await apiRequest(`/api/guardian-students?guardianId=${selectedGuardian.id}`);
+        return await apiRequest(`/api/guardians/${selectedGuardian.id}/students`);
       } catch (error) {
         console.error('Error fetching guardian students:', error);
         toast({
@@ -275,7 +275,7 @@ export default function Guardians() {
       
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/guardian-students'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/guardians/students'] });
       queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
       
       // Reset UI state

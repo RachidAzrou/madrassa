@@ -1,14 +1,40 @@
-// Simpele adapter voor Vercel serverless
+// Serverless adapter voor Vercel
 import express from 'express';
-import { registerRoutes } from '../server/routes';
-import { serveStatic } from '../server/vite';
+import bodyParser from 'body-parser';
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import ws from 'ws';
+import * as schema from '../shared/schema';
 
-// Maak een Express app voor serverless
+// Configureer WebSocket voor serverless
+neonConfig.webSocketConstructor = ws;
+
+// Controleer of DATABASE_URL beschikbaar is
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL moet ingesteld zijn voor Vercel deployment');
+}
+
+// Singleton pattern voor database connectie in serverless
+let poolInstance = null;
+function getPool() {
+  if (!poolInstance) {
+    poolInstance = new Pool({ 
+      connectionString: process.env.DATABASE_URL,
+      max: 1 // Beperkt aantal verbindingen voor serverless
+    });
+  }
+  return poolInstance;
+}
+
+// Creëer drizzle instance met pool
+const db = drizzle(getPool(), { schema });
+
+// Express app instellen
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// CORS headers
+// CORS headers voor API aanvragen
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
@@ -21,43 +47,41 @@ app.use((req, res, next) => {
   next();
 });
 
-// Registreer routes
-let routesRegistered = false;
-let routePromise = null;
+// Basis API routes instellen
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
-// Handler voor Vercel serverless
-export default async function handler(req, res) {
+// Studenten route voorbeeld
+app.get('/api/students', async (req, res) => {
   try {
-    // Registreer routes alleen één keer
-    if (!routesRegistered) {
-      if (!routePromise) {
-        routePromise = registerRoutes(app);
-      }
-      await routePromise;
-      
-      // Error handler
-      app.use((err, _req, res, _next) => {
-        console.error('Server error:', err);
-        const status = err.status || err.statusCode || 500;
-        const message = err.message || "Interne Server Fout";
-        
-        res.status(status).json({ message });
-      });
-      
-      // Statische bestanden serveren
-      serveStatic(app);
-      
-      routesRegistered = true;
-    }
-    
-    // Verwerk aanvraag
-    app(req, res);
-  } catch (error) {
-    console.error('Serverless error:', error);
-    res.status(500).json({ 
-      error: 'Internal Server Error', 
-      message: 'Er is een fout opgetreden bij het verwerken van het verzoek.',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    const students = await db.query.students.findMany({
+      orderBy: (students, { desc }) => [desc(students.createdAt)]
     });
+    res.json(students);
+  } catch (error) {
+    console.error('Error fetching students:', error);
+    res.status(500).json({ error: 'Database error', message: error.message });
   }
+});
+
+// Meer routes hier...
+// Voeg meer routes toe op basis van je behoeften
+
+// Foutafhandeling voor API
+app.use((err, req, res, next) => {
+  console.error('API error:', err);
+  res.status(500).json({ 
+    error: 'Server Error', 
+    message: err.message || 'Er is een onverwachte fout opgetreden'
+  });
+});
+
+// Vercel serverless handler
+export default async function handler(req, res) {
+  return new Promise((resolve) => {
+    app(req, res, (result) => {
+      resolve(result);
+    });
+  });
 }

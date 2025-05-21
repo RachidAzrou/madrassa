@@ -134,46 +134,46 @@ async function main() {
     {
       name: "Arabisch Basis Groep 1",
       description: "Basisgroep Arabisch voor jongere kinderen",
+      academicYear: "2025-2026",
       programId: 1,
       isActive: true,
-      schoolYear: "2025-2026",
-      capacity: 20,
-      notes: "Lessen op zaterdag 10:00-12:00",
+      maxCapacity: 20,
       startDate: new Date("2025-09-06"),
-      endDate: new Date("2026-06-20")
+      endDate: new Date("2026-06-20"),
+      instructor: "Mohammed Youssef"
     },
     {
       name: "Arabisch Gevorderd Groep 1",
       description: "Gevorderde groep Arabisch",
+      academicYear: "2025-2026",
       programId: 2,
       isActive: true,
-      schoolYear: "2025-2026",
-      capacity: 15,
-      notes: "Lessen op zaterdag 13:00-15:00",
+      maxCapacity: 15,
       startDate: new Date("2025-09-06"),
-      endDate: new Date("2026-06-20")
+      endDate: new Date("2026-06-20"),
+      instructor: "Fatima Azizi"
     },
     {
       name: "Fiqh Basis Groep 1",
       description: "Basisgroep Fiqh voor alle leeftijden",
+      academicYear: "2025-2026",
       programId: 3,
       isActive: true,
-      schoolYear: "2025-2026",
-      capacity: 25,
-      notes: "Lessen op zondag 10:00-12:00",
+      maxCapacity: 25,
       startDate: new Date("2025-09-07"),
-      endDate: new Date("2026-06-21")
+      endDate: new Date("2026-06-21"),
+      instructor: "Youssef El Mansouri"
     },
     {
       name: "Koran Recitatie Groep 1",
       description: "Basisgroep voor Koran recitatie",
+      academicYear: "2025-2026",
       programId: 4,
       isActive: true,
-      schoolYear: "2025-2026",
-      capacity: 20,
-      notes: "Lessen op zondag 13:00-15:00",
+      maxCapacity: 20,
       startDate: new Date("2025-09-07"),
-      endDate: new Date("2026-06-21")
+      endDate: new Date("2026-06-21"),
+      instructor: "Aisha Benali"
     }
   ];
   

@@ -6,6 +6,7 @@ import {
   Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, CreditCard, AlertCircle,
   Image, Upload
 } from 'lucide-react';
+import ManageStudentGuardians from '@/components/guardians/ManageStudentGuardians';
 import { useToast } from '@/hooks/use-toast';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';

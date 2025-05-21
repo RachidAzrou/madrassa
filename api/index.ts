@@ -1,13 +1,19 @@
-import { createServer } from 'http';
-import initApp from '../server/index';
+import { createServerlessApp } from './server';
 
+// Express request handler voor Vercel serverless functies
 export default async function handler(req: any, res: any) {
-  // Initialiseer Express app
-  const app = await initApp();
-  
-  // Maak een mock server aanvraag
-  const server = createServer();
-  
-  // Stuur de aanvraag door naar Express
-  app(req, res);
+  try {
+    // Initialiseer Express app voor serverless
+    const app = await createServerlessApp();
+    
+    // Verwerk het verzoek met Express
+    app(req, res);
+  } catch (error) {
+    console.error('Serverless error:', error);
+    res.status(500).json({ 
+      error: 'Internal Server Error', 
+      message: 'Er is een fout opgetreden bij het verwerken van het verzoek.',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
 }

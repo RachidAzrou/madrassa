@@ -315,7 +315,7 @@ export default function Dashboard() {
               staleTime: 60000,
             });
             
-            // Tel het aantal studenten per groep
+            // Tel het aantal studenten per groep en houd ook de maximale capaciteit bij
             const studentCountsPerGroup = (studentGroupsData as StudentGroup[]).map((group) => {
               const count = (groupEnrollments as StudentGroupEnrollment[]).filter(
                 enrollment => enrollment.studentGroupId === group.id
@@ -323,18 +323,21 @@ export default function Dashboard() {
               
               return {
                 name: group.name,
-                count: count
+                count: count,
+                maxCapacity: group.maxCapacity || 25, // Default naar 25 als er geen maxCapacity is
+                percentageFilled: count / (group.maxCapacity || 25) // Bereken bezettingspercentage
               };
             });
             
             // Voeg dummy data toe als er geen echte data is
             const chartData = studentCountsPerGroup.length > 0 ? studentCountsPerGroup : [
-              { name: "Klas 1", count: 0 },
-              { name: "Klas 2", count: 0 },
-              { name: "Klas 3", count: 0 }
+              { name: "Klas 1", count: 0, maxCapacity: 25, percentageFilled: 0 },
+              { name: "Klas 2", count: 0, maxCapacity: 25, percentageFilled: 0 },
+              { name: "Klas 3", count: 0, maxCapacity: 25, percentageFilled: 0 }
             ];
             
             // Bereken de maximumwaarde voor het schalen van de grafiek
+            // Nu niet meer nodig omdat we percentages gebruiken, maar behouden voor compatibiliteit
             const maxCount = Math.max(...chartData.map(item => item.count), 1);
             
             return (
@@ -359,11 +362,11 @@ export default function Dashboard() {
                             <div
                               className="absolute bottom-full mb-1 sm:mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-[10px] sm:text-xs py-0.5 sm:py-1 px-1 sm:px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                             >
-                              {item.count} studenten
+                              {item.count} / {item.maxCapacity} studenten
                             </div>
                             <div
                               style={{ 
-                                height: `${Math.max(20, (item.count / maxCount) * (window.innerWidth < 640 ? 90 : 130))}px`
+                                height: `${Math.max(20, (item.percentageFilled * 100) * (window.innerWidth < 640 ? 90 : 130) / 100)}px`
                               }}
                             ></div>
                           </div>

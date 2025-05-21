@@ -107,7 +107,7 @@ export default function Guardians() {
   
   // Extract guardians with proper type safety and create a fallback for pagination
   const guardians: GuardianType[] = Array.isArray(guardiansResponse) ? guardiansResponse : [];
-  const totalGuardians: number = guardiansResponse?.totalCount || 0;
+  const totalGuardians: number = guardians.length; // Gebruik de daadwerkelijke lengte van de array
   
   const totalPages = Math.ceil(totalGuardians / itemsPerPage);
 

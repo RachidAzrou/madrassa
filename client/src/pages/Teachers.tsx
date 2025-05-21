@@ -69,8 +69,9 @@ type CourseAssignmentType = {
   id: number;
   teacherId: number;
   courseId: number;
-  isActive: boolean;
-  assignedDate: Date;
+  isPrimary: boolean;
+  startDate: Date;
+  endDate?: Date;
   notes?: string;
   courseName?: string; // Voor weergave
 };
@@ -1106,11 +1107,11 @@ export default function Teachers() {
                                 {assignment.courseName || 'Onbekende cursus'}
                               </div>
                               <div className="text-sm text-gray-500">
-                                Toegewezen op: {formatDateToDisplayFormat(assignment.assignedDate.toString())}
+                                Startdatum: {assignment.startDate ? formatDateToDisplayFormat(assignment.startDate.toString()) : 'Niet ingesteld'}
                               </div>
-                              {!assignment.isActive && (
+                              {!assignment.isPrimary && (
                                 <span className="text-xs bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full mt-1 inline-block">
-                                  Inactief
+                                  Secundair
                                 </span>
                               )}
                             </div>

@@ -1,0 +1,39 @@
+De volgende fixes moeten worden doorgevoerd in het student formulier om te voorkomen dat er lege waarden in de select items worden gebruikt:
+
+1. Vervang in regel 634:
+```
+<SelectItem value="">Geen programma</SelectItem>
+```
+met:
+```
+<SelectItem value="null">Geen programma</SelectItem>
+```
+
+2. Vervang in regel 655:
+```
+<SelectItem value="">Geen jaar</SelectItem>
+```
+met:
+```
+<SelectItem value="null">Geen jaar</SelectItem>
+```
+
+3. Vervang in regel 1185:
+```
+<SelectItem value="">Geen programma</SelectItem>
+```
+met:
+```
+<SelectItem value="null">Geen programma</SelectItem>
+```
+
+4. Vervang in regel 1206:
+```
+<SelectItem value="">Geen jaar</SelectItem>
+```
+met:
+```
+<SelectItem value="null">Geen jaar</SelectItem>
+```
+
+Hiermee zorgen we ervoor dat er geen lege waarden meer in de select items staan, wat de foutmelding zou moeten oplossen.

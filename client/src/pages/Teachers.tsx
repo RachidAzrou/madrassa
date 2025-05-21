@@ -718,8 +718,8 @@ export default function Teachers() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <div className="flex items-center justify-center">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center">
                     Docent
                   </div>
                 </th>
@@ -754,7 +754,7 @@ export default function Teachers() {
                 teachers.map((teacher: TeacherType) => (
                   <tr key={teacher.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center justify-center">
+                      <div className="flex items-center">
                         <Avatar className="h-9 w-9">
                           <AvatarFallback className="bg-[#1e3a8a] text-white">
                             {teacher.firstName.charAt(0)}{teacher.lastName.charAt(0)}

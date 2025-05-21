@@ -298,6 +298,7 @@ export default function Dashboard() {
             interface StudentGroup {
               id: number;
               name: string;
+              maxCapacity?: number;
               // andere velden...
             }
             

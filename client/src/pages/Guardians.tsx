@@ -101,31 +101,12 @@ export default function Guardians() {
     isLoading,
     isError,
     refetch
-  } = useQuery<{guardians: GuardianType[], totalCount: number}>({
+  } = useQuery<GuardianType[]>({
     queryKey: ['/api/guardians', { page: currentPage, limit: itemsPerPage, search: debouncedSearch }],
-    queryFn: async () => {
-      try {
-        const params = new URLSearchParams({
-          page: currentPage.toString(),
-          limit: itemsPerPage.toString(),
-          search: debouncedSearch,
-        });
-        
-        return await apiRequest(`/api/guardians?${params.toString()}`);
-      } catch (error) {
-        console.error('Error fetching guardians:', error);
-        toast({
-          title: "Fout bij ophalen voogden",
-          description: "Er is een probleem opgetreden bij het laden van de voogdgegevens. Probeer het later opnieuw.",
-          variant: "destructive",
-        });
-        return { guardians: [], totalCount: 0 };
-      }
-    },
   });
   
-  // Extract guardians and total count from response with proper type safety
-  const guardians: GuardianType[] = guardiansResponse?.guardians || [];
+  // Extract guardians with proper type safety and create a fallback for pagination
+  const guardians: GuardianType[] = Array.isArray(guardiansResponse) ? guardiansResponse : [];
   const totalGuardians: number = guardiansResponse?.totalCount || 0;
   
   const totalPages = Math.ceil(totalGuardians / itemsPerPage);

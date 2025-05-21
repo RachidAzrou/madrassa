@@ -463,6 +463,21 @@ export default function StudentGroups() {
                             <Edit className="mr-2 h-4 w-4" />
                             <span>Bewerken</span>
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="cursor-pointer flex items-center"
+                            onClick={() => {
+                              setSelectedGroup(group);
+                              setIsEditDialogOpen(true);
+                              // We gebruiken een kleine vertraging om ervoor te zorgen dat de dialog eerst opent
+                              setTimeout(() => {
+                                const studentenTab = document.querySelector('[value="studenten"]') as HTMLElement;
+                                if (studentenTab) studentenTab.click();
+                              }, 100);
+                            }}
+                          >
+                            <UsersRound className="mr-2 h-4 w-4" />
+                            <span>Studenten beheren</span>
+                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="cursor-pointer text-red-600 flex items-center"

@@ -178,6 +178,20 @@ const NotificationDropdown: React.FC = () => {
             )}
           </DropdownMenuGroup>
         </div>
+        <DropdownMenuSeparator />
+        <div className="p-2 bg-gray-50">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => {
+              setLocation('/notifications');
+              setOpen(false);
+            }}
+            className="w-full text-sm font-medium text-blue-600 hover:bg-blue-100"
+          >
+            Bekijk alles →
+          </Button>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

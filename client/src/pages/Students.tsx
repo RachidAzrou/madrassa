@@ -4,7 +4,7 @@ import {
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle,
   ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
   Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, CreditCard, AlertCircle,
-  Image, Upload
+  Image, Upload, School, UserRound, Camera, CheckSquare, SquareSlash
 } from 'lucide-react';
 import ManageStudentGuardians from '@/components/guardians/ManageStudentGuardians';
 import { useToast } from '@/hooks/use-toast';

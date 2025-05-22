@@ -57,11 +57,24 @@ const flexibleDateSchema = z.union([
   z.date()
 ]).nullable().optional().catch(null);
 
+// Hulpfunctie voor het omzetten van string naar integer of null
+const flexibleIntegerSchema = z.union([
+  z.string().transform(val => {
+    if (!val || val === "") return null;
+    const num = parseInt(val, 10);
+    return isNaN(num) ? null : num;
+  }),
+  z.number(),
+  z.null(),
+  z.undefined()
+]).nullable().optional().catch(null);
+
 // Pas het schema aan met aangepaste validatie
 export const insertStudentSchema = baseInsertStudentSchema.extend({
   // Validatie voor alle datum velden
   dateOfBirth: flexibleDateSchema,
-  enrollmentDate: flexibleDateSchema
+  enrollmentDate: flexibleDateSchema,
+  yearLevel: flexibleIntegerSchema
 });
 
 export type InsertStudent = z.infer<typeof insertStudentSchema>;

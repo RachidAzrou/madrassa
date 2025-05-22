@@ -1032,12 +1032,12 @@ export default function Students() {
               {/* Persoonlijke informatie tab */}
               <TabsContent value="personal" className="space-y-3">
                 <div className="p-3 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-base font-semibold text-primary mb-3">Persoonlijke gegevens</h3>
+                  <h3 className="text-base font-semibold text-primary mb-1">Persoonlijke gegevens</h3>
                   
                   {/* Foto upload sectie */}
-                  <div className="flex mb-2 items-start">
+                  <div className="flex mb-0 mt-0 items-start">
                     <div 
-                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-4"
+                      className="w-16 h-16 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-2"
                       onClick={() => {
                         const fileInput = document.getElementById('student-photo') as HTMLInputElement;
                         fileInput?.click();

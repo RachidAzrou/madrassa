@@ -994,7 +994,7 @@ export default function Students() {
 
       {/* Create Student Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] max-h-[90vh] h-auto">
+        <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto">
           <DialogHeader>
             <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
             <DialogDescription>
@@ -1002,9 +1002,9 @@ export default function Students() {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="py-4">
+          <div className="py-2">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-5 mb-4">
+              <TabsList className="grid grid-cols-4 mb-2">
                 <TabsTrigger value="personal">
                   <User className="mr-2 h-4 w-4" />
                   Persoonlijk
@@ -1020,10 +1020,6 @@ export default function Students() {
                 <TabsTrigger value="class">
                   <Users className="mr-2 h-4 w-4" />
                   Klas
-                </TabsTrigger>
-                <TabsTrigger value="subjects">
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Vakken
                 </TabsTrigger>
               </TabsList>
               
@@ -2169,7 +2165,7 @@ export default function Students() {
 
       {/* Student Detail Dialog */}
       <Dialog open={isStudentDetailDialogOpen} onOpenChange={setIsStudentDetailDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] max-h-[90vh] h-auto">
+        <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto">
           <DialogHeader>
             <DialogTitle>Student Details</DialogTitle>
             <DialogDescription>
@@ -2178,9 +2174,9 @@ export default function Students() {
           </DialogHeader>
           
           {selectedStudent && (
-            <div className="py-4">
+            <div className="py-2">
               <Tabs defaultValue="personal" className="w-full">
-                <TabsList className="grid grid-cols-5 mb-4">
+                <TabsList className="grid grid-cols-4 mb-2">
                   <TabsTrigger value="personal">
                     <User className="mr-2 h-4 w-4" />
                     Persoonlijk
@@ -2196,10 +2192,6 @@ export default function Students() {
                   <TabsTrigger value="class">
                     <Users className="mr-2 h-4 w-4" />
                     Klas
-                  </TabsTrigger>
-                  <TabsTrigger value="subjects">
-                    <BookOpen className="mr-2 h-4 w-4" />
-                    Vakken
                   </TabsTrigger>
                 </TabsList>
                 

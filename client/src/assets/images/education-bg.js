@@ -1,0 +1,1 @@
+export const educationBgUrl = "https://i.imgur.com/pXlE83Y.jpg";

@@ -92,6 +92,33 @@ type SidebarProps = {
 const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) => {
   const [location] = useLocation();
   const [expanded, setExpanded] = useState(!isMobile);
+  const [userData, setUserData] = useState<any>(null);
+  
+  // Gebruiker data uit localStorage ophalen of standaard data gebruiken
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUserData(parsedUser);
+      } catch (error) {
+        console.error('Fout bij het parsen van gebruikersdata:', error);
+        // Fallback naar demo data als er een fout is
+        setUserData({
+          firstName: "Ahmed",
+          lastName: "Hassan",
+          role: "Administrator"
+        });
+      }
+    } else {
+      // Demo data als er geen gebruiker is opgeslagen
+      setUserData({
+        firstName: "Ahmed",
+        lastName: "Hassan",
+        role: "Administrator"
+      });
+    }
+  }, []);
 
   // Adjust sidebar on window resize
   useEffect(() => {
@@ -156,11 +183,11 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         >
           <div className="flex items-center">
             <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
-              <span className="font-semibold">JD</span>
+              <span className="font-semibold">{userData?.firstName?.[0] || ""}{userData?.lastName?.[0] || ""}</span>
             </div>
             <div>
-              <div className="font-medium">Jan Doe</div>
-              <div className="text-xs text-gray-500">Beheerder</div>
+              <div className="font-medium">{userData?.firstName || ""} {userData?.lastName || ""}</div>
+              <div className="text-xs text-gray-500">{userData?.role || "Gebruiker"}</div>
             </div>
           </div>
         </div>

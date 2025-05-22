@@ -26,6 +26,7 @@ import {
   insertTeacherCourseAssignmentSchema,
   insertTeacherAttendanceSchema,
   insertBehaviorAssessmentSchema,
+  insertNotificationSchema,
   type Student,
   type Teacher,
   type BehaviorAssessment
@@ -3332,6 +3333,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: "Error deleting teacher course assignment" });
+    }
+  });
+
+  // ********************
+  // Notification API endpoints
+  // ********************
+  apiRouter.get("/api/notifications/user/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Ongeldig gebruikers-ID" });
+      }
+      
+      const notifications = await storage.getNotificationsByUser(userId);
+      res.json(notifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ message: "Fout bij ophalen notificaties" });
+    }
+  });
+  
+  apiRouter.get("/api/notifications/user/:userId/unread", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Ongeldig gebruikers-ID" });
+      }
+      
+      const notifications = await storage.getUnreadNotificationsByUser(userId);
+      res.json(notifications);
+    } catch (error) {
+      console.error("Error fetching unread notifications:", error);
+      res.status(500).json({ message: "Fout bij ophalen ongelezen notificaties" });
+    }
+  });
+  
+  apiRouter.post("/api/notifications", async (req, res) => {
+    try {
+      const validatedData = insertNotificationSchema.parse(req.body);
+      const notification = await storage.createNotification(validatedData);
+      res.status(201).json(notification);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validatiefout", errors: error.errors });
+      }
+      console.error("Error creating notification:", error);
+      res.status(500).json({ message: "Fout bij maken notificatie" });
+    }
+  });
+  
+  apiRouter.patch("/api/notifications/:id/mark-read", async (req, res) => {
+    try {
+      const notificationId = parseInt(req.params.id);
+      if (isNaN(notificationId)) {
+        return res.status(400).json({ message: "Ongeldig notificatie-ID" });
+      }
+      
+      const notification = await storage.markNotificationAsRead(notificationId);
+      if (!notification) {
+        return res.status(404).json({ message: "Notificatie niet gevonden" });
+      }
+      
+      res.json(notification);
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ message: "Fout bij markeren notificatie als gelezen" });
+    }
+  });
+  
+  apiRouter.patch("/api/notifications/user/:userId/mark-all-read", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Ongeldig gebruikers-ID" });
+      }
+      
+      await storage.markAllNotificationsAsRead(userId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      res.status(500).json({ message: "Fout bij markeren alle notificaties als gelezen" });
+    }
+  });
+  
+  apiRouter.delete("/api/notifications/:id", async (req, res) => {
+    try {
+      const notificationId = parseInt(req.params.id);
+      if (isNaN(notificationId)) {
+        return res.status(400).json({ message: "Ongeldig notificatie-ID" });
+      }
+      
+      await storage.deleteNotification(notificationId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      res.status(500).json({ message: "Fout bij verwijderen notificatie" });
     }
   });
 

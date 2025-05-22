@@ -788,12 +788,6 @@ export default function Students() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : (Array.isArray(studentsData) ? studentsData : []).length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
-                    Geen studenten gevonden
-                  </TableCell>
-                </TableRow>
               ) : (
                 (Array.isArray(studentsData) ? studentsData : []).map((student: any) => (
                   <TableRow key={student.id}>

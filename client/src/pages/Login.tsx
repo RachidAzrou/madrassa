@@ -76,114 +76,148 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-white to-blue-50 dark:from-slate-900 dark:via-slate-900 dark:to-primary/20 p-4">
-      <div className="w-full max-w-md relative z-10">
-        {/* Decoratieve elementen */}
-        <div className="absolute -top-12 -left-12 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-12 -right-12 w-40 h-40 bg-blue-400/10 rounded-full blur-3xl"></div>
+    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-white dark:bg-[#0f1117]">
+      {/* Linker kolom - Visuele sectie */}
+      <div className="hidden md:flex flex-col justify-center items-center relative bg-[#f0f4f8] dark:bg-[#111827] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
+        <div className="absolute top-0 left-0 w-full h-full opacity-20 dark:opacity-10 bg-grid-primary"></div>
         
-        <div className="flex flex-col items-center mb-8 relative">
-          <div className="w-28 h-28 rounded-full bg-white shadow-xl flex items-center justify-center p-4 mb-6 dark:bg-slate-800">
+        <div className="relative z-10 max-w-md p-8 text-center">
+          <img src={madrassaLogo} alt="Madrassa Logo" className="h-24 mx-auto mb-8" />
+          <h2 className="text-4xl font-bold text-primary mb-6">Welkom bij Madrassa</h2>
+          <p className="text-slate-600 dark:text-slate-300 text-lg mb-8">
+            Het beheerplatform voor al je administratieve taken
+          </p>
+          
+          <div className="flex justify-center space-x-3 mb-6">
+            <span className="w-3 h-3 rounded-full bg-primary"></span>
+            <span className="w-3 h-3 rounded-full bg-primary/70"></span>
+            <span className="w-3 h-3 rounded-full bg-primary/40"></span>
+          </div>
+          
+          <div className="flex justify-center">
+            <div className="bg-white dark:bg-slate-800 shadow-lg p-4 rounded-lg text-left">
+              <div className="flex items-center mb-2">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-white">Veilig & Beveiligd</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">End-to-end versleuteling</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Rechter kolom - Login form */}
+      <div className="flex flex-col justify-center items-center px-6 py-12">
+        <div className="w-full max-w-sm">
+          <div className="md:hidden flex justify-center mb-10">
             <img src={madrassaLogo} alt="Madrassa Logo" className="h-16" />
           </div>
-          <h1 className="text-3xl font-bold text-center text-primary dark:text-primary-foreground mb-2">
-            Madrassa Beheerplatform
-          </h1>
-          <div className="w-16 h-1 bg-primary rounded-full mb-3"></div>
-          <p className="text-muted-foreground text-center max-w-xs">
-            Log in om toegang te krijgen tot het administratie platform
-          </p>
-        </div>
-        
-        <Card className="border-none shadow-2xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-blue-500 to-primary"></div>
           
-          <CardContent className="pt-8 pb-6">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">E-mailadres</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-3 h-5 w-5 text-primary/60" />
-                          <Input
-                            placeholder="naam@voorbeeld.nl"
-                            className="pl-11 h-12 border-slate-200 dark:border-slate-700 transition-all focus:border-primary focus:ring-1 focus:ring-primary"
-                            {...field}
-                            disabled={isLoading}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex justify-between items-center">
-                        <FormLabel className="text-sm font-medium">Wachtwoord</FormLabel>
-                        <a href="#" className="text-xs text-primary hover:underline">
-                          Wachtwoord vergeten?
-                        </a>
+          <div className="space-y-2 mb-8">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+              Log in op je account
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400">
+              Vul je gegevens in om toegang te krijgen
+            </p>
+          </div>
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-slate-700 dark:text-slate-300">
+                      E-mailadres
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          placeholder="naam@voorbeeld.nl"
+                          className="h-11 bg-transparent dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 rounded-lg focus-visible:ring-primary"
+                          {...field}
+                          disabled={isLoading}
+                        />
+                        <Mail className="absolute right-3 top-3 h-5 w-5 text-slate-400" />
                       </div>
-                      <FormControl>
-                        <div className="relative">
-                          <LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-primary/60" />
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            className="pl-11 h-12 border-slate-200 dark:border-slate-700 transition-all focus:border-primary focus:ring-1 focus:ring-primary"
-                            {...field}
-                            disabled={isLoading}
-                          />
-                          <button
-                            type="button"
-                            onClick={togglePasswordVisibility}
-                            className="absolute right-3 top-3.5"
-                            tabIndex={-1}
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" />
-                            ) : (
-                              <Eye className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" />
-                            )}
-                          </button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  className="w-full h-12 mt-2 text-base font-medium bg-primary hover:bg-primary/90 transition-all shadow-md hover:shadow-lg"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Bezig met inloggen...
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex justify-between">
+                      <FormLabel className="text-slate-700 dark:text-slate-300">
+                        Wachtwoord
+                      </FormLabel>
+                      <a href="#" className="text-xs text-primary hover:text-primary/80 transition-colors">
+                        Wachtwoord vergeten?
+                      </a>
                     </div>
-                  ) : (
-                    "Inloggen"
-                  )}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-        
-        <div className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
-          <p>&copy; {new Date().getFullYear()} Madrassa Beheerplatform. Alle rechten voorbehouden.</p>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          className="h-11 bg-transparent dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 rounded-lg focus-visible:ring-primary"
+                          {...field}
+                          disabled={isLoading}
+                        />
+                        <button
+                          type="button"
+                          onClick={togglePasswordVisibility}
+                          className="absolute right-3 top-3 text-slate-400 hover:text-primary transition-colors"
+                          tabIndex={-1}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-5 w-5" />
+                          ) : (
+                            <Eye className="h-5 w-5" />
+                          )}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <Button
+                type="submit"
+                className="w-full h-11 font-medium bg-primary hover:bg-primary/90 transition-colors"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <svg className="animate-spin mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Inloggen...
+                  </div>
+                ) : "Inloggen"}
+              </Button>
+            </form>
+          </Form>
+          
+          <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 text-center">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              &copy; {new Date().getFullYear()} Madrassa. Alle rechten voorbehouden.
+            </p>
+          </div>
         </div>
       </div>
     </div>

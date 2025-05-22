@@ -162,7 +162,7 @@ const NotificationDropdown: React.FC = () => {
             }}
             className="w-full text-sm font-medium text-primary hover:bg-primary/10"
           >
-            Bekijk alles →
+            Bekijk alles
           </Button>
         </div>
       </DropdownMenuContent>

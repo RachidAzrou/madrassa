@@ -144,8 +144,8 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
   return (
     <aside
       className={cn(
-        "h-full bg-white border-r border-gray-200",
-        "w-64 flex flex-col overflow-hidden",
+        "h-screen bg-white border-r border-gray-200",
+        "w-64 flex flex-col",
         className
       )}
     >

@@ -232,15 +232,8 @@ export default function Dashboard() {
               </div>
               <p className="text-sm font-medium mb-1">Geen klassen beschikbaar</p>
               <p className="text-xs text-center max-w-md">
-                Er zijn momenteel geen klassen aangemaakt. Ga naar de Klassen pagina om klassen toe te voegen.
+                Er zijn momenteel geen klassen aangemaakt.
               </p>
-              <Button 
-                variant="link" 
-                className="mt-3 text-sm text-[#1e3a8a]"
-                onClick={() => setLocation('/student-groups')}
-              >
-                Naar Klassen beheer
-              </Button>
             </div>
           ) : chartData.length === 0 ? (
             <div className="h-48 flex items-center justify-center text-gray-500 text-sm">

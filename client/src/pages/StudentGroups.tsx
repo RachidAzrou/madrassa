@@ -337,7 +337,11 @@ export default function StudentGroups() {
           )}
         </div>
         
-        <div className="flex justify-end">
+        <div className="flex justify-between items-center">
+          <TabsList className="h-10 p-1 bg-blue-900/10">
+            <TabsTrigger value="grid" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Rasterweergave</TabsTrigger>
+            <TabsTrigger value="list" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lijstweergave</TabsTrigger>
+          </TabsList>
           <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Klas Aanmaken</span>
@@ -347,11 +351,8 @@ export default function StudentGroups() {
 
       {/* Main content area */}
       <Tabs defaultValue="grid" className="space-y-4">
-        <div className="flex justify-between items-center mb-6">
-          <TabsList className="h-10 p-1 bg-blue-900/10">
-            <TabsTrigger value="grid" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Rasterweergave</TabsTrigger>
-            <TabsTrigger value="list" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lijstweergave</TabsTrigger>
-          </TabsList>
+        <div className="mb-6">
+          {/* TabsList is verplaatst naar boven naast de knop */}
         </div>
         
         <div className="student-groups-filters bg-white rounded-lg shadow-sm p-4 border border-gray-200 mb-6">

@@ -653,55 +653,18 @@ export default function Students() {
       {/* Filter opties */}
       {showFilterOptions && (
         <div className="mb-6 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
-          <h3 className="text-lg font-medium mb-4">Filter Opties</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="flex items-center mb-4">
+            <Filter className="h-5 w-5 mr-2 text-[#1e3a8a]" />
+            <h3 className="text-base font-medium text-gray-900">Filter Opties</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="program-filter">Programma</Label>
-              <Select 
-                value={selectedProgramFilter} 
-                onValueChange={setSelectedProgramFilter}
-              >
-                <SelectTrigger id="program-filter" className="bg-white">
-                  <SelectValue placeholder="Alle programma's" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle programma's</SelectItem>
-                  {programs.map((program: any) => (
-                    <SelectItem key={program.id} value={program.id.toString()}>
-                      {program.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="year-filter">Leerjaar</Label>
-              <Select 
-                value={selectedYearLevelFilter} 
-                onValueChange={setSelectedYearLevelFilter}
-              >
-                <SelectTrigger id="year-filter" className="bg-white">
-                  <SelectValue placeholder="Alle leerjaren" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle leerjaren</SelectItem>
-                  {yearLevels.map((year: any) => (
-                    <SelectItem key={year} value={year}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="status-filter">Status</Label>
+              <Label htmlFor="status-filter" className="text-xs font-medium text-gray-700">Status</Label>
               <Select 
                 value={selectedStatusFilter} 
                 onValueChange={setSelectedStatusFilter}
               >
-                <SelectTrigger id="status-filter" className="bg-white">
+                <SelectTrigger id="status-filter" className="bg-white h-9 mt-1 text-sm">
                   <SelectValue placeholder="Alle statussen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -716,12 +679,12 @@ export default function Students() {
             </div>
             
             <div>
-              <Label htmlFor="group-filter">Klas</Label>
+              <Label htmlFor="group-filter" className="text-xs font-medium text-gray-700">Klas</Label>
               <Select 
                 value={selectedStudentGroupFilter} 
                 onValueChange={setSelectedStudentGroupFilter}
               >
-                <SelectTrigger id="group-filter" className="bg-white">
+                <SelectTrigger id="group-filter" className="bg-white h-9 mt-1 text-sm">
                   <SelectValue placeholder="Alle klassen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -733,6 +696,53 @@ export default function Students() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="year-filter" className="text-xs font-medium text-gray-700">Schooljaar</Label>
+              <Select 
+                value={selectedYearLevelFilter} 
+                onValueChange={setSelectedYearLevelFilter}
+              >
+                <SelectTrigger id="year-filter" className="bg-white h-9 mt-1 text-sm">
+                  <SelectValue placeholder="Alle schooljaren" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle schooljaren</SelectItem>
+                  {yearLevels.map((year: any) => (
+                    <SelectItem key={year} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex gap-2 md:col-span-3 mt-2 justify-end">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => {
+                  setSelectedStatusFilter("all");
+                  setSelectedStudentGroupFilter("all");
+                  setSelectedYearLevelFilter("all");
+                }}
+                className="text-xs h-8"
+              >
+                <X className="mr-1 h-3 w-3" />
+                Filters wissen
+              </Button>
+              <Button 
+                size="sm" 
+                onClick={() => {
+                  setPage(1);
+                  setShowFilterOptions(false);
+                }}
+                className="text-xs h-8 bg-[#1e3a8a] hover:bg-blue-900"
+              >
+                <Check className="mr-1 h-3 w-3" />
+                Toepassen
+              </Button>
             </div>
           </div>
         </div>

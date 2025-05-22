@@ -332,9 +332,6 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
           </div>
 
         </div>
-
-        {/* Flexibele spacer die de ruimte opvult */}
-        <div className="flex-grow min-h-[20px]"></div>
         
         {/* Afmelden knop aan einde van de sidebar */}
         <div className="border-t border-gray-200 pt-4">

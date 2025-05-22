@@ -20,11 +20,6 @@ const EmptyState: React.FC<EmptyStateProps> = ({
         <Icon className="h-12 w-12 mx-auto opacity-30" />
       </div>
       <p className="text-sm font-medium">{title}</p>
-      {description && (
-        <p className="text-xs text-gray-400 mt-1 max-w-sm text-center">
-          {description}
-        </p>
-      )}
     </div>
   );
 };

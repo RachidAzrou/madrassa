@@ -253,7 +253,18 @@ const MyAccount = () => {
 
   // Toggle donkere modus
   const handleToggleDarkMode = () => {
-    setDarkMode(!darkMode);
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    
+    // Pas de donkere modus toe op het document element
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
+    // Sla de voorkeur op in localStorage zodat het persistent blijft
+    localStorage.setItem('darkMode', newDarkMode ? 'true' : 'false');
   };
 
   // Verander standaardpagina

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
+import myMadrassaLogo from "../assets/mymadrassa_logo.png";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -70,10 +71,7 @@ export default function Login() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">
-            <span className="text-black">my</span>
-            <span className="text-[#1e3a8a]">madrassa</span>
-          </h1>
+          <img src={myMadrassaLogo} alt="mymadrassa logo" className="h-32 mx-auto mb-4" />
           <p className="text-gray-600 mt-2">Islamitisch Onderwijs Beheersysteem</p>
         </div>
 

@@ -140,20 +140,20 @@ const NotificationsPage: React.FC = () => {
                     size="sm"
                     variant="outline"
                     onClick={() => handleMarkAsRead(notification.id)}
-                    className="h-8"
+                    className="h-8 w-8 p-0"
+                    title="Markeer als gelezen"
                   >
-                    <Check className="h-4 w-4 mr-1" />
-                    Markeer als gelezen
+                    <Check className="h-4 w-4" />
                   </Button>
                 )}
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => handleDelete(notification.id)}
-                  className="h-8 text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                  className="h-8 w-8 p-0 text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                  title="Verwijderen"
                 >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Verwijderen
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -191,16 +191,29 @@ const NotificationsPage: React.FC = () => {
             <Button
               variant="outline"
               onClick={handleMarkAllAsRead}
-              className="whitespace-nowrap"
+              className="h-9 w-9 p-0"
+              title="Markeer alles als gelezen"
             >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Alles als gelezen markeren
+              <CheckCircle className="h-4 w-4" />
             </Button>
           )}
         </div>
       </div>
 
       <Separator className="my-6" />
+
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+        <div className="relative w-full sm:w-[300px]">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Zoeken in notificaties..."
+            className="pl-8 w-full"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
 
       <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-6 grid w-full grid-cols-3 bg-card">

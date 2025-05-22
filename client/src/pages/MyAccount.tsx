@@ -184,10 +184,21 @@ const MyAccount = () => {
   };
 
   // Bij initialisatie gebruiker in localStorage opslaan voor de sidebar
+  // en donkere modus uit localStorage halen en toepassen
   useEffect(() => {
     // Sla de huidige gebruiker op in localStorage voor sidebar en andere componenten
     localStorage.setItem('user', JSON.stringify(currentUser));
-  }, [currentUser]);
+    
+    // Haal de donkere modus voorkeur op uit localStorage
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'true') {
+      setDarkMode(true);
+      document.documentElement.classList.add('dark');
+    } else if (savedDarkMode === 'false') {
+      setDarkMode(false);
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
 
   // Profiel opslaan
   const onProfileSubmit = (data: ProfileFormValues) => {

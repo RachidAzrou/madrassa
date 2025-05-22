@@ -84,11 +84,14 @@ export default function Login(props: any) {
            backgroundImage: `url(${educationBgImage})`,
            backgroundSize: 'cover',
            backgroundPosition: 'center',
-           backgroundColor: '#f8fafc'
+           backgroundColor: '#3b5998'
          }}>
       {/* Blauwe overlay */}
-      <div className="absolute inset-0 bg-blue-50/50 dark:bg-slate-900/90" 
-           style={{ backgroundColor: '#3b5998', opacity: 0.4, mixBlendMode: 'color' }}></div>
+      <div className="absolute inset-0" 
+           style={{ 
+             background: 'linear-gradient(135deg, rgba(59, 89, 152, 0.95) 0%, rgba(59, 89, 152, 0.85) 100%)',
+             mixBlendMode: 'multiply'
+           }}></div>
       
       {/* Eén container voor alles */}
       <div className="w-full max-w-md bg-white/95 dark:bg-slate-800/95 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-sm rounded-xl overflow-hidden relative z-10">

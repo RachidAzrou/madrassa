@@ -6,6 +6,30 @@ import {
   Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, CreditCard, AlertCircle,
   Image, Upload, School, UserRound, Camera, CheckSquare, SquareSlash
 } from 'lucide-react';
+
+// Aangepast ChalkboardTeacher icoon
+const ChalkBoard = (props: any) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg" 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    {...props}
+  >
+    <rect x="2" y="2" width="20" height="14" rx="2" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <line x1="6" y1="12" x2="6" y2="20" />
+    <line x1="18" y1="12" x2="18" y2="20" />
+    <ellipse cx="12" cy="18" rx="3" ry="2" />
+    <path d="M10 4h4" />
+    <path d="M8 8h8" />
+  </svg>
+);
 import ManageStudentGuardians from '@/components/guardians/ManageStudentGuardians';
 import { useToast } from '@/hooks/use-toast';
 
@@ -1417,39 +1441,39 @@ export default function Students() {
                       Wijs de student toe aan een klas. Een student kan maar in één klas zitten.
                     </p>
                     
-                    <div className="grid grid-cols-1 gap-6">
-                      <div>
-                        <Label htmlFor="schoolYear" className="text-sm font-medium text-gray-700">
-                          Schooljaar <span className="text-primary">*</span>
-                        </Label>
-                        <div className="mt-2">
-                          <Select
-                            value={studentFormData.schoolYear || 'geen'}
-                            onValueChange={(value) => setStudentFormData({ 
-                              ...studentFormData, 
-                              schoolYear: value === 'geen' ? '' : value
-                            })}
-                          >
-                            <SelectTrigger className="border-gray-200 bg-white">
-                              <SelectValue placeholder="Selecteer schooljaar" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="geen">Selecteer schooljaar</SelectItem>
-                              <SelectItem value="2024-2025">2024-2025</SelectItem>
-                              <SelectItem value="2025-2026">2025-2026</SelectItem>
-                              <SelectItem value="2026-2027">2026-2027</SelectItem>
-                              <SelectItem value="2027-2028">2027-2028</SelectItem>
-                            </SelectContent>
-                          </Select>
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="schoolYear" className="text-sm font-medium text-gray-700">
+                            Schooljaar <span className="text-primary">*</span>
+                          </Label>
+                          <div className="mt-1">
+                            <Select
+                              value={studentFormData.schoolYear || 'geen'}
+                              onValueChange={(value) => setStudentFormData({ 
+                                ...studentFormData, 
+                                schoolYear: value === 'geen' ? '' : value
+                              })}
+                            >
+                              <SelectTrigger className="border-gray-200 bg-white h-9">
+                                <SelectValue placeholder="Selecteer schooljaar" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="geen">Selecteer schooljaar</SelectItem>
+                                <SelectItem value="2024-2025">2024-2025</SelectItem>
+                                <SelectItem value="2025-2026">2025-2026</SelectItem>
+                                <SelectItem value="2026-2027">2026-2027</SelectItem>
+                                <SelectItem value="2027-2028">2027-2028</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="studentGroupId" className="text-sm font-medium text-gray-700">
-                          Selecteer klas
-                        </Label>
-                        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
+                        
+                        <div>
+                          <Label htmlFor="studentGroupId" className="text-sm font-medium text-gray-700">
+                            Selecteer klas
+                          </Label>
+                          <div className="mt-1">
                             <Select
                               value={studentFormData.studentGroupId?.toString() || 'none'}
                               onValueChange={(value) => setStudentFormData({ 
@@ -1457,7 +1481,7 @@ export default function Students() {
                                 studentGroupId: value === 'none' ? null : parseInt(value) 
                               })}
                             >
-                              <SelectTrigger className="border-gray-200 bg-white">
+                              <SelectTrigger className="border-gray-200 bg-white h-9">
                                 <SelectValue placeholder="Selecteer klas" />
                               </SelectTrigger>
                               <SelectContent>

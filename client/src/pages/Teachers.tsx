@@ -353,20 +353,39 @@ export default function Teachers() {
   // Create Teacher Mutation
   const createTeacherMutation = useMutation({
     mutationFn: async (formData: any) => {
+      // Bereid de data voor om naar de server te sturen
+      const teacherData = {
+        teacherId: formData.teacherId,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone || null,
+        gender: formData.gender || null,
+        dateOfBirth: formData.dateOfBirth || null,
+        street: formData.street || null,
+        houseNumber: formData.houseNumber || null,
+        postalCode: formData.postalCode || null,
+        city: formData.city || null,
+        isActive: formData.isActive,
+        notes: formData.notes || null
+      };
+      
       try {
+        console.log('Sending teacher data:', teacherData);
         return await apiRequest('/api/teachers', {
           method: 'POST',
-          body: formData
+          body: teacherData
         });
       } catch (error: any) {
         console.error('Create teacher error:', error);
         throw new Error(error?.message || 'Fout bij het aanmaken van docent');
       }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const teacherName = `${teacherFormData.firstName} ${teacherFormData.lastName}`;
       toast({
         title: "Docent toegevoegd",
-        description: "De nieuwe docent is succesvol toegevoegd aan het systeem",
+        description: `${teacherName} is succesvol toegevoegd aan het systeem`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
       setIsCreateDialogOpen(false);

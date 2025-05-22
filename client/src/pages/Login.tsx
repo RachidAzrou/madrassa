@@ -89,9 +89,13 @@ export default function Login() {
           </div>
           
           <div className="px-8 pb-8">
-            <p className="text-sm text-gray-500 text-center mb-6">
+            <p className="text-sm text-gray-500 text-center mb-2">
               Log in om toegang te krijgen tot uw account
             </p>
+            
+            <div className="bg-[#1e3a8a] text-white text-xs font-medium py-1 px-3 rounded text-center mb-6">
+              TEST OMGEVING versie 1.1.0
+            </div>
             
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">

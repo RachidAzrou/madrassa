@@ -38,10 +38,9 @@ const NotificationDropdown: React.FC = () => {
       markAsRead(notification.id);
     }
     
-    if (notification.link) {
-      setLocation(notification.link);
-      setOpen(false);
-    }
+    // Altijd naar de notificatiepagina navigeren
+    setLocation('/notifications');
+    setOpen(false);
   };
 
   const getNotificationIcon = (type: string) => {

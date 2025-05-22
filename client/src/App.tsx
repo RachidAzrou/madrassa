@@ -19,6 +19,7 @@ import Guardians from "@/pages/Guardians";
 import Teachers from "@/pages/Teachers";
 import Admissions from "@/pages/Admissions";
 import StudentGroups from "@/pages/StudentGroups";
+import Notifications from "@/pages/Notifications";
 import MyAccount from "@/pages/MyAccount";
 import Login from "@/pages/Login";
 
@@ -61,6 +62,7 @@ function AuthenticatedRouter() {
         <Route path="/fees" component={() => <AuthenticatedRoute component={Fees} />} />
         <Route path="/reports" component={() => <AuthenticatedRoute component={Reports} />} />
         <Route path="/settings" component={() => <AuthenticatedRoute component={Settings} />} />
+        <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
         <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
         <Route component={NotFound} />
       </Switch>

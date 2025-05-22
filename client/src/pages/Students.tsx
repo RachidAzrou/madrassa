@@ -890,15 +890,7 @@ export default function Students() {
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-                <path d="M18 16a4 4 0 0 0-4.65-4"></path>
-                <path d="M10 16a3.5 3.5 0 0 0-6.64-1.5"></path>
-                <path d="M21.5 20.5c0-2.5-2.5-2.5-3.5-2.5"></path>
-                <path d="M10 20.5c0-2.5-2.5-2.5-3.5-2.5"></path>
-                <path d="M15.5 20.5c0-1.833-1.5-2.5-3.5-2.5s-3.5.667-3.5 2.5"></path>
-                <circle cx="7" cy="10" r="3"></circle>
-                <circle cx="15" cy="8" r="4"></circle>
-              </svg>
+              <Users className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-semibold text-[#1e3a8a]">Studenten</h1>
           </div>
@@ -1207,15 +1199,7 @@ export default function Students() {
                 <td colSpan={8}>
                   <div className="h-48 flex flex-col items-center justify-center text-gray-500">
                     <div className="text-[#1e3a8a] mb-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto opacity-30">
-                        <path d="M18 16a4 4 0 0 0-4.65-4"></path>
-                        <path d="M10 16a3.5 3.5 0 0 0-6.64-1.5"></path>
-                        <path d="M21.5 20.5c0-2.5-2.5-2.5-3.5-2.5"></path>
-                        <path d="M10 20.5c0-2.5-2.5-2.5-3.5-2.5"></path>
-                        <path d="M15.5 20.5c0-1.833-1.5-2.5-3.5-2.5s-3.5.667-3.5 2.5"></path>
-                        <circle cx="7" cy="10" r="3"></circle>
-                        <circle cx="15" cy="8" r="4"></circle>
-                      </svg>
+                      <Users className="h-12 w-12 mx-auto opacity-30" />
                     </div>
                     <p className="text-sm font-medium">Geen studenten beschikbaar</p>
                   </div>

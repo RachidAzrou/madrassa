@@ -466,12 +466,13 @@ export default function Courses() {
                 Fout bij het laden van curriculum. Probeer het opnieuw.
               </div>
             ) : courses.length === 0 ? (
-              <div className="col-span-full text-center py-10">
-                <BookOpen className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                <h3 className="text-lg font-medium mb-2">Geen curriculum gevonden</h3>
-                <p className="text-gray-500 mb-4">
-                  Er zijn geen vakken die overeenkomen met de geselecteerde filters.
-                </p>
+              <div className="col-span-full">
+                <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                  <div className="text-[#1e3a8a] mb-2">
+                    <BookOpen className="h-12 w-12 mx-auto opacity-30" />
+                  </div>
+                  <p className="text-sm font-medium">Geen curriculum beschikbaar</p>
+                </div>
               </div>
             ) : (
               courses.map((course) => (
@@ -585,8 +586,13 @@ export default function Courses() {
                 Fout bij het laden van klassen. Probeer het opnieuw.
               </div>
             ) : studentGroups.length === 0 ? (
-              <div className="col-span-full text-center py-8 text-gray-500">
-                Geen klassen gevonden. Voeg een nieuwe klas toe.
+              <div className="col-span-full">
+                <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                  <div className="text-[#1e3a8a] mb-2">
+                    <BookOpen className="h-12 w-12 mx-auto opacity-30" />
+                  </div>
+                  <p className="text-sm font-medium">Geen klassen beschikbaar</p>
+                </div>
               </div>
             ) : (
               studentGroups.map((group) => (

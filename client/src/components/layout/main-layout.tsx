@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import Sidebar from "./sidebar";
 import Header from "./header";
-import { useMobile } from "@/hooks/useMobile";
+import { useMobile } from "@/hooks/use-mobile";
 
 type MainLayoutProps = {
   children: React.ReactNode;
@@ -13,35 +13,19 @@ const getPageTitle = (path: string): string => {
     case "/":
       return "Dashboard";
     case "/students":
-      return "Studenten";
-    case "/guardians":
-      return "Voogden";
-    case "/teachers":
-      return "Docenten";
+      return "Student Management";
     case "/courses":
-      return "Curriculum";
+      return "Course Management";
     case "/programs":
-      return "Vakken";
+      return "Program Management";
     case "/calendar":
-      return "Kalender";
+      return "Academic Calendar";
     case "/attendance":
-      return "Aanwezigheid";
+      return "Attendance Tracking";
     case "/grading":
-      return "Cijfers";
+      return "Grading System";
     case "/reports":
-      return "Rapport";
-    case "/fees":
-      return "Betalingsbeheer";
-    case "/admissions":
-      return "Aanmeldingen";
-    case "/student-groups":
-      return "Klassen";
-    case "/scheduling":
-      return "Planning";
-    case "/settings":
-      return "Instellingen";
-    case "/mijn-account":
-      return "Mijn Account";
+      return "Reports";
     default:
       return "myMadrassa";
   }
@@ -53,32 +37,16 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const isMobile = useMobile();
   const pageTitle = getPageTitle(location);
 
-  // Voorkom scrollen van body wanneer mobiele sidebar open is
-  useEffect(() => {
-    if (isMobile && sidebarOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isMobile, sidebarOpen]);
-
-  // Sluit sidebar bij navigatie op mobiel
+  // Close sidebar on location change for mobile
   useEffect(() => {
     if (isMobile) {
       setSidebarOpen(false);
     }
   }, [location, isMobile]);
 
-  // Standaard sidebar open op desktop
+  // Open sidebar by default on desktop
   useEffect(() => {
-    if (!isMobile) {
-      setSidebarOpen(true);
-    } else {
-      setSidebarOpen(false);
-    }
+    setSidebarOpen(!isMobile);
   }, [isMobile]);
 
   const toggleSidebar = () => {
@@ -86,20 +54,20 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row overflow-hidden">
-      {/* Overlay backdrop voor mobiel */}
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Mobile sidebar backdrop */}
       {isMobile && sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50"
+          className="fixed inset-0 z-20 bg-black bg-opacity-50"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar - vast op desktop, zwevend op mobiel */}
+      {/* Sidebar for both mobile and desktop */}
       <div 
-        className={`fixed lg:static inset-y-0 left-0 transform ${
+        className={`fixed md:static inset-y-0 left-0 transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 z-50 transition duration-200 ease-in-out lg:h-screen flex-shrink-0`}
+        } md:translate-x-0 z-30 transition duration-200 ease-in-out h-screen md:h-auto flex-shrink-0`}
       >
         <Sidebar 
           isMobile={isMobile} 
@@ -108,10 +76,10 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       </div>
 
       {/* Main content */}
-      <div className="flex flex-col flex-1 w-full h-screen overflow-hidden">
+      <div className="flex flex-col flex-1 min-h-screen overflow-hidden">
         <Header onMenuClick={toggleSidebar} title={pageTitle} />
-        <main className="flex-1 p-2 sm:p-4 md:p-6 overflow-y-auto border-l border-gray-200 bg-white">
-          <div className="w-full mx-auto max-w-7xl">
+        <main className="flex-1 p-2 sm:p-4 md:p-6 pt-10 overflow-x-auto border-l border-gray-200">
+          <div className="max-w-7xl mx-auto w-full">
             {children}
           </div>
         </main>

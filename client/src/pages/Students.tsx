@@ -1999,9 +1999,7 @@ export default function Students() {
                 <li><strong>city</strong> - Plaats</li>
                 <li><strong>status</strong> - Status (enrolled, graduated, suspended, withdrawn)</li>
               </ul>
-              <p className="text-xs text-blue-600 mt-2 italic">
-                De kolommen in uw bestand kunnen andere namen hebben. In de volgende stap kunt u aangeven welke kolom bij welk veld hoort.
-              </p>
+
             </div>
             
             {!importFile ? (

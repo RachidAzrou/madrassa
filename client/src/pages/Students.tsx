@@ -1020,7 +1020,10 @@ export default function Students() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto">
           <DialogHeader>
-            <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
+            <DialogTitle className="text-xl font-bold flex items-center text-primary">
+              <PlusCircle className="mr-2 h-5 w-5 text-primary" />
+              Nieuwe Student Toevoegen
+            </DialogTitle>
             <DialogDescription>
               Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem.
             </DialogDescription>

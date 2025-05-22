@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, 
   FilePlus, GraduationCap, Palmtree, PartyPopper, Pencil, BookOpen, Timer,
-  MapPin, Clock
+  MapPin, Clock, Search, XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -55,6 +55,7 @@ export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<'month' | 'week' | 'day'>('month');
   const [filter, setFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [isAddEventDialogOpen, setIsAddEventDialogOpen] = useState(false);
   const [newEvent, setNewEvent] = useState({
     title: '',
@@ -88,7 +89,8 @@ export default function Calendar() {
         year: currentDate.getFullYear(), 
         month: currentDate.getMonth() + 1,
         view,
-        filter
+        filter,
+        search: searchTerm
       }
     ],
     staleTime: 30000,
@@ -96,10 +98,20 @@ export default function Calendar() {
 
   const events: CalendarEvent[] = data?.events || [];
   
-  // Filter evenementen gebaseerd op filter
+  // Filter evenementen gebaseerd op filter en zoekterm
   const filteredEvents = events.filter(event => {
-    if (filter === 'all') return true;
-    return event.type === filter;
+    // Eerst filteren op type
+    const typeMatch = filter === 'all' || event.type === filter;
+    
+    // Dan filteren op zoekterm als er een is
+    const searchMatch = !searchTerm || 
+      event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (event.description && event.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (event.location && event.location.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (event.courseName && event.courseName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (event.className && event.className.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    return typeMatch && searchMatch;
   });
 
   // Navigate to previous/next period based on current view

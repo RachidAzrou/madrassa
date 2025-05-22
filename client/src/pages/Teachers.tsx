@@ -661,21 +661,11 @@ export default function Teachers() {
             Beheer en monitor alle docenten en hun vaardigheden
           </p>
         </div>
-        
-        <Button 
-          onClick={handleAddNewTeacher} 
-          variant="default" 
-          size="default" 
-          className="bg-primary hover:bg-primary/90 flex items-center"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          <span>Docent Toevoegen</span>
-        </Button>
       </div>
       
       {/* Zoekbalk - onder de paginatitel geplaatst */}
-      <div className="mb-4">
-        <div className="relative">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+        <div className="relative w-full md:w-auto">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             type="search"
@@ -691,6 +681,16 @@ export default function Teachers() {
             />
           )}
         </div>
+        
+        <Button 
+          onClick={handleAddNewTeacher} 
+          variant="default" 
+          size="default" 
+          className="bg-primary hover:bg-primary/90 flex items-center"
+        >
+          <PlusCircle className="mr-2 h-4 w-4" />
+          <span>Docent Toevoegen</span>
+        </Button>
       </div>
       
       {/* Docenten lijst */}

@@ -8,6 +8,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
 import { Eye, EyeOff } from "lucide-react";
 import myMadrassaLogo from "../assets/mymadrassa_logo.png";
+import schoolDoodlesBg from "../assets/school_doodles.png";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -68,9 +69,16 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50 p-4">
+    <div 
+      className="min-h-screen flex flex-col items-center justify-center p-4"
+      style={{
+        backgroundImage: `url(${schoolDoodlesBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
       <div className="w-full max-w-md">
-        <div className="w-full bg-white rounded-2xl shadow-xl overflow-hidden border-t-4 border-[#1e3a8a]">
+        <div className="w-full bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border-t-4 border-[#1e3a8a]">
           <div className="pt-10 pb-6 px-8 text-center">
             <img src={myMadrassaLogo} alt="mymadrassa logo" className="h-24 mx-auto" />
           </div>

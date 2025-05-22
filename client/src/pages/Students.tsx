@@ -374,9 +374,22 @@ export default function Students() {
 
   // Function to view student details
   const handleViewStudentDetails = async (student: any) => {
-    const details = await getStudentDetails(student.id);
-    setSelectedStudent(details);
-    setIsStudentDetailDialogOpen(true);
+    try {
+      // Stuur een API-verzoek om de volledige details van de student op te halen
+      const response = await fetch(`/api/students/${student.id}`);
+      if (!response.ok) throw new Error('Kon studentgegevens niet ophalen');
+      
+      const details = await response.json();
+      setSelectedStudent(details);
+      setIsStudentDetailDialogOpen(true);
+    } catch (error) {
+      console.error("Fout bij ophalen studentdetails:", error);
+      toast({
+        title: "Fout bij ophalen gegevens",
+        description: "Er is een probleem opgetreden bij het ophalen van de studentgegevens.",
+        variant: "destructive"
+      });
+    }
   };
 
   // Function to edit student

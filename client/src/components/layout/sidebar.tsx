@@ -334,7 +334,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
         
         {/* Afmelden knop aan einde van de sidebar */}
-        <div className="px-3 border-t border-gray-200 py-4">
+        <div className="px-3 border-t border-gray-200 py-4 bg-white">
           <div
             onClick={() => {
               // Verwijder authenticatie gegevens
@@ -344,7 +344,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               window.location.href = "/login";
               if (onClose) onClose();
             }}
-            className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50 bg-gray-50"
+            className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50"
           >
             <div className="flex-shrink-0">
               <LogOut className="h-5 w-5" />

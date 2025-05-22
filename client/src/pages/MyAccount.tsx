@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useTheme } from "@/components/ui/theme-provider";
 import { 
   Card, 
   CardContent, 
@@ -24,8 +23,7 @@ import {
   FormField, 
   FormItem, 
   FormLabel, 
-  FormMessage,
-  FormDescription 
+  FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -43,10 +41,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { 
-  User, Lock, Bell, Shield, UserCircle, KeyRound, BellRing, 
-  Settings, BookOpen, FileText, School, UploadCloud, Moon, 
-  Sun, Calendar, Home, History, Terminal, Languages, LogOut,
-  Mail, Phone
+  UserCircle, KeyRound, BellRing, 
+  Settings, UploadCloud, 
+  LogOut, Mail, Phone
 } from "lucide-react";
 
 // Schema voor het formulier
@@ -55,9 +52,7 @@ const profileFormSchema = z.object({
   lastName: z.string().min(1, { message: "Achternaam is verplicht" }),
   email: z.string().email({ message: "Ongeldig e-mailadres" }),
   phone: z.string().optional(),
-  profileImageUrl: z.string().optional(),
   language: z.string().optional(),
-  darkMode: z.boolean().optional(),
   defaultPage: z.string().optional(),
 });
 
@@ -85,7 +80,6 @@ const adminUser = {
   role: "Administrator",
   avatar: "", // URL voor avatar indien beschikbaar
   language: "Nederlands",
-  darkMode: false,
   defaultPage: "Dashboard",
   twoFactorEnabled: false,
   lastLogin: "10 mei 2025 14:30",
@@ -106,7 +100,6 @@ const teacherUser = {
   subjects: ["Arabisch", "Islamitische Studies"],
   classes: ["Groep 3A", "Groep 4B", "Groep 5A"],
   language: "Nederlands",
-  darkMode: true,
   defaultPage: "Rooster",
   twoFactorEnabled: true,
   lastLogin: "11 mei 2025 09:15",
@@ -128,7 +121,6 @@ const MyAccount = () => {
   const [showPasswordChangedMessage, setShowPasswordChangedMessage] = useState(false);
   const [showNotificationSavedMessage, setShowNotificationSavedMessage] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(currentUser.twoFactorEnabled);
-  const [darkMode, setDarkMode] = useState(currentUser.darkMode);
   const [selectedDefaultPage, setSelectedDefaultPage] = useState(currentUser.defaultPage);
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: isTeacher 
@@ -156,7 +148,6 @@ const MyAccount = () => {
       email: currentUser.email,
       phone: currentUser.phone,
       language: currentUser.language,
-      darkMode: currentUser.darkMode,
       defaultPage: currentUser.defaultPage,
     },
   });
@@ -183,20 +174,12 @@ const MyAccount = () => {
     // Normaal zou dit een bestandskiezer openen
     alert("Profielfoto uploaden gesimuleerd voor demonstratie");
   };
-
-  // Gebruik de ThemeProvider voor donkere modus
-  const { theme, setTheme } = useTheme();
   
   // Bij initialisatie gebruiker in localStorage opslaan voor de sidebar
-  // en de huidige themastand ophalen
   useEffect(() => {
     // Sla de huidige gebruiker op in localStorage voor sidebar en andere componenten
     localStorage.setItem('user', JSON.stringify(currentUser));
-    
-    // Haal de huidige thema-instelling op uit de ThemeProvider
-    // en synchroniseer de lokale 'darkMode' state hiermee
-    setDarkMode(theme === 'dark');
-  }, [theme, currentUser]);
+  }, [currentUser]);
 
   // Profiel opslaan
   const onProfileSubmit = (data: ProfileFormValues) => {
@@ -260,20 +243,6 @@ const MyAccount = () => {
     setTwoFactorEnabled(!twoFactorEnabled);
   };
 
-  // Toggle donkere modus
-  const handleToggleDarkMode = () => {
-    const newDarkMode = !darkMode;
-    setDarkMode(newDarkMode);
-    
-    // Update de globale theme via de ThemeProvider
-    setTheme(newDarkMode ? 'dark' : 'light');
-    
-    // We hoeven niets toe te voegen aan document.documentElement.classList
-    // omdat de ThemeProvider dit automatisch doet
-    
-    // De ThemeProvider slaat de voorkeur al op in localStorage
-  };
-
   // Verander standaardpagina
   const handleSelectDefaultPage = (page: string) => {
     setSelectedDefaultPage(page);
@@ -295,35 +264,6 @@ const MyAccount = () => {
         [type]: !notificationSettings[type as keyof typeof notificationSettings]
       });
     }
-  };
-
-  // Opslaan van voorkeuren
-  const savePreferences = () => {
-    setIsSaving(true);
-    
-    // Simuleer een API call
-    setTimeout(() => {
-      console.log("Voorkeuren opgeslagen:", {
-        darkMode,
-        defaultPage: selectedDefaultPage,
-        language: profileForm.getValues().language
-      });
-      
-      // Update de gebruiker met de nieuwe voorkeuren
-      setCurrentUser({
-        ...currentUser,
-        darkMode,
-        defaultPage: selectedDefaultPage
-      });
-      
-      setIsSaving(false);
-      setShowSavedMessage(true);
-      
-      // Verberg het bericht na 3 seconden
-      setTimeout(() => {
-        setShowSavedMessage(false);
-      }, 3000);
-    }, 800);
   };
 
   // Opslaan van notificatie-instellingen
@@ -369,7 +309,7 @@ const MyAccount = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="profiel" className="w-full">
-              <TabsList className="grid grid-cols-4 mb-6 bg-blue-900/10">
+              <TabsList className="grid grid-cols-3 mb-6 bg-blue-900/10">
                 <TabsTrigger value="profiel" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <UserCircle className="h-4 w-4 mr-2" />
                   Profiel
@@ -377,10 +317,6 @@ const MyAccount = () => {
                 <TabsTrigger value="beveiliging" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <KeyRound className="h-4 w-4 mr-2" />
                   Beveiliging
-                </TabsTrigger>
-                <TabsTrigger value="voorkeuren" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Voorkeuren
                 </TabsTrigger>
                 <TabsTrigger value="notificaties" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
                   <BellRing className="h-4 w-4 mr-2" />
@@ -475,45 +411,80 @@ const MyAccount = () => {
                               <FormControl>
                                 <Input {...field} className="border-gray-300" />
                               </FormControl>
-                              <FormDescription>Optioneel</FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
                       </div>
 
-                      <div className="grid grid-cols-1">
-                        <FormItem>
-                          <FormLabel>Rol</FormLabel>
-                          <div className="flex h-10 w-full rounded-md border border-gray-300 bg-background px-3 py-2 text-sm text-gray-500 ring-offset-background">
-                            {currentUser.role}
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-1">De rol kan niet worden gewijzigd</p>
-                        </FormItem>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <FormField
+                          control={profileForm.control}
+                          name="language"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Taal</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="border-gray-300">
+                                    <SelectValue placeholder="Selecteer een taal" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="Nederlands">Nederlands</SelectItem>
+                                  <SelectItem value="Engels">Engels</SelectItem>
+                                  <SelectItem value="Arabisch">Arabisch</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={profileForm.control}
+                          name="defaultPage"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Startpagina</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="border-gray-300">
+                                    <SelectValue placeholder="Selecteer een startpagina" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="Dashboard">Dashboard</SelectItem>
+                                  <SelectItem value="Leerlingen">Leerlingen</SelectItem>
+                                  <SelectItem value="Klassen">Klassen</SelectItem>
+                                  <SelectItem value="Vakken">Vakken</SelectItem>
+                                  <SelectItem value="Rooster">Rooster</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
 
-                      {showSavedMessage && (
-                        <div className="col-span-2">
-                          <p className="text-sm text-green-600 mb-2 bg-green-50 p-2 rounded border border-green-200">
-                            ✓ Profielgegevens succesvol opgeslagen!
-                          </p>
-                        </div>
-                      )}
-                      
-                      <div className="flex justify-end">
+                      <div className="flex justify-end mt-6">
+                        {showSavedMessage && (
+                          <div className="mr-4 px-3 py-2 rounded-md bg-blue-100 text-blue-700 flex items-center">
+                            Wijzigingen opgeslagen
+                          </div>
+                        )}
                         <Button 
                           type="submit" 
-                          className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
-                          disabled={isSaving}
+                          disabled={isSaving || !profileForm.formState.isDirty}
+                          className="bg-[#1e3a8a] text-white hover:bg-blue-700 transition-colors"
                         >
-                          {isSaving ? (
-                            <>
-                              <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                              Opslaan...
-                            </>
-                          ) : (
-                            "Wijzigingen opslaan"
-                          )}
+                          {isSaving ? "Bezig met opslaan..." : "Opslaan"}
                         </Button>
                       </div>
                     </form>
@@ -521,11 +492,40 @@ const MyAccount = () => {
                 </div>
               </TabsContent>
 
-              {/* Beveiliging tab inhoud */}
-              <TabsContent value="beveiliging" className="space-y-4">
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-medium mb-4">Wachtwoord wijzigen</h3>
+              {/* Beveiligingstab inhoud */}
+              <TabsContent value="beveiliging" className="space-y-6">
+                {/* Sectie 1: Account beveiliging */}
+                <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 mb-4">
+                  <h3 className="text-lg font-medium mb-3">Accountbeveiliging</h3>
+                  <div className="space-y-5">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center">
+                          <Label htmlFor="two-factor" className="font-medium text-base">
+                            Tweefactorauthenticatie
+                          </Label>
+                        </div>
+                        <p className="text-sm text-gray-500">
+                          Beveilig uw account met 2FA-authenticatie.
+                        </p>
+                      </div>
+                      <Switch 
+                        id="two-factor" 
+                        checked={twoFactorEnabled}
+                        onCheckedChange={handleToggleTwoFactor}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sectie 2: Wachtwoord wijzigen */}
+                <div className="bg-white rounded-lg mb-4">
+                  <div className="mb-4">
+                    <h3 className="text-lg font-medium mb-2">Wachtwoord wijzigen</h3>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Zorg ervoor dat uw account een sterk wachtwoord gebruikt dat u nergens anders gebruikt.
+                    </p>
+                    
                     <Form {...passwordForm}>
                       <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
                         <FormField
@@ -541,201 +541,120 @@ const MyAccount = () => {
                             </FormItem>
                           )}
                         />
-
-                        <FormField
-                          control={passwordForm.control}
-                          name="newPassword"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Nieuw wachtwoord</FormLabel>
-                              <FormControl>
-                                <Input type="password" {...field} className="border-gray-300" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                          <FormField
+                            control={passwordForm.control}
+                            name="newPassword"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Nieuw wachtwoord</FormLabel>
+                                <FormControl>
+                                  <Input type="password" {...field} className="border-gray-300" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={passwordForm.control}
+                            name="confirmPassword"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Bevestig wachtwoord</FormLabel>
+                                <FormControl>
+                                  <Input type="password" {...field} className="border-gray-300" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        
+                        <div className="flex justify-end pt-2">
+                          {showPasswordChangedMessage && (
+                            <div className="mr-4 px-3 py-2 rounded-md bg-blue-100 text-blue-700 flex items-center">
+                              Wachtwoord gewijzigd
+                            </div>
                           )}
-                        />
-
-                        <FormField
-                          control={passwordForm.control}
-                          name="confirmPassword"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Bevestig nieuw wachtwoord</FormLabel>
-                              <FormControl>
-                                <Input type="password" {...field} className="border-gray-300" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {showPasswordChangedMessage && (
-                          <p className="text-sm text-green-600 mb-2 bg-green-50 p-2 rounded border border-green-200">
-                            ✓ Wachtwoord succesvol gewijzigd!
-                          </p>
-                        )}
-                        <div className="flex justify-end">
                           <Button 
                             type="submit" 
-                            className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
-                            disabled={isChangingPassword}
+                            disabled={isChangingPassword || !passwordForm.formState.isDirty}
+                            className="bg-[#1e3a8a] text-white hover:bg-blue-700 transition-colors"
                           >
-                            {isChangingPassword ? (
-                              <>
-                                <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                                Wijzigen...
-                              </>
-                            ) : (
-                              "Wachtwoord wijzigen"
-                            )}
+                            {isChangingPassword ? "Bezig met wijzigen..." : "Wachtwoord wijzigen"}
                           </Button>
                         </div>
                       </form>
                     </Form>
                   </div>
-
-                  <Separator />
-
-                  <div>
-                    <h3 className="text-lg font-medium mb-4">Tweestapsverificatie</h3>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <p className="font-medium">Tweestapsverificatie is {currentUser.twoFactorEnabled ? 'ingeschakeld' : 'uitgeschakeld'}</p>
-                        <p className="text-sm text-gray-500">Verhoog de beveiliging van uw account door tweestapsverificatie in te schakelen</p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Switch 
-                          id="twofa" 
-                          checked={twoFactorEnabled} 
-                          onCheckedChange={handleToggleTwoFactor}
-                        />
-                        <Label htmlFor="twofa">{twoFactorEnabled ? 'Aan' : 'Uit'}</Label>
-                      </div>
-                    </div>
-
-                    <div className="mt-4">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => alert(twoFactorEnabled ? 'Tweestapsverificatie beheren' : 'Tweestapsverificatie instellen')}
-                      >
-                        {twoFactorEnabled ? 'Beheren' : 'Instellen'}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              {/* Voorkeuren tab inhoud */}
-              <TabsContent value="voorkeuren" className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Taal en weergave</h3>
-                  <div className="space-y-4">
-                    <div className="flex flex-col space-y-1.5">
-                      <Label htmlFor="language">Taal</Label>
-                      <Select defaultValue={currentUser.language}>
-                        <SelectTrigger id="language" className="border-gray-300">
-                          <SelectValue placeholder="Selecteer een taal" />
-                        </SelectTrigger>
-                        <SelectContent position="popper">
-                          <SelectItem value="Nederlands">Nederlands</SelectItem>
-                          <SelectItem value="Engels">Engels</SelectItem>
-                          <SelectItem value="Arabisch">Arabisch</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="darkmode">Donkere modus</Label>
-                        <p className="text-sm text-muted-foreground">Schakel tussen lichte en donkere weergave</p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Switch 
-                          id="darkmode" 
-                          checked={darkMode} 
-                          onCheckedChange={handleToggleDarkMode}
-                        />
-                        <div className="flex items-center space-x-1">
-                          {darkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {showSavedMessage && (
-                  <p className="text-sm text-green-600 mb-2 bg-green-50 p-2 rounded border border-green-200">
-                    ✓ Voorkeuren succesvol opgeslagen!
-                  </p>
-                )}
-                <div className="flex justify-end">
-                  <Button 
-                    className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
-                    onClick={savePreferences}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? (
-                      <>
-                        <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                        Opslaan...
-                      </>
-                    ) : (
-                      "Voorkeuren opslaan"
-                    )}
-                  </Button>
                 </div>
               </TabsContent>
 
               {/* Notificaties tab inhoud */}
               <TabsContent value="notificaties" className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium mb-4">E-mailnotificaties</h3>
-                  <div className="space-y-3">
+                <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 mb-4">
+                  <h3 className="text-lg font-medium mb-3">E-mailmeldingen</h3>
+                  <div className="space-y-4">
                     {isTeacher ? (
                       <>
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <Label htmlFor="notifyMessages">Nieuwe berichten</Label>
-                            <p className="text-sm text-muted-foreground">Ontvang een e-mail wanneer u een nieuw bericht ontvangt</p>
+                            <Label className="font-medium text-base">
+                              Nieuwe berichten
+                            </Label>
+                            <p className="text-sm text-gray-500">
+                              Ontvang een e-mail wanneer u een nieuw bericht ontvangt.
+                            </p>
                           </div>
                           <Switch 
-                            id="notifyMessages" 
-                            checked={notificationSettings.emailNotifications.messages} 
+                            checked={notificationSettings.emailNotifications.messages}
                             onCheckedChange={() => handleToggleNotification('email', 'messages')}
                           />
                         </div>
+                        <Separator />
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <Label htmlFor="notifySchedule">Roosterwijzigingen</Label>
-                            <p className="text-sm text-muted-foreground">Ontvang een e-mail bij wijzigingen in het rooster</p>
+                            <Label className="font-medium text-base">
+                              Roosterwijzigingen
+                            </Label>
+                            <p className="text-sm text-gray-500">
+                              Ontvang een e-mail bij wijzigingen in uw rooster.
+                            </p>
                           </div>
                           <Switch 
-                            id="notifySchedule" 
-                            checked={notificationSettings.emailNotifications.scheduleChanges} 
+                            checked={notificationSettings.emailNotifications.scheduleChanges}
                             onCheckedChange={() => handleToggleNotification('email', 'scheduleChanges')}
                           />
                         </div>
+                        <Separator />
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <Label htmlFor="notifyGrades">Cijferregistratie</Label>
-                            <p className="text-sm text-muted-foreground">Ontvang een e-mail bij bevestiging van cijferregistratie</p>
+                            <Label className="font-medium text-base">
+                              Cijfermeldingen
+                            </Label>
+                            <p className="text-sm text-gray-500">
+                              Ontvang een e-mail wanneer u nieuwe cijfers invoert of wijzigt.
+                            </p>
                           </div>
                           <Switch 
-                            id="notifyGrades" 
-                            checked={notificationSettings.emailNotifications.grades} 
+                            checked={notificationSettings.emailNotifications.grades}
                             onCheckedChange={() => handleToggleNotification('email', 'grades')}
                           />
                         </div>
+                        <Separator />
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <Label htmlFor="notifyAttendance">Aanwezigheidsregistratie</Label>
-                            <p className="text-sm text-muted-foreground">Ontvang een e-mail met een overzicht van aanwezigheidsregistratie</p>
+                            <Label className="font-medium text-base">
+                              Aanwezigheidsmeldingen
+                            </Label>
+                            <p className="text-sm text-gray-500">
+                              Ontvang een e-mail bij afwezigheid van leerlingen.
+                            </p>
                           </div>
                           <Switch 
-                            id="notifyAttendance" 
-                            checked={notificationSettings.emailNotifications.attendance} 
+                            checked={notificationSettings.emailNotifications.attendance}
                             onCheckedChange={() => handleToggleNotification('email', 'attendance')}
                           />
                         </div>
@@ -744,34 +663,45 @@ const MyAccount = () => {
                       <>
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <Label htmlFor="notifyNewUsers">Nieuwe gebruikers</Label>
-                            <p className="text-sm text-muted-foreground">Ontvang een e-mail wanneer nieuwe gebruikers worden geregistreerd</p>
+                            <Label className="font-medium text-base">
+                              Nieuwe gebruikers
+                            </Label>
+                            <p className="text-sm text-gray-500">
+                              Ontvang een e-mail wanneer er nieuwe gebruikers worden aangemaakt.
+                            </p>
                           </div>
                           <Switch 
-                            id="notifyNewUsers" 
-                            checked={notificationSettings.emailNotifications.newUsers} 
+                            checked={notificationSettings.emailNotifications.newUsers}
                             onCheckedChange={() => handleToggleNotification('email', 'newUsers')}
                           />
                         </div>
+                        <Separator />
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <Label htmlFor="notifySystemUpdates">Systeemupdates</Label>
-                            <p className="text-sm text-muted-foreground">Ontvang een e-mail over belangrijke systeemupdates</p>
+                            <Label className="font-medium text-base">
+                              Systeemupdates
+                            </Label>
+                            <p className="text-sm text-gray-500">
+                              Ontvang een e-mail over belangrijke systeemupdates.
+                            </p>
                           </div>
                           <Switch 
-                            id="notifySystemUpdates" 
-                            checked={notificationSettings.emailNotifications.systemUpdates} 
+                            checked={notificationSettings.emailNotifications.systemUpdates}
                             onCheckedChange={() => handleToggleNotification('email', 'systemUpdates')}
                           />
                         </div>
+                        <Separator />
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <Label htmlFor="notifySecurityAlerts">Beveiligingsnotificaties</Label>
-                            <p className="text-sm text-muted-foreground">Ontvang een e-mail bij belangrijke beveiligingsgebeurtenissen</p>
+                            <Label className="font-medium text-base">
+                              Beveiligingswaarschuwingen
+                            </Label>
+                            <p className="text-sm text-gray-500">
+                              Ontvang een e-mail bij verdachte aanmeldingen of beveiligingsproblemen.
+                            </p>
                           </div>
                           <Switch 
-                            id="notifySecurityAlerts" 
-                            checked={notificationSettings.emailNotifications.securityAlerts} 
+                            checked={notificationSettings.emailNotifications.securityAlerts}
                             onCheckedChange={() => handleToggleNotification('email', 'securityAlerts')}
                           />
                         </div>
@@ -780,61 +710,73 @@ const MyAccount = () => {
                   </div>
                 </div>
 
-                <Separator />
-
-                <div>
-                  <h3 className="text-lg font-medium mb-4">In-app notificaties</h3>
-                  <div className="space-y-3">
+                <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 mb-4">
+                  <h3 className="text-lg font-medium mb-3">App-meldingen</h3>
+                  <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label htmlFor="pushNotifications">Push notificaties</Label>
-                        <p className="text-sm text-muted-foreground">Ontvang push notificaties op uw apparaat</p>
+                        <Label className="font-medium text-base">
+                          Push-meldingen
+                        </Label>
+                        <p className="text-sm text-gray-500">
+                          Ontvang push-meldingen op uw mobiele apparaat.
+                        </p>
                       </div>
                       <Switch 
-                        id="pushNotifications" 
-                        checked={notificationSettings.pushNotifications} 
+                        checked={notificationSettings.pushNotifications}
                         onCheckedChange={() => handleToggleNotification('pushNotifications', '')}
                       />
                     </div>
+                    <Separator />
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label htmlFor="desktopNotifications">Desktop notificaties</Label>
-                        <p className="text-sm text-muted-foreground">Ontvang notificaties in uw browser (alleen desktop)</p>
+                        <Label className="font-medium text-base">
+                          Desktop-meldingen
+                        </Label>
+                        <p className="text-sm text-gray-500">
+                          Ontvang meldingen in uw browser wanneer u bent ingelogd.
+                        </p>
                       </div>
                       <Switch 
-                        id="desktopNotifications" 
-                        checked={notificationSettings.desktopNotifications} 
+                        checked={notificationSettings.desktopNotifications}
                         onCheckedChange={() => handleToggleNotification('desktopNotifications', '')}
                       />
                     </div>
                   </div>
                 </div>
 
-                {showNotificationSavedMessage && (
-                  <p className="text-sm text-green-600 mb-2 bg-green-50 p-2 rounded border border-green-200">
-                    ✓ Meldingsinstellingen succesvol opgeslagen!
-                  </p>
-                )}
-                <div className="flex justify-end">
+                <div className="flex justify-end mt-6">
+                  {showNotificationSavedMessage && (
+                    <div className="mr-4 px-3 py-2 rounded-md bg-blue-100 text-blue-700 flex items-center">
+                      Meldingsinstellingen opgeslagen
+                    </div>
+                  )}
                   <Button 
-                    className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                    type="button"
                     onClick={saveNotificationSettings}
                     disabled={isSavingNotifications}
+                    className="bg-[#1e3a8a] text-white hover:bg-blue-700 transition-colors"
                   >
-                    {isSavingNotifications ? (
-                      <>
-                        <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                        Opslaan...
-                      </>
-                    ) : (
-                      "Meldingsinstellingen opslaan"
-                    )}
+                    {isSavingNotifications ? "Bezig met opslaan..." : "Instellingen opslaan"}
                   </Button>
                 </div>
               </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
+
+        {/* Uitlogknop */}
+        <div className="flex justify-end mt-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleLogout}
+            className="text-red-600 border-red-200 hover:bg-red-50"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Uitloggen
+          </Button>
+        </div>
       </div>
     </div>
   );

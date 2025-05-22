@@ -660,8 +660,12 @@ export default function Scheduling() {
                         </div>
                       ))
                     ) : (
-                      <div className="p-6 text-center text-gray-500">
-                        Geen docentroosters beschikbaar
+                      <div className="p-6 text-center">
+                        <Calendar className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+                        <h3 className="text-lg font-medium mb-2">Geen rooster gevonden</h3>
+                        <p className="text-gray-500 mb-4">
+                          Er zijn geen roosters die overeenkomen met de geselecteerde filters.
+                        </p>
                       </div>
                     )}
                   </div>

@@ -1423,8 +1423,11 @@ export default function Fees() {
             </CardHeader>
             <CardContent>
               {feeSettings.length === 0 ? (
-                <div className="py-8 text-center">
-                  <p className="text-gray-500">Geen collegegeld instellingen gevonden.</p>
+                <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                  <div className="text-[#1e3a8a] mb-2">
+                    <Euro className="h-12 w-12 mx-auto opacity-30" />
+                  </div>
+                  <p className="text-sm font-medium">Geen collegegeld instellingen gevonden</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -1676,8 +1679,13 @@ export default function Fees() {
                       <tbody className="bg-white divide-y divide-gray-200">
                         {/* Bij geen data dit weergeven: */}
                         <tr>
-                          <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                            Geen activiteiten gevonden. Voeg een nieuwe activiteit toe met de knop hierboven.
+                          <td colSpan={6} className="px-0 py-0">
+                            <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                              <div className="text-[#1e3a8a] mb-2">
+                                <MapPin className="h-12 w-12 mx-auto opacity-30" />
+                              </div>
+                              <p className="text-sm font-medium">Geen activiteiten gevonden</p>
+                            </div>
                           </td>
                         </tr>
                         
@@ -1817,8 +1825,11 @@ export default function Fees() {
             </CardHeader>
             <CardContent>
               {discounts.length === 0 ? (
-                <div className="py-8 text-center">
-                  <p className="text-gray-500">Geen kortingsregels gevonden.</p>
+                <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                  <div className="text-[#1e3a8a] mb-2">
+                    <Percent className="h-12 w-12 mx-auto opacity-30" />
+                  </div>
+                  <p className="text-sm font-medium">Geen kortingsregels gevonden</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">

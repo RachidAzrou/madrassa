@@ -427,9 +427,6 @@ const MyAccount = () => {
                         {currentUser.role}
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" className="mt-1 border-gray-300" onClick={handleLogout}>
-                      <LogOut className="h-4 w-4 mr-2 text-[#1e3a8a]" /> Afmelden
-                    </Button>
                   </div>
                 </div>
                 

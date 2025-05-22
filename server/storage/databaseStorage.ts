@@ -27,6 +27,10 @@ import type { IStorage } from "./IStorage";
 
 export class DatabaseStorage implements IStorage {
   // Users
+  async getUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+  
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
@@ -40,6 +44,317 @@ export class DatabaseStorage implements IStorage {
   async createUser(userData: InsertUser): Promise<User> {
     const [user] = await db.insert(users).values(userData).returning();
     return user;
+  }
+  
+  async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
+    const [updatedUser] = await db.update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
+  }
+  
+  async deleteUser(id: number): Promise<boolean> {
+    const result = await db.delete(users).where(eq(users.id, id));
+    return true;
+  }
+  
+  // Students
+  async getStudents(): Promise<Student[]> {
+    return await db.select().from(students);
+  }
+  
+  async getStudent(id: number): Promise<Student | undefined> {
+    const [student] = await db.select().from(students).where(eq(students.id, id));
+    return student;
+  }
+  
+  async getStudentByEmail(email: string): Promise<Student | undefined> {
+    const [student] = await db.select().from(students).where(eq(students.email, email));
+    return student;
+  }
+  
+  async createStudent(studentData: InsertStudent): Promise<Student> {
+    const [student] = await db.insert(students).values(studentData).returning();
+    return student;
+  }
+  
+  async updateStudent(id: number, studentData: Partial<Student>): Promise<Student | undefined> {
+    const [updatedStudent] = await db.update(students)
+      .set(studentData)
+      .where(eq(students.id, id))
+      .returning();
+    return updatedStudent;
+  }
+  
+  async deleteStudent(id: number): Promise<boolean> {
+    await db.delete(students).where(eq(students.id, id));
+    return true;
+  }
+  
+  // Programs
+  async getPrograms(): Promise<Program[]> {
+    return await db.select().from(programs);
+  }
+  
+  async getProgram(id: number): Promise<Program | undefined> {
+    const [program] = await db.select().from(programs).where(eq(programs.id, id));
+    return program;
+  }
+  
+  async getProgramByCode(code: string): Promise<Program | undefined> {
+    const [program] = await db.select().from(programs).where(eq(programs.code, code));
+    return program;
+  }
+  
+  async createProgram(programData: InsertProgram): Promise<Program> {
+    const [program] = await db.insert(programs).values(programData).returning();
+    return program;
+  }
+  
+  async updateProgram(id: number, programData: Partial<Program>): Promise<Program | undefined> {
+    const [updatedProgram] = await db.update(programs)
+      .set(programData)
+      .where(eq(programs.id, id))
+      .returning();
+    return updatedProgram;
+  }
+  
+  async deleteProgram(id: number): Promise<boolean> {
+    await db.delete(programs).where(eq(programs.id, id));
+    return true;
+  }
+  
+  // Courses
+  async getCourses(): Promise<Course[]> {
+    return await db.select().from(courses);
+  }
+  
+  async getCourse(id: number): Promise<Course | undefined> {
+    const [course] = await db.select().from(courses).where(eq(courses.id, id));
+    return course;
+  }
+  
+  async getCourseByCode(code: string): Promise<Course | undefined> {
+    const [course] = await db.select().from(courses).where(eq(courses.code, code));
+    return course;
+  }
+  
+  async getCoursesByProgram(programId: number): Promise<Course[]> {
+    return await db.select().from(courses).where(eq(courses.programId, programId));
+  }
+  
+  async getCoursesByFilter(filter: { isActive?: boolean }): Promise<Course[]> {
+    let query = db.select().from(courses);
+    if (filter.isActive !== undefined) {
+      query = query.where(eq(courses.isActive, filter.isActive));
+    }
+    return await query;
+  }
+  
+  async createCourse(courseData: InsertCourse): Promise<Course> {
+    const [course] = await db.insert(courses).values(courseData).returning();
+    return course;
+  }
+  
+  async updateCourse(id: number, courseData: Partial<Course>): Promise<Course | undefined> {
+    const [updatedCourse] = await db.update(courses)
+      .set(courseData)
+      .where(eq(courses.id, id))
+      .returning();
+    return updatedCourse;
+  }
+  
+  async deleteCourse(id: number): Promise<boolean> {
+    await db.delete(courses).where(eq(courses.id, id));
+    return true;
+  }
+  
+  // Student Groups
+  async getStudentGroups(): Promise<StudentGroup[]> {
+    return await db.select().from(studentGroups);
+  }
+  
+  async getStudentGroup(id: number): Promise<StudentGroup | undefined> {
+    const [group] = await db.select().from(studentGroups).where(eq(studentGroups.id, id));
+    return group;
+  }
+  
+  async getStudentGroupsByProgram(programId: number): Promise<StudentGroup[]> {
+    return await db.select().from(studentGroups).where(eq(studentGroups.programId, programId));
+  }
+  
+  async getStudentGroupsByCourse(courseId: number): Promise<StudentGroup[]> {
+    return await db.select().from(studentGroups).where(eq(studentGroups.courseId, courseId));
+  }
+  
+  async getStudentGroupsByAcademicYear(academicYear: string): Promise<StudentGroup[]> {
+    return await db.select().from(studentGroups).where(eq(studentGroups.academicYear, academicYear));
+  }
+  
+  async createStudentGroup(groupData: InsertStudentGroup): Promise<StudentGroup> {
+    const [group] = await db.insert(studentGroups).values(groupData).returning();
+    return group;
+  }
+  
+  async updateStudentGroup(id: number, groupData: Partial<StudentGroup>): Promise<StudentGroup | undefined> {
+    const [updatedGroup] = await db.update(studentGroups)
+      .set(groupData)
+      .where(eq(studentGroups.id, id))
+      .returning();
+    return updatedGroup;
+  }
+  
+  async deleteStudentGroup(id: number): Promise<boolean> {
+    await db.delete(studentGroups).where(eq(studentGroups.id, id));
+    return true;
+  }
+  
+  // Student Group Enrollments
+  async getStudentGroupEnrollments(): Promise<StudentGroupEnrollment[]> {
+    return await db.select().from(studentGroupEnrollments);
+  }
+  
+  async getStudentGroupEnrollment(id: number): Promise<StudentGroupEnrollment | undefined> {
+    const [enrollment] = await db.select().from(studentGroupEnrollments).where(eq(studentGroupEnrollments.id, id));
+    return enrollment;
+  }
+  
+  async getStudentGroupEnrollmentsByStudent(studentId: number): Promise<StudentGroupEnrollment[]> {
+    return await db.select().from(studentGroupEnrollments).where(eq(studentGroupEnrollments.studentId, studentId));
+  }
+  
+  async getStudentGroupEnrollmentsByGroup(groupId: number): Promise<StudentGroupEnrollment[]> {
+    return await db.select().from(studentGroupEnrollments).where(eq(studentGroupEnrollments.groupId, groupId));
+  }
+  
+  async createStudentGroupEnrollment(enrollmentData: InsertStudentGroupEnrollment): Promise<StudentGroupEnrollment> {
+    const [enrollment] = await db.insert(studentGroupEnrollments).values(enrollmentData).returning();
+    return enrollment;
+  }
+  
+  async updateStudentGroupEnrollment(id: number, enrollmentData: Partial<StudentGroupEnrollment>): Promise<StudentGroupEnrollment | undefined> {
+    const [updatedEnrollment] = await db.update(studentGroupEnrollments)
+      .set(enrollmentData)
+      .where(eq(studentGroupEnrollments.id, id))
+      .returning();
+    return updatedEnrollment;
+  }
+  
+  async deleteStudentGroupEnrollment(id: number): Promise<boolean> {
+    await db.delete(studentGroupEnrollments).where(eq(studentGroupEnrollments.id, id));
+    return true;
+  }
+  
+  // Teachers
+  async getTeachers(): Promise<Teacher[]> {
+    return await db.select().from(teachers);
+  }
+  
+  async getTeacher(id: number): Promise<Teacher | undefined> {
+    const [teacher] = await db.select().from(teachers).where(eq(teachers.id, id));
+    return teacher;
+  }
+  
+  async getTeacherByEmail(email: string): Promise<Teacher | undefined> {
+    const [teacher] = await db.select().from(teachers).where(eq(teachers.email, email));
+    return teacher;
+  }
+  
+  async createTeacher(teacherData: InsertTeacher): Promise<Teacher> {
+    const [teacher] = await db.insert(teachers).values(teacherData).returning();
+    return teacher;
+  }
+  
+  async updateTeacher(id: number, teacherData: Partial<Teacher>): Promise<Teacher | undefined> {
+    const [updatedTeacher] = await db.update(teachers)
+      .set(teacherData)
+      .where(eq(teachers.id, id))
+      .returning();
+    return updatedTeacher;
+  }
+  
+  async deleteTeacher(id: number): Promise<boolean> {
+    await db.delete(teachers).where(eq(teachers.id, id));
+    return true;
+  }
+  
+  // Teacher Availability
+  async getTeacherAvailabilities(): Promise<TeacherAvailability[]> {
+    return await db.select().from(teacherAvailability);
+  }
+  
+  async getTeacherAvailability(id: number): Promise<TeacherAvailability | undefined> {
+    const [availability] = await db.select().from(teacherAvailability).where(eq(teacherAvailability.id, id));
+    return availability;
+  }
+  
+  async getTeacherAvailabilitiesByTeacher(teacherId: number): Promise<TeacherAvailability[]> {
+    return await db.select().from(teacherAvailability).where(eq(teacherAvailability.teacherId, teacherId));
+  }
+  
+  async createTeacherAvailability(availabilityData: InsertTeacherAvailability): Promise<TeacherAvailability> {
+    const [availability] = await db.insert(teacherAvailability).values(availabilityData).returning();
+    return availability;
+  }
+  
+  async updateTeacherAvailability(id: number, availabilityData: Partial<TeacherAvailability>): Promise<TeacherAvailability | undefined> {
+    const [updatedAvailability] = await db.update(teacherAvailability)
+      .set(availabilityData)
+      .where(eq(teacherAvailability.id, id))
+      .returning();
+    return updatedAvailability;
+  }
+  
+  async deleteTeacherAvailability(id: number): Promise<boolean> {
+    await db.delete(teacherAvailability).where(eq(teacherAvailability.id, id));
+    return true;
+  }
+  
+  // Lessons
+  async getLessons(): Promise<Lesson[]> {
+    return await db.select().from(lessons);
+  }
+  
+  async getLesson(id: number): Promise<Lesson | undefined> {
+    const [lesson] = await db.select().from(lessons).where(eq(lessons.id, id));
+    return lesson;
+  }
+  
+  async getLessonsByCourse(courseId: number): Promise<Lesson[]> {
+    return await db.select().from(lessons).where(eq(lessons.courseId, courseId));
+  }
+  
+  async getLessonsByGroup(groupId: number): Promise<Lesson[]> {
+    return await db.select().from(lessons).where(eq(lessons.groupId, groupId));
+  }
+  
+  async getLessonsByDateRange(startDate: Date, endDate: Date): Promise<Lesson[]> {
+    return await db.select().from(lessons)
+      .where(
+        and(
+          sql`${lessons.date} >= ${startDate}`,
+          sql`${lessons.date} <= ${endDate}`
+        )
+      );
+  }
+  
+  async createLesson(lessonData: InsertLesson): Promise<Lesson> {
+    const [lesson] = await db.insert(lessons).values(lessonData).returning();
+    return lesson;
+  }
+  
+  async updateLesson(id: number, lessonData: Partial<Lesson>): Promise<Lesson | undefined> {
+    const [updatedLesson] = await db.update(lessons)
+      .set(lessonData)
+      .where(eq(lessons.id, id))
+      .returning();
+    return updatedLesson;
+  }
+  
+  async deleteLesson(id: number): Promise<boolean> {
+    await db.delete(lessons).where(eq(lessons.id, id));
+    return true;
   }
 
   // Notifications

@@ -192,18 +192,22 @@ const NotificationsPage: React.FC = () => {
         </div>
       </div>
 
-      <Separator className="my-6" />
-
-      <div className="mb-6">
-        <div className="relative w-full">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+      <div className="mt-6 mb-6">
+        <div className="relative w-full md:w-96">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             type="search"
             placeholder="Zoeken in notificaties..."
-            className="pl-8 w-full"
+            className="pl-8 bg-white w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {searchTerm && (
+            <XCircle
+              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+              onClick={() => setSearchTerm("")}
+            />
+          )}
         </div>
       </div>
 

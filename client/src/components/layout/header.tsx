@@ -1,4 +1,4 @@
-import { Menu, Settings } from "lucide-react";
+import { Menu, Settings, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import NotificationDropdown from "../notifications/NotificationDropdown";
@@ -22,10 +22,14 @@ const Header = ({ onMenuClick }: HeaderProps) => {
       
       <NotificationDropdown />
       
-      <Button variant="ghost" size="icon" className="bg-primary hover:bg-primary/90 text-white shadow-sm" asChild>
-        <Link href="/settings">
-          <Settings className="h-5 w-5" />
-        </Link>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="bg-primary hover:bg-primary/90 text-white shadow-sm"
+        onClick={() => window.history.back()}
+        title="Terug naar vorige pagina"
+      >
+        <ArrowLeft className="h-5 w-5" />
       </Button>
     </div>
   );

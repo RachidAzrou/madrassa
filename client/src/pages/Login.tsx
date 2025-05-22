@@ -76,38 +76,43 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-800 p-4">
-      <div className="w-full max-w-md">
-        <div className="flex flex-col items-center mb-6">
-          <img src={madrassaLogo} alt="Madrassa Logo" className="h-20 mb-4" />
-          <h1 className="text-2xl font-bold text-center text-primary dark:text-primary-foreground">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-white to-blue-50 dark:from-slate-900 dark:via-slate-900 dark:to-primary/20 p-4">
+      <div className="w-full max-w-md relative z-10">
+        {/* Decoratieve elementen */}
+        <div className="absolute -top-12 -left-12 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-12 -right-12 w-40 h-40 bg-blue-400/10 rounded-full blur-3xl"></div>
+        
+        <div className="flex flex-col items-center mb-8 relative">
+          <div className="w-28 h-28 rounded-full bg-white shadow-xl flex items-center justify-center p-4 mb-6 dark:bg-slate-800">
+            <img src={madrassaLogo} alt="Madrassa Logo" className="h-16" />
+          </div>
+          <h1 className="text-3xl font-bold text-center text-primary dark:text-primary-foreground mb-2">
             Madrassa Beheerplatform
           </h1>
-          <p className="text-muted-foreground text-center mt-2">
-            Log in om toegang te krijgen tot het beheerplatform
+          <div className="w-16 h-1 bg-primary rounded-full mb-3"></div>
+          <p className="text-muted-foreground text-center max-w-xs">
+            Log in om toegang te krijgen tot het administratie platform
           </p>
         </div>
         
-        <Card className="border-t-4 border-t-primary shadow-lg">
-          <CardHeader className="pb-2">
-            <h2 className="text-xl font-semibold text-center">Inloggen</h2>
-          </CardHeader>
+        <Card className="border-none shadow-2xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-blue-500 to-primary"></div>
           
-          <CardContent>
+          <CardContent className="pt-8 pb-6">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>E-mailadres</FormLabel>
+                      <FormLabel className="text-sm font-medium">E-mailadres</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Mail className="absolute left-3 top-3 h-5 w-5 text-primary/60" />
                           <Input
                             placeholder="naam@voorbeeld.nl"
-                            className="pl-10"
+                            className="pl-11 h-12 border-slate-200 dark:border-slate-700 transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                             {...field}
                             disabled={isLoading}
                           />
@@ -122,26 +127,31 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Wachtwoord</FormLabel>
+                      <div className="flex justify-between items-center">
+                        <FormLabel className="text-sm font-medium">Wachtwoord</FormLabel>
+                        <a href="#" className="text-xs text-primary hover:underline">
+                          Wachtwoord vergeten?
+                        </a>
+                      </div>
                       <FormControl>
                         <div className="relative">
-                          <LockKeyhole className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-primary/60" />
                           <Input
                             type={showPassword ? "text" : "password"}
-                            className="pl-10"
+                            className="pl-11 h-12 border-slate-200 dark:border-slate-700 transition-all focus:border-primary focus:ring-1 focus:ring-primary"
                             {...field}
                             disabled={isLoading}
                           />
                           <button
                             type="button"
                             onClick={togglePasswordVisibility}
-                            className="absolute right-3 top-3"
+                            className="absolute right-3 top-3.5"
                             tabIndex={-1}
                           >
                             {showPassword ? (
-                              <EyeOff className="h-4 w-4 text-muted-foreground" />
+                              <EyeOff className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" />
                             ) : (
-                              <Eye className="h-4 w-4 text-muted-foreground" />
+                              <Eye className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" />
                             )}
                           </button>
                         </div>
@@ -152,26 +162,28 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 />
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full h-12 mt-2 text-base font-medium bg-primary hover:bg-primary/90 transition-all shadow-md hover:shadow-lg"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Bezig met inloggen..." : "Inloggen"}
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Bezig met inloggen...
+                    </div>
+                  ) : (
+                    "Inloggen"
+                  )}
                 </Button>
               </form>
             </Form>
           </CardContent>
-          
-          <CardFooter className="flex flex-col space-y-2 pt-0">
-            <div className="text-sm text-center w-full">
-              <a href="#" className="text-primary hover:underline">
-                Wachtwoord vergeten?
-              </a>
-            </div>
-          </CardFooter>
         </Card>
         
-        <div className="mt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Madrassa. Alle rechten voorbehouden.</p>
+        <div className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+          <p>&copy; {new Date().getFullYear()} Madrassa Beheerplatform. Alle rechten voorbehouden.</p>
         </div>
       </div>
     </div>

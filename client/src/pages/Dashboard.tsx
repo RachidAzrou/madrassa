@@ -150,7 +150,7 @@ export default function Dashboard() {
   });
   
   // Navigatiefuncties
-  const navigateToCalendar = () => setLocation('/calendar');
+  const navigateToCalendar = () => setLocation('/calendar?view=week');
   const navigateToStudents = () => setLocation('/students');
   const navigateToCourses = () => setLocation('/courses');
   const navigateToTeachers = () => setLocation('/teachers');

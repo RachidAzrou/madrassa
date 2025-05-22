@@ -1973,11 +1973,37 @@ export default function Students() {
               Studenten Importeren
             </DialogTitle>
             <DialogDescription>
-              Importeer meerdere studenten vanuit een Excel of CSV bestand.
+              Importeer meerdere studenten vanuit een Excel of CSV bestand. Zorg dat de benodigde velden correct worden herkend.
             </DialogDescription>
           </DialogHeader>
           
           <div className="py-4 space-y-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+              <h3 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-2" />
+                Benodigde velden in importbestand
+              </h3>
+              <p className="text-sm text-blue-700 mb-2">
+                Voor een succesvolle import moet uw bestand de volgende velden bevatten:
+              </p>
+              <ul className="text-xs text-blue-600 list-disc pl-5 grid grid-cols-1 md:grid-cols-2 gap-1">
+                <li><strong>firstName</strong> - Voornaam (verplicht)</li>
+                <li><strong>lastName</strong> - Achternaam (verplicht)</li>
+                <li><strong>email</strong> - E-mailadres</li>
+                <li><strong>phone</strong> - Telefoonnummer</li>
+                <li><strong>dateOfBirth</strong> - Geboortedatum (DD-MM-YYYY)</li>
+                <li><strong>gender</strong> - Geslacht (M/V)</li>
+                <li><strong>street</strong> - Straatnaam</li>
+                <li><strong>houseNumber</strong> - Huisnummer</li>
+                <li><strong>postalCode</strong> - Postcode</li>
+                <li><strong>city</strong> - Plaats</li>
+                <li><strong>status</strong> - Status (enrolled, graduated, suspended, withdrawn)</li>
+              </ul>
+              <p className="text-xs text-blue-600 mt-2 italic">
+                De kolommen in uw bestand kunnen andere namen hebben. In de volgende stap kunt u aangeven welke kolom bij welk veld hoort.
+              </p>
+            </div>
+            
             {!importFile ? (
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                 <div className="mx-auto w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">

@@ -453,6 +453,20 @@ export default function Guardians() {
         </div>
       </div>
       
+      {/* Zoekbalk */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoek voogden..."
+            className="pl-8 bg-white"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </div>
+      </div>
+      
       {/* View tabs & Actions */}
       <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
         <div>
@@ -505,17 +519,6 @@ export default function Guardians() {
       
       {/* Voogden lijst */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex justify-end items-center">
-          <div className="relative">
-            <Input
-              placeholder="Zoek voogden..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="w-full md:w-64 pl-10"
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          </div>
-        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">

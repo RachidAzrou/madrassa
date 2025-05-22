@@ -141,80 +141,80 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
     }
   };
 
-  return (
-    <aside
-      className={cn(
-        "h-screen bg-white border-r border-gray-200",
-        "w-64 flex flex-col",
-        className
-      )}
-    >
-      {/* Logo and header */}
-      <div className="flex items-center justify-center px-2 py-4 border-b border-gray-200">
-        <Link href="/">
-          <div className="w-full flex items-center justify-center">
-            <img 
-              src={myMadrassaLogo} 
-              alt="myMadrassa Logo" 
-              className="w-full object-contain" 
-              style={{ maxHeight: "60px" }}
-            />
-            <span className="sr-only">myMadrassa</span>
-          </div>
-        </Link>
-        {isMobile && (
-          <button 
-            onClick={onClose} 
-            className="p-1 rounded-full text-gray-500 hover:bg-gray-100"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        )}
-      </div>
+  const handleLogoClick = () => {
+    if (isMobile && onClose) {
+      onClose();
+    }
+  };
 
-      {/* Ingelogde gebruiker informatie - vast bovenaan */}
-      <div className="px-3 pt-4 pb-2 border-b border-gray-100">
-        <div 
-          className="bg-blue-50 rounded-md p-3 mb-2 cursor-pointer hover:bg-blue-100 transition-colors"
-          onClick={() => {
-            window.location.href = "/mijn-account";
-            if (onClose) onClose();
-          }}
-        >
-          <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
-              <span className="font-semibold">{userData?.firstName?.[0] || ""}{userData?.lastName?.[0] || ""}</span>
+  return (
+    <div className={cn("h-full w-64 relative", className)}>
+      <div className="absolute inset-0 bg-white border-r border-gray-200 flex flex-col">
+        {/* Logo and header */}
+        <div className="flex items-center justify-center px-2 py-4 border-b border-gray-200">
+          <Link href="/">
+            <div className="w-full flex items-center justify-center">
+              <img 
+                src={myMadrassaLogo} 
+                alt="myMadrassa Logo" 
+                className="w-full object-contain" 
+                style={{ maxHeight: "60px" }}
+              />
+              <span className="sr-only">myMadrassa</span>
             </div>
-            <div>
-              <div className="font-medium">{userData?.firstName || ""} {userData?.lastName || ""}</div>
-              <div className="text-xs text-gray-500">{userData?.role || "Gebruiker"}</div>
+          </Link>
+          {isMobile && (
+            <button 
+              onClick={onClose} 
+              className="p-1 rounded-full text-gray-500 hover:bg-gray-100"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          )}
+        </div>
+
+        {/* Ingelogde gebruiker informatie - vast bovenaan */}
+        <div className="px-3 pt-4 pb-2 border-b border-gray-100">
+          <div 
+            className="bg-blue-50 rounded-md p-3 mb-2 cursor-pointer hover:bg-blue-100 transition-colors"
+            onClick={() => {
+              window.location.href = "/mijn-account";
+              if (onClose) onClose();
+            }}
+          >
+            <div className="flex items-center">
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
+                <span className="font-semibold">{userData?.firstName?.[0] || ""}{userData?.lastName?.[0] || ""}</span>
+              </div>
+              <div>
+                <div className="font-medium">{userData?.firstName || ""} {userData?.lastName || ""}</div>
+                <div className="text-xs text-gray-500">{userData?.role || "Gebruiker"}</div>
+              </div>
             </div>
+          </div>
+          
+          <div className="mt-2 bg-gray-50 rounded-md overflow-hidden">
+            <Link href="/">
+              <div
+                onClick={handleLinkClick}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 text-sm transition-colors cursor-pointer",
+                  location === "/"
+                    ? "bg-primary/10 text-primary font-medium"
+                    : "text-gray-700 hover:text-primary hover:bg-gray-100"
+                )}
+              >
+                <div className="flex-shrink-0">
+                  <LayoutDashboard className="h-5 w-5" />
+                </div>
+                <span className="truncate whitespace-nowrap">Dashboard</span>
+              </div>
+            </Link>
           </div>
         </div>
         
-        <div className="mt-2 bg-gray-50 rounded-md overflow-hidden">
-          <Link href="/">
-            <div
-              onClick={handleLinkClick}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 text-sm transition-colors cursor-pointer",
-                location === "/"
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "text-gray-700 hover:text-primary hover:bg-gray-100"
-              )}
-            >
-              <div className="flex-shrink-0">
-                <LayoutDashboard className="h-5 w-5" />
-              </div>
-              <span className="truncate whitespace-nowrap">Dashboard</span>
-            </div>
-          </Link>
-        </div>
-      </div>
-      
-      {/* Navigation links */}
-      <nav className="flex flex-col flex-1">
-        <div className="flex-1 py-2 px-3 overflow-y-auto">
+        {/* Navigation links - scrollable section */}
+        <div className="flex-1 overflow-auto py-2 px-3">
           <div className="space-y-4">
             <div className="pt-2">
               <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -333,8 +333,8 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
           </div>
         </div>
         
-        {/* Afmelden knop aan einde van de sidebar */}
-        <div className="px-3 mt-auto border-t border-gray-200 py-4 bg-white w-full">
+        {/* Afmelden knop aan einde van de sidebar - fixed */}
+        <div className="px-3 border-t border-gray-200 py-4 bg-white">
           <div
             onClick={() => {
               // Verwijder authenticatie gegevens
@@ -352,8 +352,8 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
             <span className="truncate whitespace-nowrap font-medium">Afmelden</span>
           </div>
         </div>
-      </nav>
-    </aside>
+      </div>
+    </div>
   );
 };
 

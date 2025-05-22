@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
-import Sidebar from "./sidebar";
+import Sidebar from "./sidebar-fixed";
 import Header from "./header";
 import { useMobile } from "@/hooks/use-mobile";
 

@@ -79,46 +79,33 @@ export default function Login(props: any) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Stijlvolle achtergrond */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
-          <div className="absolute inset-0" style={{ 
-            backgroundImage: `url(${educationBgImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.3
-          }}></div>
-          <div className="absolute inset-0" style={{ 
-            backgroundColor: '#3b5998', 
-            mixBlendMode: 'color',
-            opacity: 0.4
-          }}></div>
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/40 dark:to-slate-900/40"></div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+         style={{ 
+           backgroundImage: `url(${educationBgImage})`,
+           backgroundSize: 'cover',
+           backgroundPosition: 'center',
+           backgroundColor: '#f8fafc'
+         }}>
+      {/* Blauwe overlay */}
+      <div className="absolute inset-0 bg-blue-50/50 dark:bg-slate-900/90" 
+           style={{ backgroundColor: '#3b5998', opacity: 0.4, mixBlendMode: 'color' }}></div>
       
-      {/* Decoratieve elementen */}
-      <div className="absolute top-0 right-0 w-1/3 h-64 bg-blue-500/5 rounded-bl-full"></div>
-      <div className="absolute bottom-0 left-0 w-1/4 h-48 bg-blue-500/5 rounded-tr-full"></div>
-      
-      {/* Eén container voor zowel logo als login formulier met subtiele schaduw */}
-      <div className="w-full max-w-md bg-white/90 dark:bg-slate-800/90 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-sm rounded-xl overflow-hidden relative z-10 border border-white/50 dark:border-slate-700/50">
-        {/* Logo bovenaan in de container */}
-        <div className="flex flex-col items-center p-8 bg-white/80 dark:bg-slate-800/80 border-b border-slate-200/70 dark:border-slate-700/70">
-          <div className="mb-6 mt-2">
-            <img src={madrassaLogoPng} alt="mymadrassa" className="h-20" />
-          </div>
-          <p className="text-slate-600 dark:text-slate-300 text-center">
-            Log in om toegang te krijgen tot het platform
-          </p>
-          <div className="mt-2">
-            <p className="text-blue-600 text-sm font-bold bg-blue-100 px-2 py-1 rounded-md">TST-ENVIRONMENT versie 1.1.0</p>
-          </div>
-        </div>
-        
-        {/* Login formulier in dezelfde container */}
+      {/* Eén container voor alles */}
+      <div className="w-full max-w-md bg-white/95 dark:bg-slate-800/95 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-sm rounded-xl overflow-hidden relative z-10">
+        {/* Logo, titel en login alles in één container */}
         <div className="p-8">
+          {/* Logo */}
+          <div className="flex flex-col items-center mb-6">
+            <img src={madrassaLogoPng} alt="mymadrassa" className="h-20 mb-4" />
+            <p className="text-slate-600 dark:text-slate-300 text-center mb-2">
+              Log in om toegang te krijgen tot het platform
+            </p>
+            <p className="text-blue-600 text-sm font-bold bg-blue-100 px-2 py-1 rounded-md">
+              TST-ENVIRONMENT versie 1.1.0
+            </p>
+          </div>
+          
+          {/* Login formulier direct hieronder */}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               <FormField
@@ -134,7 +121,7 @@ export default function Login(props: any) {
                         <Mail className="absolute left-3 top-3 h-5 w-5 text-primary/60" />
                         <Input
                           placeholder="naam@voorbeeld.nl"
-                          className="pl-10 h-11 bg-white/50 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 rounded-lg focus-visible:ring-primary"
+                          className="pl-10 h-11 bg-white/70 dark:bg-slate-900/70 border-slate-300 dark:border-slate-700 rounded-lg focus-visible:ring-primary"
                           {...field}
                           disabled={isLoading}
                         />
@@ -163,7 +150,7 @@ export default function Login(props: any) {
                         <LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-primary/60" />
                         <Input
                           type={showPassword ? "text" : "password"}
-                          className="pl-10 h-11 bg-white/50 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 rounded-lg focus-visible:ring-primary"
+                          className="pl-10 h-11 bg-white/70 dark:bg-slate-900/70 border-slate-300 dark:border-slate-700 rounded-lg focus-visible:ring-primary"
                           {...field}
                           disabled={isLoading}
                         />
@@ -188,7 +175,7 @@ export default function Login(props: any) {
               
               <Button
                 type="submit"
-                className="w-full h-11 mt-2 font-medium bg-primary hover:bg-primary/90 transition-colors"
+                className="w-full h-11 mt-4 font-medium bg-primary hover:bg-primary/90 transition-colors"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -204,7 +191,7 @@ export default function Login(props: any) {
             </form>
           </Form>
           
-          <div className="mt-6 pt-6 border-t border-slate-200/70 dark:border-slate-700/70 text-center">
+          <div className="mt-6 pt-4 border-t border-slate-200/70 dark:border-slate-700/70 text-center">
             <p className="text-sm text-slate-500 dark:text-slate-400">
               &copy; {new Date().getFullYear()} mymadrassa. Alle rechten voorbehouden.
             </p>

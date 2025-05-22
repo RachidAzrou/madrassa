@@ -337,11 +337,7 @@ export default function StudentGroups() {
           )}
         </div>
         
-        <div className="flex justify-between items-center">
-          <TabsList className="h-10 p-1 bg-blue-900/10">
-            <TabsTrigger value="grid" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Rasterweergave</TabsTrigger>
-            <TabsTrigger value="list" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lijstweergave</TabsTrigger>
-          </TabsList>
+        <div className="flex justify-end items-center">
           <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Klas Aanmaken</span>
@@ -351,9 +347,6 @@ export default function StudentGroups() {
 
       {/* Main content area */}
       <Tabs defaultValue="grid" className="space-y-4">
-        <div className="mb-6">
-          {/* TabsList is verplaatst naar boven naast de knop */}
-        </div>
         
         <div className="student-groups-filters bg-white rounded-lg shadow-sm p-4 border border-gray-200 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -738,7 +731,7 @@ export default function StudentGroups() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <Tabs defaultValue="algemeen" className="w-full">
-                <TabsList className="grid grid-cols-5 w-full p-1 bg-blue-900/10">
+                <TabsList className="grid grid-cols-5 w-full h-10 p-1 bg-blue-900/10">
                   <TabsTrigger value="algemeen" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <ChalkBoard className="h-4 w-4" />
                     <span>Algemeen</span>

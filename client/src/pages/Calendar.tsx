@@ -397,7 +397,23 @@ export default function Calendar() {
               </TabsList>
             </Tabs>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 flex-wrap gap-3">
+            <div className="relative w-full md:w-auto">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="search"
+                placeholder="Zoek evenementen..."
+                className="w-full md:w-[250px] pl-9 pr-9 border-gray-300 focus:border-blue-500"
+                value={searchTerm || ""}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <XCircle
+                  className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                  onClick={() => setSearchTerm("")}
+                />
+              )}
+            </div>
             <Select value={filter} onValueChange={handleFilterChange}>
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Filter Evenementen" />

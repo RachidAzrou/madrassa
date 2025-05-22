@@ -365,17 +365,17 @@ export default function Courses() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page Title */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <BookOpen className="h-6 w-6" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <BookOpen className="h-7 w-7" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Curriculum</h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Curriculum</h1>
+              <p className="text-base text-gray-500 mt-1">Beheer het curriculum en de inschrijvingen</p>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beheer het curriculum en de inschrijvingen
-          </p>
         </div>
       </div>
       

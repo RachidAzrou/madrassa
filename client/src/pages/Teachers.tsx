@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image, BookText } from "lucide-react";
+import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image, BookText, XCircle } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -666,13 +666,20 @@ export default function Teachers() {
       {/* Zoek en acties */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
         <div className="relative w-full md:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           <Input
+            type="search"
             placeholder="Zoek docenten..."
+            className="w-full pl-9 pr-9 border-gray-300 focus:border-blue-500"
             value={searchTerm}
             onChange={handleSearchChange}
-            className="w-full pl-10"
           />
+          {searchTerm && (
+            <XCircle
+              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+              onClick={() => setSearchTerm("")}
+            />
+          )}
         </div>
         
         <Button 

@@ -48,20 +48,34 @@ export default function Login(props: any) {
       // Simuleer een korte vertraging
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Toon een succesbericht
-      toast({
-        title: 'Ingelogd!',
-        description: 'Je bent succesvol ingelogd.',
-      });
-      
-      // Callback voor succesvolle login
-      if (onLoginSuccess) {
-        onLoginSuccess();
+      // Check of we de admin login kunnen gebruiken
+      if (data.email === 'admin@mymadrassa.nl' && data.password === 'admin123') {
+        // Toon een succesbericht
+        toast({
+          title: 'Ingelogd!',
+          description: 'Je bent succesvol ingelogd als beheerder.',
+        });
+        
+        // Sla de gebruikersgegevens op in localStorage
+        localStorage.setItem("auth_token", "admin_token");
+        localStorage.setItem("user_role", "ADMIN");
+        localStorage.setItem("user_name", "Admin");
+        
+        // Callback voor succesvolle login
+        if (onLoginSuccess) {
+          onLoginSuccess();
+        } else {
+          // Navigeer naar dashboard
+          setLocation('/');
+        }
       } else {
-        // Maak een dummy token aan en sla het op
-        localStorage.setItem("auth_token", "dummy_token");
-        // Navigeer naar dashboard
-        setLocation('/');
+        // Toon een foutmelding voor ongeldige inloggegevens
+        toast({
+          title: 'Ongeldige inloggegevens',
+          description: 'De ingevoerde gegevens zijn niet correct. Probeer het opnieuw.',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
       }
     } catch (error) {
       toast({
@@ -69,7 +83,6 @@ export default function Login(props: any) {
         description: 'Er is een fout opgetreden bij het inloggen. Probeer het opnieuw.',
         variant: 'destructive',
       });
-    } finally {
       setIsLoading(false);
     }
   }

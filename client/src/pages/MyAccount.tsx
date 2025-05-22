@@ -47,7 +47,7 @@ import { z } from "zod";
 import { 
   User, Lock, Bell, Shield, UserCircle, KeyRound, BellRing, 
   Settings, BookOpen, FileText, School, UploadCloud, Moon, 
-  Sun, Calendar, Home, History, Terminal, Languages
+  Sun, Calendar, Home, History, Terminal, Languages, LogOut
 } from "lucide-react";
 
 // Schema voor het formulier
@@ -371,70 +371,9 @@ const MyAccount = () => {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Profielkaart */}
-        <Card className="w-full md:w-1/3">
-          <CardHeader className="text-center">
-            <div className="relative mx-auto w-24 h-24 mb-4">
-              <Avatar className="w-24 h-24">
-                <AvatarImage src={currentUser.avatar} />
-                <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
-                  {currentUser.firstName[0]}{currentUser.lastName[0]}
-                </AvatarFallback>
-              </Avatar>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="absolute bottom-0 right-0 rounded-full p-1.5 bg-white/90"
-                onClick={handleProfilePhotoUpload}
-              >
-                <UploadCloud className="h-4 w-4" />
-              </Button>
-            </div>
-            <CardTitle>{currentUser.firstName} {currentUser.lastName}</CardTitle>
-            <CardDescription>{currentUser.role}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="text-sm">
-              <span className="font-medium text-gray-500">Email:</span> {currentUser.email}
-            </div>
-            <div className="text-sm">
-              <span className="font-medium text-gray-500">Telefoon:</span> {currentUser.phone}
-            </div>
-            {isTeacher && (
-              <>
-                <div className="text-sm mt-4">
-                  <span className="font-medium text-gray-500">Vakken:</span> 
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {teacherUser.subjects.map((subject, index) => (
-                      <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                        {subject}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="text-sm mt-2">
-                  <span className="font-medium text-gray-500">Klassen:</span>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {teacherUser.classes.map((className, index) => (
-                      <span key={index} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                        {className}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-            <div className="mt-4">
-              <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
-                Afmelden
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
+      <div className="flex flex-col gap-6">
         {/* Tabs voor accountinstellingen */}
-        <Card className="w-full md:w-2/3">
+        <Card className="w-full">
           <CardHeader>
             <CardTitle>Accountinstellingen</CardTitle>
             <CardDescription>
@@ -464,125 +403,157 @@ const MyAccount = () => {
 
               {/* Profieltab inhoud */}
               <TabsContent value="profiel" className="space-y-4">
-                <Form {...profileForm}>
-                  <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={profileForm.control}
-                        name="firstName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Voornaam</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={profileForm.control}
-                        name="lastName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Achternaam</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                <div className="flex flex-col md:flex-row gap-6 pb-6">
+                  {/* Profielfoto sectie */}
+                  <div className="flex flex-col items-center">
+                    <div className="relative w-28 h-28 mb-2">
+                      <Avatar className="w-28 h-28">
+                        <AvatarImage src={currentUser.avatar} />
+                        <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
+                          {currentUser.firstName[0]}{currentUser.lastName[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="absolute bottom-0 right-0 rounded-full p-1.5 bg-white/90"
+                        onClick={handleProfilePhotoUpload}
+                      >
+                        <UploadCloud className="h-4 w-4" />
+                      </Button>
                     </div>
-
-                    <FormField
-                      control={profileForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={profileForm.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Telefoon</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormDescription>Optioneel</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormItem>
-                      <FormLabel>Rol</FormLabel>
-                      <div className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-500 ring-offset-background">
-                        {currentUser.role}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">De rol kan niet worden gewijzigd</p>
-                    </FormItem>
-
-                    {isTeacher && (
-                      <>
-                        <FormItem>
-                          <FormLabel>Vakken</FormLabel>
-                          <div className="flex h-min-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-500 ring-offset-background">
-                            <div className="flex flex-wrap gap-1">
-                              {teacherUser.subjects.map((subject, index) => (
-                                <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                                  {subject}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-1">Vakken worden toegewezen door een beheerder</p>
-                        </FormItem>
-
-                        <FormItem>
-                          <FormLabel>Gekoppelde klassen</FormLabel>
-                          <div className="flex h-min-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-500 ring-offset-background">
-                            <div className="flex flex-wrap gap-1">
-                              {teacherUser.classes.map((className, index) => (
-                                <span key={index} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                                  {className}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-1">Klassen worden toegewezen door een beheerder</p>
-                        </FormItem>
-                      </>
-                    )}
-
-                    {showSavedMessage && (
-                      <p className="text-sm text-green-600 mb-2">Profielgegevens succesvol opgeslagen!</p>
-                    )}
-                    <Button 
-                      type="submit" 
-                      className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
-                      disabled={isSaving}
-                    >
-                      {isSaving ? (
-                        <>
-                          <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                          Opslaan...
-                        </>
-                      ) : (
-                        "Wijzigingen opslaan"
-                      )}
+                    <div className="text-center mb-2">
+                      <p className="font-medium">{currentUser.firstName} {currentUser.lastName}</p>
+                      <p className="text-sm text-gray-500">{currentUser.role}</p>
+                    </div>
+                    <Button variant="outline" size="sm" className="mt-2" onClick={handleLogout}>
+                      <LogOut className="h-4 w-4 mr-2" /> Afmelden
                     </Button>
-                  </form>
-                </Form>
+                  </div>
+                  
+                  {/* Profielformulier */}
+                  <div className="flex-1">
+                    <Form {...profileForm}>
+                      <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FormField
+                            control={profileForm.control}
+                            name="firstName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Voornaam</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={profileForm.control}
+                            name="lastName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Achternaam</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={profileForm.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={profileForm.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Telefoon</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormDescription>Optioneel</FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormItem>
+                          <FormLabel>Rol</FormLabel>
+                          <div className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-500 ring-offset-background">
+                            {currentUser.role}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">De rol kan niet worden gewijzigd</p>
+                        </FormItem>
+
+                        {isTeacher && (
+                          <>
+                            <FormItem>
+                              <FormLabel>Vakken</FormLabel>
+                              <div className="flex h-min-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-500 ring-offset-background">
+                                <div className="flex flex-wrap gap-1">
+                                  {teacherUser.subjects.map((subject, index) => (
+                                    <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                      {subject}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">Vakken worden toegewezen door een beheerder</p>
+                            </FormItem>
+
+                            <FormItem>
+                              <FormLabel>Gekoppelde klassen</FormLabel>
+                              <div className="flex h-min-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-500 ring-offset-background">
+                                <div className="flex flex-wrap gap-1">
+                                  {teacherUser.classes.map((className, index) => (
+                                    <span key={index} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                                      {className}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">Klassen worden toegewezen door een beheerder</p>
+                            </FormItem>
+                          </>
+                        )}
+
+                        {showSavedMessage && (
+                          <p className="text-sm text-green-600 mb-2">Profielgegevens succesvol opgeslagen!</p>
+                        )}
+                        <Button 
+                          type="submit" 
+                          className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                          disabled={isSaving}
+                        >
+                          {isSaving ? (
+                            <>
+                              <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                              Opslaan...
+                            </>
+                          ) : (
+                            "Wijzigingen opslaan"
+                          )}
+                        </Button>
+                      </form>
+                    </Form>
+                  </div>
+                </div>
               </TabsContent>
 
               {/* Beveiliging tab inhoud */}
@@ -879,7 +850,7 @@ const MyAccount = () => {
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
                             <Label htmlFor="notifyNewUsers">Nieuwe gebruikers</Label>
-                            <p className="text-sm text-muted-foreground">Ontvang een e-mail wanneer een nieuwe gebruiker zich registreert</p>
+                            <p className="text-sm text-muted-foreground">Ontvang een e-mail wanneer nieuwe gebruikers worden geregistreerd</p>
                           </div>
                           <Switch 
                             id="notifyNewUsers" 
@@ -890,7 +861,7 @@ const MyAccount = () => {
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
                             <Label htmlFor="notifySystemUpdates">Systeemupdates</Label>
-                            <p className="text-sm text-muted-foreground">Ontvang een e-mail bij belangrijke systeemupdates</p>
+                            <p className="text-sm text-muted-foreground">Ontvang een e-mail over belangrijke systeemupdates</p>
                           </div>
                           <Switch 
                             id="notifySystemUpdates" 
@@ -900,8 +871,8 @@ const MyAccount = () => {
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <Label htmlFor="notifySecurityAlerts">Beveiligingswaarschuwingen</Label>
-                            <p className="text-sm text-muted-foreground">Ontvang een e-mail bij beveiligingswaarschuwingen</p>
+                            <Label htmlFor="notifySecurityAlerts">Beveiligingsnotificaties</Label>
+                            <p className="text-sm text-muted-foreground">Ontvang een e-mail bij belangrijke beveiligingsgebeurtenissen</p>
                           </div>
                           <Switch 
                             id="notifySecurityAlerts" 
@@ -917,28 +888,28 @@ const MyAccount = () => {
                 <Separator />
 
                 <div>
-                  <h3 className="text-lg font-medium mb-4">App-meldingen</h3>
+                  <h3 className="text-lg font-medium mb-4">In-app notificaties</h3>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label htmlFor="pushNotifications">Push-meldingen</Label>
-                        <p className="text-sm text-muted-foreground">Schakel push-meldingen in of uit voor de mobiele app</p>
+                        <Label htmlFor="pushNotifications">Push notificaties</Label>
+                        <p className="text-sm text-muted-foreground">Ontvang push notificaties op uw apparaat</p>
                       </div>
                       <Switch 
                         id="pushNotifications" 
-                        checked={notificationSettings.pushNotifications}
-                        onCheckedChange={() => handleToggleNotification('pushNotifications', '')} 
+                        checked={notificationSettings.pushNotifications} 
+                        onCheckedChange={() => handleToggleNotification('pushNotifications', '')}
                       />
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label htmlFor="desktopNotifications">Bureaubladmeldingen</Label>
-                        <p className="text-sm text-muted-foreground">Schakel bureaubladmeldingen in of uit</p>
+                        <Label htmlFor="desktopNotifications">Desktop notificaties</Label>
+                        <p className="text-sm text-muted-foreground">Ontvang notificaties in uw browser (alleen desktop)</p>
                       </div>
                       <Switch 
                         id="desktopNotifications" 
-                        checked={notificationSettings.desktopNotifications}
-                        onCheckedChange={() => handleToggleNotification('desktopNotifications', '')} 
+                        checked={notificationSettings.desktopNotifications} 
+                        onCheckedChange={() => handleToggleNotification('desktopNotifications', '')}
                       />
                     </div>
                   </div>

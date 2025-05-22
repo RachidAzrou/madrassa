@@ -1210,9 +1210,6 @@ export default function Students() {
                       </svg>
                     </div>
                     <p className="text-sm font-medium">Geen studenten beschikbaar</p>
-                    <p className="text-gray-500 mb-4">
-                      Er zijn geen studenten die overeenkomen met de geselecteerde filters.
-                    </p>
                   </div>
                 </td>
               </tr>

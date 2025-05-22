@@ -364,26 +364,6 @@ export default function Courses() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      {/* Zoekbalk - bovenaan geplaatst */}
-      <div className="mb-4">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            type="search"
-            placeholder="Zoek curricula..."
-            className="pl-8 bg-white"
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-          {searchTerm && (
-            <XCircle
-              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
-              onClick={() => setSearchTerm("")}
-            />
-          )}
-        </div>
-      </div>
-      
       {/* Page Title */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
@@ -407,6 +387,26 @@ export default function Courses() {
           <PlusCircle className="mr-2 h-4 w-4" />
           <span>Curriculum Toevoegen</span>
         </Button>
+      </div>
+      
+      {/* Zoekbalk - onder de paginatitel geplaatst */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoek curricula..."
+            className="pl-8 bg-white"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          {searchTerm && (
+            <XCircle
+              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+              onClick={() => setSearchTerm("")}
+            />
+          )}
+        </div>
       </div>
       
       {/* Main Tabs for Courses/Classes and Filter Tabs for Status */}

@@ -356,6 +356,94 @@ export class DatabaseStorage implements IStorage {
     await db.delete(lessons).where(eq(lessons.id, id));
     return true;
   }
+  
+  // Guardians
+  async getGuardians(): Promise<Guardian[]> {
+    return await db.select().from(guardians);
+  }
+  
+  async getGuardian(id: number): Promise<Guardian | undefined> {
+    const [guardian] = await db.select().from(guardians).where(eq(guardians.id, id));
+    return guardian;
+  }
+  
+  async getGuardianByEmail(email: string): Promise<Guardian | undefined> {
+    const [guardian] = await db.select().from(guardians).where(eq(guardians.email, email));
+    return guardian;
+  }
+  
+  async getGuardiansByStudent(studentId: number): Promise<Guardian[]> {
+    // Gebruik student-guardian relaties om voogden van een student te vinden
+    const relations = await db.select({
+      guardianId: studentGuardians.guardianId
+    })
+    .from(studentGuardians)
+    .where(eq(studentGuardians.studentId, studentId));
+    
+    if (relations.length === 0) {
+      return [];
+    }
+    
+    // Haal alle voogden op basis van de gevonden IDs
+    const guardianIds = relations.map(rel => rel.guardianId);
+    return await db.select()
+      .from(guardians)
+      .where(sql`${guardians.id} IN (${guardianIds.join(',')})`);
+  }
+  
+  async createGuardian(guardianData: InsertGuardian): Promise<Guardian> {
+    const [guardian] = await db.insert(guardians).values(guardianData).returning();
+    return guardian;
+  }
+  
+  async updateGuardian(id: number, guardianData: Partial<Guardian>): Promise<Guardian | undefined> {
+    const [updatedGuardian] = await db.update(guardians)
+      .set(guardianData)
+      .where(eq(guardians.id, id))
+      .returning();
+    return updatedGuardian;
+  }
+  
+  async deleteGuardian(id: number): Promise<boolean> {
+    await db.delete(guardians).where(eq(guardians.id, id));
+    return true;
+  }
+  
+  // Student Guardian relations
+  async getStudentGuardians(): Promise<StudentGuardian[]> {
+    return await db.select().from(studentGuardians);
+  }
+  
+  async getStudentGuardian(id: number): Promise<StudentGuardian | undefined> {
+    const [relation] = await db.select().from(studentGuardians).where(eq(studentGuardians.id, id));
+    return relation;
+  }
+  
+  async getStudentGuardiansByStudent(studentId: number): Promise<StudentGuardian[]> {
+    return await db.select().from(studentGuardians).where(eq(studentGuardians.studentId, studentId));
+  }
+  
+  async getStudentGuardiansByGuardian(guardianId: number): Promise<StudentGuardian[]> {
+    return await db.select().from(studentGuardians).where(eq(studentGuardians.guardianId, guardianId));
+  }
+  
+  async createStudentGuardian(relationData: InsertStudentGuardian): Promise<StudentGuardian> {
+    const [relation] = await db.insert(studentGuardians).values(relationData).returning();
+    return relation;
+  }
+  
+  async updateStudentGuardian(id: number, relationData: Partial<StudentGuardian>): Promise<StudentGuardian | undefined> {
+    const [updatedRelation] = await db.update(studentGuardians)
+      .set(relationData)
+      .where(eq(studentGuardians.id, id))
+      .returning();
+    return updatedRelation;
+  }
+  
+  async deleteStudentGuardian(id: number): Promise<boolean> {
+    await db.delete(studentGuardians).where(eq(studentGuardians.id, id));
+    return true;
+  }
 
   // Notifications
   async getNotificationsByUser(userId: number): Promise<Notification[]> {

@@ -2400,6 +2400,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  apiRouter.get("/api/guardians", async (req, res) => {
+    try {
+      const guardians = await storage.getGuardians();
+      res.json(guardians);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching guardians" });
+    }
+  });
+
   apiRouter.get("/api/guardians/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);

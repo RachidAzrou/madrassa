@@ -1030,8 +1030,8 @@ export default function Students() {
 
               
               {/* Persoonlijke informatie tab */}
-              <TabsContent value="personal" className="space-y-6">
-                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+              <TabsContent value="personal" className="space-y-3">
+                <div className="p-3 border border-gray-200 rounded-lg bg-white shadow-sm">
                   <h3 className="text-base font-semibold text-primary mb-3">Persoonlijke gegevens</h3>
                   
                   {/* Foto upload sectie */}

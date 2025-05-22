@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, X, UserCircle, Mail, Home, BookOpen, Phone } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, Users2, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -552,7 +552,7 @@ export default function Guardians() {
                 <tr>
                   <td colSpan={5} className="px-6 py-8">
                     <div className="p-6 text-center">
-                      <Users2 className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+                      <Users className="h-10 w-10 text-gray-400 mx-auto mb-3" />
                       <h3 className="text-lg font-medium mb-2">Geen voogden gevonden</h3>
                       <p className="text-gray-500 mb-4">
                         Er zijn geen voogden die overeenkomen met de geselecteerde filters.

@@ -775,15 +775,6 @@ export default function Students() {
                       <Users className="h-12 w-12 mx-auto opacity-30" />
                     </div>
                     <p className="text-sm font-medium">Geen studenten beschikbaar</p>
-                    <Button 
-                      onClick={() => setIsCreateDialogOpen(true)}
-                      variant="outline"
-                      size="sm"
-                      className="mt-3 text-xs text-[#1e3a8a]"
-                    >
-                      <PlusCircle className="mr-1 h-3 w-3" />
-                      Student toevoegen
-                    </Button>
                   </div>
                 </TableCell>
               </TableRow>

@@ -13,7 +13,6 @@ import {
   BookText,
   LayoutDashboard
 } from 'lucide-react';
-import { ResponsiveStatsCard } from '@/components/dashboard/responsive-stats-card';
 
 // Aangepast ChalkBoard icoon
 const ChalkBoard = (props: any) => (
@@ -232,30 +231,39 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-        <ResponsiveStatsCard 
-          title="Studenten" 
-          value={stats.totalStudents} 
-          icon={<Users className="h-5 w-5" />}
-        />
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <Users className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
+          </div>
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Studenten</h3>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.totalStudents}</p>
+        </div>
         
-        <ResponsiveStatsCard 
-          title="Klassen" 
-          value={stats.studentGroups} 
-          icon={<ChalkBoard className="h-5 w-5" />}
-        />
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <ChalkBoard className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
+          </div>
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Klassen</h3>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.studentGroups}</p>
+        </div>
         
-        <ResponsiveStatsCard 
-          title="Docenten" 
-          value={stats.totalTeachers} 
-          icon={<GraduationCap className="h-5 w-5" />}
-        />
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <GraduationCap className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
+          </div>
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Docenten</h3>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.totalTeachers}</p>
+        </div>
         
-        <ResponsiveStatsCard 
-          title="Vakken" 
-          value={stats.programs} 
-          icon={<BookOpen className="h-5 w-5" />}
-        />
+        {/* Programma's widget als vervanger voor Vakken */}
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10">
+            <BookOpen className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
+          </div>
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Vakken</h3>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.programs}</p>
+        </div>
       </div>
 
       {/* Main Content */}

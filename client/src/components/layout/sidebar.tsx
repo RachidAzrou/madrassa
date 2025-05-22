@@ -117,8 +117,8 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
   return (
     <aside
       className={cn(
-        "h-full min-h-screen bg-white border-r border-gray-200",
-        "w-64 flex flex-col overflow-hidden",
+        "h-screen bg-white border-r border-gray-200",
+        "w-64 flex flex-col",
         className
       )}
     >
@@ -146,8 +146,8 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
       </div>
 
       {/* Navigation links */}
-      <nav className="flex-1 py-4 px-3 overflow-y-auto flex flex-col h-full justify-between">
-        <div className="space-y-4">
+      <nav className="flex-1 py-4 px-3 overflow-y-auto flex flex-col justify-between" style={{ maxHeight: "calc(100vh - 80px)" }}>
+        <div className="space-y-4 overflow-y-auto">
           {/* Ingelogde gebruiker informatie */}
           <div className="pt-1 pb-3">
             <div 

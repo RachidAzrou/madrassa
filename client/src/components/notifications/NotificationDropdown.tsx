@@ -34,11 +34,7 @@ const NotificationDropdown: React.FC = () => {
   };
 
   const handleItemClick = (notification: Notification) => {
-    if (!notification.isRead) {
-      markAsRead(notification.id);
-    }
-    
-    // Altijd naar de notificatiepagina navigeren
+    // Alleen naar de notificatiepagina navigeren, niet automatisch als gelezen markeren
     setLocation('/notifications');
     setOpen(false);
   };
@@ -135,7 +131,7 @@ const NotificationDropdown: React.FC = () => {
                       size="sm"
                       variant="ghost"
                       onClick={(e) => handleDelete(notification.id, e)}
-                      className="invisible group-hover:visible absolute top-3 right-3 h-5 w-5 p-0 text-primary hover:bg-primary/10 rounded-full"
+                      className="invisible group-hover:visible absolute bottom-3 right-3 h-5 w-5 p-0 text-primary hover:bg-primary/10 rounded-full"
                       title="Verwijderen"
                     >
                       <Trash2 className="h-3 w-3" />

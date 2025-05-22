@@ -113,29 +113,20 @@ const NotificationDropdown: React.FC = () => {
                           {notification.message}
                         </p>
                         
-                        <div className="flex justify-end mt-2 gap-1">
-                          {!notification.isRead && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => handleMarkAsRead(notification.id, e)}
-                              className="h-6 text-xs px-2 text-primary hover:bg-primary/10 visible"
-                            >
-                              Gelezen
-                            </Button>
-                          )}
-                        </div>
+                        {/* Gelezen-knop verwijderd */}
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={(e) => handleDelete(notification.id, e)}
-                      className="invisible group-hover:visible absolute bottom-3 right-3 h-5 w-5 p-0 text-primary hover:bg-primary/10 rounded-full"
-                      title="Verwijderen"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                    <div className="absolute top-2 right-2 flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => handleDelete(notification.id, e)}
+                        className="invisible group-hover:visible h-5 w-5 p-0 text-primary hover:bg-primary/10 rounded-full"
+                        title="Verwijderen"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </DropdownMenuItem>
                 ))}
                 {notifications.length > 3 && !showAll && (

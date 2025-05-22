@@ -674,45 +674,6 @@ const MyAccount = () => {
                   </div>
                 </div>
 
-                <Separator />
-
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Startpagina</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div 
-                      className={`flex flex-col items-center p-4 border rounded-lg ${selectedDefaultPage === "Dashboard" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
-                      onClick={() => handleSelectDefaultPage("Dashboard")}
-                    >
-                      <Home className="h-8 w-8 mb-2" />
-                      <span>Dashboard</span>
-                    </div>
-                    
-                    <div 
-                      className={`flex flex-col items-center p-4 border rounded-lg ${selectedDefaultPage === "Rooster" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
-                      onClick={() => handleSelectDefaultPage("Rooster")}
-                    >
-                      <Calendar className="h-8 w-8 mb-2" />
-                      <span>Rooster</span>
-                    </div>
-                    
-                    <div 
-                      className={`flex flex-col items-center p-4 border rounded-lg ${selectedDefaultPage === "Mijn Klassen" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
-                      onClick={() => handleSelectDefaultPage("Mijn Klassen")}
-                    >
-                      <School className="h-8 w-8 mb-2" />
-                      <span>Mijn Klassen</span>
-                    </div>
-                    
-                    <div 
-                      className={`flex flex-col items-center p-4 border rounded-lg ${selectedDefaultPage === "Mijn Vakken" ? "border-primary bg-primary/5" : "hover:bg-muted/50 cursor-pointer"}`}
-                      onClick={() => handleSelectDefaultPage("Mijn Vakken")}
-                    >
-                      <BookOpen className="h-8 w-8 mb-2" />
-                      <span>Mijn Vakken</span>
-                    </div>
-                  </div>
-                </div>
-
                 {isAdmin && (
                   <>
                     <Separator />

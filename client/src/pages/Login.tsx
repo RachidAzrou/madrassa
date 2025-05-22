@@ -83,14 +83,15 @@ export default function Login(props: any) {
       {/* Stijlvolle achtergrond */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
-          <div className="absolute inset-0 overflow-hidden" style={{
-            backgroundImage: 'url("https://raw.githubusercontent.com/user-attachments/assets/main/rm347-porpla-02-a-01.jpg")',
-            backgroundSize: 'cover',
-            backgroundRepeat: 'repeat',
-            backgroundPosition: 'center',
-            filter: 'brightness(1.05) hue-rotate(-10deg) opacity(0.15) contrast(0.9) sepia(0.2) saturate(0.9)',
-          }}>
-            <div className="absolute inset-0" style={{ backgroundColor: '#3b5998', mixBlendMode: 'color', opacity: 0.2 }}></div>
+          <div className="absolute inset-0 overflow-hidden" style={{ backgroundColor: '#f8fafc' }}>
+            <div className="absolute inset-0" style={{ 
+              background: `url("https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA1L3JtMzQ3LXBvcnBsYS0wMi1hLmpwZw.jpg")`,
+              backgroundSize: 'cover',
+              backgroundRepeat: 'repeat',
+              opacity: 0.15,
+              filter: 'grayscale(0.2) invert(0) sepia(0.2) hue-rotate(175deg) saturate(0.8)'
+            }}></div>
+            <div className="absolute inset-0" style={{ backgroundColor: '#3b5998', mixBlendMode: 'overlay', opacity: 0.1 }}></div>
           </div>
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/40 dark:to-slate-900/40"></div>

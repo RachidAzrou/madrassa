@@ -10,17 +10,15 @@ interface NavItemProps {
 
 const NavItem = ({ to, icon, label, isActive }: NavItemProps) => {
   return (
-    <Link href={to}>
-      <a
-        className={`flex items-center px-4 py-3 text-sm font-medium rounded-md cursor-pointer ${
-          isActive
-            ? "bg-primary-700 text-white"
-            : "text-white/70 hover:bg-primary-700 hover:text-white"
-        }`}
-      >
-        <i className={`${icon} mr-3 text-lg`}></i>
-        {label}
-      </a>
+    <Link href={to} 
+      className={`flex items-center px-4 py-3 text-sm font-medium rounded-md cursor-pointer ${
+        isActive
+          ? "bg-primary-700 text-white"
+          : "text-white/70 hover:bg-primary-700 hover:text-white"
+      }`}
+    >
+      <i className={`${icon} mr-3 text-lg`}></i>
+      {label}
     </Link>
   );
 };

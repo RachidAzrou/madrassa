@@ -1037,7 +1037,7 @@ export default function Students() {
                   {/* Foto upload sectie */}
                   <div className="flex mb-0 mt-0 items-start">
                     <div 
-                      className="w-16 h-16 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-2"
+                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-4"
                       onClick={() => {
                         const fileInput = document.getElementById('student-photo') as HTMLInputElement;
                         fileInput?.click();
@@ -1102,11 +1102,11 @@ export default function Students() {
                     />
                   </div>
                   
-                  <div className="flex mt-0 mb-1 justify-end">
+                  <div className="flex mt-0 mb-0 justify-end">
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="flex items-center border border-gray-300 text-xs h-8"
+                      className="flex items-center border border-gray-300 text-xs h-7"
                       onClick={() => {
                         // Get access to toast context within this function
                         const localToast = toast;

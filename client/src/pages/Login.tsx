@@ -82,12 +82,13 @@ export default function Login(props: any) {
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Stijlvolle achtergrond */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-white to-blue-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
-          <div className="absolute inset-0 opacity-10" style={{ 
-            backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%233b5998\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-10v-10h-4v10h-10v4h10v10h4v-10h10zM60 12v-4h-10V0h-4v8h-8v4h8v8h4v-8h10zm-28 20v-4h-8v-8h-4v8h-8v4h8v8h4v-8h8zM16 12v-4H0v4h4v4h12v-4h4z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-            backgroundSize: '60px 60px'
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-50 via-white to-blue-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
+          <div className="absolute inset-0 opacity-25" style={{ 
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'56\' height=\'56\' viewBox=\'0 0 56 56\' enable-background=\'new 0 0 56 56\'%3E%3Cpath fill=\'%233b5998\' d=\'M29 20.984c0-.585-.415-1-1-1-.552 0-1 .415-1 1 0 .552.448 1 1 1C28.585 21.984 29 21.536 29 20.984zM41 44.984h-8V42h1c.553 0 1-.447 1-1v-4c0-.553-.447-1-1-1h-1v-1c0-.553-.447-1-1-1h-1v-1c0-.553-.447-1-1-1h-1V30.984c0-.553-.447-1-1-1h-2V29.984c0-.553-.447-1-1-1h-1v-8h9c.553 0 1-.447 1-1v-6c0-.553-.447-1-1-1H21c-.553 0-1 .447-1 1v6c0 .553.447 1 1 1h9v8h-1c-.553 0-1 .447-1 1V30.984h-2c-.553 0-1 .447-1 1V33.984h-1c-.553 0-1 .447-1 1v1h-1c-.553 0-1 .447-1 1v1h-1c-.553 0-1 .447-1 1v4c0 .553.447 1 1 1h1V44.984h-8c-.553 0-1 .447-1 1s.447 1 1 1h14 8 14c.553 0 1-.447 1-1S41.553 44.984 41 44.984zM22 14.984V9.984h12v5H22z\'/%3E%3C/svg%3E")',
+            backgroundSize: '56px 56px'
           }}></div>
         </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/40 dark:to-slate-900/40"></div>
       </div>
       
       {/* Decoratieve elementen */}

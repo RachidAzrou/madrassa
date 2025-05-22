@@ -334,7 +334,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
         
         {/* Afmelden knop aan einde van de sidebar */}
-        <div className="border-t border-gray-200 pt-4">
+        <div className="mt-auto border-t border-gray-200 pt-4">
           <div
             onClick={() => {
               // Verwijder authenticatie gegevens

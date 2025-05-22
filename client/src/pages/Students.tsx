@@ -677,17 +677,27 @@ export default function Students() {
           </div>
         </div>
         
-        <Button 
-          variant="default" 
-          size="default" 
-          className="bg-primary hover:bg-primary/90"
-          onClick={() => {
-            resetForm();
-            setIsCreateDialogOpen(true);
-          }}
-        >
-          <PlusCircle className="mr-2 h-4 w-4" /> Student Toevoegen
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="default" 
+            className="border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a]/10"
+            onClick={() => setIsImportDialogOpen(true)}
+          >
+            <FileUp className="mr-2 h-4 w-4" /> Importeren
+          </Button>
+          <Button 
+            variant="default" 
+            size="default" 
+            className="bg-primary hover:bg-primary/90"
+            onClick={() => {
+              resetForm();
+              setIsCreateDialogOpen(true);
+            }}
+          >
+            <PlusCircle className="mr-2 h-4 w-4" /> Student Toevoegen
+          </Button>
+        </div>
       </div>
 
       {/* Filter opties */}

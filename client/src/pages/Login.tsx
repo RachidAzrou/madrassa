@@ -48,8 +48,8 @@ export default function Login(props: any) {
       // Simuleer een korte vertraging
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Check of we de admin login kunnen gebruiken
-      if (data.email === 'admin@mymadrassa.nl' && data.password === 'admin123') {
+      // Check of we de admin login kunnen gebruiken (ook met .be email)
+      if ((data.email === 'admin@mymadrassa.nl' || data.email === 'admin@mymadrassa.be') && data.password === 'admin123') {
         // Toon een succesbericht
         toast({
           title: 'Ingelogd!',
@@ -61,13 +61,12 @@ export default function Login(props: any) {
         localStorage.setItem("user_role", "ADMIN");
         localStorage.setItem("user_name", "Admin");
         
-        // Callback voor succesvolle login
-        if (onLoginSuccess) {
-          onLoginSuccess();
-        } else {
-          // Navigeer naar dashboard
-          setLocation('/');
-        }
+        // Direct naar dashboard navigeren zonder callbacks
+        localStorage.setItem("is_authenticated", "true");
+        
+        // Forceer een harde redirect
+        window.location.href = "/";
+        return;
       } else {
         // Toon een foutmelding voor ongeldige inloggegevens
         toast({

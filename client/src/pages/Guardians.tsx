@@ -550,13 +550,12 @@ export default function Guardians() {
                 </tr>
               ) : guardians.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8">
-                    <div className="p-6 text-center">
-                      <Users className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                      <h3 className="text-lg font-medium mb-2">Geen voogden gevonden</h3>
-                      <p className="text-gray-500 mb-4">
-                        Er zijn geen voogden die overeenkomen met de geselecteerde filters.
-                      </p>
+                  <td colSpan={5}>
+                    <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                      <div className="text-[#1e3a8a] mb-2">
+                        <Users className="h-12 w-12 mx-auto opacity-30" />
+                      </div>
+                      <p className="text-sm font-medium">Geen voogden beschikbaar</p>
                     </div>
                   </td>
                 </tr>

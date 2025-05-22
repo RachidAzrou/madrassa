@@ -1003,7 +1003,7 @@ export default function Students() {
           </DialogHeader>
           
           <div className="py-4">
-            <Tabs defaultValue="photo" className="w-full">
+            <Tabs defaultValue="personal" className="w-full">
               <TabsList className="grid grid-cols-6 mb-4">
                 <TabsTrigger value="photo">
                   <Image className="mr-2 h-4 w-4" />

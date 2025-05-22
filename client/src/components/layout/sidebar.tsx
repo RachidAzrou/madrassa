@@ -145,39 +145,40 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         )}
       </div>
 
-      {/* Navigation links */}
-      <nav className="flex-1 py-4 px-3 overflow-y-auto flex flex-col justify-between" style={{ maxHeight: "calc(100vh - 80px)" }}>
-        <div className="space-y-4 overflow-y-auto">
-          {/* Ingelogde gebruiker informatie */}
-          <div className="pt-1 pb-3">
-            <div 
-              className="bg-blue-50 rounded-md p-3 mb-2 cursor-pointer hover:bg-blue-100 transition-colors"
-              onClick={() => {
-                window.location.href = "/mijn-account";
-                if (onClose) onClose();
-              }}
-            >
-              <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
-                  <span className="font-semibold">JD</span>
-                </div>
-                <div>
-                  <div className="font-medium">Jan Doe</div>
-                  <div className="text-xs text-gray-500">Beheerder</div>
-                </div>
-              </div>
+      {/* Ingelogde gebruiker informatie - vast bovenaan */}
+      <div className="px-3 pt-4 pb-2 border-b border-gray-100">
+        <div 
+          className="bg-blue-50 rounded-md p-3 mb-2 cursor-pointer hover:bg-blue-100 transition-colors"
+          onClick={() => {
+            window.location.href = "/mijn-account";
+            if (onClose) onClose();
+          }}
+        >
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
+              <span className="font-semibold">JD</span>
+            </div>
+            <div>
+              <div className="font-medium">Jan Doe</div>
+              <div className="text-xs text-gray-500">Beheerder</div>
             </div>
           </div>
-
-          <div className="space-y-1.5">
-            <SidebarLink
-              href="/"
-              icon={<LayoutDashboard className="h-5 w-5" />}
-              label="Dashboard"
-              isActive={location === "/"}
-              onClick={handleLinkClick}
-            />
-          </div>
+        </div>
+        
+        <div className="mt-2">
+          <SidebarLink
+            href="/"
+            icon={<LayoutDashboard className="h-5 w-5" />}
+            label="Dashboard"
+            isActive={location === "/"}
+            onClick={handleLinkClick}
+          />
+        </div>
+      </div>
+      
+      {/* Navigation links */}
+      <nav className="flex-1 py-2 px-3 overflow-y-auto flex flex-col justify-between" style={{ maxHeight: "calc(100vh - 160px)" }}>
+        <div className="space-y-4 overflow-y-auto">
 
           <div className="pt-2">
             <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">

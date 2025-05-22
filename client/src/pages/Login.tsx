@@ -9,8 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 
-// Import logo direct
+// Import logo en achtergrond direct
 import madrassaLogoPng from '../assets/mymadrassa_logo.png'
+import educationBgImage from '../assets/images/education-bg.jpg'
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Voer een geldig e-mailadres in' }),
@@ -81,18 +82,17 @@ export default function Login(props: any) {
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Stijlvolle achtergrond */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[#f8f9fa] dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
-          <div className="absolute inset-0 overflow-hidden" style={{ 
-            backgroundImage: 'url("https://i.imgur.com/yJKs40t.jpg")',
+        <div className="absolute inset-0 bg-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
+          <div className="absolute inset-0" style={{ 
+            backgroundImage: `url(${educationBgImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            opacity: 0.4
-          }}>
-          </div>
+            opacity: 0.3
+          }}></div>
           <div className="absolute inset-0" style={{ 
             backgroundColor: '#3b5998', 
             mixBlendMode: 'color',
-            opacity: 0.5
+            opacity: 0.4
           }}></div>
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/40 dark:to-slate-900/40"></div>

@@ -10,7 +10,7 @@ type HeaderProps = {
 
 const Header = ({ onMenuClick }: HeaderProps) => {
   return (
-    <div className="absolute top-4 right-16 z-50 flex items-center gap-4">
+    <div className="absolute top-4 right-16 z-50 flex items-center gap-4 p-2 rounded-lg border border-blue-100 bg-white/80 backdrop-blur-sm shadow-sm">
       <Button
         variant="ghost"
         size="icon"

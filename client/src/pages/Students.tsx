@@ -306,6 +306,229 @@ export default function Students() {
   });
 
   // Function to reset form
+  // Functie voor het verwerken van geïmporteerde bestanden
+  const handleImportFile = (file: File) => {
+    setImportFile(file);
+    setImportPreview([]);
+    setImportColumns([]);
+    setColumnMappings({});
+    
+    if (file.name.endsWith('.csv')) {
+      setImportType('csv');
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          if (results.data && results.data.length > 0) {
+            setImportPreview(results.data.slice(0, 5) as any[]);
+            if (results.meta.fields) {
+              setImportColumns(results.meta.fields);
+            }
+          }
+        },
+        error: (error) => {
+          toast({
+            title: "Error bij importeren",
+            description: `Er is een fout opgetreden bij het verwerken van het CSV bestand: ${error.message}`,
+            variant: "destructive"
+          });
+        }
+      });
+    } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+      setImportType('excel');
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = e.target?.result;
+          if (data) {
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            
+            if (json.length > 0) {
+              const headers = json[0] as string[];
+              setImportColumns(headers);
+              
+              const rows = [];
+              for (let i = 1; i < Math.min(json.length, 6); i++) {
+                const row = json[i] as any[];
+                const rowData: {[key: string]: any} = {};
+                for (let j = 0; j < headers.length; j++) {
+                  rowData[headers[j]] = row[j];
+                }
+                rows.push(rowData);
+              }
+              setImportPreview(rows);
+            }
+          }
+        } catch (error: any) {
+          toast({
+            title: "Error bij importeren",
+            description: `Er is een fout opgetreden bij het verwerken van het Excel bestand: ${error.message}`,
+            variant: "destructive"
+          });
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      toast({
+        title: "Niet-ondersteund bestandsformaat",
+        description: "Alleen CSV, XLS en XLSX bestanden worden ondersteund.",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  // Functie om de geïmporteerde data te verwerken
+  const importStudents = async () => {
+    if (!importFile || importPreview.length === 0 || Object.keys(columnMappings).length === 0) {
+      toast({
+        title: "Kan niet importeren",
+        description: "Zorg ervoor dat u een bestand heeft geselecteerd en kolomtoewijzingen heeft gemaakt.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsImporting(true);
+    
+    try {
+      // Lees alle gegevens uit het bestand
+      let allData: any[] = [];
+      
+      if (importType === 'csv') {
+        const parsePromise = new Promise<any[]>((resolve, reject) => {
+          Papa.parse(importFile, {
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => resolve(results.data),
+            error: reject
+          });
+        });
+        
+        allData = await parsePromise;
+      } else if (importType === 'excel') {
+        const reader = new FileReader();
+        const readPromise = new Promise<any[]>((resolve, reject) => {
+          reader.onload = (e) => {
+            try {
+              const data = e.target?.result;
+              if (data) {
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const json = XLSX.utils.sheet_to_json(worksheet);
+                resolve(json);
+              } else {
+                reject(new Error("Kon bestand niet lezen"));
+              }
+            } catch (error) {
+              reject(error);
+            }
+          };
+          reader.onerror = reject;
+          reader.readAsArrayBuffer(importFile);
+        });
+        
+        allData = await readPromise;
+      }
+      
+      // Map de gegevens naar het juiste formaat
+      const formattedData = allData.map(row => {
+        const student: any = {
+          studentId: '',
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          dateOfBirth: null,
+          address: '',
+          city: '',
+          postalCode: '',
+          country: 'Nederland',
+          status: 'enrolled', // Standaard status: ingeschreven
+          notes: '',
+          gender: '',
+          street: '',
+          houseNumber: ''
+        };
+        
+        // Verwerk de kolomtoewijzingen
+        Object.entries(columnMappings).forEach(([sourceColumn, targetField]) => {
+          if (row[sourceColumn] !== undefined && row[sourceColumn] !== null) {
+            if (targetField === 'dateOfBirth' && row[sourceColumn]) {
+              // Zorg ervoor dat de datum in het juiste formaat is
+              try {
+                // Probeer datum te parsen (kan verschillende formaten zijn)
+                const parsedDate = new Date(row[sourceColumn]);
+                if (!isNaN(parsedDate.getTime())) {
+                  // Formatteer naar YYYY-MM-DD
+                  const year = parsedDate.getFullYear();
+                  const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                  const day = String(parsedDate.getDate()).padStart(2, '0');
+                  student[targetField] = `${year}-${month}-${day}`;
+                }
+              } catch (e) {
+                // Als het parsen mislukt, gebruik de waarde als string
+                student[targetField] = row[sourceColumn];
+              }
+            } else {
+              student[targetField] = row[sourceColumn];
+            }
+          }
+        });
+        
+        return student;
+      });
+      
+      // Valideer de gegevens
+      const validStudents = formattedData.filter(s => 
+        s.firstName && s.lastName // Minimale vereisten
+      );
+      
+      if (validStudents.length === 0) {
+        toast({
+          title: "Geen geldige studentgegevens",
+          description: "De geïmporteerde gegevens bevatten geen geldige studentinformatie. Controleer of de kolomtoewijzingen correct zijn.",
+          variant: "destructive"
+        });
+        setIsImporting(false);
+        return;
+      }
+      
+      // Voeg de studenten toe
+      const apiPromises = validStudents.map(student => 
+        apiRequest("POST", "/api/students", student)
+      );
+      
+      await Promise.all(apiPromises);
+      
+      // Invalideer de query om de studentenlijst te vernieuwen
+      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      
+      toast({
+        title: "Import voltooid",
+        description: `${validStudents.length} studenten succesvol geïmporteerd.`,
+      });
+      
+      // Sluit het dialoogvenster en reset de state
+      setIsImportDialogOpen(false);
+      setImportFile(null);
+      setImportPreview([]);
+      setImportColumns([]);
+      setColumnMappings({});
+    } catch (error: any) {
+      toast({
+        title: "Import mislukt",
+        description: `Er is een fout opgetreden: ${error.message}`,
+        variant: "destructive"
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   const resetForm = () => {
     setStudentFormData({
       studentId: '',
@@ -1737,6 +1960,196 @@ export default function Students() {
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></div>
               )}
               Student toevoegen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import Students Dialog */}
+      <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+        <DialogContent className="sm:max-w-[95%] md:max-w-[80%] lg:max-w-[70%] h-auto max-h-[96vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center text-primary">
+              <FileUp className="mr-2 h-5 w-5 text-primary" />
+              Studenten Importeren
+            </DialogTitle>
+            <DialogDescription>
+              Importeer meerdere studenten vanuit een Excel of CSV bestand.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-4">
+            {!importFile ? (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <div className="mx-auto w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                  <FileSpreadsheet className="h-8 w-8" />
+                </div>
+                <h3 className="text-lg font-medium mb-2">Sleep een bestand hierheen of</h3>
+                <Button 
+                  variant="outline" 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-2"
+                >
+                  <Upload className="mr-2 h-4 w-4" /> Selecteer bestand
+                </Button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept=".csv,.xls,.xlsx"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleImportFile(file);
+                    }
+                  }}
+                />
+                <p className="text-sm text-gray-500 mt-2">
+                  Ondersteunde bestandsformaten: .CSV, .XLS, .XLSX
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between items-center pb-2 border-b">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-blue-50 rounded-lg mr-3">
+                      {importType === 'csv' ? (
+                        <FileText className="h-6 w-6 text-blue-600" />
+                      ) : (
+                        <FileSpreadsheet className="h-6 w-6 text-blue-600" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium">{importFile.name}</p>
+                      <p className="text-sm text-gray-500">
+                        {importType === 'csv' ? 'CSV Bestand' : 'Excel Bestand'} • {(importFile.size / 1024).toFixed(2)} KB
+                      </p>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      setImportFile(null);
+                      setImportPreview([]);
+                      setImportColumns([]);
+                      setColumnMappings({});
+                    }}
+                  >
+                    <X className="h-4 w-4 mr-1" /> Verwijderen
+                  </Button>
+                </div>
+                
+                {importPreview.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="font-medium text-lg">Voorbeeldgegevens</h3>
+                    <div className="overflow-x-auto rounded-lg border">
+                      <table className="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            {importColumns.map((column, idx) => (
+                              <th 
+                                key={idx} 
+                                className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                              >
+                                {column}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {importPreview.map((row, rowIdx) => (
+                            <tr key={rowIdx}>
+                              {importColumns.map((column, colIdx) => (
+                                <td key={colIdx} className="px-4 py-2 whitespace-nowrap text-gray-900">
+                                  {row[column] !== undefined ? String(row[column]) : '-'}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    <div className="space-y-4 pt-2">
+                      <h3 className="font-medium text-lg">Kolomtoewijzingen</h3>
+                      <p className="text-sm text-gray-500">
+                        Verbind de kolommen uit uw bestand met de juiste studentvelden
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {importColumns.map((column) => (
+                          <div key={column} className="space-y-1">
+                            <Label className="text-sm font-medium">
+                              {column}
+                            </Label>
+                            <Select
+                              value={columnMappings[column] || ''}
+                              onValueChange={(value) => {
+                                if (value) {
+                                  setColumnMappings({
+                                    ...columnMappings,
+                                    [column]: value
+                                  });
+                                } else {
+                                  const newMappings = {...columnMappings};
+                                  delete newMappings[column];
+                                  setColumnMappings(newMappings);
+                                }
+                              }}
+                            >
+                              <SelectTrigger className="h-8">
+                                <SelectValue placeholder="Selecteer veld" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="">Negeer deze kolom</SelectItem>
+                                <SelectItem value="firstName">Voornaam</SelectItem>
+                                <SelectItem value="lastName">Achternaam</SelectItem>
+                                <SelectItem value="email">E-mail</SelectItem>
+                                <SelectItem value="phone">Telefoon</SelectItem>
+                                <SelectItem value="dateOfBirth">Geboortedatum</SelectItem>
+                                <SelectItem value="gender">Geslacht</SelectItem>
+                                <SelectItem value="street">Straat</SelectItem>
+                                <SelectItem value="houseNumber">Huisnummer</SelectItem>
+                                <SelectItem value="postalCode">Postcode</SelectItem>
+                                <SelectItem value="city">Woonplaats</SelectItem>
+                                <SelectItem value="status">Status</SelectItem>
+                                <SelectItem value="notes">Notities</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsImportDialogOpen(false)}
+            >
+              Annuleren
+            </Button>
+            <Button 
+              variant="default"
+              className="bg-[#1e3a8a]"
+              onClick={importStudents}
+              disabled={!importFile || importPreview.length === 0 || Object.keys(columnMappings).length === 0 || isImporting}
+            >
+              {isImporting ? (
+                <>
+                  <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                  Importeren...
+                </>
+              ) : (
+                <>
+                  <Check className="mr-2 h-4 w-4" /> Importeren
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

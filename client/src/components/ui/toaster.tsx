@@ -31,20 +31,20 @@ export function Toaster() {
         }
 
         return (
-          <Toast key={id} variant={variant} {...props} className="p-4">
-            <div className="flex items-start w-full">
-              <div className={`flex-shrink-0 p-1.5 mr-3 rounded-full ${iconColorClass}`}>
-                <Icon className="h-5 w-5" />
+          <Toast key={id} variant={variant} {...props} className="py-3 px-4">
+            <div className="flex items-center w-full">
+              <div className="flex-shrink-0 mr-3">
+                <Icon className="h-5 w-5 text-white" />
               </div>
-              <div className="flex-1 pt-0.5">
-                {title && <ToastTitle className="text-base font-semibold text-gray-800 leading-tight mb-1">{title}</ToastTitle>}
+              <div className="flex-1">
+                {title && <ToastTitle className="text-sm font-semibold text-white leading-tight">{title}</ToastTitle>}
                 {description && (
-                  <ToastDescription className="text-sm text-gray-600">{description}</ToastDescription>
+                  <ToastDescription className="text-xs text-white/90 mt-0.5">{description}</ToastDescription>
                 )}
               </div>
             </div>
             {action}
-            <ToastClose className="absolute opacity-70 hover:opacity-100 right-3 top-3 rounded-full bg-gray-200/60 hover:bg-gray-200 p-1 transition-colors" />
+            <ToastClose className="absolute opacity-70 hover:opacity-100 right-2 top-2 rounded-full bg-white/20 hover:bg-white/30 p-1 transition-colors text-white" />
           </Toast>
         )
       })}

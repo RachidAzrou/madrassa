@@ -23,15 +23,15 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-start space-x-3 overflow-hidden rounded-md border shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-right-full",
+  "group pointer-events-auto relative flex w-full items-start space-x-3 overflow-hidden rounded-lg border-0 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-right-full",
   {
     variants: {
       variant: {
-        default: "border-blue-600/20 bg-white text-gray-800 shadow-blue-500/10",
-        destructive: "border-red-600/20 bg-white text-gray-800 shadow-red-500/10",
-        success: "border-green-600/20 bg-white text-gray-800 shadow-green-500/10", 
-        warning: "border-yellow-600/20 bg-white text-gray-800 shadow-yellow-500/10",
-        info: "border-blue-600/20 bg-white text-gray-800 shadow-blue-500/10",
+        default: "bg-[#1e3a8a] text-white shadow-lg",
+        destructive: "bg-red-600 text-white shadow-lg",
+        success: "bg-green-600 text-white shadow-lg",
+        warning: "bg-amber-500 text-white shadow-lg",
+        info: "bg-[#1e3a8a] text-white shadow-lg",
       },
     },
     defaultVariants: {

@@ -70,10 +70,72 @@ const NotificationsPage: React.FC = () => {
 
   const handleDelete = (id: number) => {
     deleteNotification(id);
-    toast({
-      title: "Notificatie verwijderd",
-      description: "De notificatie is verwijderd.",
+  };
+  
+  const handleToggleSelectMode = () => {
+    setSelectMode(!selectMode);
+    setSelectedNotifications([]);
+  };
+  
+  const handleSelectNotification = (id: number, checked: boolean) => {
+    if (checked) {
+      setSelectedNotifications(prev => [...prev, id]);
+    } else {
+      setSelectedNotifications(prev => prev.filter(notificationId => notificationId !== id));
+    }
+  };
+  
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      let notificationsToSelect: number[] = [];
+      switch (activeTab) {
+        case 'all':
+          notificationsToSelect = filteredNotifications?.map(n => n.id) || [];
+          break;
+        case 'unread':
+          notificationsToSelect = filteredUnreadNotifications?.map(n => n.id) || [];
+          break;
+        case 'read':
+          notificationsToSelect = filteredReadNotifications?.map(n => n.id) || [];
+          break;
+      }
+      setSelectedNotifications(notificationsToSelect);
+    } else {
+      setSelectedNotifications([]);
+    }
+  };
+  
+  const handleBulkMarkAsRead = () => {
+    selectedNotifications.forEach(id => {
+      markAsRead(id);
     });
+    toast({
+      title: "Notificaties gemarkeerd als gelezen",
+      description: `${selectedNotifications.length} notificaties zijn gemarkeerd als gelezen.`,
+    });
+    setSelectedNotifications([]);
+  };
+  
+  const handleBulkMarkAsUnread = () => {
+    selectedNotifications.forEach(id => {
+      toggleReadStatus(id);
+    });
+    toast({
+      title: "Notificaties gemarkeerd als ongelezen",
+      description: `${selectedNotifications.length} notificaties zijn gemarkeerd als ongelezen.`,
+    });
+    setSelectedNotifications([]);
+  };
+  
+  const handleBulkDelete = () => {
+    selectedNotifications.forEach(id => {
+      deleteNotification(id);
+    });
+    toast({
+      title: "Notificaties verwijderd",
+      description: `${selectedNotifications.length} notificaties zijn verwijderd.`,
+    });
+    setSelectedNotifications([]);
   };
 
   const formatDate = (dateString: string) => {
@@ -102,29 +164,101 @@ const NotificationsPage: React.FC = () => {
   const renderNotificationList = (notificationList: Notification[]) => {
     if (notificationList.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center py-16">
-          <div className="h-32 w-32 rounded-full bg-blue-50 flex items-center justify-center mb-4">
-            <BellOff className="h-12 w-12 text-blue-300 opacity-30" />
-          </div>
-          <h3 className="text-xl font-medium text-gray-700">Geen notificaties</h3>
-          <p className="text-sm text-gray-500 mt-1 max-w-sm text-center">
-            {activeTab === 'unread' 
+        <EmptyState 
+          icon={BellOff}
+          title="Geen notificaties"
+          description={
+            activeTab === 'unread' 
               ? 'U heeft momenteel geen ongelezen notificaties.' 
               : activeTab === 'read' 
                 ? 'U heeft momenteel geen gelezen notificaties.' 
-                : 'U heeft momenteel geen notificaties.'}
-          </p>
-        </div>
+                : 'U heeft momenteel geen notificaties.'
+          }
+        />
       );
     }
 
+    const allSelected = notificationList.length > 0 && 
+      selectedNotifications.length === notificationList.length && 
+      notificationList.every(n => selectedNotifications.includes(n.id));
+
     return (
       <div className="space-y-3 mt-4">
+        {selectMode && (
+          <div className="flex items-center justify-between p-2 rounded-lg bg-blue-50 border border-blue-200 mb-4">
+            <div className="flex items-center gap-2">
+              <Checkbox 
+                id="select-all" 
+                checked={allSelected}
+                onCheckedChange={handleSelectAll}
+              />
+              <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                Alles selecteren ({selectedNotifications.length}/{notificationList.length})
+              </label>
+            </div>
+            <div className="flex gap-2">
+              {selectedNotifications.length > 0 && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleBulkMarkAsRead}
+                    className="h-8 flex items-center gap-1"
+                    disabled={selectedNotifications.length === 0}
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>Markeer als gelezen</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleBulkMarkAsUnread}
+                    className="h-8 flex items-center gap-1"
+                    disabled={selectedNotifications.length === 0}
+                  >
+                    <EyeOff className="h-4 w-4" />
+                    <span>Markeer als ongelezen</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleBulkDelete}
+                    className="h-8 text-red-500 hover:text-red-600 hover:bg-red-50 flex items-center gap-1"
+                    disabled={selectedNotifications.length === 0}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span>Verwijderen</span>
+                  </Button>
+                </>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleToggleSelectMode}
+                className="h-8"
+              >
+                <X className="h-4 w-4 mr-1" />
+                <span>Annuleren</span>
+              </Button>
+            </div>
+          </div>
+        )}
+        
         {notificationList.map((notification) => (
           <Card key={notification.id} className={`border group relative ${!notification.isRead ? 'border-l-4 border-l-blue-500 bg-blue-50' : ''}`}>
             <CardHeader className="p-4">
               <div className="flex justify-between items-start">
                 <div className="flex items-start gap-3">
+                  {selectMode && (
+                    <div className="mt-1 flex items-center justify-center w-6 h-6">
+                      <Checkbox 
+                        id={`checkbox-${notification.id}`}
+                        checked={selectedNotifications.includes(notification.id)}
+                        onCheckedChange={(checked) => handleSelectNotification(notification.id, checked === true)}
+                        className="border-2 border-primary data-[state=checked]:bg-primary data-[state=checked]:text-white"
+                      />
+                    </div>
+                  )}
                   <div className="mt-1">
                     {getNotificationIcon(notification.type)}
                   </div>
@@ -142,26 +276,28 @@ const NotificationsPage: React.FC = () => {
                   {/* Badge ongelezen verwijderd */}
                 </div>
               </div>
-              <div className="absolute top-2 right-2 flex gap-1">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handleToggleReadStatus(notification.id)}
-                  className="invisible group-hover:visible h-6 w-6 p-0 text-primary hover:bg-primary/10 rounded-full"
-                  title={notification.isRead ? "Markeer als ongelezen" : "Markeer als gelezen"}
-                >
-                  {notification.isRead ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handleDelete(notification.id)}
-                  className="invisible group-hover:visible h-6 w-6 p-0 text-primary hover:bg-primary/10 rounded-full"
-                  title="Verwijderen"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+              {!selectMode && (
+                <div className="absolute top-2 right-2 flex gap-1">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleToggleReadStatus(notification.id)}
+                    className="invisible group-hover:visible h-6 w-6 p-0 text-primary hover:bg-primary/10 rounded-full"
+                    title={notification.isRead ? "Markeer als ongelezen" : "Markeer als gelezen"}
+                  >
+                    {notification.isRead ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDelete(notification.id)}
+                    className="invisible group-hover:visible h-6 w-6 p-0 text-primary hover:bg-primary/10 rounded-full"
+                    title="Verwijderen"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </CardHeader>
           </Card>
         ))}
@@ -200,21 +336,42 @@ const NotificationsPage: React.FC = () => {
       </div>
 
       <div className="mt-6 mb-6">
-        <div className="relative w-full">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            type="search"
-            placeholder="Zoeken in notificaties..."
-            className="pl-8 bg-white w-full"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          {searchTerm && (
-            <XCircle
-              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
-              onClick={() => setSearchTerm("")}
+        <div className="flex gap-3 items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="search"
+              placeholder="Zoeken in notificaties..."
+              className="pl-8 bg-white w-full"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-          )}
+            {searchTerm && (
+              <XCircle
+                className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                onClick={() => setSearchTerm("")}
+              />
+            )}
+          </div>
+          
+          <Button 
+            variant={selectMode ? "default" : "outline"} 
+            size="sm" 
+            onClick={handleToggleSelectMode}
+            className={`flex items-center gap-2 ${selectMode ? "bg-primary text-white" : ""}`}
+          >
+            {selectMode ? (
+              <>
+                <X className="h-4 w-4" />
+                <span>Annuleren</span>
+              </>
+            ) : (
+              <>
+                <Check className="h-4 w-4" />
+                <span>Selecteren</span>
+              </>
+            )}
+          </Button>
         </div>
       </div>
 

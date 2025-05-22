@@ -482,7 +482,7 @@ const MyAccount = () => {
                         </div>
                       )}
                       
-                      <div className="grid grid-cols-1">
+                      <div className="flex justify-end">
                         <Button 
                           type="submit" 
                           className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
@@ -557,20 +557,22 @@ const MyAccount = () => {
                             ✓ Wachtwoord succesvol gewijzigd!
                           </p>
                         )}
-                        <Button 
-                          type="submit" 
-                          className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
-                          disabled={isChangingPassword}
-                        >
-                          {isChangingPassword ? (
-                            <>
-                              <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                              Wijzigen...
-                            </>
-                          ) : (
-                            "Wachtwoord wijzigen"
-                          )}
-                        </Button>
+                        <div className="flex justify-end">
+                          <Button 
+                            type="submit" 
+                            className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                            disabled={isChangingPassword}
+                          >
+                            {isChangingPassword ? (
+                              <>
+                                <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                Wijzigen...
+                              </>
+                            ) : (
+                              "Wachtwoord wijzigen"
+                            )}
+                          </Button>
+                        </div>
                       </form>
                     </Form>
                   </div>

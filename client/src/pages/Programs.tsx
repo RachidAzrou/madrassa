@@ -342,12 +342,11 @@ export default function Programs() {
             Fout bij het laden van vakken. Probeer het opnieuw.
           </div>
         ) : programs.length === 0 ? (
-          <div className="text-center py-10">
-            <GraduationCap className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-            <h3 className="text-lg font-medium mb-2">Geen opleidingen gevonden</h3>
-            <p className="text-gray-500 mb-4">
-              Er zijn geen opleidingen die overeenkomen met de geselecteerde filters.
-            </p>
+          <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+            <div className="text-[#1e3a8a] mb-2">
+              <GraduationCap className="h-12 w-12 mx-auto opacity-30" />
+            </div>
+            <p className="text-sm font-medium">Geen opleidingen beschikbaar</p>
           </div>
         ) : (
           programs.map((program: Program) => (

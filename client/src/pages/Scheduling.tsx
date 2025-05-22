@@ -530,25 +530,34 @@ export default function Scheduling() {
             <TabsTrigger value="room-allocation" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lokalenverdeling</TabsTrigger>
           </TabsList>
           
-          <div className="flex items-center gap-4">
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <div className="space-y-4">
+            <div className="relative w-full">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
               <Input
                 placeholder="Zoek planning..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="pl-10 w-full"
+                className="pl-8 bg-white w-full"
               />
+              {searchTerm && (
+                <XCircle
+                  className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                  onClick={() => setSearchTerm("")}
+                />
+              )}
             </div>
-            <Button 
-              onClick={handleAddSchedule} 
-              variant="default"
-              size="default"
-              className="bg-primary hover:bg-primary/90 flex items-center"
-            >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              <span>Planning Toevoegen</span>
-            </Button>
+            
+            <div className="flex justify-end">
+              <Button 
+                onClick={handleAddSchedule} 
+                variant="default"
+                size="default"
+                className="bg-primary hover:bg-primary/90 flex items-center"
+              >
+                <PlusCircle className="mr-2 h-4 w-4" />
+                <span>Planning Toevoegen</span>
+              </Button>
+            </div>
           </div>
         </div>
         

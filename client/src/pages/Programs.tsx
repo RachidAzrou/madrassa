@@ -346,7 +346,7 @@ export default function Programs() {
             <div className="text-[#1e3a8a] mb-2">
               <BookText className="h-12 w-12 mx-auto opacity-30" />
             </div>
-            <p className="text-sm font-medium">Geen opleidingen beschikbaar</p>
+            <p className="text-sm font-medium">Geen vakken beschikbaar</p>
           </div>
         ) : (
           programs.map((program: Program) => (

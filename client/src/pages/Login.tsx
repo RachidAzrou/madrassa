@@ -100,6 +100,9 @@ export default function Login(props: any) {
           <p className="text-slate-600 dark:text-slate-300 text-center">
             Log in om toegang te krijgen tot het platform
           </p>
+          <div className="mt-2">
+            <p className="text-red-500 text-sm font-bold bg-red-100 px-2 py-1 rounded-md">TST-ENVIRONMENT versie 1.1.0</p>
+          </div>
         </div>
         
         {/* Login formulier in dezelfde container */}

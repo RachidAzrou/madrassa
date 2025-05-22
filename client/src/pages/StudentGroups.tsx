@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, School, 
   Pencil, MoreVertical, Plus, GraduationCap, BookOpen, UsersRound,
-  CalendarIcon, Loader2, XCircle,
+  CalendarIcon, Loader2, XCircle, Users2,
 } from 'lucide-react';
 import ManageStudentEnrollments from "@/components/student-groups/ManageStudentEnrollments";
 // Aangepast ChalkboardTeacher icoon
@@ -434,7 +434,7 @@ export default function StudentGroups() {
               </Button>
             </div>
           ) : studentGroups.length === 0 ? (
-            <div className="p-6 text-center">
+            <div className="text-center py-10">
               <School className="h-10 w-10 text-gray-400 mx-auto mb-3" />
               <h3 className="text-lg font-medium mb-2">Geen klassen gevonden</h3>
               <p className="text-gray-500 mb-4">
@@ -613,14 +613,12 @@ export default function StudentGroups() {
                   ))
                 ) : studentGroups.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8">
-                      <div className="p-6 text-center">
-                        <School className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                        <h3 className="text-lg font-medium mb-2">Geen klassen gevonden</h3>
-                        <p className="text-gray-500 mb-4">
-                          Er zijn geen klassen die overeenkomen met de geselecteerde filters.
-                        </p>
-                      </div>
+                    <td colSpan={7} className="text-center px-6 py-8">
+                      <School className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+                      <h3 className="text-lg font-medium mb-2">Geen klassen gevonden</h3>
+                      <p className="text-gray-500 mb-4">
+                        Er zijn geen klassen die overeenkomen met de geselecteerde filters.
+                      </p>
                     </td>
                   </tr>
                 ) : (

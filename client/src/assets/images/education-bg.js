@@ -1,1 +1,1 @@
-export const educationBgUrl = "https://i.imgur.com/pXlE83Y.jpg";
+export const educationBgUrl = "https://raw.githubusercontent.com/user-attachments/assets/main/rm347-porpla-02-a-01.jpg";

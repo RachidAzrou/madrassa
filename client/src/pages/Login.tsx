@@ -87,9 +87,15 @@ export default function Login(props: any) {
             backgroundImage: `url(${educationBgUrl})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            opacity: 0.2
+            opacity: 0.25,
+            filter: 'sepia(0.4) hue-rotate(175deg) saturate(0.9)'
           }}>
           </div>
+          <div className="absolute inset-0" style={{ 
+            backgroundColor: '#3b5998', 
+            mixBlendMode: 'color',
+            opacity: 0.35
+          }}></div>
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/40 dark:to-slate-900/40"></div>
       </div>

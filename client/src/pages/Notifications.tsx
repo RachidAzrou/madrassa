@@ -194,43 +194,41 @@ const NotificationsPage: React.FC = () => {
                 onCheckedChange={handleSelectAll}
               />
               <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
-                Alles selecteren ({selectedNotifications.length}/{notificationList.length})
+                {selectedNotifications.length} van {notificationList.length} geselecteerd
               </label>
             </div>
             <div className="flex gap-2">
               {selectedNotifications.length > 0 && (
-                <>
+                <div className="flex gap-1">
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon"
                     onClick={handleBulkMarkAsRead}
-                    className="h-8 flex items-center gap-1"
-                    disabled={selectedNotifications.length === 0}
+                    className="h-8 w-8"
+                    title="Markeer als gelezen"
                   >
                     <Eye className="h-4 w-4" />
-                    <span>Markeer als gelezen</span>
                   </Button>
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon"
                     onClick={handleBulkMarkAsUnread}
-                    className="h-8 flex items-center gap-1"
-                    disabled={selectedNotifications.length === 0}
+                    className="h-8 w-8"
+                    title="Markeer als ongelezen"
                   >
                     <EyeOff className="h-4 w-4" />
-                    <span>Markeer als ongelezen</span>
                   </Button>
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon"
                     onClick={handleBulkDelete}
-                    className="h-8 text-red-500 hover:text-red-600 hover:bg-red-50 flex items-center gap-1"
-                    disabled={selectedNotifications.length === 0}
+                    className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                    title="Verwijderen"
                   >
                     <Trash2 className="h-4 w-4" />
-                    <span>Verwijderen</span>
                   </Button>
-                </>
+                  <Separator orientation="vertical" className="h-8 mx-1" />
+                </div>
               )}
               <Button
                 variant="outline"
@@ -239,7 +237,7 @@ const NotificationsPage: React.FC = () => {
                 className="h-8"
               >
                 <X className="h-4 w-4 mr-1" />
-                <span>Annuleren</span>
+                <span>Sluiten</span>
               </Button>
             </div>
           </div>

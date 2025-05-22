@@ -620,9 +620,8 @@ export const teacherCourseAssignments = pgTable("teacher_course_assignments", {
   id: serial("id").primaryKey(),
   teacherId: integer("teacher_id").notNull().references(() => teachers.id),
   courseId: integer("course_id").notNull().references(() => courses.id),
-  isPrimary: boolean("is_primary").default(false),
-  startDate: date("start_date"),
-  endDate: date("end_date"),
+  isActive: boolean("is_active").default(true),
+  assignedDate: date("assigned_date").defaultNow(),
   notes: text("notes"),
 });
 

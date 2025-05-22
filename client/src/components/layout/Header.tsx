@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSidebar } from '@/contexts/SidebarContext';
+import useSidebar from '@/hooks/use-sidebar';
 
 export default function Header() {
   const { toggle } = useSidebar();

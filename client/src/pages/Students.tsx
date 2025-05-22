@@ -6,7 +6,6 @@ import {
   Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, CreditCard, AlertCircle,
   Image, Upload
 } from 'lucide-react';
-import ManageStudentGuardians from '@/components/guardians/ManageStudentGuardians';
 import { useToast } from '@/hooks/use-toast';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -750,14 +749,14 @@ export default function Students() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : (Array.isArray(studentsData) ? studentsData : []).length === 0 ? (
+              ) : (studentsData.students || []).length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center py-8">
                     Geen studenten gevonden
                   </TableCell>
                 </TableRow>
               ) : (
-                (Array.isArray(studentsData) ? studentsData : []).map((student: any) => (
+                (studentsData.students || []).map((student: any) => (
                   <TableRow key={student.id}>
                     <TableCell>
                       <Checkbox 
@@ -833,13 +832,13 @@ export default function Students() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               <span className="ml-2">Laden...</span>
             </div>
-          ) : (Array.isArray(studentsData) ? studentsData : []).length === 0 ? (
+          ) : (studentsData.students || []).length === 0 ? (
             <div className="text-center py-8">
               Geen studenten gevonden
             </div>
           ) : (
             <div className="divide-y divide-gray-200">
-              {(Array.isArray(studentsData) ? studentsData : []).map((student: any) => (
+              {(studentsData.students || []).map((student: any) => (
                 <div key={student.id} className="p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-start">

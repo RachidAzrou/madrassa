@@ -36,8 +36,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Initialisatie functie
-async function initApp() {
+(async () => {
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -57,29 +56,15 @@ async function initApp() {
     serveStatic(app);
   }
 
-  // In development, gebruik poort 5000
-  // In production (Vercel), werkt serverless
-  if (app.get("env") === "development") {
-    const port = process.env.PORT || 5000;
-    server.listen({
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    }, () => {
-      log(`serving on port ${port}`);
-    });
-  } else {
-    // Voor Vercel deployment, geen expliciete server.listen nodig
-    log(`Server ready for serverless`);
-  }
-  
-  return app;
-}
-
-// Start initialisatie in development mode
-if (process.env.NODE_ENV === "development") {
-  initApp();
-}
-
-// Exporteer voor Vercel serverless
-export default initApp;
+  // ALWAYS serve the app on port 5000
+  // this serves both the API and the client.
+  // It is the only port that is not firewalled.
+  const port = 5000;
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true,
+  }, () => {
+    log(`serving on port ${port}`);
+  });
+})();

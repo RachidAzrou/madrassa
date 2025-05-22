@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image, BookText } from "lucide-react";
+import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import ManageTeacherAssignments from "@/components/teachers/ManageTeacherAssignments";
 
 type TeacherType = {
   id: number;
@@ -69,9 +68,8 @@ type CourseAssignmentType = {
   id: number;
   teacherId: number;
   courseId: number;
-  isPrimary: boolean;
-  startDate: Date;
-  endDate?: Date;
+  isActive: boolean;
+  assignedDate: Date;
   notes?: string;
   courseName?: string; // Voor weergave
 };
@@ -82,7 +80,6 @@ export default function Teachers() {
   const [itemsPerPage] = useState(10);
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherType | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isAssignmentsDialogOpen, setIsAssignmentsDialogOpen] = useState(false);
   const [teacherFormData, setTeacherFormData] = useState({
     teacherId: '',
     firstName: '',
@@ -721,8 +718,8 @@ export default function Teachers() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <div className="flex items-center">
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center justify-center">
                     Docent
                   </div>
                 </th>
@@ -757,7 +754,7 @@ export default function Teachers() {
                 teachers.map((teacher: TeacherType) => (
                   <tr key={teacher.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
+                      <div className="flex items-center justify-center">
                         <Avatar className="h-9 w-9">
                           <AvatarFallback className="bg-[#1e3a8a] text-white">
                             {teacher.firstName.charAt(0)}{teacher.lastName.charAt(0)}
@@ -878,30 +875,10 @@ export default function Teachers() {
             </DialogDescription>
           </DialogHeader>
           
-      {/* Docent vakken beheren dialoog */}
-      {selectedTeacher && (
-        <ManageTeacherAssignments
-          teacherId={selectedTeacher.id}
-          onClose={() => setIsAssignmentsDialogOpen(false)}
-          open={isAssignmentsDialogOpen}
-        />
-      )}
-          
           {selectedTeacher && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-md font-medium">Persoonlijke Informatie</h3>
-                <Button 
-                  onClick={() => setIsAssignmentsDialogOpen(true)}
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1"
-                >
-                  <BookText className="h-4 w-4 text-[#1e3a8a]" />
-                  <span>Vakken beheren</span>
-                </Button>
-              </div>
               <div>
+                <h3 className="text-md font-medium mb-2">Persoonlijke Informatie</h3>
                 <div className="space-y-2">
                   <div className="flex items-center">
                     <span className="w-32 text-sm text-gray-500">Docent ID:</span>
@@ -1107,11 +1084,11 @@ export default function Teachers() {
                                 {assignment.courseName || 'Onbekende cursus'}
                               </div>
                               <div className="text-sm text-gray-500">
-                                Startdatum: {assignment.startDate ? formatDateToDisplayFormat(assignment.startDate.toString()) : 'Niet ingesteld'}
+                                Toegewezen op: {formatDateToDisplayFormat(assignment.assignedDate.toString())}
                               </div>
-                              {!assignment.isPrimary && (
+                              {!assignment.isActive && (
                                 <span className="text-xs bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full mt-1 inline-block">
-                                  Secundair
+                                  Inactief
                                 </span>
                               )}
                             </div>

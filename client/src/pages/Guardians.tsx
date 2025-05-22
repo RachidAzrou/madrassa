@@ -101,13 +101,32 @@ export default function Guardians() {
     isLoading,
     isError,
     refetch
-  } = useQuery<GuardianType[]>({
+  } = useQuery<{guardians: GuardianType[], totalCount: number}>({
     queryKey: ['/api/guardians', { page: currentPage, limit: itemsPerPage, search: debouncedSearch }],
+    queryFn: async () => {
+      try {
+        const params = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: itemsPerPage.toString(),
+          search: debouncedSearch,
+        });
+        
+        return await apiRequest(`/api/guardians?${params.toString()}`);
+      } catch (error) {
+        console.error('Error fetching guardians:', error);
+        toast({
+          title: "Fout bij ophalen voogden",
+          description: "Er is een probleem opgetreden bij het laden van de voogdgegevens. Probeer het later opnieuw.",
+          variant: "destructive",
+        });
+        return { guardians: [], totalCount: 0 };
+      }
+    },
   });
   
-  // Extract guardians with proper type safety and create a fallback for pagination
-  const guardians: GuardianType[] = Array.isArray(guardiansResponse) ? guardiansResponse : [];
-  const totalGuardians: number = guardians.length; // Gebruik de daadwerkelijke lengte van de array
+  // Extract guardians and total count from response with proper type safety
+  const guardians: GuardianType[] = guardiansResponse?.guardians || [];
+  const totalGuardians: number = guardiansResponse?.totalCount || 0;
   
   const totalPages = Math.ceil(totalGuardians / itemsPerPage);
 
@@ -135,15 +154,15 @@ export default function Guardians() {
 
   // Fetch associated students for selected guardian
   const {
-    data: guardianStudentsData = [] as any[],
+    data: guardianStudentsData = [] as StudentType[],
     isLoading: guardianStudentsLoading,
     isError: isGuardianStudentsError,
-  } = useQuery({
-    queryKey: ['/api/guardians/students', selectedGuardian?.id],
+  } = useQuery<StudentType[]>({
+    queryKey: ['/api/guardian-students', selectedGuardian?.id],
     queryFn: async () => {
       if (!selectedGuardian) return [];
       try {
-        return await apiRequest(`/api/guardians/${selectedGuardian.id}/students`);
+        return await apiRequest(`/api/guardian-students?guardianId=${selectedGuardian.id}`);
       } catch (error) {
         console.error('Error fetching guardian students:', error);
         toast({
@@ -275,7 +294,7 @@ export default function Guardians() {
       
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/guardians/students'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/guardian-students'] });
       queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
       
       // Reset UI state

@@ -69,15 +69,20 @@ export default function Login() {
   };
 
   return (
-    <div 
-      className="min-h-screen flex flex-col items-center justify-center p-4"
-      style={{
-        backgroundImage: `url(${schoolDoodlesBg})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative">
+      {/* Achtergrondlaag met doodles en blur effect */}
+      <div
+        className="absolute inset-0 z-0" 
+        style={{
+          backgroundImage: `url(${schoolDoodlesBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.3,
+          filter: 'blur(3px)',
+        }}
+      />
+      {/* Content laag bovenop de achtergrond */}
+      <div className="w-full max-w-md relative z-10">
         <div className="w-full bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border-t-4 border-[#1e3a8a]">
           <div className="pt-10 pb-6 px-8 text-center">
             <img src={myMadrassaLogo} alt="mymadrassa logo" className="h-24 mx-auto" />

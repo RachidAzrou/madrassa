@@ -82,8 +82,12 @@ export default function Login(props: any) {
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Stijlvolle achtergrond */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700"></div>
-        <img src={loginBgSvg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-white to-blue-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
+          <div className="absolute inset-0 opacity-10" style={{ 
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%233b5998\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-10v-10h-4v10h-10v4h10v10h4v-10h10zM60 12v-4h-10V0h-4v8h-8v4h8v8h4v-8h10zm-28 20v-4h-8v-8h-4v8h-8v4h8v8h4v-8h8zM16 12v-4H0v4h4v4h12v-4h4z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+            backgroundSize: '60px 60px'
+          }}></div>
+        </div>
       </div>
       
       {/* Decoratieve elementen */}
@@ -101,7 +105,7 @@ export default function Login(props: any) {
             Log in om toegang te krijgen tot het platform
           </p>
           <div className="mt-2">
-            <p className="text-red-500 text-sm font-bold bg-red-100 px-2 py-1 rounded-md">TST-ENVIRONMENT versie 1.1.0</p>
+            <p className="text-blue-600 text-sm font-bold bg-blue-100 px-2 py-1 rounded-md">TST-ENVIRONMENT versie 1.1.0</p>
           </div>
         </div>
         

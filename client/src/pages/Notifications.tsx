@@ -23,16 +23,8 @@ const NotificationsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   
   const handleToggleReadStatus = (id: number) => {
-    // Zoek de notificatie om te weten of het als gelezen of ongelezen gemarkeerd moet worden
-    const notification = notifications.find(n => n.id === id);
+    // Wissel de lees-status zonder toast melding te tonen
     toggleReadStatus(id);
-    
-    if (notification) {
-      toast({
-        title: notification.isRead ? "Notificatie gemarkeerd als ongelezen" : "Notificatie gemarkeerd als gelezen",
-        description: notification.isRead ? "De notificatie is gemarkeerd als ongelezen." : "De notificatie is gemarkeerd als gelezen.",
-      });
-    }
   };
 
   const unreadNotifications = notifications.filter(notification => !notification.isRead);
@@ -122,7 +114,7 @@ const NotificationsPage: React.FC = () => {
     return (
       <div className="space-y-3 mt-4">
         {notificationList.map((notification) => (
-          <Card key={notification.id} className={`border group relative ${!notification.isRead ? 'border-l-4 border-l-blue-500' : ''}`}>
+          <Card key={notification.id} className={`border group relative ${!notification.isRead ? 'border-l-4 border-l-blue-500 bg-blue-50' : ''}`}>
             <CardHeader className="p-4">
               <div className="flex justify-between items-start">
                 <div className="flex items-start gap-3">

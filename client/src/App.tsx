@@ -1,4 +1,5 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation, useRouter } from "wouter";
+import { useState, useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -18,35 +19,62 @@ import Teachers from "@/pages/Teachers";
 import Admissions from "@/pages/Admissions";
 import StudentGroups from "@/pages/StudentGroups";
 import MyAccount from "@/pages/MyAccount";
+import Login from "@/pages/Login";
 
 import Scheduling from "@/pages/Scheduling";
 import Fees from "@/pages/Fees";
 import Settings from "@/pages/Settings";
 
-function Router() {
+// Authentication check route component
+function AuthenticatedRoute({ component: Component, ...rest }: any) {
+  const [, setLocation] = useLocation();
+  const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
+  
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setLocation("/login");
+    }
+  }, [isAuthenticated, setLocation]);
+  
+  return isAuthenticated ? <Component {...rest} /> : null;
+}
+
+// Authenticated Routes
+function AuthenticatedRouter() {
   return (
     <MainLayout>
       <Switch>
-        <Route path="/" component={Dashboard} />
-        <Route path="/students" component={Students} />
-        <Route path="/guardians" component={Guardians} />
-        <Route path="/teachers" component={Teachers} />
-        <Route path="/admissions" component={Admissions} />
-        <Route path="/student-groups" component={StudentGroups} />
-        <Route path="/courses" component={Courses} />
-        <Route path="/programs" component={Programs} />
-
-        <Route path="/scheduling" component={Scheduling} />
-        <Route path="/calendar" component={Calendar} />
-        <Route path="/attendance" component={Attendance} />
-        <Route path="/grading" component={Cijfers} />
-        <Route path="/fees" component={Fees} />
-        <Route path="/reports" component={Reports} />
-        <Route path="/settings" component={Settings} />
-        <Route path="/mijn-account" component={MyAccount} />
+        <Route path="/" component={() => <AuthenticatedRoute component={Dashboard} />} />
+        <Route path="/dashboard" component={() => <AuthenticatedRoute component={Dashboard} />} />
+        <Route path="/students" component={() => <AuthenticatedRoute component={Students} />} />
+        <Route path="/guardians" component={() => <AuthenticatedRoute component={Guardians} />} />
+        <Route path="/teachers" component={() => <AuthenticatedRoute component={Teachers} />} />
+        <Route path="/admissions" component={() => <AuthenticatedRoute component={Admissions} />} />
+        <Route path="/student-groups" component={() => <AuthenticatedRoute component={StudentGroups} />} />
+        <Route path="/courses" component={() => <AuthenticatedRoute component={Courses} />} />
+        <Route path="/programs" component={() => <AuthenticatedRoute component={Programs} />} />
+        <Route path="/scheduling" component={() => <AuthenticatedRoute component={Scheduling} />} />
+        <Route path="/calendar" component={() => <AuthenticatedRoute component={Calendar} />} />
+        <Route path="/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
+        <Route path="/grading" component={() => <AuthenticatedRoute component={Cijfers} />} />
+        <Route path="/fees" component={() => <AuthenticatedRoute component={Fees} />} />
+        <Route path="/reports" component={() => <AuthenticatedRoute component={Reports} />} />
+        <Route path="/settings" component={() => <AuthenticatedRoute component={Settings} />} />
+        <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>
+  );
+}
+
+function Router() {
+  return (
+    <Switch>
+      <Route path="/login" component={Login} />
+      <Route>
+        <AuthenticatedRouter />
+      </Route>
+    </Switch>
   );
 }
 

@@ -633,26 +633,6 @@ const MyAccount = () => {
                       </Button>
                     </div>
                   </div>
-
-                  <Separator />
-
-                  <div>
-                    <h3 className="text-lg font-medium mb-4">Recente aanmeldingen</h3>
-                    <div className="space-y-3">
-                      <div className="bg-muted/50 p-3 rounded-md">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <History className="h-4 w-4 mr-2 text-gray-500" />
-                            <span>Laatste aanmelding: {currentUser.lastLogin}</span>
-                          </div>
-                          <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">Succesvol</span>
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        Alle aanmeldingen bekijken
-                      </Button>
-                    </div>
-                  </div>
                 </div>
               </TabsContent>
 

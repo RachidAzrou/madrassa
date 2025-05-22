@@ -205,15 +205,18 @@ const NotificationsPage: React.FC = () => {
       </div>
 
       <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-6 grid w-full grid-cols-3 bg-card">
-          <TabsTrigger value="all" className="text-sm">
-            Alle notificaties ({filteredNotifications.length})
+        <TabsList className="mb-6 grid w-full grid-cols-3 bg-blue-900/10">
+          <TabsTrigger value="all" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+            <Bell className="h-4 w-4" />
+            <span>Alle notificaties ({filteredNotifications.length})</span>
           </TabsTrigger>
-          <TabsTrigger value="unread" className="text-sm">
-            Ongelezen ({filteredUnreadNotifications.length})
+          <TabsTrigger value="unread" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+            <BellOff className="h-4 w-4" />
+            <span>Ongelezen ({filteredUnreadNotifications.length})</span>
           </TabsTrigger>
-          <TabsTrigger value="read" className="text-sm">
-            Gelezen ({filteredReadNotifications.length})
+          <TabsTrigger value="read" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+            <CheckCircle className="h-4 w-4" />
+            <span>Gelezen ({filteredReadNotifications.length})</span>
           </TabsTrigger>
         </TabsList>
         

@@ -34,7 +34,10 @@ const NotificationDropdown: React.FC = () => {
   };
 
   const handleItemClick = (notification: Notification) => {
-    // Alleen naar de notificatiepagina navigeren, niet automatisch als gelezen markeren
+    // Naar de notificatiepagina navigeren en automatisch als gelezen markeren
+    if (!notification.isRead) {
+      markAsRead(notification.id);
+    }
     setLocation('/notifications');
     setOpen(false);
   };

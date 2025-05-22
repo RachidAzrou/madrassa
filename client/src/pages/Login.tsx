@@ -82,7 +82,7 @@ export default function Login(props: any) {
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
          style={{ 
            backgroundImage: `url(${educationBgImage})`,
-           backgroundSize: 'cover',
+           backgroundSize: '120%',
            backgroundPosition: 'center',
            backgroundColor: '#f8fafc'
          }}>

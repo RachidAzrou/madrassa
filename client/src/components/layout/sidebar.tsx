@@ -145,7 +145,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
     <aside
       className={cn(
         "h-full bg-white border-r border-gray-200",
-        "w-64 flex flex-col",
+        "w-64 flex flex-col overflow-hidden",
         className
       )}
     >
@@ -334,7 +334,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
         
         {/* Afmelden knop aan einde van de sidebar */}
-        <div className="px-3 border-t border-gray-200 py-4 bg-white">
+        <div className="px-3 border-t border-gray-200 py-4 bg-white w-full">
           <div
             onClick={() => {
               // Verwijder authenticatie gegevens

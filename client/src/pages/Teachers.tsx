@@ -752,7 +752,7 @@ export default function Teachers() {
                   <td colSpan={5} className="px-6 py-8">
                     <div className="h-48 flex flex-col items-center justify-center text-gray-500">
                       <div className="text-[#1e3a8a] mb-2">
-                        <BookOpen className="h-12 w-12 mx-auto opacity-30" />
+                        <GraduationCap className="h-12 w-12 mx-auto opacity-30" />
                       </div>
                       <p className="text-sm font-medium">Geen docenten beschikbaar</p>
                     </div>

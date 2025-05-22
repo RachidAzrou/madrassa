@@ -20,46 +20,47 @@ import Admissions from "@/pages/Admissions";
 import StudentGroups from "@/pages/StudentGroups";
 import MyAccount from "@/pages/MyAccount";
 import Login from "@/pages/Login";
-
 import Scheduling from "@/pages/Scheduling";
 import Fees from "@/pages/Fees";
 import Settings from "@/pages/Settings";
-
-// Context voor authenticatie
 import React, { createContext } from "react";
 
+// Eenvoudigere AuthContext
 export const AuthContext = createContext({
   isAuthenticated: false,
   login: () => {},
   logout: () => {},
+  user: null as any,
 });
 
+// Auth provider component
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const [, navigate] = useLocation();
-  const [isInitialized, setIsInitialized] = useState(false);
   
-  // Check bij laden van de applicatie of er een token is
+  // Check token bij het laden
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      // Alleen navigeren als we niet al op de login pagina zijn
-      if (window.location.pathname !== "/login") {
-        navigate("/login");
+    const checkAuth = () => {
+      const token = localStorage.getItem("auth_token");
+      if (token) {
+        setIsAuthenticated(true);
+        const userRole = localStorage.getItem("user_role") || "USER";
+        const userName = localStorage.getItem("user_name") || "Gebruiker";
+        setUser({ role: userRole, name: userName });
       }
-    }
-    setIsInitialized(true);
+    };
+    
+    checkAuth();
   }, []);
   
   const login = () => {
-    console.log("Login functie aangeroepen");
     localStorage.setItem("auth_token", "admin_token");
+    localStorage.setItem("user_role", "ADMIN");
+    localStorage.setItem("user_name", "Admin");
     setIsAuthenticated(true);
-    
-    // Forceer een redirect naar het dashboard
-    window.location.href = "/";
+    setUser({ role: "ADMIN", name: "Admin" });
+    navigate("/");
   };
   
   const logout = () => {
@@ -67,69 +68,71 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("user_role");
     localStorage.removeItem("user_name");
     setIsAuthenticated(false);
+    setUser(null);
     navigate("/login");
   };
   
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
-      {isInitialized ? children : 
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-        </div>
-      }
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, user }}>
+      {children}
     </AuthContext.Provider>
   );
 }
 
-// Protected Route component
-function ProtectedRoute({ component: Component, ...rest }: { component: React.ComponentType<any>, [key: string]: any }) {
+// Hoofdapplicatie routes
+function AppRoutes() {
   const { isAuthenticated } = React.useContext(AuthContext);
+  const [location] = useLocation();
   const [, navigate] = useLocation();
   
+  // Redirect naar login als niet geauthenticeerd
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && location !== "/login") {
       navigate("/login");
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, location, navigate]);
   
-  return isAuthenticated ? <Component {...rest} /> : null;
-}
-
-function AppRoutes() {
-  const { isAuthenticated, login } = React.useContext(AuthContext);
-  const [location] = useLocation();
+  // Als we op login pagina zijn maar al geauthenticeerd, ga naar dashboard
+  useEffect(() => {
+    if (isAuthenticated && location === "/login") {
+      navigate("/");
+    }
+  }, [isAuthenticated, location, navigate]);
   
-  // Als we op de login pagina zijn, toon alleen de login component
-  if (location === "/login") {
-    return <Login onLoginSuccess={login} />;
+  if (!isAuthenticated && location !== "/login") {
+    return null;
   }
   
-  // Anders, toon de beveiligde routes
+  if (location === "/login") {
+    return <Login />;
+  }
+  
   return (
     <MainLayout>
       <Switch>
-        <Route path="/" component={() => <ProtectedRoute component={Dashboard} />} />
-        <Route path="/students" component={() => <ProtectedRoute component={Students} />} />
-        <Route path="/guardians" component={() => <ProtectedRoute component={Guardians} />} />
-        <Route path="/teachers" component={() => <ProtectedRoute component={Teachers} />} />
-        <Route path="/admissions" component={() => <ProtectedRoute component={Admissions} />} />
-        <Route path="/student-groups" component={() => <ProtectedRoute component={StudentGroups} />} />
-        <Route path="/courses" component={() => <ProtectedRoute component={Courses} />} />
-        <Route path="/programs" component={() => <ProtectedRoute component={Programs} />} />
-        <Route path="/scheduling" component={() => <ProtectedRoute component={Scheduling} />} />
-        <Route path="/calendar" component={() => <ProtectedRoute component={Calendar} />} />
-        <Route path="/attendance" component={() => <ProtectedRoute component={Attendance} />} />
-        <Route path="/grading" component={() => <ProtectedRoute component={Cijfers} />} />
-        <Route path="/fees" component={() => <ProtectedRoute component={Fees} />} />
-        <Route path="/reports" component={() => <ProtectedRoute component={Reports} />} />
-        <Route path="/settings" component={() => <ProtectedRoute component={Settings} />} />
-        <Route path="/mijn-account" component={() => <ProtectedRoute component={MyAccount} />} />
+        <Route path="/" component={Dashboard} />
+        <Route path="/students" component={Students} />
+        <Route path="/guardians" component={Guardians} />
+        <Route path="/teachers" component={Teachers} />
+        <Route path="/admissions" component={Admissions} />
+        <Route path="/student-groups" component={StudentGroups} />
+        <Route path="/courses" component={Courses} />
+        <Route path="/programs" component={Programs} />
+        <Route path="/scheduling" component={Scheduling} />
+        <Route path="/calendar" component={Calendar} />
+        <Route path="/attendance" component={Attendance} />
+        <Route path="/grading" component={Cijfers} />
+        <Route path="/fees" component={Fees} />
+        <Route path="/reports" component={Reports} />
+        <Route path="/settings" component={Settings} />
+        <Route path="/mijn-account" component={MyAccount} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>
   );
 }
 
+// Main App component
 function App() {
   return (
     <QueryClientProvider client={queryClient}>

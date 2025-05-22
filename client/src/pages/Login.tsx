@@ -78,12 +78,16 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   return (
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-white dark:bg-[#0f1117]">
       {/* Linker kolom - Visuele sectie */}
-      <div className="hidden md:flex flex-col justify-center items-center relative bg-[#f0f4f8] dark:bg-[#111827] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
-        <div className="absolute top-0 left-0 w-full h-full opacity-20 dark:opacity-10 bg-grid-primary"></div>
+      <div className="hidden md:flex flex-col justify-center items-center relative overflow-hidden">
+        {/* Mooie achtergrond met patroon en gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-blue-50 to-white dark:from-primary/10 dark:via-slate-900 dark:to-slate-950"></div>
+        <div className="absolute inset-0" style={{ 
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231e3a8a' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundSize: '25px 25px'
+        }}></div>
         
         <div className="relative z-10 max-w-md p-8 text-center">
-          <img src={madrassaLogo} alt="Madrassa Logo" className="h-24 mx-auto mb-8" />
+          <img src={madrassaLogo} alt="Madrassa Logo" className="h-36 mx-auto mb-10 drop-shadow-lg" />
           <h2 className="text-4xl font-bold text-primary mb-6">Welkom bij Madrassa</h2>
           <p className="text-slate-600 dark:text-slate-300 text-lg mb-8">
             Het beheerplatform voor al je administratieve taken
@@ -117,7 +121,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       <div className="flex flex-col justify-center items-center px-6 py-12">
         <div className="w-full max-w-sm">
           <div className="md:hidden flex justify-center mb-10">
-            <img src={madrassaLogo} alt="Madrassa Logo" className="h-16" />
+            <img src={madrassaLogo} alt="Madrassa Logo" className="h-28 drop-shadow-lg" />
           </div>
           
           <div className="space-y-2 mb-8">

@@ -1196,12 +1196,13 @@ export default function Students() {
             {/* Lege state wanneer er geen studenten zijn - onder de headers */}
             {!isLoading && (!studentsData?.students || studentsData?.students.length === 0) && (
               <tr>
-                <td colSpan={8} className="px-6 py-4">
-                  <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-                    <div className="text-[#1e3a8a] mb-2">
-                      <Users className="h-12 w-12 mx-auto opacity-30" />
-                    </div>
-                    <p className="text-sm font-medium">Geen studenten beschikbaar</p>
+                <td colSpan={8} className="px-6 py-8">
+                  <div className="p-6 text-center">
+                    <Users className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+                    <h3 className="text-lg font-medium mb-2">Geen studenten gevonden</h3>
+                    <p className="text-gray-500 mb-4">
+                      Er zijn geen studenten die overeenkomen met de geselecteerde filters.
+                    </p>
                   </div>
                 </td>
               </tr>

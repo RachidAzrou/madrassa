@@ -551,25 +551,12 @@ export default function Guardians() {
               ) : guardians.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-8">
-                    <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-                      <div className="text-[#1e3a8a] mb-2">
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          width="48" 
-                          height="48" 
-                          viewBox="0 0 24 24" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          strokeWidth="2" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          className="mx-auto opacity-30"
-                        >
-                          <circle cx="12" cy="12" r="3"></circle>
-                          <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
-                        </svg>
-                      </div>
-                      <p className="text-sm font-medium">Geen voogden beschikbaar</p>
+                    <div className="p-6 text-center">
+                      <Users2 className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+                      <h3 className="text-lg font-medium mb-2">Geen voogden gevonden</h3>
+                      <p className="text-gray-500 mb-4">
+                        Er zijn geen voogden die overeenkomen met de geselecteerde filters.
+                      </p>
                     </div>
                   </td>
                 </tr>

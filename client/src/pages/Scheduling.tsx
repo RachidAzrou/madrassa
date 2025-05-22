@@ -601,8 +601,11 @@ export default function Scheduling() {
                         </div>
                       ))
                     ) : (
-                      <div className="p-6 text-center text-gray-500">
-                        Geen lokaalgegevens beschikbaar
+                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                        <div className="text-[#1e3a8a] mb-2">
+                          <Building className="h-12 w-12 mx-auto opacity-30" />
+                        </div>
+                        <p className="text-sm font-medium">Geen lokaalgegevens beschikbaar</p>
                       </div>
                     )}
                   </div>

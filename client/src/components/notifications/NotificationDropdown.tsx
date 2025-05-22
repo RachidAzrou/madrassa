@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Check, Trash2, BellOff, ExternalLink } from 'lucide-react';
+import { Check, Trash2, BellOff, ExternalLink, Info, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
 import { useNotifications, type Notification } from '@/contexts/NotificationContext';
 import NotificationBell from './NotificationBell';
 import { formatDistanceToNow } from 'date-fns';
@@ -43,17 +43,17 @@ const NotificationDropdown: React.FC = () => {
   };
 
   const getNotificationIcon = (type: string) => {
-    switch (type) {
+    switch (type?.toLowerCase()) {
       case 'info':
-        return <div className="bg-blue-100 text-blue-500 p-2 rounded-full" />;
+        return <div className="bg-blue-100 p-2 rounded-full"><Info className="h-4 w-4 text-blue-600" /></div>;
       case 'warning':
-        return <div className="bg-amber-100 text-amber-500 p-2 rounded-full" />;
+        return <div className="bg-amber-100 p-2 rounded-full"><AlertTriangle className="h-4 w-4 text-amber-600" /></div>;
       case 'error':
-        return <div className="bg-red-100 text-red-500 p-2 rounded-full" />;
+        return <div className="bg-red-100 p-2 rounded-full"><AlertCircle className="h-4 w-4 text-red-600" /></div>;
       case 'success':
-        return <div className="bg-green-100 text-green-500 p-2 rounded-full" />;
+        return <div className="bg-green-100 p-2 rounded-full"><CheckCircle className="h-4 w-4 text-green-600" /></div>;
       default:
-        return <div className="bg-gray-100 text-gray-500 p-2 rounded-full" />;
+        return <div className="bg-blue-100 p-2 rounded-full"><Info className="h-4 w-4 text-blue-600" /></div>;
     }
   };
   
@@ -72,55 +72,60 @@ const NotificationDropdown: React.FC = () => {
           <NotificationBell onClick={() => setOpen(!open)} />
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80" align="end">
-        <DropdownMenuLabel className="flex justify-between items-center">
-          <span>Notificaties</span>
-          {unreadCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => markAllAsRead()}
-              className="text-xs"
-            >
-              <Check className="h-4 w-4 mr-1" />
-              Alles gelezen
-            </Button>
-          )}
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+      <DropdownMenuContent className="w-96 p-0 shadow-lg border-gray-200 overflow-hidden" align="end">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 py-3 px-4">
+          <DropdownMenuLabel className="flex justify-between items-center p-0 text-white">
+            <span className="text-lg font-medium">Notificaties</span>
+            {unreadCount > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => markAllAsRead()}
+                className="bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white"
+              >
+                <Check className="h-3.5 w-3.5 mr-1" />
+                Alles gelezen
+              </Button>
+            )}
+          </DropdownMenuLabel>
+        </div>
         <div className="max-h-[400px] overflow-y-auto">
           <DropdownMenuGroup>
             {notifications.length === 0 ? (
-              <div className="py-4 px-2 text-center text-muted-foreground">
-                <BellOff className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                <p>Geen notificaties</p>
+              <div className="py-10 px-4 text-center text-muted-foreground">
+                <div className="bg-blue-50 rounded-full p-4 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
+                  <BellOff className="h-8 w-8 text-blue-400 opacity-70" />
+                </div>
+                <p className="text-base font-medium text-gray-600">Geen notificaties</p>
+                <p className="text-sm text-gray-500 mt-1">U bent helemaal bij!</p>
               </div>
             ) : (
               notifications.map((notification) => (
                 <DropdownMenuItem
                   key={notification.id}
-                  className={`p-3 cursor-pointer ${!notification.isRead ? 'bg-muted/50' : ''}`}
+                  className={`p-0 cursor-pointer focus:bg-blue-50/50 hover:bg-blue-50/50 ${!notification.isRead ? 'bg-blue-50/30' : ''}`}
                   onClick={() => handleItemClick(notification)}
                 >
-                  <div className="flex items-start gap-3">
-                    <div>{getNotificationIcon(notification.type)}</div>
+                  <div className="flex items-start gap-4 p-4 border-b border-gray-100 w-full">
+                    <div className="flex-shrink-0 mt-1">{getNotificationIcon(notification.type)}</div>
                     <div className="flex-1">
                       <div className="flex justify-between items-start w-full">
-                        <h4 className="font-medium text-sm">{notification.title}</h4>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
+                        <h4 className="font-medium text-gray-800">{notification.title}</h4>
+                        <span className="text-xs text-gray-500 whitespace-nowrap ml-2 mt-1">
                           {formatDate(notification.createdAt)}
                         </span>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-sm text-gray-600 mt-1 leading-normal">
                         {notification.message}
                       </p>
-                      <div className="flex justify-end mt-2 gap-2">
+                      
+                      <div className="flex justify-end mt-3 gap-2">
                         {!notification.isRead && (
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={(e) => handleMarkAsRead(notification.id, e)}
-                            className="h-7 text-xs px-2"
+                            className="h-7 text-xs px-2 bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 hover:text-blue-700"
                           >
                             <Check className="h-3 w-3 mr-1" />
                             Gelezen
@@ -130,7 +135,7 @@ const NotificationDropdown: React.FC = () => {
                           variant="ghost"
                           size="sm"
                           onClick={(e) => handleDelete(notification.id, e)}
-                          className="h-7 text-xs px-2 text-destructive hover:text-destructive"
+                          className="h-7 text-xs px-2 text-gray-600 hover:bg-red-50 hover:text-red-600"
                         >
                           <Trash2 className="h-3 w-3 mr-1" />
                           Verwijderen
@@ -139,7 +144,7 @@ const NotificationDropdown: React.FC = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 text-xs px-2"
+                            className="h-7 text-xs px-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600"
                           >
                             <ExternalLink className="h-3 w-3 mr-1" />
                             Bekijken

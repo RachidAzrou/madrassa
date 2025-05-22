@@ -86,7 +86,7 @@ export class DatabaseStorage implements IStorage {
     await db.update(notifications)
       .set({ isRead: true })
       .where(and(
-        eq(notifications.userId, userId),
+        eq(notifications.user_id, userId),
         eq(notifications.isRead, false)
       ));
   }

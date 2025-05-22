@@ -1031,11 +1031,11 @@ export default function Students() {
               
               {/* Persoonlijke informatie tab */}
               <TabsContent value="personal" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-base font-semibold text-primary mb-3">Persoonlijke gegevens</h3>
                   
                   {/* Foto upload sectie */}
-                  <div className="flex mb-6 items-start">
+                  <div className="flex mb-4 items-start">
                     <div 
                       className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-6"
                       onClick={() => {

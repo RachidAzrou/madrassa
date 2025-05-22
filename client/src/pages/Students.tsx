@@ -652,19 +652,32 @@ export default function Students() {
 
       {/* Filter opties */}
       {showFilterOptions && (
-        <div className="mb-6 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
-          <div className="flex items-center mb-4">
-            <Filter className="h-5 w-5 mr-2 text-[#1e3a8a]" />
-            <h3 className="text-base font-medium text-gray-900">Filter Opties</h3>
+        <div className="mb-6 bg-blue-50/30 p-5 rounded-lg border border-blue-100 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100/70 mr-3 text-[#1e3a8a]">
+                <Filter className="h-4 w-4" />
+              </div>
+              <h3 className="text-base font-medium text-gray-800">Filters</h3>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowFilterOptions(false)}
+              className="h-8 w-8 p-0 rounded-full"
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="status-filter" className="text-xs font-medium text-gray-700">Status</Label>
+            <div className="bg-white p-3 rounded-md border border-blue-100/80 shadow-xs">
+              <Label htmlFor="status-filter" className="text-xs font-medium text-gray-700 mb-1.5 block">Status</Label>
               <Select 
                 value={selectedStatusFilter} 
                 onValueChange={setSelectedStatusFilter}
               >
-                <SelectTrigger id="status-filter" className="bg-white h-9 mt-1 text-sm">
+                <SelectTrigger id="status-filter" className="bg-white border-gray-200 h-9 text-sm">
                   <SelectValue placeholder="Alle statussen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -678,13 +691,13 @@ export default function Students() {
               </Select>
             </div>
             
-            <div>
-              <Label htmlFor="group-filter" className="text-xs font-medium text-gray-700">Klas</Label>
+            <div className="bg-white p-3 rounded-md border border-blue-100/80 shadow-xs">
+              <Label htmlFor="group-filter" className="text-xs font-medium text-gray-700 mb-1.5 block">Klas</Label>
               <Select 
                 value={selectedStudentGroupFilter} 
                 onValueChange={setSelectedStudentGroupFilter}
               >
-                <SelectTrigger id="group-filter" className="bg-white h-9 mt-1 text-sm">
+                <SelectTrigger id="group-filter" className="bg-white border-gray-200 h-9 text-sm">
                   <SelectValue placeholder="Alle klassen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -698,13 +711,13 @@ export default function Students() {
               </Select>
             </div>
             
-            <div>
-              <Label htmlFor="year-filter" className="text-xs font-medium text-gray-700">Schooljaar</Label>
+            <div className="bg-white p-3 rounded-md border border-blue-100/80 shadow-xs">
+              <Label htmlFor="year-filter" className="text-xs font-medium text-gray-700 mb-1.5 block">Schooljaar</Label>
               <Select 
                 value={selectedYearLevelFilter} 
                 onValueChange={setSelectedYearLevelFilter}
               >
-                <SelectTrigger id="year-filter" className="bg-white h-9 mt-1 text-sm">
+                <SelectTrigger id="year-filter" className="bg-white border-gray-200 h-9 text-sm">
                   <SelectValue placeholder="Alle schooljaren" />
                 </SelectTrigger>
                 <SelectContent>
@@ -717,33 +730,33 @@ export default function Students() {
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
-            <div className="flex gap-2 md:col-span-3 mt-2 justify-end">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => {
-                  setSelectedStatusFilter("all");
-                  setSelectedStudentGroupFilter("all");
-                  setSelectedYearLevelFilter("all");
-                }}
-                className="text-xs h-8"
-              >
-                <X className="mr-1 h-3 w-3" />
-                Filters wissen
-              </Button>
-              <Button 
-                size="sm" 
-                onClick={() => {
-                  setPage(1);
-                  setShowFilterOptions(false);
-                }}
-                className="text-xs h-8 bg-[#1e3a8a] hover:bg-blue-900"
-              >
-                <Check className="mr-1 h-3 w-3" />
-                Toepassen
-              </Button>
-            </div>
+          <div className="flex gap-2 mt-4 justify-end">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => {
+                setSelectedStatusFilter("all");
+                setSelectedStudentGroupFilter("all");
+                setSelectedYearLevelFilter("all");
+              }}
+              className="text-xs h-8 border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800"
+            >
+              <X className="mr-1.5 h-3 w-3" />
+              Wissen
+            </Button>
+            <Button 
+              size="sm" 
+              onClick={() => {
+                setPage(1);
+                setShowFilterOptions(false);
+              }}
+              className="text-xs h-8 bg-[#1e3a8a] hover:bg-blue-800"
+            >
+              <Check className="mr-1.5 h-3 w-3" />
+              Toepassen
+            </Button>
           </div>
         </div>
       )}
@@ -912,7 +925,7 @@ export default function Students() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => handleViewStudent(student.id)}
+                          onClick={() => handleViewStudentDetails(student)}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -920,7 +933,7 @@ export default function Students() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => handleEditStudent(student.id)}
+                          onClick={() => handleEditStudent(student)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -941,24 +954,24 @@ export default function Students() {
                   
                   <div className="ml-10 space-y-1 text-sm">
                     <div className="flex items-baseline">
-                      <span className="text-gray-500 w-24">Email:</span>
-                      <span className="text-sm text-gray-900 truncate">{student.email}</span>
-                    </div>
-                    <div className="flex items-baseline">
-                      <span className="text-gray-500 w-24">Programma:</span>
-                      <span className="text-sm text-gray-900">
-                        {student.programs && student.programs[0] 
-                          ? programs.find((p: any) => p.id === student.programs[0].programId)?.name 
+                      <span className="text-gray-500 w-24">Klas:</span>
+                      <span className="text-sm text-gray-900 truncate">
+                        {student.studentGroups && student.studentGroups.length > 0
+                          ? student.studentGroups[0].groupName
                           : '-'}
                       </span>
                     </div>
                     <div className="flex items-baseline">
-                      <span className="text-gray-500 w-24">Leerjaar:</span>
+                      <span className="text-gray-500 w-24">Schooljaar:</span>
                       <span className="text-sm text-gray-900">
                         {student.programs && student.programs[0] 
                           ? student.programs[0].yearLevel 
                           : '-'}
                       </span>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="text-gray-500 w-24">Email:</span>
+                      <span className="text-sm text-gray-900 truncate">{student.email}</span>
                     </div>
                   </div>
                 </div>

@@ -213,7 +213,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
       </div>
       
       {/* Navigation links */}
-      <nav className="flex-1 py-2 px-3 overflow-y-auto flex flex-col justify-between" style={{ maxHeight: "calc(100vh - 160px)" }}>
+      <nav className="flex-1 py-2 px-3 overflow-y-auto flex flex-col justify-between">
         <div className="space-y-4 overflow-y-auto">
 
           <div className="pt-2">

@@ -434,7 +434,7 @@ export default function StudentGroups() {
               </Button>
             </div>
           ) : studentGroups.length === 0 ? (
-            <div className="text-center py-10">
+            <div className="p-6 text-center">
               <School className="h-10 w-10 text-gray-400 mx-auto mb-3" />
               <h3 className="text-lg font-medium mb-2">Geen klassen gevonden</h3>
               <p className="text-gray-500 mb-4">
@@ -613,9 +613,14 @@ export default function StudentGroups() {
                   ))
                 ) : studentGroups.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="p-8 text-center">
-                      <School className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-gray-500">Geen klassen gevonden</p>
+                    <td colSpan={7} className="px-6 py-8">
+                      <div className="p-6 text-center">
+                        <School className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+                        <h3 className="text-lg font-medium mb-2">Geen klassen gevonden</h3>
+                        <p className="text-gray-500 mb-4">
+                          Er zijn geen klassen die overeenkomen met de geselecteerde filters.
+                        </p>
+                      </div>
                     </td>
                   </tr>
                 ) : (

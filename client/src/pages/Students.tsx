@@ -877,7 +877,7 @@ export default function Students() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               <span className="ml-2">Laden...</span>
             </div>
-          ) : filteredStudents.length === 0 ? null : (
+          ) : (studentsData?.students?.length === 0) ? null : (
             <div className="divide-y divide-gray-200">
               {(Array.isArray(studentsData) ? studentsData : []).map((student: any) => (
                 <div key={student.id} className="p-4">

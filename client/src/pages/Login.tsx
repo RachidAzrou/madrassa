@@ -9,7 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 
-// We gebruiken geen logo import maar tekstuele weergave van het logo
+// Import logo direct
+import madrassaLogoSvg from '../assets/mymadrassa_logo.svg'
+import loginBgSvg from '../assets/login-bg.svg'
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Voer een geldig e-mailadres in' }),
@@ -81,7 +83,7 @@ export default function Login(props: any) {
       {/* Stijlvolle achtergrond */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700"></div>
-        <img src="@assets/login-bg.svg" alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+        <img src={loginBgSvg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
       </div>
       
       {/* Decoratieve elementen */}
@@ -93,7 +95,7 @@ export default function Login(props: any) {
         {/* Logo bovenaan in de container */}
         <div className="flex flex-col items-center p-8 bg-white/80 dark:bg-slate-800/80 border-b border-slate-200/70 dark:border-slate-700/70">
           <div className="mb-6 mt-2">
-            <img src="@assets/mymadrassa_logo.svg" alt="mymadrassa" className="h-16" />
+            <img src={madrassaLogoSvg} alt="mymadrassa" className="h-16" />
           </div>
           <p className="text-slate-600 dark:text-slate-300 text-center">
             Log in om toegang te krijgen tot het platform

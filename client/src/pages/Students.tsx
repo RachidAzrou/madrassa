@@ -897,18 +897,19 @@ export default function Students() {
             >
               <Download className="mr-2 h-4 w-4" /> Exporteren
             </Button>
+            
+            <Button 
+              variant="outline" 
+              size="default"
+              className="border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a]/10"
+              onClick={() => setIsImportDialogOpen(true)}
+            >
+              <FileUp className="mr-2 h-4 w-4" /> Importeren
+            </Button>
           </div>
         </div>
         
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="default" 
-            className="border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a]/10"
-            onClick={() => setIsImportDialogOpen(true)}
-          >
-            <FileUp className="mr-2 h-4 w-4" /> Importeren
-          </Button>
           <Button 
             variant="default" 
             size="default" 

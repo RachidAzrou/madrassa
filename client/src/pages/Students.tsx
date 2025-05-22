@@ -101,9 +101,9 @@ export default function Students() {
 
   // Statusopties voor dropdown
   const statusOptions = [
-    { value: 'active', label: 'Actief' },
-    { value: 'pending', label: 'In Afwachting' },
-    { value: 'inactive', label: 'Inactief' },
+    { value: 'enrolled', label: 'Ingeschreven' },
+    { value: 'unenrolled', label: 'Uitgeschreven' },
+    { value: 'suspended', label: 'Geschorst' },
     { value: 'graduated', label: 'Afgestudeerd' }
   ];
 
@@ -311,7 +311,7 @@ export default function Students() {
       schoolYear: '',
       studentGroupId: null,
       enrollmentDate: '',
-      status: 'active',
+      status: 'enrolled',
       notes: '',
       gender: '',
     });
@@ -515,14 +515,21 @@ export default function Students() {
   // Function to render status badge
   const renderStatusBadge = (status: string) => {
     switch (status) {
-      case 'active':
-        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">Actief</Badge>;
-      case 'pending':
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">In Afwachting</Badge>;
-      case 'inactive':
-        return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">Inactief</Badge>;
+      case 'enrolled':
+        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">Ingeschreven</Badge>;
+      case 'unenrolled':
+        return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">Uitgeschreven</Badge>;
+      case 'suspended':
+        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">Geschorst</Badge>;
       case 'graduated':
         return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">Afgestudeerd</Badge>;
+      // Fallback voor oude statuswaarden
+      case 'active':
+        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">Ingeschreven</Badge>;
+      case 'inactive':
+        return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">Uitgeschreven</Badge>;
+      case 'pending':
+        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">In Afwachting</Badge>;
       default:
         return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">{status}</Badge>;
     }

@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 
 // Import logo en achtergrond direct
 import madrassaLogoPng from '../assets/mymadrassa_logo.png'
-import educationBgImage from '../assets/images/education-bg-notebook.jpg'
+import educationBgImage from '../assets/images/education-bg-blue.png'
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Voer een geldig e-mailadres in' }),
@@ -86,9 +86,8 @@ export default function Login(props: any) {
            backgroundPosition: 'center',
            backgroundColor: '#f8fafc'
          }}>
-      {/* Blauwe overlay */}
-      <div className="absolute inset-0" 
-           style={{ backgroundColor: '#3b5998', opacity: 0.85, mixBlendMode: 'color' }}></div>
+      {/* Lichte achtergrond overlay */}
+      <div className="absolute inset-0 bg-white/20"></div>
       
       {/* Eén container voor alles */}
       <div className="w-full max-w-md bg-white/95 dark:bg-slate-800/95 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-sm rounded-xl overflow-hidden relative z-10">

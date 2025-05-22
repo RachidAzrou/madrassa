@@ -76,84 +76,48 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-gradient-to-b from-blue-50 to-white dark:from-slate-950 dark:to-slate-900">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-800 p-4">
       {/* Mooie achtergrond patroon over de hele pagina */}
       <div className="absolute inset-0 opacity-5 dark:opacity-10" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%231e3a8a' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E")`,
         backgroundSize: '180px 180px'
       }}></div>
       
-      {/* Linker kolom - Visuele sectie */}
-      <div className="hidden md:flex flex-col justify-center items-center relative overflow-hidden">
-        {/* Extra visueel element voor de linker kolom */}
-        <div className="absolute inset-0 bg-primary/5 dark:bg-primary/10"></div>
-        
-        <div className="relative z-10 max-w-md p-8 text-center">
-          <img src={madrassaLogo} alt="Madrassa Logo" className="h-36 mx-auto mb-10 drop-shadow-lg" />
-          <h2 className="text-4xl font-bold text-primary mb-6">Welkom bij Madrassa</h2>
-          <p className="text-slate-600 dark:text-slate-300 text-lg mb-8">
-            Het beheerplatform voor al je administratieve taken
+      {/* Eén container voor zowel logo als login formulier */}
+      <div className="w-full max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-2xl rounded-xl overflow-hidden relative z-10">
+        {/* Logo bovenaan in de container */}
+        <div className="flex flex-col items-center p-8 bg-gradient-to-r from-primary/10 via-blue-100/30 to-primary/10 dark:from-primary/20 dark:via-slate-700/30 dark:to-primary/20 border-b border-slate-200 dark:border-slate-700">
+          <img src={madrassaLogo} alt="Madrassa Logo" className="h-32 mx-auto mb-4 drop-shadow-lg" />
+          <h1 className="text-2xl font-bold text-primary dark:text-primary-foreground">
+            Madrassa Beheerplatform
+          </h1>
+          <div className="w-16 h-1 bg-primary rounded-full my-3"></div>
+          <p className="text-slate-600 dark:text-slate-300 text-center">
+            Log in om toegang te krijgen tot het platform
           </p>
-          
-          <div className="flex justify-center space-x-3 mb-6">
-            <span className="w-3 h-3 rounded-full bg-primary"></span>
-            <span className="w-3 h-3 rounded-full bg-primary/70"></span>
-            <span className="w-3 h-3 rounded-full bg-primary/40"></span>
-          </div>
-          
-          <div className="flex justify-center">
-            <div className="bg-white dark:bg-slate-800 shadow-lg p-4 rounded-lg text-left">
-              <div className="flex items-center mb-2">
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="font-medium text-slate-900 dark:text-white">Veilig & Beveiligd</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">End-to-end versleuteling</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-      
-      {/* Rechter kolom - Login form */}
-      <div className="flex flex-col justify-center items-center px-6 py-12">
-        <div className="w-full max-w-sm">
-          <div className="md:hidden flex justify-center mb-10">
-            <img src={madrassaLogo} alt="Madrassa Logo" className="h-28 drop-shadow-lg" />
-          </div>
-          
-          <div className="space-y-2 mb-8">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Log in op je account
-            </h1>
-            <p className="text-slate-500 dark:text-slate-400">
-              Vul je gegevens in om toegang te krijgen
-            </p>
-          </div>
-          
+        
+        {/* Login formulier in dezelfde container */}
+        <div className="p-8">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-700 dark:text-slate-300">
+                    <FormLabel className="text-slate-700 dark:text-slate-200">
                       E-mailadres
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-5 w-5 text-primary/60" />
                         <Input
                           placeholder="naam@voorbeeld.nl"
-                          className="h-11 bg-transparent dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 rounded-lg focus-visible:ring-primary"
+                          className="pl-10 h-11 bg-white/50 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 rounded-lg focus-visible:ring-primary"
                           {...field}
                           disabled={isLoading}
                         />
-                        <Mail className="absolute right-3 top-3 h-5 w-5 text-slate-400" />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -167,7 +131,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex justify-between">
-                      <FormLabel className="text-slate-700 dark:text-slate-300">
+                      <FormLabel className="text-slate-700 dark:text-slate-200">
                         Wachtwoord
                       </FormLabel>
                       <a href="#" className="text-xs text-primary hover:text-primary/80 transition-colors">
@@ -176,9 +140,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     </div>
                     <FormControl>
                       <div className="relative">
+                        <LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-primary/60" />
                         <Input
                           type={showPassword ? "text" : "password"}
-                          className="h-11 bg-transparent dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 rounded-lg focus-visible:ring-primary"
+                          className="pl-10 h-11 bg-white/50 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 rounded-lg focus-visible:ring-primary"
                           {...field}
                           disabled={isLoading}
                         />
@@ -203,7 +168,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               
               <Button
                 type="submit"
-                className="w-full h-11 font-medium bg-primary hover:bg-primary/90 transition-colors"
+                className="w-full h-11 mt-2 font-medium bg-primary hover:bg-primary/90 transition-colors"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -219,7 +184,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             </form>
           </Form>
           
-          <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 text-center">
+          <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 text-center">
             <p className="text-sm text-slate-500 dark:text-slate-400">
               &copy; {new Date().getFullYear()} Madrassa. Alle rechten voorbehouden.
             </p>

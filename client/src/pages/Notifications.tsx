@@ -306,20 +306,18 @@ const NotificationsPage: React.FC = () => {
 
   return (
     <div className="container max-w-6xl p-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <Bell className="h-6 w-6" />
-            </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Notificaties</h1>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-200 pb-4 mb-8 gap-4">
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+            <Bell className="h-7 w-7" />
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beheer al uw systeem- en applicatienotificaties
-          </p>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Notificaties</h1>
+            <p className="text-base text-gray-500 mt-1">Beheer hier al uw notificaties</p>
+          </div>
         </div>
 
-        <div>
+        <div className="md:flex-shrink-0">
           {unreadNotifications.length > 0 && (
             <Button
               variant="outline"

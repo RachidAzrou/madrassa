@@ -2055,8 +2055,11 @@ export default function Fees() {
             </CardHeader>
             <CardContent>
               {outstandingDebts.length === 0 ? (
-                <div className="py-8 text-center">
-                  <p className="text-gray-500">Geen openstaande schulden gevonden.</p>
+                <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                  <div className="text-[#1e3a8a] mb-2">
+                    <Euro className="h-12 w-12 mx-auto opacity-30" />
+                  </div>
+                  <p className="text-sm font-medium">Geen openstaande schulden gevonden</p>
                 </div>
               ) : (
                 <>
@@ -2532,8 +2535,11 @@ export default function Fees() {
           
           <div className="space-y-4">
             {!guardianData || guardianData.length === 0 ? (
-              <div className="py-8 text-center">
-                <p className="text-gray-500">Geen voogden gevonden voor deze student.</p>
+              <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                <div className="text-[#1e3a8a] mb-2">
+                  <Users className="h-12 w-12 mx-auto opacity-30" />
+                </div>
+                <p className="text-sm font-medium">Geen voogden gevonden voor deze student</p>
               </div>
             ) : (
               <div className="space-y-4">

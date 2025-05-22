@@ -184,6 +184,9 @@ const MyAccount = () => {
     alert("Profielfoto uploaden gesimuleerd voor demonstratie");
   };
 
+  // Gebruik de ThemeProvider voor donkere modus
+  const { theme, setTheme } = useTheme();
+  
   // Bij initialisatie gebruiker in localStorage opslaan voor de sidebar
   // en de huidige themastand ophalen
   useEffect(() => {
@@ -193,7 +196,7 @@ const MyAccount = () => {
     // Haal de huidige thema-instelling op uit de ThemeProvider
     // en synchroniseer de lokale 'darkMode' state hiermee
     setDarkMode(theme === 'dark');
-  }, [theme]);
+  }, [theme, currentUser]);
 
   // Profiel opslaan
   const onProfileSubmit = (data: ProfileFormValues) => {
@@ -257,9 +260,6 @@ const MyAccount = () => {
     setTwoFactorEnabled(!twoFactorEnabled);
   };
 
-  // Gebruik de ThemeProvider voor donkere modus
-  const { theme, setTheme } = useTheme();
-  
   // Toggle donkere modus
   const handleToggleDarkMode = () => {
     const newDarkMode = !darkMode;

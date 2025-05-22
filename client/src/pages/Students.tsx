@@ -740,25 +740,6 @@ export default function Students() {
 
       {/* Studenten tabel - responsieve weergave */}
       <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
-        {/* Lege state wanneer er geen studenten zijn */}
-        {!isLoading && (!studentsData?.students || studentsData?.students.length === 0) && (
-          <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-            <div className="text-[#1e3a8a] mb-2">
-              <Users className="h-12 w-12 mx-auto opacity-30" />
-            </div>
-            <p className="text-sm font-medium">Geen studenten beschikbaar</p>
-            <Button 
-              onClick={() => setIsCreateDialogOpen(true)}
-              variant="outline"
-              size="sm"
-              className="mt-3 text-xs text-[#1e3a8a]"
-            >
-              <PlusCircle className="mr-1 h-3 w-3" />
-              Student toevoegen
-            </Button>
-          </div>
-        )}
-        
         {/* Desktop weergave */}
         <div className="hidden md:block overflow-x-auto">
           <Table>
@@ -784,6 +765,29 @@ export default function Students() {
               </TableRow>
             </TableHeader>
             <TableBody>
+            
+            {/* Lege state wanneer er geen studenten zijn - onder de headers */}
+            {!isLoading && (!studentsData?.students || studentsData?.students.length === 0) && (
+              <TableRow>
+                <TableCell colSpan={8}>
+                  <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                    <div className="text-[#1e3a8a] mb-2">
+                      <Users className="h-12 w-12 mx-auto opacity-30" />
+                    </div>
+                    <p className="text-sm font-medium">Geen studenten beschikbaar</p>
+                    <Button 
+                      onClick={() => setIsCreateDialogOpen(true)}
+                      variant="outline"
+                      size="sm"
+                      className="mt-3 text-xs text-[#1e3a8a]"
+                    >
+                      <PlusCircle className="mr-1 h-3 w-3" />
+                      Student toevoegen
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center py-8">

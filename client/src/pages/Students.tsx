@@ -505,10 +505,17 @@ export default function Students() {
 
   // Handle select all
   const handleSelectAll = () => {
-    if (selectedStudents.length === (studentsData.students || []).length) {
+    const studentList = Array.isArray(studentsData) 
+      ? studentsData
+      : (studentsData?.students || []);
+      
+    const studentIds = studentList.map((s: any) => s.id);
+    
+    if (selectedStudents.length === studentIds.length && 
+        studentIds.every((id: number) => selectedStudents.includes(id))) {
       setSelectedStudents([]);
     } else {
-      setSelectedStudents((studentsData.students || []).map((s: any) => s.id));
+      setSelectedStudents(studentIds);
     }
   };
 
@@ -784,11 +791,18 @@ export default function Students() {
                 <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
                   <Checkbox 
                     checked={
-                      selectedStudents.length > 0 && 
-                      selectedStudents.length === (studentsData.students || []).length
+                      (() => {
+                        const studentList = Array.isArray(studentsData) 
+                          ? studentsData
+                          : (studentsData?.students || []);
+                        const studentIds = studentList.map((s: any) => s.id);
+                        return studentIds.length > 0 && 
+                          selectedStudents.length === studentIds.length &&
+                          studentIds.every(id => selectedStudents.includes(id));
+                      })()
                     }
                     onCheckedChange={handleSelectAll}
-                    aria-label="Select all"
+                    aria-label="Selecteer alle studenten"
                   />
                 </th>
                 <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>

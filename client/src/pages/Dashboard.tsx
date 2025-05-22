@@ -256,13 +256,13 @@ export default function Dashboard() {
           <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.totalTeachers}</p>
         </div>
         
-        {/* Programma's widget als vervanger voor Vakken */}
+        {/* Vakken widget */}
         <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10">
             <BookOpen className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
           </div>
           <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Vakken</h3>
-          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.programs}</p>
+          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.activeCourses}</p>
         </div>
       </div>
 
@@ -275,9 +275,7 @@ export default function Dashboard() {
               <ChalkBoard className="h-4 w-4 sm:h-5 sm:w-5 text-[#1e3a8a]" />
               <h3 className="text-base sm:text-lg font-semibold text-gray-800">Studenten per klas</h3>
             </div>
-            <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50 w-full sm:w-auto text-xs sm:text-sm" asChild>
-              <div onClick={() => setLocation('/student-groups')}>Details bekijken</div>
-            </Button>
+
           </div>
           
           {/* Fetch studentGroups data */}

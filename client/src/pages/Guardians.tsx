@@ -440,7 +440,7 @@ export default function Guardians() {
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <UserRound className="h-6 w-6" />
+              <UserCheck className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-semibold text-[#1e3a8a]">Voogden</h1>
           </div>
@@ -473,7 +473,7 @@ export default function Guardians() {
                 value="all" 
                 className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
               >
-                <UserRound className="h-4 w-4" />
+                <UserCheck className="h-4 w-4" />
                 Alle Voogden
               </TabsTrigger>
               <TabsTrigger 
@@ -547,7 +547,7 @@ export default function Guardians() {
                   <td colSpan={5}>
                     <div className="h-48 flex flex-col items-center justify-center text-gray-500">
                       <div className="text-[#1e3a8a] mb-2">
-                        <UserRound className="h-12 w-12 mx-auto opacity-30" />
+                        <UserCheck className="h-12 w-12 mx-auto opacity-30" />
                       </div>
                       <p className="text-sm font-medium">Geen voogden beschikbaar</p>
                     </div>
@@ -909,7 +909,7 @@ export default function Guardians() {
         <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-primary flex items-center">
-              <UserRound className="h-6 w-6 mr-2" />
+              <UserCheck className="h-6 w-6 mr-2" />
               {newGuardian.id ? 'Voogd Bewerken' : 'Nieuwe Voogd Toevoegen'}
             </DialogTitle>
             <DialogDescription>

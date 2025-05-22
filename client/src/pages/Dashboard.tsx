@@ -13,6 +13,7 @@ import {
   BookText,
   LayoutDashboard
 } from 'lucide-react';
+import { ResponsiveStatsCard } from '@/components/dashboard/responsive-stats-card';
 
 // Aangepast ChalkBoard icoon
 const ChalkBoard = (props: any) => (
@@ -232,39 +233,29 @@ export default function Dashboard() {
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-        {/* Import ResponsiveStatsCard */}
-        {(() => {
-          // Dynamisch importeren om circulaire afhankelijkheden te vermijden
-          const { ResponsiveStatsCard } = require('@/components/dashboard/responsive-stats-card');
-          
-          return (
-            <>
-              <ResponsiveStatsCard 
-                title="Studenten" 
-                value={stats.totalStudents} 
-                icon={<Users className="h-5 w-5" />}
-              />
-              
-              <ResponsiveStatsCard 
-                title="Klassen" 
-                value={stats.studentGroups} 
-                icon={<ChalkBoard className="h-5 w-5" />}
-              />
-              
-              <ResponsiveStatsCard 
-                title="Docenten" 
-                value={stats.totalTeachers} 
-                icon={<GraduationCap className="h-5 w-5" />}
-              />
-              
-              <ResponsiveStatsCard 
-                title="Vakken" 
-                value={stats.programs} 
-                icon={<BookOpen className="h-5 w-5" />}
-              />
-            </>
-          );
-        })()}
+        <ResponsiveStatsCard 
+          title="Studenten" 
+          value={stats.totalStudents} 
+          icon={<Users className="h-5 w-5" />}
+        />
+        
+        <ResponsiveStatsCard 
+          title="Klassen" 
+          value={stats.studentGroups} 
+          icon={<ChalkBoard className="h-5 w-5" />}
+        />
+        
+        <ResponsiveStatsCard 
+          title="Docenten" 
+          value={stats.totalTeachers} 
+          icon={<GraduationCap className="h-5 w-5" />}
+        />
+        
+        <ResponsiveStatsCard 
+          title="Vakken" 
+          value={stats.programs} 
+          icon={<BookOpen className="h-5 w-5" />}
+        />
       </div>
 
       {/* Main Content */}

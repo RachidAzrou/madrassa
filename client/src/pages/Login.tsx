@@ -94,9 +94,8 @@ export default function Login(props: any) {
       <div className="w-full max-w-md bg-white/90 dark:bg-slate-800/90 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-sm rounded-xl overflow-hidden relative z-10 border border-white/50 dark:border-slate-700/50">
         {/* Logo bovenaan in de container */}
         <div className="flex flex-col items-center p-8 bg-white/80 dark:bg-slate-800/80 border-b border-slate-200/70 dark:border-slate-700/70">
-          <div className="mb-6 mt-2 flex items-center">
-            <span className="text-4xl font-bold text-black">my</span>
-            <span className="text-4xl font-bold text-[#3b5998]">madrassa</span>
+          <div className="mb-6 mt-2">
+            <img src={madrassaLogoPng} alt="mymadrassa" className="h-20" />
           </div>
           <p className="text-slate-600 dark:text-slate-300 text-center">
             Log in om toegang te krijgen tot het platform

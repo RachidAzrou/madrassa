@@ -82,11 +82,50 @@ export default function Login(props: any) {
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Stijlvolle achtergrond */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-tr from-blue-50 via-white to-blue-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
-          <div className="absolute inset-0 opacity-25" style={{ 
-            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'56\' height=\'56\' viewBox=\'0 0 56 56\' enable-background=\'new 0 0 56 56\'%3E%3Cpath fill=\'%233b5998\' d=\'M29 20.984c0-.585-.415-1-1-1-.552 0-1 .415-1 1 0 .552.448 1 1 1C28.585 21.984 29 21.536 29 20.984zM41 44.984h-8V42h1c.553 0 1-.447 1-1v-4c0-.553-.447-1-1-1h-1v-1c0-.553-.447-1-1-1h-1v-1c0-.553-.447-1-1-1h-1V30.984c0-.553-.447-1-1-1h-2V29.984c0-.553-.447-1-1-1h-1v-8h9c.553 0 1-.447 1-1v-6c0-.553-.447-1-1-1H21c-.553 0-1 .447-1 1v6c0 .553.447 1 1 1h9v8h-1c-.553 0-1 .447-1 1V30.984h-2c-.553 0-1 .447-1 1V33.984h-1c-.553 0-1 .447-1 1v1h-1c-.553 0-1 .447-1 1v1h-1c-.553 0-1 .447-1 1v4c0 .553.447 1 1 1h1V44.984h-8c-.553 0-1 .447-1 1s.447 1 1 1h14 8 14c.553 0 1-.447 1-1S41.553 44.984 41 44.984zM22 14.984V9.984h12v5H22z\'/%3E%3C/svg%3E")',
-            backgroundSize: '56px 56px'
-          }}></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
+          <div className="absolute inset-0 overflow-hidden">
+            {/* Books */}
+            <div className="absolute" style={{ top: '5%', left: '10%', transform: 'rotate(-5deg)', opacity: 0.15 }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#3b5998" strokeWidth="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+            </div>
+            <div className="absolute" style={{ top: '30%', left: '85%', transform: 'rotate(15deg)', opacity: 0.1 }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#3b5998" strokeWidth="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+            </div>
+            {/* Pencils */}
+            <div className="absolute" style={{ top: '65%', left: '20%', transform: 'rotate(45deg)', opacity: 0.12 }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#3b5998" strokeWidth="2">
+                <path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><path d="M11 11l5 5"></path>
+              </svg>
+            </div>
+            {/* Calculator */}
+            <div className="absolute" style={{ top: '15%', left: '60%', transform: 'rotate(-8deg)', opacity: 0.15 }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="65" height="65" viewBox="0 0 24 24" fill="none" stroke="#3b5998" strokeWidth="2">
+                <rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" x2="16" y1="6" y2="6"></line><line x1="16" x2="16" y1="14" y2="18"></line><line x1="16" x2="16" y1="10" y2="10"></line><line x1="12" x2="12" y1="14" y2="18"></line><line x1="12" x2="12" y1="10" y2="10"></line><line x1="8" x2="8" y1="14" y2="18"></line><line x1="8" x2="8" y1="10" y2="10"></line>
+              </svg>
+            </div>
+            {/* Globe */}
+            <div className="absolute" style={{ top: '70%', left: '75%', transform: 'rotate(12deg)', opacity: 0.12 }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#3b5998" strokeWidth="1.5">
+                <circle cx="12" cy="12" r="10"></circle><line x1="2" x2="22" y1="12" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </div>
+            {/* Ruler */}
+            <div className="absolute" style={{ top: '40%', left: '5%', transform: 'rotate(90deg)', opacity: 0.1 }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#3b5998" strokeWidth="1.5">
+                <path d="M3 5v14h18V5H3z M6 19v-3 M10 19v-6 M14 19v-3 M18 19v-6"></path>
+              </svg>
+            </div>
+            {/* Paper */}
+            <div className="absolute" style={{ top: '25%', left: '40%', transform: 'rotate(-3deg)', opacity: 0.12 }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#3b5998" strokeWidth="1.5">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line>
+              </svg>
+            </div>
+          </div>
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/40 dark:to-slate-900/40"></div>
       </div>

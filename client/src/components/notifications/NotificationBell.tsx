@@ -14,13 +14,13 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onClick }) => {
     <Button 
       onClick={onClick} 
       variant="ghost" 
-      size="sm" 
-      className="relative"
+      size="icon" 
+      className="relative bg-blue-50 hover:bg-blue-100 text-blue-800 shadow-sm"
       aria-label="Notificaties bekijken"
     >
       <Bell className="h-5 w-5" />
       {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
           {unreadCount > 9 ? '9+' : unreadCount}
         </span>
       )}

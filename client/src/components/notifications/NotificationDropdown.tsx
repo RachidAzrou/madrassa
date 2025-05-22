@@ -187,7 +187,7 @@ const NotificationDropdown: React.FC = () => {
               setLocation('/notifications');
               setOpen(false);
             }}
-            className="w-full text-sm font-medium text-blue-600 hover:bg-blue-100"
+            className="w-full text-sm font-medium text-primary hover:bg-primary/10"
           >
             Bekijk alles →
           </Button>

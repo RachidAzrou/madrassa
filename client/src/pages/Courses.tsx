@@ -364,6 +364,26 @@ export default function Courses() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
+      {/* Zoekbalk - bovenaan geplaatst */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoek curricula..."
+            className="pl-8 bg-white"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          {searchTerm && (
+            <XCircle
+              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+              onClick={() => setSearchTerm("")}
+            />
+          )}
+        </div>
+      </div>
+      
       {/* Page Title */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
@@ -377,282 +397,223 @@ export default function Courses() {
             Beheer het curriculum en de inschrijvingen
           </p>
         </div>
+        
+        <Button 
+          onClick={handleAddCourse} 
+          variant="default"
+          size="default"
+          className="bg-primary hover:bg-primary/90 flex items-center"
+        >
+          <PlusCircle className="mr-2 h-4 w-4" />
+          <span>Curriculum Toevoegen</span>
+        </Button>
       </div>
       
-      {/* Search and Add Course */}
-      <div className="mb-6">
-        <div className="flex flex-col md:flex-row justify-end items-center gap-4 mb-4">
-          <div className="relative w-full md:w-64 order-2 md:order-1">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-            <Input
-              type="search"
-              placeholder="Zoek curricula..."
-              className="w-full pl-9 pr-9 border-gray-300 focus:border-blue-500"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-            {searchTerm && (
-              <XCircle
-                className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
-                onClick={() => setSearchTerm("")}
-              />
+      {/* Main Tabs for Courses/Classes and Filter Tabs for Status */}
+      <div className="flex flex-col md:flex-row md:items-center gap-4 mb-5 mt-6">
+        <Tabs defaultValue="courses" className="w-full" onValueChange={setActiveTab}>
+          <TabsList className="p-1 bg-blue-900/10 mb-0 flex w-auto">
+            <TabsTrigger value="courses" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+              Vakken
+            </TabsTrigger>
+            <TabsTrigger value="classes" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+              Klassen
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+        
+        <Tabs defaultValue="active" className="w-auto">
+          <TabsList className="p-1 bg-blue-900/10 mb-0 flex w-auto">
+            <TabsTrigger 
+              value="active" 
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
+              onClick={() => handleStatusFilterChange('active')}
+            >
+              Actief
+            </TabsTrigger>
+            <TabsTrigger 
+              value="inactive" 
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
+              onClick={() => handleStatusFilterChange('inactive')}
+            >
+              Inactief
+            </TabsTrigger>
+            <TabsTrigger 
+              value="all" 
+              className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
+              onClick={() => handleStatusFilterChange('all')}
+            >
+              Alle vakken
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+      
+      {/* Content Tabs */}
+      <Tabs defaultValue="courses" className="w-full" value={activeTab}>
+        
+        {/* Courses Tab Content */}
+        <TabsContent value="courses">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {isLoading ? (
+              <div className="col-span-full flex justify-center py-8">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : isError ? (
+              <div className="col-span-full text-center py-8 text-red-500">
+                Fout bij het laden van curriculum. Probeer het opnieuw.
+              </div>
+            ) : courses.length === 0 ? (
+              <div className="col-span-full text-center py-8 text-gray-500">
+                Geen curriculum gevonden. Pas uw filters aan of voeg een nieuw curriculum toe.
+              </div>
+            ) : (
+              courses.map((course) => (
+                <div key={course.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="p-5">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-800">{course.name}</h3>
+                        <p className="text-gray-500 text-sm mt-1">{course.code} • {course.credits} Studiepunten</p>
+                      </div>
+                      <Badge variant={course.isActive ? "default" : "secondary"}>
+                        {course.isActive ? "Actief" : "Inactief"}
+                      </Badge>
+                    </div>
+                    
+                    <div className="mt-3 space-y-2">
+                      <div className="flex items-center text-sm text-gray-500">
+                        <BookOpen className="h-4 w-4 mr-2" />
+                        <span>{getProgramNameById(course.programId)}</span>
+                      </div>
+                      
+                      {course.instructor && (
+                        <div className="flex items-center text-sm text-gray-500">
+                          <Users className="h-4 w-4 mr-2" />
+                          <span>{course.instructor}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="px-5 py-3 bg-gray-50 border-t flex justify-end space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleViewCourse(course)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <span className="sr-only">Bekijken</span>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditCourse(course)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <span className="sr-only">Bewerken</span>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteCourse(course)}
+                      className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                    >
+                      <span className="sr-only">Verwijderen</span>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))
             )}
           </div>
           
-          <Button 
-            onClick={handleAddCourse} 
-            variant="default"
-            size="default"
-            className="bg-primary hover:bg-primary/90 flex items-center w-full md:w-auto order-1 md:order-2"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Curriculum Toevoegen</span>
-          </Button>
-        </div>
-        
-        {/* Main Tabs for Courses/Classes and Filter Tabs for Status */}
-        <div className="flex flex-col md:flex-row md:items-center gap-4 mb-5">
-          <Tabs defaultValue="courses" className="w-full" onValueChange={setActiveTab}>
-            <TabsList className="p-1 bg-blue-900/10 mb-0 flex w-auto">
-              <TabsTrigger value="courses" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-                Vakken
-              </TabsTrigger>
-              <TabsTrigger value="classes" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-                Klassen
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-          
-          <Tabs defaultValue="active" className="w-auto">
-            <TabsList className="p-1 bg-blue-900/10 mb-0 flex w-auto">
-              <TabsTrigger 
-                value="active" 
-                className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
-                onClick={() => handleStatusFilterChange('active')}
-              >
-                Actief
-              </TabsTrigger>
-              <TabsTrigger 
-                value="inactive" 
-                className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
-                onClick={() => handleStatusFilterChange('inactive')}
-              >
-                Inactief
-              </TabsTrigger>
-              <TabsTrigger 
-                value="all" 
-                className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
-                onClick={() => handleStatusFilterChange('all')}
-              >
-                Alle vakken
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-        
-        {/* Content Tabs */}
-        <Tabs defaultValue="courses" className="w-full" value={activeTab}>
-          
-          {/* Courses Tab Content */}
-          <TabsContent value="courses">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {isLoading ? (
-                <div className="col-span-full flex justify-center py-8">
-                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              ) : isError ? (
-                <div className="col-span-full text-center py-8 text-red-500">
-                  Fout bij het laden van curriculum. Probeer het opnieuw.
-                </div>
-              ) : courses.length === 0 ? (
-                <div className="col-span-full text-center py-8 text-gray-500">
-                  Geen curriculum gevonden. Pas uw filters aan of voeg een nieuw curriculum toe.
-                </div>
-              ) : (
-                courses.map((course) => (
-                  <div key={course.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                    <div className="p-5">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold text-lg text-gray-800">{course.name}</h3>
-                          <p className="text-gray-500 text-sm mt-1">{course.code} • {course.credits} Studiepunten</p>
-                        </div>
-                        <Badge variant={course.isActive ? "default" : "secondary"}>
-                          {course.isActive ? "Actief" : "Inactief"}
-                        </Badge>
-                      </div>
-                      
-                      <p className="mt-3 text-gray-600 text-sm line-clamp-2">
-                        {course.description || 'Geen beschrijving beschikbaar'}
-                      </p>
-                      
-                      <div className="mt-4 flex items-center">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-[#1e3a8a] text-white">
-                            {course.instructor ? course.instructor.charAt(0) : 'D'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="ml-2">
-                          <p className="text-xs font-medium text-gray-800">{course.instructor || 'Nog geen docent toegewezen'}</p>
-                          <p className="text-xs text-gray-500">Docent</p>
-                        </div>
-                      </div>
-                      
-                      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                        <Badge variant="outline" className="text-xs">
-                          {getProgramNameById(course.programId)}
-                        </Badge>
-                        
-                        <div className="flex space-x-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handleViewCourse(course)}
-                            title="Details bekijken"
-                            className="h-8 w-8 p-0"
-                          >
-                            <Eye className="h-4 w-4 text-gray-500" />
-                            <span className="sr-only">Bekijken</span>
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handleEditCourse(course)}
-                            title="Cursus bewerken"
-                            className="h-8 w-8 p-0"
-                          >
-                            <Pencil className="h-4 w-4 text-gray-500" />
-                            <span className="sr-only">Bewerken</span>
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                            onClick={() => handleDeleteCourse(course)}
-                            title="Cursus verwijderen"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            <span className="sr-only">Verwijderen</span>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-            
-            {/* Pagination - Only shown in Courses tab */}
-            {totalPages > 1 && (
-              <div className="bg-white mt-4 px-4 py-3 flex items-center justify-between border border-gray-200 rounded-lg sm:px-6">
-                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-gray-700">
-                      Tonen <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> tot <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalCourses)}</span> van <span className="font-medium">{totalCourses}</span> resultaten
-                    </p>
-                  </div>
-                  <div>
-                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Paginering">
-                      <button
-                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                        disabled={currentPage === 1}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                      >
-                        <span className="sr-only">Vorige</span>
-                        &larr;
-                      </button>
-                      {Array.from({ length: totalPages }).map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setCurrentPage(i + 1)}
-                          className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
-                            currentPage === i + 1
-                              ? 'bg-primary text-white'
-                              : 'bg-white text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          {i + 1}
-                        </button>
-                      ))}
-                      <button
-                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                        disabled={currentPage === totalPages}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                      >
-                        <span className="sr-only">Volgende</span>
-                        &rarr;
-                      </button>
-                    </nav>
-                  </div>
-                </div>
+          {/* Pagination */}
+          {!isLoading && !isError && totalPages > 1 && (
+            <div className="flex justify-center mt-8">
+              <div className="flex space-x-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                >
+                  Vorige
+                </Button>
+                
+                {[...Array(totalPages)].map((_, i) => (
+                  <Button
+                    key={i}
+                    variant={currentPage === i + 1 ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(i + 1)}
+                  >
+                    {i + 1}
+                  </Button>
+                ))}
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Volgende
+                </Button>
               </div>
-            )}
-          </TabsContent>
-          
-          {/* Classes Tab Content */}
-          <TabsContent value="classes">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {isLoadingGroups ? (
-                <div className="col-span-full flex justify-center py-8">
-                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              ) : isErrorGroups ? (
-                <div className="col-span-full text-center py-8 text-red-500">
-                  Fout bij het laden van klassen. Probeer het opnieuw.
-                </div>
-              ) : studentGroups.length === 0 ? (
-                <div className="col-span-full text-center py-8 text-gray-500">
-                  Geen klassen gevonden. Ga naar de Klassen pagina om klassen toe te voegen.
-                </div>
-              ) : (
-                studentGroups.map((group) => (
-                  <div key={group.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                    <div className="p-5">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold text-lg text-gray-800">{group.name}</h3>
-                          <p className="text-gray-500 text-sm mt-1">Academisch jaar: {group.academicYear}</p>
-                        </div>
-                        <Badge variant={group.isActive ? "default" : "secondary"}>
-                          {group.isActive ? "Actief" : "Inactief"}
-                        </Badge>
+            </div>
+          )}
+        </TabsContent>
+        
+        {/* Classes Tab Content */}
+        <TabsContent value="classes">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {isLoadingGroups ? (
+              <div className="col-span-full flex justify-center py-8">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : isErrorGroups ? (
+              <div className="col-span-full text-center py-8 text-red-500">
+                Fout bij het laden van klassen. Probeer het opnieuw.
+              </div>
+            ) : studentGroups.length === 0 ? (
+              <div className="col-span-full text-center py-8 text-gray-500">
+                Geen klassen gevonden. Voeg een nieuwe klas toe.
+              </div>
+            ) : (
+              studentGroups.map((group) => (
+                <div key={group.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="p-5">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-800">{group.name}</h3>
+                        <p className="text-gray-500 text-sm mt-1">Schooljaar: {group.academicYear}</p>
+                      </div>
+                      <Badge variant={group.isActive ? "default" : "secondary"}>
+                        {group.isActive ? "Actief" : "Inactief"}
+                      </Badge>
+                    </div>
+                    
+                    <div className="mt-3 space-y-2">
+                      <div className="flex items-center text-sm text-gray-500">
+                        <BookOpen className="h-4 w-4 mr-2" />
+                        <span>{getProgramNameById(group.programId)}</span>
                       </div>
                       
-                      <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center">
-                          <Users className="h-4 w-4 text-primary mr-1" />
-                          <span className="text-xs text-gray-700">
-                            {group.enrolledStudents || 0} studenten
-                          </span>
-                        </div>
-                        
-                        <Badge variant="outline" className="text-xs">
-                          {programs.find((p) => p.id === group.programId)?.name || 'Geen programma'}
-                        </Badge>
-                      </div>
-                      
-                      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-end">
-                        <div className="flex space-x-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            title="Details bekijken"
-                            className="h-8 w-8 p-0"
-                            onClick={() => window.location.href = '/student-groups'}
-                          >
-                            <Eye className="h-4 w-4 text-gray-500" />
-                            <span className="sr-only">Bekijken</span>
-                          </Button>
-                        </div>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <Users className="h-4 w-4 mr-2" />
+                        <span>{group.enrolledStudents || 0} studenten</span>
                       </div>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+                </div>
+              ))
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
       
       {/* View Course Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
@@ -670,93 +631,100 @@ export default function Courses() {
                 </DialogDescription>
               </DialogHeader>
               
-              <div className="mt-6 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="md:col-span-2 space-y-6">
                   <div>
-                    <h3 className="text-md font-medium mb-3">Cursusinformatie</h3>
+                    <h3 className="text-sm font-medium text-gray-500 mb-1">Beschrijving</h3>
+                    <p className="text-gray-800 text-sm">
+                      {selectedCourse.description || 'Geen beschrijving beschikbaar'}
+                    </p>
+                  </div>
+                  
+                  {selectedCourse.learningObjectives && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Leerdoelen</h3>
+                      <p className="text-gray-800 text-sm">
+                        {selectedCourse.learningObjectives}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {selectedCourse.competencies && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Competenties</h3>
+                      <p className="text-gray-800 text-sm">
+                        {selectedCourse.competencies}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {selectedCourse.prerequisites && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Voorvereisten</h3>
+                      <p className="text-gray-800 text-sm">
+                        {selectedCourse.prerequisites}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {selectedCourse.materials && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Studiemateriaal</h3>
+                      <p className="text-gray-800 text-sm">
+                        {selectedCourse.materials}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="space-y-6">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-gray-500 mb-3">Cursus Informatie</h3>
+                    
                     <div className="space-y-3">
-                      <div className="flex flex-col">
-                        <span className="text-sm text-gray-500">Naam</span>
-                        <span className="font-medium">{selectedCourse.name}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm text-gray-500">Code</span>
-                        <span>{selectedCourse.code}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm text-gray-500">Programma</span>
-                        <span>{getProgramNameById(selectedCourse.programId)}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm text-gray-500">Studiepunten</span>
-                        <span>{selectedCourse.credits}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm text-gray-500">Status</span>
-                        <Badge variant={selectedCourse.isActive ? "default" : "secondary"} className="w-fit mt-1">
+                      <div>
+                        <p className="text-xs text-gray-500">Status</p>
+                        <Badge variant={selectedCourse.isActive ? "default" : "secondary"} className="mt-1">
                           {selectedCourse.isActive ? "Actief" : "Inactief"}
                         </Badge>
                       </div>
+                      
+                      <div>
+                        <p className="text-xs text-gray-500">Programma</p>
+                        <p className="text-sm font-medium">{getProgramNameById(selectedCourse.programId)}</p>
+                      </div>
+                      
+                      {selectedCourse.instructor && (
+                        <div>
+                          <p className="text-xs text-gray-500">Instructeur</p>
+                          <p className="text-sm font-medium">{selectedCourse.instructor}</p>
+                        </div>
+                      )}
+                      
+                      {selectedCourse.maxStudents && (
+                        <div>
+                          <p className="text-xs text-gray-500">Maximum aantal studenten</p>
+                          <p className="text-sm font-medium">{selectedCourse.maxStudents}</p>
+                        </div>
+                      )}
+                      
+                      <div>
+                        <p className="text-xs text-gray-500">Ingeschreven studenten</p>
+                        <p className="text-sm font-medium">{selectedCourse.enrolledStudents || 0} / {selectedCourse.maxStudents || 'Onbeperkt'}</p>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div>
-                    <h3 className="text-md font-medium mb-3">Onderwijsinformatie</h3>
-                    <div className="space-y-3">
-                      <div className="flex flex-col">
-                        <span className="text-sm text-gray-500">Docent</span>
-                        <span>{selectedCourse.instructor || 'Nog niet toegewezen'}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm text-gray-500">Maximaal aantal studenten</span>
-                        <span>{selectedCourse.maxStudents || 'Onbeperkt'}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm text-gray-500">Ingeschreven studenten</span>
-                        <span>{selectedCourse.enrolledStudents || 0} studenten</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="text-md font-medium mb-3">Beschrijving</h3>
-                  <p className="text-gray-700 text-sm bg-gray-50 p-4 rounded-md border border-gray-100">
-                    {selectedCourse.description || 'Geen beschrijving beschikbaar'}
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="text-md font-medium mb-3">Leerdoelen</h3>
-                  <p className="text-gray-700 text-sm bg-gray-50 p-4 rounded-md border border-gray-100">
-                    {selectedCourse.learningObjectives || 'Geen leerdoelen gespecificeerd'}
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="text-md font-medium mb-3">Vereisten voor deelname</h3>
-                  <p className="text-gray-700 text-sm bg-gray-50 p-4 rounded-md border border-gray-100">
-                    {selectedCourse.prerequisites || 'Geen vereisten gespecificeerd'}
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="text-md font-medium mb-3">Competenties</h3>
-                  <p className="text-gray-700 text-sm bg-gray-50 p-4 rounded-md border border-gray-100">
-                    {selectedCourse.competencies || 'Geen competenties gespecificeerd'}
-                  </p>
                 </div>
               </div>
               
-              <DialogFooter className="mt-6">
-                <Button 
-                  variant="outline" 
+              <DialogFooter className="mt-8 pt-4 border-t">
+                <Button
+                  variant="outline"
                   onClick={() => setIsViewDialogOpen(false)}
                 >
                   Sluiten
                 </Button>
-                <Button 
-                  variant="default" 
+                <Button
                   onClick={() => {
                     setIsViewDialogOpen(false);
                     handleEditCourse(selectedCourse);
@@ -770,241 +738,214 @@ export default function Courses() {
         </DialogContent>
       </Dialog>
       
-      {/* Add/Edit Dialog */}
+      {/* Add/Edit Course Dialog */}
       <Dialog open={isAddDialogOpen || isEditDialogOpen} onOpenChange={(open) => {
         if (!open) {
-          isAddDialogOpen ? setIsAddDialogOpen(false) : setIsEditDialogOpen(false);
-          resetFormData();
+          setIsAddDialogOpen(false);
+          setIsEditDialogOpen(false);
         }
       }}>
-        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">
-              {isAddDialogOpen ? 'Curriculum aanmaken' : 'Curriculum bewerken'}
+            <DialogTitle>
+              {isEditDialogOpen ? 'Curriculum Bewerken' : 'Nieuw Curriculum Toevoegen'}
             </DialogTitle>
             <DialogDescription>
-              Vul de onderstaande velden in om {isAddDialogOpen ? 'een nieuw curriculum toe te voegen' : 'het curriculum bij te werken'}.
+              {isEditDialogOpen
+                ? 'Bewerk de gegevens van dit curriculum hieronder.'
+                : 'Vul de onderstaande velden in om een nieuw curriculum toe te voegen.'}
             </DialogDescription>
           </DialogHeader>
           
-          <form onSubmit={isAddDialogOpen ? handleSubmitCourse : handleSubmitEditCourse} className="space-y-6 pt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="name" className="mb-1 block">Cursus naam <span className="text-red-500">*</span></Label>
-                  <Input
-                    id="name"
-                    value={courseFormData.name}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
-                    placeholder="Bijv. Arabische Grammatica Niveau 1"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="code" className="mb-1 block">Cursuscode <span className="text-red-500">*</span></Label>
-                  <Input
-                    id="code"
-                    value={courseFormData.code}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
-                    placeholder="Bijv. ARA101"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="credits" className="mb-1 block">Studiepunten</Label>
-                  <Input
-                    id="credits"
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={courseFormData.credits}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, credits: Number(e.target.value) })}
-                  />
-                </div>
-                
-                <div>
-                  <div className="flex items-center space-x-2 mb-1">
-                    <Label htmlFor="isActive">Status</Label>
-                  </div>
-                  <Select 
-                    value={courseFormData.isActive ? "active" : "inactive"}
-                    onValueChange={(value) => setCourseFormData({ ...courseFormData, isActive: value === "active" })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecteer status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Actief</SelectItem>
-                      <SelectItem value="inactive">Inactief</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+          <form onSubmit={isEditDialogOpen ? handleSubmitEditCourse : handleSubmitCourse} className="space-y-6 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Naam *</Label>
+                <Input
+                  id="name"
+                  value={courseFormData.name}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
+                  required
+                />
               </div>
               
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="programId" className="mb-1 block">Programma</Label>
-                  <Select 
-                    value={courseFormData.programId?.toString() || "null"}
-                    onValueChange={(value) => setCourseFormData({ ...courseFormData, programId: value !== "null" ? Number(value) : null })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecteer een programma" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="null">Geen programma</SelectItem>
-                      {programs.map((program) => (
-                        <SelectItem key={program.id} value={program.id.toString()}>
-                          {program.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label htmlFor="instructor" className="mb-1 block">Docent</Label>
-                  <Input
-                    id="instructor"
-                    value={courseFormData.instructor || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, instructor: e.target.value })}
-                    placeholder="Naam van de docent"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="maxStudents" className="mb-1 block">Maximum aantal studenten</Label>
-                  <Input
-                    id="maxStudents"
-                    type="number"
-                    min="1"
-                    value={courseFormData.maxStudents || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, maxStudents: Number(e.target.value) || null })}
-                    placeholder="Laat leeg voor onbeperkt"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="description">Beschrijving</Label>
-                  <Textarea
-                    id="description"
-                    value={courseFormData.description || ''}
-                    onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
-                    rows={3}
-                    placeholder="Geef een beschrijving van de cursus"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="code">Code *</Label>
+                <Input
+                  id="code"
+                  value={courseFormData.code}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
+                  required
+                />
               </div>
             </div>
             
-            <div className="space-y-4">
-              <Label htmlFor="learningObjectives">Leerdoelen van de cursus</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="programId">Programma</Label>
+                <Select
+                  value={courseFormData.programId?.toString() || ''}
+                  onValueChange={(value) => setCourseFormData({ ...courseFormData, programId: value ? parseInt(value) : null })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecteer een programma" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Geen programma</SelectItem>
+                    {programs.map((program: ProgramType) => (
+                      <SelectItem key={program.id} value={program.id.toString()}>
+                        {program.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="credits">Studiepunten *</Label>
+                <Input
+                  id="credits"
+                  type="number"
+                  min="0"
+                  value={courseFormData.credits?.toString() || '0'}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, credits: parseInt(e.target.value) })}
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="instructor">Instructeur</Label>
+                <Input
+                  id="instructor"
+                  value={courseFormData.instructor || ''}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, instructor: e.target.value })}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="maxStudents">Maximum aantal studenten</Label>
+                <Input
+                  id="maxStudents"
+                  type="number"
+                  min="0"
+                  value={courseFormData.maxStudents?.toString() || ''}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, maxStudents: parseInt(e.target.value) })}
+                />
+                <p className="text-xs text-gray-500">Laat leeg voor onbeperkt</p>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="description">Beschrijving</Label>
+              <Textarea
+                id="description"
+                value={courseFormData.description || ''}
+                onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
+                rows={3}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="learningObjectives">Leerdoelen</Label>
               <Textarea
                 id="learningObjectives"
                 value={courseFormData.learningObjectives || ''}
                 onChange={(e) => setCourseFormData({ ...courseFormData, learningObjectives: e.target.value })}
                 rows={3}
-                placeholder="Wat bereikt de student na het volgen van deze cursus"
               />
             </div>
             
-            <div className="space-y-4">
-              <Label htmlFor="prerequisites">Voorkennis en vereisten</Label>
-              <Textarea
-                id="prerequisites"
-                value={courseFormData.prerequisites || ''}
-                onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
-                rows={3}
-                placeholder="Welke voorkennis of afgeronde cursussen zijn vereist"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="competencies">Competenties</Label>
+                <Textarea
+                  id="competencies"
+                  value={courseFormData.competencies || ''}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
+                  rows={3}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="prerequisites">Voorvereisten</Label>
+                <Textarea
+                  id="prerequisites"
+                  value={courseFormData.prerequisites || ''}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
+                  rows={3}
+                />
+              </div>
             </div>
             
-            <div className="space-y-4">
-              <Label htmlFor="materials">Lesmateriaal en bronnen</Label>
+            <div className="space-y-2">
+              <Label htmlFor="materials">Studiemateriaal</Label>
               <Textarea
                 id="materials"
                 value={courseFormData.materials || ''}
                 onChange={(e) => setCourseFormData({ ...courseFormData, materials: e.target.value })}
                 rows={3}
-                placeholder="Boeken, readers, handouts en andere leermaterialen"
               />
             </div>
             
-            <div className="space-y-4">
-              <Label htmlFor="competencies">Vereiste competenties</Label>
-              <Textarea
-                id="competencies"
-                value={courseFormData.competencies || ''}
-                onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
-                rows={3}
-                placeholder="Welke competenties verwerft de student"
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isActive"
+                checked={courseFormData.isActive || false}
+                onChange={(e) => setCourseFormData({ ...courseFormData, isActive: e.target.checked })}
+                className="rounded border-gray-300 focus:ring-primary h-4 w-4 text-primary"
               />
+              <Label htmlFor="isActive" className="cursor-pointer">Actief</Label>
             </div>
             
-            <div className="pt-4 flex justify-end space-x-3 border-t">
-              <Button 
-                type="button" 
-                variant="outline" 
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => {
-                  isAddDialogOpen ? setIsAddDialogOpen(false) : setIsEditDialogOpen(false);
-                  resetFormData();
+                  setIsAddDialogOpen(false);
+                  setIsEditDialogOpen(false);
                 }}
               >
                 Annuleren
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={createCourseMutation.isPending || updateCourseMutation.isPending}
               >
-                {createCourseMutation.isPending || updateCourseMutation.isPending ? (
-                  <>
-                    <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Bezig met opslaan...
-                  </>
-                ) : (
-                  isAddDialogOpen ? 'Toevoegen' : 'Bijwerken'
+                {(createCourseMutation.isPending || updateCourseMutation.isPending) && (
+                  <div className="mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 )}
+                {isEditDialogOpen ? 'Opslaan' : 'Toevoegen'}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
       
-      {/* Delete Confirmation */}
+      {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-red-600">Curriculum verwijderen</DialogTitle>
+            <DialogTitle>Bevestig Verwijdering</DialogTitle>
             <DialogDescription>
-              Weet u zeker dat u dit curriculum wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+              Weet u zeker dat u het curriculum <span className="font-semibold">{selectedCourse?.name}</span> wilt verwijderen?
+              Dit kan niet ongedaan worden gemaakt.
             </DialogDescription>
           </DialogHeader>
           
-          {selectedCourse && (
-            <div className="py-4">
-              <div className="bg-gray-50 p-4 rounded-md border">
-                <h4 className="font-medium">{selectedCourse.name}</h4>
-                <p className="text-sm text-gray-500 mt-1">{selectedCourse.code}</p>
-                <p className="text-sm mt-2">Programma: {getProgramNameById(selectedCourse.programId)}</p>
-                {selectedCourse.enrolledStudents && selectedCourse.enrolledStudents > 0 && (
-                  <p className="text-sm text-red-500 mt-2">
-                    Let op: Er zijn {selectedCourse.enrolledStudents} studenten ingeschreven voor deze cursus
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-          
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:justify-start">
             <Button
+              type="button"
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
             >
               Annuleren
             </Button>
             <Button
+              type="button"
               variant="destructive"
               onClick={() => {
                 if (selectedCourse) {
@@ -1013,14 +954,10 @@ export default function Courses() {
               }}
               disabled={deleteCourseMutation.isPending}
             >
-              {deleteCourseMutation.isPending ? (
-                <>
-                  <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Bezig met verwijderen...
-                </>
-              ) : (
-                'Verwijderen'
+              {deleteCourseMutation.isPending && (
+                <div className="mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
               )}
+              Verwijderen
             </Button>
           </DialogFooter>
         </DialogContent>

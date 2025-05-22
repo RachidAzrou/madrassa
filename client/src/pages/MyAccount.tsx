@@ -145,39 +145,6 @@ const MyAccount = () => {
     pushNotifications: true,
     desktopNotifications: true
   });
-
-  // Toggle voor demonstratie (alleen voor deze demo)
-  const toggleUserRole = () => {
-    const newUser = currentUser.id === adminUser.id ? teacherUser : adminUser;
-    
-    // Het type conversie probleem oplossen door een specifieke casting te doen
-    setCurrentUser(newUser as typeof currentUser);
-    setTwoFactorEnabled(newUser.twoFactorEnabled);
-    setDarkMode(newUser.darkMode);
-    setSelectedDefaultPage(newUser.defaultPage);
-    
-    // Update notificatie-instellingen op basis van de nieuwe gebruikersrol
-    if (newUser.role === "Docent") {
-      setNotificationSettings({
-        ...notificationSettings,
-        emailNotifications: {
-          messages: teacherUser.notifyMessages,
-          scheduleChanges: teacherUser.notifyScheduleChanges,
-          grades: teacherUser.notifyGrades,
-          attendance: teacherUser.notifyAttendance
-        }
-      });
-    } else {
-      setNotificationSettings({
-        ...notificationSettings,
-        emailNotifications: {
-          newUsers: adminUser.notifyNewUsers,
-          systemUpdates: adminUser.notifySystemUpdates,
-          securityAlerts: adminUser.notifySecurityAlerts
-        }
-      });
-    }
-  };
   
   // Formulier voor profielgegevens
   const profileForm = useForm<ProfileFormValues>({
@@ -359,13 +326,6 @@ const MyAccount = () => {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Mijn Account</h1>
             <p className="text-base text-gray-500 mt-1">Beheer hier uw accountinstellingen</p>
           </div>
-        </div>
-        
-        <div className="md:flex-shrink-0">
-          {/* Demo-schakelaar tussen admin/docent - alleen voor demonstratie */}
-          <Button variant="outline" size="sm" onClick={toggleUserRole}>
-            Wissel naar {currentUser.role === "Administrator" ? "Docent" : "Administrator"} weergave
-          </Button>
         </div>
       </div>
 

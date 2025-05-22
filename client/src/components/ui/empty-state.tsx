@@ -15,13 +15,13 @@ const EmptyState: React.FC<EmptyStateProps> = ({
   className = "" 
 }) => {
   return (
-    <div className={`flex flex-col items-center justify-center py-16 ${className}`}>
-      <div className="h-48 w-48 rounded-full bg-blue-50 flex items-center justify-center mb-4">
-        <Icon className="h-24 w-24 text-blue-300 opacity-30" />
+    <div className={`h-48 flex flex-col items-center justify-center text-gray-500 ${className}`}>
+      <div className="text-[#1e3a8a] mb-2">
+        <Icon className="h-12 w-12 mx-auto opacity-30" />
       </div>
-      <h3 className="text-xl font-medium text-gray-700">{title}</h3>
+      <p className="text-sm font-medium">{title}</p>
       {description && (
-        <p className="text-sm text-gray-500 mt-1 max-w-sm text-center">
+        <p className="text-xs text-gray-400 mt-1 max-w-sm text-center">
           {description}
         </p>
       )}

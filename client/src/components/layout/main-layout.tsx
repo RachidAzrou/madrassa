@@ -67,12 +67,12 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <div 
         className={`fixed md:static inset-y-0 left-0 transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 z-30 transition duration-200 ease-in-out h-screen md:h-auto flex-shrink-0`}
+        } md:translate-x-0 z-30 transition duration-200 ease-in-out h-screen flex-shrink-0`}
       >
         <Sidebar 
           isMobile={isMobile} 
           onClose={() => setSidebarOpen(false)} 
-        />
+          className="h-full" />
       </div>
 
       {/* Main content */}

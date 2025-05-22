@@ -144,7 +144,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
   return (
     <aside
       className={cn(
-        "h-screen bg-white border-r border-gray-200",
+        "h-full bg-white border-r border-gray-200",
         "w-64 flex flex-col",
         className
       )}
@@ -213,8 +213,8 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
       </div>
       
       {/* Navigation links */}
-      <nav className="flex-1 py-2 px-3 overflow-y-auto flex flex-col justify-between">
-        <div className="space-y-4 overflow-y-auto">
+      <nav className="flex-1 py-2 px-3 overflow-y-auto flex flex-col">
+        <div className="flex-1 space-y-4 overflow-y-auto">
 
           <div className="pt-2">
             <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -334,7 +334,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
         
         {/* Afmelden knop aan einde van de sidebar */}
-        <div className="mt-auto pt-2 mb-2">
+        <div className="mt-auto pt-2 mb-0">
           <div className="border-t border-gray-200 pt-4"></div>
           <div
             onClick={() => {

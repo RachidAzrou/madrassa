@@ -3,7 +3,7 @@ import {
   Filter, CheckCircle, XCircle, Clock, 
   ArrowLeft, ArrowRight, Save,
   ClipboardCheck, GraduationCap, Users2,
-  Loader2
+  Loader2, Users, Building
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -698,8 +698,11 @@ export default function Attendance() {
                         </div>
                       </div>
                     ) : (
-                      <div className="py-8 text-center border rounded-md">
-                        <p className="text-sm text-gray-500">Geen studenten gevonden</p>
+                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                        <div className="text-[#1e3a8a] mb-2">
+                          <Users className="h-12 w-12 mx-auto opacity-30" />
+                        </div>
+                        <p className="text-sm font-medium">Geen studenten gevonden</p>
                       </div>
                     )}
                   </div>
@@ -818,8 +821,11 @@ export default function Attendance() {
                         </div>
                       </div>
                     ) : (
-                      <div className="py-8 text-center border rounded-md">
-                        <p className="text-sm text-gray-500">Geen docenten gevonden</p>
+                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                        <div className="text-[#1e3a8a] mb-2">
+                          <GraduationCap className="h-12 w-12 mx-auto opacity-30" />
+                        </div>
+                        <p className="text-sm font-medium">Geen docenten gevonden</p>
                       </div>
                     )}
                   </div>

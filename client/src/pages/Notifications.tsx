@@ -143,17 +143,8 @@ const NotificationsPage: React.FC = () => {
                   {!notification.isRead && (
                     <>
                       <div className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
-                        Nieuw
+                        Ongelezen
                       </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleMarkAsRead(notification.id)}
-                        className="h-6 w-6 p-0 visible"
-                        title="Markeer als gelezen"
-                      >
-                        <Check className="h-4 w-4" />
-                      </Button>
                     </>
                   )}
                 </div>

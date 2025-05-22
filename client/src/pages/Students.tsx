@@ -56,6 +56,8 @@ import { formatDateToDisplayFormat } from '@/lib/utils';
 export default function Students() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProgramFilter, setSelectedProgramFilter] = useState('all');
@@ -71,6 +73,15 @@ export default function Students() {
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [isFeeNotificationOpen, setIsFeeNotificationOpen] = useState(false);
   const [feeDetails, setFeeDetails] = useState<any>(null);
+  
+  // Import state
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [importType, setImportType] = useState<'csv' | 'excel'>('excel');
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importPreview, setImportPreview] = useState<any[]>([]);
+  const [importColumns, setImportColumns] = useState<string[]>([]);
+  const [columnMappings, setColumnMappings] = useState<{[key: string]: string}>({});
+  const [isImporting, setIsImporting] = useState(false);
   
   // State voor het studentformulier
   const [studentFormData, setStudentFormData] = useState({

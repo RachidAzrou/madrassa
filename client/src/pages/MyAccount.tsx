@@ -355,7 +355,7 @@ const MyAccount = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-200 pb-4 mb-8 gap-4">
         <div className="flex items-center gap-4">
           <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
-            <User className="h-7 w-7" />
+            <Settings className="h-7 w-7" />
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Mijn Account</h1>

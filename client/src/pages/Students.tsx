@@ -1196,10 +1196,20 @@ export default function Students() {
             {/* Lege state wanneer er geen studenten zijn - onder de headers */}
             {!isLoading && (!studentsData?.students || studentsData?.students.length === 0) && (
               <tr>
-                <td colSpan={8} className="px-6 py-8">
-                  <div className="p-6 text-center">
-                    <Users className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                    <h3 className="text-lg font-medium mb-2">Geen studenten gevonden</h3>
+                <td colSpan={8}>
+                  <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                    <div className="text-[#1e3a8a] mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto opacity-30">
+                        <path d="M18 16a4 4 0 0 0-4.65-4"></path>
+                        <path d="M10 16a3.5 3.5 0 0 0-6.64-1.5"></path>
+                        <path d="M21.5 20.5c0-2.5-2.5-2.5-3.5-2.5"></path>
+                        <path d="M10 20.5c0-2.5-2.5-2.5-3.5-2.5"></path>
+                        <path d="M15.5 20.5c0-1.833-1.5-2.5-3.5-2.5s-3.5.667-3.5 2.5"></path>
+                        <circle cx="7" cy="10" r="3"></circle>
+                        <circle cx="15" cy="8" r="4"></circle>
+                      </svg>
+                    </div>
+                    <p className="text-sm font-medium">Geen studenten beschikbaar</p>
                     <p className="text-gray-500 mb-4">
                       Er zijn geen studenten die overeenkomen met de geselecteerde filters.
                     </p>

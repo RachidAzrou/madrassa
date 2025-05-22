@@ -93,9 +93,8 @@ export default function Login() {
               Log in om toegang te krijgen tot uw account
             </p>
             
-            <div className="bg-blue-50 border border-blue-200 text-blue-600 text-xs p-2 rounded-md shadow-sm mb-6 flex items-center justify-center space-x-1">
-              <span className="px-1.5 py-0.5 bg-blue-100 rounded font-medium">TEST OMGEVING</span>
-              <span>versie 1.1.0</span>
+            <div className="bg-blue-50 border border-blue-200 text-blue-600 text-xs p-2 rounded-md shadow-sm mb-6 flex items-center justify-center">
+              <span className="px-2 py-0.5 bg-blue-100 rounded font-medium">TEST OMGEVING versie 1.1.0</span>
             </div>
             
             <form onSubmit={handleSubmit} className="space-y-5">

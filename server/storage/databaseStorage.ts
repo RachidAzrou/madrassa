@@ -81,6 +81,14 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return notification;
   }
+  
+  async markNotificationAsUnread(id: number): Promise<Notification | undefined> {
+    const [notification] = await db.update(notifications)
+      .set({ isRead: false })
+      .where(eq(notifications.id, id))
+      .returning();
+    return notification;
+  }
 
   async markAllNotificationsAsRead(userId: number): Promise<void> {
     await db.update(notifications)

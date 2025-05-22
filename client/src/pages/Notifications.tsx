@@ -21,6 +21,19 @@ const NotificationsPage: React.FC = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  
+  const handleToggleReadStatus = (id: number) => {
+    // Zoek de notificatie om te weten of het als gelezen of ongelezen gemarkeerd moet worden
+    const notification = notifications.find(n => n.id === id);
+    toggleReadStatus(id);
+    
+    if (notification) {
+      toast({
+        title: notification.isRead ? "Notificatie gemarkeerd als ongelezen" : "Notificatie gemarkeerd als gelezen",
+        description: notification.isRead ? "De notificatie is gemarkeerd als ongelezen." : "De notificatie is gemarkeerd als gelezen.",
+      });
+    }
+  };
 
   const unreadNotifications = notifications.filter(notification => !notification.isRead);
   const readNotifications = notifications.filter(notification => notification.isRead);
@@ -149,7 +162,7 @@ const NotificationsPage: React.FC = () => {
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => toggleReadStatus(notification.id)}
+                  onClick={() => handleToggleReadStatus(notification.id)}
                   className="invisible group-hover:visible h-6 w-6 p-0 text-primary hover:bg-primary/10 rounded-full"
                   title={notification.isRead ? "Markeer als ongelezen" : "Markeer als gelezen"}
                 >

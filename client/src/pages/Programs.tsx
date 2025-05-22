@@ -344,7 +344,7 @@ export default function Programs() {
         ) : programs.length === 0 ? (
           <div className="h-48 flex flex-col items-center justify-center text-gray-500">
             <div className="text-[#1e3a8a] mb-2">
-              <GraduationCap className="h-12 w-12 mx-auto opacity-30" />
+              <BookText className="h-12 w-12 mx-auto opacity-30" />
             </div>
             <p className="text-sm font-medium">Geen opleidingen beschikbaar</p>
           </div>

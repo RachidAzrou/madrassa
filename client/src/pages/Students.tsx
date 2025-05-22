@@ -1018,7 +1018,7 @@ export default function Students() {
                   Adres
                 </TabsTrigger>
                 <TabsTrigger value="class">
-                  <School className="mr-2 h-4 w-4" />
+                  <ChalkBoard className="mr-2 h-4 w-4" />
                   Klas
                 </TabsTrigger>
               </TabsList>
@@ -1663,7 +1663,7 @@ export default function Students() {
                   Adres
                 </TabsTrigger>
                 <TabsTrigger value="class">
-                  <Users className="mr-2 h-4 w-4" />
+                  <ChalkBoard className="mr-2 h-4 w-4" />
                   Klas
                 </TabsTrigger>
                 <TabsTrigger value="subjects">
@@ -2190,7 +2190,7 @@ export default function Students() {
                     Adres
                   </TabsTrigger>
                   <TabsTrigger value="class">
-                    <Users className="mr-2 h-4 w-4" />
+                    <ChalkBoard className="mr-2 h-4 w-4" />
                     Klas
                   </TabsTrigger>
                 </TabsList>

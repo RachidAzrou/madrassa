@@ -221,7 +221,7 @@ export default function Dashboard() {
           </div>
           
           {/* Studentengroepen data visualisatie - Horizontale staafdiagram */}
-          {isGroupsLoading || isEnrollmentsLoading ? (
+          {isGroupsLoading || isEnrollmentsLoading || isStatsLoading ? (
             <div className="h-48 flex items-center justify-center">
               <div className="w-6 h-6 sm:w-8 sm:h-8 border-3 sm:border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
@@ -238,10 +238,6 @@ export default function Dashboard() {
                 <ChalkBoard className="h-12 w-12 mx-auto opacity-30" />
               </div>
               <p className="text-sm font-medium">Geen klassen beschikbaar</p>
-            </div>
-          ) : chartData.length === 0 ? (
-            <div className="h-48 flex items-center justify-center text-gray-500 text-sm">
-              Geen klasgegevens beschikbaar
             </div>
           ) : (
             <div className="p-4">

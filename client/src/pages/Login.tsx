@@ -67,29 +67,27 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50 p-4">
       <div className="w-full max-w-md">
-        <div className="w-full bg-white border border-blue-100 rounded-lg shadow-lg overflow-hidden">
-          <div className="bg-[#1e3a8a]/5 pt-8 pb-4 px-6 text-center">
-            <img src={myMadrassaLogo} alt="mymadrassa logo" className="h-28 mx-auto" />
-            <h1 className="text-2xl font-bold mt-4">
+        <div className="w-full bg-white rounded-2xl shadow-xl overflow-hidden border-t-4 border-[#1e3a8a]">
+          <div className="bg-gradient-to-b from-[#1e3a8a]/5 to-white pt-10 pb-6 px-8 text-center">
+            <img src={myMadrassaLogo} alt="mymadrassa logo" className="h-24 mx-auto drop-shadow-md" />
+            <h1 className="text-3xl font-bold mt-5 mb-1">
               <span className="text-black">my</span>
               <span className="text-[#1e3a8a]">madrassa</span>
             </h1>
-            <p className="text-gray-600 mt-2">Islamitisch Onderwijs Beheersysteem</p>
+            <p className="text-gray-600">Islamitisch Onderwijs Beheersysteem</p>
           </div>
           
-          <div className="px-6 pt-6 pb-2 text-center">
-            <h2 className="text-xl font-semibold">Inloggen</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Voer uw gegevens in om toegang te krijgen
+          <div className="px-8 pb-8">
+            <h2 className="text-xl font-semibold text-center mb-1">Welkom terug</h2>
+            <p className="text-sm text-gray-500 text-center mb-6">
+              Log in om toegang te krijgen tot uw account
             </p>
-          </div>
-          
-          <form onSubmit={handleSubmit}>
-            <div className="px-6 py-4 space-y-4">
+            
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email">E-mailadres</Label>
+                <Label htmlFor="email" className="text-gray-700 font-medium">E-mailadres</Label>
                 <Input
                   id="email"
                   name="email"
@@ -98,14 +96,16 @@ export default function Login() {
                   required
                   value={loginData.email}
                   onChange={handleInputChange}
+                  className="h-11 px-4 rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
+              
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <Label htmlFor="password">Wachtwoord</Label>
+                  <Label htmlFor="password" className="text-gray-700 font-medium">Wachtwoord</Label>
                   <button
                     type="button"
-                    className="text-xs text-blue-600 hover:underline"
+                    className="text-xs text-blue-600 hover:text-blue-800 transition-colors"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? "Verbergen" : "Tonen"}
@@ -119,61 +119,62 @@ export default function Login() {
                   required
                   value={loginData.password}
                   onChange={handleInputChange}
+                  className="h-11 px-4 rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
+              
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   id="remember"
-                  className="rounded text-blue-600 focus:ring-blue-500"
+                  className="rounded text-[#1e3a8a] focus:ring-blue-500 w-4 h-4"
                 />
                 <label htmlFor="remember" className="text-sm text-gray-600">
                   Onthoud mij
                 </label>
               </div>
             
-              <div className="pt-2 pb-2">
-                <Button
-                  type="submit"
-                  className="w-full bg-[#1e3a8a] hover:bg-blue-800"
-                  disabled={loginMutation.isPending}
-                >
-                  {loginMutation.isPending ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Inloggen...</span>
-                    </div>
-                  ) : (
-                    "Inloggen"
-                  )}
-                </Button>
+              <Button
+                type="submit"
+                className="w-full h-11 bg-[#1e3a8a] hover:bg-blue-800 transition-colors shadow-md rounded-md text-white font-medium"
+                disabled={loginMutation.isPending}
+              >
+                {loginMutation.isPending ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Inloggen...</span>
+                  </div>
+                ) : (
+                  "Inloggen"
+                )}
+              </Button>
               
-                <div className="mt-4 text-center">
-                  <a
-                    href="#"
-                    className="text-sm text-blue-600 hover:underline"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      toast({
-                        title: "Wachtwoord herstel",
-                        description: "Neem contact op met uw systeembeheerder om uw wachtwoord te herstellen",
-                        variant: "default",
-                      });
-                    }}
-                  >
-                    Wachtwoord vergeten?
-                  </a>
-                </div>
+              <div className="text-center">
+                <a
+                  href="#"
+                  className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toast({
+                      title: "Wachtwoord herstel",
+                      description: "Neem contact op met uw systeembeheerder om uw wachtwoord te herstellen",
+                      variant: "default",
+                    });
+                  }}
+                >
+                  Wachtwoord vergeten?
+                </a>
               </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
         
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>© {new Date().getFullYear()} mymadrassa | Alle rechten voorbehouden</p>
-          <p className="mt-2">
-            <a href="#" className="text-blue-600 hover:underline">Voorwaarden</a> · 
-            <a href="#" className="text-blue-600 hover:underline ml-2">Privacy</a>
+          <p className="mt-2 space-x-3">
+            <a href="#" className="text-blue-600 hover:text-blue-800 transition-colors">Voorwaarden</a>
+            <span>·</span>
+            <a href="#" className="text-blue-600 hover:text-blue-800 transition-colors">Privacy</a>
           </p>
         </div>
       </div>

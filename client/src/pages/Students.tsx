@@ -742,20 +742,19 @@ export default function Students() {
       <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
         {/* Lege state wanneer er geen studenten zijn */}
         {!isLoading && (!studentsData?.students || studentsData?.students.length === 0) && (
-          <div className="flex flex-col items-center justify-center py-16 px-6">
-            <div className="bg-blue-50 p-5 rounded-full mb-5">
-              <Users className="h-14 w-14 text-[#1e3a8a]" />
+          <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+            <div className="text-[#1e3a8a] mb-2">
+              <Users className="h-12 w-12 mx-auto opacity-30" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Geen studenten gevonden</h3>
-            <p className="text-sm text-gray-500 text-center mb-6 max-w-md">
-              Er zijn momenteel geen studenten in het systeem. Klik op de knop hieronder om je eerste student toe te voegen.
-            </p>
+            <p className="text-sm font-medium">Geen studenten beschikbaar</p>
             <Button 
               onClick={() => setIsCreateDialogOpen(true)}
-              className="bg-[#1e3a8a] hover:bg-blue-900"
+              variant="outline"
+              size="sm"
+              className="mt-3 text-xs text-[#1e3a8a]"
             >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Nieuwe Student Toevoegen
+              <PlusCircle className="mr-1 h-3 w-3" />
+              Student toevoegen
             </Button>
           </div>
         )}

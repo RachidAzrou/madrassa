@@ -220,90 +220,92 @@ export default function Dashboard() {
             </div>
           </div>
           
-          {/* Studentengroepen data visualisatie - Taartdiagram */}
+          {/* Studentengroepen data visualisatie - Horizontale staafdiagram */}
           {isGroupsLoading || isEnrollmentsLoading ? (
-            <div className="h-56 sm:h-64 flex items-center justify-center">
+            <div className="h-48 flex items-center justify-center">
               <div className="w-6 h-6 sm:w-8 sm:h-8 border-3 sm:border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : chartData.length === 0 ? (
-            <div className="h-56 sm:h-64 flex items-center justify-center text-gray-500 text-sm">
+            <div className="h-48 flex items-center justify-center text-gray-500 text-sm">
               Geen klasgegevens beschikbaar
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-              {/* Taartdiagram met CSS */}
-              <div className="flex justify-center items-center">
-                <div className="relative w-44 h-44">
-                  {/* Cirkeldiagram maken met conic-gradient */}
-                  <div 
-                    className="w-full h-full rounded-full shadow-md" 
-                    style={{
-                      background: `conic-gradient(
-                        ${chartData.map((item, index, array) => {
-                          // Bereken de kleuren en percentages voor de gradient
-                          const percentage = item.count / chartData.reduce((sum, i) => sum + i.count, 0) * 100;
-                          const startPercentage = array.slice(0, index).reduce((sum, i) => 
-                            sum + (i.count / chartData.reduce((s, i) => s + i.count, 0) * 100), 0);
-                          
-                          // Kies kleur op basis van vulgraad
-                          let color;
-                          if (item.percentageFilled < 0.5) color = '#4ade80'; // light green
-                          else if (item.percentageFilled < 0.75) color = '#fbbf24'; // light amber 
-                          else color = '#f87171'; // light red
-                          
-                          return `${color} ${startPercentage}% ${startPercentage + percentage}%`;
-                        }).join(', ')
-                      }`
-                    }}
-                  >
-                    {/* Centrale cirkel voor donut effect */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="text-lg font-bold text-gray-800">
-                            {chartData.reduce((sum, item) => sum + item.count, 0)}
+            <div className="p-4">
+              <div className="grid grid-cols-12 mb-2">
+                <div className="col-span-3 text-xs text-gray-500 font-medium">Klas</div>
+                <div className="col-span-7 text-xs text-gray-500 font-medium">Bezetting</div>
+                <div className="col-span-2 text-xs text-gray-500 font-medium text-right">Aantal</div>
+              </div>
+
+              <div className="space-y-4">
+                {chartData.map((item, index) => {
+                  // Kies kleur op basis van vulgraad - gebruik de app kleuren
+                  const barColor = item.percentageFilled < 0.5 
+                    ? 'bg-sky-400' // lichtblauw voor weinig bezette klassen
+                    : item.percentageFilled < 0.75 
+                      ? 'bg-sky-500' // medium blauw voor gemiddeld bezette klassen 
+                      : 'bg-blue-700'; // donkerblauw voor volle klassen
+                      
+                  const textColor = item.percentageFilled < 0.5 
+                    ? 'text-sky-500' // lichtblauw
+                    : item.percentageFilled < 0.75 
+                      ? 'text-sky-600' // medium blauw
+                      : 'text-blue-800'; // donkerblauw
+                  
+                  // Bereken breedte voor de balk
+                  const barWidth = `${Math.max(5, Math.min(100, item.percentageFilled * 100))}%`;
+                  
+                  return (
+                    <div key={index} className="group">
+                      <div className="grid grid-cols-12 items-center gap-2">
+                        {/* Klasnaam */}
+                        <div className="col-span-3 font-medium text-gray-700 truncate" title={item.name}>
+                          {item.name}
+                        </div>
+                        
+                        {/* Staafdiagram */}
+                        <div className="col-span-7 h-8 bg-gray-100 rounded-lg relative overflow-hidden">
+                          {/* Voortgangsbalk */}
+                          <div 
+                            className={`h-full ${barColor} transition-all duration-1000 ease-out shadow-sm rounded-l-lg flex items-center justify-end px-2`}
+                            style={{ width: barWidth }}
+                          >
+                            {item.percentageFilled > 0.25 && (
+                              <span className="text-white text-xs font-medium">
+                                {Math.round(item.percentageFilled * 100)}%
+                              </span>
+                            )}
                           </div>
-                          <div className="text-xs text-gray-500">studenten</div>
+
+                          {/* Info popup on hover */}
+                          <div className="opacity-0 group-hover:opacity-100 absolute -top-9 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap transition-opacity z-10">
+                            {item.count} van {item.maxCapacity} plekken bezet
+                          </div>
+                        </div>
+                        
+                        {/* Aantal studenten */}
+                        <div className={`col-span-2 text-right ${textColor} font-semibold`}>
+                          {item.count}/{item.maxCapacity}
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
               
-              {/* Legenda en details */}
-              <div className="flex flex-col justify-center">
-                <h4 className="text-sm font-medium text-gray-600 mb-3">Verdeling per klas</h4>
-                <div className="space-y-3">
-                  {chartData.map((item, index) => {
-                    // Kies kleur op basis van vulgraad
-                    const dotColor = item.percentageFilled < 0.5 
-                      ? 'bg-green-400' 
-                      : item.percentageFilled < 0.75 
-                        ? 'bg-amber-400' 
-                        : 'bg-red-400';
-                        
-                    const textColor = item.percentageFilled < 0.5 
-                      ? 'text-green-500' 
-                      : item.percentageFilled < 0.75 
-                        ? 'text-amber-500' 
-                        : 'text-red-500';
-                        
-                    return (
-                      <div key={index} className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-1 rounded">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-3 h-3 ${dotColor} rounded-full`}></div>
-                          <span className="text-sm text-gray-700">{item.name}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-sm font-medium ${textColor}`}>{item.count}/{item.maxCapacity}</span>
-                          <span className="text-xs text-gray-500 hidden group-hover:inline-block">
-                            ({Math.round(item.percentageFilled * 100)}%)
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
+              {/* Legenda */}
+              <div className="flex justify-end mt-4 text-xs text-gray-500 gap-3">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 bg-sky-400 rounded-sm mr-1"></div>
+                  <span>&lt;50%</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 bg-sky-500 rounded-sm mr-1"></div>
+                  <span>50-75%</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-3 h-3 bg-blue-700 rounded-sm mr-1"></div>
+                  <span>&gt;75%</span>
                 </div>
               </div>
             </div>

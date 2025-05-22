@@ -350,8 +350,31 @@ export default function Dashboard() {
                     Geen klasgegevens beschikbaar
                   </div>
                 ) : (
-                  <div className="h-32 sm:h-48 relative">
-                    <div className="flex justify-center items-end h-28 sm:h-40 pt-2 sm:pt-4 gap-4 sm:gap-8">
+                  <div className="h-40 sm:h-56 relative pl-7 sm:pl-8 pb-6 sm:pb-7">
+                    {/* Y-as met labels */}
+                    <div className="absolute left-0 top-0 h-[calc(100%-24px)] sm:h-[calc(100%-28px)] flex flex-col justify-between text-[9px] sm:text-[10px] text-gray-500">
+                      <div>100%</div>
+                      <div>75%</div>
+                      <div>50%</div>
+                      <div>25%</div>
+                      <div>0%</div>
+                    </div>
+                    
+                    {/* Y-as lijn */}
+                    <div className="absolute left-5 sm:left-6 top-0 bottom-6 sm:bottom-7 w-px bg-gray-300"></div>
+                    
+                    {/* Horizontale hulplijnen */}
+                    <div className="absolute left-5 sm:left-6 right-0 top-0 h-px bg-gray-200"></div>
+                    <div className="absolute left-5 sm:left-6 right-0 top-1/4 h-px bg-gray-200"></div>
+                    <div className="absolute left-5 sm:left-6 right-0 top-2/4 h-px bg-gray-200"></div>
+                    <div className="absolute left-5 sm:left-6 right-0 top-3/4 h-px bg-gray-200"></div>
+                    <div className="absolute left-5 sm:left-6 right-0 bottom-6 sm:bottom-7 h-px bg-gray-300"></div>
+                    
+                    {/* X-as lijn */}
+                    <div className="absolute left-5 sm:left-6 right-0 bottom-6 sm:bottom-7 h-px bg-gray-400"></div>
+
+                    {/* Grafiek balken */}
+                    <div className="flex justify-center items-end h-[calc(100%-24px)] sm:h-[calc(100%-28px)] gap-4 sm:gap-8 relative">
                       {chartData.map((item, index) => (
                         <div key={index} className="flex flex-col items-center">
                           <div className="bg-gradient-to-t from-sky-600 to-sky-400 rounded-t shadow-md transition-all duration-500 ease-out px-1 sm:px-2 md:px-4 relative group min-w-[30px] sm:min-w-[40px]">
@@ -374,6 +397,11 @@ export default function Dashboard() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                    
+                    {/* X-as label */}
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-[10px] sm:text-xs text-gray-500">
+                      Klassen
                     </div>
                   </div>
                 )}

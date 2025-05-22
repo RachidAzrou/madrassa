@@ -77,20 +77,23 @@ export default function Login(props: any) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-800 p-4">
-      {/* Mooie achtergrond patroon over de hele pagina */}
-      <div className="absolute inset-0 opacity-5 dark:opacity-10" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%233b5998' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E")`,
-        backgroundSize: '180px 180px'
-      }}></div>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Stijlvolle achtergrond */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700"></div>
+        <img src="@assets/login-bg.svg" alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+      </div>
       
-      {/* Eén container voor zowel logo als login formulier */}
-      <div className="w-full max-w-md bg-white dark:bg-slate-800 shadow-2xl rounded-xl overflow-hidden relative z-10">
+      {/* Decoratieve elementen */}
+      <div className="absolute top-0 right-0 w-1/3 h-64 bg-blue-500/5 rounded-bl-full"></div>
+      <div className="absolute bottom-0 left-0 w-1/4 h-48 bg-blue-500/5 rounded-tr-full"></div>
+      
+      {/* Eén container voor zowel logo als login formulier met subtiele schaduw */}
+      <div className="w-full max-w-md bg-white/90 dark:bg-slate-800/90 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-sm rounded-xl overflow-hidden relative z-10 border border-white/50 dark:border-slate-700/50">
         {/* Logo bovenaan in de container */}
-        <div className="flex flex-col items-center p-8 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
-          <div className="flex items-center mb-4">
-            <span className="text-4xl font-bold text-black">my</span>
-            <span className="text-4xl font-bold text-[#3b5998]">madrassa</span>
+        <div className="flex flex-col items-center p-8 bg-white/80 dark:bg-slate-800/80 border-b border-slate-200/70 dark:border-slate-700/70">
+          <div className="mb-6 mt-2">
+            <img src="@assets/mymadrassa_logo.svg" alt="mymadrassa" className="h-16" />
           </div>
           <p className="text-slate-600 dark:text-slate-300 text-center">
             Log in om toegang te krijgen tot het platform
@@ -184,7 +187,7 @@ export default function Login(props: any) {
             </form>
           </Form>
           
-          <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 text-center">
+          <div className="mt-6 pt-6 border-t border-slate-200/70 dark:border-slate-700/70 text-center">
             <p className="text-sm text-slate-500 dark:text-slate-400">
               &copy; {new Date().getFullYear()} mymadrassa. Alle rechten voorbehouden.
             </p>

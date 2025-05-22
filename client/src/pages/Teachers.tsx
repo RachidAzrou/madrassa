@@ -664,13 +664,13 @@ export default function Teachers() {
       </div>
       
       {/* Zoekbalk - onder de paginatitel geplaatst */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
-        <div className="relative w-full md:w-auto">
+      <div className="space-y-4">
+        <div className="relative w-full">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             type="search"
             placeholder="Zoek docenten..."
-            className="pl-8 bg-white"
+            className="pl-8 bg-white w-full"
             value={searchTerm}
             onChange={handleSearchChange}
           />
@@ -682,15 +682,17 @@ export default function Teachers() {
           )}
         </div>
         
-        <Button 
-          onClick={handleAddNewTeacher} 
-          variant="default" 
-          size="default" 
-          className="bg-primary hover:bg-primary/90 flex items-center"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          <span>Docent Toevoegen</span>
-        </Button>
+        <div className="flex justify-end">
+          <Button 
+            onClick={handleAddNewTeacher} 
+            variant="default" 
+            size="default" 
+            className="bg-primary hover:bg-primary/90 flex items-center"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            <span>Docent Toevoegen</span>
+          </Button>
+        </div>
       </div>
       
       {/* Docenten lijst */}

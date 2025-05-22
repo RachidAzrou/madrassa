@@ -55,10 +55,12 @@ export default function Login(props: any) {
       // Callback voor succesvolle login
       if (onLoginSuccess) {
         onLoginSuccess();
+      } else {
+        // Maak een dummy token aan en sla het op
+        localStorage.setItem("auth_token", "dummy_token");
+        // Navigeer naar dashboard
+        setLocation('/');
       }
-      
-      // Navigeer naar dashboard
-      setLocation('/');
     } catch (error) {
       toast({
         title: 'Fout bij inloggen',

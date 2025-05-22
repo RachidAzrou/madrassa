@@ -1,4 +1,5 @@
-import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { useState, useEffect } from "react";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -24,28 +25,91 @@ import Scheduling from "@/pages/Scheduling";
 import Fees from "@/pages/Fees";
 import Settings from "@/pages/Settings";
 
-// Authenticated Router die de main layout gebruikt
-function AuthenticatedRouter() {
+// Context voor authenticatie
+import React, { createContext } from "react";
+
+export const AuthContext = createContext({
+  isAuthenticated: false,
+  login: () => {},
+  logout: () => {},
+});
+
+function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [, navigate] = useLocation();
+  
+  // Check bij laden van de applicatie of er een token is
+  useEffect(() => {
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      setIsAuthenticated(true);
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
+  
+  const login = () => {
+    localStorage.setItem("auth_token", "dummy_token");
+    setIsAuthenticated(true);
+    navigate("/");
+  };
+  
+  const logout = () => {
+    localStorage.removeItem("auth_token");
+    setIsAuthenticated(false);
+    navigate("/login");
+  };
+  
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+// Protected Route component
+function ProtectedRoute({ component: Component, ...rest }: { component: React.ComponentType<any>, [key: string]: any }) {
+  const { isAuthenticated } = React.useContext(AuthContext);
+  const [, navigate] = useLocation();
+  
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
+  
+  return isAuthenticated ? <Component {...rest} /> : null;
+}
+
+function AppRoutes() {
+  const { isAuthenticated, login } = React.useContext(AuthContext);
+  const [location] = useLocation();
+  
+  // Als we op de login pagina zijn, toon alleen de login component
+  if (location === "/login") {
+    return <Login onLoginSuccess={login} />;
+  }
+  
+  // Anders, toon de beveiligde routes
   return (
     <MainLayout>
       <Switch>
-        <Route path="/" component={Dashboard} />
-        <Route path="/students" component={Students} />
-        <Route path="/guardians" component={Guardians} />
-        <Route path="/teachers" component={Teachers} />
-        <Route path="/admissions" component={Admissions} />
-        <Route path="/student-groups" component={StudentGroups} />
-        <Route path="/courses" component={Courses} />
-        <Route path="/programs" component={Programs} />
-
-        <Route path="/scheduling" component={Scheduling} />
-        <Route path="/calendar" component={Calendar} />
-        <Route path="/attendance" component={Attendance} />
-        <Route path="/grading" component={Cijfers} />
-        <Route path="/fees" component={Fees} />
-        <Route path="/reports" component={Reports} />
-        <Route path="/settings" component={Settings} />
-        <Route path="/mijn-account" component={MyAccount} />
+        <Route path="/" component={() => <ProtectedRoute component={Dashboard} />} />
+        <Route path="/students" component={() => <ProtectedRoute component={Students} />} />
+        <Route path="/guardians" component={() => <ProtectedRoute component={Guardians} />} />
+        <Route path="/teachers" component={() => <ProtectedRoute component={Teachers} />} />
+        <Route path="/admissions" component={() => <ProtectedRoute component={Admissions} />} />
+        <Route path="/student-groups" component={() => <ProtectedRoute component={StudentGroups} />} />
+        <Route path="/courses" component={() => <ProtectedRoute component={Courses} />} />
+        <Route path="/programs" component={() => <ProtectedRoute component={Programs} />} />
+        <Route path="/scheduling" component={() => <ProtectedRoute component={Scheduling} />} />
+        <Route path="/calendar" component={() => <ProtectedRoute component={Calendar} />} />
+        <Route path="/attendance" component={() => <ProtectedRoute component={Attendance} />} />
+        <Route path="/grading" component={() => <ProtectedRoute component={Cijfers} />} />
+        <Route path="/fees" component={() => <ProtectedRoute component={Fees} />} />
+        <Route path="/reports" component={() => <ProtectedRoute component={Reports} />} />
+        <Route path="/settings" component={() => <ProtectedRoute component={Settings} />} />
+        <Route path="/mijn-account" component={() => <ProtectedRoute component={MyAccount} />} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>
@@ -57,28 +121,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <MainLayout>
+        <AuthProvider>
           <Switch>
             <Route path="/login" component={Login} />
-            <Route path="/" component={Dashboard} />
-            <Route path="/students" component={Students} />
-            <Route path="/guardians" component={Guardians} />
-            <Route path="/teachers" component={Teachers} />
-            <Route path="/admissions" component={Admissions} />
-            <Route path="/student-groups" component={StudentGroups} />
-            <Route path="/courses" component={Courses} />
-            <Route path="/programs" component={Programs} />
-            <Route path="/scheduling" component={Scheduling} />
-            <Route path="/calendar" component={Calendar} />
-            <Route path="/attendance" component={Attendance} />
-            <Route path="/grading" component={Cijfers} />
-            <Route path="/fees" component={Fees} />
-            <Route path="/reports" component={Reports} />
-            <Route path="/settings" component={Settings} />
-            <Route path="/mijn-account" component={MyAccount} />
-            <Route component={NotFound} />
+            <Route path="/:rest*" component={AppRoutes} />
           </Switch>
-        </MainLayout>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

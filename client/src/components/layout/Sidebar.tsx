@@ -115,11 +115,15 @@ export default function Sidebar() {
                 <p className="text-xs text-white/70">Administrator</p>
               </div>
             </div>
-            <Link href="/login">
-              <a className="px-3 py-1 text-xs text-white bg-red-600 hover:bg-red-700 rounded-md">
-                Uitloggen
-              </a>
-            </Link>
+            <a 
+              onClick={() => {
+                localStorage.removeItem("auth_token");
+                window.location.href = "/login";
+              }}
+              className="px-3 py-1 text-xs text-white bg-red-600 hover:bg-red-700 rounded-md cursor-pointer"
+            >
+              Uitloggen
+            </a>
           </div>
         </div>
       </div>

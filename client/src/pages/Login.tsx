@@ -79,37 +79,31 @@ export default function Login(props: any) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#f8fafc]">
-      {/* Achtergrond met overlay */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0" style={{ 
-          backgroundImage: `url(${educationBgImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.25
-        }}></div>
-        <div className="absolute inset-0" style={{ 
-          backgroundColor: '#3b5998', 
-          mixBlendMode: 'color',
-          opacity: 0.15
-        }}></div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+         style={{ 
+           backgroundImage: `url(${educationBgImage})`,
+           backgroundSize: 'cover',
+           backgroundPosition: 'center',
+           backgroundColor: '#f8fafc'
+         }}>
+      {/* Blauwe overlay */}
+      <div className="absolute inset-0 bg-blue-50/50 dark:bg-slate-900/90" 
+           style={{ backgroundColor: '#3b5998', opacity: 0.4, mixBlendMode: 'color' }}></div>
       
       {/* Eén container voor alles */}
-      <div className="w-full max-w-md bg-white shadow-md rounded-xl overflow-hidden relative z-10">
-        {/* Logo in een blauwe header die naadloos aansluit */}
-        <div className="bg-[#3b5998] p-6 flex flex-col items-center">
-          <img src={madrassaLogoPng} alt="mymadrassa" className="h-20 mb-3" />
-          <p className="text-white text-center text-sm mb-2">
-            Log in om toegang te krijgen tot het platform
-          </p>
-          <div className="bg-white/20 text-white text-xs font-medium px-2 py-1 rounded">
-            TST-ENVIRONMENT versie 1.1.0
-          </div>
-        </div>
-        
-        {/* Login formulier in een aparte container */}
+      <div className="w-full max-w-md bg-white/95 dark:bg-slate-800/95 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-sm rounded-xl overflow-hidden relative z-10">
+        {/* Logo, titel en login alles in één container */}
         <div className="p-8">
+          {/* Logo */}
+          <div className="flex flex-col items-center mb-6">
+            <img src={madrassaLogoPng} alt="mymadrassa" className="h-20 mb-4" />
+            <p className="text-slate-600 dark:text-slate-300 text-center mb-2">
+              Log in om toegang te krijgen tot het platform
+            </p>
+            <p className="text-blue-600 text-sm font-bold bg-blue-100 px-2 py-1 rounded-md">
+              TST-ENVIRONMENT versie 1.1.0
+            </p>
+          </div>
           
           {/* Login formulier direct hieronder */}
           <Form {...form}>

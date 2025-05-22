@@ -70,18 +70,23 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <img src={myMadrassaLogo} alt="mymadrassa logo" className="h-32 mx-auto mb-4" />
-          <p className="text-gray-600 mt-2">Islamitisch Onderwijs Beheersysteem</p>
-        </div>
-
-        <Card className="w-full border-blue-100 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">Inloggen</CardTitle>
+        <Card className="w-full border-blue-100 shadow-lg overflow-hidden">
+          <div className="bg-[#1e3a8a]/5 pt-8 pb-4 px-6 text-center">
+            <img src={myMadrassaLogo} alt="mymadrassa logo" className="h-28 mx-auto" />
+            <h1 className="text-2xl font-bold mt-4">
+              <span className="text-black">my</span>
+              <span className="text-[#1e3a8a]">madrassa</span>
+            </h1>
+            <p className="text-gray-600 mt-2">Islamitisch Onderwijs Beheersysteem</p>
+          </div>
+          
+          <CardHeader className="pt-6 pb-2">
+            <CardTitle className="text-xl text-center">Inloggen</CardTitle>
             <CardDescription className="text-center">
               Voer uw gegevens in om toegang te krijgen
             </CardDescription>
           </CardHeader>
+          
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -128,7 +133,8 @@ export default function Login() {
                 </label>
               </div>
             </CardContent>
-            <CardFooter className="flex flex-col">
+            
+            <CardFooter className="flex flex-col pt-2 pb-6">
               <Button
                 type="submit"
                 className="w-full bg-[#1e3a8a] hover:bg-blue-800"
@@ -164,7 +170,7 @@ export default function Login() {
           </form>
         </Card>
         
-        <div className="mt-8 text-center text-sm text-gray-500">
+        <div className="mt-6 text-center text-sm text-gray-500">
           <p>© {new Date().getFullYear()} mymadrassa | Alle rechten voorbehouden</p>
           <p className="mt-2">
             <a href="#" className="text-blue-600 hover:underline">Voorwaarden</a> · 

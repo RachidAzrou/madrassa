@@ -994,7 +994,7 @@ export default function Students() {
 
       {/* Create Student Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[95%] max-h-[90vh] h-auto">
           <DialogHeader>
             <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
             <DialogDescription>
@@ -1645,7 +1645,7 @@ export default function Students() {
 
       {/* Edit Student Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[95%] max-h-[90vh] h-auto">
           <DialogHeader>
             <DialogTitle>Student Bewerken</DialogTitle>
             <DialogDescription>
@@ -2171,7 +2171,7 @@ export default function Students() {
 
       {/* Student Detail Dialog */}
       <Dialog open={isStudentDetailDialogOpen} onOpenChange={setIsStudentDetailDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[95%] max-h-[90vh] h-auto">
           <DialogHeader>
             <DialogTitle>Student Details</DialogTitle>
             <DialogDescription>

@@ -10,6 +10,7 @@ import {
   Pencil, MoreVertical, Plus, GraduationCap, BookOpen, UsersRound,
   CalendarIcon, Loader2, 
 } from 'lucide-react';
+import ManageStudentEnrollments from "@/components/student-groups/ManageStudentEnrollments";
 // Aangepast ChalkboardTeacher icoon
 const ChalkBoard = (props: any) => (
   <svg
@@ -462,6 +463,21 @@ export default function StudentGroups() {
                             <Edit className="mr-2 h-4 w-4" />
                             <span>Bewerken</span>
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="cursor-pointer flex items-center"
+                            onClick={() => {
+                              setSelectedGroup(group);
+                              setIsEditDialogOpen(true);
+                              // We gebruiken een kleine vertraging om ervoor te zorgen dat de dialog eerst opent
+                              setTimeout(() => {
+                                const studentenTab = document.querySelector('[value="studenten"]') as HTMLElement;
+                                if (studentenTab) studentenTab.click();
+                              }, 100);
+                            }}
+                          >
+                            <UsersRound className="mr-2 h-4 w-4" />
+                            <span>Studenten beheren</span>
+                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="cursor-pointer text-red-600 flex items-center"
@@ -733,6 +749,22 @@ export default function StudentGroups() {
                     <span>Planning</span>
                   </TabsTrigger>
                 </TabsList>
+
+                {/* Studenten tabblad */}
+                <TabsContent value="studenten" className="pt-4">
+                  {isEditDialogOpen && selectedGroup ? (
+                    <ManageStudentEnrollments groupId={selectedGroup.id} />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-8 text-center">
+                      <p className="text-gray-500 mb-2">
+                        Sla de klas eerst op om studenten toe te kunnen wijzen.
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Na het aanmaken kun je vanuit het bewerkscherm studenten toewijzen.
+                      </p>
+                    </div>
+                  )}
+                </TabsContent>
 
                 {/* Algemeen tabblad */}
                 <TabsContent value="algemeen" className="pt-4">

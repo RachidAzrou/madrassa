@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
-import Sidebar from "./sidebar";
-import Header from "./header";
+import Sidebar from "./Sidebar";
+import Header from "./Header";
 import { useMobile } from "@/hooks/use-mobile";
 
 type MainLayoutProps = {

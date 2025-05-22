@@ -544,6 +544,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Error fetching active courses" });
     }
   });
+  
+  // Haal alle vaktoewijzingen op voor een specifieke docent
+  apiRouter.get("/api/teacher-course-assignments/:teacherId", async (req, res) => {
+    try {
+      const teacherId = parseInt(req.params.teacherId);
+      if (isNaN(teacherId)) {
+        return res.status(400).json({ message: "Invalid teacher ID format" });
+      }
+      
+      const assignments = await storage.getTeacherCourseAssignmentsByTeacher(teacherId);
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching teacher course assignments:", error);
+      res.status(500).json({ message: "Error fetching teacher course assignments" });
+    }
+  });
+  
+  // Endpoint om alle docent-vak toewijzingen op te halen
+  apiRouter.get("/api/teacher-course-assignments", async (_req, res) => {
+    try {
+      const assignments = await storage.getTeacherCourseAssignments();
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching all teacher course assignments:", error);
+      res.status(500).json({ message: "Error fetching all teacher course assignments" });
+    }
+  });
+  
+  // Update vakken voor een docent
+  apiRouter.post("/api/teachers/:teacherId/course-assignments", async (req, res) => {
+    try {
+      const teacherId = parseInt(req.params.teacherId);
+      if (isNaN(teacherId)) {
+        return res.status(400).json({ message: "Invalid teacher ID format" });
+      }
+      
+      // Controleer of docent bestaat
+      const teacher = await storage.getTeacher(teacherId);
+      if (!teacher) {
+        return res.status(404).json({ message: "Teacher not found" });
+      }
+      
+      const { assignments } = req.body;
+      if (!assignments || !Array.isArray(assignments)) {
+        return res.status(400).json({ message: "Invalid assignments data format" });
+      }
+      
+      // Verwijder bestaande toewijzingen voor deze docent
+      const currentAssignments = await storage.getTeacherCourseAssignmentsByTeacher(teacherId);
+      for (const assignment of currentAssignments) {
+        await storage.deleteTeacherCourseAssignment(assignment.id);
+      }
+      
+      // Maak nieuwe toewijzingen aan
+      const results = [];
+      for (const assignment of assignments) {
+        const assignmentData = {
+          teacherId,
+          courseId: assignment.courseId,
+          isPrimary: assignment.isPrimary || false,
+          notes: assignment.notes || "",
+          startDate: new Date(assignment.startDate || new Date()),
+          endDate: new Date(assignment.endDate || new Date(new Date().setFullYear(new Date().getFullYear() + 1)))
+        };
+        
+        const result = await storage.createTeacherCourseAssignment(assignmentData);
+        results.push(result);
+      }
+      
+      res.status(200).json({ message: "Teacher course assignments updated", assignments: results });
+    } catch (error) {
+      console.error("Error updating teacher course assignments:", error);
+      res.status(500).json({ message: "Error updating teacher course assignments" });
+    }
+  });
 
   apiRouter.get("/api/courses/:id", async (req, res) => {
     try {

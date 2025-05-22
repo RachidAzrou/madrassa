@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -20,93 +19,13 @@ import Admissions from "@/pages/Admissions";
 import StudentGroups from "@/pages/StudentGroups";
 import MyAccount from "@/pages/MyAccount";
 import Login from "@/pages/Login";
+
 import Scheduling from "@/pages/Scheduling";
 import Fees from "@/pages/Fees";
 import Settings from "@/pages/Settings";
-import React, { createContext } from "react";
+import { useState, useEffect } from "react";
 
-// Eenvoudigere AuthContext
-export const AuthContext = createContext({
-  isAuthenticated: false,
-  login: () => {},
-  logout: () => {},
-  user: null as any,
-});
-
-// Auth provider component
-function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [, navigate] = useLocation();
-  
-  // Check token bij het laden
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        setIsAuthenticated(true);
-        const userRole = localStorage.getItem("user_role") || "USER";
-        const userName = localStorage.getItem("user_name") || "Gebruiker";
-        setUser({ role: userRole, name: userName });
-      }
-    };
-    
-    checkAuth();
-  }, []);
-  
-  const login = () => {
-    localStorage.setItem("auth_token", "admin_token");
-    localStorage.setItem("user_role", "ADMIN");
-    localStorage.setItem("user_name", "Admin");
-    setIsAuthenticated(true);
-    setUser({ role: "ADMIN", name: "Admin" });
-    navigate("/");
-  };
-  
-  const logout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("user_role");
-    localStorage.removeItem("user_name");
-    setIsAuthenticated(false);
-    setUser(null);
-    navigate("/login");
-  };
-  
-  return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, user }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-// Hoofdapplicatie routes
-function AppRoutes() {
-  const { isAuthenticated } = React.useContext(AuthContext);
-  const [location] = useLocation();
-  const [, navigate] = useLocation();
-  
-  // Redirect naar login als niet geauthenticeerd
-  useEffect(() => {
-    if (!isAuthenticated && location !== "/login") {
-      navigate("/login");
-    }
-  }, [isAuthenticated, location, navigate]);
-  
-  // Als we op login pagina zijn maar al geauthenticeerd, ga naar dashboard
-  useEffect(() => {
-    if (isAuthenticated && location === "/login") {
-      navigate("/");
-    }
-  }, [isAuthenticated, location, navigate]);
-  
-  if (!isAuthenticated && location !== "/login") {
-    return null;
-  }
-  
-  if (location === "/login") {
-    return <Login />;
-  }
-  
+function AuthenticatedRouter() {
   return (
     <MainLayout>
       <Switch>
@@ -118,6 +37,7 @@ function AppRoutes() {
         <Route path="/student-groups" component={StudentGroups} />
         <Route path="/courses" component={Courses} />
         <Route path="/programs" component={Programs} />
+
         <Route path="/scheduling" component={Scheduling} />
         <Route path="/calendar" component={Calendar} />
         <Route path="/attendance" component={Attendance} />
@@ -132,18 +52,45 @@ function AppRoutes() {
   );
 }
 
-// Main App component
 function App() {
+  // Voor demo doeleinden, in productie zou je dit met een echte auth check implementeren
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [location] = useLocation();
+
+  useEffect(() => {
+    // Controleer of er een login route is, zo niet we zijn automatisch ingelogd 
+    // Dit is alleen voor demo doeleinden
+    if (location === "/login") {
+      setIsAuthenticated(false);
+    } else {
+      // Controleer als er een login token is, anders blijf niet-ingelogd
+      const hasToken = localStorage.getItem("auth_token");
+      
+      // Voor demo purposes, we simuleren een token
+      if (location === "/") {
+        setIsAuthenticated(true);
+      }
+    }
+  }, [location]);
+
+  // Login functie voor de Login component
+  const handleLogin = () => {
+    localStorage.setItem("auth_token", "demo_token");
+    setIsAuthenticated(true);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <AuthProvider>
-          <Switch>
-            <Route path="/login" component={Login} />
-            <Route path="/:rest*" component={AppRoutes} />
-          </Switch>
-        </AuthProvider>
+        <Switch>
+          <Route path="/login">
+            <Login onLoginSuccess={handleLogin} />
+          </Route>
+          <Route>
+            {isAuthenticated ? <AuthenticatedRouter /> : <Login onLoginSuccess={handleLogin} />}
+          </Route>
+        </Switch>
       </TooltipProvider>
     </QueryClientProvider>
   );

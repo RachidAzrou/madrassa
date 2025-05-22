@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import useSidebar from "@/hooks/use-sidebar";
+import { useSidebar } from "@/contexts/SidebarContext";
 
 interface NavItemProps {
   to: string;
@@ -10,17 +10,15 @@ interface NavItemProps {
 
 const NavItem = ({ to, icon, label, isActive }: NavItemProps) => {
   return (
-    <Link href={to}>
-      <a
-        className={`flex items-center px-4 py-3 text-sm font-medium rounded-md cursor-pointer ${
-          isActive
-            ? "bg-primary-700 text-white"
-            : "text-white/70 hover:bg-primary-700 hover:text-white"
-        }`}
-      >
-        <i className={`${icon} mr-3 text-lg`}></i>
-        {label}
-      </a>
+    <Link href={to} 
+      className={`flex items-center px-4 py-3 text-sm font-medium rounded-md cursor-pointer ${
+        isActive
+          ? "bg-primary-700 text-white"
+          : "text-white/70 hover:bg-primary-700 hover:text-white"
+      }`}
+    >
+      <i className={`${icon} mr-3 text-lg`}></i>
+      {label}
     </Link>
   );
 };
@@ -105,25 +103,14 @@ export default function Sidebar() {
 
         {/* User Profile */}
         <div className="p-4 border-t border-primary-700">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-primary-700 flex items-center justify-center">
-                <span className="text-white font-semibold">JD</span>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-white">John Doe</p>
-                <p className="text-xs text-white/70">Administrator</p>
-              </div>
+          <div className="flex items-center">
+            <div className="w-10 h-10 rounded-full bg-primary-700 flex items-center justify-center">
+              <span className="text-white font-semibold">JD</span>
             </div>
-            <a 
-              onClick={() => {
-                localStorage.removeItem("auth_token");
-                window.location.href = "/login";
-              }}
-              className="px-3 py-1 text-xs text-white bg-red-600 hover:bg-red-700 rounded-md cursor-pointer"
-            >
-              Uitloggen
-            </a>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-white">John Doe</p>
+              <p className="text-xs text-white/70">Administrator</p>
+            </div>
           </div>
         </div>
       </div>

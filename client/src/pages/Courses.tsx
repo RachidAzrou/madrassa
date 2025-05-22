@@ -466,8 +466,12 @@ export default function Courses() {
                 Fout bij het laden van curriculum. Probeer het opnieuw.
               </div>
             ) : courses.length === 0 ? (
-              <div className="col-span-full text-center py-8 text-gray-500">
-                Geen curriculum gevonden. Pas uw filters aan of voeg een nieuw curriculum toe.
+              <div className="col-span-full text-center py-10">
+                <BookOpen className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+                <h3 className="text-lg font-medium mb-2">Geen curriculum gevonden</h3>
+                <p className="text-gray-500 mb-4">
+                  Er zijn geen vakken die overeenkomen met de geselecteerde filters.
+                </p>
               </div>
             ) : (
               courses.map((course) => (

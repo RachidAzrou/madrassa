@@ -1035,9 +1035,9 @@ export default function Students() {
                   <h3 className="text-base font-semibold text-primary mb-3">Persoonlijke gegevens</h3>
                   
                   {/* Foto upload sectie */}
-                  <div className="flex mb-4 items-start">
+                  <div className="flex mb-2 items-start">
                     <div 
-                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-6"
+                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-4"
                       onClick={() => {
                         const fileInput = document.getElementById('student-photo') as HTMLInputElement;
                         fileInput?.click();
@@ -1102,11 +1102,11 @@ export default function Students() {
                     />
                   </div>
                   
-                  <div className="flex mb-4 justify-end">
+                  <div className="flex mt-0 mb-1 justify-end">
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="flex items-center border border-gray-300"
+                      className="flex items-center border border-gray-300 text-xs h-8"
                       onClick={() => {
                         // Get access to toast context within this function
                         const localToast = toast;
@@ -1186,16 +1186,16 @@ export default function Students() {
                       Gegevens laden via eID
                     </Button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <Label htmlFor="studentId" className="text-sm font-medium text-gray-700">
-                        StudentID <span className="text-muted-foreground text-xs">(wordt automatisch gegenereerd)</span>
+                      <Label htmlFor="studentId" className="text-xs font-medium text-gray-700">
+                        StudentID <span className="text-muted-foreground text-xs">(automatisch)</span>
                       </Label>
                       <Input
                         id="studentId"
                         value={nextStudentIdData?.nextStudentId || "Wordt geladen..."}
                         disabled
-                        className="mt-1 bg-gray-100 text-gray-500 font-medium"
+                        className="mt-0.5 h-8 text-sm bg-gray-100 text-gray-500 font-medium"
                       />
                     </div>
                     

@@ -202,8 +202,8 @@ const NotificationsPage: React.FC = () => {
 
       <Separator className="my-6" />
 
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
-        <div className="relative w-full sm:w-[300px]">
+      <div className="mb-6">
+        <div className="relative w-full">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"

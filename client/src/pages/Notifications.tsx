@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNotifications, type Notification } from '@/contexts/NotificationContext';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { Search, BellOff, CheckCircle, Trash2, Check, Bell, Info, AlertTriangle, AlertCircle, X } from 'lucide-react';
+import { Search, BellOff, CheckCircle, Trash2, Check, Bell, Info, AlertTriangle, AlertCircle, X, Eye, EyeOff } from 'lucide-react';
 
 const NotificationsPage: React.FC = () => {
   const { notifications, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
@@ -145,15 +145,26 @@ const NotificationsPage: React.FC = () => {
                   )}
                 </div>
               </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => handleDelete(notification.id)}
-                className="invisible group-hover:visible absolute top-2 right-2 h-6 w-6 p-0 text-primary hover:bg-primary/10 rounded-full"
-                title="Verwijderen"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <div className="absolute top-2 right-2 flex gap-1">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {}}
+                  className="invisible group-hover:visible h-6 w-6 p-0 text-primary hover:bg-primary/10 rounded-full"
+                  title={notification.isRead ? "Markeer als ongelezen" : "Markeer als gelezen"}
+                >
+                  {notification.isRead ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => handleDelete(notification.id)}
+                  className="invisible group-hover:visible h-6 w-6 p-0 text-primary hover:bg-primary/10 rounded-full"
+                  title="Verwijderen"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </CardHeader>
           </Card>
         ))}

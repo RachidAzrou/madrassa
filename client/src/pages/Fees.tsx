@@ -852,8 +852,11 @@ export default function Fees() {
                   <p className="text-red-500">Fout bij het laden van betalingsgegevens. Probeer de pagina te vernieuwen.</p>
                 </div>
               ) : feeRecords.length === 0 ? (
-                <div className="py-12 text-center">
-                  <p className="text-gray-500">Geen betalingsrecords gevonden.</p>
+                <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                  <div className="text-[#1e3a8a] mb-2">
+                    <Euro className="h-12 w-12 mx-auto opacity-30" />
+                  </div>
+                  <p className="text-sm font-medium">Geen betalingsrecords gevonden</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">

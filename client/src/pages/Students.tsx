@@ -1037,23 +1037,25 @@ export default function Students() {
                   {/* Foto upload sectie */}
                   <div className="flex mb-6 items-start">
                     <div 
-                      className="w-24 h-24 border border-gray-200 shadow-sm rounded-md flex items-center justify-center overflow-hidden bg-gradient-to-br from-white to-sky-50 relative group cursor-pointer mr-6 hover:border-blue-300 hover:shadow transition-all duration-200"
+                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-6"
                       onClick={() => {
                         const fileInput = document.getElementById('student-photo') as HTMLInputElement;
                         fileInput?.click();
                       }}
                     >
                       <img id="student-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
-                      <div id="student-photo-placeholder" className="flex flex-col items-center justify-center">
-                        <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-1">
-                          <Upload className="h-6 w-6 text-[#1e3a8a]" />
+                      <div id="student-photo-placeholder" className="w-full h-full flex flex-col items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-full">
+                        <div className="flex flex-col items-center justify-center">
+                          <User className="h-10 w-10 text-gray-300" />
+                          <div className="absolute bottom-0 right-0 bg-[#1e3a8a] rounded-full p-1.5 shadow-sm">
+                            <Upload className="h-3.5 w-3.5 text-white" />
+                          </div>
                         </div>
-                        <p className="text-xs text-blue-700 font-medium">Foto kiezen</p>
                       </div>
                       
                       {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
                       <div 
-                        className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2 hidden"
+                        className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden"
                         id="photo-delete-overlay"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1071,7 +1073,7 @@ export default function Students() {
                           }
                         }}
                       >
-                        <Trash2 className="h-5 w-5 text-white" />
+                        <Trash2 className="h-6 w-6 text-white" />
                       </div>
                     </div>
                     

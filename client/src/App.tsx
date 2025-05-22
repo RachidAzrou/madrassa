@@ -37,6 +37,7 @@ export const AuthContext = createContext({
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [, navigate] = useLocation();
+  const [isInitialized, setIsInitialized] = useState(false);
   
   // Check bij laden van de applicatie of er een token is
   useEffect(() => {
@@ -44,25 +45,38 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     if (token) {
       setIsAuthenticated(true);
     } else {
-      navigate("/login");
+      // Alleen navigeren als we niet al op de login pagina zijn
+      if (window.location.pathname !== "/login") {
+        navigate("/login");
+      }
     }
-  }, [navigate]);
+    setIsInitialized(true);
+  }, []);
   
   const login = () => {
-    localStorage.setItem("auth_token", "dummy_token");
+    console.log("Login functie aangeroepen");
+    localStorage.setItem("auth_token", "admin_token");
     setIsAuthenticated(true);
-    navigate("/");
+    
+    // Forceer een redirect naar het dashboard
+    window.location.href = "/";
   };
   
   const logout = () => {
     localStorage.removeItem("auth_token");
+    localStorage.removeItem("user_role");
+    localStorage.removeItem("user_name");
     setIsAuthenticated(false);
     navigate("/login");
   };
   
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
-      {children}
+      {isInitialized ? children : 
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+        </div>
+      }
     </AuthContext.Provider>
   );
 }

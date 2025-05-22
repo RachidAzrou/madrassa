@@ -225,6 +225,23 @@ export default function Dashboard() {
             <div className="h-48 flex items-center justify-center">
               <div className="w-6 h-6 sm:w-8 sm:h-8 border-3 sm:border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
+          ) : (studentGroupsData as any[]).length === 0 ? (
+            <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+              <div className="text-[#1e3a8a] mb-2">
+                <ChalkBoard className="h-12 w-12 mx-auto opacity-30" />
+              </div>
+              <p className="text-sm font-medium mb-1">Geen klassen beschikbaar</p>
+              <p className="text-xs text-center max-w-md">
+                Er zijn momenteel geen klassen aangemaakt. Ga naar de Klassen pagina om klassen toe te voegen.
+              </p>
+              <Button 
+                variant="link" 
+                className="mt-3 text-sm text-[#1e3a8a]"
+                onClick={() => setLocation('/student-groups')}
+              >
+                Naar Klassen beheer
+              </Button>
+            </div>
           ) : chartData.length === 0 ? (
             <div className="h-48 flex items-center justify-center text-gray-500 text-sm">
               Geen klasgegevens beschikbaar

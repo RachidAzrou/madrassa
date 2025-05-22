@@ -669,8 +669,11 @@ export default function Students() {
     setIsEditDialogOpen(true);
   };
 
-  // Function to export student data as PDF
+  // Functie om studentgegevens te exporteren als PDF
   const exportStudentsAsPDF = () => {
+    // Verberg het exportmenu na selectie
+    document.getElementById('export-menu')?.classList.add('hidden');
+    
     const doc = new jsPDF();
     
     // Title
@@ -718,7 +721,106 @@ export default function Students() {
       }
     });
     
-    doc.save('studentenlijst.pdf');
+    doc.save(`studenten_${new Date().toISOString().split('T')[0]}.pdf`);
+    
+    toast({
+      title: "PDF geëxporteerd",
+      description: "De studentenlijst is succesvol geëxporteerd als PDF.",
+    });
+  };
+  
+  // Functie om studentgegevens te exporteren als Excel bestand
+  const exportStudentsAsExcel = () => {
+    // Verberg het exportmenu na selectie
+    document.getElementById('export-menu')?.classList.add('hidden');
+    
+    const students = studentsData.students || [];
+    
+    // Gegevens voorbereiden voor Excel export
+    const worksheetData = students.map((student: any) => {
+      return {
+        'Student ID': student.studentId,
+        'Voornaam': student.firstName,
+        'Achternaam': student.lastName,
+        'Email': student.email,
+        'Telefoon': student.phone,
+        'Geboortedatum': student.dateOfBirth,
+        'Adres': student.address,
+        'Straat': student.street,
+        'Huisnummer': student.houseNumber,
+        'Postcode': student.postalCode,
+        'Plaats': student.city,
+        'Status': student.status === 'active' ? 'Actief' : 
+                student.status === 'pending' ? 'In Afwachting' : 
+                student.status === 'inactive' ? 'Inactief' : 'Afgestudeerd',
+        'Geslacht': student.gender === 'M' ? 'Man' : student.gender === 'F' ? 'Vrouw' : '-',
+        'Notities': student.notes
+      };
+    });
+    
+    // Maak een nieuwe werkmap en werkblad
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+    
+    // Voeg het werkblad toe aan de werkmap
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Studenten');
+    
+    // Exporteer als Excel-bestand
+    XLSX.writeFile(workbook, `studenten_${new Date().toISOString().split('T')[0]}.xlsx`);
+    
+    toast({
+      title: "Excel geëxporteerd",
+      description: "De studentenlijst is succesvol geëxporteerd als Excel bestand.",
+    });
+  };
+  
+  // Functie om studentgegevens te exporteren als CSV
+  const exportStudentsAsCSV = () => {
+    // Verberg het exportmenu na selectie
+    document.getElementById('export-menu')?.classList.add('hidden');
+    
+    const students = studentsData.students || [];
+    
+    // Gegevens voorbereiden voor CSV export
+    const csvData = students.map((student: any) => {
+      return {
+        'Student ID': student.studentId,
+        'Voornaam': student.firstName,
+        'Achternaam': student.lastName,
+        'Email': student.email,
+        'Telefoon': student.phone,
+        'Geboortedatum': student.dateOfBirth,
+        'Adres': student.address,
+        'Straat': student.street,
+        'Huisnummer': student.houseNumber,
+        'Postcode': student.postalCode,
+        'Plaats': student.city,
+        'Status': student.status === 'active' ? 'Actief' : 
+                student.status === 'pending' ? 'In Afwachting' : 
+                student.status === 'inactive' ? 'Inactief' : 'Afgestudeerd',
+        'Geslacht': student.gender === 'M' ? 'Man' : student.gender === 'F' ? 'Vrouw' : '-',
+        'Notities': student.notes
+      };
+    });
+    
+    // Converteer naar CSV en download
+    const csv = Papa.unparse(csvData);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `studenten_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "CSV geëxporteerd",
+      description: "De studentenlijst is succesvol geëxporteerd als CSV bestand.",
+    });
   };
 
   // Filter unique year levels for dropdown
@@ -889,14 +991,42 @@ export default function Students() {
               <Filter className="mr-2 h-4 w-4" /> Filteren
             </Button>
             
-            <Button 
-              variant="outline" 
-              size="default"
-              className="border-gray-300 text-gray-700"
-              onClick={exportStudentsAsPDF}
-            >
-              <FileUp className="mr-2 h-4 w-4" /> Exporteren
-            </Button>
+            <div className="relative">
+              <Button 
+                variant="outline" 
+                size="default"
+                className="border-gray-300 text-gray-700"
+                onClick={() => document.getElementById('export-menu')?.classList.toggle('hidden')}
+              >
+                <FileUp className="mr-2 h-4 w-4" /> Exporteren
+              </Button>
+              
+              <div 
+                id="export-menu" 
+                className="hidden absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+              >
+                <div className="py-1">
+                  <button 
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" 
+                    onClick={exportStudentsAsPDF}
+                  >
+                    <FileUp className="mr-2 h-4 w-4" /> PDF bestand
+                  </button>
+                  <button 
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" 
+                    onClick={exportStudentsAsExcel}
+                  >
+                    <FileSpreadsheet className="mr-2 h-4 w-4" /> Excel bestand
+                  </button>
+                  <button 
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" 
+                    onClick={exportStudentsAsCSV}
+                  >
+                    <FileText className="mr-2 h-4 w-4" /> CSV bestand
+                  </button>
+                </div>
+              </div>
+            </div>
             
             <Button 
               variant="outline" 

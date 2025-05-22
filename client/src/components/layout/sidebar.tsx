@@ -301,17 +301,22 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         {/* Afmelden knop aan einde van de sidebar */}
         <div className="mt-auto pt-2 pb-4">
           <div className="border-t border-gray-200 pt-4"></div>
-          <Link href="/api/logout">
-            <div
-              onClick={handleLinkClick}
-              className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50 bg-gray-50"
-            >
-              <div className="flex-shrink-0">
-                <LogOut className="h-5 w-5" />
-              </div>
-              <span className="truncate whitespace-nowrap font-medium">Afmelden</span>
+          <div
+            onClick={() => {
+              // Verwijder authenticatie gegevens
+              localStorage.removeItem("isAuthenticated");
+              localStorage.removeItem("user");
+              // Navigeer naar de logout API route die terug naar login pagina redirectt
+              window.location.href = "/api/logout";
+              if (onClose) onClose();
+            }}
+            className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50 bg-gray-50"
+          >
+            <div className="flex-shrink-0">
+              <LogOut className="h-5 w-5" />
             </div>
-          </Link>
+            <span className="truncate whitespace-nowrap font-medium">Afmelden</span>
+          </div>
         </div>
       </nav>
     </aside>

@@ -34,6 +34,13 @@ import {
 export async function registerRoutes(app: Express): Promise<Server> {
   // prefix all routes with /api
   const apiRouter = app;
+  
+  // ********************
+  // Authentication endpoints
+  // ********************
+  apiRouter.get("/api/logout", (_req, res) => {
+    res.redirect("/");
+  });
 
   // ********************
   // Student API endpoints

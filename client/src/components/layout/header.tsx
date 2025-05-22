@@ -21,16 +21,6 @@ const Header = ({ onMenuClick }: HeaderProps) => {
       </Button>
       
       <NotificationDropdown />
-      
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="bg-primary hover:bg-primary/90 text-white shadow-sm"
-        onClick={() => window.history.back()}
-        title="Terug naar vorige pagina"
-      >
-        <ArrowLeft className="h-5 w-5" />
-      </Button>
     </div>
   );
 };

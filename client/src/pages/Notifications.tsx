@@ -17,7 +17,7 @@ import { nl } from 'date-fns/locale';
 import { Search, BellOff, CheckCircle, Trash2, Check, Bell, Info, AlertTriangle, AlertCircle, X, Eye, EyeOff } from 'lucide-react';
 
 const NotificationsPage: React.FC = () => {
-  const { notifications, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
+  const { notifications, markAsRead, markAllAsRead, deleteNotification, toggleReadStatus } = useNotifications();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');

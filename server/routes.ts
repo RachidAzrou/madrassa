@@ -3402,6 +3402,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  apiRouter.patch("/api/notifications/:id/mark-unread", async (req, res) => {
+    try {
+      const notificationId = parseInt(req.params.id);
+      if (isNaN(notificationId)) {
+        return res.status(400).json({ message: "Ongeldig notificatie-ID" });
+      }
+      
+      const notification = await storage.markNotificationAsUnread(notificationId);
+      if (!notification) {
+        return res.status(404).json({ message: "Notificatie niet gevonden" });
+      }
+      
+      res.json(notification);
+    } catch (error) {
+      console.error("Error marking notification as unread:", error);
+      res.status(500).json({ message: "Fout bij markeren notificatie als ongelezen" });
+    }
+  });
+  
   apiRouter.patch("/api/notifications/user/:userId/mark-all-read", async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);

@@ -10,17 +10,24 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useNotifications, type Notification } from '@/contexts/NotificationContext';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { Search, BellOff, CheckCircle, Trash2, Check, Bell, Info, AlertTriangle, AlertCircle, X, Eye, EyeOff, XCircle } from 'lucide-react';
+import { 
+  Search, BellOff, CheckCircle, Trash2, Check, Bell, Info, 
+  AlertTriangle, AlertCircle, X, Eye, EyeOff, XCircle, Briefcase, 
+  GraduationCap, BookOpen, CreditCard, ClipboardCheck
+} from 'lucide-react';
 
 const NotificationsPage: React.FC = () => {
   const { notifications, markAsRead, markAllAsRead, deleteNotification, toggleReadStatus } = useNotifications();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedNotifications, setSelectedNotifications] = useState<number[]>([]);
+  const [selectMode, setSelectMode] = useState(false);
   
   const handleToggleReadStatus = (id: number) => {
     // Wissel de lees-status zonder toast melding te tonen

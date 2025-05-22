@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { StudentEmptyState } from '@/components/ui/empty-states';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import { 
@@ -1197,11 +1198,8 @@ export default function Students() {
             {!isLoading && (!studentsData?.students || studentsData?.students.length === 0) && (
               <tr>
                 <td colSpan={8}>
-                  <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-                    <div className="text-[#1e3a8a] mb-2">
-                      <Users className="h-12 w-12 mx-auto opacity-30" />
-                    </div>
-                    <p className="text-sm font-medium">Geen studenten beschikbaar</p>
+                  <div className="py-6">
+                    <StudentEmptyState description="Er zijn momenteel geen studenten in het systeem. Klik op 'Nieuw' om een student toe te voegen." />
                   </div>
                 </td>
               </tr>

@@ -414,11 +414,8 @@ export default function Dashboard() {
               <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : currentWeekLessons.length === 0 ? (
-            <div className="text-center py-3 sm:py-4 space-y-2">
+            <div className="text-center py-3 sm:py-4">
               <p className="text-gray-500 text-sm">Geen lessen gevonden voor deze week</p>
-              <Button variant="outline" size="sm" className="border-sky-200 text-sky-700 hover:bg-sky-50 text-xs sm:text-sm" asChild>
-                <div onClick={() => setLocation('/lessons/new')}>Les toevoegen</div>
-              </Button>
             </div>
           ) : (
             <div className="space-y-2 sm:space-y-3">

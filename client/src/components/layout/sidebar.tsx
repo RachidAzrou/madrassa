@@ -306,8 +306,8 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               // Verwijder authenticatie gegevens
               localStorage.removeItem("isAuthenticated");
               localStorage.removeItem("user");
-              // Navigeer naar de logout API route die terug naar login pagina redirectt
-              window.location.href = "/api/logout";
+              // Direct naar login pagina navigeren
+              window.location.href = "/login";
               if (onClose) onClose();
             }}
             className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50 bg-gray-50"

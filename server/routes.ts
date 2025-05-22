@@ -39,7 +39,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication endpoints
   // ********************
   apiRouter.get("/api/logout", (_req, res) => {
-    res.redirect("/");
+    res.redirect("/login");
   });
 
   // ********************

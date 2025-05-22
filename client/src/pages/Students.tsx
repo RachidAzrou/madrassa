@@ -1195,7 +1195,10 @@ export default function Students() {
             <tbody className="bg-white divide-y divide-gray-200">
             
             {/* Lege state wanneer er geen studenten zijn - onder de headers */}
-            {!isLoading && (!studentsData?.students || studentsData?.students.length === 0) && (
+            {!isLoading && (
+              (Array.isArray(studentsData) && studentsData.length === 0) ||
+              (!Array.isArray(studentsData) && (!studentsData?.students || studentsData?.students.length === 0))
+            ) && (
               <tr>
                 <td colSpan={8}>
                   <div className="py-6">

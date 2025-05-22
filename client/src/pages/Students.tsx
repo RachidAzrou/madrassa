@@ -743,9 +743,9 @@ export default function Students() {
         {/* Desktop weergave */}
         <div className="hidden md:block overflow-x-auto">
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
                   <Checkbox 
                     checked={
                       selectedStudents.length > 0 && 
@@ -754,80 +754,81 @@ export default function Students() {
                     onCheckedChange={handleSelectAll}
                     aria-label="Select all"
                   />
-                </TableHead>
-                <TableHead>Student ID</TableHead>
-                <TableHead>Naam</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Programma</TableHead>
-                <TableHead>Leerjaar</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Acties</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+                </th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Naam</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Programma</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leerjaar</th>
+                <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th scope="col" className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
             
             {/* Lege state wanneer er geen studenten zijn - onder de headers */}
             {!isLoading && (!studentsData?.students || studentsData?.students.length === 0) && (
-              <TableRow>
-                <TableCell colSpan={8}>
+              <tr>
+                <td colSpan={8} className="px-6 py-4">
                   <div className="h-48 flex flex-col items-center justify-center text-gray-500">
                     <div className="text-[#1e3a8a] mb-2">
                       <Users className="h-12 w-12 mx-auto opacity-30" />
                     </div>
                     <p className="text-sm font-medium">Geen studenten beschikbaar</p>
                   </div>
-                </TableCell>
-              </TableRow>
+                </td>
+              </tr>
             )}
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                <tr>
+                  <td colSpan={8} className="px-6 py-4 text-center">
                     <div className="flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                       <span className="ml-2">Laden...</span>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : (
                 (Array.isArray(studentsData) ? studentsData : []).map((student: any) => (
-                  <TableRow key={student.id}>
-                    <TableCell>
+                  <tr key={student.id} className="hover:bg-gray-50">
+                    <td className="px-3 py-4 whitespace-nowrap">
                       <Checkbox 
                         checked={selectedStudents.includes(student.id)}
                         onCheckedChange={() => handleSelectStudent(student.id)}
                         aria-label={`Select ${student.firstName}`}
                       />
-                    </TableCell>
-                    <TableCell className="font-medium">{student.studentId}</TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{student.studentId}</td>
+                    <td className="px-3 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <Avatar className="h-8 w-8 mr-2">
                           <AvatarFallback className="bg-[#1e3a8a] text-white">
                             {student.firstName[0]}{student.lastName[0]}
                           </AvatarFallback>
                         </Avatar>
-                        {student.firstName} {student.lastName}
+                        <div className="text-sm text-gray-900">{student.firstName} {student.lastName}</div>
                       </div>
-                    </TableCell>
-                    <TableCell>{student.email}</TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{student.email}</td>
+                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
                       {student.programs && student.programs[0] 
                         ? programs.find((p: any) => p.id === student.programs[0].programId)?.name 
                         : '-'}
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
                       {student.programs && student.programs[0] 
                         ? student.programs[0].yearLevel 
                         : '-'}
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-center">
                       {renderStatusBadge(student.status)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-right text-sm">
+                      <div className="flex justify-end gap-1">
                         <Button 
                           variant="ghost" 
                           size="icon"
+                          className="h-7 w-7"
                           onClick={() => handleViewStudentDetails(student)}
                         >
                           <Eye className="h-4 w-4" />
@@ -835,6 +836,7 @@ export default function Students() {
                         <Button 
                           variant="ghost" 
                           size="icon"
+                          className="h-7 w-7"
                           onClick={() => handleEditStudent(student)}
                         >
                           <Edit className="h-4 w-4" />
@@ -842,6 +844,7 @@ export default function Students() {
                         <Button 
                           variant="ghost" 
                           size="icon"
+                          className="h-7 w-7"
                           onClick={() => {
                             setSelectedStudent(student);
                             setIsDeleteDialogOpen(true);
@@ -850,11 +853,11 @@ export default function Students() {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))
               )}
-            </TableBody>
+            </tbody>
           </Table>
         </div>
         

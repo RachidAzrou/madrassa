@@ -166,20 +166,22 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
         
         <div className="mt-2 bg-gray-50 rounded-md overflow-hidden">
-          <div
-            onClick={handleLinkClick}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 text-sm transition-colors cursor-pointer",
-              location === "/"
-                ? "bg-primary/10 text-primary font-medium"
-                : "text-gray-700 hover:text-primary hover:bg-gray-100"
-            )}
-          >
-            <div className="flex-shrink-0">
-              <LayoutDashboard className="h-5 w-5" />
+          <Link href="/">
+            <div
+              onClick={handleLinkClick}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 text-sm transition-colors cursor-pointer",
+                location === "/"
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "text-gray-700 hover:text-primary hover:bg-gray-100"
+              )}
+            >
+              <div className="flex-shrink-0">
+                <LayoutDashboard className="h-5 w-5" />
+              </div>
+              <span className="truncate whitespace-nowrap">Dashboard</span>
             </div>
-            <span className="truncate whitespace-nowrap">Dashboard</span>
-          </div>
+          </Link>
         </div>
       </div>
       

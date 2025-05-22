@@ -665,32 +665,27 @@ export default function Students() {
 
       {/* Filter opties */}
       {showFilterOptions && (
-        <div className="mb-6 bg-blue-50/30 p-5 rounded-lg border border-blue-100 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100/70 mr-3 text-[#1e3a8a]">
-                <Filter className="h-4 w-4" />
-              </div>
-              <h3 className="text-base font-medium text-gray-800">Filters</h3>
-            </div>
+        <div className="mb-6 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-700">Filters</h3>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => setShowFilterOptions(false)}
-              className="h-8 w-8 p-0 rounded-full"
+              className="h-7 w-7 p-0"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </Button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white p-3 rounded-md border border-blue-100/80 shadow-xs">
-              <Label htmlFor="status-filter" className="text-xs font-medium text-gray-700 mb-1.5 block">Status</Label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <Label htmlFor="status-filter" className="text-xs text-gray-600 mb-1 block">Status</Label>
               <Select 
                 value={selectedStatusFilter} 
                 onValueChange={setSelectedStatusFilter}
               >
-                <SelectTrigger id="status-filter" className="bg-white border-gray-200 h-9 text-sm">
+                <SelectTrigger id="status-filter" className="h-8 text-xs">
                   <SelectValue placeholder="Alle statussen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -704,13 +699,13 @@ export default function Students() {
               </Select>
             </div>
             
-            <div className="bg-white p-3 rounded-md border border-blue-100/80 shadow-xs">
-              <Label htmlFor="group-filter" className="text-xs font-medium text-gray-700 mb-1.5 block">Klas</Label>
+            <div>
+              <Label htmlFor="group-filter" className="text-xs text-gray-600 mb-1 block">Klas</Label>
               <Select 
                 value={selectedStudentGroupFilter} 
                 onValueChange={setSelectedStudentGroupFilter}
               >
-                <SelectTrigger id="group-filter" className="bg-white border-gray-200 h-9 text-sm">
+                <SelectTrigger id="group-filter" className="h-8 text-xs">
                   <SelectValue placeholder="Alle klassen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -724,13 +719,13 @@ export default function Students() {
               </Select>
             </div>
             
-            <div className="bg-white p-3 rounded-md border border-blue-100/80 shadow-xs">
-              <Label htmlFor="year-filter" className="text-xs font-medium text-gray-700 mb-1.5 block">Schooljaar</Label>
+            <div>
+              <Label htmlFor="year-filter" className="text-xs text-gray-600 mb-1 block">Schooljaar</Label>
               <Select 
                 value={selectedYearLevelFilter} 
                 onValueChange={setSelectedYearLevelFilter}
               >
-                <SelectTrigger id="year-filter" className="bg-white border-gray-200 h-9 text-sm">
+                <SelectTrigger id="year-filter" className="h-8 text-xs">
                   <SelectValue placeholder="Alle schooljaren" />
                 </SelectTrigger>
                 <SelectContent>
@@ -745,7 +740,7 @@ export default function Students() {
             </div>
           </div>
 
-          <div className="flex gap-2 mt-4 justify-end">
+          <div className="flex gap-2 mt-3 border-t border-gray-100 pt-3 justify-end">
             <Button 
               variant="outline" 
               size="sm" 
@@ -754,9 +749,8 @@ export default function Students() {
                 setSelectedStudentGroupFilter("all");
                 setSelectedYearLevelFilter("all");
               }}
-              className="text-xs h-8 border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800"
+              className="text-xs h-7"
             >
-              <X className="mr-1.5 h-3 w-3" />
               Wissen
             </Button>
             <Button 
@@ -765,9 +759,8 @@ export default function Students() {
                 setPage(1);
                 setShowFilterOptions(false);
               }}
-              className="text-xs h-8 bg-[#1e3a8a] hover:bg-blue-800"
+              className="text-xs h-7 bg-[#1e3a8a]"
             >
-              <Check className="mr-1.5 h-3 w-3" />
               Toepassen
             </Button>
           </div>

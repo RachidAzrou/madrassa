@@ -351,15 +351,15 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <div className="h-32 sm:h-48 relative">
-                    <div className="flex justify-between items-end h-28 sm:h-40 pt-2 sm:pt-4">
+                    <div className="flex justify-center items-end h-28 sm:h-40 pt-2 sm:pt-4 gap-4 sm:gap-8">
                       {chartData.map((item, index) => (
                         <div key={index} className="flex flex-col items-center">
-                          <div className="bg-gradient-to-t from-sky-600 to-sky-400 rounded-t shadow-md transition-all duration-500 ease-out px-1 sm:px-2 md:px-6 relative group">
+                          <div className="bg-gradient-to-t from-sky-600 to-sky-400 rounded-t shadow-md transition-all duration-500 ease-out px-1 sm:px-2 md:px-4 relative group min-w-[30px] sm:min-w-[40px]">
                             <div 
                               className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"
                             ></div>
                             <div
-                              className="absolute bottom-full mb-1 sm:mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-[10px] sm:text-xs py-0.5 sm:py-1 px-1 sm:px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              className="absolute bottom-full mb-1 sm:mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-[10px] sm:text-xs py-0.5 sm:py-1 px-1 sm:px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-10"
                             >
                               {item.count} / {item.maxCapacity} studenten
                             </div>

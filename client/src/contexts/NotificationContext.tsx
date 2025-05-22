@@ -23,6 +23,8 @@ interface NotificationContextType {
   isLoading: boolean;
   error: Error | null;
   markAsRead: (id: number) => void;
+  markAsUnread: (id: number) => void;
+  toggleReadStatus: (id: number) => void;
   markAllAsRead: () => void;
   deleteNotification: (id: number) => void;
   refreshNotifications: () => void;
@@ -55,6 +57,21 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         variant: "destructive",
         title: "Fout",
         description: "Er is een fout opgetreden bij het markeren van de notificatie als gelezen."
+      });
+    }
+  });
+  
+  // Markeer notificatie als ongelezen
+  const markAsUnreadMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/notifications/${id}/mark-unread`, { method: 'PATCH' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/notifications/user', CURRENT_USER_ID] });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het markeren van de notificatie als ongelezen."
       });
     }
   });
@@ -105,6 +122,18 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, [notifications]);
 
+  // Toggle notification read status
+  const toggleReadStatus = (id: number) => {
+    const notification = notifications.find(n => n.id === id);
+    if (notification) {
+      if (notification.isRead) {
+        markAsUnreadMutation.mutate(id);
+      } else {
+        markAsReadMutation.mutate(id);
+      }
+    }
+  };
+
   // Context value
   const value = {
     notifications: notifications as Notification[],
@@ -112,6 +141,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     isLoading,
     error: error as Error | null,
     markAsRead: (id: number) => markAsReadMutation.mutate(id),
+    markAsUnread: (id: number) => markAsUnreadMutation.mutate(id),
+    toggleReadStatus,
     markAllAsRead: () => markAllAsReadMutation.mutate(),
     deleteNotification: (id: number) => deleteNotificationMutation.mutate(id),
     refreshNotifications: refetch as () => void

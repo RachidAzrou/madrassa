@@ -149,7 +149,7 @@ const NotificationsPage: React.FC = () => {
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => {}}
+                  onClick={() => toggleReadStatus(notification.id)}
                   className="invisible group-hover:visible h-6 w-6 p-0 text-primary hover:bg-primary/10 rounded-full"
                   title={notification.isRead ? "Markeer als ongelezen" : "Markeer als gelezen"}
                 >

@@ -350,41 +350,144 @@ export default function Dashboard() {
                     Geen klasgegevens beschikbaar
                   </div>
                 ) : (
-                  <div className="h-40 sm:h-56 relative">
-                    {/* Horizontale balken grafiek */}
-                    <div className="h-full w-full flex flex-col justify-center gap-3 sm:gap-4 px-2 sm:px-4">
-                      {chartData.map((item, index) => (
-                        <div key={index} className="relative flex flex-col">
-                          <div className="flex items-center mb-1">
-                            <div className="text-xs font-medium text-gray-700 w-20 truncate" title={item.name}>
-                              {item.name}
-                            </div>
-                            <div className="text-[10px] sm:text-xs text-gray-500 ml-2">
-                              {item.count} / {item.maxCapacity}
-                            </div>
-                          </div>
+                  <div className="h-56 sm:h-64 relative">
+                    <div className="flex flex-col sm:flex-row h-full w-full">
+                      {/* Piechart */}
+                      <div className="h-40 sm:h-full w-full sm:w-1/2 relative flex items-center justify-center">
+                        <div className="relative h-32 w-32 sm:h-44 sm:w-44">
+                          {/* Donut chart met animatie */}
+                          <svg viewBox="0 0 100 100" className="transform -rotate-90 w-full h-full">
+                            {/* Achtergrond cirkel */}
+                            <circle 
+                              cx="50" 
+                              cy="50" 
+                              r="45" 
+                              fill="transparent" 
+                              stroke="#f3f4f6" 
+                              strokeWidth="10"
+                            />
+                            
+                            {/* Kleurrijke segmenten */}
+                            {(() => {
+                              // Bereken totale studenten
+                              const totalStudents = chartData.reduce((sum, item) => sum + item.count, 0);
+                              
+                              // Als er geen studenten zijn, toon geen segmenten
+                              if (totalStudents === 0) {
+                                return (
+                                  <circle 
+                                    cx="50" 
+                                    cy="50" 
+                                    r="45" 
+                                    fill="transparent" 
+                                    stroke="#e5e7eb" 
+                                    strokeWidth="10"
+                                  />
+                                );
+                              }
+                              
+                              // Definieer kleuren voor de segmenten
+                              const colors = ['#1e3a8a', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#2563eb'];
+                              
+                              // Sterk startpunt op 0
+                              let cumulativePercent = 0;
+                              
+                              return chartData.map((item, index) => {
+                                // Sla segmenten over die 0 studenten hebben
+                                if (item.count === 0) return null;
+                                
+                                // Bereken percentage van het totaal
+                                const percent = (item.count / totalStudents) * 100;
+                                
+                                // Bereken de circumference (omtrek) van de cirkel
+                                const circumference = 2 * Math.PI * 45;
+                                
+                                // Bereken stroke-dasharray en stroke-dashoffset
+                                const strokeDasharray = circumference;
+                                const strokeDashoffset = circumference - (percent / 100) * circumference;
+                                
+                                // Bereken de startpositie voor dit segment
+                                const startPercent = cumulativePercent;
+                                cumulativePercent += percent;
+                                
+                                // Bereken start positie langs de omtrek
+                                const startOffset = (startPercent / 100) * circumference;
+                                
+                                return (
+                                  <circle 
+                                    key={index}
+                                    cx="50" 
+                                    cy="50" 
+                                    r="45" 
+                                    fill="transparent" 
+                                    stroke={colors[index % colors.length]} 
+                                    strokeWidth="10"
+                                    strokeDasharray={`${circumference}`}
+                                    strokeDashoffset={strokeDashoffset}
+                                    style={{
+                                      transform: `rotate(${startPercent * 3.6}deg)`,
+                                      transformOrigin: 'center',
+                                      transition: 'all 1s ease-out'
+                                    }}
+                                    className="hover:opacity-80 transition-opacity"
+                                  />
+                                );
+                              });
+                            })()}
+                            
+                            {/* Binnenste cirkel voor donut effect */}
+                            <circle 
+                              cx="50" 
+                              cy="50" 
+                              r="35" 
+                              fill="white" 
+                              className="drop-shadow-sm" 
+                            />
+                          </svg>
                           
-                          {/* Achtergrond container */}
-                          <div className="h-5 sm:h-6 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner">
-                            {/* Capaciteit visualisatie */}
-                            <div className="h-full bg-gradient-to-r from-[#1e3a8a] to-sky-500 rounded-full relative" 
-                                style={{ width: `${Math.min(100, item.percentageFilled * 100)}%` }}>
-                              <div className="absolute inset-0 bg-white opacity-0 hover:opacity-10 transition-opacity"></div>
-                            </div>
-                          </div>
-                          
-                          {/* Percentage indicator */}
-                          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[10px] sm:text-xs font-medium text-white">
-                            {Math.round(item.percentageFilled * 100)}%
+                          {/* Centrale tekst */}
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                            <span className="text-xs sm:text-sm text-gray-500">Totaal</span>
+                            <span className="text-lg sm:text-xl font-bold text-gray-800">
+                              {chartData.reduce((sum, item) => sum + item.count, 0)}
+                            </span>
+                            <span className="text-xs text-gray-500">studenten</span>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                    
-                    {/* Legenda */}
-                    <div className="absolute bottom-0 right-0 text-[10px] sm:text-xs text-gray-500 flex items-center">
-                      <div className="w-3 h-3 bg-gradient-to-r from-[#1e3a8a] to-sky-500 rounded-sm mr-1"></div>
-                      <span>Bezettingsgraad</span>
+                      </div>
+                      
+                      {/* Legenda */}
+                      <div className="h-full w-full sm:w-1/2 pt-2 sm:pt-4 flex flex-col justify-center">
+                        <div className="space-y-2 px-4">
+                          {chartData.map((item, index) => {
+                            // Definieer kleuren voor de legenda items
+                            const colors = ['#1e3a8a', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#2563eb'];
+                            
+                            // Bereken totaal voor percentages
+                            const totalStudents = chartData.reduce((sum, item) => sum + item.count, 0);
+                            const percent = totalStudents === 0 ? 0 : Math.round((item.count / totalStudents) * 100);
+                            
+                            return (
+                              <div key={index} className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                  <div 
+                                    className="w-3 h-3 sm:w-4 sm:h-4 rounded-sm mr-2" 
+                                    style={{ backgroundColor: colors[index % colors.length] }}
+                                  ></div>
+                                  <span className="text-xs sm:text-sm text-gray-600 font-medium">{item.name}</span>
+                                </div>
+                                <div className="text-xs sm:text-sm text-gray-500">
+                                  <span className="font-medium">{item.count}</span>
+                                  <span className="text-gray-400 ml-1">({percent}%)</span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-3 px-4">
+                          * Percentage vertegenwoordigt het aandeel studenten per klas ten opzichte van het totaal
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}

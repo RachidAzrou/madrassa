@@ -878,38 +878,36 @@ export default function Students() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="default"
-              className="border-gray-300 text-gray-700"
-              onClick={() => setShowFilterOptions(!showFilterOptions)}
-            >
-              <Filter className="mr-2 h-4 w-4" /> Filteren
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              size="default"
-              className="border-gray-300 text-gray-700"
-              onClick={exportStudentsAsPDF}
-            >
-              <Download className="mr-2 h-4 w-4" /> Exporteren
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              size="default"
-              className="border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a]/10"
-              onClick={() => setIsImportDialogOpen(true)}
-            >
-              <FileUp className="mr-2 h-4 w-4" /> Importeren
-            </Button>
-          </div>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Button 
+            variant="outline" 
+            size="default"
+            className="border-gray-300 text-gray-700"
+            onClick={() => setShowFilterOptions(!showFilterOptions)}
+          >
+            <Filter className="mr-2 h-4 w-4" /> Filteren
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="default"
+            className="border-gray-300 text-gray-700"
+            onClick={exportStudentsAsPDF}
+          >
+            <Download className="mr-2 h-4 w-4" /> Exporteren
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="default"
+            className="border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a]/10"
+            onClick={() => setIsImportDialogOpen(true)}
+          >
+            <FileUp className="mr-2 h-4 w-4" /> Importeren
+          </Button>
+          
           <Button 
             variant="default" 
             size="default" 

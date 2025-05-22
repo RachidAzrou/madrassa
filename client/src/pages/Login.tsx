@@ -3,7 +3,6 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useMutation } from "@tanstack/react-query";
@@ -70,7 +69,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
       <div className="w-full max-w-md">
-        <Card className="w-full border-blue-100 shadow-lg overflow-hidden">
+        <div className="w-full bg-white border border-blue-100 rounded-lg shadow-lg overflow-hidden">
           <div className="bg-[#1e3a8a]/5 pt-8 pb-4 px-6 text-center">
             <img src={myMadrassaLogo} alt="mymadrassa logo" className="h-28 mx-auto" />
             <h1 className="text-2xl font-bold mt-4">
@@ -80,15 +79,15 @@ export default function Login() {
             <p className="text-gray-600 mt-2">Islamitisch Onderwijs Beheersysteem</p>
           </div>
           
-          <CardHeader className="pt-6 pb-2">
-            <CardTitle className="text-xl text-center">Inloggen</CardTitle>
-            <CardDescription className="text-center">
+          <div className="px-6 pt-6 pb-2 text-center">
+            <h2 className="text-xl font-semibold">Inloggen</h2>
+            <p className="text-sm text-gray-500 mt-1">
               Voer uw gegevens in om toegang te krijgen
-            </CardDescription>
-          </CardHeader>
+            </p>
+          </div>
           
           <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
+            <div className="px-6 py-4 space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">E-mailadres</Label>
                 <Input
@@ -132,43 +131,43 @@ export default function Login() {
                   Onthoud mij
                 </label>
               </div>
-            </CardContent>
             
-            <CardFooter className="flex flex-col pt-2 pb-6">
-              <Button
-                type="submit"
-                className="w-full bg-[#1e3a8a] hover:bg-blue-800"
-                disabled={loginMutation.isPending}
-              >
-                {loginMutation.isPending ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Inloggen...</span>
-                  </div>
-                ) : (
-                  "Inloggen"
-                )}
-              </Button>
-              
-              <div className="mt-4 text-center">
-                <a
-                  href="#"
-                  className="text-sm text-blue-600 hover:underline"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    toast({
-                      title: "Wachtwoord herstel",
-                      description: "Neem contact op met uw systeembeheerder om uw wachtwoord te herstellen",
-                      variant: "default",
-                    });
-                  }}
+              <div className="pt-2 pb-2">
+                <Button
+                  type="submit"
+                  className="w-full bg-[#1e3a8a] hover:bg-blue-800"
+                  disabled={loginMutation.isPending}
                 >
-                  Wachtwoord vergeten?
-                </a>
+                  {loginMutation.isPending ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Inloggen...</span>
+                    </div>
+                  ) : (
+                    "Inloggen"
+                  )}
+                </Button>
+              
+                <div className="mt-4 text-center">
+                  <a
+                    href="#"
+                    className="text-sm text-blue-600 hover:underline"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toast({
+                        title: "Wachtwoord herstel",
+                        description: "Neem contact op met uw systeembeheerder om uw wachtwoord te herstellen",
+                        variant: "default",
+                      });
+                    }}
+                  >
+                    Wachtwoord vergeten?
+                  </a>
+                </div>
               </div>
-            </CardFooter>
+            </div>
           </form>
-        </Card>
+        </div>
         
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>© {new Date().getFullYear()} mymadrassa | Alle rechten voorbehouden</p>

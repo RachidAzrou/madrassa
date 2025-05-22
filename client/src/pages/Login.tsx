@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 
 // Import logo en achtergrond direct
 import madrassaLogoPng from '../assets/mymadrassa_logo.png'
-import educationBgImage from '../assets/images/education-bg.jpg'
+import educationBgImage from '../assets/images/education-bg-notebook.jpg'
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Voer een geldig e-mailadres in' }),
@@ -96,7 +96,7 @@ export default function Login(props: any) {
         <div className="p-8">
           {/* Logo */}
           <div className="flex flex-col items-center mb-6">
-            <img src={madrassaLogoPng} alt="mymadrassa" className="h-20 mb-4" />
+            <img src={madrassaLogoPng} alt="mymadrassa" className="h-28 mb-4" />
             <p className="text-slate-600 dark:text-slate-300 text-center mb-2">
               Log in om toegang te krijgen tot het platform
             </p>

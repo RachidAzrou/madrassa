@@ -23,7 +23,8 @@ import {
   type TeacherAttendance, type InsertTeacherAttendance,
   type BehaviorAssessment, type InsertBehaviorAssessment,
   type FeeSettings, type InsertFeeSettings,
-  type FeeDiscount, type InsertFeeDiscount
+  type FeeDiscount, type InsertFeeDiscount,
+  type Notification, type InsertNotification
 } from "@shared/schema";
 
 // Storage interface for CRUD operations
@@ -267,4 +268,14 @@ export interface IStorage {
   createBehaviorAssessments(assessments: InsertBehaviorAssessment[]): Promise<BehaviorAssessment[]>;
   updateBehaviorAssessment(id: number, assessment: Partial<BehaviorAssessment>): Promise<BehaviorAssessment | undefined>;
   deleteBehaviorAssessment(id: number): Promise<boolean>;
+  
+  // Notification operations
+  getNotificationsByUser(userId: number): Promise<Notification[]>;
+  getUnreadNotificationsByUser(userId: number): Promise<Notification[]>;
+  getNotification(id: number): Promise<Notification | undefined>;
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  markNotificationAsRead(id: number): Promise<Notification | undefined>;
+  markAllNotificationsAsRead(userId: number): Promise<void>;
+  deleteNotification(id: number): Promise<void>;
+  deleteAllNotificationsForUser(userId: number): Promise<void>;
 }

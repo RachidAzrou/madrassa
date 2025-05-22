@@ -98,4 +98,24 @@ export class DatabaseStorage implements IStorage {
   async deleteAllNotificationsForUser(userId: number): Promise<void> {
     await db.delete(notifications).where(eq(notifications.userId, userId));
   }
+
+  // Implementatie van de getOutstandingDebts functie voor de DatabaseStorage
+  async getOutstandingDebts(): Promise<any[]> {
+    const outstandingFees = await db.select({
+      id: fees.id,
+      studentId: fees.studentId,
+      firstName: students.firstName,
+      lastName: students.lastName,
+      invoiceNumber: fees.invoiceNumber,
+      amount: fees.amount,
+      dueDate: fees.dueDate,
+      status: fees.status
+    })
+    .from(fees)
+    .innerJoin(students, eq(fees.studentId, students.id))
+    .where(eq(fees.status, 'pending'))
+    .orderBy(desc(fees.dueDate));
+    
+    return outstandingFees;
+  }
 }

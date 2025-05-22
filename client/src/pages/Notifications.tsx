@@ -176,17 +176,7 @@ const NotificationsPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-2">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Zoeken..."
-              className="pl-8 w-full sm:w-[250px]"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+        <div>
           {unreadNotifications.length > 0 && (
             <Button
               variant="outline"

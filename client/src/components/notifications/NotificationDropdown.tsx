@@ -74,15 +74,15 @@ const NotificationDropdown: React.FC = () => {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80 p-0 shadow-lg border-gray-200 overflow-hidden" align="end">
-        <div className="bg-blue-500 py-2 px-3">
-          <DropdownMenuLabel className="flex justify-between items-center p-0 text-white">
+        <div className="bg-primary py-2 px-3">
+          <DropdownMenuLabel className="flex justify-between items-center p-0 text-primary-foreground">
             <span className="font-medium">Notificaties</span>
             {unreadCount > 0 && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => markAllAsRead()}
-                className="h-7 text-xs px-2 bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white"
+                className="h-7 text-xs px-2 bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground"
               >
                 Alles gelezen
               </Button>
@@ -93,8 +93,8 @@ const NotificationDropdown: React.FC = () => {
           <DropdownMenuGroup>
             {notifications.length === 0 ? (
               <div className="py-6 px-3 text-center text-muted-foreground">
-                <BellOff className="h-6 w-6 mx-auto mb-2 text-blue-400 opacity-60" />
-                <p className="text-sm text-gray-600">Geen notificaties</p>
+                <BellOff className="h-6 w-6 mx-auto mb-2 text-primary/40" />
+                <p className="text-sm text-muted-foreground">Geen notificaties</p>
               </div>
             ) : (
               <>
@@ -156,7 +156,7 @@ const NotificationDropdown: React.FC = () => {
                       variant="ghost" 
                       size="sm" 
                       onClick={() => setShowAll(true)}
-                      className="w-full text-xs text-blue-600 hover:bg-blue-50"
+                      className="w-full text-xs text-primary hover:bg-primary/10"
                     >
                       Meer weergeven ({notifications.length - 3})
                     </Button>

@@ -247,9 +247,9 @@ export default function Dashboard() {
                           
                           // Kies kleur op basis van vulgraad
                           let color;
-                          if (item.percentageFilled < 0.5) color = '#10B981'; // green-500
-                          else if (item.percentageFilled < 0.75) color = '#F59E0B'; // amber-500
-                          else color = '#EF4444'; // red-500
+                          if (item.percentageFilled < 0.5) color = '#4ade80'; // light green
+                          else if (item.percentageFilled < 0.75) color = '#fbbf24'; // light amber 
+                          else color = '#f87171'; // light red
                           
                           return `${color} ${startPercentage}% ${startPercentage + percentage}%`;
                         }).join(', ')
@@ -278,16 +278,16 @@ export default function Dashboard() {
                   {chartData.map((item, index) => {
                     // Kies kleur op basis van vulgraad
                     const dotColor = item.percentageFilled < 0.5 
-                      ? 'bg-green-500' 
+                      ? 'bg-green-400' 
                       : item.percentageFilled < 0.75 
-                        ? 'bg-amber-500' 
-                        : 'bg-red-500';
+                        ? 'bg-amber-400' 
+                        : 'bg-red-400';
                         
                     const textColor = item.percentageFilled < 0.5 
-                      ? 'text-green-600' 
+                      ? 'text-green-500' 
                       : item.percentageFilled < 0.75 
-                        ? 'text-amber-600' 
-                        : 'text-red-600';
+                        ? 'text-amber-500' 
+                        : 'text-red-500';
                         
                     return (
                       <div key={index} className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-1 rounded">

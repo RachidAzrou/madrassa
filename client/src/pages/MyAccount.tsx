@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTheme } from "@/components/ui/theme-provider";
 import { 
   Card, 
   CardContent, 
@@ -184,21 +185,15 @@ const MyAccount = () => {
   };
 
   // Bij initialisatie gebruiker in localStorage opslaan voor de sidebar
-  // en donkere modus uit localStorage halen en toepassen
+  // en de huidige themastand ophalen
   useEffect(() => {
     // Sla de huidige gebruiker op in localStorage voor sidebar en andere componenten
     localStorage.setItem('user', JSON.stringify(currentUser));
     
-    // Haal de donkere modus voorkeur op uit localStorage
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode === 'true') {
-      setDarkMode(true);
-      document.documentElement.classList.add('dark');
-    } else if (savedDarkMode === 'false') {
-      setDarkMode(false);
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
+    // Haal de huidige thema-instelling op uit de ThemeProvider
+    // en synchroniseer de lokale 'darkMode' state hiermee
+    setDarkMode(theme === 'dark');
+  }, [theme]);
 
   // Profiel opslaan
   const onProfileSubmit = (data: ProfileFormValues) => {
@@ -262,20 +257,21 @@ const MyAccount = () => {
     setTwoFactorEnabled(!twoFactorEnabled);
   };
 
+  // Gebruik de ThemeProvider voor donkere modus
+  const { theme, setTheme } = useTheme();
+  
   // Toggle donkere modus
   const handleToggleDarkMode = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     
-    // Pas de donkere modus toe op het document element
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    // Update de globale theme via de ThemeProvider
+    setTheme(newDarkMode ? 'dark' : 'light');
     
-    // Sla de voorkeur op in localStorage zodat het persistent blijft
-    localStorage.setItem('darkMode', newDarkMode ? 'true' : 'false');
+    // We hoeven niets toe te voegen aan document.documentElement.classList
+    // omdat de ThemeProvider dit automatisch doet
+    
+    // De ThemeProvider slaat de voorkeur al op in localStorage
   };
 
   // Verander standaardpagina

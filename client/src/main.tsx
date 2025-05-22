@@ -4,7 +4,7 @@ import "./index.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 
 createRoot(document.getElementById("root")!).render(
-  <ThemeProvider defaultTheme="light" storageKey="edumanage-theme">
+  <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
     <App />
   </ThemeProvider>
 );

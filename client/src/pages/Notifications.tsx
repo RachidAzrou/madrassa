@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNotifications, type Notification } from '@/contexts/NotificationContext';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { Search, BellOff, CheckCircle, Trash2, Check, Bell, Info, AlertTriangle, AlertCircle } from 'lucide-react';
+import { Search, BellOff, CheckCircle, Trash2, Check, Bell, Info, AlertTriangle, AlertCircle, X } from 'lucide-react';
 
 const NotificationsPage: React.FC = () => {
   const { notifications, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
@@ -123,11 +123,22 @@ const NotificationsPage: React.FC = () => {
                     </span>
                   </div>
                 </div>
-                {!notification.isRead && (
-                  <div className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
-                    Nieuw
-                  </div>
-                )}
+                <div className="flex items-center gap-2">
+                  {!notification.isRead && (
+                    <div className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
+                      Nieuw
+                    </div>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDelete(notification.id)}
+                    className="h-6 w-6 p-0 text-primary hover:bg-primary/10 rounded-full"
+                    title="Verwijderen"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               <CardDescription className="text-sm mt-2">
                 {notification.message}

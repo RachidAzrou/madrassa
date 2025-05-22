@@ -601,12 +601,13 @@ export default function Cijfers() {
                   {/* Cijferstabel */}
                   <div className="bg-white shadow rounded-lg border overflow-hidden">
                     {!selectedClass ? (
-                      <div className="p-8 text-center text-gray-500">
-                        <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
-                        <h3 className="mt-2 text-sm font-medium">Geen gegevens beschikbaar</h3>
-                        <p className="mt-1 text-sm text-gray-500">
-                          Selecteer een klas om cijfers te beheren.
-                        </p>
+                      <div className="p-8 text-center">
+                        <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                          <div className="text-[#1e3a8a] mb-2">
+                            <Percent className="h-12 w-12 mx-auto opacity-30" />
+                          </div>
+                          <p className="text-sm font-medium">Selecteer een klas om cijfers te beheren</p>
+                        </div>
                       </div>
                     ) : isLoadingClassStudents || isLoadingGrades ? (
                       <div className="p-8 text-center">

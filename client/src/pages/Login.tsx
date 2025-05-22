@@ -11,7 +11,6 @@ import { useToast } from '@/hooks/use-toast';
 
 // Import logo direct
 import madrassaLogoPng from '../assets/mymadrassa_logo.png'
-import { educationBgUrl } from '../assets/images/education-bg'
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Voer een geldig e-mailadres in' }),
@@ -84,17 +83,16 @@ export default function Login(props: any) {
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-[#f8f9fa] dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
           <div className="absolute inset-0 overflow-hidden" style={{ 
-            backgroundImage: `url(${educationBgUrl})`,
+            backgroundImage: 'url("https://i.imgur.com/yJKs40t.jpg")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            opacity: 0.25,
-            filter: 'sepia(0.4) hue-rotate(175deg) saturate(0.9)'
+            opacity: 0.4
           }}>
           </div>
           <div className="absolute inset-0" style={{ 
             backgroundColor: '#3b5998', 
             mixBlendMode: 'color',
-            opacity: 0.35
+            opacity: 0.5
           }}></div>
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/40 dark:to-slate-900/40"></div>

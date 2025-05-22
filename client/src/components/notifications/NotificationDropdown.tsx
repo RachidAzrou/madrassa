@@ -123,26 +123,9 @@ const NotificationDropdown: React.FC = () => {
                               variant="ghost"
                               size="sm"
                               onClick={(e) => handleMarkAsRead(notification.id, e)}
-                              className="h-6 text-xs px-2 text-blue-600 hover:bg-blue-50"
+                              className="h-6 text-xs px-2 text-primary hover:bg-primary/10"
                             >
                               Gelezen
-                            </Button>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => handleDelete(notification.id, e)}
-                            className="h-6 text-xs px-2 text-gray-600 hover:bg-red-50 hover:text-red-600"
-                          >
-                            Verwijderen
-                          </Button>
-                          {notification.link && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 text-xs px-2 text-gray-600 hover:bg-blue-50"
-                            >
-                              Bekijken
                             </Button>
                           )}
                         </div>

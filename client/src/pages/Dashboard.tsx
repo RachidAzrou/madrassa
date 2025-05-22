@@ -350,58 +350,41 @@ export default function Dashboard() {
                     Geen klasgegevens beschikbaar
                   </div>
                 ) : (
-                  <div className="h-40 sm:h-56 relative pl-7 sm:pl-8 pb-6 sm:pb-7">
-                    {/* Y-as met labels */}
-                    <div className="absolute left-0 top-0 h-[calc(100%-24px)] sm:h-[calc(100%-28px)] flex flex-col justify-between text-[9px] sm:text-[10px] text-gray-500">
-                      <div>100%</div>
-                      <div>75%</div>
-                      <div>50%</div>
-                      <div>25%</div>
-                      <div>0%</div>
-                    </div>
-                    
-                    {/* Y-as lijn */}
-                    <div className="absolute left-5 sm:left-6 top-0 bottom-6 sm:bottom-7 w-px bg-gray-300"></div>
-                    
-                    {/* Horizontale hulplijnen */}
-                    <div className="absolute left-5 sm:left-6 right-0 top-0 h-px bg-gray-200"></div>
-                    <div className="absolute left-5 sm:left-6 right-0 top-1/4 h-px bg-gray-200"></div>
-                    <div className="absolute left-5 sm:left-6 right-0 top-2/4 h-px bg-gray-200"></div>
-                    <div className="absolute left-5 sm:left-6 right-0 top-3/4 h-px bg-gray-200"></div>
-                    <div className="absolute left-5 sm:left-6 right-0 bottom-6 sm:bottom-7 h-px bg-gray-300"></div>
-                    
-                    {/* X-as lijn */}
-                    <div className="absolute left-5 sm:left-6 right-0 bottom-6 sm:bottom-7 h-px bg-gray-400"></div>
-
-                    {/* Grafiek balken */}
-                    <div className="flex justify-center items-end h-[calc(100%-24px)] sm:h-[calc(100%-28px)] gap-4 sm:gap-8 relative">
+                  <div className="h-40 sm:h-56 relative">
+                    {/* Horizontale balken grafiek */}
+                    <div className="h-full w-full flex flex-col justify-center gap-3 sm:gap-4 px-2 sm:px-4">
                       {chartData.map((item, index) => (
-                        <div key={index} className="flex flex-col items-center">
-                          <div className="bg-gradient-to-t from-sky-600 to-sky-400 rounded-t shadow-md transition-all duration-500 ease-out px-1 sm:px-2 md:px-4 relative group min-w-[30px] sm:min-w-[40px]">
-                            <div 
-                              className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"
-                            ></div>
-                            <div
-                              className="absolute bottom-full mb-1 sm:mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-[10px] sm:text-xs py-0.5 sm:py-1 px-1 sm:px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-10"
-                            >
-                              {item.count} / {item.maxCapacity} studenten
+                        <div key={index} className="relative flex flex-col">
+                          <div className="flex items-center mb-1">
+                            <div className="text-xs font-medium text-gray-700 w-20 truncate" title={item.name}>
+                              {item.name}
                             </div>
-                            <div
-                              style={{ 
-                                height: `${Math.max(20, (item.percentageFilled * 100) * (window.innerWidth < 640 ? 90 : 130) / 100)}px`
-                              }}
-                            ></div>
+                            <div className="text-[10px] sm:text-xs text-gray-500 ml-2">
+                              {item.count} / {item.maxCapacity}
+                            </div>
                           </div>
-                          <div className="text-[10px] sm:text-xs text-gray-500 mt-1 sm:mt-2 max-w-[60px] sm:max-w-[80px] text-center truncate" title={item.name}>
-                            {item.name}
+                          
+                          {/* Achtergrond container */}
+                          <div className="h-5 sm:h-6 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner">
+                            {/* Capaciteit visualisatie */}
+                            <div className="h-full bg-gradient-to-r from-[#1e3a8a] to-sky-500 rounded-full relative" 
+                                style={{ width: `${Math.min(100, item.percentageFilled * 100)}%` }}>
+                              <div className="absolute inset-0 bg-white opacity-0 hover:opacity-10 transition-opacity"></div>
+                            </div>
+                          </div>
+                          
+                          {/* Percentage indicator */}
+                          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[10px] sm:text-xs font-medium text-white">
+                            {Math.round(item.percentageFilled * 100)}%
                           </div>
                         </div>
                       ))}
                     </div>
                     
-                    {/* X-as label */}
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-[10px] sm:text-xs text-gray-500">
-                      Klassen
+                    {/* Legenda */}
+                    <div className="absolute bottom-0 right-0 text-[10px] sm:text-xs text-gray-500 flex items-center">
+                      <div className="w-3 h-3 bg-gradient-to-r from-[#1e3a8a] to-sky-500 rounded-sm mr-1"></div>
+                      <span>Bezettingsgraad</span>
                     </div>
                   </div>
                 )}

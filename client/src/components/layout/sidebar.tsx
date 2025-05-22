@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Users,
   UserRound,
+  UserCheck,
   BookOpen,
   BookText,
   Calendar,
@@ -192,7 +193,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               />
               <SidebarLink
                 href="/guardians"
-                icon={<UserRound className="h-5 w-5" />}
+                icon={<UserCheck className="h-5 w-5" />}
                 label="Voogden"
                 isActive={location.startsWith("/guardians")}
                 onClick={handleLinkClick}

@@ -1044,12 +1044,10 @@ export default function Students() {
                       }}
                     >
                       <img id="student-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
-                      <div id="student-photo-placeholder" className="w-full h-full flex flex-col items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-full">
-                        <div className="flex flex-col items-center justify-center">
-                          <User className="h-10 w-10 text-gray-300" />
-                          <div className="absolute bottom-0 right-0 bg-[#1e3a8a] rounded-full p-1.5 shadow-sm">
-                            <Upload className="h-3.5 w-3.5 text-white" />
-                          </div>
+                      <div id="student-photo-placeholder" className="w-full h-full flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-full">
+                        <User className="h-10 w-10 text-gray-300" />
+                        <div className="absolute bottom-0 right-0 bg-[#1e3a8a] rounded-full p-1.5 shadow-sm">
+                          <Upload className="h-3.5 w-3.5 text-white" />
                         </div>
                       </div>
                       

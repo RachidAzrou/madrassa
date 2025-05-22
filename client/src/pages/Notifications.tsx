@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNotifications, type Notification } from '@/contexts/NotificationContext';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { Search, BellOff, CheckCircle, Trash2, Check, Bell, Info, AlertTriangle, AlertCircle, X, Eye, EyeOff } from 'lucide-react';
+import { Search, BellOff, CheckCircle, Trash2, Check, Bell, Info, AlertTriangle, AlertCircle, X, Eye, EyeOff, XCircle } from 'lucide-react';
 
 const NotificationsPage: React.FC = () => {
   const { notifications, markAsRead, markAllAsRead, deleteNotification, toggleReadStatus } = useNotifications();
@@ -193,7 +193,7 @@ const NotificationsPage: React.FC = () => {
       </div>
 
       <div className="mt-6 mb-6">
-        <div className="relative w-full md:w-96">
+        <div className="relative w-full">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             type="search"

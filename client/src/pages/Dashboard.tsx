@@ -220,65 +220,92 @@ export default function Dashboard() {
             </div>
           </div>
           
-          {/* Studentengroepen data visualisatie */}
+          {/* Studentengroepen data visualisatie - Taartdiagram */}
           {isGroupsLoading || isEnrollmentsLoading ? (
-            <div className="h-32 sm:h-48 flex items-center justify-center">
+            <div className="h-56 sm:h-64 flex items-center justify-center">
               <div className="w-6 h-6 sm:w-8 sm:h-8 border-3 sm:border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : chartData.length === 0 ? (
-            <div className="h-32 sm:h-48 flex items-center justify-center text-gray-500 text-sm">
+            <div className="h-56 sm:h-64 flex items-center justify-center text-gray-500 text-sm">
               Geen klasgegevens beschikbaar
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
-              {chartData.map((item, index) => {
-                // Calculate styling classes based on fill percentage
-                const borderColorClass = item.percentageFilled < 0.5 
-                  ? 'border-green-400' 
-                  : item.percentageFilled < 0.75 
-                    ? 'border-amber-400' 
-                    : 'border-red-400';
-                    
-                const textColorClass = item.percentageFilled < 0.5 
-                  ? 'text-green-600' 
-                  : item.percentageFilled < 0.75 
-                    ? 'text-amber-600' 
-                    : 'text-red-600';
-                    
-                const progressBgClass = item.percentageFilled < 0.5 
-                  ? 'bg-green-400' 
-                  : item.percentageFilled < 0.75 
-                    ? 'bg-amber-400' 
-                    : 'bg-red-400';
-                    
-                return (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+              {/* Taartdiagram met CSS */}
+              <div className="flex justify-center items-center">
+                <div className="relative w-44 h-44">
+                  {/* Cirkeldiagram maken met conic-gradient */}
                   <div 
-                    key={index} 
-                    className={`rounded-lg border-2 ${borderColorClass} bg-white p-4 shadow-sm transition-all hover:shadow-md`}
+                    className="w-full h-full rounded-full shadow-md" 
+                    style={{
+                      background: `conic-gradient(
+                        ${chartData.map((item, index, array) => {
+                          // Bereken de kleuren en percentages voor de gradient
+                          const percentage = item.count / chartData.reduce((sum, i) => sum + i.count, 0) * 100;
+                          const startPercentage = array.slice(0, index).reduce((sum, i) => 
+                            sum + (i.count / chartData.reduce((s, i) => s + i.count, 0) * 100), 0);
+                          
+                          // Kies kleur op basis van vulgraad
+                          let color;
+                          if (item.percentageFilled < 0.5) color = '#10B981'; // green-500
+                          else if (item.percentageFilled < 0.75) color = '#F59E0B'; // amber-500
+                          else color = '#EF4444'; // red-500
+                          
+                          return `${color} ${startPercentage}% ${startPercentage + percentage}%`;
+                        }).join(', ')
+                      }`
+                    }}
                   >
-                    <h4 className="font-medium text-gray-700 mb-2">{item.name}</h4>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs text-gray-500">Bezetting</span>
-                      <span className={`text-sm font-bold ${textColorClass}`}>{item.count} / {item.maxCapacity}</span>
-                    </div>
-                    
-                    {/* Progress Bar */}
-                    <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full ${progressBgClass} transition-all duration-1000 ease-out`}
-                        style={{width: `${Math.min(100, item.percentageFilled * 100)}%`}}
-                      />
-                    </div>
-                    
-                    {/* Percentage */}
-                    <div className="text-right mt-1">
-                      <span className="text-xs text-gray-500">
-                        {Math.round(item.percentageFilled * 100)}% vol
-                      </span>
+                    {/* Centrale cirkel voor donut effect */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-gray-800">
+                            {chartData.reduce((sum, item) => sum + item.count, 0)}
+                          </div>
+                          <div className="text-xs text-gray-500">studenten</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              </div>
+              
+              {/* Legenda en details */}
+              <div className="flex flex-col justify-center">
+                <h4 className="text-sm font-medium text-gray-600 mb-3">Verdeling per klas</h4>
+                <div className="space-y-3">
+                  {chartData.map((item, index) => {
+                    // Kies kleur op basis van vulgraad
+                    const dotColor = item.percentageFilled < 0.5 
+                      ? 'bg-green-500' 
+                      : item.percentageFilled < 0.75 
+                        ? 'bg-amber-500' 
+                        : 'bg-red-500';
+                        
+                    const textColor = item.percentageFilled < 0.5 
+                      ? 'text-green-600' 
+                      : item.percentageFilled < 0.75 
+                        ? 'text-amber-600' 
+                        : 'text-red-600';
+                        
+                    return (
+                      <div key={index} className="flex items-center justify-between group cursor-pointer hover:bg-gray-50 p-1 rounded">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-3 h-3 ${dotColor} rounded-full`}></div>
+                          <span className="text-sm text-gray-700">{item.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-sm font-medium ${textColor}`}>{item.count}/{item.maxCapacity}</span>
+                          <span className="text-xs text-gray-500 hidden group-hover:inline-block">
+                            ({Math.round(item.percentageFilled * 100)}%)
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           )}
         </div>

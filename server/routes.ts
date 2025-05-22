@@ -2804,7 +2804,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const students = await storage.getStudents();
       const courses = await storage.getCourses();
       const programs = await storage.getPrograms();
-      const enrollments = await storage.getEnrollments();
       const teachers = await storage.getTeachers();
       const studentGroups = await storage.getStudentGroups();
       
@@ -2812,7 +2811,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const totalStudents = students.length;
       const activeCourses = courses.length;
       const activePrograms = programs.length;
-      const totalEnrollments = enrollments.length;
       const totalTeachers = teachers.length;
       const studentGroups_count = studentGroups.length;
       
@@ -2821,7 +2819,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalStudents,
         activeCourses,
         activePrograms,
-        totalEnrollments,
         totalTeachers,
         studentGroups: studentGroups_count
       });

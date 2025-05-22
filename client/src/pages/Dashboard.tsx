@@ -230,10 +230,7 @@ export default function Dashboard() {
               <div className="text-[#1e3a8a] mb-2">
                 <ChalkBoard className="h-12 w-12 mx-auto opacity-30" />
               </div>
-              <p className="text-sm font-medium mb-1">Geen klassen beschikbaar</p>
-              <p className="text-xs text-center max-w-md">
-                Er zijn momenteel geen klassen aangemaakt.
-              </p>
+              <p className="text-sm font-medium">Geen klassen beschikbaar</p>
             </div>
           ) : chartData.length === 0 ? (
             <div className="h-48 flex items-center justify-center text-gray-500 text-sm">
@@ -346,8 +343,11 @@ export default function Dashboard() {
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {currentWeekLessons.length === 0 ? (
-                <div className="h-32 flex items-center justify-center text-gray-500 text-sm">
-                  Geen lessen gepland voor deze week
+                <div className="h-32 flex flex-col items-center justify-center text-gray-500">
+                  <div className="text-[#1e3a8a] mb-2">
+                    <Calendar className="h-12 w-12 mx-auto opacity-30" />
+                  </div>
+                  <p className="text-sm font-medium">Geen lessen gepland voor deze week</p>
                 </div>
               ) : (
                 <div className="space-y-3">

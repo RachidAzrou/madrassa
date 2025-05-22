@@ -796,21 +796,6 @@ export default function Students() {
             Bekijk en beheer alle studentgegevens
           </p>
         </div>
-        <div className="flex space-x-2">
-          <Button 
-            onClick={() => setIsImportDialogOpen(true)} 
-            variant="outline"
-            className="border-[#1e3a8a] text-[#1e3a8a]"
-          >
-            <FileUp className="mr-2 h-4 w-4" /> Importeren
-          </Button>
-          <Button
-            onClick={() => setIsCreateDialogOpen(true)}
-            className="bg-[#1e3a8a]"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" /> Student Toevoegen
-          </Button>
-        </div>
       </div>
 
       {/* Notification dialog voor nieuw betalingsrecord */}

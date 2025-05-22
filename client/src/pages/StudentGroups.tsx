@@ -316,16 +316,11 @@ export default function StudentGroups() {
             Beheer klassen, secties en activiteitengroepen
           </p>
         </div>
-        
-        <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          <span>Klas Aanmaken</span>
-        </Button>
       </div>
       
       {/* Zoekbalk - onder de paginatitel geplaatst */}
-      <div className="mb-4">
-        <div className="relative">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+        <div className="relative w-full md:w-auto">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             type="search"
@@ -341,6 +336,11 @@ export default function StudentGroups() {
             />
           )}
         </div>
+        
+        <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">
+          <PlusCircle className="mr-2 h-4 w-4" />
+          <span>Klas Aanmaken</span>
+        </Button>
       </div>
 
       {/* Main content area */}

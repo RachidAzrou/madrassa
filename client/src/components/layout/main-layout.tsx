@@ -54,7 +54,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="flex h-full min-h-screen">
       {/* Mobile sidebar backdrop */}
       {isMobile && sidebarOpen && (
         <div
@@ -76,10 +76,10 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       </div>
 
       {/* Main content */}
-      <div className="flex flex-col flex-1 min-h-screen overflow-hidden bg-gray-50">
+      <div className="flex flex-col flex-1 overflow-hidden">
         <Header onMenuClick={toggleSidebar} title={pageTitle} />
-        <main className="flex-1 p-2 sm:p-4 md:p-6 pt-10 overflow-x-auto overflow-y-auto border-l border-gray-200" style={{ height: "calc(100vh - 64px)", minHeight: "600px" }}>
-          <div className="max-w-7xl mx-auto w-full min-h-[400px]">
+        <main className="flex-1 p-2 sm:p-4 md:p-6 pt-10 overflow-x-auto overflow-y-auto border-l border-gray-200" style={{ minHeight: "calc(100vh - 64px)" }}>
+          <div className="max-w-7xl mx-auto w-full min-h-full pb-12">
             {children}
           </div>
         </main>

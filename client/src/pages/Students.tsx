@@ -1196,7 +1196,7 @@ export default function Students() {
                 <td colSpan={8} className="px-6 py-4">
                   <div className="h-48 flex flex-col items-center justify-center text-gray-500">
                     <div className="text-[#1e3a8a] mb-2">
-                      <Users className="h-12 w-12 mx-auto opacity-30" />
+                      <GraduationCap className="h-12 w-12 mx-auto opacity-30" />
                     </div>
                     <p className="text-sm font-medium">Geen studenten beschikbaar</p>
                   </div>

@@ -164,13 +164,15 @@ const NotificationsPage: React.FC = () => {
 
   return (
     <div className="container max-w-6xl p-6">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
         <div>
-          <h1 className="text-2xl font-bold flex items-center">
-            <Bell className="mr-2 h-6 w-6" />
-            Notificaties
-          </h1>
-          <p className="text-muted-foreground">
+          <div className="flex items-center">
+            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
+              <Bell className="h-6 w-6" />
+            </div>
+            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Notificaties</h1>
+          </div>
+          <p className="text-gray-500 text-sm mt-1 ml-11">
             Beheer al uw systeem- en applicatienotificaties
           </p>
         </div>
@@ -180,10 +182,11 @@ const NotificationsPage: React.FC = () => {
             <Button
               variant="outline"
               onClick={handleMarkAllAsRead}
-              className="h-9 w-9 p-0"
+              className="h-9 p-2 flex items-center gap-2"
               title="Markeer alles als gelezen"
             >
               <CheckCircle className="h-4 w-4" />
+              <span>Markeer alles als gelezen</span>
             </Button>
           )}
         </div>

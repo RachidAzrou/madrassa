@@ -213,7 +213,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
       </div>
       
       {/* Navigation links */}
-      <nav className="flex-1 py-2 px-3 overflow-y-auto flex flex-col">
+      <nav className="flex-1 py-2 px-3 overflow-y-auto flex flex-col h-full">
         <div className="flex-1 space-y-4 overflow-y-auto">
 
           <div className="pt-2">
@@ -332,10 +332,12 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
           </div>
 
         </div>
+
+        {/* Flexibele spacer die de ruimte opvult */}
+        <div className="flex-grow min-h-[20px]"></div>
         
         {/* Afmelden knop aan einde van de sidebar */}
-        <div className="mt-auto pt-2 pb-0">
-          <div className="border-t border-gray-200 pt-4"></div>
+        <div className="border-t border-gray-200 pt-4">
           <div
             onClick={() => {
               // Verwijder authenticatie gegevens

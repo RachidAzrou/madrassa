@@ -192,7 +192,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               />
               <SidebarLink
                 href="/guardians"
-                icon={<Users2 className="h-5 w-5" />}
+                icon={<UserRound className="h-5 w-5" />}
                 label="Voogden"
                 isActive={location.startsWith("/guardians")}
                 onClick={handleLinkClick}

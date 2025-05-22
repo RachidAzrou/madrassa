@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, Users2, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserRound, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -440,7 +440,7 @@ export default function Guardians() {
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <Users className="h-6 w-6" />
+              <UserRound className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-semibold text-[#1e3a8a]">Voogden</h1>
           </div>
@@ -473,10 +473,7 @@ export default function Guardians() {
                 value="all" 
                 className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
-                </svg>
+                <UserRound className="h-4 w-4" />
                 Alle Voogden
               </TabsTrigger>
               <TabsTrigger 
@@ -550,10 +547,7 @@ export default function Guardians() {
                   <td colSpan={5}>
                     <div className="h-48 flex flex-col items-center justify-center text-gray-500">
                       <div className="text-[#1e3a8a] mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto opacity-30">
-                          <circle cx="12" cy="12" r="3"></circle>
-                          <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
-                        </svg>
+                        <UserRound className="h-12 w-12 mx-auto opacity-30" />
                       </div>
                       <p className="text-sm font-medium">Geen voogden beschikbaar</p>
                     </div>
@@ -915,10 +909,7 @@ export default function Guardians() {
         <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-primary flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
-              </svg>
+              <UserRound className="h-6 w-6 mr-2" />
               {newGuardian.id ? 'Voogd Bewerken' : 'Nieuwe Voogd Toevoegen'}
             </DialogTitle>
             <DialogDescription>

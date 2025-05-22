@@ -866,47 +866,47 @@ export default function Students() {
         </DialogContent>
       </Dialog>
       
-      <div className="mb-6 flex flex-col md:flex-row gap-4 justify-between">
-        <div className="flex flex-col md:flex-row gap-4 flex-1">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="search"
-              placeholder="Zoek studenten..."
-              className="pl-8 bg-white"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+      <div className="mb-6 flex flex-col gap-4">
+        <div className="relative w-full">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoek studenten..."
+            className="pl-8 bg-white"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
         
-        <div className="flex flex-wrap gap-2">
-          <Button 
-            variant="outline" 
-            size="default"
-            className="border-gray-300 text-gray-700"
-            onClick={() => setShowFilterOptions(!showFilterOptions)}
-          >
-            <Filter className="mr-2 h-4 w-4" /> Filteren
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="default"
-            className="border-gray-300 text-gray-700"
-            onClick={exportStudentsAsPDF}
-          >
-            <Download className="mr-2 h-4 w-4" /> Exporteren
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="default"
-            className="border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a]/10"
-            onClick={() => setIsImportDialogOpen(true)}
-          >
-            <FileUp className="mr-2 h-4 w-4" /> Importeren
-          </Button>
+        <div className="flex flex-wrap gap-2 justify-between">
+          <div className="flex flex-wrap gap-2">
+            <Button 
+              variant="outline" 
+              size="default"
+              className="border-gray-300 text-gray-700"
+              onClick={() => setShowFilterOptions(!showFilterOptions)}
+            >
+              <Filter className="mr-2 h-4 w-4" /> Filteren
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="default"
+              className="border-gray-300 text-gray-700"
+              onClick={exportStudentsAsPDF}
+            >
+              <Download className="mr-2 h-4 w-4" /> Exporteren
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="default"
+              className="border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a]/10"
+              onClick={() => setIsImportDialogOpen(true)}
+            >
+              <FileUp className="mr-2 h-4 w-4" /> Importeren
+            </Button>
+          </div>
           
           <Button 
             variant="default" 

@@ -2805,22 +2805,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const courses = await storage.getCourses();
       const programs = await storage.getPrograms();
       const enrollments = await storage.getEnrollments();
+      const teachers = await storage.getTeachers();
+      const studentGroups = await storage.getStudentGroups();
       
       // Bereken statistieken
       const totalStudents = students.length;
       const activeCourses = courses.length;
       const activePrograms = programs.length;
       const totalEnrollments = enrollments.length;
+      const totalTeachers = teachers.length;
+      const studentGroups_count = studentGroups.length;
       
       // Stuur response
       res.json({
         totalStudents,
         activeCourses,
         activePrograms,
-        totalEnrollments
+        totalEnrollments,
+        totalTeachers,
+        studentGroups: studentGroups_count
       });
     } catch (error) {
-      res.status(500).json({ message: "Error fetching dashboard stats" });
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ message: "Error fetching dashboard stats", error: String(error) });
     }
   });
   

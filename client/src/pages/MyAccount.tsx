@@ -652,20 +652,22 @@ const MyAccount = () => {
                     ✓ Voorkeuren succesvol opgeslagen!
                   </p>
                 )}
-                <Button 
-                  className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
-                  onClick={savePreferences}
-                  disabled={isSaving}
-                >
-                  {isSaving ? (
-                    <>
-                      <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                      Opslaan...
-                    </>
-                  ) : (
-                    "Voorkeuren opslaan"
-                  )}
-                </Button>
+                <div className="flex justify-end">
+                  <Button 
+                    className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                    onClick={savePreferences}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                        Opslaan...
+                      </>
+                    ) : (
+                      "Voorkeuren opslaan"
+                    )}
+                  </Button>
+                </div>
               </TabsContent>
 
               {/* Notificaties tab inhoud */}
@@ -795,20 +797,22 @@ const MyAccount = () => {
                     ✓ Meldingsinstellingen succesvol opgeslagen!
                   </p>
                 )}
-                <Button 
-                  className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
-                  onClick={saveNotificationSettings}
-                  disabled={isSavingNotifications}
-                >
-                  {isSavingNotifications ? (
-                    <>
-                      <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                      Opslaan...
-                    </>
-                  ) : (
-                    "Meldingsinstellingen opslaan"
-                  )}
-                </Button>
+                <div className="flex justify-end">
+                  <Button 
+                    className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                    onClick={saveNotificationSettings}
+                    disabled={isSavingNotifications}
+                  >
+                    {isSavingNotifications ? (
+                      <>
+                        <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                        Opslaan...
+                      </>
+                    ) : (
+                      "Meldingsinstellingen opslaan"
+                    )}
+                  </Button>
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>

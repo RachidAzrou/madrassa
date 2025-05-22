@@ -74,7 +74,7 @@ export default function Students() {
   const [isFeeNotificationOpen, setIsFeeNotificationOpen] = useState(false);
   const [feeDetails, setFeeDetails] = useState<any>(null);
   
-  // Import state
+  // Import dialoog state
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [importType, setImportType] = useState<'csv' | 'excel'>('excel');
   const [importFile, setImportFile] = useState<File | null>(null);

@@ -4,7 +4,7 @@ import {
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, 
   Calendar, Clock, Users, Repeat, Landmark, GraduationCap, 
   Building, BookOpen, ChevronRight, MapPin, Check, X,
-  AlertCircle, Calendar as CalendarIcon
+  AlertCircle, Calendar as CalendarIcon, XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

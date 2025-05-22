@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, DollarSign, CreditCard, CheckCircle, 
   Users, Settings, Percent, AlertCircle, ChevronDown, FileText, UserPlus, Euro, Coins, 
-  Mail, Phone, Home, CalendarIcon, Plus, User, X, MapPin, School
+  Mail, Phone, Home, CalendarIcon, Plus, User, X, MapPin, School, XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -482,18 +482,24 @@ export default function Fees() {
       </div>
 
       {/* Zoek en acties */}
-      <div className="flex flex-col md:flex-row justify-end items-center gap-4 mb-6">
-        <div className="relative w-full md:w-64 order-2 md:order-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+      <div className="space-y-4">
+        <div className="relative w-full">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             placeholder="Zoek betalingsrecords of studenten..."
             value={searchTerm}
             onChange={handleSearchChange}
-            className="w-full pl-10"
+            className="pl-8 bg-white w-full"
           />
+          {searchTerm && (
+            <XCircle
+              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+              onClick={() => setSearchTerm("")}
+            />
+          )}
         </div>
         
-        <div className="flex items-center gap-1 order-1 md:order-2">
+        <div className="flex justify-end">
           <Button 
             onClick={() => setShowAddOptionsDialog(true)} 
             className="flex items-center bg-[#1e3a8a] hover:bg-blue-800"

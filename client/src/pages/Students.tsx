@@ -895,13 +895,13 @@ export default function Students() {
               className="border-gray-300 text-gray-700"
               onClick={exportStudentsAsPDF}
             >
-              <Download className="mr-2 h-4 w-4" /> Exporteren
+              <FileDown className="mr-2 h-4 w-4" /> Exporteren
             </Button>
             
             <Button 
               variant="outline" 
               size="default"
-              className="border-[#1e3a8a] text-[#1e3a8a] hover:bg-[#1e3a8a]/10"
+              className="border-gray-300 text-gray-700"
               onClick={() => setIsImportDialogOpen(true)}
             >
               <FileUp className="mr-2 h-4 w-4" /> Importeren

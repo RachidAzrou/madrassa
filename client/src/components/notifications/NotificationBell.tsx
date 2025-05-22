@@ -15,7 +15,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onClick }) => {
       onClick={onClick} 
       variant="ghost" 
       size="icon" 
-      className="relative bg-blue-400 hover:bg-blue-500 text-white shadow-sm"
+      className="relative bg-primary hover:bg-primary/90 text-white shadow-sm"
       aria-label="Notificaties bekijken"
     >
       <Bell className="h-5 w-5" />

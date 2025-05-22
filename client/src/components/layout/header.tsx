@@ -15,14 +15,14 @@ const Header = ({ onMenuClick }: HeaderProps) => {
         variant="ghost"
         size="icon"
         onClick={onMenuClick}
-        className="md:hidden bg-blue-400 hover:bg-blue-500 text-white shadow-sm"
+        className="md:hidden bg-primary hover:bg-primary/90 text-white shadow-sm"
       >
         <Menu className="h-5 w-5" />
       </Button>
       
       <NotificationDropdown />
       
-      <Button variant="ghost" size="icon" className="bg-blue-400 hover:bg-blue-500 text-white shadow-sm" asChild>
+      <Button variant="ghost" size="icon" className="bg-primary hover:bg-primary/90 text-white shadow-sm" asChild>
         <Link href="/settings">
           <Settings className="h-5 w-5" />
         </Link>

@@ -132,13 +132,7 @@ const NotificationsPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {!notification.isRead && (
-                    <>
-                      <div className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
-                        Ongelezen
-                      </div>
-                    </>
-                  )}
+                  {/* Badge ongelezen verwijderd */}
                 </div>
               </div>
               <div className="absolute top-2 right-2 flex gap-1">

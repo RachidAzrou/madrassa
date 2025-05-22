@@ -97,7 +97,7 @@ const NotificationDropdown: React.FC = () => {
                 {visibleNotifications.map((notification) => (
                   <DropdownMenuItem
                     key={notification.id}
-                    className={`p-0 cursor-pointer hover:bg-gray-50 group relative ${!notification.isRead ? 'bg-blue-50/20' : ''}`}
+                    className={`p-0 cursor-pointer hover:bg-gray-50 group relative ${!notification.isRead ? 'bg-blue-50' : ''}`}
                     onClick={() => handleItemClick(notification)}
                   >
                     <div className="flex items-start gap-3 p-3 border-b border-gray-100 w-full">

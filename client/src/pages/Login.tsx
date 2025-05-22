@@ -84,14 +84,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       }}></div>
       
       {/* Eén container voor zowel logo als login formulier */}
-      <div className="w-full max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-2xl rounded-xl overflow-hidden relative z-10">
+      <div className="w-full max-w-md bg-white dark:bg-slate-800 shadow-2xl rounded-xl overflow-hidden relative z-10">
         {/* Logo bovenaan in de container */}
-        <div className="flex flex-col items-center p-8 bg-gradient-to-r from-primary/10 via-blue-100/30 to-primary/10 dark:from-primary/20 dark:via-slate-700/30 dark:to-primary/20 border-b border-slate-200 dark:border-slate-700">
-          <img src={madrassaLogo} alt="Madrassa Logo" className="h-32 mx-auto mb-4 drop-shadow-lg" />
-          <h1 className="text-2xl font-bold text-primary dark:text-primary-foreground">
-            Madrassa Beheerplatform
-          </h1>
-          <div className="w-16 h-1 bg-primary rounded-full my-3"></div>
+        <div className="flex flex-col items-center p-8 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+          <img src={madrassaLogo} alt="Madrassa Logo" className="h-24 mx-auto mb-4 drop-shadow-lg" />
           <p className="text-slate-600 dark:text-slate-300 text-center">
             Log in om toegang te krijgen tot het platform
           </p>

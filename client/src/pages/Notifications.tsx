@@ -146,15 +146,6 @@ const NotificationsPage: React.FC = () => {
                     <Check className="h-4 w-4" />
                   </Button>
                 )}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleDelete(notification.id)}
-                  className="h-8 w-8 p-0 text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
-                  title="Verwijderen"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
               </div>
             </CardContent>
           </Card>

@@ -740,6 +740,26 @@ export default function Students() {
 
       {/* Studenten tabel - responsieve weergave */}
       <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
+        {/* Lege state wanneer er geen studenten zijn */}
+        {!isLoading && (!studentsData?.students || studentsData?.students.length === 0) && (
+          <div className="flex flex-col items-center justify-center py-16 px-6">
+            <div className="bg-blue-50 p-5 rounded-full mb-5">
+              <Users className="h-14 w-14 text-[#1e3a8a]" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Geen studenten gevonden</h3>
+            <p className="text-sm text-gray-500 text-center mb-6 max-w-md">
+              Er zijn momenteel geen studenten in het systeem. Klik op de knop hieronder om je eerste student toe te voegen.
+            </p>
+            <Button 
+              onClick={() => setIsCreateDialogOpen(true)}
+              className="bg-[#1e3a8a] hover:bg-blue-900"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Nieuwe Student Toevoegen
+            </Button>
+          </div>
+        )}
+        
         {/* Desktop weergave */}
         <div className="hidden md:block overflow-x-auto">
           <Table>
@@ -850,18 +870,14 @@ export default function Students() {
           </Table>
         </div>
         
-        {/* Mobiele kaartweergave */}
+        {/* Mobiele kaartweergave - alleen tonen als er studenten zijn en de lege state niet wordt getoond */}
         <div className="md:hidden">
           {isLoading ? (
             <div className="flex justify-center items-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               <span className="ml-2">Laden...</span>
             </div>
-          ) : (Array.isArray(studentsData) ? studentsData : []).length === 0 ? (
-            <div className="text-center py-8">
-              Geen studenten gevonden
-            </div>
-          ) : (
+          ) : filteredStudents.length === 0 ? null : (
             <div className="divide-y divide-gray-200">
               {(Array.isArray(studentsData) ? studentsData : []).map((student: any) => (
                 <div key={student.id} className="p-4">

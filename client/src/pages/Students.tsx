@@ -1033,6 +1033,73 @@ export default function Students() {
               <TabsContent value="personal" className="space-y-6">
                 <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
                   <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+                  
+                  {/* Foto upload sectie */}
+                  <div className="flex mb-6 items-start">
+                    <div 
+                      className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center overflow-hidden bg-gray-50 relative group cursor-pointer mr-6"
+                      onClick={() => {
+                        const fileInput = document.getElementById('student-photo') as HTMLInputElement;
+                        fileInput?.click();
+                      }}
+                    >
+                      <img id="student-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
+                      <div id="student-photo-placeholder" className="flex flex-col items-center justify-center">
+                        <Upload className="h-8 w-8 text-blue-500 mb-1" />
+                        <p className="text-xs text-gray-500">Foto</p>
+                      </div>
+                      
+                      {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
+                      <div 
+                        className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden"
+                        id="photo-delete-overlay"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
+                          const photoPlaceholder = document.getElementById('student-photo-placeholder');
+                          const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                          const fileInput = document.getElementById('student-photo') as HTMLInputElement;
+                          
+                          if (photoPreview && photoPlaceholder && fileInput && photoDeleteOverlay) {
+                            photoPreview.src = '';
+                            photoPreview.classList.add('hidden');
+                            photoPlaceholder.classList.remove('hidden');
+                            photoDeleteOverlay.classList.add('hidden');
+                            fileInput.value = '';
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
+                    
+                    <input 
+                      type="file" 
+                      id="student-photo" 
+                      accept="image/*" 
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = function(event) {
+                            const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
+                            const photoPlaceholder = document.getElementById('student-photo-placeholder');
+                            const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                            
+                            if (photoPreview && photoPlaceholder && photoDeleteOverlay && event.target?.result) {
+                              photoPreview.src = event.target.result as string;
+                              photoPreview.classList.remove('hidden');
+                              photoPlaceholder.classList.add('hidden');
+                              photoDeleteOverlay.classList.remove('hidden');
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </div>
+                  
                   <div className="flex mb-4 justify-end">
                     <Button 
                       variant="outline" 

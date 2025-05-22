@@ -674,25 +674,6 @@ const MyAccount = () => {
                   </div>
                 </div>
 
-                {isAdmin && (
-                  <>
-                    <Separator />
-                    <div>
-                      <h3 className="text-lg font-medium mb-4">Systeemvoorkeuren</h3>
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <Switch id="systemLogs" />
-                          <Label htmlFor="systemLogs">Uitgebreide systeemlogboeken weergeven</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Switch id="developerMode" />
-                          <Label htmlFor="developerMode">Ontwikkelaarsmodus</Label>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
                 {showSavedMessage && (
                   <p className="text-sm text-green-600 mb-2 bg-green-50 p-2 rounded border border-green-200">
                     ✓ Voorkeuren succesvol opgeslagen!

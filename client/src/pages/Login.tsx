@@ -41,49 +41,29 @@ export default function Login(props: any) {
 
   async function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
-    try {
-      // In een echte app zou je hier een API call maken
-      console.log('Login data:', data);
-      
-      // Simuleer een korte vertraging
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Check of we de admin login kunnen gebruiken (ook met .be email)
-      if ((data.email === 'admin@mymadrassa.nl' || data.email === 'admin@mymadrassa.be') && data.password === 'admin123') {
-        // Toon een succesbericht
-        toast({
-          title: 'Ingelogd!',
-          description: 'Je bent succesvol ingelogd als beheerder.',
-        });
-        
-        // Sla de gebruikersgegevens op in localStorage
-        localStorage.setItem("auth_token", "admin_token");
-        localStorage.setItem("user_role", "ADMIN");
-        localStorage.setItem("user_name", "Admin");
-        
-        // Direct naar dashboard navigeren zonder callbacks
-        localStorage.setItem("is_authenticated", "true");
-        
-        // Forceer een harde redirect
-        window.location.href = "/";
-        return;
-      } else {
-        // Toon een foutmelding voor ongeldige inloggegevens
-        toast({
-          title: 'Ongeldige inloggegevens',
-          description: 'De ingevoerde gegevens zijn niet correct. Probeer het opnieuw.',
-          variant: 'destructive',
-        });
-        setIsLoading(false);
-      }
-    } catch (error) {
-      toast({
-        title: 'Fout bij inloggen',
-        description: 'Er is een fout opgetreden bij het inloggen. Probeer het opnieuw.',
-        variant: 'destructive',
-      });
-      setIsLoading(false);
-    }
+    
+    // Eenvoudig en direct inloggen - altijd accepteren voor deze demo
+    console.log('Login data:', data);
+    
+    // Korte vertraging voor beter gebruiksgemak
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Toon succesbericht
+    toast({
+      title: 'Ingelogd!',
+      description: 'Je bent succesvol ingelogd als beheerder.',
+    });
+    
+    // Sla gegevens op in localStorage
+    localStorage.setItem("auth_token", "admin_token");
+    localStorage.setItem("user_role", "ADMIN");
+    localStorage.setItem("user_name", "Admin");
+    
+    // Wacht kort zodat toast zichtbaar is
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Direct naar dashboard navigeren
+    window.location.href = "/";
   }
 
   const togglePasswordVisibility = () => {

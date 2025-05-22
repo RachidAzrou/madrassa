@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, Users2, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -440,10 +440,7 @@ export default function Guardians() {
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
-              </svg>
+              <Users className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-semibold text-[#1e3a8a]">Voogden</h1>
           </div>

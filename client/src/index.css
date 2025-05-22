@@ -9,7 +9,7 @@ html, body, #root {
 }
 
 body {
-  background-image: url('./assets/images/blue-bg.jpg');
+  background-image: url('./assets/images/notebook-bg.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

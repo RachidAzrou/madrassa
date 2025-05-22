@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, School, 
   Pencil, MoreVertical, Plus, GraduationCap, BookOpen, UsersRound,
-  CalendarIcon, Loader2, 
+  CalendarIcon, Loader2, XCircle,
 } from 'lucide-react';
 import ManageStudentEnrollments from "@/components/student-groups/ManageStudentEnrollments";
 // Aangepast ChalkboardTeacher icoon
@@ -328,13 +328,20 @@ export default function StudentGroups() {
 
           <div className="flex items-center gap-4">
             <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
               <Input
+                type="search"
                 placeholder="Zoek klassen..."
+                className="w-full pl-9 pr-9 border-gray-300 focus:border-blue-500"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="pl-10 w-full"
               />
+              {searchTerm && (
+                <XCircle
+                  className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                  onClick={() => setSearchTerm("")}
+                />
+              )}
             </div>
             
             <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">

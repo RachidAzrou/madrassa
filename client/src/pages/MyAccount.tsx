@@ -352,14 +352,23 @@ const MyAccount = () => {
 
   return (
     <div className="container max-w-5xl py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight flex items-center">
-          <User className="mr-2 h-6 w-6 text-[#1e3a8a]" /> Mijn Account
-        </h1>
-        {/* Demo-schakelaar tussen admin/docent - alleen voor demonstratie */}
-        <Button variant="outline" size="sm" onClick={toggleUserRole} className="mb-4">
-          Wissel naar {currentUser.role === "Administrator" ? "Docent" : "Administrator"} weergave
-        </Button>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-200 pb-4 mb-8 gap-4">
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+            <User className="h-7 w-7" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Mijn Account</h1>
+            <p className="text-base text-gray-500 mt-1">Beheer hier uw accountinstellingen</p>
+          </div>
+        </div>
+        
+        <div className="md:flex-shrink-0">
+          {/* Demo-schakelaar tussen admin/docent - alleen voor demonstratie */}
+          <Button variant="outline" size="sm" onClick={toggleUserRole}>
+            Wissel naar {currentUser.role === "Administrator" ? "Docent" : "Administrator"} weergave
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">

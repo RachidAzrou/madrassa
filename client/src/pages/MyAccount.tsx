@@ -378,7 +378,7 @@ const MyAccount = () => {
                     <div className="relative w-28 h-28 mb-2">
                       <Avatar className="w-28 h-28 border-2 border-white shadow-md">
                         <AvatarImage src={currentUser.avatar} />
-                        <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
+                        <AvatarFallback className="bg-blue-600 text-white text-xl">
                           {currentUser.firstName[0]}{currentUser.lastName[0]}
                         </AvatarFallback>
                       </Avatar>

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Briefcase, GraduationCap, BookOpen, CreditCard, ClipboardCheck } from 'lucide-react';
+import { Users, GraduationCap, BookOpen, CreditCard, ClipboardCheck } from 'lucide-react';
 import EmptyState from './empty-state';
 
 // Voor studenten pagina
 export const StudentEmptyState = ({ description = "Er zijn momenteel geen studenten beschikbaar." }) => (
   <EmptyState 
-    icon={Briefcase} 
+    icon={Users} 
     title="Geen studenten gevonden" 
     description={description} 
   />

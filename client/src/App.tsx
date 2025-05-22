@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -18,12 +18,14 @@ import Teachers from "@/pages/Teachers";
 import Admissions from "@/pages/Admissions";
 import StudentGroups from "@/pages/StudentGroups";
 import MyAccount from "@/pages/MyAccount";
+import Login from "@/pages/Login";
 
 import Scheduling from "@/pages/Scheduling";
 import Fees from "@/pages/Fees";
 import Settings from "@/pages/Settings";
+import { useState, useEffect } from "react";
 
-function Router() {
+function AuthenticatedRouter() {
   return (
     <MainLayout>
       <Switch>
@@ -51,11 +53,44 @@ function Router() {
 }
 
 function App() {
+  // Voor demo doeleinden, in productie zou je dit met een echte auth check implementeren
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [location] = useLocation();
+
+  useEffect(() => {
+    // Controleer of er een login route is, zo niet we zijn automatisch ingelogd 
+    // Dit is alleen voor demo doeleinden
+    if (location === "/login") {
+      setIsAuthenticated(false);
+    } else {
+      // Controleer als er een login token is, anders blijf niet-ingelogd
+      const hasToken = localStorage.getItem("auth_token");
+      
+      // Voor demo purposes, we simuleren een token
+      if (location === "/") {
+        setIsAuthenticated(true);
+      }
+    }
+  }, [location]);
+
+  // Login functie voor de Login component
+  const handleLogin = () => {
+    localStorage.setItem("auth_token", "demo_token");
+    setIsAuthenticated(true);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Router />
+        <Switch>
+          <Route path="/login">
+            <Login onLoginSuccess={handleLogin} />
+          </Route>
+          <Route>
+            {isAuthenticated ? <AuthenticatedRouter /> : <Login onLoginSuccess={handleLogin} />}
+          </Route>
+        </Switch>
       </TooltipProvider>
     </QueryClientProvider>
   );

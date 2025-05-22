@@ -347,8 +347,8 @@ export default function StudentGroups() {
 
       {/* Main content area */}
       <Tabs defaultValue="grid" className="space-y-4">
-        <div className="flex items-center gap-4 mb-6">
-          <TabsList className="p-1 bg-blue-900/10">
+        <div className="flex justify-between items-center mb-6">
+          <TabsList className="h-10 p-1 bg-blue-900/10">
             <TabsTrigger value="grid" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Rasterweergave</TabsTrigger>
             <TabsTrigger value="list" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lijstweergave</TabsTrigger>
           </TabsList>

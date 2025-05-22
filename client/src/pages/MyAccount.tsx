@@ -432,7 +432,6 @@ const MyAccount = () => {
                 
                 {/* Sectie 2: Profielgegevens bewerken */}
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Profiel bewerken</h3>
                   <Form {...profileForm}>
                     <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-5">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

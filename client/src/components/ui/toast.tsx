@@ -23,15 +23,15 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-start overflow-hidden rounded-md border shadow-md transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-right-full",
+  "group pointer-events-auto relative flex w-full items-start overflow-hidden rounded-md shadow-md transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-right-full",
   {
     variants: {
       variant: {
-        default: "border-l-4 border-l-[#1e3a8a] bg-white text-gray-800",
-        destructive: "border-l-4 border-l-red-600 bg-white text-gray-800",
-        success: "border-l-4 border-l-green-600 bg-white text-gray-800",
-        warning: "border-l-4 border-l-amber-500 bg-white text-gray-800",
-        info: "border-l-4 border-l-[#1e3a8a] bg-white text-gray-800",
+        default: "bg-blue-50 text-gray-700 hover:bg-blue-100 transition-colors",
+        destructive: "bg-red-50 text-gray-700 hover:bg-red-100 transition-colors border-l-4 border-l-red-600",
+        success: "bg-blue-50 text-gray-700 hover:bg-blue-100 transition-colors",
+        warning: "bg-amber-50 text-gray-700 hover:bg-amber-100 transition-colors border-l-4 border-l-amber-500",
+        info: "bg-blue-50 text-gray-700 hover:bg-blue-100 transition-colors",
       },
     },
     defaultVariants: {

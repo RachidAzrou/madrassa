@@ -34,7 +34,7 @@ export function Toaster() {
         }
 
         return (
-          <Toast key={id} variant={variant} {...props} className="py-3 px-4">
+          <Toast key={id} variant={variant} {...props} className="py-3 px-4 rounded-md">
             <div className="flex items-start w-full">
               <div className="flex-shrink-0 mr-3">
                 <Icon className={`h-5 w-5 ${iconColor}`} />
@@ -47,7 +47,7 @@ export function Toaster() {
               </div>
             </div>
             {action}
-            <ToastClose className="absolute opacity-70 hover:opacity-100 right-2 top-2 rounded-full bg-gray-200 hover:bg-gray-300 p-1 transition-colors" />
+            <ToastClose className="absolute opacity-70 hover:opacity-100 right-2 top-2 rounded-full bg-blue-100 hover:bg-blue-200 p-1 transition-colors" />
           </Toast>
         )
       })}

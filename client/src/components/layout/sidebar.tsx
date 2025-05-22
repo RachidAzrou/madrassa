@@ -181,7 +181,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
 
           <div className="pt-2">
             <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Studentenbeheer
+              Beheer
             </p>
             <div className="space-y-1.5">
               <SidebarLink
@@ -224,7 +224,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
 
           <div className="pt-2">
             <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Academisch
+              Onderwijs
             </p>
             <div className="space-y-1.5">
               <SidebarLink
@@ -241,7 +241,6 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                 isActive={location.startsWith("/programs")}
                 onClick={handleLinkClick}
               />
-
               <SidebarLink
                 href="/scheduling"
                 icon={<Clock className="h-5 w-5" />}
@@ -261,7 +260,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
 
           <div className="pt-2">
             <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Hulpmiddelen
+              Evaluatie
             </p>
             <div className="space-y-1.5">
               <SidebarLink

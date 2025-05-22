@@ -403,75 +403,33 @@ const MyAccount = () => {
               <TabsContent value="profiel" className="space-y-6">
                 {/* Sectie 1: Profielfoto en basisinformatie */}
                 <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 mb-4">
-                  <div className="flex flex-col md:flex-row items-center gap-6">
-                    <div className="flex flex-col items-center">
-                      <div className="relative w-28 h-28 mb-3">
-                        <Avatar className="w-28 h-28 border-2 border-white shadow-md">
-                          <AvatarImage src={currentUser.avatar} />
-                          <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
-                            {currentUser.firstName[0]}{currentUser.lastName[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="absolute bottom-0 right-0 rounded-full p-1.5 bg-white shadow-sm"
-                          onClick={handleProfilePhotoUpload}
-                        >
-                          <UploadCloud className="h-4 w-4 text-[#1e3a8a]" />
-                        </Button>
-                      </div>
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="relative w-28 h-28 mb-2">
+                      <Avatar className="w-28 h-28 border-2 border-white shadow-md">
+                        <AvatarImage src={currentUser.avatar} />
+                        <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
+                          {currentUser.firstName[0]}{currentUser.lastName[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="absolute bottom-0 right-0 rounded-full p-1.5 bg-white shadow-sm"
+                        onClick={handleProfilePhotoUpload}
+                      >
+                        <UploadCloud className="h-4 w-4 text-[#1e3a8a]" />
+                      </Button>
+                    </div>
+                    <div className="text-center">
                       <p className="font-medium text-lg">{currentUser.firstName} {currentUser.lastName}</p>
-                      <div className="flex items-center text-sm text-gray-500 mt-1 mb-3">
+                      <div className="flex items-center justify-center text-sm text-gray-500 mt-1">
                         <UserCircle className="h-4 w-4 mr-1.5" />
                         {currentUser.role}
                       </div>
-                      <Button variant="outline" size="sm" className="mt-1 border-gray-300" onClick={handleLogout}>
-                        <LogOut className="h-4 w-4 mr-2 text-[#1e3a8a]" /> Afmelden
-                      </Button>
                     </div>
-                    
-                    <div className="flex-1 flex flex-col md:flex-row flex-wrap gap-4 md:pl-6 md:border-l border-gray-200">
-                      <div className="min-w-[200px] flex-1">
-                        <h3 className="text-sm font-medium text-gray-500 mb-1.5">Contact</h3>
-                        <div className="space-y-2">
-                          <div className="flex items-center">
-                            <Mail className="h-4 w-4 text-gray-500 mr-2" />
-                            <p className="text-sm">{currentUser.email}</p>
-                          </div>
-                          <div className="flex items-center">
-                            <Phone className="h-4 w-4 text-gray-500 mr-2" />
-                            <p className="text-sm">{currentUser.phone || "Niet opgegeven"}</p>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {isTeacher && (
-                        <div className="min-w-[200px] flex-1">
-                          <h3 className="text-sm font-medium text-gray-500 mb-1.5">Vakgebied</h3>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {teacherUser.subjects.map((subject, index) => (
-                              <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                                {subject}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {isTeacher && (
-                        <div className="min-w-[200px] flex-1">
-                          <h3 className="text-sm font-medium text-gray-500 mb-1.5">Klassen</h3>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {teacherUser.classes.map((className, index) => (
-                              <span key={index} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                                {className}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    <Button variant="outline" size="sm" className="mt-1 border-gray-300" onClick={handleLogout}>
+                      <LogOut className="h-4 w-4 mr-2 text-[#1e3a8a]" /> Afmelden
+                    </Button>
                   </div>
                 </div>
                 

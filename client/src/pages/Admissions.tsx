@@ -448,6 +448,20 @@ export default function Admissions() {
         </div>
       </div>
 
+      {/* Zoekbalk */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoek aanmeldingen..."
+            className="pl-8 bg-white"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </div>
+      </div>
+      
       <div className="mb-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -581,8 +595,13 @@ export default function Admissions() {
                     </tr>
                   ) : applicants.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                        Geen aanmelders gevonden
+                      <td colSpan={5} className="px-6 py-8">
+                        <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                          <div className="text-[#1e3a8a] mb-2">
+                            <FileText className="h-12 w-12 mx-auto opacity-30" />
+                          </div>
+                          <p className="text-sm font-medium">Geen aanmelders beschikbaar</p>
+                        </div>
                       </td>
                     </tr>
                   ) : (

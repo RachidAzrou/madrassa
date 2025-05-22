@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Check, Trash2, BellOff, ExternalLink, Info, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
+import { Check, BellOff, Info, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
 import { useNotifications, type Notification } from '@/contexts/NotificationContext';
 import NotificationBell from './NotificationBell';
 import { formatDistanceToNow } from 'date-fns';
@@ -85,7 +85,6 @@ const NotificationDropdown: React.FC = () => {
                 onClick={() => markAllAsRead()}
                 className="h-7 text-xs px-2 bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white"
               >
-                <Check className="h-3 w-3 mr-1" />
                 Alles gelezen
               </Button>
             )}
@@ -127,7 +126,6 @@ const NotificationDropdown: React.FC = () => {
                               onClick={(e) => handleMarkAsRead(notification.id, e)}
                               className="h-6 text-xs px-2 text-blue-600 hover:bg-blue-50"
                             >
-                              <Check className="h-3 w-3 mr-1" />
                               Gelezen
                             </Button>
                           )}
@@ -137,7 +135,7 @@ const NotificationDropdown: React.FC = () => {
                             onClick={(e) => handleDelete(notification.id, e)}
                             className="h-6 text-xs px-2 text-gray-600 hover:bg-red-50 hover:text-red-600"
                           >
-                            <Trash2 className="h-3 w-3 mr-1" />
+                            Verwijderen
                           </Button>
                           {notification.link && (
                             <Button
@@ -145,7 +143,7 @@ const NotificationDropdown: React.FC = () => {
                               size="sm"
                               className="h-6 text-xs px-2 text-gray-600 hover:bg-blue-50"
                             >
-                              <ExternalLink className="h-3 w-3" />
+                              Bekijken
                             </Button>
                           )}
                         </div>

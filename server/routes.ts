@@ -3409,15 +3409,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Ongeldig notificatie-ID" });
       }
       
-      const notification = await storage.markNotificationAsUnread(notificationId);
-      if (!notification) {
+      // Controleer eerst of de notificatie bestaat voordat we proberen hem te updaten
+      const existingNotification = await storage.getNotification(notificationId);
+      if (!existingNotification) {
         return res.status(404).json({ message: "Notificatie niet gevonden" });
       }
       
-      res.json(notification);
+      try {
+        const notification = await storage.markNotificationAsUnread(notificationId);
+        res.json(notification);
+      } catch (updateError) {
+        console.error("Error updating notification:", updateError);
+        res.status(500).json({ message: "Fout bij updaten notificatie", error: updateError.message });
+      }
     } catch (error) {
       console.error("Error marking notification as unread:", error);
-      res.status(500).json({ message: "Fout bij markeren notificatie als ongelezen" });
+      res.status(500).json({ message: "Fout bij markeren notificatie als ongelezen", error: error.message });
     }
   });
   

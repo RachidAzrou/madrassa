@@ -73,16 +73,7 @@ const NotificationDropdown: React.FC = () => {
         <div className="bg-primary py-2 px-3">
           <DropdownMenuLabel className="flex justify-between items-center p-0 text-primary-foreground">
             <span className="font-medium">Notificaties</span>
-            {unreadCount > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => markAllAsRead()}
-                className="h-7 text-xs px-2 bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground"
-              >
-                Alles gelezen
-              </Button>
-            )}
+            {/* Alles gelezen knop verwijderd */}
           </DropdownMenuLabel>
         </div>
         <div className="max-h-[350px] overflow-y-auto">
@@ -102,7 +93,7 @@ const NotificationDropdown: React.FC = () => {
                   >
                     <div className="flex items-start gap-3 p-3 border-b border-gray-100 w-full">
                       <div className="flex-shrink-0 mt-1">{getNotificationIcon(notification.type)}</div>
-                      <div className="flex-1">
+                      <div className="flex-1 pr-7">
                         <div className="flex justify-between items-start w-full">
                           <h4 className="font-medium text-sm text-gray-800">{notification.title}</h4>
                           <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
@@ -116,7 +107,7 @@ const NotificationDropdown: React.FC = () => {
                         {/* Gelezen-knop verwijderd */}
                       </div>
                     </div>
-                    <div className="absolute top-2 right-2 flex gap-1">
+                    <div className="absolute top-3 right-3 flex gap-1">
                       <Button
                         size="sm"
                         variant="ghost"

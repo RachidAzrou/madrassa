@@ -1200,14 +1200,14 @@ export default function Students() {
                     </div>
                     
                     <div>
-                      <Label htmlFor="status" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="status" className="text-xs font-medium text-gray-700">
                         Status <span className="text-primary">*</span>
                       </Label>
                       <Select
                         value={studentFormData.status}
                         onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
                       >
-                        <SelectTrigger id="status" className="mt-1 bg-white">
+                        <SelectTrigger id="status" className="mt-0.5 h-8 text-sm bg-white">
                           <SelectValue placeholder="Selecteer status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1221,27 +1221,27 @@ export default function Students() {
                     </div>
                     
                     <div>
-                      <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">
                         Voornaam <span className="text-primary">*</span>
                       </Label>
                       <Input
                         id="firstName"
                         value={studentFormData.firstName}
                         onChange={(e) => setStudentFormData({ ...studentFormData, firstName: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-0.5 h-8 text-sm bg-white"
                         placeholder="Voornaam"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">
                         Achternaam <span className="text-primary">*</span>
                       </Label>
                       <Input
                         id="lastName"
                         value={studentFormData.lastName}
                         onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-0.5 h-8 text-sm bg-white"
                         placeholder="Achternaam"
                       />
                     </div>

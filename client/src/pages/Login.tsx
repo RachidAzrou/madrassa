@@ -87,7 +87,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       <div className="w-full max-w-md bg-white dark:bg-slate-800 shadow-2xl rounded-xl overflow-hidden relative z-10">
         {/* Logo bovenaan in de container */}
         <div className="flex flex-col items-center p-8 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
-          <img src={madrassaLogo} alt="Madrassa Logo" className="h-24 mx-auto mb-4 drop-shadow-lg" />
+          <img src={madrassaLogo} alt="Madrassa Logo" className="h-24 mx-auto mb-4" style={{ filter: 'drop-shadow(0 0 0 transparent)' }} />
           <p className="text-slate-600 dark:text-slate-300 text-center">
             Log in om toegang te krijgen tot het platform
           </p>

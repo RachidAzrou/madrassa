@@ -83,6 +83,11 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         backgroundSize: '180px 180px'
       }}></div>
       
+      {/* Test environment banner */}
+      <div className="w-full max-w-md mb-2 bg-amber-100 dark:bg-amber-900 border border-amber-300 dark:border-amber-700 rounded-md py-2 px-4 text-center text-amber-800 dark:text-amber-200 font-medium text-sm relative z-10">
+        <span className="inline-block mr-1">⚠️</span> TEST ENVIRONMENT
+      </div>
+      
       {/* Eén container voor zowel logo als login formulier */}
       <div className="w-full max-w-md bg-white dark:bg-slate-800 shadow-2xl rounded-xl overflow-hidden relative z-10">
         {/* Logo bovenaan in de container */}

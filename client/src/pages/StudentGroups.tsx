@@ -308,7 +308,7 @@ export default function StudentGroups() {
         <div>
           <div className="flex items-center">
             <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <School className="h-6 w-6" />
+              <ChalkBoard className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-semibold text-[#1e3a8a]">Klassen</h1>
           </div>
@@ -436,7 +436,7 @@ export default function StudentGroups() {
           ) : studentGroups.length === 0 ? (
             <div className="h-48 flex flex-col items-center justify-center text-gray-500">
               <div className="text-[#1e3a8a] mb-2">
-                <School className="h-12 w-12 mx-auto opacity-30" />
+                <ChalkBoard className="h-12 w-12 mx-auto opacity-30" />
               </div>
               <p className="text-sm font-medium">Geen klassen beschikbaar</p>
             </div>
@@ -615,7 +615,7 @@ export default function StudentGroups() {
                     <td colSpan={7}>
                       <div className="h-48 flex flex-col items-center justify-center text-gray-500">
                         <div className="text-[#1e3a8a] mb-2">
-                          <School className="h-12 w-12 mx-auto opacity-30" />
+                          <ChalkBoard className="h-12 w-12 mx-auto opacity-30" />
                         </div>
                         <p className="text-sm font-medium">Geen klassen beschikbaar</p>
                       </div>

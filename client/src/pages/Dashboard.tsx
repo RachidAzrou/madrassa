@@ -159,53 +159,53 @@ export default function Dashboard() {
   return (
     <div className="p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
       {/* Page Title */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 sm:gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-2 sm:mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-1.5 sm:p-2">
-              <LayoutDashboard className="h-5 w-5 sm:h-6 sm:w-6" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <LayoutDashboard className="h-7 w-7" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-[#1e3a8a]">Dashboard</h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-base text-gray-500 mt-1">Overzicht van de belangrijkste statistieken en activiteiten</p>
+            </div>
           </div>
-          <p className="text-gray-500 text-xs sm:text-sm mt-1 ml-9 sm:ml-11">
-            Overzicht van de belangrijkste statistieken en activiteiten
-          </p>
         </div>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <Users className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+        <div className="bg-[#1e3a8a] text-white rounded-xl shadow-lg p-4 sm:p-6 relative overflow-hidden group hover:bg-[#1e3a8a]/90 transition-all">
+          <div className="absolute right-0 top-0 opacity-20 group-hover:opacity-25 transition-opacity">
+            <Users className="h-24 sm:h-28 w-24 sm:w-28 text-white" />
           </div>
-          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Studenten</h3>
-          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.totalStudents}</p>
+          <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Studenten</h3>
+          <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.totalStudents}</p>
         </div>
         
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <ChalkBoard className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
+        <div className="bg-[#1e3a8a] text-white rounded-xl shadow-lg p-4 sm:p-6 relative overflow-hidden group hover:bg-[#1e3a8a]/90 transition-all">
+          <div className="absolute right-0 top-0 opacity-20 group-hover:opacity-25 transition-opacity">
+            <ChalkBoard className="h-24 sm:h-28 w-24 sm:w-28 text-white" />
           </div>
-          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Klassen</h3>
-          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.studentGroups}</p>
+          <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Klassen</h3>
+          <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.studentGroups}</p>
         </div>
         
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <GraduationCap className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
+        <div className="bg-[#1e3a8a] text-white rounded-xl shadow-lg p-4 sm:p-6 relative overflow-hidden group hover:bg-[#1e3a8a]/90 transition-all">
+          <div className="absolute right-0 top-0 opacity-20 group-hover:opacity-25 transition-opacity">
+            <GraduationCap className="h-24 sm:h-28 w-24 sm:w-28 text-white" />
           </div>
-          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Docenten</h3>
-          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.totalTeachers}</p>
+          <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Docenten</h3>
+          <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.totalTeachers}</p>
         </div>
         
         {/* Vakken widget */}
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <BookOpen className="h-16 sm:h-20 w-16 sm:w-20 text-sky-500" />
+        <div className="bg-[#1e3a8a] text-white rounded-xl shadow-lg p-4 sm:p-6 relative overflow-hidden group hover:bg-[#1e3a8a]/90 transition-all">
+          <div className="absolute right-0 top-0 opacity-20 group-hover:opacity-25 transition-opacity">
+            <BookOpen className="h-24 sm:h-28 w-24 sm:w-28 text-white" />
           </div>
-          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Vakken</h3>
-          <p className="text-xl sm:text-2xl font-bold text-sky-700">{stats.activeCourses}</p>
+          <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Vakken</h3>
+          <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.activeCourses}</p>
         </div>
       </div>
 

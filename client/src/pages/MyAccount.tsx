@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Card, 
   CardContent, 
@@ -183,6 +183,12 @@ const MyAccount = () => {
     alert("Profielfoto uploaden gesimuleerd voor demonstratie");
   };
 
+  // Bij initialisatie gebruiker in localStorage opslaan voor de sidebar
+  useEffect(() => {
+    // Sla de huidige gebruiker op in localStorage voor sidebar en andere componenten
+    localStorage.setItem('user', JSON.stringify(currentUser));
+  }, [currentUser]);
+
   // Profiel opslaan
   const onProfileSubmit = (data: ProfileFormValues) => {
     setIsSaving(true);
@@ -192,13 +198,18 @@ const MyAccount = () => {
       console.log("Profielgegevens bijgewerkt:", data);
       
       // Update de gebruiker met de nieuwe gegevens
-      setCurrentUser({
+      const updatedUser = {
         ...currentUser,
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         phone: data.phone || "",
-      });
+      };
+      
+      setCurrentUser(updatedUser);
+      
+      // Update localStorage met de nieuwe gebruikersgegevens
+      localStorage.setItem('user', JSON.stringify(updatedUser));
       
       setIsSaving(false);
       setShowSavedMessage(true);

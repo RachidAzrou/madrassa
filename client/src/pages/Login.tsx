@@ -87,8 +87,8 @@ export default function Login(props: any) {
            backgroundColor: '#f8fafc'
          }}>
       {/* Blauwe overlay */}
-      <div className="absolute inset-0 bg-blue-50/50 dark:bg-slate-900/90" 
-           style={{ backgroundColor: '#3b5998', opacity: 0.4, mixBlendMode: 'color' }}></div>
+      <div className="absolute inset-0" 
+           style={{ backgroundColor: '#3b5998', opacity: 0.85, mixBlendMode: 'color' }}></div>
       
       {/* Eén container voor alles */}
       <div className="w-full max-w-md bg-white/95 dark:bg-slate-800/95 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-sm rounded-xl overflow-hidden relative z-10">

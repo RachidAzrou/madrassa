@@ -698,3 +698,32 @@ export const teacherAttendanceRelations = relations(teacherAttendance, ({ one })
     relationName: "replacements"
   })
 }));
+
+// Notificaties
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  type: text("type").notNull(), // info, warning, error, success
+  isRead: boolean("is_read").default(false),
+  link: text("link"), // Optional link to navigate to
+  createdAt: timestamp("created_at").defaultNow(),
+  category: text("category"), // e.g. 'student', 'fee', 'attendance', etc.
+  relatedEntityId: integer("related_entity_id"), // ID of the related entity (optional)
+});
+
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type Notification = typeof notifications.$inferSelect;
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id]
+  })
+}));

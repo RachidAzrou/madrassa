@@ -105,14 +105,21 @@ export default function Sidebar() {
 
         {/* User Profile */}
         <div className="p-4 border-t border-primary-700">
-          <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-primary-700 flex items-center justify-center">
-              <span className="text-white font-semibold">JD</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-10 h-10 rounded-full bg-primary-700 flex items-center justify-center">
+                <span className="text-white font-semibold">JD</span>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-white">John Doe</p>
+                <p className="text-xs text-white/70">Administrator</p>
+              </div>
             </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-white">John Doe</p>
-              <p className="text-xs text-white/70">Administrator</p>
-            </div>
+            <Link href="/login">
+              <a className="px-3 py-1 text-xs text-white bg-red-600 hover:bg-red-700 rounded-md">
+                Uitloggen
+              </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -742,7 +742,7 @@ export default function Students() {
       <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
         {/* Desktop weergave */}
         <div className="hidden md:block overflow-x-auto">
-          <Table>
+          <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
@@ -757,11 +757,10 @@ export default function Students() {
                 </th>
                 <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>
                 <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Naam</th>
-                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Programma</th>
-                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leerjaar</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klas</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Schooljaar</th>
                 <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th scope="col" className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
+                <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -809,10 +808,9 @@ export default function Students() {
                         <div className="text-sm text-gray-900">{student.firstName} {student.lastName}</div>
                       </div>
                     </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">{student.email}</td>
                     <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {student.programs && student.programs[0] 
-                        ? programs.find((p: any) => p.id === student.programs[0].programId)?.name 
+                      {student.studentGroups && student.studentGroups.length > 0
+                        ? student.studentGroups[0].groupName
                         : '-'}
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -858,7 +856,7 @@ export default function Students() {
                 ))
               )}
             </tbody>
-          </Table>
+          </table>
         </div>
         
         {/* Mobiele kaartweergave - alleen tonen als er studenten zijn en de lege state niet wordt getoond */}

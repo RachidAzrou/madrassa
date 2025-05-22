@@ -109,8 +109,8 @@ const NotificationsPage: React.FC = () => {
     return (
       <div className="space-y-3 mt-4">
         {notificationList.map((notification) => (
-          <Card key={notification.id} className={`border ${!notification.isRead ? 'border-l-4 border-l-blue-500' : ''}`}>
-            <CardHeader className="p-4 pb-2">
+          <Card key={notification.id} className={`border group relative ${!notification.isRead ? 'border-l-4 border-l-blue-500' : ''}`}>
+            <CardHeader className="p-4">
               <div className="flex justify-between items-start">
                 <div className="flex items-start gap-3">
                   <div className="mt-1">
@@ -121,44 +121,40 @@ const NotificationsPage: React.FC = () => {
                     <span className="text-xs text-gray-500">
                       {formatDate(notification.createdAt)}
                     </span>
+                    <CardDescription className="text-sm mt-2">
+                      {notification.message}
+                    </CardDescription>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   {!notification.isRead && (
-                    <div className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
-                      Nieuw
-                    </div>
+                    <>
+                      <div className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
+                        Nieuw
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleMarkAsRead(notification.id)}
+                        className="h-6 w-6 p-0 visible"
+                        title="Markeer als gelezen"
+                      >
+                        <Check className="h-4 w-4" />
+                      </Button>
+                    </>
                   )}
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleDelete(notification.id)}
-                    className="h-6 w-6 p-0 text-primary hover:bg-primary/10 rounded-full"
-                    title="Verwijderen"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
               </div>
-              <CardDescription className="text-sm mt-2">
-                {notification.message}
-              </CardDescription>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => handleDelete(notification.id)}
+                className="invisible group-hover:visible absolute top-2 right-2 h-6 w-6 p-0 text-primary hover:bg-primary/10 rounded-full"
+                title="Verwijderen"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </CardHeader>
-            <CardContent className="pt-0 p-4">
-              <div className="flex justify-end gap-2 mt-2">
-                {!notification.isRead && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleMarkAsRead(notification.id)}
-                    className="h-8 w-8 p-0"
-                    title="Markeer als gelezen"
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </CardContent>
           </Card>
         ))}
       </div>

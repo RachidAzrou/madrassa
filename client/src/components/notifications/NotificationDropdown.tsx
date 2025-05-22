@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Check, BellOff, Info, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
+import { Check, BellOff, Info, AlertTriangle, AlertCircle, CheckCircle, Trash2 } from 'lucide-react';
 import { useNotifications, type Notification } from '@/contexts/NotificationContext';
 import NotificationBell from './NotificationBell';
 import { formatDistanceToNow } from 'date-fns';
@@ -101,7 +101,7 @@ const NotificationDropdown: React.FC = () => {
                 {visibleNotifications.map((notification) => (
                   <DropdownMenuItem
                     key={notification.id}
-                    className={`p-0 cursor-pointer hover:bg-gray-50 ${!notification.isRead ? 'bg-blue-50/20' : ''}`}
+                    className={`p-0 cursor-pointer hover:bg-gray-50 group relative ${!notification.isRead ? 'bg-blue-50/20' : ''}`}
                     onClick={() => handleItemClick(notification)}
                   >
                     <div className="flex items-start gap-3 p-3 border-b border-gray-100 w-full">
@@ -123,7 +123,7 @@ const NotificationDropdown: React.FC = () => {
                               variant="ghost"
                               size="sm"
                               onClick={(e) => handleMarkAsRead(notification.id, e)}
-                              className="h-6 text-xs px-2 text-primary hover:bg-primary/10"
+                              className="h-6 text-xs px-2 text-primary hover:bg-primary/10 visible"
                             >
                               Gelezen
                             </Button>
@@ -131,6 +131,15 @@ const NotificationDropdown: React.FC = () => {
                         </div>
                       </div>
                     </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => handleDelete(notification.id, e)}
+                      className="invisible group-hover:visible absolute top-3 right-3 h-5 w-5 p-0 text-primary hover:bg-primary/10 rounded-full"
+                      title="Verwijderen"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
                   </DropdownMenuItem>
                 ))}
                 {notifications.length > 3 && !showAll && (

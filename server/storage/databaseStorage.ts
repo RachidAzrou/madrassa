@@ -26,6 +26,31 @@ import type {
 import type { IStorage } from "./IStorage";
 
 export class DatabaseStorage implements IStorage {
+  // Health check - Test database connection
+  async checkHealth(): Promise<{ connected: boolean; timestamp?: string; error?: string }> {
+    try {
+      // Execute a simple query to check database connection
+      const result = await db.execute(sql`SELECT NOW() as timestamp`);
+      
+      if (result && result.rows && result.rows.length > 0) {
+        return { 
+          connected: true, 
+          timestamp: result.rows[0].timestamp 
+        };
+      }
+      
+      return { 
+        connected: false, 
+        error: "Database connection successful but no data returned" 
+      };
+    } catch (error) {
+      console.error("Database health check failed:", error);
+      return { 
+        connected: false, 
+        error: error instanceof Error ? error.message : "Unknown database error" 
+      };
+    }
+  }
   // Users
   async getUsers(): Promise<User[]> {
     return await db.select().from(users);

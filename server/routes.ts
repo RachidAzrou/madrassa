@@ -37,6 +37,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const apiRouter = app;
   
   // ********************
+  // Health check endpoint
+  // ********************
+  apiRouter.get("/api/health", async (_req, res) => {
+    try {
+      // Check database connection by executing a simple query
+      const result = await storage.checkHealth();
+      
+      // Return health status
+      res.json({
+        status: "ok",
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        database: result
+      });
+    } catch (error) {
+      console.error("Health check failed:", error);
+      res.status(500).json({
+        status: "error",
+        message: error instanceof Error ? error.message : "Unknown error",
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+  
+  // ********************
   // Authentication endpoints
   // ********************
   apiRouter.get("/api/logout", (_req, res) => {

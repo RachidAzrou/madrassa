@@ -1014,7 +1014,49 @@ export default function Guardians() {
               </TabsList>
 
               <TabsContent value="personal" className="mt-0">
-
+                {/* Basisinformatie */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">Voornaam</Label>
+                    <Input 
+                      id="firstName"
+                      name="firstName"
+                      value={newGuardian.firstName || ''}
+                      onChange={handleInputChange}
+                      placeholder="Voornaam"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Achternaam</Label>
+                    <Input 
+                      id="lastName"
+                      name="lastName"
+                      value={newGuardian.lastName || ''}
+                      onChange={handleInputChange}
+                      placeholder="Achternaam"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="relationship">Relatie tot student</Label>
+                    <Select 
+                      name="relationship"
+                      value={newGuardian.relationship || 'parent'}
+                      onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecteer relatie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="parent">Ouder</SelectItem>
+                        <SelectItem value="guardian">Voogd</SelectItem>
+                        <SelectItem value="family">Familie</SelectItem>
+                        <SelectItem value="noodcontact">Noodcontact</SelectItem>
+                        <SelectItem value="other">Anders</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">
                     <Checkbox 

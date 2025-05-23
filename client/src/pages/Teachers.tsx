@@ -423,12 +423,6 @@ const Teachers = () => {
         
         {/* Teachers Table */}
         <div className="bg-white rounded-md border shadow-sm overflow-hidden">
-          <div className="bg-gray-50 px-4 py-3 border-b flex items-center">
-            <div className="h-6 w-6 rounded-full bg-[#1e3a8a]/10 flex items-center justify-center mr-2">
-              <GraduationCap className="h-3.5 w-3.5 text-[#1e3a8a]" />
-            </div>
-            <h3 className="text-base font-medium text-gray-900">Alle docenten</h3>
-          </div>
           <table className="w-full text-sm">
             <thead className="bg-gray-50 uppercase text-xs">
               <tr>

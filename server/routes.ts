@@ -135,19 +135,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentYear = new Date().getFullYear() % 100;
       const prefix = `ST${currentYear}`;
       
-      // Als er geen studenten zijn, begin met ST25001 (of het huidige jaar)
+      // Als er geen studenten zijn, begin met ST + jaar + 001
       if (!allStudents || allStudents.length === 0) {
         return `${prefix}001`;
       }
       
-      // Filter alle geldige IDs die beginnen met ST gevolgd door het huidige jaar en nummers
-      const pattern = new RegExp(`^${prefix}\\d+$`);
-      const validNums = allStudents
+      // Filter IDs die het nieuwe format volgen: ST + jaar + volgnummer
+      // EN IDs die het oude format volgen (alleen voor dit jaar)
+      const stPattern = new RegExp(`^ST\\d+$`); // Alle ST-nummers
+      const yearPattern = new RegExp(`^${prefix}\\d+$`); // Specifiek voor dit jaar
+      
+      // Eerst alles verzamelen wat in de vorm ST + nummers is
+      const allStNums = allStudents
         .map(student => student.studentId)
-        .filter(id => pattern.test(id))
-        .map(id => parseInt(id.substring(4), 10)) // Verwijder "ST25" (of huidige jaar) en converteren naar nummer
+        .filter(id => stPattern.test(id));
+        
+      // Dan alleen de nummers voor dit jaar eruit filteren
+      const validNums = allStNums
+        .filter(id => yearPattern.test(id))
+        .map(id => parseInt(id.substring(4), 10)) // Verwijder "ST" + jaar en converteer naar nummer
         .filter(num => !isNaN(num))
         .sort((a, b) => a - b); // Sorteer op numerieke volgorde
+      
+      // En als fallback ook de oude formaten meenemen 
+      const oldFormatNums = allStNums
+        .filter(id => !yearPattern.test(id) && id.startsWith('ST'))
+        .map(id => parseInt(id.substring(2), 10)) // Verwijder "ST" en converteer naar nummer
+        .filter(num => !isNaN(num))
+        .sort((a, b) => a - b);
       
       // Als er geen geldige numerieke IDs zijn voor dit jaar, begin met 001
       if (validNums.length === 0) {

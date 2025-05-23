@@ -496,15 +496,6 @@ const Teachers = () => {
                       icon={<Users className="h-10 w-10 text-gray-400" />}
                       title="Geen docenten gevonden"
                       description="Er zijn geen docenten die overeenkomen met je zoekcriteria."
-                      action={
-                        <Button
-                          onClick={() => setIsCreateDialogOpen(true)}
-                          className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/80"
-                        >
-                          <PlusCircle className="h-4 w-4 mr-2" />
-                          Docent toevoegen
-                        </Button>
-                      }
                     />
                   </td>
                 </tr>

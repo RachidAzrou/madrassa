@@ -424,20 +424,20 @@ const Teachers = () => {
         {/* Teachers Table */}
         <div className="bg-white rounded-md border shadow-sm overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 uppercase text-xs">
-              <tr>
-                <th className="py-3 px-4 font-medium text-left">
+            <thead className="bg-gray-50">
+              <tr className="border-b border-gray-200">
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">
                   <Checkbox 
                     checked={selectedTeachers.length === filteredTeachers.length && filteredTeachers.length > 0} 
                     onCheckedChange={handleSelectAll} 
                   />
                 </th>
-                <th className="py-3 px-4 font-medium text-left">ID</th>
-                <th className="py-3 px-4 font-medium text-left">NAAM</th>
-                <th className="py-3 px-4 font-medium text-left">E-MAIL</th>
-                <th className="py-3 px-4 font-medium text-left">TELEFOONNUMMER</th>
-                <th className="py-3 px-4 font-medium text-left">STATUS</th>
-                <th className="py-3 px-4 font-medium text-right"></th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">ID</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">NAAM</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">E-MAIL</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">TELEFOONNUMMER</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">STATUS</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right"></th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -451,7 +451,7 @@ const Teachers = () => {
                 </tr>
               ) : paginatedTeachers.length > 0 ? (
                 paginatedTeachers.map((teacher) => (
-                  <tr key={teacher.id} className="hover:bg-gray-50">
+                  <tr key={teacher.id} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
                     <td className="py-3 px-4">
                       <Checkbox 
                         checked={selectedTeachers.includes(teacher.id)} 
@@ -475,26 +475,28 @@ const Teachers = () => {
                     <td className="py-3 px-4">{teacher.email}</td>
                     <td className="py-3 px-4">{teacher.phone}</td>
                     <td className="py-3 px-4">{renderStatusBadge(teacher.isActive)}</td>
-                    <td className="py-3 px-4">
-                      <div className="flex justify-end gap-2">
+                    <td className="py-3 px-4 text-right">
+                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
-                          size="icon"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                           onClick={() => handleViewTeacher(teacher)}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="icon"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
                           onClick={() => handleEditTeacher(teacher)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="text-destructive"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
                           onClick={() => handleDeleteTeacher(teacher)}
                         >
                           <Trash2 className="h-4 w-4" />

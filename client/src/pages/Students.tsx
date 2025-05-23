@@ -2497,8 +2497,10 @@ export default function Students() {
               onClick={handleCreateStudent}
               disabled={createStudentMutation.isPending}
             >
-              {createStudentMutation.isPending && (
+              {createStudentMutation.isPending ? (
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></div>
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
               )}
               Student toevoegen
             </Button>

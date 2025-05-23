@@ -435,17 +435,16 @@ export default function Guardians() {
                   <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
               </div>
-              <div className="flex items-center gap-2">
-                {/* Noodcontact badge direct naast de titel */}
-                {selectedGuardian?.isEmergencyContact && (
-                  <Badge variant="destructive" className="mr-1">Noodcontact</Badge>
-                )}
-                <div>
+              <div>
+                <div className="flex items-center gap-2">
                   <DialogTitle className="text-primary text-lg font-bold">Voogd Details</DialogTitle>
-                  <DialogDescription className="text-gray-500 text-sm">
-                    {selectedGuardian?.firstName} {selectedGuardian?.lastName}
-                  </DialogDescription>
+                  {selectedGuardian?.isEmergencyContact && (
+                    <Badge variant="destructive" size="sm" className="h-5">Noodcontact</Badge>
+                  )}
                 </div>
+                <DialogDescription className="text-gray-500 text-sm mt-1">
+                  {selectedGuardian?.firstName} {selectedGuardian?.lastName}
+                </DialogDescription>
               </div>
             </div>
           </DialogHeader>

@@ -2087,10 +2087,6 @@ export default function Students() {
               {/* Voogden tab */}
               <TabsContent value="guardian" className="mt-0">
                 <div className="p-4 bg-white rounded-lg min-h-[450px]">
-                  <div className="mb-6">
-                    <h3 className="text-base font-medium text-gray-900 mb-2">Voogd toevoegen</h3>
-                    <p className="text-sm text-gray-500">Voeg een voogd toe aan deze student (optioneel).</p>
-                  </div>
                   
                   {/* Persoonlijke informatie sectie */}
                   <div className="mb-6">

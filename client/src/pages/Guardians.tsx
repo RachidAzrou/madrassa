@@ -717,38 +717,16 @@ export default function Guardians() {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="bg-white/20 border-transparent text-white hover:bg-white/30 hover:text-white"
-                    onClick={() => {
-                      handleEditGuardian(selectedGuardian!);
-                      setSelectedGuardian(null);
-                    }}
-                  >
-                    <Pencil className="h-4 w-4 mr-2" />
-                    Bewerken
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    className="bg-red-500/30 border-transparent hover:bg-red-500/50"
-                    onClick={() => {
-                      setIsDeleteDialogOpen(true);
-                      setSelectedGuardian(null);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Verwijderen
-                  </Button>
+                <div className="flex items-center">
+                  <X 
+                    className="h-5 w-5 text-white/70 hover:text-white cursor-pointer transition-colors" 
+                    onClick={() => setSelectedGuardian(null)}
+                  />
                 </div>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6 py-5">
+            <div className="flex-1 overflow-y-auto px-6 py-5 pb-0">
               {selectedGuardian && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -889,12 +867,13 @@ export default function Guardians() {
                   Sluiten
                 </Button>
                 <Button
-                  className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                  className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white"
                   onClick={() => {
                     handleEditGuardian(selectedGuardian!);
                     setSelectedGuardian(null);
                   }}
                 >
+                  <Pencil className="h-4 w-4 mr-2" />
                   Bewerken
                 </Button>
               </div>

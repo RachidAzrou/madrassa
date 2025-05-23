@@ -422,22 +422,45 @@ const Teachers = () => {
           <div className="border-b border-gray-200 pb-4 mb-4"></div>
           
           <div className="mt-4">
-            <div className="relative w-full mb-4">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-              <Input
-                type="search"
-                placeholder="Zoek op naam of docent ID..."
-                className="w-full pl-9 bg-white"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            <div className="flex justify-end">
-              <Button onClick={() => setIsCreateDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Docent toevoegen
-              </Button>
+            <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-4">
+              {/* Zoek- en filteropties */}
+              <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                <div className="relative w-full sm:w-64">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                  <Input
+                    type="search"
+                    placeholder="Zoek op naam of docent ID..."
+                    className="w-full pl-9 h-8 bg-white border-gray-200 shadow-sm"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                
+                <div className="flex items-center w-full sm:w-auto">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full sm:w-40 h-8 bg-white border-gray-200 shadow-sm">
+                      <SelectValue placeholder="Filter op status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Alle docenten</SelectItem>
+                      <SelectItem value="active">Actief</SelectItem>
+                      <SelectItem value="inactive">Inactief</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              {/* Actieknoppen */}
+              <div className="flex items-center gap-2 w-full sm:w-auto mt-3 sm:mt-0">
+                <Button variant="outline" size="sm" className="h-8 border-gray-200 shadow-sm" onClick={handleExportTeachers}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Exporteren
+                </Button>
+                <Button size="sm" className="h-8" onClick={() => setIsCreateDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nieuw
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -451,66 +474,62 @@ const Teachers = () => {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Docent ID</th>
-                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Naam</th>
-                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Klas</th>
-                  <th className="py-3.5 px-4 text-right text-sm font-medium text-gray-500">Acties</th>
+                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DOCENT ID</th>
+                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NAAM</th>
+                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KLAS</th>
+                  <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS</th>
+                  <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {teachersData.teachers.map((teacher: any, index: number) => (
-                  <tr key={teacher.id} className="hover:bg-gray-50">
-                    <td className="py-4 px-4 text-sm text-gray-700 align-top">{teacher.teacherId}</td>
-                    <td className="py-4 px-4 text-sm align-top">
+                  <tr key={teacher.id} className="group hover:bg-gray-50 border-b border-gray-200">
+                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{teacher.teacherId}</td>
+                    <td className="px-3 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <Avatar className="h-9 w-9 mr-3 bg-blue-100 text-blue-600">
-                          <AvatarFallback>
+                        <Avatar className="h-8 w-8 mr-2">
+                          <AvatarFallback className="bg-[#1e3a8a] text-white">
                             {teacher.firstName?.[0]}{teacher.lastName?.[0]}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <div className="font-medium text-gray-900">{teacher.firstName} {teacher.lastName}</div>
-                          <div className="text-gray-500 text-xs mt-1">
-                            {teacher.email}
-                          </div>
-                        </div>
+                        <div className="text-sm text-gray-900">{teacher.firstName} {teacher.lastName}</div>
                       </div>
                     </td>
-                    <td className="py-4 px-4 text-sm text-gray-500 align-top">
-                      <div className="flex flex-wrap gap-1">
-                        {teacher.assignedClasses && teacher.assignedClasses.length > 0 ? 
-                          teacher.assignedClasses.map((klas: string, index: number) => (
-                            <span key={index} className="inline-flex px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                              {klas}
-                            </span>
-                          )) 
-                          : 
-                          <span className="text-gray-400">Geen klassen toegewezen</span>
-                        }
-                      </div>
+                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {teacher.assignedClasses && teacher.assignedClasses.length > 0 ? 
+                        teacher.assignedClasses[0]
+                        : 
+                        <span className="text-gray-400">-</span>
+                      }
                     </td>
-                    <td className="py-4 px-4 text-sm text-gray-500 text-right align-top">
-                      <div className="flex justify-end gap-2">
+                    <td className="px-3 py-4 whitespace-nowrap text-center">
+                      {renderStatusBadge(teacher.isActive)}
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-right text-sm">
+                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button 
                           variant="ghost" 
-                          size="icon"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                           onClick={() => handleViewTeacher(teacher)}
                         >
-                          <Eye className="h-4 w-4 text-gray-600" />
+                          <Eye className="h-4 w-4" />
                         </Button>
                         <Button 
                           variant="ghost" 
-                          size="icon"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
                           onClick={() => handleEditTeacher(teacher)}
                         >
-                          <Pencil className="h-4 w-4 text-gray-600" />
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         <Button 
-                          variant="ghost" 
-                          size="icon"
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
                           onClick={() => openDeleteDialog(teacher)}
                         >
-                          <Trash2 className="h-4 w-4 text-red-500" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </td>

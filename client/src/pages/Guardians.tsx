@@ -779,78 +779,34 @@ export default function Guardians() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-            
-          {/* Gekoppelde studenten in eigen sectie */}
-          <div className="bg-white rounded-lg border shadow-sm">
-            <div className="p-2 border-b bg-gray-50">
-              <h3 className="text-sm font-semibold flex items-center text-primary">
-                <Users className="h-4 w-4 mr-1" />
-                Gekoppelde Studenten
-              </h3>
-            </div>
-            
-            <div className="p-3">
-              {guardianStudentsLoading ? (
-                <div className="flex justify-center py-2">
-                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  <span className="ml-2 text-sm">Laden...</span>
-                </div>
-              ) : (
-                <>
-                  {guardianStudentsData && Array.isArray(guardianStudentsData) && guardianStudentsData.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
-                      {guardianStudentsData.map((relation) => (
-                        <div 
-                          key={relation.id} 
-                          className="flex items-center justify-between p-2 rounded-md border border-gray-200 hover:bg-gray-50"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6">
-                              <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
-                                {relation.student?.firstName?.charAt(0) || ''}
-                                {relation.student?.lastName?.charAt(0) || ''}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="text-sm font-medium truncate max-w-[120px]">{relation.student?.firstName} {relation.student?.lastName}</p>
-                              <p className="text-xs text-gray-500">{relation.student?.studentId}</p>
-                            </div>
-                          </div>
-                          
-                          {relation.isPrimary && (
-                            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-600 border-blue-200">
-                              Primair
-                            </Badge>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-3 border border-dashed rounded-md bg-gray-50">
-                      <Users className="h-6 w-6 mx-auto text-gray-400 mb-1" />
-                      <p className="text-gray-500 text-sm">Geen studenten gekoppeld aan deze voogd.</p>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+
+      {/* Verwijder dialoog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Voogd verwijderen</DialogTitle>
+            <DialogDescription>
+              Weet u zeker dat u deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex items-center gap-2 mt-2 mb-5 bg-red-50 p-3 rounded-md border border-red-200">
+            <AlertTriangle className="h-5 w-5 text-red-600" />
+            <p className="text-sm text-red-600">Alle koppelingen met studenten worden ook verwijderd.</p>
           </div>
           
-          <DialogFooter className="mt-6 border-t pt-4">
+          <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setSelectedGuardian(null)}
+              onClick={() => setIsDeleteDialogOpen(false)}
             >
-              Sluiten
+              Annuleren
             </Button>
             <Button
-              onClick={() => {
-                setNewGuardian(selectedGuardian);
-                setSelectedGuardian(null);
-                setShowAddDialog(true);
-              }}
+              variant="destructive"
+              onClick={confirmDelete}
             >
-              Bewerken
+              Verwijderen
             </Button>
           </DialogFooter>
         </DialogContent>

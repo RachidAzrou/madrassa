@@ -596,23 +596,24 @@ export default function Guardians() {
                             .map((rel: any) => {
                               const student = studentsData.find((s: any) => s.id === rel.studentId);
                               return student ? (
-                                <Avatar 
-                                  key={rel.id} 
-                                  className="h-7 w-7 border-2 border-white cursor-pointer hover:scale-110 hover:z-10 transition-transform"
-                                  onClick={() => handleShowStudentDetails(student)}
-                                >
-                                  <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
-                                    {student.firstName?.charAt(0)}{student.lastName?.charAt(0)}
-                                  </AvatarFallback>
+                                <TooltipProvider>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <span className="sr-only">{student.firstName} {student.lastName}</span>
+                                      <Avatar 
+                                        key={rel.id} 
+                                        className="h-7 w-7 border-2 border-white cursor-pointer hover:scale-110 hover:z-10 transition-transform"
+                                        onClick={() => handleShowStudentDetails(student)}
+                                      >
+                                        <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
+                                          {student.firstName?.charAt(0)}{student.lastName?.charAt(0)}
+                                        </AvatarFallback>
+                                      </Avatar>
                                     </TooltipTrigger>
                                     <TooltipContent side="top">
                                       {student.firstName} {student.lastName}
                                     </TooltipContent>
                                   </Tooltip>
-                                </Avatar>
+                                </TooltipProvider>
                               ) : null;
                             })}
                           {guardianStudentsQuery.data.filter((rel: any) => rel.guardianId === guardian.id).length > 3 && (
@@ -818,6 +819,124 @@ export default function Guardians() {
               Sluiten
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Student details dialoog */}
+      <Dialog open={!!selectedStudent} onOpenChange={() => setSelectedStudent(null)}>
+        <DialogContent className="w-[90vw] sm:max-w-[900px] max-h-[80vh] overflow-y-auto bg-white p-0">
+          <div className="px-6 py-4">
+            <DialogHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
+                    <UserCircle className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl font-semibold">
+                      {selectedStudent?.firstName} {selectedStudent?.lastName}
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-500 text-sm mt-1">
+                      Student ID: {selectedStudent?.studentId}
+                    </DialogDescription>
+                  </div>
+                </div>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setSelectedStudent(null)}
+                >
+                  Sluiten
+                </Button>
+              </div>
+            </DialogHeader>
+
+            <div className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-sm font-medium mb-3 text-gray-500">Studentgegevens</h3>
+                  <div className="space-y-4 bg-gray-50 border rounded-md p-4">
+                    <div>
+                      <p className="text-xs text-gray-500">Naam</p>
+                      <p className="font-medium">{selectedStudent?.firstName} {selectedStudent?.lastName}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Student ID</p>
+                      <p className="font-medium">{selectedStudent?.studentId}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Status</p>
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 mt-1">
+                        {selectedStudent?.status || 'Actief'}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium mb-3 text-gray-500">Voogdgegevens</h3>
+                  <div className="space-y-0 bg-gray-50 border rounded-md divide-y">
+                    {guardianStudentsQuery.data && guardianStudentsQuery.data
+                      .filter((rel: any) => rel.studentId === selectedStudent?.id)
+                      .map((rel: any) => {
+                        const guardian = guardiansData?.find((g: any) => g.id === rel.guardianId);
+                        return guardian ? (
+                          <div key={rel.id} className="p-3">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-6 w-6">
+                                  <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
+                                    {guardian.firstName.charAt(0)}{guardian.lastName.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-medium text-sm">{guardian.firstName} {guardian.lastName}</p>
+                                  <div className="flex items-center gap-1 mt-0.5">
+                                    <Badge 
+                                      variant="outline" 
+                                      className="px-1 py-0 h-4 text-[10px]"
+                                    >
+                                      {getRelationshipLabel(guardian.relationship)}
+                                    </Badge>
+                                    {rel.isPrimary && (
+                                      <Badge 
+                                        variant="outline" 
+                                        className="px-1 py-0 h-4 text-[10px] bg-blue-50 text-blue-700 border-blue-200"
+                                      >
+                                        Primair
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 w-7 p-0"
+                                onClick={() => {
+                                  setSelectedStudent(null);
+                                  handleShowGuardianDetails(guardian);
+                                }}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ) : null;
+                      })}
+                      
+                    {!guardianStudentsQuery.data || 
+                     !guardianStudentsQuery.data.some((rel: any) => rel.studentId === selectedStudent?.id) && (
+                      <div className="p-4 text-center text-gray-500 text-sm">
+                        Geen voogden gekoppeld aan deze student
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 

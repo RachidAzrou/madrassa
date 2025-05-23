@@ -406,21 +406,15 @@ export default function Guardians() {
       
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2">
-            <Select
-              value={showFilterOptions ? "on" : "off"}
-              onValueChange={(value) => setShowFilterOptions(value === "on")}
+            <Button 
+              variant="outline" 
+              size="default"
+              className="border-gray-300 text-gray-700 shrink-0"
+              onClick={() => setShowFilterOptions(!showFilterOptions)}
             >
-              <SelectTrigger className="h-9 border-gray-300 text-gray-700 w-[130px]">
-                <div className="flex items-center">
-                  <Filter className="mr-2 h-4 w-4" />
-                  <span>Filteren</span>
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="on">Toon filters</SelectItem>
-                <SelectItem value="off">Verberg filters</SelectItem>
-              </SelectContent>
-            </Select>
+              <Filter className="mr-2 h-4 w-4" />
+              Filteren
+            </Button>
             
             <div className="relative">
               <Button 

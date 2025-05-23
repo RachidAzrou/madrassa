@@ -484,27 +484,7 @@ export default function Guardians() {
       {showFilterOptions && (
         <div className="mt-4 p-4 bg-gray-50 border rounded-lg">
           <h3 className="text-sm font-medium mb-3">Filter voogden</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="relationshipFilter" className="text-xs">Relatie</Label>
-              <Select
-                value={selectedRelationshipFilter}
-                onValueChange={setSelectedRelationshipFilter}
-              >
-                <SelectTrigger id="relationshipFilter" className="mt-1">
-                  <SelectValue placeholder="Selecteer relatie" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle relaties</SelectItem>
-                  <SelectItem value="parent">Ouder</SelectItem>
-                  <SelectItem value="guardian">Voogd</SelectItem>
-                  <SelectItem value="family">Familie</SelectItem>
-                  <SelectItem value="noodcontact">Noodcontact</SelectItem>
-                  <SelectItem value="other">Anders</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="emergencyFilter" className="text-xs">Noodcontact</Label>
               <Select

@@ -1492,42 +1492,53 @@ export default function Students() {
                   <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-4">
                     {/* Foto upload sectie */}
                     <div className="flex items-start">
-                      <div 
-                        className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-4 rounded-full border-2 border-blue-100 shadow-sm"
-                        onClick={() => {
-                          const fileInput = document.getElementById('student-photo') as HTMLInputElement;
-                          fileInput?.click();
-                        }}
-                      >
-                        <img id="student-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
-                        <div id="student-photo-placeholder" className="w-full h-full flex items-center justify-center bg-blue-50 rounded-full">
-                          <User className="h-10 w-10 text-blue-300" />
-                          <div className="absolute bottom-0 right-0 bg-primary rounded-full p-1.5 shadow-sm">
-                            <Upload className="h-3.5 w-3.5 text-white" />
-                          </div>
-                        </div>
-                        
-                        {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
+                      <div className="relative">
                         <div 
-                          className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden rounded-full"
-                          id="photo-delete-overlay"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
-                            const photoPlaceholder = document.getElementById('student-photo-placeholder');
-                            const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                          className="w-28 h-28 flex items-center justify-center overflow-hidden relative group cursor-pointer rounded-full shadow-md bg-gradient-to-b from-blue-50 to-blue-100 border-4 border-white outline outline-2 outline-blue-100"
+                          onClick={() => {
                             const fileInput = document.getElementById('student-photo') as HTMLInputElement;
-                            
-                            if (photoPreview && photoPlaceholder && fileInput && photoDeleteOverlay) {
-                              photoPreview.src = '';
-                              photoPreview.classList.add('hidden');
-                              photoPlaceholder.classList.remove('hidden');
-                              photoDeleteOverlay.classList.add('hidden');
-                              fileInput.value = '';
-                            }
+                            fileInput?.click();
                           }}
                         >
-                          <Trash2 className="h-6 w-6 text-white" />
+                          <img id="student-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
+                          <div id="student-photo-placeholder" className="w-full h-full flex items-center justify-center">
+                            <User className="h-12 w-12 text-blue-300/60" />
+                          </div>
+                          
+                          {/* Upload indicator overlay bij hover */}
+                          <div className="absolute inset-0 bg-blue-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
+                            <div className="bg-white/90 rounded-full p-2.5 shadow-md">
+                              <Upload className="h-5 w-5 text-primary" />
+                            </div>
+                          </div>
+                          
+                          {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
+                          <div 
+                            className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden rounded-full"
+                            id="photo-delete-overlay"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
+                              const photoPlaceholder = document.getElementById('student-photo-placeholder');
+                              const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                              const fileInput = document.getElementById('student-photo') as HTMLInputElement;
+                              
+                              if (photoPreview && photoPlaceholder && fileInput && photoDeleteOverlay) {
+                                photoPreview.src = '';
+                                photoPreview.classList.add('hidden');
+                                photoPlaceholder.classList.remove('hidden');
+                                photoDeleteOverlay.classList.add('hidden');
+                                fileInput.value = '';
+                              }
+                            }}
+                          >
+                            <div className="bg-white/90 rounded-full p-2.5 shadow-md">
+                              <Trash2 className="h-5 w-5 text-red-500" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 bg-primary rounded-full p-2 shadow-lg ring-2 ring-white">
+                          <Camera className="h-4 w-4 text-white" />
                         </div>
                       </div>
                       
@@ -1865,7 +1876,7 @@ export default function Students() {
                   <div className="flex justify-between items-center mb-2">
                     {studentFormData.studentGroupId && (
                       <Badge variant="outline" className="bg-blue-50 text-primary border-blue-100 font-medium py-1">
-                        <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                        <Check className="h-3.5 w-3.5 mr-1" />
                         Klas toegewezen
                       </Badge>
                     )}

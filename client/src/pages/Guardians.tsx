@@ -200,6 +200,10 @@ export default function Guardians() {
   
   // Filter guardians based on search query
   useEffect(() => {
+    if (!Array.isArray(guardiansData)) {
+      return;
+    }
+
     if (searchQuery.trim() === '') {
       setSearchResults(guardiansData);
       return;
@@ -208,9 +212,9 @@ export default function Guardians() {
     const query = searchQuery.toLowerCase();
     const filtered = guardiansData.filter((guardian: any) => {
       return (
-        guardian.firstName.toLowerCase().includes(query) ||
-        guardian.lastName.toLowerCase().includes(query) ||
-        guardian.email.toLowerCase().includes(query) ||
+        guardian.firstName?.toLowerCase().includes(query) ||
+        guardian.lastName?.toLowerCase().includes(query) ||
+        guardian.email?.toLowerCase().includes(query) ||
         (guardian.phone && guardian.phone.includes(query))
       );
     });
@@ -220,6 +224,10 @@ export default function Guardians() {
   
   // Students that can be added to a guardian
   useEffect(() => {
+    if (!Array.isArray(studentsData)) {
+      return;
+    }
+    
     if (studentSearchQuery.trim() === '') {
       setFilteredStudentIds(
         studentsData
@@ -233,9 +241,9 @@ export default function Guardians() {
     const filtered = studentsData.filter((student: any) => {
       return (
         !selectedStudentIds.includes(student.id) &&
-        (student.firstName.toLowerCase().includes(query) ||
-         student.lastName.toLowerCase().includes(query) ||
-         student.studentId.toLowerCase().includes(query))
+        (student.firstName?.toLowerCase().includes(query) ||
+         student.lastName?.toLowerCase().includes(query) ||
+         student.studentId?.toLowerCase().includes(query))
       );
     });
     

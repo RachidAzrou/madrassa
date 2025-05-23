@@ -131,22 +131,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Haal alle bestaande studenten op
       const allStudents = await storage.getStudents();
       
-      // Als er geen studenten zijn, begin met ST001
+      // Huidige jaar (laatste 2 cijfers)
+      const currentYear = new Date().getFullYear() % 100;
+      const prefix = `ST${currentYear}`;
+      
+      // Als er geen studenten zijn, begin met ST25001 (of het huidige jaar)
       if (!allStudents || allStudents.length === 0) {
-        return "ST001";
+        return `${prefix}001`;
       }
       
-      // Filter alle geldige IDs die beginnen met ST gevolgd door nummers
+      // Filter alle geldige IDs die beginnen met ST gevolgd door het huidige jaar en nummers
+      const pattern = new RegExp(`^${prefix}\\d+$`);
       const validNums = allStudents
         .map(student => student.studentId)
-        .filter(id => /^ST\d+$/.test(id))
-        .map(id => parseInt(id.substring(2), 10)) // Verwijder "ST" en converteren naar nummer
+        .filter(id => pattern.test(id))
+        .map(id => parseInt(id.substring(4), 10)) // Verwijder "ST25" (of huidige jaar) en converteren naar nummer
         .filter(num => !isNaN(num))
         .sort((a, b) => a - b); // Sorteer op numerieke volgorde
       
-      // Als er geen geldige numerieke IDs zijn, begin met ST001
+      // Als er geen geldige numerieke IDs zijn voor dit jaar, begin met 001
       if (validNums.length === 0) {
-        return "ST001";
+        return `${prefix}001`;
       }
 
       // Zoek naar "gaten" in de reeks
@@ -157,18 +162,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const num of validNums) {
         if (num > expectedNum) {
           // We hebben een gat gevonden
-          return `ST${expectedNum.toString().padStart(3, '0')}`;
+          return `${prefix}${expectedNum.toString().padStart(3, '0')}`;
         }
         // Ga door naar het volgende verwachte nummer
         expectedNum = num + 1;
       }
       
       // Als er geen gaten zijn, gebruik dan het volgende nummer na het hoogste ID
-      return `ST${expectedNum.toString().padStart(3, '0')}`;
+      return `${prefix}${expectedNum.toString().padStart(3, '0')}`;
     } catch (error) {
       console.error("Fout bij genereren studentnummer:", error);
-      // Fallback naar gewoon oplopend nummer als er een fout optreedt
-      return `ST${Math.floor(Math.random() * 999 + 1).toString().padStart(3, '0')}`;
+      // Fallback naar huidige jaar en random nummer als er een fout optreedt
+      const currentYear = new Date().getFullYear() % 100;
+      return `ST${currentYear}${Math.floor(Math.random() * 999 + 1).toString().padStart(3, '0')}`;
     }
   }
   

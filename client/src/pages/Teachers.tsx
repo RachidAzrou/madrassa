@@ -694,7 +694,7 @@ const Teachers = () => {
         <DialogContent className="sm:max-w-[95vw] h-[95vh]">
           <DialogHeader className="pb-1">
             <DialogTitle className="text-xl font-bold text-primary flex items-center">
-              <User className="mr-2 h-5 w-5" />
+              <GraduationCap className="mr-2 h-5 w-5" />
               Nieuwe Docent Toevoegen
             </DialogTitle>
             <DialogDescription className="text-sm">

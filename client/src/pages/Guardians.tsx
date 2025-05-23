@@ -1105,8 +1105,8 @@ export default function Guardians() {
                 </DialogTitle>
                 <DialogDescription className="text-blue-100 text-sm mt-1">
                   {newGuardian.id 
-                    ? 'Bewerk de gegevens van deze voogd'
-                    : 'Voer de gegevens in van de nieuwe voogd'}
+                    ? 'Werk de gegevens bij voor deze voogd.'
+                    : 'Voeg een nieuwe voogd toe aan het systeem.'}
                 </DialogDescription>
               </div>
             </div>

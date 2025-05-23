@@ -450,147 +450,122 @@ export default function Guardians() {
             </div>
           </DialogHeader>
 
-          <div className="grid grid-cols-3 gap-4">
-            {/* Linker kolom: Persoonlijke info + adres */}
-            <div className="col-span-1 bg-white rounded-lg border shadow-sm">
-              <div className="p-2 border-b bg-gray-50">
-                <h3 className="text-sm font-semibold flex items-center text-primary">
-                  <UserCircle className="h-4 w-4 mr-1" />
-                  Persoonlijke informatie
-                </h3>
+          <div className="bg-white p-4 border rounded-lg mb-4">
+            {/* Persoonlijke info in een horizontale layout */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-x-4 gap-y-2">
+              <div className="col-span-1">
+                <p className="text-xs font-medium text-gray-500 mb-1">Naam</p>
+                <p className="text-sm font-medium">{selectedGuardian?.firstName} {selectedGuardian?.lastName}</p>
               </div>
               
-              <div className="p-3 space-y-2">
-                <div>
-                  <p className="text-xs font-medium text-gray-500">Naam</p>
-                  <p className="text-sm font-medium">{selectedGuardian?.firstName} {selectedGuardian?.lastName}</p>
-                </div>
-                
-                <div>
-                  <p className="text-xs font-medium text-gray-500">Relatie</p>
-                  <p className="text-sm font-medium">{selectedGuardian && getRelationshipLabel(selectedGuardian.relationship)}</p>
-                </div>
-                
-                <div>
-                  <p className="text-xs font-medium text-gray-500">Beroep</p>
-                  <p className="text-sm font-medium">{selectedGuardian?.occupation || '-'}</p>
-                </div>
-                
-                <div>
-                  <p className="text-xs font-medium text-gray-500">E-mail</p>
-                  <p className="text-sm font-medium flex items-center">
-                    <Mail className="h-3 w-3 mr-1 text-gray-500" />
-                    {selectedGuardian?.email || '-'}
-                  </p>
-                </div>
-                
-                <div>
-                  <p className="text-xs font-medium text-gray-500">Telefoon</p>
-                  <p className="text-sm font-medium flex items-center">
-                    <Phone className="h-3 w-3 mr-1 text-gray-500" />
-                    {selectedGuardian?.phone || '-'}
-                  </p>
-                </div>
+              <div className="col-span-1">
+                <p className="text-xs font-medium text-gray-500 mb-1">Relatie</p>
+                <p className="text-sm font-medium">{selectedGuardian && getRelationshipLabel(selectedGuardian.relationship)}</p>
               </div>
-
-              {/* Adres info in dezelfde kolom, onder persoonlijke info */}
+              
+              <div className="col-span-1">
+                <p className="text-xs font-medium text-gray-500 mb-1">Beroep</p>
+                <p className="text-sm font-medium">{selectedGuardian?.occupation || '-'}</p>
+              </div>
+              
+              <div className="col-span-1">
+                <p className="text-xs font-medium text-gray-500 mb-1">E-mail</p>
+                <p className="text-sm font-medium flex items-center">
+                  <Mail className="h-3 w-3 mr-1 text-gray-500" />
+                  {selectedGuardian?.email || '-'}
+                </p>
+              </div>
+              
+              <div className="col-span-1">
+                <p className="text-xs font-medium text-gray-500 mb-1">Telefoon</p>
+                <p className="text-sm font-medium flex items-center">
+                  <Phone className="h-3 w-3 mr-1 text-gray-500" />
+                  {selectedGuardian?.phone || '-'}
+                </p>
+              </div>
+              
+              {/* Adres info horizontaal */}
               {(selectedGuardian?.street || selectedGuardian?.city) && (
                 <>
-                  <div className="p-2 border-b border-t bg-gray-50">
-                    <h3 className="text-sm font-semibold flex items-center text-primary">
-                      <Home className="h-4 w-4 mr-1" />
-                      Adres
-                    </h3>
+                  <div className="col-span-2 mt-2">
+                    <p className="text-xs font-medium text-gray-500 mb-1">Straat en huisnummer</p>
+                    <p className="text-sm font-medium">
+                      {selectedGuardian?.street || '-'} {selectedGuardian?.houseNumber || ''}
+                    </p>
                   </div>
                   
-                  <div className="p-3 space-y-2">
-                    <div>
-                      <p className="text-xs font-medium text-gray-500">Straat en huisnummer</p>
-                      <p className="text-sm font-medium">
-                        {selectedGuardian?.street || '-'} {selectedGuardian?.houseNumber || ''}
-                      </p>
-                    </div>
-                    
-                    <div>
-                      <p className="text-xs font-medium text-gray-500">Postcode en stad</p>
-                      <p className="text-sm font-medium">
-                        {selectedGuardian?.postalCode || '-'} {selectedGuardian?.city || ''}
-                      </p>
-                    </div>
+                  <div className="col-span-2 mt-2">
+                    <p className="text-xs font-medium text-gray-500 mb-1">Postcode en stad</p>
+                    <p className="text-sm font-medium">
+                      {selectedGuardian?.postalCode || '-'} {selectedGuardian?.city || ''}
+                    </p>
                   </div>
                 </>
               )}
               
               {/* Notities indien aanwezig */}
               {selectedGuardian?.notes && (
-                <>
-                  <div className="p-2 border-b border-t bg-gray-50">
-                    <h3 className="text-sm font-semibold flex items-center text-primary">
-                      <BookOpen className="h-4 w-4 mr-1" />
-                      Notities
-                    </h3>
-                  </div>
-                  <div className="p-3">
-                    <p className="text-xs text-gray-700 bg-gray-50 p-2 rounded-md">{selectedGuardian?.notes}</p>
-                  </div>
-                </>
+                <div className="col-span-5 mt-2">
+                  <p className="text-xs font-medium text-gray-500 mb-1">Notities</p>
+                  <p className="text-xs text-gray-700 bg-gray-50 p-2 rounded-md">{selectedGuardian?.notes}</p>
+                </div>
               )}
             </div>
+          </div>
             
-            {/* Rechter kolom (span 2): Gekoppelde studenten */}
-            <div className="col-span-2 bg-white rounded-lg border shadow-sm">
-              <div className="p-2 border-b bg-gray-50">
-                <h3 className="text-sm font-semibold flex items-center text-primary">
-                  <Users className="h-4 w-4 mr-1" />
-                  Gekoppelde Studenten
-                </h3>
-              </div>
-              
-              <div className="p-3">
-                {guardianStudentsLoading ? (
-                  <div className="flex justify-center py-2">
-                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <span className="ml-2 text-sm">Laden...</span>
-                  </div>
-                ) : (
-                  <>
-                    {guardianStudentsData && Array.isArray(guardianStudentsData) && guardianStudentsData.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                        {guardianStudentsData.map((relation) => (
-                          <div 
-                            key={relation.id} 
-                            className="flex items-center justify-between p-2 rounded-md border border-gray-200 hover:bg-gray-50"
-                          >
-                            <div className="flex items-center gap-2">
-                              <Avatar className="h-6 w-6">
-                                <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
-                                  {relation.student?.firstName?.charAt(0) || ''}
-                                  {relation.student?.lastName?.charAt(0) || ''}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <p className="text-sm font-medium">{relation.student?.firstName} {relation.student?.lastName}</p>
-                                <p className="text-xs text-gray-500">{relation.student?.studentId}</p>
-                              </div>
+          {/* Gekoppelde studenten in eigen sectie */}
+          <div className="bg-white rounded-lg border shadow-sm">
+            <div className="p-2 border-b bg-gray-50">
+              <h3 className="text-sm font-semibold flex items-center text-primary">
+                <Users className="h-4 w-4 mr-1" />
+                Gekoppelde Studenten
+              </h3>
+            </div>
+            
+            <div className="p-3">
+              {guardianStudentsLoading ? (
+                <div className="flex justify-center py-2">
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  <span className="ml-2 text-sm">Laden...</span>
+                </div>
+              ) : (
+                <>
+                  {guardianStudentsData && Array.isArray(guardianStudentsData) && guardianStudentsData.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                      {guardianStudentsData.map((relation) => (
+                        <div 
+                          key={relation.id} 
+                          className="flex items-center justify-between p-2 rounded-md border border-gray-200 hover:bg-gray-50"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-6 w-6">
+                              <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
+                                {relation.student?.firstName?.charAt(0) || ''}
+                                {relation.student?.lastName?.charAt(0) || ''}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="text-sm font-medium truncate max-w-[120px]">{relation.student?.firstName} {relation.student?.lastName}</p>
+                              <p className="text-xs text-gray-500">{relation.student?.studentId}</p>
                             </div>
-                            
-                            {relation.isPrimary && (
-                              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-600 border-blue-200">
-                                Primair
-                              </Badge>
-                            )}
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-3 border border-dashed rounded-md bg-gray-50">
-                        <Users className="h-6 w-6 mx-auto text-gray-400 mb-1" />
-                        <p className="text-gray-500 text-sm">Geen studenten gekoppeld aan deze voogd.</p>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+                          
+                          {relation.isPrimary && (
+                            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-600 border-blue-200">
+                              Primair
+                            </Badge>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-3 border border-dashed rounded-md bg-gray-50">
+                      <Users className="h-6 w-6 mx-auto text-gray-400 mb-1" />
+                      <p className="text-gray-500 text-sm">Geen studenten gekoppeld aan deze voogd.</p>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
           

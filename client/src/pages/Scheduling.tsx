@@ -524,8 +524,8 @@ export default function Scheduling() {
       {/* Geen widgets op verzoek van gebruiker */}
 
       <div className="mb-4">
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full mb-4">
-          <div className="relative w-full flex-grow">
+        <div className="flex flex-col gap-4 w-full mb-4">
+          <div className="relative w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
             <Input
               placeholder="Zoek planning..."
@@ -541,15 +541,17 @@ export default function Scheduling() {
             )}
           </div>
           
-          <Button 
-            onClick={handleAddSchedule} 
-            variant="default"
-            size="default"
-            className="bg-primary hover:bg-primary/90 flex items-center whitespace-nowrap"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Planning Toevoegen</span>
-          </Button>
+          <div className="flex justify-end">
+            <Button 
+              onClick={handleAddSchedule} 
+              variant="default"
+              size="default"
+              className="bg-primary hover:bg-primary/90 flex items-center"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              <span>Planning Toevoegen</span>
+            </Button>
+          </div>
         </div>
       </div>
 

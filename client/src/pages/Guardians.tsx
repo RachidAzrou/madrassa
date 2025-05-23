@@ -834,43 +834,43 @@ export default function Guardians() {
       
       {/* Student details dialoog */}
       <Dialog open={!!selectedStudent} onOpenChange={() => setSelectedStudent(null)}>
-        <DialogContent className="w-[90vw] sm:max-w-[900px] max-h-[85vh] overflow-y-auto bg-white p-0">
-          <div className="pb-6">
+        <DialogContent className="sm:max-w-[900px] h-[calc(100vh-100px)] max-h-[900px] overflow-hidden p-0 bg-white rounded-lg border shadow-lg">
+          <div className="flex flex-col h-full">
             {/* Header met blauwe achtergrond */}
-            <div className="bg-[#1e3a8a] text-white px-6 py-5 rounded-t-lg">
+            <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                     <UserCircle className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold">
+                    <DialogTitle className="text-xl font-semibold text-white">
                       {selectedStudent?.firstName} {selectedStudent?.lastName}
-                    </h2>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-blue-100 font-medium">
+                    </DialogTitle>
+                    <DialogDescription className="text-blue-100 text-sm mt-1 flex items-center gap-2">
+                      <span className="font-medium">
                         {selectedStudent?.studentId}
                       </span>
                       <Badge className="bg-white/20 text-white border-transparent hover:bg-white/30">
                         {selectedStudent?.status === 'enrolled' ? 'Ingeschreven' : (selectedStudent?.status || 'Actief')}
                       </Badge>
-                    </div>
+                    </DialogDescription>
                   </div>
                 </div>
-                
-
               </div>
             </div>
 
-            <div className="px-6 pt-6">
+            <div className="flex-1 overflow-y-auto px-6 py-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <div className="flex items-center mb-4">
-                    <GraduationCap className="h-5 w-5 text-blue-600 mr-2" />
+                    <div className="h-6 w-6 rounded-full bg-[#1e3a8a]/10 flex items-center justify-center mr-2">
+                      <GraduationCap className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                    </div>
                     <h3 className="text-base font-medium text-gray-900">Studentgegevens</h3>
                   </div>
                   
-                  <div className="bg-gray-50 border rounded-md overflow-hidden">
+                  <div className="bg-gray-50 border rounded-md overflow-hidden shadow-sm">
                     <div className="grid grid-cols-1 divide-y">
                       <div className="p-4 flex">
                         <div className="w-1/3">
@@ -932,11 +932,13 @@ export default function Guardians() {
                 
                 <div>
                   <div className="flex items-center mb-4">
-                    <UserCircle className="h-5 w-5 text-blue-600 mr-2" />
+                    <div className="h-6 w-6 rounded-full bg-[#1e3a8a]/10 flex items-center justify-center mr-2">
+                      <UserCircle className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                    </div>
                     <h3 className="text-base font-medium text-gray-900">Voogdgegevens</h3>
                   </div>
                   
-                  <div className="bg-gray-50 border rounded-md overflow-hidden">
+                  <div className="bg-gray-50 border rounded-md overflow-hidden shadow-sm">
                     <div className="divide-y">
                       {guardianStudentsQuery.data && guardianStudentsQuery.data
                         .filter((rel: any) => rel.studentId === selectedStudent?.id)
@@ -1045,6 +1047,27 @@ export default function Guardians() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div className="flex-shrink-0 px-6 py-4 border-t bg-gray-50">
+              <div className="flex justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedStudent(null)}
+                  className="mr-2"
+                >
+                  Sluiten
+                </Button>
+                <Button
+                  className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                  onClick={() => {
+                    // Hier kan een logische vervolgactie komen, bijvoorbeeld:
+                    // window.location.href = `#/students/${selectedStudent?.id}/edit`;
+                    setSelectedStudent(null);
+                  }}
+                >
+                  Naar student
+                </Button>
               </div>
             </div>
           </div>

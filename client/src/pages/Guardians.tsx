@@ -482,16 +482,27 @@ export default function Guardians() {
       
       {/* Filter opties */}
       {showFilterOptions && (
-        <div className="mt-4 p-4 bg-gray-50 border rounded-lg">
-          <h3 className="text-sm font-medium mb-3">Filter voogden</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+        <div className="mb-6 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-700">Filters</h3>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowFilterOptions(false)}
+              className="h-7 w-7 p-0"
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <Label htmlFor="emergencyFilter" className="text-xs">Noodcontact</Label>
+              <Label htmlFor="emergencyFilter" className="text-xs text-gray-600 mb-1 block">Noodcontact</Label>
               <Select
                 value={selectedEmergencyFilter}
                 onValueChange={setSelectedEmergencyFilter}
               >
-                <SelectTrigger id="emergencyFilter" className="mt-1">
+                <SelectTrigger id="emergencyFilter" className="h-8 text-xs">
                   <SelectValue placeholder="Selecteer type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -503,17 +514,26 @@ export default function Guardians() {
             </div>
           </div>
           
-          <div className="mt-4 flex justify-end">
-            <Button
-              variant="outline"
-              size="sm"
+          <div className="flex gap-2 mt-3 border-t border-gray-100 pt-3 justify-end">
+            <Button 
+              variant="outline" 
+              size="sm" 
               onClick={() => {
                 setSelectedRelationshipFilter('all');
                 setSelectedEmergencyFilter('all');
               }}
-              className="mr-2"
+              className="text-xs h-7"
             >
-              Reset filters
+              Wissen
+            </Button>
+            <Button 
+              size="sm" 
+              onClick={() => {
+                setShowFilterOptions(false);
+              }}
+              className="text-xs h-7 bg-[#1e3a8a]"
+            >
+              Toepassen
             </Button>
           </div>
         </div>

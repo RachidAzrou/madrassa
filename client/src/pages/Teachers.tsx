@@ -803,12 +803,12 @@ const Teachers = () => {
               </TabsContent>
               
               {/* Persoonlijke informatie tab */}
-              <TabsContent value="personal" className="space-y-6">
-                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm min-h-[400px]">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+              <TabsContent value="personal" className="space-y-3">
+                <div className="p-3 border border-gray-200 rounded-lg bg-white shadow-sm min-h-[365px]">
+                  <h3 className="text-lg font-semibold text-primary mb-2">Persoonlijke gegevens</h3>
                   
                   {/* Foto upload sectie met knoppen rechts */}
-                  <div className="flex mb-4 items-start justify-between">
+                  <div className="flex mb-2 items-start justify-between">
                     <div 
                       className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer"
                       onClick={() => {

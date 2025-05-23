@@ -253,16 +253,41 @@ export default function Guardians() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Voogden Beheer</h1>
-        <Button 
-          className="flex items-center gap-2" 
-          onClick={() => setIsAddingGuardian(true)}
-        >
-          <PlusCircle className="h-4 w-4" />
-          <span>Voogd Toevoegen</span>
-        </Button>
+    <div className="container mx-auto py-6 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-primary">Voogdenbeheer</h1>
+          <p className="text-gray-500 mt-1">Beheer alle voogden en hun relaties met studenten</p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Zoek voogden..."
+              className="pl-8 w-full sm:w-[250px]"
+              value={searchInput}
+              onChange={handleSearchChange}
+            />
+          </div>
+          <Button 
+            className="flex items-center gap-2 bg-primary" 
+            onClick={() => setIsAddingGuardian(true)}
+          >
+            <PlusCircle className="h-4 w-4" />
+            <span>Voogd Toevoegen</span>
+          </Button>
+        </div>
+      </div>
+      
+      {/* Filtering options */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'all' | 'emergency')} className="w-auto">
+          <TabsList className="bg-muted p-1">
+            <TabsTrigger value="all" className="data-[state=active]:bg-white">Alle voogden</TabsTrigger>
+            <TabsTrigger value="emergency" className="data-[state=active]:bg-white">Noodcontacten</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
       
       {/* Voogden lijst */}

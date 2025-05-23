@@ -106,6 +106,13 @@ export default function Guardians() {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
   
+  // Query voor alle voogd-student relaties (voor weergave in tabel)
+  const guardianStudentsQuery = useQuery({
+    queryKey: ['/api/student-guardians'],
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+  
+  // Query voor relaties van de geselecteerde voogd (voor detailweergave)
   const { data: guardianStudentsData = [], isLoading: guardianStudentsLoading } = useQuery({
     queryKey: ['/api/guardians', selectedGuardian?.id, 'students'],
     enabled: !!selectedGuardian?.id,
@@ -533,7 +540,7 @@ export default function Guardians() {
                   </TableHead>
                   <TableHead className="py-3 font-medium">Naam</TableHead>
                   <TableHead className="py-3 font-medium">Relatie</TableHead>
-                  <TableHead className="w-[100px] text-center py-3 font-medium">Status</TableHead>
+                  <TableHead className="py-3 font-medium">Studenten</TableHead>
                   <TableHead className="text-right w-[120px] py-3 font-medium">Acties</TableHead>
                 </TableRow>
               </TableHeader>
@@ -561,37 +568,15 @@ export default function Guardians() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="py-3">{getRelationshipLabel(guardian.relationship)}</TableCell>
                     <TableCell className="py-3">
-                      <div className="space-y-1">
-                        <div className="flex items-center text-xs">
-                          <Mail className="h-3 w-3 mr-1 opacity-70" />
-                          {guardian.email}
-                        </div>
-                        {guardian.phone && (
-                          <div className="flex items-center text-xs">
-                            <Phone className="h-3 w-3 mr-1 opacity-70" />
-                            {guardian.phone}
-                          </div>
-                        )}
+                      <div className="flex items-center">
+                        <Badge variant="outline" className={`${guardian.isEmergencyContact ? "bg-red-50 text-red-700 border-red-200" : "bg-blue-50 text-blue-700 border-blue-200"}`}>
+                          {getRelationshipLabel(guardian.relationship)}
+                        </Badge>
                       </div>
                     </TableCell>
                     <TableCell className="py-3">
-                      {guardian.street || guardian.city ? (
-                        <div className="text-xs">
-                          <div>{guardian.street} {guardian.houseNumber}</div>
-                          <div>{guardian.postalCode} {guardian.city}</div>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-gray-400">Geen adres</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-center py-3">
-                      {guardian.isEmergencyContact ? (
-                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Noodcontact</Badge>
-                      ) : (
-                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Voogd</Badge>
-                      )}
+                      <div className="text-xs">Studenten informatie wordt geladen...</div>
                     </TableCell>
                     <TableCell className="text-right py-3">
                       <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

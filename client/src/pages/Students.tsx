@@ -3285,51 +3285,153 @@ export default function Students() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setShowGuardianConfirmDialog(false)}
-            >
-              Annuleren
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-primary"
               onClick={() => {
-                // Sla de studentgegevens tijdelijk op
-                const tempStudent = {...studentFormData};
                 setShowGuardianConfirmDialog(false);
                 
-                // Open voogdbewerking dialoog
-                // We doen dit door naar de Guardian pagina te navigeren en daar de bewerking te openen
-                // Simuleer dit hier door een functie aan te roepen die de voogdbewerking zou starten
-                
-                // Redirect naar de voogdenpagina met de voogd-ID in een query parameter
-                window.location.href = `/guardians?edit=${foundGuardian.id}&returnToStudent=true`;
-                
-                toast({
-                  title: "Voogd bewerken",
-                  description: "U wordt doorgestuurd naar de voogdbewerking. Na het opslaan kunt u terugkeren naar de student.",
-                });
+                // Als het een noodcontactnummer is, verwijderen we de tijdelijke voogd
+                if (foundGuardian?.phone && foundGuardian?.phone.startsWith('+') && !foundGuardian.id) {
+                  setFoundGuardian(null);
+                }
               }}
             >
-              <Pencil className="h-4 w-4 mr-2" />
-              Bewerken
+              {foundGuardian?.phone && foundGuardian?.phone.startsWith('+') 
+                ? "Afwijzen" 
+                : "Annuleren"}
             </Button>
+            
+            {/* Als het een bestaande voogd is met ID, toon dan de bewerken knop */}
+            {foundGuardian && foundGuardian.id && (
+              <Button
+                type="button"
+                variant="outline"
+                className="border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-primary"
+                onClick={() => {
+                  // Sla de studentgegevens tijdelijk op
+                  const tempStudent = {...studentFormData};
+                  setShowGuardianConfirmDialog(false);
+                  
+                  // Redirect naar de voogdenpagina met de voogd-ID in een query parameter
+                  window.location.href = `/guardians?edit=${foundGuardian.id}&returnToStudent=true`;
+                  
+                  toast({
+                    title: "Voogd bewerken",
+                    description: "U wordt doorgestuurd naar de voogdbewerking. Na het opslaan kunt u terugkeren naar de student.",
+                  });
+                }}
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Bewerken
+              </Button>
+            )}
+            
+            {/* Als het een noodcontactnummer is zonder ID, toon dan een andere bewerken knop */}
+            {foundGuardian?.phone && foundGuardian?.phone.startsWith('+') && !foundGuardian.id && (
+              <Button
+                type="button"
+                variant="outline"
+                className="border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-primary"
+                onClick={() => {
+                  // Aanmaken van een nieuwe voogd met het noodcontactnummer
+                  const newGuardian = {
+                    firstName: "",
+                    lastName: foundGuardian.lastName || studentFormData.lastName,
+                    relationship: "noodcontact",
+                    email: "",
+                    phone: foundGuardian.phone,
+                    street: studentFormData.street || "",
+                    houseNumber: studentFormData.houseNumber || "",
+                    postalCode: studentFormData.postalCode || "",
+                    city: studentFormData.city || "",
+                    isEmergencyContact: true
+                  };
+                  
+                  // Maak eerst een voogd aan
+                  apiRequest('/api/guardians', {
+                    method: 'POST',
+                    body: newGuardian
+                  })
+                  .then(createdGuardian => {
+                    setShowGuardianConfirmDialog(false);
+                    
+                    // Ga naar de bewerken pagina voor deze nieuwe voogd
+                    window.location.href = `/guardians?edit=${createdGuardian.id}&returnToStudent=true`;
+                    
+                    toast({
+                      title: "Noodcontact aangemaakt",
+                      description: "U wordt doorgestuurd naar de voogdbewerking om de gegevens verder aan te vullen.",
+                    });
+                  })
+                  .catch(error => {
+                    console.error("Fout bij aanmaken noodcontact:", error);
+                    toast({
+                      variant: "destructive",
+                      title: "Fout bij aanmaken noodcontact",
+                      description: "Er is een fout opgetreden bij het aanmaken van het noodcontact.",
+                    });
+                  });
+                }}
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Bewerken
+              </Button>
+            )}
+            
             <Button
               type="button"
               onClick={() => {
-                // Maak een kopie van de data om te versturen, zonder studentId
-                const { studentId, ...restData } = studentFormData;
-                const dataToSubmit = {
-                  ...restData,
-                  programs: selectedPrograms.length > 0 ? selectedPrograms : 
-                    (studentFormData.programId ? [{ 
-                      programId: studentFormData.programId, 
-                      yearLevel: studentFormData.yearLevel 
-                    }] : [])
-                };
-                
-                // Voeg de student toe en koppel aan de voogd
-                createStudentMutation.mutate(dataToSubmit);
+                // Als het een tijdelijk noodcontact object is (zonder ID), maak eerst een voogdrecord aan
+                if (foundGuardian && !foundGuardian.id && foundGuardian.phone && foundGuardian.phone.startsWith('+')) {
+                  apiRequest('/api/guardians', {
+                    method: 'POST',
+                    body: foundGuardian
+                  })
+                  .then(createdGuardian => {
+                    // Maak een kopie van de data om te versturen, zonder studentId
+                    const { studentId, ...restData } = studentFormData;
+                    const dataToSubmit = {
+                      ...restData,
+                      programs: selectedPrograms.length > 0 ? selectedPrograms : 
+                        (studentFormData.programId ? [{ 
+                          programId: studentFormData.programId, 
+                          yearLevel: studentFormData.yearLevel 
+                        }] : []),
+                      guardianId: createdGuardian.id // Koppel aan de zojuist aangemaakte voogd
+                    };
+                    
+                    // Voeg de student toe en koppel aan de voogd
+                    createStudentMutation.mutate(dataToSubmit);
+                    setShowGuardianConfirmDialog(false);
+                    
+                    toast({
+                      title: "Noodcontact opgeslagen",
+                      description: "Het noodcontact is opgeslagen en gekoppeld aan de student.",
+                    });
+                  })
+                  .catch(error => {
+                    console.error("Fout bij aanmaken noodcontact:", error);
+                    toast({
+                      variant: "destructive",
+                      title: "Fout bij aanmaken noodcontact",
+                      description: "Er is een fout opgetreden bij het aanmaken van het noodcontact.",
+                    });
+                  });
+                } else {
+                  // Maak een kopie van de data om te versturen, zonder studentId
+                  const { studentId, ...restData } = studentFormData;
+                  const dataToSubmit = {
+                    ...restData,
+                    programs: selectedPrograms.length > 0 ? selectedPrograms : 
+                      (studentFormData.programId ? [{ 
+                        programId: studentFormData.programId, 
+                        yearLevel: studentFormData.yearLevel 
+                      }] : []),
+                    guardianId: foundGuardian?.id
+                  };
+                  
+                  // Voeg de student toe en koppel aan de voogd
+                  createStudentMutation.mutate(dataToSubmit);
+                  setShowGuardianConfirmDialog(false);
+                }
               }}
             >
               <Check className="h-4 w-4 mr-2" />

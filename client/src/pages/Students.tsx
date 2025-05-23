@@ -2483,8 +2483,8 @@ export default function Students() {
             </Tabs>
           </div>
           
-          <DialogFooter>
-            <Button variant="outline" onClick={() => {
+          <DialogFooter className="mt-8 flex justify-between">
+            <Button variant="outline" size="lg" onClick={() => {
               resetForm();
               setIsCreateDialogOpen(false);
             }}>
@@ -2492,6 +2492,8 @@ export default function Students() {
             </Button>
             <Button 
               type="submit" 
+              size="lg"
+              className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
               onClick={handleCreateStudent}
               disabled={createStudentMutation.isPending}
             >

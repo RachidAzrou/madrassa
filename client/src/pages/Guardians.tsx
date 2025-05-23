@@ -695,24 +695,25 @@ export default function Guardians() {
       
       {/* Voogd details dialoog */}
       <Dialog open={!!selectedGuardian} onOpenChange={() => setSelectedGuardian(null)}>
-        <DialogContent className="w-[90vw] sm:max-w-[900px] max-h-[80vh] overflow-y-auto bg-white p-0">
-          <div className="px-6 py-4">
-            <DialogHeader className="pb-2">
+        <DialogContent className="sm:max-w-[900px] h-[calc(100vh-100px)] max-h-[900px] overflow-hidden p-0 bg-white rounded-lg border shadow-lg">
+          <div className="flex flex-col h-full">
+            {/* Header met blauwe achtergrond */}
+            <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-4 -mx-6 -mt-6 flex-shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <UserCheck className="h-5 w-5 text-primary" />
+                  <div className="bg-white/20 rounded-full p-2">
+                    <UserCheck className="h-5 w-5 text-white" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <DialogTitle className="text-xl font-semibold">
+                      <DialogTitle className="text-xl font-bold text-white">
                         {selectedGuardian?.firstName} {selectedGuardian?.lastName}
                       </DialogTitle>
                       {selectedGuardian?.isEmergencyContact && (
-                        <Badge variant="destructive" className="text-xs">Noodcontact</Badge>
+                        <Badge className="bg-red-500/80 hover:bg-red-500/90 text-white border-transparent text-xs">Noodcontact</Badge>
                       )}
                     </div>
-                    <DialogDescription className="text-gray-500 text-sm mt-1">
+                    <DialogDescription className="text-blue-100 text-sm mt-1">
                       {selectedGuardian && getRelationshipLabel(selectedGuardian.relationship)}
                     </DialogDescription>
                   </div>
@@ -721,8 +722,9 @@ export default function Guardians() {
                 <div className="flex items-center gap-2">
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="secondary"
                     size="sm"
+                    className="bg-white/20 text-white hover:bg-white/30 border-transparent"
                     onClick={() => {
                       handleEditGuardian(selectedGuardian!);
                       setSelectedGuardian(null);
@@ -733,8 +735,9 @@ export default function Guardians() {
                   </Button>
                   <Button
                     type="button"
-                    variant="destructive"
+                    variant="secondary"
                     size="sm"
+                    className="bg-red-500/80 text-white hover:bg-red-500/90 border-transparent"
                     onClick={() => {
                       setIsDeleteDialogOpen(true);
                       setSelectedGuardian(null);
@@ -745,14 +748,20 @@ export default function Guardians() {
                   </Button>
                 </div>
               </div>
-            </DialogHeader>
+            </div>
 
-            {selectedGuardian && (
-              <div className="mt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              {selectedGuardian && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h3 className="text-sm font-medium mb-3 text-gray-500">Contactgegevens</h3>
-                    <div className="space-y-3">
+                    <div className="flex items-center mb-4">
+                      <div className="h-6 w-6 rounded-full bg-[#1e3a8a]/10 flex items-center justify-center mr-2">
+                        <Mail className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                      </div>
+                      <h3 className="text-base font-medium text-gray-900">Contactgegevens</h3>
+                    </div>
+                    
+                    <div className="bg-gray-50 border rounded-md p-4 shadow-sm space-y-3">
                       <div className="flex items-center gap-2 text-sm">
                         <Mail className="h-4 w-4 text-gray-500" />
                         <span>{selectedGuardian.email}</span>
@@ -790,28 +799,37 @@ export default function Guardians() {
                   </div>
                   
                   <div>
-                    <h3 className="text-sm font-medium mb-3 text-gray-500">Gekoppelde studenten</h3>
+                    <div className="flex items-center mb-4">
+                      <div className="h-6 w-6 rounded-full bg-[#1e3a8a]/10 flex items-center justify-center mr-2">
+                        <Users className="h-3.5 w-3.5 text-[#1e3a8a]" />
+                      </div>
+                      <h3 className="text-base font-medium text-gray-900">Gekoppelde studenten</h3>
+                    </div>
                     
                     {guardianStudentsLoading ? (
-                      <div className="flex justify-center items-center h-32">
+                      <div className="flex justify-center items-center h-32 bg-gray-50 border rounded-md">
                         <div className="w-6 h-6 border-2 border-t-primary rounded-full animate-spin"></div>
                       </div>
                     ) : guardianStudentsData.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {guardianStudentsData.map((rel: GuardianStudentRelationType) => (
-                          <div key={rel.id} className="border rounded-lg p-3 bg-gray-50 flex justify-between items-start">
-                            <div>
-                              <p className="font-medium text-sm">{rel.student?.firstName} {rel.student?.lastName}</p>
-                              <p className="text-xs text-gray-500">ID: {rel.student?.studentId}</p>
+                      <div className="bg-gray-50 border rounded-md shadow-sm overflow-hidden">
+                        <div className="grid grid-cols-1 divide-y">
+                          {guardianStudentsData.map((rel: GuardianStudentRelationType) => (
+                            <div key={rel.id} className="p-3 hover:bg-blue-50/50 transition-colors">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <p className="font-medium text-sm">{rel.student?.firstName} {rel.student?.lastName}</p>
+                                  <p className="text-xs text-gray-500 mt-1">ID: {rel.student?.studentId}</p>
+                                </div>
+                                {rel.isPrimary && (
+                                  <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200 text-xs">Primair</Badge>
+                                )}
+                              </div>
                             </div>
-                            {rel.isPrimary && (
-                              <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200 text-xs">Primair</Badge>
-                            )}
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     ) : (
-                      <div className="text-center py-6 bg-gray-50 border rounded-md">
+                      <div className="text-center py-6 bg-gray-50 border rounded-md shadow-sm">
                         <p className="text-gray-500 text-sm">Geen studenten gekoppeld aan deze voogd</p>
                       </div>
                     )}
@@ -819,16 +837,26 @@ export default function Guardians() {
                 </div>
               </div>
             )}
+            <div className="flex-shrink-0 px-6 py-4 border-t bg-gray-50">
+              <div className="flex justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedGuardian(null)}
+                  className="mr-2"
+                >
+                  Sluiten
+                </Button>
+                <Button
+                  className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                  onClick={() => {
+                    setSelectedGuardian(null);
+                  }}
+                >
+                  Opslaan
+                </Button>
+              </div>
+            </div>
           </div>
-          
-          <DialogFooter className="px-6 py-4 border-t">
-            <Button
-              variant="outline"
-              onClick={() => setSelectedGuardian(null)}
-            >
-              Sluiten
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
       

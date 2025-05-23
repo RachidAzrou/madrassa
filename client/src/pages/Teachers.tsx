@@ -1159,7 +1159,7 @@ export default function Teachers() {
 
       {/* Create Teacher Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95vw] sm:h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[95vw] max-h-[90vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-primary flex items-center">
               <User className="mr-2 h-5 w-5" />
@@ -1170,37 +1170,38 @@ export default function Teachers() {
             </DialogDescription>
           </DialogHeader>
           
-          <Tabs defaultValue="personal" className="mt-4">
-            <TabsList className="grid grid-cols-7 mb-4">
-              <TabsTrigger value="photo" className="flex items-center gap-2">
-                <Image className="h-4 w-4" />
-                <span>Foto</span>
-              </TabsTrigger>
-              <TabsTrigger value="personal" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                <span>Persoonlijk</span>
-              </TabsTrigger>
-              <TabsTrigger value="contact" className="flex items-center gap-2">
-                <Phone className="h-4 w-4" />
-                <span>Contact</span>
-              </TabsTrigger>
-              <TabsTrigger value="address" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                <span>Adres</span>
-              </TabsTrigger>
-              <TabsTrigger value="professional" className="flex items-center gap-2">
-                <Briefcase className="h-4 w-4" />
-                <span>Professioneel</span>
-              </TabsTrigger>
-              <TabsTrigger value="subjects" className="flex items-center gap-2">
-                <Book className="h-4 w-4" />
-                <span>Vakken</span>
-              </TabsTrigger>
-              <TabsTrigger value="classes" className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
-                <span>Klassen</span>
-              </TabsTrigger>
-            </TabsList>
+          <div className="overflow-y-auto pr-1" style={{ maxHeight: "calc(80vh - 180px)" }}>
+            <Tabs defaultValue="personal" className="mt-4">
+              <TabsList className="grid grid-cols-7 mb-4">
+                <TabsTrigger value="photo" className="flex items-center gap-2">
+                  <Image className="h-4 w-4" />
+                  <span>Foto</span>
+                </TabsTrigger>
+                <TabsTrigger value="personal" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>Persoonlijk</span>
+                </TabsTrigger>
+                <TabsTrigger value="contact" className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <span>Contact</span>
+                </TabsTrigger>
+                <TabsTrigger value="address" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  <span>Adres</span>
+                </TabsTrigger>
+                <TabsTrigger value="professional" className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4" />
+                  <span>Professioneel</span>
+                </TabsTrigger>
+                <TabsTrigger value="subjects" className="flex items-center gap-2">
+                  <Book className="h-4 w-4" />
+                  <span>Vakken</span>
+                </TabsTrigger>
+                <TabsTrigger value="classes" className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  <span>Klassen</span>
+                </TabsTrigger>
+              </TabsList>
             
             {/* Foto upload tab */}
             <TabsContent value="photo" className="space-y-6">

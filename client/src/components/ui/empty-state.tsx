@@ -21,7 +21,6 @@ const EmptyState: React.FC<EmptyStateProps> = ({
         {icon}
       </div>
       <p className="text-sm font-medium">{title}</p>
-      {description && <p className="text-sm mt-1">{description}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

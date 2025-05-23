@@ -2483,7 +2483,7 @@ export default function Students() {
             </Tabs>
           </div>
           
-          <DialogFooter className="mt-8 flex gap-4 justify-center">
+          <div className="mt-8 mb-12 flex gap-4 justify-center">
             <Button variant="outline" size="lg" onClick={() => {
               resetForm();
               setIsCreateDialogOpen(false);
@@ -2502,7 +2502,7 @@ export default function Students() {
               )}
               Student toevoegen
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 

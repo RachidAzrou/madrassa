@@ -279,4 +279,7 @@ export interface IStorage {
   markAllNotificationsAsRead(userId: number): Promise<void>;
   deleteNotification(id: number): Promise<void>;
   deleteAllNotificationsForUser(userId: number): Promise<void>;
+  
+  // Health check operations
+  checkHealth(): Promise<{ connected: boolean; timestamp?: string; error?: string }>;
 }

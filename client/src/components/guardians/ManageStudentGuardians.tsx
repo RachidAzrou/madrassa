@@ -187,23 +187,25 @@ export default function ManageStudentGuardians({ studentId, onClose, readonly = 
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-        <div>
-          <h2 className="text-xl font-bold">{student.firstName} {student.lastName}</h2>
-          <p className="text-gray-500">
-            {student.studentId} • {linkedGuardians.length} voogd{linkedGuardians.length !== 1 ? 'en' : ''}
-          </p>
+      {!readonly && (
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <div>
+            <h2 className="text-xl font-bold">{student.firstName} {student.lastName}</h2>
+            <p className="text-gray-500">
+              {student.studentId} • {linkedGuardians.length} voogd{linkedGuardians.length !== 1 ? 'en' : ''}
+            </p>
+          </div>
+          <div className="relative w-full md:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Zoek voogden..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-full"
+            />
+          </div>
         </div>
-        <div className="relative w-full md:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Zoek voogden..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 w-full"
-          />
-        </div>
-      </div>
+      )}
 
       <div className="border rounded-md bg-white">
         <div className="p-3 bg-gray-50 border-b">
@@ -222,7 +224,7 @@ export default function ManageStudentGuardians({ studentId, onClose, readonly = 
                   <TableHead className="font-medium">Voogd</TableHead>
                   <TableHead className="font-medium">Contact</TableHead>
                   <TableHead className="font-medium">Relatie</TableHead>
-                  <TableHead className="w-20 text-right font-medium">Acties</TableHead>
+                  {!readonly && <TableHead className="w-20 text-right font-medium">Acties</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -269,17 +271,19 @@ export default function ManageStudentGuardians({ studentId, onClose, readonly = 
                           {relationship?.relationshipType || 'Voogd'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveGuardian(guardian.id)}
-                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <X className="h-4 w-4" />
-                          <span className="sr-only">Verwijderen</span>
-                        </Button>
-                      </TableCell>
+                      {!readonly && (
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveGuardian(guardian.id)}
+                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <X className="h-4 w-4" />
+                            <span className="sr-only">Verwijderen</span>
+                          </Button>
+                        </TableCell>
+                      )}
                     </TableRow>
                   );
                 })}
@@ -289,11 +293,12 @@ export default function ManageStudentGuardians({ studentId, onClose, readonly = 
         )}
       </div>
 
-      <div className="border rounded-md bg-white">
-        <div className="p-3 bg-gray-50 border-b">
-          <h4 className="font-medium">Beschikbare voogden</h4>
-          <p className="text-sm text-gray-500">Voeg voogden toe aan deze student.</p>
-        </div>
+      {!readonly && (
+        <div className="border rounded-md bg-white">
+          <div className="p-3 bg-gray-50 border-b">
+            <h4 className="font-medium">Beschikbare voogden</h4>
+            <p className="text-sm text-gray-500">Voeg voogden toe aan deze student.</p>
+          </div>
         {filteredGuardians.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             <p>Geen voogden gevonden of alle beschikbare voogden zijn al gekoppeld.</p>
@@ -359,7 +364,8 @@ export default function ManageStudentGuardians({ studentId, onClose, readonly = 
             </Table>
           </div>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

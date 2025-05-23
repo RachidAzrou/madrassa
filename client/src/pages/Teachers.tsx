@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image, BookText, XCircle, LucideIcon, School } from "lucide-react";
+import * as XLSX from 'xlsx';
+import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image, BookText, XCircle, LucideIcon, School, Download } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -118,6 +119,62 @@ const Teachers = () => {
   const totalPages = teachersData?.totalCount 
     ? Math.ceil(teachersData.totalCount / rowsPerPage) 
     : 0;
+    
+  // Functie om docenten te exporteren naar Excel of CSV
+  const handleExportTeachers = async () => {
+    try {
+      // Verkrijg alle docenten van de API zonder paginatie
+      const response = await fetch('/api/teachers?export=true');
+      if (!response.ok) throw new Error('Kon docentgegevens niet ophalen voor export');
+      const data = await response.json();
+      
+      if (!data.teachers || data.teachers.length === 0) {
+        toast({
+          title: "Geen gegevens om te exporteren",
+          description: "Er zijn geen docentgegevens beschikbaar om te exporteren.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Bereid gegevens voor voor export
+      const exportData = data.teachers.map((teacher: any) => ({
+        ID: teacher.teacherId,
+        Voornaam: teacher.firstName,
+        Achternaam: teacher.lastName,
+        Email: teacher.email,
+        Telefoon: teacher.phone,
+        Status: teacher.isActive ? 'Actief' : 'Inactief',
+        Adres: `${teacher.street || ''} ${teacher.houseNumber || ''}`,
+        Postcode: teacher.postalCode,
+        Woonplaats: teacher.city,
+        Geboortedatum: teacher.dateOfBirth,
+        Geslacht: teacher.gender,
+        Specialisaties: teacher.specialties?.join(", ") || '',
+        AanmaakDatum: new Date(teacher.createdAt).toLocaleDateString('nl-NL')
+      }));
+      
+      // Genereer Excel bestand en download
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Docenten");
+      
+      const fileName = `Docenten_Export_${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      toast({
+        title: "Export succesvol",
+        description: `${exportData.length} docenten succesvol geëxporteerd naar ${fileName}`,
+      });
+    } catch (error) {
+      console.error("Fout bij exporteren docenten:", error);
+      toast({
+        title: "Export mislukt",
+        description: "Er is een fout opgetreden bij het exporteren van de docentgegevens.",
+        variant: "destructive"
+      });
+    }
+  };
   
   // Mutations
   const createTeacherMutation = useMutation({
@@ -404,7 +461,7 @@ const Teachers = () => {
               value={rowsPerPage.toString()}
               onValueChange={(value) => setRowsPerPage(parseInt(value))}
             >
-              <SelectTrigger className="w-full sm:w-[140px] bg-white">
+              <SelectTrigger className="w-full md:w-[140px] bg-white">
                 <SelectValue placeholder="Rijen" />
               </SelectTrigger>
               <SelectContent>
@@ -414,6 +471,17 @@ const Teachers = () => {
                 <SelectItem value="100">100 rijen</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          
+          <div className="flex items-center gap-2 mt-2 md:mt-0">
+            <Button 
+              variant="outline" 
+              className="px-3 py-2 h-10 bg-white"
+              onClick={handleExportTeachers}
+            >
+              <Download className="h-4 w-4 mr-1" />
+              <span className="hidden md:inline">Exporteren</span>
+            </Button>
           </div>
         </div>
         

@@ -1487,8 +1487,8 @@ export default function Students() {
               </TabsList>
               
               {/* Persoonlijke informatie tab */}
-              <TabsContent value="personal" className="space-y-4">
-                <div className="p-4 bg-white rounded-lg">
+              <TabsContent value="personal" className="mt-0">
+                <div className="p-4 bg-white rounded-lg min-h-[450px]">
                   <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-4">
                     {/* Foto upload sectie */}
                     <div className="flex items-start">
@@ -1765,8 +1765,8 @@ export default function Students() {
               </TabsContent>
               
               {/* Contact informatie tab */}
-              <TabsContent value="contact" className="space-y-4">
-                <div className="p-4 bg-white rounded-lg">
+              <TabsContent value="contact" className="mt-0">
+                <div className="p-4 bg-white rounded-lg min-h-[450px]">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="email" className="text-xs font-medium text-gray-700">
@@ -1812,8 +1812,8 @@ export default function Students() {
               </TabsContent>
               
               {/* Adres informatie tab */}
-              <TabsContent value="address" className="space-y-4">
-                <div className="p-4 bg-white rounded-lg">
+              <TabsContent value="address" className="mt-0">
+                <div className="p-4 bg-white rounded-lg min-h-[450px]">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="street" className="text-xs font-medium text-gray-700">
@@ -1871,8 +1871,8 @@ export default function Students() {
               </TabsContent>
               
               {/* Klas toewijzing tab */}
-              <TabsContent value="class" className="space-y-4">
-                <div className="p-4 bg-white rounded-lg">
+              <TabsContent value="class" className="mt-0">
+                <div className="p-4 bg-white rounded-lg min-h-[450px]">
                   <div className="flex justify-between items-center mb-2">
                     {studentFormData.studentGroupId && (
                       <Badge variant="outline" className="bg-blue-50 text-primary border-blue-100 font-medium py-1">

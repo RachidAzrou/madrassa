@@ -700,7 +700,7 @@ export default function Guardians() {
             {/* Header met blauwe achtergrond */}
             <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-6 -mx-6 -mt-6 flex-shrink-0">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-7 pl-3">
                   <div className="bg-white/20 rounded-full p-3 mt-1">
                     <UserCheck className="h-6 w-6 text-white" />
                   </div>
@@ -886,7 +886,7 @@ export default function Guardians() {
             {/* Header met blauwe achtergrond */}
             <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-6 -mx-6 -mt-6 flex-shrink-0">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-7 pl-3">
                   <div className="bg-white/20 rounded-full p-3 mt-1">
                     <UserCircle className="h-6 w-6 text-white" />
                   </div>
@@ -1123,7 +1123,7 @@ export default function Guardians() {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden">
           <div className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-6 -mx-6 -mt-6">
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-7 pl-3">
               <div className="bg-white/20 rounded-full p-3 mt-1">
                 <AlertTriangle className="h-6 w-6 text-white" />
               </div>
@@ -1167,7 +1167,7 @@ export default function Guardians() {
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent className="sm:max-w-[95%] md:max-w-[80%] lg:max-w-[70%] h-[80vh] max-h-[80vh] overflow-hidden flex flex-col">
           <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] px-6 py-6 -mx-6 -mt-6 mb-6">
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-7 pl-3">
               <div className="bg-white/20 rounded-full p-3 mt-1">
                 <UserCheck className="h-6 w-6 text-white" />
               </div>

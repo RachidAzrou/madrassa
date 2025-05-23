@@ -1346,7 +1346,7 @@ export default function Students() {
                 </tr>
               ) : (
                 (Array.isArray(studentsData) ? studentsData : []).map((student: any) => (
-                  <tr key={student.id} className="hover:bg-gray-50">
+                  <tr key={student.id} className="group hover:bg-gray-50">
                     <td className="px-3 py-4 whitespace-nowrap">
                       <Checkbox 
                         checked={selectedStudents.includes(student.id)}
@@ -1379,7 +1379,7 @@ export default function Students() {
                       {renderStatusBadge(student.status)}
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap text-right text-sm">
-                      <div className="flex justify-end gap-1">
+                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button 
                           variant="ghost" 
                           size="icon"
@@ -1454,7 +1454,7 @@ export default function Students() {
                     
                     <div className="flex items-center">
                       {renderStatusBadge(student.status)}
-                      <div className="flex ml-2">
+                      <div className="flex ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
                           size="icon"

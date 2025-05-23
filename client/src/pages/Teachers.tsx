@@ -357,7 +357,17 @@ const Teachers = () => {
   return (
     <div className="container mx-auto py-6 px-4 space-y-6">
       <div className="flex flex-col space-y-4">
-        <h1 className="text-2xl font-bold">Docenten</h1>
+        <div className="flex justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <GraduationCap className="h-7 w-7" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Docenten</h1>
+              <p className="text-base text-gray-500 mt-1">Bekijk en beheer alle docentgegevens</p>
+            </div>
+          </div>
+        </div>
         
         {/* Search and Filter Section */}
         <div className="flex flex-col space-y-4">

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle, FileDown, FileSpreadsheet, GraduationCap, ExternalLink, UserX } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle, FileDown, FileSpreadsheet, GraduationCap, ExternalLink, UserX, User, MapPin } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1113,8 +1113,33 @@ export default function Guardians() {
           </div>
           
           <form onSubmit={handleSubmitGuardian}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-4">
-              <div className="col-span-1 md:col-span-2 space-y-6">
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid grid-cols-3 mb-6 bg-gray-100 rounded-lg h-12">
+                <TabsTrigger 
+                  value="personal" 
+                  className="flex items-center gap-2 font-medium data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-sm rounded-md"
+                >
+                  <User className="h-4 w-4" />
+                  Persoonlijk
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="contact" 
+                  className="flex items-center gap-2 font-medium data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-sm rounded-md"
+                >
+                  <MapPin className="h-4 w-4" />
+                  Contact & Adres
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="students" 
+                  className="flex items-center gap-2 font-medium data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-sm rounded-md"
+                >
+                  <Users className="h-4 w-4" />
+                  Studenten
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="personal" className="space-y-6 mt-0">
+                <div className="space-y-4">
                 <div className="border rounded-lg p-4">
                   <h3 className="font-medium mb-4">Persoonlijke Informatie</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1186,8 +1211,52 @@ export default function Guardians() {
                   </div>
                 </div>
                 
+
+                
                 <div className="border rounded-lg p-4">
-                  <h3 className="font-medium mb-4">Adres</h3>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="isEmergencyContact"
+                      name="isEmergencyContact" 
+                      checked={newGuardian.isEmergencyContact}
+                      onCheckedChange={(checked) => 
+                        setNewGuardian({...newGuardian, isEmergencyContact: !!checked})
+                      }
+                    />
+                    <Label 
+                      htmlFor="isEmergencyContact" 
+                      className="font-medium text-red-600"
+                    >
+                      Dit is een noodcontact
+                    </Label>
+                  </div>
+                  {newGuardian.isEmergencyContact && (
+                    <p className="text-sm text-gray-500 mt-2">
+                      Deze persoon zal gecontacteerd worden in geval van nood.
+                    </p>
+                  )}
+                </div>
+                
+                <div className="border rounded-lg p-4">
+                  <h3 className="font-medium mb-4">Notities</h3>
+                  <div className="space-y-2">
+                    <Textarea
+                      id="notes"
+                      name="notes"
+                      placeholder="Extra informatie over deze voogd..."
+                      value={newGuardian.notes || ''}
+                      onChange={handleInputChange}
+                      className="min-h-[100px]"
+                    />
+                  </div>
+                </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="contact" className="space-y-6 mt-0">
+                <div className="space-y-4">
+                <div className="border rounded-lg p-4">
+                  <h3 className="font-medium mb-4">Adres Informatie</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="street">Straat</Label>
@@ -1230,48 +1299,13 @@ export default function Guardians() {
                     </div>
                   </div>
                 </div>
-                
-                <div className="border rounded-lg p-4">
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id="isEmergencyContact"
-                      name="isEmergencyContact" 
-                      checked={newGuardian.isEmergencyContact}
-                      onCheckedChange={(checked) => 
-                        setNewGuardian({...newGuardian, isEmergencyContact: !!checked})
-                      }
-                    />
-                    <Label 
-                      htmlFor="isEmergencyContact" 
-                      className="font-medium text-red-600"
-                    >
-                      Dit is een noodcontact
-                    </Label>
-                  </div>
-                  {newGuardian.isEmergencyContact && (
-                    <p className="text-sm text-gray-500 mt-2">
-                      Deze persoon zal gecontacteerd worden in geval van nood.
-                    </p>
-                  )}
                 </div>
-                
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-medium mb-4">Notities</h3>
-                  <div className="space-y-2">
-                    <Textarea
-                      id="notes"
-                      name="notes"
-                      placeholder="Extra informatie over deze voogd..."
-                      value={newGuardian.notes || ''}
-                      onChange={handleInputChange}
-                      className="min-h-[100px]"
-                    />
-                  </div>
-                </div>
-              </div>
-              
+              </TabsContent>
+
+              <TabsContent value="students" className="space-y-6 mt-0">
+                <div className="space-y-4">
               {!newGuardian.id && (
-                <div className="col-span-1 border rounded-lg p-4">
+                <div className="border rounded-lg p-4">
                   <h3 className="font-medium mb-4">Koppel Studenten</h3>
                   
                   <div className="space-y-2 mb-4">
@@ -1379,7 +1413,9 @@ export default function Guardians() {
                   )}
                 </div>
               )}
-            </div>
+                </div>
+              </TabsContent>
+            </Tabs>
             
             <DialogFooter>
               <Button 

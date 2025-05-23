@@ -679,7 +679,7 @@ const Teachers = () => {
           
           <div className="mt-2 overflow-y-auto pr-1" style={{ height: "calc(95vh - 100px)" }}>
             <Tabs defaultValue="personal">
-              <TabsList className="grid grid-cols-5 mb-2">
+              <TabsList className="flex mb-2 overflow-x-auto">
                 <TabsTrigger value="personal" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   <span>Persoonlijk</span>

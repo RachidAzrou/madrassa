@@ -1405,18 +1405,6 @@ export default function Guardians() {
                                 <span className="text-sm">{student?.firstName} {student?.lastName}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <Checkbox
-                                  id={`primary-${id}`}
-                                  checked={primaryStudentId === id}
-                                  onCheckedChange={(checked) => {
-                                    if (checked) {
-                                      setPrimaryStudentId(id);
-                                    } else if (primaryStudentId === id) {
-                                      setPrimaryStudentId(null);
-                                    }
-                                  }}
-                                />
-                                <Label htmlFor={`primary-${id}`} className="text-xs">Primair</Label>
                                 <Button
                                   type="button"
                                   variant="ghost"

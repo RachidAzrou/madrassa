@@ -1457,24 +1457,24 @@ export default function Students() {
                       <div className="flex ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                           onClick={() => handleViewStudentDetails(student)}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
                           onClick={() => handleEditStudent(student)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
                           onClick={() => {
                             setSelectedStudent(student);
                             setIsDeleteDialogOpen(true);

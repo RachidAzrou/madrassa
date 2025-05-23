@@ -645,7 +645,7 @@ export default function Guardians() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                           onClick={() => handleShowGuardianDetails(guardian)}
                         >
                           <Eye className="h-4 w-4" />
@@ -653,7 +653,7 @@ export default function Guardians() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
                           onClick={() => handleEditGuardian(guardian)}
                         >
                           <Pencil className="h-4 w-4" />
@@ -661,7 +661,7 @@ export default function Guardians() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 text-red-600"
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
                           onClick={() => handleDelete(guardian)}
                         >
                           <Trash2 className="h-4 w-4" />

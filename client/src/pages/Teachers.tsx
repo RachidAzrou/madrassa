@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import EmptyState from "@/components/ui/empty-state";
+import { TeacherEmptyState } from "@/components/ui/empty-states";
 
 const Teachers = () => {
   const { toast } = useToast();
@@ -492,11 +493,7 @@ const Teachers = () => {
               ) : (
                 <tr>
                   <td colSpan={7} className="py-8">
-                    <EmptyState 
-                      icon={<Users className="h-10 w-10 text-gray-400" />}
-                      title="Geen docenten gevonden"
-                      description="Er zijn geen docenten die overeenkomen met je zoekcriteria."
-                    />
+                    <TeacherEmptyState description="Er zijn geen docenten die overeenkomen met je zoekcriteria." />
                   </td>
                 </tr>
               )}

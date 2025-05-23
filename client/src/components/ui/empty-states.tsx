@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, GraduationCap, BookOpen, CreditCard, ClipboardCheck } from 'lucide-react';
+import { Users, GraduationCap, BookOpen, CreditCard, ClipboardCheck, UserCog } from 'lucide-react';
 import EmptyState from './empty-state';
 
 // Voor studenten pagina
@@ -43,6 +43,15 @@ export const ExamEmptyState = ({ description = "Er zijn momenteel geen examens b
   <EmptyState 
     icon={<ClipboardCheck className="h-10 w-10 opacity-30" />}
     title="Geen examens gevonden" 
+    description={description} 
+  />
+);
+
+// Voor docenten pagina
+export const TeacherEmptyState = ({ description = "Er zijn momenteel geen docenten beschikbaar." }) => (
+  <EmptyState 
+    icon={<UserCog className="h-10 w-10 opacity-30" />}
+    title="Geen docenten gevonden" 
     description={description} 
   />
 );

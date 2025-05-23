@@ -3201,12 +3201,21 @@ export default function Students() {
           <DialogHeader className="pb-3 border-b">
             <DialogTitle className="text-xl font-semibold flex items-center text-primary">
               <div className="bg-blue-100 rounded-full p-1.5 mr-3">
-                <UserCheck className="h-5 w-5 text-primary" />
+                {foundGuardian?.phone && foundGuardian?.phone.startsWith('+') ? 
+                  <AlertCircle className="h-5 w-5 text-primary" /> : 
+                  <UserCheck className="h-5 w-5 text-primary" />
+                }
               </div>
-              Voogd gevonden
+              {foundGuardian?.phone && foundGuardian?.phone.startsWith('+') ? 
+                'Noodcontact gedetecteerd' : 
+                'Voogd gevonden'
+              }
             </DialogTitle>
             <DialogDescription className="text-gray-500 mt-1">
-              Er is een voogd gevonden met dezelfde achternaam. Wilt u deze koppelen aan de student?
+              {foundGuardian?.phone && foundGuardian?.phone.startsWith('+') ? 
+                `Er is een noodcontactnummer (${foundGuardian?.phone}) gedetecteerd op de eID. Wilt u dit nummer koppelen als contactpersoon?` : 
+                'Er is een voogd gevonden met dezelfde achternaam. Wilt u deze koppelen aan de student?'
+              }
             </DialogDescription>
           </DialogHeader>
           

@@ -70,7 +70,9 @@ const Teachers = () => {
     documents: [],
     availability: [],
     assignedCourses: [],
-    assignedClasses: []
+    assignedClasses: [],
+    profession: "",
+    educations: []
   });
   
   // State for search and filters
@@ -1325,7 +1327,7 @@ const Teachers = () => {
                 <div className="p-3 border border-gray-200 rounded-lg bg-white shadow-sm min-h-[365px]">
                   <h3 className="text-lg font-semibold text-primary mb-2">Professionele gegevens</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-3">
-                    <div>
+                    <div className="md:col-span-3">
                       <Label htmlFor="profession" className="text-sm font-medium text-gray-700">
                         Beroep
                       </Label>
@@ -1338,38 +1340,56 @@ const Teachers = () => {
                       />
                     </div>
                     
-                    <div>
-                      <Label htmlFor="educationLevel" className="text-sm font-medium text-gray-700">
-                        Opleidingsniveau
+                    <div className="md:col-span-3">
+                      <Label className="text-sm font-medium text-gray-700 mb-1 block">
+                        Opleidingen
                       </Label>
-                      <Select
-                        value={teacherFormData.educationLevel}
-                        onValueChange={(value) => setTeacherFormData({ ...teacherFormData, educationLevel: value })}
-                      >
-                        <SelectTrigger className="w-full mt-1 bg-white h-8">
-                          <SelectValue placeholder="Selecteer opleidingsniveau" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="MBO">MBO</SelectItem>
-                          <SelectItem value="HBO">HBO</SelectItem>
-                          <SelectItem value="Bachelor">Bachelor</SelectItem>
-                          <SelectItem value="Master">Master</SelectItem>
-                          <SelectItem value="PhD">PhD/Doctoraat</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="educationDetail" className="text-sm font-medium text-gray-700">
-                        Opleidingsdetails
-                      </Label>
-                      <Input
-                        id="educationDetail"
-                        placeholder="Specifieke opleiding"
-                        value={teacherFormData.educationDetail || ""}
-                        onChange={(e) => setTeacherFormData({ ...teacherFormData, educationDetail: e.target.value })}
-                        className="mt-1 bg-white h-8"
-                      />
+                      <div className="grid grid-cols-1 gap-2">
+                        <Input
+                          placeholder="Voeg een opleiding toe en druk op Enter"
+                          className="bg-white h-8"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && e.currentTarget.value.trim() !== '') {
+                              e.preventDefault();
+                              const value = e.currentTarget.value.trim();
+                              if (!teacherFormData.educations) {
+                                setTeacherFormData({
+                                  ...teacherFormData,
+                                  educations: [value]
+                                });
+                              } else if (!teacherFormData.educations.includes(value)) {
+                                setTeacherFormData({
+                                  ...teacherFormData,
+                                  educations: [...teacherFormData.educations, value]
+                                });
+                              }
+                              e.currentTarget.value = '';
+                            }
+                          }}
+                        />
+                        
+                        {teacherFormData.educations && teacherFormData.educations.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {teacherFormData.educations.map((education, index) => (
+                              <div key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-md flex items-center group">
+                                {education}
+                                <button
+                                  type="button"
+                                  className="ml-1 text-blue-600 hover:text-blue-800 opacity-60 group-hover:opacity-100"
+                                  onClick={() => {
+                                    setTeacherFormData({
+                                      ...teacherFormData,
+                                      educations: teacherFormData.educations.filter((_, i) => i !== index)
+                                    });
+                                  }}
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     
                     <div className="md:col-span-3">
@@ -1548,7 +1568,7 @@ const Teachers = () => {
                 <span>Vakken</span>
               </TabsTrigger>
               <TabsTrigger value="classes" className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
+                <ChalkBoard className="h-4 w-4" />
                 <span>Klassen</span>
               </TabsTrigger>
             </TabsList>

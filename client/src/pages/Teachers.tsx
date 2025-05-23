@@ -666,8 +666,8 @@ const Teachers = () => {
       
       {/* Create Teacher Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[95%] max-h-[92vh] h-auto overflow-hidden">
+          <DialogHeader className="pb-2">
             <DialogTitle className="text-xl font-bold flex items-center text-primary">
               <User className="mr-2 h-5 w-5" />
               Nieuwe Docent Toevoegen
@@ -677,7 +677,7 @@ const Teachers = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="py-2">
+          <div className="flex-1 overflow-auto py-2" style={{ maxHeight: "calc(85vh - 150px)" }}>
             <Tabs defaultValue="personal">
               <TabsList className="grid grid-cols-6 mb-4">
                 <TabsTrigger value="personal" className="flex items-center gap-2">
@@ -710,8 +710,8 @@ const Teachers = () => {
               
               {/* Persoonlijke informatie tab */}
               <TabsContent value="personal" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-base font-semibold text-primary mb-3">Persoonlijke gegevens</h3>
                   
                   {/* Foto upload sectie */}
                   <div className="flex mb-4 mt-0 items-start">
@@ -1056,9 +1056,9 @@ const Teachers = () => {
               
               {/* Contact informatie tab */}
               <TabsContent value="contact" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-base font-semibold text-primary mb-3">Contactgegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="email" className="text-sm font-medium text-gray-700">
                         Email <span className="text-primary">*</span>
@@ -1091,9 +1091,9 @@ const Teachers = () => {
               
               {/* Adres informatie tab */}
               <TabsContent value="address" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-base font-semibold text-primary mb-3">Adresgegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="street" className="text-sm font-medium text-gray-700">
                         Straat
@@ -1151,9 +1151,9 @@ const Teachers = () => {
               
               {/* Professionele informatie tab */}
               <TabsContent value="professional" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Professionele gegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-base font-semibold text-primary mb-3">Professionele gegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="educationLevel" className="text-sm font-medium text-gray-700">
                         Opleidingsniveau
@@ -1339,23 +1339,23 @@ const Teachers = () => {
               
               {/* Vakken tab */}
               <TabsContent value="subjects" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Vakken</h3>
-                  <p className="text-gray-500 mb-4">Vakken worden toegewezen na het aanmaken van de docent.</p>
+                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-base font-semibold text-primary mb-3">Vakken</h3>
+                  <p className="text-gray-500 mb-2">Vakken worden toegewezen na het aanmaken van de docent.</p>
                 </div>
               </TabsContent>
               
               {/* Klassen tab */}
               <TabsContent value="classes" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Klassen</h3>
-                  <p className="text-gray-500 mb-4">Klassen worden toegewezen na het aanmaken van de docent.</p>
+                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-base font-semibold text-primary mb-3">Klassen</h3>
+                  <p className="text-gray-500 mb-2">Klassen worden toegewezen na het aanmaken van de docent.</p>
                 </div>
               </TabsContent>
             </Tabs>
           </div>
           
-          <DialogFooter className="mt-6">
+          <DialogFooter className="mt-3 pt-2 border-t">
             <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
               Annuleren
             </Button>

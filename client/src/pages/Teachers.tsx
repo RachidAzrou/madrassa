@@ -758,15 +758,7 @@ const Teachers = () => {
                 </div>
               </div>
               
-              <Button
-                type="button"
-                variant="ghost"
-                className="text-white hover:bg-blue-700 hover:text-white"
-                onClick={() => setIsCreateDialogOpen(false)}
-              >
-                <X className="h-4 w-4 mr-2" />
-                Sluiten
-              </Button>
+
             </div>
           </DialogHeader>
           

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle, FileDown, FileSpreadsheet } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle, FileDown, FileSpreadsheet, GraduationCap, ExternalLink, UserX } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -824,114 +824,240 @@ export default function Guardians() {
       
       {/* Student details dialoog */}
       <Dialog open={!!selectedStudent} onOpenChange={() => setSelectedStudent(null)}>
-        <DialogContent className="w-[90vw] sm:max-w-[900px] max-h-[80vh] overflow-y-auto bg-white p-0">
-          <div className="px-6 py-4">
-            <DialogHeader className="pb-2">
+        <DialogContent className="w-[90vw] sm:max-w-[900px] max-h-[85vh] overflow-y-auto bg-white p-0">
+          <div className="pb-6">
+            {/* Header met blauwe achtergrond */}
+            <div className="bg-blue-600 text-white px-6 py-5 rounded-t-lg">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
-                    <UserCircle className="h-5 w-5 text-blue-600" />
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <UserCircle className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <DialogTitle className="text-xl font-semibold">
+                    <h2 className="text-xl font-semibold">
                       {selectedStudent?.firstName} {selectedStudent?.lastName}
-                    </DialogTitle>
-                    <DialogDescription className="text-gray-500 text-sm mt-1">
-                      Student ID: {selectedStudent?.studentId}
-                    </DialogDescription>
-                  </div>
-                </div>
-                
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setSelectedStudent(null)}
-                >
-                  Sluiten
-                </Button>
-              </div>
-            </DialogHeader>
-
-            <div className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-sm font-medium mb-3 text-gray-500">Studentgegevens</h3>
-                  <div className="space-y-4 bg-gray-50 border rounded-md p-4">
-                    <div>
-                      <p className="text-xs text-gray-500">Naam</p>
-                      <p className="font-medium">{selectedStudent?.firstName} {selectedStudent?.lastName}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Student ID</p>
-                      <p className="font-medium">{selectedStudent?.studentId}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Status</p>
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 mt-1">
+                    </h2>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-sm text-blue-100 font-medium">
+                        {selectedStudent?.studentId}
+                      </span>
+                      <Badge className="bg-white/20 text-white border-transparent hover:bg-white/30">
                         {selectedStudent?.status || 'Actief'}
                       </Badge>
                     </div>
                   </div>
                 </div>
                 
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-white hover:bg-blue-700 hover:text-white"
+                  onClick={() => setSelectedStudent(null)}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Sluiten
+                </Button>
+              </div>
+            </div>
+
+            <div className="px-6 pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-sm font-medium mb-3 text-gray-500">Voogdgegevens</h3>
-                  <div className="space-y-0 bg-gray-50 border rounded-md divide-y">
-                    {guardianStudentsQuery.data && guardianStudentsQuery.data
-                      .filter((rel: any) => rel.studentId === selectedStudent?.id)
-                      .map((rel: any) => {
-                        const guardian = guardiansData?.find((g: any) => g.id === rel.guardianId);
-                        return guardian ? (
-                          <div key={rel.id} className="p-3">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Avatar className="h-6 w-6">
-                                  <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
-                                    {guardian.firstName.charAt(0)}{guardian.lastName.charAt(0)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <p className="font-medium text-sm">{guardian.firstName} {guardian.lastName}</p>
-                                  <div className="flex items-center gap-1 mt-0.5">
-                                    <Badge 
-                                      variant="outline" 
-                                      className="px-1 py-0 h-4 text-[10px]"
+                  <div className="flex items-center mb-4">
+                    <GraduationCap className="h-5 w-5 text-blue-600 mr-2" />
+                    <h3 className="text-base font-medium text-gray-900">Studentgegevens</h3>
+                  </div>
+                  
+                  <div className="bg-gray-50 border rounded-md overflow-hidden">
+                    <div className="grid grid-cols-1 divide-y">
+                      <div className="p-4 flex">
+                        <div className="w-1/3">
+                          <p className="text-xs font-medium text-gray-500 uppercase">Naam</p>
+                        </div>
+                        <div className="w-2/3">
+                          <p className="font-medium text-gray-900">{selectedStudent?.firstName} {selectedStudent?.lastName}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 flex">
+                        <div className="w-1/3">
+                          <p className="text-xs font-medium text-gray-500 uppercase">Student ID</p>
+                        </div>
+                        <div className="w-2/3">
+                          <p className="font-medium text-gray-900">{selectedStudent?.studentId}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 flex">
+                        <div className="w-1/3">
+                          <p className="text-xs font-medium text-gray-500 uppercase">Email</p>
+                        </div>
+                        <div className="w-2/3">
+                          <p className="font-medium text-gray-900">
+                            {selectedStudent?.email || <span className="text-gray-400 italic">Niet beschikbaar</span>}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 flex">
+                        <div className="w-1/3">
+                          <p className="text-xs font-medium text-gray-500 uppercase">Telefoon</p>
+                        </div>
+                        <div className="w-2/3">
+                          <p className="font-medium text-gray-900">
+                            {selectedStudent?.phone || <span className="text-gray-400 italic">Niet beschikbaar</span>}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 flex">
+                        <div className="w-1/3">
+                          <p className="text-xs font-medium text-gray-500 uppercase">Status</p>
+                        </div>
+                        <div className="w-2/3">
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                            {selectedStudent?.status || 'Actief'}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end mt-3">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs gap-1.5"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      Ga naar studentpagina
+                    </Button>
+                  </div>
+                  
+                  <div className="text-right mt-4">
+                    <a 
+                      href="#/students" 
+                      className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      <GraduationCap className="h-4 w-4 mr-1.5" />
+                      Ga naar studentenoverzicht
+                    </a>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="flex items-center mb-4">
+                    <UserCircle className="h-5 w-5 text-blue-600 mr-2" />
+                    <h3 className="text-base font-medium text-gray-900">Voogdgegevens</h3>
+                  </div>
+                  
+                  <div className="bg-gray-50 border rounded-md overflow-hidden">
+                    <div className="divide-y">
+                      {guardianStudentsQuery.data && guardianStudentsQuery.data
+                        .filter((rel: any) => rel.studentId === selectedStudent?.id)
+                        .map((rel: any) => {
+                          const guardian = guardiansData?.find((g: any) => g.id === rel.guardianId);
+                          return guardian ? (
+                            <div key={rel.id} className="group hover:bg-blue-50/50 transition-colors">
+                              <div className="p-4">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex gap-3">
+                                    <Avatar className="h-10 w-10 mt-0.5">
+                                      <AvatarFallback className="bg-blue-100 text-blue-700">
+                                        {guardian.firstName.charAt(0)}{guardian.lastName.charAt(0)}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                      <div className="flex items-center gap-2">
+                                        <p className="font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</p>
+                                        {rel.isPrimary && (
+                                          <Badge 
+                                            variant="outline" 
+                                            className="px-1.5 py-0 h-5 text-[10px] bg-blue-50 text-blue-700 border-blue-200"
+                                          >
+                                            Primair
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      
+                                      <div className="mt-1 flex items-center gap-2">
+                                        <Badge 
+                                          variant="outline" 
+                                          className="px-1.5 py-0 h-5 text-[10px]"
+                                        >
+                                          {getRelationshipLabel(guardian.relationship)}
+                                        </Badge>
+                                      </div>
+                                      
+                                      <div className="grid grid-cols-1 gap-1 mt-2">
+                                        {guardian.phone && (
+                                          <div className="flex items-center gap-1.5">
+                                            <Phone className="h-3 w-3 text-gray-400" />
+                                            <span className="text-xs text-gray-600">{guardian.phone}</span>
+                                          </div>
+                                        )}
+                                        
+                                        {guardian.email && (
+                                          <div className="flex items-center gap-1.5">
+                                            <Mail className="h-3 w-3 text-gray-400" />
+                                            <span className="text-xs text-gray-600">{guardian.email}</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-2">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="h-8 invisible group-hover:visible transition-all opacity-0 group-hover:opacity-100"
+                                      onClick={() => {
+                                        setSelectedStudent(null);
+                                        handleShowGuardianDetails(guardian);
+                                      }}
                                     >
-                                      {getRelationshipLabel(guardian.relationship)}
-                                    </Badge>
-                                    {rel.isPrimary && (
-                                      <Badge 
-                                        variant="outline" 
-                                        className="px-1 py-0 h-4 text-[10px] bg-blue-50 text-blue-700 border-blue-200"
-                                      >
-                                        Primair
+                                      <Eye className="h-3.5 w-3.5 mr-1.5" />
+                                      Details
+                                    </Button>
+                                    {guardian.isEmergencyContact && (
+                                      <Badge variant="outline" className="border-red-200 bg-red-50 text-red-600 text-[10px]">
+                                        <AlertTriangle className="h-3 w-3 mr-1" />
+                                        Noodcontact
                                       </Badge>
                                     )}
                                   </div>
                                 </div>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-7 w-7 p-0"
-                                onClick={() => {
-                                  setSelectedStudent(null);
-                                  handleShowGuardianDetails(guardian);
-                                }}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
                             </div>
+                          ) : null;
+                        })}
+                        
+                      {!guardianStudentsQuery.data || 
+                      !guardianStudentsQuery.data.some((rel: any) => rel.studentId === selectedStudent?.id) && (
+                        <div className="py-8 px-4">
+                          <div className="flex flex-col items-center justify-center text-center">
+                            <div className="h-12 w-12 rounded-full bg-blue-100/50 flex items-center justify-center mb-3">
+                              <UserX className="h-6 w-6 text-blue-500/30" />
+                            </div>
+                            <p className="text-gray-500 text-sm">
+                              Geen voogden gekoppeld aan deze student
+                            </p>
+                            <Button 
+                              variant="link" 
+                              size="sm" 
+                              className="mt-2 h-auto p-0 text-blue-600 text-xs"
+                              onClick={() => {
+                                setSelectedStudent(null);
+                                handleAddNewGuardian();
+                              }}
+                            >
+                              Voogd toevoegen
+                            </Button>
                           </div>
-                        ) : null;
-                      })}
-                      
-                    {!guardianStudentsQuery.data || 
-                     !guardianStudentsQuery.data.some((rel: any) => rel.studentId === selectedStudent?.id) && (
-                      <div className="p-4 text-center text-gray-500 text-sm">
-                        Geen voogden gekoppeld aan deze student
-                      </div>
-                    )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

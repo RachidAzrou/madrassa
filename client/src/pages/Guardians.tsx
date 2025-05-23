@@ -1093,7 +1093,7 @@ export default function Guardians() {
       
       {/* Toevoegen/bewerken dialoog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="sm:max-w-[95%] md:max-w-[80%] lg:max-w-[70%] h-auto max-h-[96vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[95%] md:max-w-[80%] lg:max-w-[70%] h-[80vh] max-h-[80vh] overflow-hidden flex flex-col">
           <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] px-6 py-4 -mx-6 -mt-6 mb-6">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 rounded-full p-2">
@@ -1112,9 +1112,9 @@ export default function Guardians() {
             </div>
           </div>
           
-          <form onSubmit={handleSubmitGuardian}>
-            <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-3 mb-6 bg-gray-100 rounded-lg h-12">
+          <form onSubmit={handleSubmitGuardian} className="flex flex-col flex-1 overflow-hidden">
+            <Tabs defaultValue="personal" className="w-full flex flex-col flex-1 overflow-hidden">
+              <TabsList className="grid grid-cols-3 mb-6 bg-gray-100 rounded-lg h-12 flex-shrink-0">
                 <TabsTrigger 
                   value="personal" 
                   className="flex items-center gap-2 font-medium data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-sm rounded-md"
@@ -1138,8 +1138,9 @@ export default function Guardians() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="personal" className="space-y-6 mt-0">
-                <div className="space-y-4">
+              <div className="flex-1 overflow-y-auto">
+                <TabsContent value="personal" className="space-y-6 mt-0 h-full">
+                  <div className="space-y-4">
                 <div className="border rounded-lg p-4">
                   <h3 className="font-medium mb-4">Persoonlijke Informatie</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1251,57 +1252,57 @@ export default function Guardians() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="contact" className="space-y-6 mt-0">
-                <div className="space-y-4">
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-medium mb-4">Adres Informatie</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="street">Straat</Label>
-                      <Input
-                        id="street"
-                        name="street"
-                        value={newGuardian.street || ''}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="houseNumber">Huisnummer</Label>
-                      <Input
-                        id="houseNumber"
-                        name="houseNumber"
-                        value={newGuardian.houseNumber || ''}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="postalCode">Postcode</Label>
-                      <Input
-                        id="postalCode"
-                        name="postalCode"
-                        value={newGuardian.postalCode || ''}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="city">Stad</Label>
-                      <Input
-                        id="city"
-                        name="city"
-                        value={newGuardian.city || ''}
-                        onChange={handleInputChange}
-                      />
+                <TabsContent value="contact" className="space-y-6 mt-0 h-full">
+                  <div className="space-y-4">
+                  <div className="border rounded-lg p-4">
+                    <h3 className="font-medium mb-4">Adres Informatie</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="street">Straat</Label>
+                        <Input
+                          id="street"
+                          name="street"
+                          value={newGuardian.street || ''}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="houseNumber">Huisnummer</Label>
+                        <Input
+                          id="houseNumber"
+                          name="houseNumber"
+                          value={newGuardian.houseNumber || ''}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="postalCode">Postcode</Label>
+                        <Input
+                          id="postalCode"
+                          name="postalCode"
+                          value={newGuardian.postalCode || ''}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="city">Stad</Label>
+                        <Input
+                          id="city"
+                          name="city"
+                          value={newGuardian.city || ''}
+                          onChange={handleInputChange}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-                </div>
-              </TabsContent>
+                  </div>
+                </TabsContent>
 
-              <TabsContent value="students" className="space-y-6 mt-0">
-                <div className="space-y-4">
+                <TabsContent value="students" className="space-y-6 mt-0 h-full">
+                  <div className="space-y-4">
               {!newGuardian.id && (
                 <div className="border rounded-lg p-4">
                   <h3 className="font-medium mb-4">Koppel Studenten</h3>
@@ -1413,6 +1414,7 @@ export default function Guardians() {
               )}
                 </div>
               </TabsContent>
+              </div>
             </Tabs>
             
             <DialogFooter>

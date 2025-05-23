@@ -666,7 +666,7 @@ const Teachers = () => {
       
       {/* Create Teacher Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95vw] h-[calc(100vh-60px)]">
+        <DialogContent className="sm:max-w-[95vw] h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-primary flex items-center">
               <User className="mr-2 h-5 w-5" />
@@ -677,7 +677,7 @@ const Teachers = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="mt-4 overflow-y-auto pr-1" style={{ maxHeight: "calc(100vh - 220px)" }}>
+          <div className="mt-4 overflow-y-auto pr-1" style={{ height: "calc(90vh - 150px)" }}>
             <Tabs defaultValue="personal">
               <TabsList className="grid grid-cols-7 mb-4">
                 <TabsTrigger value="photo" className="flex items-center gap-2">
@@ -804,7 +804,7 @@ const Teachers = () => {
               
               {/* Persoonlijke informatie tab */}
               <TabsContent value="personal" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm min-h-[600px]">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm min-h-[550px]">
                   <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
                   
                   {/* Foto upload sectie met knoppen rechts */}

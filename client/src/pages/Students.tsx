@@ -3335,40 +3335,28 @@ export default function Students() {
                   // Aanmaken van een nieuwe voogd met het noodcontactnummer
                   const newGuardian = {
                     firstName: "",
-                    lastName: foundGuardian.lastName || studentFormData.lastName,
+                    lastName: "",
                     relationship: "noodcontact",
                     email: "",
                     phone: foundGuardian.phone,
-                    street: studentFormData.street || "",
-                    houseNumber: studentFormData.houseNumber || "",
-                    postalCode: studentFormData.postalCode || "",
-                    city: studentFormData.city || "",
                     isEmergencyContact: true
                   };
                   
-                  // Maak eerst een voogd aan
-                  apiRequest('/api/guardians', {
-                    method: 'POST',
-                    body: newGuardian
-                  })
-                  .then(createdGuardian => {
-                    setShowGuardianConfirmDialog(false);
-                    
-                    // Ga naar de bewerken pagina voor deze nieuwe voogd
-                    window.location.href = `/guardians?edit=${createdGuardian.id}&returnToStudent=true`;
-                    
-                    toast({
-                      title: "Noodcontact aangemaakt",
-                      description: "U wordt doorgestuurd naar de voogdbewerking om de gegevens verder aan te vullen.",
-                    });
-                  })
-                  .catch(error => {
-                    console.error("Fout bij aanmaken noodcontact:", error);
-                    toast({
-                      variant: "destructive",
-                      title: "Fout bij aanmaken noodcontact",
-                      description: "Er is een fout opgetreden bij het aanmaken van het noodcontact.",
-                    });
+                  // Direct naar de Guardians pagina en de dialoog openen
+                  // We sturen het telefoonnummer mee in localStorage voor tijdelijke opslag
+                  localStorage.setItem('temp_noodcontact_phone', foundGuardian.phone);
+                  localStorage.setItem('temp_student_return', 'true');
+                  
+                  // Markeer de dialoog om te openen op Guardians pagina
+                  localStorage.setItem('open_guardian_dialog', 'true');
+                  
+                  // We redirecten naar de Guardians pagina
+                  setShowGuardianConfirmDialog(false);
+                  window.location.href = '/guardians';
+                  
+                  toast({
+                    title: "Noodcontact bewerken",
+                    description: "U wordt doorgestuurd naar de voogdenpagina om het noodcontact toe te voegen.",
                   });
                 }}
               >

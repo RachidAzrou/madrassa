@@ -149,6 +149,42 @@ export default function Guardians() {
       }
     }
   }, [searchParams.editId, guardians, toast]);
+  
+  // Controleer of we een noodcontactnummer moeten openen vanuit de studentenpagina
+  useEffect(() => {
+    // Check of er een noodcontactnummer in localStorage is gezet
+    const noodcontactPhone = localStorage.getItem('temp_noodcontact_phone');
+    const shouldOpenDialog = localStorage.getItem('open_guardian_dialog');
+    const returnToStudent = localStorage.getItem('temp_student_return');
+    
+    if (noodcontactPhone && shouldOpenDialog === 'true') {
+      // Verwijder de flags uit localStorage
+      localStorage.removeItem('temp_noodcontact_phone');
+      localStorage.removeItem('open_guardian_dialog');
+      
+      // Open een nieuwe voogd dialoog met het noodcontactnummer ingevuld
+      setNewGuardian({
+        firstName: "",
+        lastName: "",
+        relationship: "noodcontact",
+        email: "",
+        phone: noodcontactPhone,
+        isEmergencyContact: true,
+        street: "",
+        houseNumber: "",
+        postalCode: "",
+        city: ""
+      });
+      
+      setShowAddDialog(true);
+      
+      // Toon een toast met instructies
+      toast({
+        title: "Noodcontact toevoegen",
+        description: "Vul de gegevens voor het noodcontact aan en sla op.",
+      });
+    }
+  }, [toast]);
 
   // Fetch all students for student assignment
   const {

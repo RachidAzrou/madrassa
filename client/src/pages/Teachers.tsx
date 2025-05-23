@@ -445,22 +445,9 @@ const Teachers = () => {
       
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
         {/* Filters */}
-        <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-2 w-full md:w-auto">
-            
-            <Select
-              value={statusFilter}
-              onValueChange={(value) => setStatusFilter(value)}
-            >
-              <SelectTrigger className="w-full md:w-[140px] bg-white">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle statussen</SelectItem>
-                <SelectItem value="active">Actief</SelectItem>
-                <SelectItem value="inactive">Inactief</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="p-4 border-b border-gray-200">
+          <div className="w-full">
+            {/* Status filter is verwijderd zoals gevraagd */}
           </div>
         </div>
         

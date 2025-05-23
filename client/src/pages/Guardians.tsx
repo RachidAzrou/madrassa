@@ -458,11 +458,6 @@ export default function Guardians() {
               </div>
               
               <div className="col-span-1">
-                <p className="text-xs font-medium text-gray-500 mb-1">Beroep</p>
-                <p className="text-sm font-medium">{selectedGuardian?.occupation || '-'}</p>
-              </div>
-              
-              <div className="col-span-1">
                 <p className="text-xs font-medium text-gray-500 mb-1">E-mail</p>
                 <p className="text-sm font-medium flex items-center">
                   <Mail className="h-3 w-3 mr-1 text-gray-500" />
@@ -667,15 +662,7 @@ export default function Guardians() {
                       </Select>
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="occupation">Beroep</Label>
-                      <Input
-                        id="occupation"
-                        name="occupation"
-                        value={newGuardian.occupation || ''}
-                        onChange={handleInputChange}
-                      />
-                    </div>
+
                   </div>
                 </div>
                 

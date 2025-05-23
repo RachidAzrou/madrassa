@@ -666,9 +666,9 @@ const Teachers = () => {
       
       {/* Create Teacher Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] max-h-[92vh] h-auto overflow-hidden">
-          <DialogHeader className="pb-2">
-            <DialogTitle className="text-xl font-bold flex items-center text-primary">
+        <DialogContent className="sm:max-w-[95vw] h-[calc(100vh-60px)]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-primary flex items-center">
               <User className="mr-2 h-5 w-5" />
               Nieuwe Docent Toevoegen
             </DialogTitle>
@@ -677,7 +677,7 @@ const Teachers = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="flex-1 overflow-auto py-2" style={{ maxHeight: "calc(85vh - 150px)" }}>
+          <div className="mt-4 overflow-y-auto pr-1" style={{ maxHeight: "calc(100vh - 220px)" }}>
             <Tabs defaultValue="personal">
               <TabsList className="grid grid-cols-6 mb-4">
                 <TabsTrigger value="personal" className="flex items-center gap-2">
@@ -706,51 +706,20 @@ const Teachers = () => {
                 </TabsTrigger>
               </TabsList>
             
-  
-              
-              {/* Persoonlijke informatie tab */}
-              <TabsContent value="personal" className="space-y-6">
-                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-base font-semibold text-primary mb-3">Persoonlijke gegevens</h3>
-                  
-                  {/* Foto upload sectie */}
-                  <div className="flex mb-4 mt-0 items-start">
-                    <div 
-                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-4"
-                      onClick={() => {
-                        const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
-                        fileInput?.click();
-                      }}
-                    >
-                      <img id="teacher-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
-                      <div id="teacher-photo-placeholder" className="w-full h-full flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-full">
-                        <User className="h-10 w-10 text-gray-300" />
-                        <div className="absolute bottom-0 right-0 bg-[#1e3a8a] rounded-full p-1.5 shadow-sm">
-                          <Upload className="h-3.5 w-3.5 text-white" />
-                        </div>
+              {/* Foto upload tab */}
+              <TabsContent value="photo" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Foto uploaden</h3>
+                  <div className="flex flex-col items-center justify-center gap-4">
+                    <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center overflow-hidden bg-gray-50 relative group cursor-pointer">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Upload className="h-8 w-8 text-gray-500" />
+                        <p className="text-sm text-gray-500 mt-2">Bestand kiezen</p>
                       </div>
-                      
-                      {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
-                      <div 
-                        className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity hidden"
-                        id="photo-delete-overlay"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
-                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
-                          const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
-                          const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
-                          
-                          if (photoPreview && photoPlaceholder && fileInput && photoDeleteOverlay) {
-                            photoPreview.src = '';
-                            photoPreview.classList.add('hidden');
-                            photoPlaceholder.classList.remove('hidden');
-                            photoDeleteOverlay.classList.add('hidden');
-                            fileInput.value = '';
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-6 w-6 text-white" />
+                      <img id="teacher-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
+                      <div id="teacher-photo-placeholder" className="flex flex-col items-center justify-center">
+                        <User className="h-12 w-12 text-gray-300" />
+                        <p className="text-sm text-gray-400 mt-2">Geen foto</p>
                       </div>
                     </div>
                     
@@ -766,21 +735,73 @@ const Teachers = () => {
                           reader.onload = function(event) {
                             const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
                             const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
-                            const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
                             
-                            if (photoPreview && photoPlaceholder && photoDeleteOverlay && event.target?.result) {
+                            if (photoPreview && photoPlaceholder && event.target?.result) {
                               photoPreview.src = event.target.result as string;
                               photoPreview.classList.remove('hidden');
                               photoPlaceholder.classList.add('hidden');
-                              photoDeleteOverlay.classList.remove('hidden');
                             }
                           };
                           reader.readAsDataURL(file);
                         }
                       }}
                     />
+                    
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="mt-2"
+                        onClick={() => {
+                          const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
+                          fileInput?.click();
+                        }}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Foto uploaden
+                      </Button>
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="mt-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => {
+                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                          const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
+                          
+                          if (photoPreview && photoPlaceholder && fileInput) {
+                            photoPreview.src = '';
+                            photoPreview.classList.add('hidden');
+                            photoPlaceholder.classList.remove('hidden');
+                            fileInput.value = '';
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Verwijderen
+                      </Button>
+                    </div>
+
+                    <div className="w-full mt-4">
+                      <Label className="text-sm font-medium text-gray-700">
+                        Richtlijnen voor foto's
+                      </Label>
+                      <ul className="mt-2 text-sm text-gray-600 space-y-1 list-disc list-inside">
+                        <li>Upload een duidelijke, recente foto</li>
+                        <li>Foto moet het volledige gezicht tonen</li>
+                        <li>Neutrale achtergrond</li>
+                        <li>Maximum bestandsgrootte: 5MB</li>
+                      </ul>
+                    </div>
                   </div>
-                  
+                </div>
+              </TabsContent>
+              
+              {/* Persoonlijke informatie tab */}
+              <TabsContent value="personal" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
                   <div className="flex mb-4 justify-end gap-2">
                     <Button 
                       variant="outline" 
@@ -1056,9 +1077,9 @@ const Teachers = () => {
               
               {/* Contact informatie tab */}
               <TabsContent value="contact" className="space-y-6">
-                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-base font-semibold text-primary mb-3">Contactgegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="email" className="text-sm font-medium text-gray-700">
                         Email <span className="text-primary">*</span>
@@ -1091,9 +1112,9 @@ const Teachers = () => {
               
               {/* Adres informatie tab */}
               <TabsContent value="address" className="space-y-6">
-                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-base font-semibold text-primary mb-3">Adresgegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="street" className="text-sm font-medium text-gray-700">
                         Straat
@@ -1151,9 +1172,9 @@ const Teachers = () => {
               
               {/* Professionele informatie tab */}
               <TabsContent value="professional" className="space-y-6">
-                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-base font-semibold text-primary mb-3">Professionele gegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Professionele gegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="educationLevel" className="text-sm font-medium text-gray-700">
                         Opleidingsniveau
@@ -1339,23 +1360,23 @@ const Teachers = () => {
               
               {/* Vakken tab */}
               <TabsContent value="subjects" className="space-y-6">
-                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-base font-semibold text-primary mb-3">Vakken</h3>
-                  <p className="text-gray-500 mb-2">Vakken worden toegewezen na het aanmaken van de docent.</p>
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Vakken</h3>
+                  <p className="text-gray-500 mb-4">Vakken worden toegewezen na het aanmaken van de docent.</p>
                 </div>
               </TabsContent>
               
               {/* Klassen tab */}
               <TabsContent value="classes" className="space-y-6">
-                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-base font-semibold text-primary mb-3">Klassen</h3>
-                  <p className="text-gray-500 mb-2">Klassen worden toegewezen na het aanmaken van de docent.</p>
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Klassen</h3>
+                  <p className="text-gray-500 mb-4">Klassen worden toegewezen na het aanmaken van de docent.</p>
                 </div>
               </TabsContent>
             </Tabs>
           </div>
           
-          <DialogFooter className="mt-3 pt-2 border-t">
+          <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
               Annuleren
             </Button>

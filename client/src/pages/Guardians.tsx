@@ -376,12 +376,17 @@ export default function Guardians() {
   // Render
   return (
     <div className="container px-4 md:px-6 max-w-7xl">
-      <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:items-center md:justify-between py-6 border-b">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Voogdenbeheer</h1>
-          <p className="text-muted-foreground mt-1">
-            Beheer voogden, noodcontacten en hun relaties met studenten
-          </p>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <Users className="h-7 w-7" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Voogden</h1>
+              <p className="text-base text-gray-500 mt-1">Bekijk en beheer alle voogdgegevens</p>
+            </div>
+          </div>
         </div>
         
         <div className="flex flex-wrap items-center gap-3">

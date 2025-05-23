@@ -930,10 +930,10 @@ export default function Guardians() {
                   
 
                   
-                  <div className="text-right mt-4">
+                  <div className="flex justify-end mt-4 pr-4">
                     <a 
                       href="#/students" 
-                      className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
+                      className="inline-flex items-center text-sm text-[#1e3a8a] hover:text-[#1e3a8a]/80"
                     >
                       <GraduationCap className="h-4 w-4 mr-1.5" />
                       Ga naar studentenoverzicht

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle, FileDown, FileSpreadsheet } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,14 @@ import {
   DialogHeader, 
   DialogTitle 
 } from '@/components/ui/dialog';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
@@ -283,6 +291,68 @@ export default function Guardians() {
     return labels[relationship] || relationship;
   };
   
+  // State variables voor filtering en selectie
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
+  const [selectedRelationshipFilter, setSelectedRelationshipFilter] = useState('all');
+  const [selectedEmergencyFilter, setSelectedEmergencyFilter] = useState('all');
+  const [selectedGuardians, setSelectedGuardians] = useState<number[]>([]);
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  
+  // Helper functions voor selectie
+  const handleToggleAllGuardians = (checked: boolean) => {
+    if (checked) {
+      // Select all guardians from current search results
+      const ids = searchResults.map((guardian: GuardianType) => guardian.id);
+      setSelectedGuardians(ids);
+    } else {
+      // Deselect all
+      setSelectedGuardians([]);
+    }
+  };
+  
+  const toggleGuardianSelection = (guardianId: number) => {
+    setSelectedGuardians(prev => {
+      if (prev.includes(guardianId)) {
+        return prev.filter(id => id !== guardianId);
+      } else {
+        return [...prev, guardianId];
+      }
+    });
+  };
+  
+  // Handle delete selected guardians
+  const handleDeleteSelected = () => {
+    if (selectedGuardians.length > 0) {
+      if (window.confirm(`Weet u zeker dat u ${selectedGuardians.length} voogden wilt verwijderen?`)) {
+        // Hier zou een batch delete functie komen
+        toast({
+          title: "Functie nog niet beschikbaar",
+          description: "Het verwijderen van meerdere voogden is momenteel niet geïmplementeerd.",
+          variant: "destructive"
+        });
+        setSelectedGuardians([]);
+      }
+    }
+  };
+  
+  // Handle delete single guardian
+  const handleDelete = (guardian: GuardianType) => {
+    setSelectedGuardian(guardian);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  const confirmDelete = () => {
+    if (selectedGuardian) {
+      toast({
+        title: "Voogd verwijderd",
+        description: `${selectedGuardian.firstName} ${selectedGuardian.lastName} is succesvol verwijderd.`,
+      });
+      setIsDeleteDialogOpen(false);
+      setSelectedGuardian(null);
+    }
+  };
+  
   // Render
   return (
     <div className="container px-4 md:px-6 max-w-7xl">
@@ -306,21 +376,132 @@ export default function Guardians() {
             />
           </div>
           
-          <Button 
-            onClick={handleAddNewGuardian}
-            className="bg-primary hover:bg-primary/90 text-white gap-2"
-          >
-            <PlusCircle className="h-4 w-4" />
-            Nieuwe Voogd
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              className="shrink-0"
+              onClick={() => setShowFilterOptions(!showFilterOptions)}
+            >
+              <Filter className="mr-2 h-4 w-4" />
+              Filter
+            </Button>
+            
+            <div className="relative">
+              <Button 
+                variant="outline" 
+                className="shrink-0"
+                onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Exporteren
+              </Button>
+              
+              {isExportMenuOpen && (
+                <div 
+                  id="export-menu"
+                  className="absolute right-0 top-full mt-2 w-48 bg-white shadow-lg rounded-md overflow-hidden z-10 border"
+                >
+                  <div className="p-2">
+                    <button
+                      onClick={() => {
+                        // Export als PDF
+                        setIsExportMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-md flex items-center"
+                    >
+                      <FileDown className="mr-2 h-4 w-4" />
+                      Exporteren als PDF
+                    </button>
+                    <button
+                      onClick={() => {
+                        // Export als Excel
+                        setIsExportMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-md flex items-center"
+                    >
+                      <FileSpreadsheet className="mr-2 h-4 w-4" />
+                      Exporteren als Excel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <Button 
+              onClick={handleAddNewGuardian} 
+              className="bg-primary hover:bg-primary/90 text-white gap-2"
+            >
+              <PlusCircle className="h-4 w-4" />
+              Nieuwe Voogd
+            </Button>
+          </div>
         </div>
       </div>
       
+      {/* Filter opties */}
+      {showFilterOptions && (
+        <div className="mt-4 p-4 bg-gray-50 border rounded-lg">
+          <h3 className="text-sm font-medium mb-3">Filter voogden</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="relationshipFilter" className="text-xs">Relatie</Label>
+              <Select
+                value={selectedRelationshipFilter}
+                onValueChange={setSelectedRelationshipFilter}
+              >
+                <SelectTrigger id="relationshipFilter" className="mt-1">
+                  <SelectValue placeholder="Selecteer relatie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle relaties</SelectItem>
+                  <SelectItem value="parent">Ouder</SelectItem>
+                  <SelectItem value="guardian">Voogd</SelectItem>
+                  <SelectItem value="family">Familie</SelectItem>
+                  <SelectItem value="noodcontact">Noodcontact</SelectItem>
+                  <SelectItem value="other">Anders</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="emergencyFilter" className="text-xs">Noodcontact</Label>
+              <Select
+                value={selectedEmergencyFilter}
+                onValueChange={setSelectedEmergencyFilter}
+              >
+                <SelectTrigger id="emergencyFilter" className="mt-1">
+                  <SelectValue placeholder="Selecteer type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle voogden</SelectItem>
+                  <SelectItem value="yes">Alleen noodcontacten</SelectItem>
+                  <SelectItem value="no">Geen noodcontacten</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="mt-4 flex justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedRelationshipFilter('all');
+                setSelectedEmergencyFilter('all');
+              }}
+              className="mr-2"
+            >
+              Reset filters
+            </Button>
+          </div>
+        </div>
+      )}
+      
       <div className="py-6">
         {searchResults.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+          <div className="flex flex-col items-center justify-center py-12 px-4 text-center border rounded-lg bg-gray-50">
             <div className="h-20 w-20 rounded-full bg-blue-50 flex items-center justify-center mb-6">
-              <UserCircle className="h-10 w-10 text-primary opacity-70" />
+              <UserCheck className="h-10 w-10 text-primary opacity-30" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Geen voogden gevonden</h3>
             <p className="text-muted-foreground max-w-md mx-auto mb-6">
@@ -340,84 +521,122 @@ export default function Guardians() {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50 text-gray-700">
-                  <tr className="border-b">
-                    <th className="py-3 px-4 text-left font-medium">Voogd</th>
-                    <th className="py-3 px-4 text-left font-medium">Relatie</th>
-                    <th className="py-3 px-4 text-left font-medium">Status</th>
-                    <th className="py-3 px-4 text-right">Acties</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {searchResults.map((guardian: any) => (
-                    <tr 
-                      key={guardian.id} 
-                      className="border-b hover:bg-gray-50"
-                    >
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback className="bg-primary text-white">
-                              {guardian.firstName ? guardian.firstName.charAt(0) : ''}
-                              {guardian.lastName ? guardian.lastName.charAt(0) : ''}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium">{guardian.firstName} {guardian.lastName}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div>{getRelationshipLabel(guardian.relationship)}</div>
-                      </td>
-                      <td className="py-3 px-4">
+          <div className="border rounded-lg overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40px]">
+                    <Checkbox 
+                      checked={selectedGuardians.length > 0 && selectedGuardians.length === searchResults.length}
+                      onCheckedChange={handleToggleAllGuardians}
+                    />
+                  </TableHead>
+                  <TableHead>Naam</TableHead>
+                  <TableHead>Relatie</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Adres</TableHead>
+                  <TableHead className="w-[100px] text-center">Status</TableHead>
+                  <TableHead className="text-right w-[120px]">Acties</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {searchResults.map((guardian: GuardianType) => (
+                  <TableRow key={guardian.id} className="group">
+                    <TableCell className="py-2">
+                      <Checkbox
+                        checked={selectedGuardians.includes(guardian.id)}
+                        onCheckedChange={() => toggleGuardianSelection(guardian.id)}
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {guardian.firstName} {guardian.lastName}
                         {guardian.isEmergencyContact && (
-                          <Badge variant="destructive">Noodcontact</Badge>
+                          <Badge variant="destructive" className="text-xs">Noodcontact</Badge>
                         )}
-                      </td>
-                      <td className="py-3 px-4 whitespace-nowrap text-right text-sm">
-                        <div className="flex justify-end gap-1">
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => handleShowGuardianDetails(guardian)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => handleEditGuardian(guardian)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => {
-                              // Hier zou een verwijderfunctie komen
-                              toast({
-                                title: "Functie niet beschikbaar",
-                                description: "Het verwijderen van voogden is momenteel niet beschikbaar.",
-                                variant: "destructive"
-                              });
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>{getRelationshipLabel(guardian.relationship)}</TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="flex items-center text-xs">
+                          <Mail className="h-3 w-3 mr-1 opacity-70" />
+                          {guardian.email}
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        {guardian.phone && (
+                          <div className="flex items-center text-xs">
+                            <Phone className="h-3 w-3 mr-1 opacity-70" />
+                            {guardian.phone}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {guardian.street || guardian.city ? (
+                        <div className="text-xs">
+                          {guardian.street} {guardian.houseNumber}, 
+                          {guardian.postalCode} {guardian.city}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">Geen adres</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {guardian.isEmergencyContact ? (
+                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Noodcontact</Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Voogd</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 opacity-70 hover:opacity-100"
+                          onClick={() => handleShowGuardianDetails(guardian)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 opacity-70 hover:opacity-100"
+                          onClick={() => handleEditGuardian(guardian)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-red-600 opacity-70 hover:opacity-100"
+                          onClick={() => handleDelete(guardian)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            
+            {/* Actieknoppen voor geselecteerde voogden */}
+            {selectedGuardians.length > 0 && (
+              <div className="px-4 py-2 bg-gray-50 border-t flex items-center justify-between">
+                <span className="text-sm">
+                  {selectedGuardians.length} {selectedGuardians.length === 1 ? 'voogd' : 'voogden'} geselecteerd
+                </span>
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  onClick={handleDeleteSelected}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Verwijderen
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>

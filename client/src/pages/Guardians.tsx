@@ -378,22 +378,38 @@ export default function Guardians() {
                           <Badge variant="destructive">Noodcontact</Badge>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
+                      <td className="py-3 px-4 whitespace-nowrap text-right text-sm">
+                        <div className="flex justify-end gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            className="h-7 w-7"
                             onClick={() => handleShowGuardianDetails(guardian)}
                           >
-                            Details
+                            <Eye className="h-4 w-4" />
                           </Button>
-                          
-                          <Button
-                            variant="outline"
-                            size="sm"
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            className="h-7 w-7"
                             onClick={() => handleEditGuardian(guardian)}
                           >
-                            Bewerken
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => {
+                              // Hier zou een verwijderfunctie komen
+                              toast({
+                                title: "Functie niet beschikbaar",
+                                description: "Het verwijderen van voogden is momenteel niet beschikbaar.",
+                                variant: "destructive"
+                              });
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </td>

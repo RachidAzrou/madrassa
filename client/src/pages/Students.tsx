@@ -8,7 +8,7 @@ import {
   ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
   Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, CreditCard, AlertCircle,
   FileUp, Upload, FilePlus2, FileSpreadsheet, Image, School, UserRound, Camera, CheckSquare, SquareSlash,
-  UserCheck
+  UserCheck, CalendarDays, Hash
 } from 'lucide-react';
 
 // Aangepast ChalkboardTeacher icoon
@@ -3012,127 +3012,208 @@ export default function Students() {
                 </TabsList>
                 
                 {/* Persoonlijke informatie tab */}
-                <TabsContent value="personal" className="pt-2">
-                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                      <div className="md:col-span-2 flex">
-                        <div className="mr-4">
-                          <Avatar className="h-16 w-16">
-                            <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
-                              {selectedStudent.firstName[0]}{selectedStudent.lastName[0]}
-                            </AvatarFallback>
-                          </Avatar>
+                <TabsContent value="personal" className="pt-0">
+                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[#1e3a8a] rounded-full">
+                          <User className="h-5 w-5 text-white" />
                         </div>
+                        <h3 className="text-lg font-semibold text-[#1e3a8a]">Persoonlijke gegevens</h3>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6 space-y-6">
+                      {/* Profiel sectie */}
+                      <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                        <Avatar className="h-16 w-16 ring-2 ring-[#1e3a8a]/20">
+                          <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
+                            {selectedStudent.firstName[0]}{selectedStudent.lastName[0]}
+                          </AvatarFallback>
+                        </Avatar>
                         <div>
-                          <h2 className="text-xl font-semibold mb-1">
+                          <h2 className="text-xl font-semibold text-gray-900 mb-1">
                             {selectedStudent.firstName} {selectedStudent.lastName}
                           </h2>
-                          <p className="text-gray-600">{selectedStudent.studentId}</p>
-                          <div className="mt-2">
+                          <p className="text-[#1e3a8a] font-medium mb-2">{selectedStudent.studentId}</p>
+                          <div>
                             {renderStatusBadge(selectedStudent.status)}
                           </div>
                         </div>
                       </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                      <div className="md:col-span-1">
-                        <p className="text-sm font-medium text-gray-700">Geboortedatum</p>
-                        <p className="mt-1">{selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "Niet ingevuld"}</p>
+
+                      {/* Basis informatie */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <CalendarDays className="h-4 w-4" />
+                            Geboortedatum
+                          </label>
+                          <p className="text-gray-900 font-medium bg-gray-50 px-3 py-2 rounded-md">
+                            {selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "Niet ingevuld"}
+                          </p>
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            Geslacht
+                          </label>
+                          <p className="text-gray-900 font-medium bg-gray-50 px-3 py-2 rounded-md">
+                            {selectedStudent.gender === 'man' ? 'Man' : 
+                             selectedStudent.gender === 'vrouw' ? 'Vrouw' : 'Niet ingevuld'}
+                          </p>
+                        </div>
                       </div>
-                      <div className="md:col-span-1">
-                        <p className="text-sm font-medium text-gray-700">Geslacht</p>
-                        <p className="mt-1">
-                          {selectedStudent.gender === 'man' ? 'Man' : 
-                           selectedStudent.gender === 'vrouw' ? 'Vrouw' : 'Niet ingevuld'}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Notities</p>
-                        <p className="mt-1 whitespace-pre-wrap">{selectedStudent.notes || "Geen notities"}</p>
+                      
+                      {/* Notities sectie */}
+                      <div className="space-y-3">
+                        <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Notities
+                        </label>
+                        <div className="bg-gray-50 border rounded-md p-4 min-h-[80px]">
+                          <p className="text-gray-900 whitespace-pre-wrap">
+                            {selectedStudent.notes || "Geen notities beschikbaar"}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </TabsContent>
                 
                 {/* Contact tab */}
-                <TabsContent value="contact" className="pt-2">
-                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
+                <TabsContent value="contact" className="pt-0">
+                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[#1e3a8a] rounded-full">
+                          <Phone className="h-5 w-5 text-white" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-[#1e3a8a]">Contactgegevens</h3>
+                      </div>
+                    </div>
                     
-                    <div className="grid grid-cols-1 gap-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Email</p>
-                          <p className="mt-1 flex items-center">
-                            <Mail className="h-4 w-4 mr-2 text-gray-500" />
-                            {selectedStudent.email || "Niet ingevuld"}
-                          </p>
+                    <div className="p-6 space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <Mail className="h-4 w-4" />
+                            Email adres
+                          </label>
+                          <div className="bg-gray-50 border rounded-md px-3 py-2">
+                            <p className="text-gray-900 font-medium">
+                              {selectedStudent.email || "Niet ingevuld"}
+                            </p>
+                          </div>
                         </div>
                         
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Telefoonnummer</p>
-                          <p className="mt-1 flex items-center">
-                            <Phone className="h-4 w-4 mr-2 text-gray-500" />
-                            {selectedStudent.phone || "Niet ingevuld"}
-                          </p>
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <Phone className="h-4 w-4" />
+                            Telefoonnummer
+                          </label>
+                          <div className="bg-gray-50 border rounded-md px-3 py-2">
+                            <p className="text-gray-900 font-medium">
+                              {selectedStudent.phone || "Niet ingevuld"}
+                            </p>
+                          </div>
                         </div>
                       </div>
                       
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Inschrijvingsdatum</p>
-                        <p className="mt-1">
-                          {selectedStudent.enrollmentDate 
-                            ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) 
-                            : "Niet ingevuld"}
-                        </p>
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                          <CalendarDays className="h-4 w-4" />
+                          Inschrijvingsdatum
+                        </label>
+                        <div className="bg-gray-50 border rounded-md px-3 py-2">
+                          <p className="text-gray-900 font-medium">
+                            {selectedStudent.enrollmentDate 
+                              ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) 
+                              : "Niet ingevuld"}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </TabsContent>
                 
                 {/* Adres tab */}
-                <TabsContent value="address" className="pt-2">
-                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
+                <TabsContent value="address" className="pt-0">
+                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[#1e3a8a] rounded-full">
+                          <MapPin className="h-5 w-5 text-white" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-[#1e3a8a]">Adresgegevens</h3>
+                      </div>
+                    </div>
                     
-                    <div className="grid grid-cols-1 gap-6">
-                      <div className="flex items-start">
-                        <MapPin className="h-5 w-5 mr-2 mt-0.5 text-gray-500" />
-                        <div>
-                          <p className="font-medium">
-                            {selectedStudent.street} {selectedStudent.houseNumber}
-                          </p>
-                          <p className="text-gray-600">
-                            {selectedStudent.postalCode} {selectedStudent.city}
-                          </p>
+                    <div className="p-6 space-y-6">
+                      {/* Volledig adres */}
+                      <div className="bg-gray-50 border rounded-lg p-4">
+                        <div className="flex items-start gap-3">
+                          <MapPin className="h-5 w-5 text-[#1e3a8a] mt-0.5" />
+                          <div>
+                            <p className="font-semibold text-gray-900 text-lg">
+                              {selectedStudent.street} {selectedStudent.houseNumber}
+                            </p>
+                            <p className="text-gray-600 text-base">
+                              {selectedStudent.postalCode} {selectedStudent.city}
+                            </p>
+                          </div>
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Straat</p>
-                          <p className="mt-1">{selectedStudent.street || "Niet ingevuld"}</p>
+                      {/* Gedetailleerde adres informatie */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <Home className="h-4 w-4" />
+                            Straatnaam
+                          </label>
+                          <div className="bg-gray-50 border rounded-md px-3 py-2">
+                            <p className="text-gray-900 font-medium">
+                              {selectedStudent.street || "Niet ingevuld"}
+                            </p>
+                          </div>
                         </div>
                         
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Huisnummer</p>
-                          <p className="mt-1">{selectedStudent.houseNumber || "Niet ingevuld"}</p>
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <Home className="h-4 w-4" />
+                            Huisnummer
+                          </label>
+                          <div className="bg-gray-50 border rounded-md px-3 py-2">
+                            <p className="text-gray-900 font-medium">
+                              {selectedStudent.houseNumber || "Niet ingevuld"}
+                            </p>
+                          </div>
                         </div>
                         
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Postcode</p>
-                          <p className="mt-1">{selectedStudent.postalCode || "Niet ingevuld"}</p>
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <Mail className="h-4 w-4" />
+                            Postcode
+                          </label>
+                          <div className="bg-gray-50 border rounded-md px-3 py-2">
+                            <p className="text-gray-900 font-medium">
+                              {selectedStudent.postalCode || "Niet ingevuld"}
+                            </p>
+                          </div>
                         </div>
                         
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Stad</p>
-                          <p className="mt-1">{selectedStudent.city || "Niet ingevuld"}</p>
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <MapPin className="h-4 w-4" />
+                            Stad
+                          </label>
+                          <div className="bg-gray-50 border rounded-md px-3 py-2">
+                            <p className="text-gray-900 font-medium">
+                              {selectedStudent.city || "Niet ingevuld"}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>

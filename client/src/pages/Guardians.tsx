@@ -844,7 +844,7 @@ export default function Guardians() {
                         {selectedStudent?.studentId}
                       </span>
                       <Badge className="bg-white/20 text-white border-transparent hover:bg-white/30">
-                        {selectedStudent?.status || 'Actief'}
+                        {selectedStudent?.status === 'enrolled' ? 'Ingeschreven' : (selectedStudent?.status || 'Actief')}
                       </Badge>
                     </div>
                   </div>
@@ -918,23 +918,14 @@ export default function Guardians() {
                         </div>
                         <div className="w-2/3">
                           <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                            {selectedStudent?.status || 'Actief'}
+                            {selectedStudent?.status === 'enrolled' ? 'Ingeschreven' : (selectedStudent?.status || 'Actief')}
                           </Badge>
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex justify-end mt-3">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-xs gap-1.5"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      Ga naar studentpagina
-                    </Button>
-                  </div>
+
                   
                   <div className="text-right mt-4">
                     <a 

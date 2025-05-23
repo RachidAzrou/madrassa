@@ -470,11 +470,9 @@ const Teachers = () => {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500 w-16">#</th>
-                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Docent</th>
-                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Contact</th>
-                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Status</th>
-                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Aangemaakt</th>
+                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Docent ID</th>
+                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Naam</th>
+                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Klas</th>
                   <th className="py-3.5 px-4 text-right text-sm font-medium text-gray-500">Acties</th>
                 </tr>
               </thead>
@@ -492,22 +490,23 @@ const Teachers = () => {
                         <div>
                           <div className="font-medium text-gray-900">{teacher.firstName} {teacher.lastName}</div>
                           <div className="text-gray-500 text-xs mt-1">
-                            Specialisaties: {teacher.specialties?.length ? teacher.specialties.join(", ") : "Geen"}
+                            {teacher.email}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="py-4 px-4 text-sm text-gray-500 align-top">
-                      <div className="space-y-1">
-                        <div>{teacher.email}</div>
-                        <div>{teacher.phone}</div>
+                      <div className="flex flex-wrap gap-1">
+                        {teacher.assignedClasses && teacher.assignedClasses.length > 0 ? 
+                          teacher.assignedClasses.map((klas: string, index: number) => (
+                            <span key={index} className="inline-flex px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                              {klas}
+                            </span>
+                          )) 
+                          : 
+                          <span className="text-gray-400">Geen klassen toegewezen</span>
+                        }
                       </div>
-                    </td>
-                    <td className="py-4 px-4 text-sm align-top">
-                      {renderStatusBadge(teacher.isActive)}
-                    </td>
-                    <td className="py-4 px-4 text-sm text-gray-500 align-top">
-                      {teacher.createdAt ? formatDateToDisplayFormat(teacher.createdAt) : "Onbekend"}
                     </td>
                     <td className="py-4 px-4 text-sm text-gray-500 text-right align-top">
                       <div className="flex justify-end gap-2">

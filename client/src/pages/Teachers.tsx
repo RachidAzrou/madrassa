@@ -436,7 +436,6 @@ const Teachers = () => {
                 <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">NAAM</th>
                 <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">KLAS</th>
                 <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">VAKKEN</th>
-                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">STATUS</th>
                 <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right"></th>
               </tr>
             </thead>

@@ -1142,7 +1142,7 @@ export default function Guardians() {
                 <TabsContent value="personal" className="space-y-6 mt-0 h-full">
                   <div className="space-y-4">
                 <div className="border rounded-lg p-4">
-                  <h3 className="font-medium mb-4">Persoonlijke Informatie</h3>
+                  <h3 className="text-lg font-semibold mb-4">Persoonlijke Informatie</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">Voornaam</Label>
@@ -1237,7 +1237,7 @@ export default function Guardians() {
                 </div>
                 
                 <div className="border rounded-lg p-4">
-                  <h3 className="font-medium mb-4">Notities</h3>
+                  <h3 className="text-lg font-semibold mb-4">Notities</h3>
                   <div className="space-y-2">
                     <Textarea
                       id="notes"
@@ -1255,7 +1255,7 @@ export default function Guardians() {
                 <TabsContent value="contact" className="space-y-6 mt-0 h-full">
                   <div className="space-y-4">
                   <div className="border rounded-lg p-4">
-                    <h3 className="font-medium mb-4">Adres Informatie</h3>
+                    <h3 className="text-lg font-semibold mb-4">Adres Informatie</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="street">Straat</Label>
@@ -1305,7 +1305,7 @@ export default function Guardians() {
                   <div className="space-y-4">
               {!newGuardian.id && (
                 <div className="border rounded-lg p-4">
-                  <h3 className="font-medium mb-4">Koppel Studenten</h3>
+                  <h3 className="text-lg font-semibold mb-4">Koppel Studenten</h3>
                   
                   <div className="space-y-2 mb-4">
                     <Label htmlFor="studentSearch">Zoek student</Label>
@@ -1362,7 +1362,7 @@ export default function Guardians() {
                   
                   {selectedStudentIds.length > 0 && (
                     <div className="mt-4 border-t pt-4">
-                      <h4 className="font-medium mb-2">Geselecteerde studenten:</h4>
+                      <h4 className="text-base font-semibold mb-2">Geselecteerde studenten:</h4>
                       <div className="space-y-3">
                         {selectedStudentIds.map(id => {
                           const student = studentsData.find((s: any) => s.id === id);

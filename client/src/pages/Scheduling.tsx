@@ -523,42 +523,42 @@ export default function Scheduling() {
       
       {/* Geen widgets op verzoek van gebruiker */}
 
+      <div className="mb-4">
+        <div className="flex flex-col md:flex-row items-center gap-4 w-full mb-4">
+          <div className="relative w-full flex-grow">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Zoek planning..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="pl-8 bg-white w-full"
+            />
+            {searchTerm && (
+              <XCircle
+                className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                onClick={() => setSearchTerm("")}
+              />
+            )}
+          </div>
+          
+          <Button 
+            onClick={handleAddSchedule} 
+            variant="default"
+            size="default"
+            className="bg-primary hover:bg-primary/90 flex items-center whitespace-nowrap"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            <span>Planning Toevoegen</span>
+          </Button>
+        </div>
+      </div>
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
           <TabsList className="p-1 bg-blue-900/10">
             <TabsTrigger value="instructor-schedule" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Docentenrooster</TabsTrigger>
             <TabsTrigger value="room-allocation" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lokalenverdeling</TabsTrigger>
           </TabsList>
-          
-          <div className="space-y-4">
-            <div className="flex flex-col md:flex-row items-center gap-4 w-full">
-              <div className="relative w-full flex-grow">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                <Input
-                  placeholder="Zoek planning..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  className="pl-8 bg-white w-full"
-                />
-                {searchTerm && (
-                  <XCircle
-                    className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
-                    onClick={() => setSearchTerm("")}
-                  />
-                )}
-              </div>
-              
-              <Button 
-                onClick={handleAddSchedule} 
-                variant="default"
-                size="default"
-                className="bg-primary hover:bg-primary/90 flex items-center"
-              >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                <span>Planning Toevoegen</span>
-              </Button>
-            </div>
-          </div>
         </div>
         
         <TabsContent value="room-allocation">

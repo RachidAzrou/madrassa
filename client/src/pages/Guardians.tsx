@@ -930,7 +930,7 @@ export default function Guardians() {
                   
 
                   
-                  <div className="flex justify-end mt-4 pr-4">
+                  <div className="flex justify-end mt-4 pr-12">
                     <a 
                       href="#/students" 
                       className="inline-flex items-center text-sm text-[#1e3a8a] hover:text-[#1e3a8a]/80"

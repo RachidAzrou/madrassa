@@ -55,8 +55,8 @@ import { apiRequest } from '@/lib/queryClient';
 import { formatDateToDisplayFormat } from '@/lib/utils';
 
 export default function Students() {
-  const queryClient = useQueryClient();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [page, setPage] = useState(1);
@@ -177,6 +177,17 @@ export default function Students() {
   // Create student mutation
   const createStudentMutation = useMutation({
     mutationFn: (data: any) => {
+      // Als er een gevonden voogd is, voegen we deze toe aan de student
+      if (foundGuardian && !data.id) {
+        return apiRequest('/api/students', {
+          method: 'POST',
+          body: {
+            ...data,
+            guardianId: foundGuardian.id // Koppel de voogd aan de student
+          }
+        });
+      }
+      
       return apiRequest('/api/students', {
         method: 'POST',
         body: data
@@ -184,6 +195,15 @@ export default function Students() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      // Invalideer ook de voogdgegevens als er een voogd was gekoppeld
+      if (foundGuardian) {
+        queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
+        // Reset de gevonden voogd
+        setFoundGuardian(null);
+        setShowGuardianConfirmDialog(false);
+      }
+      
       resetForm();
       setIsCreateDialogOpen(false);
       
@@ -201,9 +221,13 @@ export default function Students() {
         setIsFeeNotificationOpen(true);
       } else {
         // Fallback bericht als er geen betalingsrecord is gemaakt
+        const description = foundGuardian 
+          ? "De student is succesvol toegevoegd en gekoppeld aan een voogd."
+          : "De student is succesvol toegevoegd.";
+        
         toast({
           title: "Student toegevoegd",
-          description: "De student is succesvol toegevoegd.",
+          description: description,
         });
       }
     },
@@ -573,6 +597,12 @@ export default function Students() {
     // Validatie
     if (!studentFormData.firstName || !studentFormData.lastName) {
       alert('Vul alstublieft voornaam en achternaam in');
+      return;
+    }
+
+    // Als er een voogd is gevonden via e-ID, toon dan de bevestigingsdialoog
+    if (foundGuardian && !studentFormData.id) {
+      setShowGuardianConfirmDialog(true);
       return;
     }
 
@@ -3116,6 +3146,106 @@ export default function Students() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Guardian Confirmation Dialog */}
+      <Dialog open={showGuardianConfirmDialog} onOpenChange={setShowGuardianConfirmDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader className="pb-3 border-b">
+            <DialogTitle className="text-xl font-semibold flex items-center text-primary">
+              <div className="bg-blue-100 rounded-full p-1.5 mr-3">
+                <UserCheck className="h-5 w-5 text-primary" />
+              </div>
+              Voogd gevonden
+            </DialogTitle>
+            <DialogDescription className="text-gray-500 mt-1">
+              Er is een voogd gevonden met dezelfde achternaam. Wilt u deze koppelen aan de student?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <div className="p-4 border rounded-lg bg-blue-50">
+              <div className="flex items-start">
+                <Avatar className="h-10 w-10 mr-3">
+                  <AvatarFallback className="bg-primary text-white">
+                    {foundGuardian?.firstName?.[0]}{foundGuardian?.lastName?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-medium">{foundGuardian?.firstName} {foundGuardian?.lastName}</h3>
+                  <p className="text-sm text-gray-600 mt-0.5">
+                    {foundGuardian?.relationship === 'parent' ? 'Ouder' : 
+                    foundGuardian?.relationship === 'guardian' ? 'Voogd' : 'Contactpersoon'}
+                  </p>
+                  
+                  <div className="mt-2 text-sm">
+                    <div className="flex items-center mt-1">
+                      <Mail className="h-4 w-4 mr-2 text-gray-500" />
+                      <span>{foundGuardian?.email}</span>
+                    </div>
+                    <div className="flex items-center mt-1">
+                      <Phone className="h-4 w-4 mr-2 text-gray-500" />
+                      <span>{foundGuardian?.phone}</span>
+                    </div>
+                    <div className="flex items-center mt-1">
+                      <Home className="h-4 w-4 mr-2 text-gray-500" />
+                      <span>
+                        {foundGuardian?.street} {foundGuardian?.houseNumber}, {foundGuardian?.postalCode} {foundGuardian?.city}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex space-x-2 justify-end border-t pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowGuardianConfirmDialog(false)}
+            >
+              Annuleren
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-primary"
+              onClick={() => {
+                setShowGuardianConfirmDialog(false);
+                // Hier zouden we de voogdbewerking kunnen starten
+                toast({
+                  title: "Voogd bewerken",
+                  description: "Deze functionaliteit wordt binnenkort toegevoegd.",
+                });
+              }}
+            >
+              <Pencil className="h-4 w-4 mr-2" />
+              Bewerken
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                // Maak een kopie van de data om te versturen, zonder studentId
+                const { studentId, ...restData } = studentFormData;
+                const dataToSubmit = {
+                  ...restData,
+                  programs: selectedPrograms.length > 0 ? selectedPrograms : 
+                    (studentFormData.programId ? [{ 
+                      programId: studentFormData.programId, 
+                      yearLevel: studentFormData.yearLevel 
+                    }] : [])
+                };
+                
+                // Voeg de student toe en koppel aan de voogd
+                createStudentMutation.mutate(dataToSubmit);
+              }}
+            >
+              <Check className="h-4 w-4 mr-2" />
+              Bevestigen en opslaan
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -858,10 +858,7 @@ export default function Guardians() {
                   </div>
                 </div>
                 
-                <X 
-                  className="h-6 w-6 text-white/80 hover:text-white cursor-pointer" 
-                  onClick={() => setSelectedStudent(null)} 
-                />
+
               </div>
             </div>
 
@@ -930,15 +927,7 @@ export default function Guardians() {
                   
 
                   
-                  <div className="w-full flex justify-end mt-4">
-                    <a 
-                      href="#/students" 
-                      className="inline-flex items-center text-sm text-[#1e3a8a] hover:text-[#1e3a8a]/80 mr-6"
-                    >
-                      <GraduationCap className="h-4 w-4 mr-1.5" />
-                      Ga naar studentenoverzicht
-                    </a>
-                  </div>
+
                 </div>
                 
                 <div>

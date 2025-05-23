@@ -798,7 +798,7 @@ const Teachers = () => {
               </TabsList>
               
               {/* Persoonlijke informatie tab */}
-              <TabsContent value="personal" className="space-y-3">
+              <TabsContent value="personal" className="space-y-3 pl-12 pt-8">
                 <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-4">
                   {/* Foto upload sectie */}
                   <div className="flex items-start">
@@ -1077,7 +1077,7 @@ const Teachers = () => {
               </TabsContent>
               
               {/* Contact tab */}
-              <TabsContent value="contact" className="space-y-3">
+              <TabsContent value="contact" className="space-y-3 pl-12 pt-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-xs">E-mail *</Label>
@@ -1102,7 +1102,7 @@ const Teachers = () => {
               </TabsContent>
               
               {/* Adres tab */}
-              <TabsContent value="address" className="space-y-3">
+              <TabsContent value="address" className="space-y-3 pl-12 pt-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="street" className="text-xs">Straat</Label>
@@ -1144,7 +1144,7 @@ const Teachers = () => {
               </TabsContent>
               
               {/* Professioneel tab */}
-              <TabsContent value="professional" className="space-y-3">
+              <TabsContent value="professional" className="space-y-3 pl-12 pt-8">
                 <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="profession" className="text-xs">Beroep</Label>
@@ -1249,7 +1249,7 @@ const Teachers = () => {
               </TabsContent>
               
               {/* Vakken tab */}
-              <TabsContent value="subjects" className="space-y-3">
+              <TabsContent value="subjects" className="space-y-3 pl-12 pt-8">
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label className="text-xs">Beschikbare vakken</Label>
@@ -1400,7 +1400,7 @@ const Teachers = () => {
               </TabsContent>
               
               {/* Klassen tab */}
-              <TabsContent value="classes" className="space-y-3">
+              <TabsContent value="classes" className="space-y-3 pl-12 pt-8">
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label className="text-xs">Beschikbare klassen</Label>

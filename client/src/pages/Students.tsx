@@ -3257,12 +3257,12 @@ export default function Students() {
                   <User className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold">
+                  <DialogTitle className="text-xl font-semibold text-white">
                     {selectedStudent?.firstName} {selectedStudent?.lastName}
-                  </h2>
-                  <span className="text-sm text-blue-100 font-medium">
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-blue-100 font-medium">
                     Gedetailleerde informatie over deze student
-                  </span>
+                  </DialogDescription>
                 </div>
               </div>
               

@@ -575,6 +575,33 @@ export default function Guardians() {
                         </Badge>
                       </div>
                     </TableCell>
+                    
+                    <TableCell className="py-3">
+                      {guardianStudentsQuery.data && guardianStudentsQuery.data.some((rel: any) => rel.guardianId === guardian.id) ? (
+                        <div className="flex -space-x-2 overflow-hidden">
+                          {guardianStudentsQuery.data
+                            .filter((rel: any) => rel.guardianId === guardian.id)
+                            .slice(0, 3)
+                            .map((rel: any) => {
+                              const student = studentsData.find((s: any) => s.id === rel.studentId);
+                              return student ? (
+                                <Avatar key={rel.id} className="h-7 w-7 border-2 border-white">
+                                  <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
+                                    {student.firstName?.charAt(0)}{student.lastName?.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                              ) : null;
+                            })}
+                          {guardianStudentsQuery.data.filter((rel: any) => rel.guardianId === guardian.id).length > 3 && (
+                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gray-100 border-2 border-white text-xs font-medium text-gray-600">
+                              +{guardianStudentsQuery.data.filter((rel: any) => rel.guardianId === guardian.id).length - 3}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">Geen studenten</span>
+                      )}
+                    </TableCell>
 
                     <TableCell className="text-right py-3">
                       <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

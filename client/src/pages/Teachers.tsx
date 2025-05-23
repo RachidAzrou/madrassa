@@ -680,27 +680,27 @@ const Teachers = () => {
           <div className="mt-2 overflow-y-auto pr-1" style={{ height: "calc(95vh - 100px)" }}>
             <Tabs defaultValue="personal">
               <TabsList className="flex mb-2 overflow-x-auto">
-                <TabsTrigger value="personal" className="flex items-center gap-2">
+                <TabsTrigger value="personal" className="flex items-center gap-1 px-3">
                   <User className="h-4 w-4" />
                   <span>Persoonlijk</span>
                 </TabsTrigger>
-                <TabsTrigger value="contact" className="flex items-center gap-2">
+                <TabsTrigger value="contact" className="flex items-center gap-1 px-3">
                   <Phone className="h-4 w-4" />
                   <span>Contact</span>
                 </TabsTrigger>
-                <TabsTrigger value="address" className="flex items-center gap-2">
+                <TabsTrigger value="address" className="flex items-center gap-1 px-3">
                   <MapPin className="h-4 w-4" />
                   <span>Adres</span>
                 </TabsTrigger>
-                <TabsTrigger value="professional" className="flex items-center gap-2">
+                <TabsTrigger value="professional" className="flex items-center gap-1 px-3">
                   <Briefcase className="h-4 w-4" />
                   <span>Professioneel</span>
                 </TabsTrigger>
-                <TabsTrigger value="subjects" className="flex items-center gap-2">
+                <TabsTrigger value="subjects" className="flex items-center gap-1 px-3">
                   <Book className="h-4 w-4" />
                   <span>Vakken</span>
                 </TabsTrigger>
-                <TabsTrigger value="classes" className="flex items-center gap-2">
+                <TabsTrigger value="classes" className="flex items-center gap-1 px-3">
                   <BookOpen className="h-4 w-4" />
                   <span>Klassen</span>
                 </TabsTrigger>

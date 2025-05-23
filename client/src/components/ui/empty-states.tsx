@@ -50,7 +50,7 @@ export const ExamEmptyState = ({ description = "Er zijn momenteel geen examens b
 // Voor docenten pagina
 export const TeacherEmptyState = ({ description = "Er zijn momenteel geen docenten beschikbaar." }) => (
   <EmptyState 
-    icon={<UserCog className="h-10 w-10 opacity-30" />}
+    icon={<GraduationCap className="h-10 w-10 opacity-30" />}
     title="Geen docenten gevonden" 
     description={description} 
   />

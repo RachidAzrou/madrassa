@@ -666,9 +666,9 @@ const Teachers = () => {
       
       {/* Create Teacher Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95vw] h-[calc(100vh-60px)]">
+        <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-primary flex items-center">
+            <DialogTitle className="text-xl font-bold flex items-center text-primary">
               <User className="mr-2 h-5 w-5" />
               Nieuwe Docent Toevoegen
             </DialogTitle>
@@ -677,7 +677,7 @@ const Teachers = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="mt-4 overflow-y-auto pr-1" style={{ maxHeight: "calc(100vh - 220px)" }}>
+          <div className="py-2">
             <Tabs defaultValue="personal">
               <TabsList className="grid grid-cols-7 mb-4">
                 <TabsTrigger value="photo" className="flex items-center gap-2">

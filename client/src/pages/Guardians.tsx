@@ -17,6 +17,16 @@ import {
   DialogTitle 
 } from '@/components/ui/dialog';
 import {
+  DetailDialog,
+  DetailDialogHeader,
+  DetailDialogContent,
+  DetailSection,
+  DataCard,
+  DataRow,
+  HoverCardItem,
+  EmptyState
+} from '@/components/ui/detail-dialog';
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -834,8 +844,6 @@ export default function Guardians() {
       
       {/* Student details dialoog */}
       <Dialog open={!!selectedStudent} onOpenChange={() => setSelectedStudent(null)}>
-        <DialogContent className="w-[90vw] sm:max-w-[900px] max-h-[85vh] overflow-y-auto bg-white p-0">
-          <div className="pb-6">
             {/* Header met blauwe achtergrond */}
             <div className="bg-[#1e3a8a] text-white px-6 py-5 rounded-t-lg">
               <div className="flex items-center justify-between">

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle, FileDown, FileSpreadsheet, GraduationCap, ExternalLink, UserX, User, MapPin } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle, FileDown, FileSpreadsheet, GraduationCap, ExternalLink, UserX, User, MapPin, FileUp, FileText } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -408,48 +408,60 @@ export default function Guardians() {
           <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
-              className="shrink-0"
+              size="default"
+              className="border-gray-300 text-gray-700 shrink-0"
               onClick={() => setShowFilterOptions(!showFilterOptions)}
             >
               <Filter className="mr-2 h-4 w-4" />
-              Filter
+              Filteren
             </Button>
             
             <div className="relative">
               <Button 
                 variant="outline" 
-                className="shrink-0"
+                size="default"
+                className="border-gray-300 text-gray-700 shrink-0"
                 onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
               >
-                <Download className="mr-2 h-4 w-4" />
+                <FileUp className="mr-2 h-4 w-4" />
                 Exporteren
               </Button>
               
               {isExportMenuOpen && (
                 <div 
                   id="export-menu"
-                  className="absolute right-0 top-full mt-2 w-48 bg-white shadow-lg rounded-md overflow-hidden z-10 border"
+                  className="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                 >
-                  <div className="p-2">
+                  <div className="py-1">
                     <button
                       onClick={() => {
                         // Export als PDF
                         setIsExportMenuOpen(false);
                       }}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-md flex items-center"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                     >
-                      <FileDown className="mr-2 h-4 w-4" />
-                      Exporteren als PDF
+                      <FileUp className="mr-2 h-4 w-4" />
+                      PDF bestand
                     </button>
                     <button
                       onClick={() => {
                         // Export als Excel
                         setIsExportMenuOpen(false);
                       }}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-md flex items-center"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                     >
                       <FileSpreadsheet className="mr-2 h-4 w-4" />
-                      Exporteren als Excel
+                      Excel bestand
+                    </button>
+                    <button
+                      onClick={() => {
+                        // Export als CSV
+                        setIsExportMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    >
+                      <FileText className="mr-2 h-4 w-4" />
+                      CSV bestand
                     </button>
                   </div>
                 </div>
@@ -459,6 +471,8 @@ export default function Guardians() {
           
           <Button 
             onClick={handleAddNewGuardian} 
+            variant="default" 
+            size="default" 
             className="bg-primary hover:bg-primary/90 text-white gap-2 ml-auto"
           >
             <PlusCircle className="h-4 w-4" />

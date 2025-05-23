@@ -1383,7 +1383,7 @@ export default function Students() {
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          className="h-7 w-7"
+                          className="h-7 w-7 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                           onClick={() => handleViewStudentDetails(student)}
                         >
                           <Eye className="h-4 w-4" />
@@ -1391,7 +1391,7 @@ export default function Students() {
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          className="h-7 w-7"
+                          className="h-7 w-7 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
                           onClick={() => handleEditStudent(student)}
                         >
                           <Edit className="h-4 w-4" />
@@ -1399,7 +1399,7 @@ export default function Students() {
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          className="h-7 w-7"
+                          className="h-7 w-7 text-red-600 hover:text-red-800 hover:bg-red-50"
                           onClick={() => {
                             setSelectedStudent(student);
                             setIsDeleteDialogOpen(true);

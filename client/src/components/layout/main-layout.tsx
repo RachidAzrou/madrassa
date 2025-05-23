@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import Sidebar from "./sidebar-fixed";
 import Header from "./header";
+import TestBanner from "./test-banner";
 import { useMobile } from "@/hooks/use-mobile";
 
 type MainLayoutProps = {
@@ -77,6 +78,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-hidden bg-gray-50">
+        <TestBanner />
         <Header onMenuClick={toggleSidebar} title={pageTitle} />
         <main className="flex-1 p-2 sm:p-4 md:p-6 pt-10 overflow-x-auto overflow-y-auto border-l border-gray-200" style={{ minHeight: "calc(100vh - 64px)" }}>
           <div className="max-w-7xl mx-auto w-full min-h-full pb-12">

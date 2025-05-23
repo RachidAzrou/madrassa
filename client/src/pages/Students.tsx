@@ -2292,7 +2292,7 @@ export default function Students() {
                   </div>
                 </div>
               </TabsContent>
-              
+
               {/* Klas toewijzing tab */}
               <TabsContent value="class" className="mt-0">
                 <div className="p-4 bg-white rounded-lg min-h-[450px]">

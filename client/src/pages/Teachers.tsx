@@ -444,12 +444,6 @@ const Teachers = () => {
       </div>
       
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
-        {/* Filters */}
-        <div className="p-4 border-b border-gray-200">
-          <div className="w-full">
-            {/* Status filter is verwijderd zoals gevraagd */}
-          </div>
-        </div>
         
         {/* Docententabel of lege staat */}
         {teachersData?.teachers && teachersData.teachers.length > 0 ? (

@@ -521,43 +521,53 @@ export default function Guardians() {
             )}
           </div>
         ) : (
-          <div className="border rounded-lg overflow-hidden">
+          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
             <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[40px]">
+              <TableHeader className="bg-gray-50">
+                <TableRow className="border-b border-gray-200">
+                  <TableHead className="w-[40px] py-3">
                     <Checkbox 
                       checked={selectedGuardians.length > 0 && selectedGuardians.length === searchResults.length}
                       onCheckedChange={handleToggleAllGuardians}
                     />
                   </TableHead>
-                  <TableHead>Naam</TableHead>
-                  <TableHead>Relatie</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Adres</TableHead>
-                  <TableHead className="w-[100px] text-center">Status</TableHead>
-                  <TableHead className="text-right w-[120px]">Acties</TableHead>
+                  <TableHead className="py-3 font-medium">Naam</TableHead>
+                  <TableHead className="py-3 font-medium">Relatie</TableHead>
+                  <TableHead className="py-3 font-medium">Contact</TableHead>
+                  <TableHead className="py-3 font-medium">Adres</TableHead>
+                  <TableHead className="w-[100px] text-center py-3 font-medium">Status</TableHead>
+                  <TableHead className="text-right w-[120px] py-3 font-medium">Acties</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {searchResults.map((guardian: GuardianType) => (
-                  <TableRow key={guardian.id} className="group">
-                    <TableCell className="py-2">
+                  <TableRow 
+                    key={guardian.id} 
+                    className="group hover:bg-gray-50 border-b border-gray-200"
+                  >
+                    <TableCell className="py-3">
                       <Checkbox
                         checked={selectedGuardians.includes(guardian.id)}
                         onCheckedChange={() => toggleGuardianSelection(guardian.id)}
                       />
                     </TableCell>
-                    <TableCell className="font-medium">
+                    <TableCell className="py-3 font-medium">
                       <div className="flex items-center gap-2">
-                        {guardian.firstName} {guardian.lastName}
-                        {guardian.isEmergencyContact && (
-                          <Badge variant="destructive" className="text-xs">Noodcontact</Badge>
-                        )}
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="bg-primary text-white text-xs">
+                            {guardian.firstName.charAt(0)}{guardian.lastName.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</div>
+                          {guardian.isEmergencyContact && (
+                            <Badge variant="destructive" className="text-xs mt-0.5">Noodcontact</Badge>
+                          )}
+                        </div>
                       </div>
                     </TableCell>
-                    <TableCell>{getRelationshipLabel(guardian.relationship)}</TableCell>
-                    <TableCell>
+                    <TableCell className="py-3">{getRelationshipLabel(guardian.relationship)}</TableCell>
+                    <TableCell className="py-3">
                       <div className="space-y-1">
                         <div className="flex items-center text-xs">
                           <Mail className="h-3 w-3 mr-1 opacity-70" />
@@ -571,45 +581,45 @@ export default function Guardians() {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-3">
                       {guardian.street || guardian.city ? (
                         <div className="text-xs">
-                          {guardian.street} {guardian.houseNumber}, 
-                          {guardian.postalCode} {guardian.city}
+                          <div>{guardian.street} {guardian.houseNumber}</div>
+                          <div>{guardian.postalCode} {guardian.city}</div>
                         </div>
                       ) : (
                         <span className="text-xs text-gray-400">Geen adres</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="text-center py-3">
                       {guardian.isEmergencyContact ? (
                         <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Noodcontact</Badge>
                       ) : (
                         <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Voogd</Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
+                    <TableCell className="text-right py-3">
+                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 opacity-70 hover:opacity-100"
+                          size="sm"
+                          className="h-8 w-8 p-0"
                           onClick={() => handleShowGuardianDetails(guardian)}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 opacity-70 hover:opacity-100"
+                          size="sm"
+                          className="h-8 w-8 p-0"
                           onClick={() => handleEditGuardian(guardian)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-red-600 opacity-70 hover:opacity-100"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-red-600"
                           onClick={() => handleDelete(guardian)}
                         >
                           <Trash2 className="h-4 w-4" />

@@ -1134,10 +1134,7 @@ const Teachers = () => {
             </Tabs>
           </div>
           
-          <div className="px-6 py-4 border-t flex justify-between">
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-              Annuleren
-            </Button>
+          <div className="px-6 py-4 border-t flex justify-end gap-2">
             <Button onClick={handleCreateTeacher} disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
@@ -1150,6 +1147,9 @@ const Teachers = () => {
                   Docent toevoegen
                 </>
               )}
+            </Button>
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              Annuleren
             </Button>
           </div>
         </DialogContent>

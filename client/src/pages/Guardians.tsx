@@ -346,7 +346,6 @@ export default function Guardians() {
                 <thead className="bg-gray-50 text-gray-700">
                   <tr className="border-b">
                     <th className="py-3 px-4 text-left font-medium">Voogd</th>
-                    <th className="py-3 px-4 text-left font-medium">Contact</th>
                     <th className="py-3 px-4 text-left font-medium">Relatie</th>
                     <th className="py-3 px-4 text-left font-medium">Status</th>
                     <th className="py-3 px-4 text-right">Acties</th>
@@ -372,18 +371,6 @@ export default function Guardians() {
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center text-gray-700">
-                            <Mail className="h-4 w-4 mr-2 text-gray-500" />
-                            {guardian.email || '-'}
-                          </div>
-                          <div className="flex items-center text-gray-700">
-                            <Phone className="h-4 w-4 mr-2 text-gray-500" />
-                            {guardian.phone || '-'}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
                         <div>{getRelationshipLabel(guardian.relationship)}</div>
                       </td>
                       <td className="py-3 px-4">
@@ -394,21 +381,19 @@ export default function Guardians() {
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
-                            className="text-blue-600"
                             onClick={() => handleShowGuardianDetails(guardian)}
                           >
-                            <Eye className="h-4 w-4" />
+                            Details
                           </Button>
                           
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
-                            className="text-blue-600"
                             onClick={() => handleEditGuardian(guardian)}
                           >
-                            <Pencil className="h-4 w-4" />
+                            Bewerken
                           </Button>
                         </div>
                       </td>

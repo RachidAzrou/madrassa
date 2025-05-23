@@ -186,13 +186,6 @@ export default function Guardians() {
     }
   }, [toast]);
   
-  // Ververs de gekoppelde studenten wanneer het dialoogvenster opent of sluit
-  useEffect(() => {
-    if (showAddDialog && newGuardian.id && refetchGuardianStudents) {
-      refetchGuardianStudents();
-    }
-  }, [showAddDialog, newGuardian.id, refetchGuardianStudents]);
-
   // Fetch all students for student assignment
   const {
     data: allStudents = [] as StudentType[],
@@ -241,6 +234,13 @@ export default function Guardians() {
     },
     enabled: !!guardianIdForStudents,
   });
+
+  // Ververs de gekoppelde studenten wanneer een voogd wordt toegevoegd of bijgewerkt
+  useEffect(() => {
+    if (guardianIdForStudents && refetchGuardianStudents) {
+      refetchGuardianStudents();
+    }
+  }, [guardianIdForStudents, refetchGuardianStudents, showViewDialog, showAddDialog, showEditDialog]);
 
   // Delete Guardian mutation
   const deleteGuardianMutation = useMutation({

@@ -503,13 +503,18 @@ const Teachers = () => {
                 
                 {/* Actieknoppen */}
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" className="h-8 border-gray-200 shadow-sm" onClick={handleExportTeachers}>
+                  <Button variant="outline" size="default" className="border-gray-300 text-gray-700" onClick={handleExportTeachers}>
                     <Download className="h-4 w-4 mr-2" />
                     Exporteren
                   </Button>
-                  <Button size="sm" className="h-8" onClick={() => setIsCreateDialogOpen(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nieuw
+                  <Button 
+                    variant="default" 
+                    size="default" 
+                    className="bg-primary hover:bg-primary/90"
+                    onClick={() => setIsCreateDialogOpen(true)}
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Docent Toevoegen
                   </Button>
                 </div>
               </div>

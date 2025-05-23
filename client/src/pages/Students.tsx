@@ -709,13 +709,40 @@ export default function Students() {
 
       {/* Create Student Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
-            <DialogDescription>
-              Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="w-[90vw] sm:max-w-[900px] max-h-[85vh] overflow-y-auto bg-white p-0">
+          <div className="pb-6">
+            {/* Header met blauwe achtergrond */}
+            <div className="bg-blue-600 text-white px-6 py-5 rounded-t-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <PlusCircle className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold">
+                      Nieuwe Student Toevoegen
+                    </h2>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-sm text-blue-100 font-medium">
+                        Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-white hover:bg-blue-700 hover:text-white"
+                  onClick={() => setIsCreateDialogOpen(false)}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Sluiten
+                </Button>
+              </div>
+            </div>
+            
+            <div className="px-6 pt-6">
           
           <div className="py-4">
             <Tabs defaultValue="personal" className="w-full">

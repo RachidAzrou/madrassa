@@ -837,20 +837,18 @@ export default function Guardians() {
         <DialogContent className="sm:max-w-[900px] h-[calc(100vh-100px)] max-h-[900px] overflow-hidden p-0 bg-white rounded-lg border shadow-lg">
           <div className="flex flex-col h-full">
             {/* Header met blauwe achtergrond */}
-            <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 flex-shrink-0">
+            <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-4 -mx-6 -mt-6 flex-shrink-0">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <UserCircle className="h-6 w-6 text-white" />
+                <div className="flex items-center gap-3">
+                  <div className="bg-white/20 rounded-full p-2">
+                    <UserCircle className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <DialogTitle className="text-xl font-semibold text-white">
+                    <DialogTitle className="text-xl font-bold text-white">
                       {selectedStudent?.firstName} {selectedStudent?.lastName}
                     </DialogTitle>
                     <DialogDescription className="text-blue-100 text-sm mt-1 flex items-center gap-2">
-                      <span className="font-medium">
-                        {selectedStudent?.studentId}
-                      </span>
+                      <span>{selectedStudent?.studentId}</span>
                       <Badge className="bg-white/20 text-white border-transparent hover:bg-white/30">
                         {selectedStudent?.status === 'enrolled' ? 'Ingeschreven' : (selectedStudent?.status || 'Actief')}
                       </Badge>
@@ -1076,23 +1074,35 @@ export default function Guardians() {
 
       {/* Verwijder dialoog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Voogd verwijderen</DialogTitle>
-            <DialogDescription>
-              Weet u zeker dat u deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex items-center gap-2 mt-2 mb-5 bg-red-50 p-3 rounded-md border border-red-200">
-            <AlertTriangle className="h-5 w-5 text-red-600" />
-            <p className="text-sm text-red-600">Alle koppelingen met studenten worden ook verwijderd.</p>
+        <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden">
+          <div className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-4 -mx-6 -mt-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 rounded-full p-2">
+                <AlertTriangle className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold text-white">
+                  Voogd verwijderen
+                </DialogTitle>
+                <DialogDescription className="text-red-100 text-sm mt-1">
+                  Weet u zeker dat u deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+                </DialogDescription>
+              </div>
+            </div>
           </div>
           
-          <DialogFooter>
+          <div className="px-6 py-4">
+            <div className="flex items-center gap-2 mb-5 bg-red-50 p-3 rounded-md border border-red-200">
+              <AlertTriangle className="h-5 w-5 text-red-600" />
+              <p className="text-sm text-red-600">Alle koppelingen met studenten worden ook verwijderd.</p>
+            </div>
+          </div>
+          
+          <div className="px-6 py-4 border-t bg-gray-50 flex justify-end">
             <Button
               variant="outline"
               onClick={() => setIsDeleteDialogOpen(false)}
+              className="mr-2"
             >
               Annuleren
             </Button>
@@ -1102,7 +1112,7 @@ export default function Guardians() {
             >
               Verwijderen
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
       

@@ -17,6 +17,12 @@ import {
   DialogTitle 
 } from '@/components/ui/dialog';
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Table,
   TableBody,
   TableCell,
@@ -72,6 +78,7 @@ export default function Guardians() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<StudentType | null>(null);
   
   const initialNewGuardian = {
     firstName: '',
@@ -349,6 +356,10 @@ export default function Guardians() {
     setIsDeleteDialogOpen(true);
   };
   
+  const handleShowStudentDetails = (student: StudentType) => {
+    setSelectedStudent(student);
+  };
+  
   const confirmDelete = () => {
     if (selectedGuardian) {
       toast({
@@ -585,15 +596,30 @@ export default function Guardians() {
                             .map((rel: any) => {
                               const student = studentsData.find((s: any) => s.id === rel.studentId);
                               return student ? (
-                                <Avatar key={rel.id} className="h-7 w-7 border-2 border-white">
+                                <Avatar 
+                                  key={rel.id} 
+                                  className="h-7 w-7 border-2 border-white cursor-pointer hover:scale-110 hover:z-10 transition-transform"
+                                  onClick={() => handleShowStudentDetails(student)}
+                                >
                                   <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
                                     {student.firstName?.charAt(0)}{student.lastName?.charAt(0)}
                                   </AvatarFallback>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span className="sr-only">{student.firstName} {student.lastName}</span>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top">
+                                      {student.firstName} {student.lastName}
+                                    </TooltipContent>
+                                  </Tooltip>
                                 </Avatar>
                               ) : null;
                             })}
                           {guardianStudentsQuery.data.filter((rel: any) => rel.guardianId === guardian.id).length > 3 && (
-                            <div className="flex items-center justify-center h-7 w-7 rounded-full bg-gray-100 border-2 border-white text-xs font-medium text-gray-600">
+                            <div 
+                              className="flex items-center justify-center h-7 w-7 rounded-full bg-gray-100 border-2 border-white text-xs font-medium text-gray-600 cursor-pointer hover:bg-gray-200 transition-colors"
+                              onClick={() => handleShowGuardianDetails(guardian)}
+                            >
                               +{guardianStudentsQuery.data.filter((rel: any) => rel.guardianId === guardian.id).length - 3}
                             </div>
                           )}

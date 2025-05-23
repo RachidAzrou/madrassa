@@ -698,17 +698,17 @@ export default function Guardians() {
         <DialogContent className="sm:max-w-[900px] h-[calc(100vh-100px)] max-h-[900px] overflow-hidden p-0 bg-white rounded-lg border shadow-lg">
           <div className="flex flex-col h-full">
             {/* Header met blauwe achtergrond */}
-            <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-4 -mx-6 -mt-6 flex-shrink-0">
+            <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-6 -mx-6 -mt-6 flex-shrink-0">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="bg-white/20 rounded-full p-2">
-                    <UserCheck className="h-5 w-5 text-white" />
+                <div className="flex items-center gap-4">
+                  <div className="bg-white/20 rounded-full p-2.5">
+                    <UserCheck className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <DialogTitle className="text-xl font-bold text-white">
+                    <DialogTitle className="text-xl font-bold text-white mb-1">
                       {selectedGuardian?.firstName} {selectedGuardian?.lastName}
                     </DialogTitle>
-                    <DialogDescription className="text-blue-100 text-sm mt-1 flex items-center gap-2">
+                    <DialogDescription className="text-blue-100 text-sm flex items-center gap-2">
                       <span>{getRelationshipLabel(selectedGuardian?.relationship || '')}</span>
                       {selectedGuardian?.isEmergencyContact && (
                         <Badge className="bg-red-500/30 hover:bg-red-500/30 text-white border-transparent">Noodcontact</Badge>
@@ -718,7 +718,7 @@ export default function Guardians() {
                 </div>
                 
                 <div>
-                  {/* Sluiticoon verwijderd zoals gevraagd */}
+                  {/* Header schoner zonder knoppen */}
                 </div>
               </div>
             </div>
@@ -884,17 +884,17 @@ export default function Guardians() {
         <DialogContent className="sm:max-w-[900px] h-[calc(100vh-100px)] max-h-[900px] overflow-hidden p-0 bg-white rounded-lg border shadow-lg">
           <div className="flex flex-col h-full">
             {/* Header met blauwe achtergrond */}
-            <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-4 -mx-6 -mt-6 flex-shrink-0">
+            <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-6 -mx-6 -mt-6 flex-shrink-0">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="bg-white/20 rounded-full p-2">
-                    <UserCircle className="h-5 w-5 text-white" />
+                <div className="flex items-center gap-4">
+                  <div className="bg-white/20 rounded-full p-2.5">
+                    <UserCircle className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <DialogTitle className="text-xl font-bold text-white">
+                    <DialogTitle className="text-xl font-bold text-white mb-1">
                       {selectedStudent?.firstName} {selectedStudent?.lastName}
                     </DialogTitle>
-                    <DialogDescription className="text-blue-100 text-sm mt-1 flex items-center gap-2">
+                    <DialogDescription className="text-blue-100 text-sm flex items-center gap-2">
                       <span>{selectedStudent?.studentId}</span>
                       <Badge className="bg-white/20 text-white border-transparent hover:bg-white/30">
                         {selectedStudent?.status === 'enrolled' ? 'Ingeschreven' : (selectedStudent?.status || 'Actief')}
@@ -1166,16 +1166,16 @@ export default function Guardians() {
       {/* Toevoegen/bewerken dialoog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent className="sm:max-w-[95%] md:max-w-[80%] lg:max-w-[70%] h-[80vh] max-h-[80vh] overflow-hidden flex flex-col">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] px-6 py-4 -mx-6 -mt-6 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-white/20 rounded-full p-2">
-                <UserCheck className="h-5 w-5 text-white" />
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] px-6 py-6 -mx-6 -mt-6 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 rounded-full p-2.5">
+                <UserCheck className="h-6 w-6 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-bold text-white">
+                <DialogTitle className="text-xl font-bold text-white mb-1">
                   {newGuardian.id ? 'Voogd Bewerken' : 'Nieuwe Voogd Toevoegen'}
                 </DialogTitle>
-                <DialogDescription className="text-blue-100 text-sm mt-1">
+                <DialogDescription className="text-blue-100 text-sm">
                   {newGuardian.id 
                     ? 'Werk de gegevens bij voor deze voogd.'
                     : 'Voeg een nieuwe voogd toe aan het systeem.'}

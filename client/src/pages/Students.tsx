@@ -3228,27 +3228,50 @@ export default function Students() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="font-medium">{foundGuardian?.firstName} {foundGuardian?.lastName}</h3>
+                  <h3 className="font-medium">
+                    {foundGuardian?.phone && foundGuardian?.phone.startsWith('+') 
+                      ? (foundGuardian?.firstName ? foundGuardian?.firstName : 'Onbekende voornaam') + ' ' + foundGuardian?.lastName
+                      : foundGuardian?.firstName + ' ' + foundGuardian?.lastName
+                    }
+                  </h3>
                   <p className="text-sm text-gray-600 mt-0.5">
-                    {foundGuardian?.relationship === 'parent' ? 'Ouder' : 
+                    {foundGuardian?.relationship === 'noodcontact' ? 'Noodcontact' :
+                    foundGuardian?.relationship === 'parent' ? 'Ouder' : 
                     foundGuardian?.relationship === 'guardian' ? 'Voogd' : 'Contactpersoon'}
                   </p>
                   
                   <div className="mt-2 text-sm">
-                    <div className="flex items-center mt-1">
-                      <Mail className="h-4 w-4 mr-2 text-gray-500" />
-                      <span>{foundGuardian?.email}</span>
-                    </div>
-                    <div className="flex items-center mt-1">
-                      <Phone className="h-4 w-4 mr-2 text-gray-500" />
-                      <span>{foundGuardian?.phone}</span>
-                    </div>
-                    <div className="flex items-center mt-1">
-                      <Home className="h-4 w-4 mr-2 text-gray-500" />
-                      <span>
-                        {foundGuardian?.street} {foundGuardian?.houseNumber}, {foundGuardian?.postalCode} {foundGuardian?.city}
-                      </span>
-                    </div>
+                    {/* Bij noodcontacten tonen we alleen relevante informatie */}
+                    {(foundGuardian?.phone && foundGuardian?.phone.startsWith('+')) ? (
+                      <div className="flex items-center mt-1">
+                        <Phone className="h-4 w-4 mr-2 text-amber-500" />
+                        <span className="font-medium">{foundGuardian?.phone}</span>
+                        <Badge className="ml-2 bg-amber-500 text-white text-xs">Noodgeval</Badge>
+                      </div>
+                    ) : (
+                      <>
+                        {foundGuardian?.email && (
+                          <div className="flex items-center mt-1">
+                            <Mail className="h-4 w-4 mr-2 text-gray-500" />
+                            <span>{foundGuardian?.email}</span>
+                          </div>
+                        )}
+                        {foundGuardian?.phone && (
+                          <div className="flex items-center mt-1">
+                            <Phone className="h-4 w-4 mr-2 text-gray-500" />
+                            <span>{foundGuardian?.phone}</span>
+                          </div>
+                        )}
+                        {(foundGuardian?.street || foundGuardian?.city) && (
+                          <div className="flex items-center mt-1">
+                            <Home className="h-4 w-4 mr-2 text-gray-500" />
+                            <span>
+                              {foundGuardian?.street} {foundGuardian?.houseNumber}, {foundGuardian?.postalCode} {foundGuardian?.city}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

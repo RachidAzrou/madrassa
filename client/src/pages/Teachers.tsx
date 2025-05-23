@@ -456,32 +456,6 @@ const Teachers = () => {
                 <SelectItem value="inactive">Inactief</SelectItem>
               </SelectContent>
             </Select>
-            
-            <Select
-              value={rowsPerPage.toString()}
-              onValueChange={(value) => setRowsPerPage(parseInt(value))}
-            >
-              <SelectTrigger className="w-full md:w-[140px] bg-white">
-                <SelectValue placeholder="Rijen" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10 rijen</SelectItem>
-                <SelectItem value="20">20 rijen</SelectItem>
-                <SelectItem value="50">50 rijen</SelectItem>
-                <SelectItem value="100">100 rijen</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex items-center gap-2 mt-2 md:mt-0">
-            <Button 
-              variant="outline" 
-              className="px-3 py-2 h-10 bg-white"
-              onClick={handleExportTeachers}
-            >
-              <Download className="h-4 w-4 mr-1" />
-              <span className="hidden md:inline">Exporteren</span>
-            </Button>
           </div>
         </div>
         

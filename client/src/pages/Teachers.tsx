@@ -82,6 +82,7 @@ const Teachers = () => {
   const [newLanguage, setNewLanguage] = useState("");
   const [newClassName, setNewClassName] = useState("");
   const [newClassDescription, setNewClassDescription] = useState("");
+  const [newEducation, setNewEducation] = useState("");
   
   // State for search and filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -1138,28 +1139,95 @@ const Teachers = () => {
               <TabsContent value="professional" className="space-y-3">
                 <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="educationLevel" className="text-xs">Opleidingsniveau</Label>
-                    <Select value={newTeacher.educationLevel} onValueChange={(value) => setNewTeacher({...newTeacher, educationLevel: value})}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="Selecteer opleidingsniveau" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="mbo">MBO</SelectItem>
-                        <SelectItem value="hbo">HBO</SelectItem>
-                        <SelectItem value="wo">WO</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label className="text-xs">Opleidingen</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {newTeacher.educations.map((education, index) => (
+                        <Badge key={index} className="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1">
+                          {education}
+                          <X
+                            className="h-3 w-3 ml-1 cursor-pointer"
+                            onClick={() => {
+                              const updatedEducations = [...newTeacher.educations];
+                              updatedEducations.splice(index, 1);
+                              setNewTeacher({...newTeacher, educations: updatedEducations});
+                            }}
+                          />
+                        </Badge>
+                      ))}
+                      <form
+                        className="flex gap-2"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (newEducation.trim()) {
+                            setNewTeacher({
+                              ...newTeacher,
+                              educations: [...newTeacher.educations, newEducation]
+                            });
+                            setNewEducation("");
+                          }
+                        }}
+                      >
+                        <Input
+                          placeholder="Nieuwe opleiding"
+                          className="h-9 w-48"
+                          value={newEducation}
+                          onChange={(e) => setNewEducation(e.target.value)}
+                        />
+                        <Button type="submit" size="sm" className="h-9">Toevoegen</Button>
+                      </form>
+                    </div>
                   </div>
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="yearsOfExperience" className="text-xs">Jaren ervaring</Label>
+                    <Label htmlFor="profession" className="text-xs">Beroep</Label>
                     <Input 
-                      id="yearsOfExperience" 
-                      type="number" 
+                      id="profession" 
                       className="h-9" 
-                      value={newTeacher.yearsOfExperience} 
-                      onChange={(e) => setNewTeacher({...newTeacher, yearsOfExperience: e.target.value})} 
+                      value={newTeacher.profession} 
+                      onChange={(e) => setNewTeacher({...newTeacher, profession: e.target.value})} 
                     />
                   </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-xs">Talen</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {newTeacher.languages.map((lang, index) => (
+                        <Badge key={index} className="bg-purple-100 text-purple-700 hover:bg-purple-200 px-3 py-1">
+                          {lang}
+                          <X
+                            className="h-3 w-3 ml-1 cursor-pointer"
+                            onClick={() => {
+                              const updatedLangs = [...newTeacher.languages];
+                              updatedLangs.splice(index, 1);
+                              setNewTeacher({...newTeacher, languages: updatedLangs});
+                            }}
+                          />
+                        </Badge>
+                      ))}
+                      <form
+                        className="flex gap-2"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (newLanguage.trim()) {
+                            setNewTeacher({
+                              ...newTeacher,
+                              languages: [...newTeacher.languages, newLanguage]
+                            });
+                            setNewLanguage("");
+                          }
+                        }}
+                      >
+                        <Input
+                          placeholder="Nieuwe taal"
+                          className="h-9 w-48"
+                          value={newLanguage}
+                          onChange={(e) => setNewLanguage(e.target.value)}
+                        />
+                        <Button type="submit" size="sm" className="h-9">Toevoegen</Button>
+                      </form>
+                    </div>
+                  </div>
+                  
                   <div className="space-y-2">
                     <Label htmlFor="notes" className="text-xs">Notities</Label>
                     <Textarea 
@@ -1176,42 +1244,146 @@ const Teachers = () => {
               <TabsContent value="subjects" className="space-y-3">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-xs">Specialisaties</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {newTeacher.specialties.map((specialty, index) => (
-                        <Badge key={index} className="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1">
-                          {specialty}
-                          <X
-                            className="h-3 w-3 ml-1 cursor-pointer"
-                            onClick={() => {
-                              const updatedSpecialties = [...newTeacher.specialties];
-                              updatedSpecialties.splice(index, 1);
-                              setNewTeacher({...newTeacher, specialties: updatedSpecialties});
-                            }}
-                          />
-                        </Badge>
-                      ))}
-                      <form
-                        className="flex gap-2"
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          if (newSpecialty.trim()) {
-                            setNewTeacher({
-                              ...newTeacher,
-                              specialties: [...newTeacher.specialties, newSpecialty]
-                            });
-                            setNewSpecialty("");
-                          }
-                        }}
-                      >
-                        <Input
-                          placeholder="Nieuwe specialisatie"
-                          className="h-9 w-48"
-                          value={newSpecialty}
-                          onChange={(e) => setNewSpecialty(e.target.value)}
+                    <Label className="text-xs">Beschikbare vakken</Label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      {/* Hier tonen we de vakken die beschikbaar zijn in de app */}
+                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div>
+                          <h4 className="font-medium">Arabische Taal</h4>
+                          <p className="text-xs text-gray-500">Quranic Arabisch voor beginners</p>
+                        </div>
+                        <Checkbox 
+                          checked={newTeacher.specialties.includes("Arabische Taal")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setNewTeacher({
+                                ...newTeacher,
+                                specialties: [...newTeacher.specialties, "Arabische Taal"]
+                              });
+                            } else {
+                              setNewTeacher({
+                                ...newTeacher,
+                                specialties: newTeacher.specialties.filter(s => s !== "Arabische Taal")
+                              });
+                            }
+                          }}
                         />
-                        <Button type="submit" size="sm" className="h-9">Toevoegen</Button>
-                      </form>
+                      </div>
+                      
+                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div>
+                          <h4 className="font-medium">Quran</h4>
+                          <p className="text-xs text-gray-500">Quran recitatie en memorisatie</p>
+                        </div>
+                        <Checkbox 
+                          checked={newTeacher.specialties.includes("Quran")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setNewTeacher({
+                                ...newTeacher,
+                                specialties: [...newTeacher.specialties, "Quran"]
+                              });
+                            } else {
+                              setNewTeacher({
+                                ...newTeacher,
+                                specialties: newTeacher.specialties.filter(s => s !== "Quran")
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div>
+                          <h4 className="font-medium">Fiqh</h4>
+                          <p className="text-xs text-gray-500">Islamitische jurisprudentie</p>
+                        </div>
+                        <Checkbox 
+                          checked={newTeacher.specialties.includes("Fiqh")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setNewTeacher({
+                                ...newTeacher,
+                                specialties: [...newTeacher.specialties, "Fiqh"]
+                              });
+                            } else {
+                              setNewTeacher({
+                                ...newTeacher,
+                                specialties: newTeacher.specialties.filter(s => s !== "Fiqh")
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div>
+                          <h4 className="font-medium">Aqidah</h4>
+                          <p className="text-xs text-gray-500">Islamitische geloofsleer</p>
+                        </div>
+                        <Checkbox 
+                          checked={newTeacher.specialties.includes("Aqidah")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setNewTeacher({
+                                ...newTeacher,
+                                specialties: [...newTeacher.specialties, "Aqidah"]
+                              });
+                            } else {
+                              setNewTeacher({
+                                ...newTeacher,
+                                specialties: newTeacher.specialties.filter(s => s !== "Aqidah")
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div>
+                          <h4 className="font-medium">Hadith</h4>
+                          <p className="text-xs text-gray-500">Studie van profetische tradities</p>
+                        </div>
+                        <Checkbox 
+                          checked={newTeacher.specialties.includes("Hadith")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setNewTeacher({
+                                ...newTeacher,
+                                specialties: [...newTeacher.specialties, "Hadith"]
+                              });
+                            } else {
+                              setNewTeacher({
+                                ...newTeacher,
+                                specialties: newTeacher.specialties.filter(s => s !== "Hadith")
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div>
+                          <h4 className="font-medium">Tajweed</h4>
+                          <p className="text-xs text-gray-500">Regels voor Quran recitatie</p>
+                        </div>
+                        <Checkbox 
+                          checked={newTeacher.specialties.includes("Tajweed")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setNewTeacher({
+                                ...newTeacher,
+                                specialties: [...newTeacher.specialties, "Tajweed"]
+                              });
+                            } else {
+                              setNewTeacher({
+                                ...newTeacher,
+                                specialties: newTeacher.specialties.filter(s => s !== "Tajweed")
+                              });
+                            }
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                   
@@ -1254,46 +1426,6 @@ const Teachers = () => {
                       </form>
                     </div>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="text-xs">Talen</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {newTeacher.languages.map((lang, index) => (
-                        <Badge key={index} className="bg-purple-100 text-purple-700 hover:bg-purple-200 px-3 py-1">
-                          {lang}
-                          <X
-                            className="h-3 w-3 ml-1 cursor-pointer"
-                            onClick={() => {
-                              const updatedLangs = [...newTeacher.languages];
-                              updatedLangs.splice(index, 1);
-                              setNewTeacher({...newTeacher, languages: updatedLangs});
-                            }}
-                          />
-                        </Badge>
-                      ))}
-                      <form
-                        className="flex gap-2"
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          if (newLanguage.trim()) {
-                            setNewTeacher({
-                              ...newTeacher,
-                              languages: [...newTeacher.languages, newLanguage]
-                            });
-                            setNewLanguage("");
-                          }
-                        }}
-                      >
-                        <Input
-                          placeholder="Nieuwe taal"
-                          className="h-9 w-48"
-                          value={newLanguage}
-                          onChange={(e) => setNewLanguage(e.target.value)}
-                        />
-                        <Button type="submit" size="sm" className="h-9">Toevoegen</Button>
-                      </form>
-                    </div>
-                  </div>
                 </div>
               </TabsContent>
               
@@ -1301,62 +1433,164 @@ const Teachers = () => {
               <TabsContent value="classes" className="space-y-3">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-xs">Toegewezen klassen</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {newTeacher.assignedClasses.map((cls, index) => (
-                        <div key={index} className="bg-gray-50 border border-gray-200 rounded p-2 w-full sm:w-[calc(50%-8px)]">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <p className="font-medium">{cls.name}</p>
-                              <p className="text-xs text-gray-500">{cls.description}</p>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                const updatedClasses = [...newTeacher.assignedClasses];
-                                updatedClasses.splice(index, 1);
-                                setNewTeacher({...newTeacher, assignedClasses: updatedClasses});
-                              }}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
+                    <Label className="text-xs">Beschikbare klassen</Label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Hier tonen we de klassen die beschikbaar zijn in de app */}
+                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div>
+                          <h4 className="font-medium">Klas 1A</h4>
+                          <p className="text-xs text-gray-500">Beginners niveau, leeftijd 6-8 jaar</p>
                         </div>
-                      ))}
-                      <form
-                        className="flex flex-col gap-2 w-full"
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          if (newClassName.trim() && newClassDescription.trim()) {
-                            setNewTeacher({
-                              ...newTeacher,
-                              assignedClasses: [
-                                ...newTeacher.assignedClasses, 
-                                { name: newClassName, description: newClassDescription }
-                              ]
-                            });
-                            setNewClassName("");
-                            setNewClassDescription("");
-                          }
-                        }}
-                      >
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <Input
-                            placeholder="Naam van de klas"
-                            className="h-9"
-                            value={newClassName}
-                            onChange={(e) => setNewClassName(e.target.value)}
-                          />
-                          <Input
-                            placeholder="Beschrijving"
-                            className="h-9"
-                            value={newClassDescription}
-                            onChange={(e) => setNewClassDescription(e.target.value)}
-                          />
+                        <Checkbox 
+                          checked={newTeacher.assignedClasses.some(c => c.name === "Klas 1A")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setNewTeacher({
+                                ...newTeacher,
+                                assignedClasses: [...newTeacher.assignedClasses, { 
+                                  name: "Klas 1A", 
+                                  description: "Beginners niveau, leeftijd 6-8 jaar" 
+                                }]
+                              });
+                            } else {
+                              setNewTeacher({
+                                ...newTeacher,
+                                assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 1A")
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div>
+                          <h4 className="font-medium">Klas 2B</h4>
+                          <p className="text-xs text-gray-500">Gevorderd niveau, leeftijd 8-10 jaar</p>
                         </div>
-                        <Button type="submit" className="w-full sm:w-auto">Klas toevoegen</Button>
-                      </form>
+                        <Checkbox 
+                          checked={newTeacher.assignedClasses.some(c => c.name === "Klas 2B")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setNewTeacher({
+                                ...newTeacher,
+                                assignedClasses: [...newTeacher.assignedClasses, { 
+                                  name: "Klas 2B", 
+                                  description: "Gevorderd niveau, leeftijd 8-10 jaar" 
+                                }]
+                              });
+                            } else {
+                              setNewTeacher({
+                                ...newTeacher,
+                                assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 2B")
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div>
+                          <h4 className="font-medium">Klas 3C</h4>
+                          <p className="text-xs text-gray-500">Midden niveau, leeftijd 10-12 jaar</p>
+                        </div>
+                        <Checkbox 
+                          checked={newTeacher.assignedClasses.some(c => c.name === "Klas 3C")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setNewTeacher({
+                                ...newTeacher,
+                                assignedClasses: [...newTeacher.assignedClasses, { 
+                                  name: "Klas 3C", 
+                                  description: "Midden niveau, leeftijd 10-12 jaar" 
+                                }]
+                              });
+                            } else {
+                              setNewTeacher({
+                                ...newTeacher,
+                                assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 3C")
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div>
+                          <h4 className="font-medium">Klas 4D</h4>
+                          <p className="text-xs text-gray-500">Gevorderd niveau, leeftijd 12-14 jaar</p>
+                        </div>
+                        <Checkbox 
+                          checked={newTeacher.assignedClasses.some(c => c.name === "Klas 4D")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setNewTeacher({
+                                ...newTeacher,
+                                assignedClasses: [...newTeacher.assignedClasses, { 
+                                  name: "Klas 4D", 
+                                  description: "Gevorderd niveau, leeftijd 12-14 jaar" 
+                                }]
+                              });
+                            } else {
+                              setNewTeacher({
+                                ...newTeacher,
+                                assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 4D")
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div>
+                          <h4 className="font-medium">Klas 5E</h4>
+                          <p className="text-xs text-gray-500">Vergevorderd niveau, leeftijd 14-16 jaar</p>
+                        </div>
+                        <Checkbox 
+                          checked={newTeacher.assignedClasses.some(c => c.name === "Klas 5E")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setNewTeacher({
+                                ...newTeacher,
+                                assignedClasses: [...newTeacher.assignedClasses, { 
+                                  name: "Klas 5E", 
+                                  description: "Vergevorderd niveau, leeftijd 14-16 jaar" 
+                                }]
+                              });
+                            } else {
+                              setNewTeacher({
+                                ...newTeacher,
+                                assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 5E")
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div>
+                          <h4 className="font-medium">Klas 6F</h4>
+                          <p className="text-xs text-gray-500">Expert niveau, leeftijd 16-18 jaar</p>
+                        </div>
+                        <Checkbox 
+                          checked={newTeacher.assignedClasses.some(c => c.name === "Klas 6F")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setNewTeacher({
+                                ...newTeacher,
+                                assignedClasses: [...newTeacher.assignedClasses, { 
+                                  name: "Klas 6F", 
+                                  description: "Expert niveau, leeftijd 16-18 jaar" 
+                                }]
+                              });
+                            } else {
+                              setNewTeacher({
+                                ...newTeacher,
+                                assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 6F")
+                              });
+                            }
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

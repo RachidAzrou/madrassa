@@ -1139,182 +1139,210 @@ export default function Guardians() {
               </TabsList>
 
               <div className="flex-1 overflow-y-auto">
-                <TabsContent value="personal" className="space-y-6 mt-0 h-full">
-                  <div className="space-y-4">
-                <div className="border rounded-lg p-4">
-                  <h3 className="text-lg font-semibold mb-4">Persoonlijke Informatie</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">Voornaam</Label>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        value={newGuardian.firstName}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Achternaam</Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        value={newGuardian.lastName}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="email">E-mail</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={newGuardian.email}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Telefoon</Label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        value={newGuardian.phone || ''}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="relationship">Relatie tot student</Label>
-                      <Select
-                        name="relationship"
-                        value={newGuardian.relationship}
-                        onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer relatie" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="parent">Ouder</SelectItem>
-                          <SelectItem value="guardian">Voogd</SelectItem>
-                          <SelectItem value="family">Familie</SelectItem>
-                          <SelectItem value="noodcontact">Noodcontact</SelectItem>
-                          <SelectItem value="other">Anders</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Noodcontact</Label>
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          id="isEmergencyContact"
-                          name="isEmergencyContact" 
-                          checked={newGuardian.isEmergencyContact}
-                          onCheckedChange={(checked) => 
-                            setNewGuardian({...newGuardian, isEmergencyContact: !!checked})
-                          }
-                        />
-                        <Label 
-                          htmlFor="isEmergencyContact" 
-                          className="text-sm text-red-600"
-                        >
-                          Dit is een noodcontact
+                <TabsContent value="personal" className="mt-0">
+                  <div className="p-4 bg-white rounded-lg min-h-[450px]">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">
+                          Voornaam <span className="text-primary">*</span>
                         </Label>
+                        <Input
+                          id="firstName"
+                          name="firstName"
+                          value={newGuardian.firstName}
+                          onChange={handleInputChange}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Voornaam"
+                          required
+                        />
                       </div>
-                      {newGuardian.isEmergencyContact && (
-                        <p className="text-xs text-gray-500 mt-1">
-                          Deze persoon zal gecontacteerd worden in geval van nood.
-                        </p>
-                      )}
+                      
+                      <div>
+                        <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">
+                          Achternaam <span className="text-primary">*</span>
+                        </Label>
+                        <Input
+                          id="lastName"
+                          name="lastName"
+                          value={newGuardian.lastName}
+                          onChange={handleInputChange}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Achternaam"
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="email" className="text-xs font-medium text-gray-700">
+                          E-mail <span className="text-primary">*</span>
+                        </Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          value={newGuardian.email}
+                          onChange={handleInputChange}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="email@example.com"
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="phone" className="text-xs font-medium text-gray-700">
+                          Telefoon
+                        </Label>
+                        <Input
+                          id="phone"
+                          name="phone"
+                          value={newGuardian.phone || ''}
+                          onChange={handleInputChange}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="06 1234 5678"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="relationship" className="text-xs font-medium text-gray-700">
+                          Relatie tot student
+                        </Label>
+                        <Select
+                          name="relationship"
+                          value={newGuardian.relationship}
+                          onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
+                        >
+                          <SelectTrigger className="mt-1 h-9 text-sm bg-white border-gray-200">
+                            <SelectValue placeholder="Selecteer relatie" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="parent">Ouder</SelectItem>
+                            <SelectItem value="guardian">Voogd</SelectItem>
+                            <SelectItem value="family">Familie</SelectItem>
+                            <SelectItem value="noodcontact">Noodcontact</SelectItem>
+                            <SelectItem value="other">Anders</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700">Noodcontact</Label>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Checkbox
+                            id="isEmergencyContact"
+                            name="isEmergencyContact" 
+                            checked={newGuardian.isEmergencyContact}
+                            onCheckedChange={(checked) => 
+                              setNewGuardian({...newGuardian, isEmergencyContact: !!checked})
+                            }
+                          />
+                          <Label 
+                            htmlFor="isEmergencyContact" 
+                            className="text-xs text-red-600"
+                          >
+                            Dit is een noodcontact
+                          </Label>
+                        </div>
+                        {newGuardian.isEmergencyContact && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            Deze persoon zal gecontacteerd worden in geval van nood.
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="md:col-span-3">
+                        <Label htmlFor="notes" className="text-xs font-medium text-gray-700">
+                          Notities
+                        </Label>
+                        <Textarea
+                          id="notes"
+                          name="notes"
+                          placeholder="Extra informatie over deze voogd..."
+                          value={newGuardian.notes || ''}
+                          onChange={handleInputChange}
+                          className="mt-1 text-sm bg-white border-gray-200"
+                          rows={3}
+                        />
+                      </div>
                     </div>
-
                   </div>
-                </div>
-                
-                <div className="border rounded-lg p-4">
-                  <h3 className="text-lg font-semibold mb-4">Notities</h3>
-                  <div className="space-y-2">
-                    <Textarea
-                      id="notes"
-                      name="notes"
-                      placeholder="Extra informatie over deze voogd..."
-                      value={newGuardian.notes || ''}
-                      onChange={handleInputChange}
-                      className="min-h-[100px]"
-                    />
-                  </div>
-                </div>
-                </div>
-              </TabsContent>
+                </TabsContent>
 
-                <TabsContent value="contact" className="space-y-6 mt-0 h-full">
-                  <div className="space-y-4">
-                  <div className="border rounded-lg p-4">
-                    <h3 className="text-lg font-semibold mb-4">Adres Informatie</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="street">Straat</Label>
+                <TabsContent value="contact" className="mt-0">
+                  <div className="p-4 bg-white rounded-lg min-h-[450px]">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor="street" className="text-xs font-medium text-gray-700">
+                          Straat
+                        </Label>
                         <Input
                           id="street"
                           name="street"
                           value={newGuardian.street || ''}
                           onChange={handleInputChange}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Straatnaam"
                         />
                       </div>
                       
-                      <div className="space-y-2">
-                        <Label htmlFor="houseNumber">Huisnummer</Label>
+                      <div>
+                        <Label htmlFor="houseNumber" className="text-xs font-medium text-gray-700">
+                          Huisnummer
+                        </Label>
                         <Input
                           id="houseNumber"
                           name="houseNumber"
                           value={newGuardian.houseNumber || ''}
                           onChange={handleInputChange}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="123"
                         />
                       </div>
                       
-                      <div className="space-y-2">
-                        <Label htmlFor="postalCode">Postcode</Label>
+                      <div>
+                        <Label htmlFor="postalCode" className="text-xs font-medium text-gray-700">
+                          Postcode
+                        </Label>
                         <Input
                           id="postalCode"
                           name="postalCode"
                           value={newGuardian.postalCode || ''}
                           onChange={handleInputChange}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="1234 AB"
                         />
                       </div>
                       
-                      <div className="space-y-2">
-                        <Label htmlFor="city">Stad</Label>
+                      <div>
+                        <Label htmlFor="city" className="text-xs font-medium text-gray-700">
+                          Stad
+                        </Label>
                         <Input
                           id="city"
                           name="city"
                           value={newGuardian.city || ''}
                           onChange={handleInputChange}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Amsterdam"
                         />
                       </div>
                     </div>
                   </div>
-                  </div>
                 </TabsContent>
 
-                <TabsContent value="students" className="space-y-6 mt-0 h-full">
-                  <div className="space-y-4">
+                <TabsContent value="students" className="mt-0">
+                  <div className="p-4 bg-white rounded-lg min-h-[450px]">
               {!newGuardian.id && (
-                <div className="border rounded-lg p-4">
-                  <h3 className="text-lg font-semibold mb-4">Koppel Studenten</h3>
+                <div className="space-y-4">
+                  <h3 className="text-sm font-medium text-gray-800 mb-4">Koppel Studenten</h3>
                   
                   <div className="space-y-2 mb-4">
-                    <Label htmlFor="studentSearch">Zoek student</Label>
+                    <Label htmlFor="studentSearch" className="text-xs font-medium text-gray-700">Zoek student</Label>
                     <div className="relative">
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
                       <Input
                         id="studentSearch"
                         placeholder="Zoek op naam of ID..."
-                        className="pl-9"
+                        className="pl-9 mt-1 h-9 text-sm bg-white border-gray-200"
                         value={studentSearchQuery}
                         onChange={(e) => setStudentSearchQuery(e.target.value)}
                       />
@@ -1413,6 +1441,7 @@ export default function Guardians() {
                 </div>
               )}
                 </div>
+                  </div>
               </TabsContent>
               </div>
             </Tabs>

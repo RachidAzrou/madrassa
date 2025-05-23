@@ -1440,7 +1440,6 @@ export default function Guardians() {
                   )}
                 </div>
               )}
-                </div>
                   </div>
               </TabsContent>
               </div>

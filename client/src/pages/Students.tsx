@@ -1679,23 +1679,69 @@ export default function Students() {
                               city: eidData.city
                             });
                             
-                            // Simuleer het vinden van een bijbehorende voogd
-                            const guardianData = {
-                              id: 10,
-                              firstName: "Samir",
-                              lastName: "El Alaoui",
-                              relationship: "parent",
-                              email: "samir.elalaoui@gmail.com",
-                              phone: "0477 12 34 56",
-                              street: "Molenbeekstraat",
-                              houseNumber: "45",
-                              postalCode: "1080",
-                              city: "Brussel",
-                              isEmergencyContact: true
-                            };
+                            // Zoek naar mogelijke voogden met dezelfde achternaam
+                            const lastName = eidData.lastName;
                             
-                            // Sla de gevonden voogdgegevens op voor later gebruik
-                            setFoundGuardian(guardianData);
+                            // Haal de guardians data op (als dat er is)
+                            apiRequest(`/api/guardians/search?lastName=${encodeURIComponent(lastName)}`)
+                              .then((matchingGuardians) => {
+                                if (matchingGuardians && matchingGuardians.length > 0) {
+                                  // Neem de eerste gevonden voogd met dezelfde achternaam
+                                  setFoundGuardian(matchingGuardians[0]);
+                                  
+                                  // Toon bericht dat er een mogelijke voogd is gevonden
+                                  localToast({
+                                    title: "Mogelijke voogd gevonden",
+                                    description: `${matchingGuardians[0].firstName} ${matchingGuardians[0].lastName} is gevonden als mogelijke voogd.`,
+                                  });
+                                  
+                                  // Toon het bevestigingsdialoog
+                                  setShowGuardianConfirmDialog(true);
+                                } else {
+                                  // Maak een nieuwe voogd aan met dezelfde achternaam als de student
+                                  const newGuardian = {
+                                    firstName: "", // Leeg, moet ingevuld worden
+                                    lastName: lastName, // Zelfde achternaam als student
+                                    relationship: "ouder",
+                                    email: "",
+                                    phone: "",
+                                    street: eidData.street,
+                                    houseNumber: eidData.houseNumber,
+                                    postalCode: eidData.postalCode,
+                                    city: eidData.city,
+                                    isEmergencyContact: true
+                                  };
+                                  
+                                  // Maak een nieuwe voogd aan
+                                  apiRequest('/api/guardians', {
+                                    method: 'POST',
+                                    body: newGuardian
+                                  })
+                                  .then(createdGuardian => {
+                                    // Sla de nieuwe voogd op voor gebruik
+                                    setFoundGuardian(createdGuardian);
+                                    
+                                    // Toon het dialoogvenster om de voogdgegevens te bewerken
+                                    setShowGuardianFormDialog(true);
+                                    
+                                    localToast({
+                                      title: "Nieuwe voogd aangemaakt",
+                                      description: "Vul de gegevens van de voogd aan.",
+                                    });
+                                  })
+                                  .catch(error => {
+                                    console.error("Fout bij aanmaken voogd:", error);
+                                    localToast({
+                                      variant: "destructive",
+                                      title: "Fout bij aanmaken voogd",
+                                      description: "Er is een fout opgetreden bij het aanmaken van de voogd.",
+                                    });
+                                  });
+                                }
+                              })
+                              .catch(error => {
+                                console.error("Fout bij zoeken naar voogd:", error);
+                              });
                             
                             // Voeg een extra bericht toe dat de gegevens zijn ingeladen
                             localToast({

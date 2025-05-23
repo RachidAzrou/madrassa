@@ -2425,6 +2425,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Error fetching guardians" });
     }
   });
+  
+  // Zoek voogden op basis van achternaam
+  apiRouter.get("/api/guardians/search", async (req, res) => {
+    try {
+      const { lastName } = req.query;
+      if (!lastName) {
+        return res.status(400).json({ message: "Last name is required for search" });
+      }
+      
+      // Haal alle voogden op en filter op de server
+      const allGuardians = await storage.getGuardians();
+      const matchingGuardians = allGuardians.filter(
+        guardian => guardian.lastName.toLowerCase() === (lastName as string).toLowerCase()
+      );
+      
+      res.json(matchingGuardians);
+    } catch (error) {
+      console.error("Error searching guardians by last name:", error);
+      res.status(500).json({ message: "Error searching guardians by last name" });
+    }
+  });
+
+  apiRouter.get("/api/guardians/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const guardian = await storage.getGuardian(id);
+      if (!guardian) {
+        return res.status(404).json({ message: "Guardian not found" });
+      }
+      
+      res.json(guardian);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching guardian" });
+    }
+  });
 
   apiRouter.get("/api/guardians", async (req, res) => {
     try {

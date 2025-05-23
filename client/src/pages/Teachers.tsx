@@ -679,11 +679,7 @@ const Teachers = () => {
           
           <div className="py-2">
             <Tabs defaultValue="personal">
-              <TabsList className="grid grid-cols-7 mb-4">
-                <TabsTrigger value="photo" className="flex items-center gap-2">
-                  <Image className="h-4 w-4" />
-                  <span>Foto</span>
-                </TabsTrigger>
+              <TabsList className="grid grid-cols-6 mb-4">
                 <TabsTrigger value="personal" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   <span>Persoonlijk</span>
@@ -710,20 +706,51 @@ const Teachers = () => {
                 </TabsTrigger>
               </TabsList>
             
-              {/* Foto upload tab */}
-              <TabsContent value="photo" className="space-y-6">
+  
+              
+              {/* Persoonlijke informatie tab */}
+              <TabsContent value="personal" className="space-y-6">
                 <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Foto uploaden</h3>
-                  <div className="flex flex-col items-center justify-center gap-4">
-                    <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center overflow-hidden bg-gray-50 relative group cursor-pointer">
-                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Upload className="h-8 w-8 text-gray-500" />
-                        <p className="text-sm text-gray-500 mt-2">Bestand kiezen</p>
-                      </div>
+                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+                  
+                  {/* Foto upload sectie */}
+                  <div className="flex mb-4 mt-0 items-start">
+                    <div 
+                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-4"
+                      onClick={() => {
+                        const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
+                        fileInput?.click();
+                      }}
+                    >
                       <img id="teacher-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
-                      <div id="teacher-photo-placeholder" className="flex flex-col items-center justify-center">
-                        <User className="h-12 w-12 text-gray-300" />
-                        <p className="text-sm text-gray-400 mt-2">Geen foto</p>
+                      <div id="teacher-photo-placeholder" className="w-full h-full flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-full">
+                        <User className="h-10 w-10 text-gray-300" />
+                        <div className="absolute bottom-0 right-0 bg-[#1e3a8a] rounded-full p-1.5 shadow-sm">
+                          <Upload className="h-3.5 w-3.5 text-white" />
+                        </div>
+                      </div>
+                      
+                      {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
+                      <div 
+                        className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity hidden"
+                        id="photo-delete-overlay"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                          const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                          const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
+                          
+                          if (photoPreview && photoPlaceholder && fileInput && photoDeleteOverlay) {
+                            photoPreview.src = '';
+                            photoPreview.classList.add('hidden');
+                            photoPlaceholder.classList.remove('hidden');
+                            photoDeleteOverlay.classList.add('hidden');
+                            fileInput.value = '';
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-6 w-6 text-white" />
                       </div>
                     </div>
                     
@@ -739,73 +766,21 @@ const Teachers = () => {
                           reader.onload = function(event) {
                             const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
                             const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                            const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
                             
-                            if (photoPreview && photoPlaceholder && event.target?.result) {
+                            if (photoPreview && photoPlaceholder && photoDeleteOverlay && event.target?.result) {
                               photoPreview.src = event.target.result as string;
                               photoPreview.classList.remove('hidden');
                               photoPlaceholder.classList.add('hidden');
+                              photoDeleteOverlay.classList.remove('hidden');
                             }
                           };
                           reader.readAsDataURL(file);
                         }
                       }}
                     />
-                    
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-2"
-                        onClick={() => {
-                          const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
-                          fileInput?.click();
-                        }}
-                      >
-                        <Upload className="h-4 w-4 mr-2" />
-                        Foto uploaden
-                      </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => {
-                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
-                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
-                          const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
-                          
-                          if (photoPreview && photoPlaceholder && fileInput) {
-                            photoPreview.src = '';
-                            photoPreview.classList.add('hidden');
-                            photoPlaceholder.classList.remove('hidden');
-                            fileInput.value = '';
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Verwijderen
-                      </Button>
-                    </div>
-
-                    <div className="w-full mt-4">
-                      <Label className="text-sm font-medium text-gray-700">
-                        Richtlijnen voor foto's
-                      </Label>
-                      <ul className="mt-2 text-sm text-gray-600 space-y-1 list-disc list-inside">
-                        <li>Upload een duidelijke, recente foto</li>
-                        <li>Foto moet het volledige gezicht tonen</li>
-                        <li>Neutrale achtergrond</li>
-                        <li>Maximum bestandsgrootte: 5MB</li>
-                      </ul>
-                    </div>
                   </div>
-                </div>
-              </TabsContent>
-              
-              {/* Persoonlijke informatie tab */}
-              <TabsContent value="personal" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+                  
                   <div className="flex mb-4 justify-end gap-2">
                     <Button 
                       variant="outline" 

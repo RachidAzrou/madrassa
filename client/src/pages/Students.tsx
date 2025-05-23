@@ -3383,18 +3383,40 @@ export default function Students() {
                         (studentFormData.programId ? [{ 
                           programId: studentFormData.programId, 
                           yearLevel: studentFormData.yearLevel 
-                        }] : []),
-                      guardianId: createdGuardian.id // Koppel aan de zojuist aangemaakte voogd
+                        }] : [])
                     };
                     
-                    // Voeg de student toe en koppel aan de voogd
-                    createStudentMutation.mutate(dataToSubmit);
-                    setShowGuardianConfirmDialog(false);
-                    
-                    toast({
-                      title: "Noodcontact opgeslagen",
-                      description: "Het noodcontact is opgeslagen en gekoppeld aan de student.",
+                    // Voeg de student toe
+                    createStudentMutation.mutate(dataToSubmit, {
+                      onSuccess: (createdStudent) => {
+                        // Na toevoegen van de student, koppel de voogd eraan
+                        apiRequest('/api/student-guardians', {
+                          method: 'POST',
+                          body: {
+                            studentId: createdStudent.id,
+                            guardianId: createdGuardian.id,
+                            relationship: "noodcontact",
+                            isPrimary: false
+                          }
+                        })
+                        .then(() => {
+                          toast({
+                            title: "Student en noodcontact opgeslagen",
+                            description: "De student is aangemaakt en het noodcontact is gekoppeld.",
+                          });
+                        })
+                        .catch(error => {
+                          console.error("Fout bij koppelen noodcontact:", error);
+                          toast({
+                            variant: "destructive",
+                            title: "Fout bij koppelen noodcontact",
+                            description: "Student is aangemaakt, maar kon niet aan het noodcontact worden gekoppeld.",
+                          });
+                        });
+                      }
                     });
+                    
+                    setShowGuardianConfirmDialog(false);
                   })
                   .catch(error => {
                     console.error("Fout bij aanmaken noodcontact:", error);
@@ -3413,12 +3435,41 @@ export default function Students() {
                       (studentFormData.programId ? [{ 
                         programId: studentFormData.programId, 
                         yearLevel: studentFormData.yearLevel 
-                      }] : []),
-                    guardianId: foundGuardian?.id
+                      }] : [])
                   };
                   
-                  // Voeg de student toe en koppel aan de voogd
-                  createStudentMutation.mutate(dataToSubmit);
+                  // Voeg de student toe
+                  createStudentMutation.mutate(dataToSubmit, {
+                    onSuccess: (createdStudent) => {
+                      // Als er een bestaande voogd was geselecteerd, koppel deze aan de nieuwe student
+                      if (foundGuardian && foundGuardian.id) {
+                        apiRequest('/api/student-guardians', {
+                          method: 'POST',
+                          body: {
+                            studentId: createdStudent.id,
+                            guardianId: foundGuardian.id,
+                            relationship: foundGuardian.relationship || "parent",
+                            isPrimary: true
+                          }
+                        })
+                        .then(() => {
+                          toast({
+                            title: "Student en voogd gekoppeld",
+                            description: "De student is aangemaakt en aan de voogd gekoppeld.",
+                          });
+                        })
+                        .catch(error => {
+                          console.error("Fout bij koppelen voogd:", error);
+                          toast({
+                            variant: "destructive",
+                            title: "Fout bij koppelen voogd",
+                            description: "Student is aangemaakt, maar kon niet aan de voogd worden gekoppeld.",
+                          });
+                        });
+                      }
+                    }
+                  });
+                  
                   setShowGuardianConfirmDialog(false);
                 }
               }}

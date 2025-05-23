@@ -399,12 +399,13 @@ const Teachers = () => {
             </Button>
             
             <Button
-              size="sm"
-              className="h-8 gap-1 ml-auto bg-[#1e3a8a] hover:bg-[#1e3a8a]/80"
+              variant="default" 
+              size="default" 
+              className="bg-primary hover:bg-primary/90 ml-auto"
               onClick={() => setIsCreateDialogOpen(true)}
             >
-              <PlusCircle className="h-4 w-4" />
-              <span>Nieuwe docent</span>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Nieuwe docent
             </Button>
           </div>
         </div>

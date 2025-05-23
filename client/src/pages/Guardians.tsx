@@ -62,6 +62,8 @@ type StudentType = {
   firstName: string;
   lastName: string;
   status?: string;
+  email?: string;
+  phone?: string;
 };
 
 type GuardianStudentRelationType = {

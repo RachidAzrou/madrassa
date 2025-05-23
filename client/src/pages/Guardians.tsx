@@ -388,19 +388,23 @@ export default function Guardians() {
             </div>
           </div>
         </div>
-        
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 md:flex-none">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="search"
-              placeholder="Zoek voogden..."
-              className="pl-9 w-full md:w-[250px]"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
+      </div>
+      
+      {/* Zoekbalk */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoek voogden..."
+            className="pl-8 bg-white w-full"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+      
+      <div className="flex flex-wrap items-center gap-3 mb-4">
           <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
@@ -461,7 +465,6 @@ export default function Guardians() {
             </Button>
           </div>
         </div>
-      </div>
       
       {/* Filter opties */}
       {showFilterOptions && (

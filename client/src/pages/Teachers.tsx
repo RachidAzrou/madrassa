@@ -362,13 +362,15 @@ const Teachers = () => {
         {/* Search and Filter Section */}
         <div className="flex flex-col space-y-4">
           <div className="flex flex-col space-y-2">
-            <Input
-              placeholder="Zoek op naam, e-mail of ID..."
-              className="w-full"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              startAdornment={<Search className="h-4 w-4 text-gray-500 mr-2" />}
-            />
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Input
+                placeholder="Zoek op naam, e-mail of ID..."
+                className="w-full pl-9"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
           
           <div className="flex flex-wrap items-center gap-2">
@@ -540,20 +542,20 @@ const Teachers = () => {
       {/* View Teacher Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="sm:max-w-[85vw] p-0">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                   <GraduationCap className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold">
+                  <DialogTitle className="text-xl font-semibold text-white">
                     {selectedTeacher?.firstName} {selectedTeacher?.lastName}
-                  </h2>
+                  </DialogTitle>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-sm text-blue-100 font-medium">
+                    <DialogDescription className="text-sm text-blue-100 font-medium">
                       Docentgegevens bekijken
-                    </span>
+                    </DialogDescription>
                     <Badge className="bg-white/20 text-white border-transparent hover:bg-white/30">
                       {selectedTeacher?.isActive ? 'Actief' : 'Inactief'}
                     </Badge>
@@ -571,9 +573,9 @@ const Teachers = () => {
                 Sluiten
               </Button>
             </div>
-          </div>
+          </DialogHeader>
           
-          <div className="p-6">
+          <div className="p-6 overflow-y-auto" style={{ height: "calc(80vh - 170px)" }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div className="space-y-6">
                 <div className="bg-white p-4 rounded-lg border border-gray-200">
@@ -747,19 +749,19 @@ const Teachers = () => {
       {/* Create Teacher Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[95vw] p-0">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                   <GraduationCap className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-white">
+                  <DialogTitle className="text-xl font-semibold text-white">
                     Nieuwe docent
-                  </h2>
-                  <span className="text-sm text-blue-100 font-medium">
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-blue-100 font-medium">
                     Vul alle benodigde informatie in om een nieuwe docent toe te voegen
-                  </span>
+                  </DialogDescription>
                 </div>
               </div>
               
@@ -773,9 +775,9 @@ const Teachers = () => {
                 Sluiten
               </Button>
             </div>
-          </div>
+          </DialogHeader>
           
-          <div className="p-6 overflow-y-auto">
+          <div className="p-6 overflow-y-auto" style={{ height: "calc(80vh - 170px)" }}>
             <Tabs defaultValue="personal">
               <TabsList className="flex mb-4 overflow-x-auto space-x-1">
                 <TabsTrigger value="personal" className="flex items-center gap-1 px-3">

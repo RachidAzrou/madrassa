@@ -414,9 +414,7 @@ export default function Guardians() {
               <Filter className="mr-2 h-4 w-4" />
               Filter
             </Button>
-          </div>
-          
-          <div className="flex items-center gap-2">  
+            
             <div className="relative">
               <Button 
                 variant="outline" 
@@ -457,15 +455,15 @@ export default function Guardians() {
                 </div>
               )}
             </div>
-            
-            <Button 
-              onClick={handleAddNewGuardian} 
-              className="bg-primary hover:bg-primary/90 text-white gap-2"
-            >
-              <PlusCircle className="h-4 w-4" />
-              Nieuwe Voogd
-            </Button>
           </div>
+          
+          <Button 
+            onClick={handleAddNewGuardian} 
+            className="bg-primary hover:bg-primary/90 text-white gap-2 ml-auto"
+          >
+            <PlusCircle className="h-4 w-4" />
+            Nieuwe Voogd
+          </Button>
         </div>
       
       {/* Filter opties */}

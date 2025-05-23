@@ -934,29 +934,7 @@ export default function Guardians() {
                     </div>
                   )}
                   
-                  <div className="space-y-2 mt-4">
-                    <Label className="text-sm font-medium">Adres</Label>
-                    <div className="p-2 border rounded-md bg-gray-50">
-                      {selectedGuardian.street && selectedGuardian.houseNumber
-                        ? `${selectedGuardian.street} ${selectedGuardian.houseNumber}`
-                        : 'Straat niet ingevuld'}
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Postcode</Label>
-                      <div className="p-2 border rounded-md bg-gray-50">
-                        {selectedGuardian.postalCode || 'Niet ingevuld'}
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Plaats</Label>
-                      <div className="p-2 border rounded-md bg-gray-50">
-                        {selectedGuardian.city || 'Niet ingevuld'}
-                      </div>
-                    </div>
-                  </div>
+
                 </TabsContent>
                 
                 <TabsContent value="students" className="space-y-4 pt-4">

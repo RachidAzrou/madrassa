@@ -576,7 +576,7 @@ export default function Guardians() {
                   <TableHead className="py-3 font-medium">Naam</TableHead>
                   <TableHead className="py-3 font-medium">Relatie</TableHead>
                   <TableHead className="py-3 font-medium">Studenten</TableHead>
-                  <TableHead className="text-right w-[120px] py-3 font-medium">Acties</TableHead>
+                  <TableHead className="text-right w-[120px] py-3 font-medium"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -39,6 +39,7 @@ type GuardianType = {
   emergencyContactPhone?: string;
   emergencyContactRelation?: string;
   notes?: string;
+  occupation?: string;
 };
 
 type StudentType = {

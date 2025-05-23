@@ -1,25 +1,28 @@
-import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import React, { ReactNode } from 'react';
 
 interface EmptyStateProps {
-  icon: LucideIcon;
+  icon: ReactNode;
   title: string;
   description?: string;
   className?: string;
+  action?: ReactNode;
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({ 
-  icon: Icon, 
+  icon, 
   title, 
   description, 
-  className = "" 
+  className = "",
+  action
 }) => {
   return (
     <div className={`h-48 flex flex-col items-center justify-center text-gray-500 ${className}`}>
       <div className="text-[#1e3a8a] mb-2">
-        <Icon className="h-12 w-12 mx-auto opacity-30" />
+        {icon}
       </div>
       <p className="text-sm font-medium">{title}</p>
+      {description && <p className="text-sm mt-1">{description}</p>}
+      {action && <div className="mt-4">{action}</div>}
     </div>
   );
 };

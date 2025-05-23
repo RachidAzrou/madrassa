@@ -783,22 +783,7 @@ export default function Guardians() {
           </DialogHeader>
           
           {selectedGuardian && (
-            <div className="mt-2">
-              <Tabs defaultValue="personal" className="w-full">
-                <TabsList className="grid grid-cols-3 mb-6">
-                  <TabsTrigger value="personal" className="flex gap-2 items-center">
-                    <UserCircle className="h-4 w-4" />
-                    Persoonlijk
-                  </TabsTrigger>
-                  <TabsTrigger value="contact" className="flex gap-2 items-center">
-                    <Mail className="h-4 w-4" />
-                    Contact
-                  </TabsTrigger>
-                  <TabsTrigger value="students" className="flex gap-2 items-center">
-                    <Users className="h-4 w-4" />
-                    Studenten
-                  </TabsTrigger>
-                </TabsList>
+            <div className="mt-6 space-y-8">
                 
                 <TabsContent value="personal" className="space-y-6">
                   <div className="flex flex-col md:flex-row gap-6">

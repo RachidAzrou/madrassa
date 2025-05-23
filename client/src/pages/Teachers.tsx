@@ -514,7 +514,7 @@ const Teachers = () => {
                     onClick={() => setIsCreateDialogOpen(true)}
                   >
                     <PlusCircle className="h-4 w-4 mr-2" />
-                    Docent Toevoegen
+                    Nieuwe docent
                   </Button>
                 </div>
               </div>
@@ -850,7 +850,7 @@ const Teachers = () => {
           <DialogHeader className="pb-1">
             <DialogTitle className="text-xl font-bold text-primary flex items-center">
               <GraduationCap className="mr-2 h-5 w-5" />
-              Nieuwe Docent Toevoegen
+              Nieuwe docent
             </DialogTitle>
             <DialogDescription className="text-sm">
               Vul alle benodigde informatie in om een nieuwe docent toe te voegen aan het systeem.

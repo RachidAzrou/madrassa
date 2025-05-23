@@ -677,9 +677,9 @@ const Teachers = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="mt-4 overflow-y-auto pr-1" style={{ height: "calc(95vh - 120px)" }}>
+          <div className="mt-2 overflow-y-auto pr-1" style={{ height: "calc(95vh - 100px)" }}>
             <Tabs defaultValue="personal">
-              <TabsList className="grid grid-cols-7 mb-4">
+              <TabsList className="grid grid-cols-7 mb-2">
                 <TabsTrigger value="photo" className="flex items-center gap-2">
                   <Image className="h-4 w-4" />
                   <span>Foto</span>

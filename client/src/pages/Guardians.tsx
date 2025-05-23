@@ -900,79 +900,85 @@ export default function Guardians() {
                     </div>
                   </div>
                   
+
+                  
+
+                </TabsContent>
+                
+                <TabsContent value="students" className="space-y-6 pt-4">
                   {selectedGuardian.isEmergencyContact && (
-                    <div className="mt-4 p-6 border rounded-lg bg-red-50 border-red-100">
-                      <div className="flex items-center mb-4">
-                        <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                    <div className="mb-6 p-5 border-l-4 border-red-600 bg-red-50 rounded-r-lg shadow-sm">
+                      <div className="flex items-center mb-3">
+                        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-red-100 mr-3">
                           <AlertTriangle className="h-5 w-5 text-red-600" />
                         </div>
                         <h3 className="text-lg font-medium text-red-800">Noodcontact</h3>
                       </div>
                       
-                      <p className="text-sm text-red-700 mb-4">
-                        Dit contact is aangeduid als noodcontact voor één of meerdere studenten. Deze persoon kan gecontacteerd worden in noodgevallen.
+                      <p className="text-sm text-red-700 mb-3 ml-11">
+                        Dit contact is aangeduid als noodcontact voor de onderstaande studenten en kan gecontacteerd worden in noodgevallen.
                       </p>
-                      
-                      <div className="bg-white rounded-md p-4 border border-red-100">
-                        <h4 className="text-sm font-medium text-gray-700 mb-3">Studenten waarvoor dit een noodcontact is:</h4>
-                        <div className="space-y-2">
-                          {guardianStudentsData.map((relation: any) => (
-                            relation.student && (
-                              <div key={relation.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded border">
-                                <UserCircle className="h-4 w-4 text-primary" />
-                                <span className="text-sm">{relation.student.firstName} {relation.student.lastName}</span>
-                              </div>
-                            )
-                          ))}
-                          {guardianStudentsData.length === 0 && (
-                            <div className="p-3 text-sm text-gray-500 italic bg-gray-50 rounded border">
-                              Geen studenten gekoppeld aan dit noodcontact
-                            </div>
-                          )}
-                        </div>
-                      </div>
                     </div>
                   )}
-                  
-
-                </TabsContent>
                 
-                <TabsContent value="students" className="space-y-4 pt-4">
                   {guardianStudentsLoading ? (
                     <div className="flex justify-center my-4">
                       <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                     </div>
                   ) : guardianStudentsData.length === 0 ? (
-                    <div className="text-center p-6 bg-gray-50 rounded-md text-gray-500">
-                      Deze voogd heeft geen gekoppelde studenten
+                    <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg border border-gray-200">
+                      <Users className="h-12 w-12 text-gray-300 mb-3" />
+                      <h3 className="text-lg font-medium text-gray-500 mb-1">Geen studenten gekoppeld</h3>
+                      <p className="text-sm text-gray-400">Deze voogd heeft nog geen gekoppelde studenten</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <h3 className="text-md font-medium">Toegewezen studenten</h3>
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-medium">Toegewezen studenten</h3>
+                        <Badge variant={selectedGuardian.isEmergencyContact ? "destructive" : "outline"} className="ml-2">
+                          {guardianStudentsData.length} {guardianStudentsData.length === 1 ? 'student' : 'studenten'}
+                        </Badge>
+                      </div>
                       
-                      <div className="border rounded-md divide-y">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {guardianStudentsData.map((relation: any) => {
-                          console.log("Relation data in map:", relation);
                           return (
                             <div
                               key={relation.id}
-                              className="flex items-center p-3 hover:bg-gray-50"
+                              className="flex items-center p-4 bg-white hover:bg-gray-50 border rounded-lg shadow-sm"
                             >
-                              <Avatar className="h-10 w-10">
-                                <AvatarFallback className="bg-[#1e3a8a] text-white">
+                              <Avatar className="h-12 w-12">
+                                <AvatarFallback className="bg-[#1e3a8a] text-white text-lg">
                                   {relation.student?.firstName?.[0] || '?'}{relation.student?.lastName?.[0] || '?'}
                                 </AvatarFallback>
                               </Avatar>
-                              <div className="ml-3">
+                              <div className="ml-4 flex-1">
                                 {relation.student ? (
                                   <>
-                                    <div className="text-sm font-medium">{relation.student.firstName} {relation.student.lastName}</div>
-                                    <div className="text-xs text-gray-500">Studentnr: {relation.student.studentId}</div>
+                                    <div className="text-md font-medium">{relation.student.firstName} {relation.student.lastName}</div>
+                                    <div className="text-sm text-gray-500 flex items-center">
+                                      <span className="mr-3">#{relation.student.studentId}</span>
+                                      {relation.isPrimary && (
+                                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                          Primair contact
+                                        </Badge>
+                                      )}
+                                    </div>
                                   </>
                                 ) : (
                                   <div className="text-sm text-gray-500">Student #{relation.studentId}</div>
                                 )}
                               </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-gray-400 hover:text-blue-600"
+                                onClick={() => {
+                                  // Implementation for when the button is clicked
+                                }}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
                             </div>
                           );
                         })}

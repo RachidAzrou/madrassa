@@ -389,9 +389,9 @@ const Teachers = () => {
             </Select>
             
             <Button
-              variant="outline"
-              size="sm"
-              className="h-8 gap-1"
+              variant="default"
+              size="default"
+              className="bg-primary hover:bg-primary/90 text-white gap-2"
               onClick={handleExportToExcel}
             >
               <Download className="h-4 w-4" />

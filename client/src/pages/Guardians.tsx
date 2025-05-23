@@ -418,12 +418,12 @@ export default function Guardians() {
             
             <div className="relative">
               <Button 
-                variant="outline" 
+                variant="default" 
                 size="default"
-                className="border-gray-300 text-gray-700 shrink-0"
+                className="bg-primary hover:bg-primary/90 text-white gap-2"
                 onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
               >
-                <FileUp className="mr-2 h-4 w-4" />
+                <FileUp className="h-4 w-4" />
                 Exporteren
               </Button>
               

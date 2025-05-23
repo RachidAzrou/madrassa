@@ -146,8 +146,7 @@ export default function Students() {
     emergencyContactName: '',
     emergencyContactPhone: '',
     emergencyContactRelation: '',
-    notes: '',
-    occupation: ''
+    notes: ''
   });
 
   // Statusopties voor dropdown
@@ -182,6 +181,30 @@ export default function Students() {
   });
 
   // Ophalen studenten
+  // Effect om voogden formulier te resetten wanneer het dialoog opent
+  useEffect(() => {
+    if (isCreateDialogOpen) {
+      setGuardianFormData({
+        firstName: '',
+        lastName: '',
+        relationship: 'ouder',
+        email: '',
+        phone: '',
+        address: '',
+        street: '',
+        houseNumber: '',
+        postalCode: '',
+        city: '',
+        isEmergencyContact: false,
+        emergencyContactName: '',
+        emergencyContactPhone: '',
+        emergencyContactRelation: '',
+        notes: ''
+      });
+      setFoundGuardian(null);
+    }
+  }, [isCreateDialogOpen]);
+
   const { data: studentsData = {}, isLoading } = useQuery({
     queryKey: ['/api/students', { 
       page, 
@@ -202,21 +225,47 @@ export default function Students() {
   const createStudentMutation = useMutation({
     mutationFn: async (data: any) => {
       // Maak eerst de student aan
-      let studentResponse;
+      const studentResponse = await apiRequest('/api/students', {
+        method: 'POST',
+        body: data
+      });
       
-      // Als er een gevonden voogd is, voegen we deze toe aan de student
-      if (foundGuardian && !data.id) {
-        studentResponse = await apiRequest('/api/students', {
+      // Check of er voogd gegevens zijn ingevuld
+      const hasGuardianData = guardianFormData.firstName.trim() || 
+                              guardianFormData.lastName.trim() || 
+                              guardianFormData.email.trim() || 
+                              guardianFormData.phone.trim();
+      
+      if (hasGuardianData) {
+        // Maak de voogd aan
+        const guardianResponse = await apiRequest('/api/guardians', {
           method: 'POST',
           body: {
-            ...data,
-            guardianId: foundGuardian.id // Stuur voogd-ID mee naar de server
+            firstName: guardianFormData.firstName,
+            lastName: guardianFormData.lastName,
+            relationship: guardianFormData.relationship,
+            email: guardianFormData.email,
+            phone: guardianFormData.phone,
+            address: guardianFormData.address,
+            street: guardianFormData.street,
+            houseNumber: guardianFormData.houseNumber,
+            postalCode: guardianFormData.postalCode,
+            city: guardianFormData.city,
+            isEmergencyContact: guardianFormData.isEmergencyContact,
+            emergencyContactName: guardianFormData.emergencyContactName,
+            emergencyContactPhone: guardianFormData.emergencyContactPhone,
+            emergencyContactRelation: guardianFormData.emergencyContactRelation,
+            notes: guardianFormData.notes
           }
         });
-      } else {
-        studentResponse = await apiRequest('/api/students', {
+        
+        // Koppel de voogd aan de student
+        await apiRequest('/api/student-guardians', {
           method: 'POST',
-          body: data
+          body: {
+            studentId: studentResponse.id,
+            guardianId: guardianResponse.id
+          }
         });
       }
       
@@ -1754,6 +1803,25 @@ export default function Students() {
                                 isEmergencyContact: true
                               };
                               
+                              // Vul ook de voogden tab in met het gedetecteerde noodcontact
+                              setGuardianFormData({
+                                firstName: "",
+                                lastName: eidData.lastName,
+                                relationship: "noodcontact",
+                                email: "",
+                                phone: eidData.emergencyContactPhone,
+                                address: "",
+                                street: eidData.street,
+                                houseNumber: eidData.houseNumber,
+                                postalCode: eidData.postalCode,
+                                city: eidData.city,
+                                isEmergencyContact: true,
+                                emergencyContactName: "",
+                                emergencyContactPhone: "",
+                                emergencyContactRelation: "",
+                                notes: ""
+                              });
+                              
                               // Sla de tijdelijke voogd op zodat deze in de popup getoond kan worden
                               setFoundGuardian(newGuardian);
                               
@@ -2077,19 +2145,6 @@ export default function Students() {
                           </SelectContent>
                         </Select>
                       </div>
-                      
-                      <div>
-                        <Label htmlFor="guardian-occupation" className="text-xs font-medium text-gray-700">
-                          Beroep
-                        </Label>
-                        <Input
-                          id="guardian-occupation"
-                          value={guardianFormData.occupation}
-                          onChange={(e) => setGuardianFormData({ ...guardianFormData, occupation: e.target.value })}
-                          className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="Beroep"
-                        />
-                      </div>
                     </div>
                   </div>
                   
@@ -2197,7 +2252,7 @@ export default function Students() {
                       <h4 className="text-sm font-medium text-gray-800">Noodcontact</h4>
                     </div>
                     <div className="p-3 bg-gray-50 rounded-md border">
-                      <div className="flex items-center space-x-2 mb-3">
+                      <div className="flex items-center space-x-2">
                         <Checkbox
                           id="guardian-isEmergencyContact"
                           checked={guardianFormData.isEmergencyContact}
@@ -2207,52 +2262,12 @@ export default function Students() {
                           })}
                         />
                         <Label htmlFor="guardian-isEmergencyContact" className="text-sm font-medium text-gray-700">
-                          Deze voogd is ook het primaire noodcontact
+                          Deze voogd is het primaire noodcontact
                         </Label>
                       </div>
-                      
-                      {guardianFormData.isEmergencyContact && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                          <div>
-                            <Label htmlFor="guardian-emergencyContactName" className="text-xs font-medium text-gray-700">
-                              Alternatieve noodcontact naam
-                            </Label>
-                            <Input
-                              id="guardian-emergencyContactName"
-                              value={guardianFormData.emergencyContactName}
-                              onChange={(e) => setGuardianFormData({ ...guardianFormData, emergencyContactName: e.target.value })}
-                              className="mt-1 h-8 text-sm bg-white border-gray-200"
-                              placeholder="Naam alternatief contact"
-                            />
-                          </div>
-                          
-                          <div>
-                            <Label htmlFor="guardian-emergencyContactPhone" className="text-xs font-medium text-gray-700">
-                              Alternatieve telefoon
-                            </Label>
-                            <Input
-                              id="guardian-emergencyContactPhone"
-                              value={guardianFormData.emergencyContactPhone}
-                              onChange={(e) => setGuardianFormData({ ...guardianFormData, emergencyContactPhone: e.target.value })}
-                              className="mt-1 h-8 text-sm bg-white border-gray-200"
-                              placeholder="06 1234 5678"
-                            />
-                          </div>
-                          
-                          <div>
-                            <Label htmlFor="guardian-emergencyContactRelation" className="text-xs font-medium text-gray-700">
-                              Relatie tot student
-                            </Label>
-                            <Input
-                              id="guardian-emergencyContactRelation"
-                              value={guardianFormData.emergencyContactRelation}
-                              onChange={(e) => setGuardianFormData({ ...guardianFormData, emergencyContactRelation: e.target.value })}
-                              className="mt-1 h-8 text-sm bg-white border-gray-200"
-                              placeholder="Bijv. tante, oom"
-                            />
-                          </div>
-                        </div>
-                      )}
+                      <p className="text-xs text-gray-500 mt-2">
+                        Vink aan als deze voogd het eerste contactpersoon moet zijn in noodsituaties.
+                      </p>
                     </div>
                   </div>
                   

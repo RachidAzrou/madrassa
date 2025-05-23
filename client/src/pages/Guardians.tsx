@@ -837,7 +837,7 @@ export default function Guardians() {
         <DialogContent className="w-[90vw] sm:max-w-[900px] max-h-[85vh] overflow-y-auto bg-white p-0">
           <div className="pb-6">
             {/* Header met blauwe achtergrond */}
-            <div className="bg-blue-600 text-white px-6 py-5 rounded-t-lg">
+            <div className="bg-[#1e3a8a] text-white px-6 py-5 rounded-t-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -984,7 +984,7 @@ export default function Guardians() {
                                       <div className="mt-1 flex items-center gap-2">
                                         <Badge 
                                           variant="outline" 
-                                          className="px-1.5 py-0 h-5 text-[10px]"
+                                          className="px-1.5 py-0 h-5 text-[10px] bg-[#1e3a8a]/10 text-[#1e3a8a] border-[#1e3a8a]/20"
                                         >
                                           {getRelationshipLabel(guardian.relationship)}
                                         </Badge>
@@ -1012,7 +1012,7 @@ export default function Guardians() {
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      className="h-8 invisible group-hover:visible transition-all opacity-0 group-hover:opacity-100"
+                                      className="h-8 invisible group-hover:visible transition-all opacity-0 group-hover:opacity-100 text-[#1e3a8a] hover:text-[#1e3a8a] hover:bg-blue-50 border-[#1e3a8a]/20"
                                       onClick={() => {
                                         setSelectedStudent(null);
                                         handleShowGuardianDetails(guardian);

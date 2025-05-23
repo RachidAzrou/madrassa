@@ -76,9 +76,10 @@ export default function Students() {
   const [isFeeNotificationOpen, setIsFeeNotificationOpen] = useState(false);
   const [feeDetails, setFeeDetails] = useState<any>(null);
   
-  // Voogd gevonden via e-ID
+  // State voor voogd-gerelateerde dialogen
   const [foundGuardian, setFoundGuardian] = useState<any>(null);
-  const [showGuardianConfirmDialog, setShowGuardianConfirmDialog] = useState(false);
+  const [showGuardianConfirmDialog, setShowGuardianConfirmDialog] = useState(false); 
+  const [showGuardianFormDialog, setShowGuardianFormDialog] = useState(false);
   
   // Import dialoog state
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
@@ -97,6 +98,8 @@ export default function Students() {
     const day = String(today.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
+  
+  // Dit is een commentaar om de dubbele declaratie te vervangen
   
   // State voor het studentformulier
   const [studentFormData, setStudentFormData] = useState({

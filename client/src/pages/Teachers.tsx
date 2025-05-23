@@ -807,10 +807,10 @@ const Teachers = () => {
                 <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm min-h-[600px]">
                   <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
                   
-                  {/* Foto upload sectie met knoppen ernaast */}
-                  <div className="flex mb-4 items-start">
+                  {/* Foto upload sectie met knoppen rechts */}
+                  <div className="flex mb-4 items-start justify-between">
                     <div 
-                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-4"
+                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer"
                       onClick={() => {
                         const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
                         fileInput?.click();

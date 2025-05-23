@@ -468,77 +468,103 @@ const Teachers = () => {
       
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
         
-        {/* Docententabel of lege staat */}
-        {teachersData?.teachers && teachersData.teachers.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+        {/* Docententabel */}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DOCENT ID</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NAAM</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KLAS</th>
+                <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS</th>
+                <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {/* Lege state wanneer er geen docenten zijn - onder de headers */}
+              {!isLoading && (!teachersData?.teachers || teachersData.teachers.length === 0) && (
                 <tr>
-                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DOCENT ID</th>
-                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NAAM</th>
-                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KLAS</th>
-                  <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS</th>
-                  <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                  <td colSpan={5} className="px-6 py-8 text-center">
+                    <EmptyState
+                      icon={<GraduationCap className="h-10 w-10 opacity-30" />}
+                      title="Geen docenten gevonden"
+                      description={searchQuery ? `Geen resultaten voor "${searchQuery}". Probeer een andere zoekopdracht of pas de filters aan.` : "Er zijn nog geen docenten toegevoegd aan het systeem."}
+                    />
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {teachersData.teachers.map((teacher: any, index: number) => (
-                  <tr key={teacher.id} className="group hover:bg-gray-50 border-b border-gray-200">
-                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{teacher.teacherId}</td>
-                    <td className="px-3 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <Avatar className="h-8 w-8 mr-2">
-                          <AvatarFallback className="bg-[#1e3a8a] text-white">
-                            {teacher.firstName?.[0]}{teacher.lastName?.[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="text-sm text-gray-900">{teacher.firstName} {teacher.lastName}</div>
-                      </div>
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {teacher.assignedClasses && teacher.assignedClasses.length > 0 ? 
-                        teacher.assignedClasses[0]
-                        : 
-                        <span className="text-gray-400">-</span>
-                      }
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-center">
-                      {renderStatusBadge(teacher.isActive)}
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-right text-sm">
-                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                          onClick={() => handleViewTeacher(teacher)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
-                          onClick={() => handleEditTeacher(teacher)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
-                          onClick={() => openDeleteDialog(teacher)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            
-            {/* Paginering */}
+              )}
+              
+              {/* Loading state */}
+              {isLoading && (
+                <tr>
+                  <td colSpan={5} className="px-6 py-4 text-center">
+                    <div className="flex justify-center items-center">
+                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      <span className="ml-2">Laden...</span>
+                    </div>
+                  </td>
+                </tr>
+              )}
+              
+              {/* Docenten lijst */}
+              {!isLoading && teachersData?.teachers && teachersData.teachers.map((teacher: any, index: number) => (
+                <tr key={teacher.id} className="group hover:bg-gray-50 border-b border-gray-200">
+                  <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{teacher.teacherId}</td>
+                  <td className="px-3 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <Avatar className="h-8 w-8 mr-2">
+                        <AvatarFallback className="bg-[#1e3a8a] text-white">
+                          {teacher.firstName?.[0]}{teacher.lastName?.[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="text-sm text-gray-900">{teacher.firstName} {teacher.lastName}</div>
+                    </div>
+                  </td>
+                  <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {teacher.assignedClasses && teacher.assignedClasses.length > 0 ? 
+                      teacher.assignedClasses[0]
+                      : 
+                      <span className="text-gray-400">-</span>
+                    }
+                  </td>
+                  <td className="px-3 py-4 whitespace-nowrap text-center">
+                    {renderStatusBadge(teacher.isActive)}
+                  </td>
+                  <td className="px-3 py-4 whitespace-nowrap text-right text-sm">
+                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                        onClick={() => handleViewTeacher(teacher)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
+                        onClick={() => handleEditTeacher(teacher)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                        onClick={() => openDeleteDialog(teacher)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          
+          {/* Paginering - alleen tonen als er docenten zijn */}
+          {!isLoading && teachersData?.teachers && teachersData.teachers.length > 0 && (
             <div className="p-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
               <div className="text-sm text-gray-500">
                 Toont {((currentPage - 1) * rowsPerPage) + 1}-{Math.min(currentPage * rowsPerPage, teachersData.totalCount)} van {teachersData.totalCount} docenten
@@ -564,14 +590,8 @@ const Teachers = () => {
                 </Button>
               </div>
             </div>
-          </div>
-        ) : (
-          <EmptyState
-            icon={<GraduationCap className="h-10 w-10 opacity-30" />}
-            title="Geen docenten gevonden"
-            description={searchQuery ? `Geen resultaten voor "${searchQuery}". Probeer een andere zoekopdracht of pas de filters aan.` : "Er zijn nog geen docenten toegevoegd aan het systeem."}
-          />
-        )}
+          )}
+        </div>
       </div>
       
       {/* Weergave van docentgegevens Dialog */}

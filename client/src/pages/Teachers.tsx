@@ -4,6 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import * as XLSX from 'xlsx';
 import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image, BookText, XCircle, LucideIcon, School, Download } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -665,28 +666,48 @@ const Teachers = () => {
         </div>
       </div>
       
-      {/* Weergave van docentgegevens Dialog met Detail Dialog component */}
+      {/* Weergave van docentgegevens Dialog met verbeterde structuur */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-[85vw]">
-          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg -mx-6 -mt-6">
-            <div className="flex items-center">
-              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-4">
-                <GraduationCap className="h-6 w-6 text-white" />
+        <DialogContent className="sm:max-w-[85vw] max-h-[85vh] overflow-y-auto p-0">
+          {/* Dialog Header met blauwe gradient */}
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <GraduationCap className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">
+                    {selectedTeacher?.firstName} {selectedTeacher?.lastName}
+                  </h2>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-sm text-blue-100 font-medium">
+                      Docentgegevens bekijken
+                    </span>
+                    <Badge className="bg-white/20 text-white border-transparent hover:bg-white/30">
+                      {selectedTeacher?.isActive ? 'Actief' : 'Inactief'}
+                    </Badge>
+                  </div>
+                </div>
               </div>
-              <div>
-                <DialogTitle className="text-xl font-bold text-white">
-                  {selectedTeacher?.firstName} {selectedTeacher?.lastName}
-                </DialogTitle>
-                <DialogDescription className="text-sm text-blue-100">
-                  Docentgegevens bekijken
-                </DialogDescription>
-              </div>
+              
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-white hover:bg-blue-700 hover:text-white"
+                onClick={() => setIsViewDialogOpen(false)}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Sluiten
+              </Button>
             </div>
-          </DialogHeader>
+          </div>
           
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left Column */}
-            <div className="space-y-6">
+          {/* Dialog Content */}
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              {/* Left Column */}
+              <div className="space-y-6">
               <div className="bg-white p-4 rounded-lg border border-gray-200">
                 <h3 className="text-sm font-medium text-gray-500 mb-3">Basisinformatie</h3>
                 <div className="grid grid-cols-2 gap-3">
@@ -853,22 +874,34 @@ const Teachers = () => {
       
       {/* Create Teacher Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95vw] h-[95vh]">
-          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg -mx-6 -mt-6">
-            <div className="flex items-center">
-              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-4">
-                <GraduationCap className="h-6 w-6 text-white" />
+        <DialogContent className="sm:max-w-[95vw] p-0">
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <GraduationCap className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white">
+                    Nieuwe docent
+                  </h2>
+                  <span className="text-sm text-blue-100 font-medium">
+                    Vul alle benodigde informatie in om een nieuwe docent toe te voegen
+                  </span>
+                </div>
               </div>
-              <div>
-                <DialogTitle className="text-xl font-bold text-white">
-                  Nieuwe docent
-                </DialogTitle>
-                <DialogDescription className="text-sm text-blue-100">
-                  Vul alle benodigde informatie in om een nieuwe docent toe te voegen aan het systeem.
-                </DialogDescription>
-              </div>
+              
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-white hover:bg-blue-700 hover:text-white"
+                onClick={() => setIsCreateDialogOpen(false)}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Sluiten
+              </Button>
             </div>
-          </DialogHeader>
+          </div>
           
           <div className="mt-2 overflow-y-auto pr-1" style={{ height: "calc(95vh - 100px)" }}>
             <Tabs defaultValue="personal">

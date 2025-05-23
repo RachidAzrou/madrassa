@@ -421,8 +421,8 @@ const Teachers = () => {
           
           <div className="border-b border-gray-200 pb-4 mb-4"></div>
           
-          <div className="flex flex-col gap-4 mt-4">
-            <div className="relative w-full">
+          <div className="mt-4">
+            <div className="relative w-full mb-4">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
               <Input
                 type="search"
@@ -433,7 +433,7 @@ const Teachers = () => {
               />
             </div>
             
-            <div>
+            <div className="flex justify-end">
               <Button onClick={() => setIsCreateDialogOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 Docent toevoegen

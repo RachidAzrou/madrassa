@@ -84,6 +84,15 @@ export default function Students() {
   const [columnMappings, setColumnMappings] = useState<{[key: string]: string}>({});
   const [isImporting, setIsImporting] = useState(false);
   
+  // Functie om huidige datum in YYYY-MM-DD formaat te krijgen
+  const getCurrentDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  
   // State voor het studentformulier
   const [studentFormData, setStudentFormData] = useState({
     studentId: '',
@@ -101,7 +110,7 @@ export default function Students() {
     yearLevel: '',
     schoolYear: '' as string | null,
     studentGroupId: null as number | null,
-    enrollmentDate: '',
+    enrollmentDate: getCurrentDate(), // Huidige datum als standaard
     status: 'active' as string,
     notes: '',
     gender: '' as string,
@@ -547,7 +556,7 @@ export default function Students() {
       yearLevel: '',
       schoolYear: '',
       studentGroupId: null,
-      enrollmentDate: '',
+      enrollmentDate: getCurrentDate(), // Huidige datum als standaard
       status: 'enrolled',
       notes: '',
       gender: '',

@@ -8,7 +8,7 @@ import {
   ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
   Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, CreditCard, AlertCircle,
   FileUp, Upload, FilePlus2, FileSpreadsheet, Image, School, UserRound, Camera, CheckSquare, SquareSlash,
-  UserCheck, CalendarDays, Hash
+  UserCheck, CalendarDays, Hash, Save
 } from 'lucide-react';
 
 // Aangepast ChalkboardTeacher icoon

@@ -560,9 +560,6 @@ export default function Guardians() {
                         </Avatar>
                         <div>
                           <div className="font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</div>
-                          {guardian.isEmergencyContact && (
-                            <Badge variant="destructive" className="text-xs mt-0.5">Noodcontact</Badge>
-                          )}
                         </div>
                       </div>
                     </TableCell>

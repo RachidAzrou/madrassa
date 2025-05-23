@@ -1021,7 +1021,7 @@ const Teachers = () => {
                         alt="itsme" 
                         className="h-5 mr-2"
                       />
-                      Inloggen met itsme
+                      Gegevens laden via itsme
                     </Button>
                   </div>
                 </div>

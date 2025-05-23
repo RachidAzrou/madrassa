@@ -564,7 +564,7 @@ const Teachers = () => {
             </div>
           </DialogHeader>
           
-          <div className="px-10 py-6 overflow-y-auto" style={{ height: "calc(80vh - 170px)" }}>
+          <div className="px-10 py-6 overflow-y-auto ml-12" style={{ height: "calc(80vh - 170px)" }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div className="space-y-6">
                 <div className="bg-white p-4 rounded-lg border border-gray-200">
@@ -758,7 +758,7 @@ const Teachers = () => {
             </div>
           </DialogHeader>
           
-          <div className="px-10 py-6 overflow-y-auto" style={{ height: "calc(80vh - 170px)" }}>
+          <div className="px-10 py-6 overflow-y-auto ml-12" style={{ height: "calc(80vh - 170px)" }}>
             <Tabs defaultValue="personal" className="w-full">
               <TabsList className="grid grid-cols-6 p-1 bg-[#1e3a8a]/10 rounded-md mb-4">
                 <TabsTrigger value="personal" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">

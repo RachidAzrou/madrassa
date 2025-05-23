@@ -66,7 +66,6 @@ const Teachers = () => {
     dateOfBirth: "",
     gender: "man",
     notes: "",
-    certifications: [],
     languages: [],
     specialties: [],
     educationLevel: "",
@@ -76,9 +75,8 @@ const Teachers = () => {
     educations: []
   });
   
-  // State voor het toevoegen van specialties, certifications, languages, classes
+  // State voor het toevoegen van specialties, languages, classes
   const [newSpecialty, setNewSpecialty] = useState("");
-  const [newCertification, setNewCertification] = useState("");
   const [newLanguage, setNewLanguage] = useState("");
   const [newClassName, setNewClassName] = useState("");
   const [newClassDescription, setNewClassDescription] = useState("");
@@ -1387,45 +1385,7 @@ const Teachers = () => {
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label className="text-xs">Certificeringen</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {newTeacher.certifications.map((cert, index) => (
-                        <Badge key={index} className="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1">
-                          {cert}
-                          <X
-                            className="h-3 w-3 ml-1 cursor-pointer"
-                            onClick={() => {
-                              const updatedCerts = [...newTeacher.certifications];
-                              updatedCerts.splice(index, 1);
-                              setNewTeacher({...newTeacher, certifications: updatedCerts});
-                            }}
-                          />
-                        </Badge>
-                      ))}
-                      <form
-                        className="flex gap-2"
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          if (newCertification.trim()) {
-                            setNewTeacher({
-                              ...newTeacher,
-                              certifications: [...newTeacher.certifications, newCertification]
-                            });
-                            setNewCertification("");
-                          }
-                        }}
-                      >
-                        <Input
-                          placeholder="Nieuwe certificering"
-                          className="h-9 w-48"
-                          value={newCertification}
-                          onChange={(e) => setNewCertification(e.target.value)}
-                        />
-                        <Button type="submit" size="sm" className="h-9">Toevoegen</Button>
-                      </form>
-                    </div>
-                  </div>
+
                 </div>
               </TabsContent>
               

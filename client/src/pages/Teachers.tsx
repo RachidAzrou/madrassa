@@ -389,13 +389,13 @@ const Teachers = () => {
             </Select>
             
             <Button
-              variant="default"
+              variant="outline"
               size="default"
-              className="bg-primary hover:bg-primary/90 text-white gap-2"
+              className="border-gray-300 text-gray-700"
               onClick={handleExportToExcel}
             >
-              <Download className="h-4 w-4" />
-              <span>Exporteer</span>
+              <Download className="mr-2 h-4 w-4" />
+              <span>Exporteren</span>
             </Button>
             
             <Button

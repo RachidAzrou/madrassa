@@ -1511,20 +1511,37 @@ export default function Students() {
 
       {/* Create Student Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto">
-          <DialogHeader className="pb-3 border-b">
-            <DialogTitle className="text-xl font-semibold flex items-center text-primary">
-              <div className="bg-blue-100 rounded-full p-1.5 mr-3">
-                <PlusCircle className="h-5 w-5 text-primary" />
+        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
+          {/* Blauwe header */}
+          <div className="bg-blue-600 text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <PlusCircle className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">
+                    Nieuwe Student Toevoegen
+                  </h2>
+                  <span className="text-sm text-blue-100 font-medium">
+                    Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem
+                  </span>
+                </div>
               </div>
-              Nieuwe Student Toevoegen
-            </DialogTitle>
-            <DialogDescription className="text-gray-500 mt-1">
-              Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem.
-            </DialogDescription>
-          </DialogHeader>
+              
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-white hover:bg-blue-700 hover:text-white"
+                onClick={() => setIsCreateDialogOpen(false)}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Sluiten
+              </Button>
+            </div>
+          </div>
           
-          <div className="py-4">
+          <div className="px-6 py-4">
             <Tabs defaultValue="personal" className="w-full">
               <TabsList className="grid grid-cols-4 mb-4 p-1 bg-blue-900/10 rounded-md">
                 <TabsTrigger value="personal" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">

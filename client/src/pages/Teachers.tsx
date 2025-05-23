@@ -667,18 +667,25 @@ const Teachers = () => {
       
       {/* Weergave van docentgegevens Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-[85vw]">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-primary flex items-center gap-2">
-              <GraduationCap className="h-5 w-5" />
-              {selectedTeacher?.firstName} {selectedTeacher?.lastName}
-            </DialogTitle>
-            <DialogDescription>
-              Docentgegevens bekijken
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[85vw] p-0">
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center">
+              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-4">
+                <GraduationCap className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold text-white">
+                  {selectedTeacher?.firstName} {selectedTeacher?.lastName}
+                </DialogTitle>
+                <DialogDescription className="text-sm text-blue-100">
+                  Docentgegevens bekijken
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-6">
               <div className="bg-white p-4 rounded-lg border border-gray-200">
                 <h3 className="text-sm font-medium text-gray-500 mb-3">Basisinformatie</h3>
@@ -846,16 +853,22 @@ const Teachers = () => {
       
       {/* Create Teacher Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95vw] h-[95vh]">
-          <DialogHeader className="pb-1">
-            <DialogTitle className="text-xl font-bold text-primary flex items-center">
-              <GraduationCap className="mr-2 h-5 w-5" />
-              Nieuwe docent
-            </DialogTitle>
-            <DialogDescription className="text-sm">
-              Vul alle benodigde informatie in om een nieuwe docent toe te voegen aan het systeem.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[95vw] h-[95vh] p-0">
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center">
+              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-4">
+                <GraduationCap className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold text-white">
+                  Nieuwe docent
+                </DialogTitle>
+                <DialogDescription className="text-sm text-blue-100">
+                  Vul alle benodigde informatie in om een nieuwe docent toe te voegen aan het systeem.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
           
           <div className="mt-2 overflow-y-auto pr-1" style={{ height: "calc(95vh - 100px)" }}>
             <Tabs defaultValue="personal">

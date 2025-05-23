@@ -425,26 +425,36 @@ export class DatabaseStorage implements IStorage {
   
   async getStudentGuardiansByGuardian(guardianId: number): Promise<any[]> {
     try {
-      // Haal student-voogd relaties op met volledige studentgegevens
-      const relations = await db.select({
-        id: studentGuardians.id,
-        studentId: studentGuardians.studentId,
-        guardianId: studentGuardians.guardianId,
-        isPrimary: studentGuardians.isPrimary,
-        relationship: studentGuardians.relationship,
-        student: {
-          id: students.id,
-          studentId: students.studentId,
-          firstName: students.firstName,
-          lastName: students.lastName,
-          status: students.status
-        }
-      })
-      .from(studentGuardians)
-      .leftJoin(students, eq(studentGuardians.studentId, students.id))
-      .where(eq(studentGuardians.guardianId, guardianId));
+      // Simpelere aanpak: eerst de relaties ophalen
+      const relations = await db.select()
+        .from(studentGuardians)
+        .where(eq(studentGuardians.guardianId, guardianId));
       
-      return relations;
+      // Vervolgens voor elke relatie de studentgegevens ophalen
+      const result = [];
+      for (const relation of relations) {
+        const [student] = await db.select()
+          .from(students)
+          .where(eq(students.id, relation.studentId));
+        
+        if (student) {
+          result.push({
+            ...relation,
+            student: {
+              id: student.id,
+              studentId: student.studentId,
+              firstName: student.firstName,
+              lastName: student.lastName,
+              status: student.status
+            }
+          });
+        } else {
+          // Als er geen student is gevonden, toch de relatie opnemen zonder studentgegevens
+          result.push(relation);
+        }
+      }
+      
+      return result;
     } catch (error) {
       console.error("Fout bij ophalen van student-voogd relaties:", error);
       return [];

@@ -950,22 +950,31 @@ export default function Guardians() {
                       <h3 className="text-md font-medium">Toegewezen studenten</h3>
                       
                       <div className="border rounded-md divide-y">
-                        {guardianStudentsData.map((relation: any) => (
-                          <div
-                            key={relation.id}
-                            className="flex items-center p-3 hover:bg-gray-50"
-                          >
-                            <Avatar className="h-10 w-10">
-                              <AvatarFallback className="bg-[#1e3a8a] text-white">
-                                {relation.student?.firstName?.charAt(0)}{relation.student?.lastName?.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="ml-3">
-                              <div className="text-sm font-medium">{relation.student?.firstName} {relation.student?.lastName}</div>
-                              <div className="text-xs text-gray-500">Studentnr: {relation.student?.studentId}</div>
+                        {guardianStudentsData.map((relation: any) => {
+                          console.log("Relation data in map:", relation);
+                          return (
+                            <div
+                              key={relation.id}
+                              className="flex items-center p-3 hover:bg-gray-50"
+                            >
+                              <Avatar className="h-10 w-10">
+                                <AvatarFallback className="bg-[#1e3a8a] text-white">
+                                  {relation.student?.firstName?.[0] || '?'}{relation.student?.lastName?.[0] || '?'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="ml-3">
+                                {relation.student ? (
+                                  <>
+                                    <div className="text-sm font-medium">{relation.student.firstName} {relation.student.lastName}</div>
+                                    <div className="text-xs text-gray-500">Studentnr: {relation.student.studentId}</div>
+                                  </>
+                                ) : (
+                                  <div className="text-sm text-gray-500">Student #{relation.studentId}</div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}

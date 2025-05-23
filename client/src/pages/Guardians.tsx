@@ -540,7 +540,6 @@ export default function Guardians() {
                   </TableHead>
                   <TableHead className="py-3 font-medium">Naam</TableHead>
                   <TableHead className="py-3 font-medium">Relatie</TableHead>
-                  <TableHead className="py-3 font-medium">Studenten</TableHead>
                   <TableHead className="text-right w-[120px] py-3 font-medium">Acties</TableHead>
                 </TableRow>
               </TableHeader>
@@ -575,9 +574,7 @@ export default function Guardians() {
                         </Badge>
                       </div>
                     </TableCell>
-                    <TableCell className="py-3">
-                      <div className="text-xs">Studenten informatie wordt geladen...</div>
-                    </TableCell>
+
                     <TableCell className="text-right py-3">
                       <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button

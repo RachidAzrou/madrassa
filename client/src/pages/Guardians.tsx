@@ -1441,18 +1441,23 @@ export default function Guardians() {
               </div>
             </Tabs>
             
-            <DialogFooter>
+            <div className="mt-8 mb-12 flex gap-4 justify-end pr-8">
               <Button 
                 type="button" 
                 variant="outline" 
+                size="lg"
                 onClick={() => setShowAddDialog(false)}
               >
                 Annuleren
               </Button>
-              <Button type="submit">
+              <Button 
+                type="submit"
+                size="lg"
+                className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+              >
                 {newGuardian.id ? 'Opslaan' : 'Toevoegen'}
               </Button>
-            </DialogFooter>
+            </div>
           </form>
         </DialogContent>
       </Dialog>

@@ -67,6 +67,7 @@ export default function Guardians() {
   const [viewMode, setViewMode] = useState<'all' | 'emergency'>('all');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
+  const [isEditMode, setIsEditMode] = useState(false);
   
   // States voor verwijderbevestiging
   const [guardianToDelete, setGuardianToDelete] = useState<GuardianType | null>(null);
@@ -177,6 +178,7 @@ export default function Guardians() {
       });
       
       setShowAddDialog(true);
+      setIsEditMode(false);
       
       // Toon een toast met instructies
       toast({
@@ -240,7 +242,7 @@ export default function Guardians() {
     if (guardianIdForStudents && refetchGuardianStudents) {
       refetchGuardianStudents();
     }
-  }, [guardianIdForStudents, refetchGuardianStudents, showViewDialog, showAddDialog, showEditDialog]);
+  }, [guardianIdForStudents, refetchGuardianStudents, showAddDialog, isEditMode]);
 
   // Delete Guardian mutation
   const deleteGuardianMutation = useMutation({
@@ -306,6 +308,7 @@ export default function Guardians() {
     });
     setSelectedStudentIds([]);
     setShowAddDialog(true);
+    setIsEditMode(false);
     console.log("Add new guardian");
   };
   
@@ -424,6 +427,7 @@ export default function Guardians() {
       ...guardian
     });
     setShowAddDialog(true);
+    setIsEditMode(true);
     console.log("Edit guardian:", guardian);
   };
 

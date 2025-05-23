@@ -531,23 +531,23 @@ export default function Scheduling() {
           </TabsList>
           
           <div className="space-y-4">
-            <div className="relative w-full">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-              <Input
-                placeholder="Zoek planning..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="pl-8 bg-white w-full"
-              />
-              {searchTerm && (
-                <XCircle
-                  className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
-                  onClick={() => setSearchTerm("")}
+            <div className="flex flex-col md:flex-row items-center gap-4 w-full">
+              <div className="relative w-full flex-grow">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                <Input
+                  placeholder="Zoek planning..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="pl-8 bg-white w-full"
                 />
-              )}
-            </div>
-            
-            <div className="flex justify-end">
+                {searchTerm && (
+                  <XCircle
+                    className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                    onClick={() => setSearchTerm("")}
+                  />
+                )}
+              </div>
+              
               <Button 
                 onClick={handleAddSchedule} 
                 variant="default"

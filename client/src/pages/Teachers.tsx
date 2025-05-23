@@ -701,7 +701,7 @@ const Teachers = () => {
                   <span>Vakken</span>
                 </TabsTrigger>
                 <TabsTrigger value="classes" className="flex items-center gap-1 px-3">
-                  <ChalkBoard className="h-4 w-4" />
+                  <School className="h-4 w-4" />
                   <span>Klassen</span>
                 </TabsTrigger>
               </TabsList>

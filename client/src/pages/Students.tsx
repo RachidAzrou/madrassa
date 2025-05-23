@@ -1576,13 +1576,13 @@ export default function Students() {
                   <MapPin className="h-4 w-4" />
                   <span>Adres</span>
                 </TabsTrigger>
-                <TabsTrigger value="guardian" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                  <UserCheck className="h-4 w-4" />
-                  <span>Voogden</span>
-                </TabsTrigger>
                 <TabsTrigger value="class" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                   <ChalkBoard className="h-4 w-4" />
                   <span>Klas</span>
+                </TabsTrigger>
+                <TabsTrigger value="guardian" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <UserCheck className="h-4 w-4" />
+                  <span>Voogden</span>
                 </TabsTrigger>
               </TabsList>
               
@@ -2019,152 +2019,250 @@ export default function Students() {
               {/* Voogden tab */}
               <TabsContent value="guardian" className="mt-0">
                 <div className="p-4 bg-white rounded-lg min-h-[450px]">
-                  <div className="mb-4">
+                  <div className="mb-6">
                     <h3 className="text-base font-medium text-gray-900 mb-2">Voogd toevoegen</h3>
                     <p className="text-sm text-gray-500">Voeg een voogd toe aan deze student (optioneel).</p>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="guardian-firstName" className="text-xs font-medium text-gray-700">
-                        Voornaam
-                      </Label>
-                      <Input
-                        id="guardian-firstName"
-                        value={guardianFormData.firstName}
-                        onChange={(e) => setGuardianFormData({ ...guardianFormData, firstName: e.target.value })}
-                        className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="Voornaam voogd"
-                      />
+                  {/* Persoonlijke informatie sectie */}
+                  <div className="mb-6">
+                    <div className="flex items-center mb-3">
+                      <User className="h-4 w-4 text-primary mr-2" />
+                      <h4 className="text-sm font-medium text-gray-800">Persoonlijke informatie</h4>
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="guardian-lastName" className="text-xs font-medium text-gray-700">
-                        Achternaam
-                      </Label>
-                      <Input
-                        id="guardian-lastName"
-                        value={guardianFormData.lastName}
-                        onChange={(e) => setGuardianFormData({ ...guardianFormData, lastName: e.target.value })}
-                        className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="Achternaam voogd"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor="guardian-firstName" className="text-xs font-medium text-gray-700">
+                          Voornaam
+                        </Label>
+                        <Input
+                          id="guardian-firstName"
+                          value={guardianFormData.firstName}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, firstName: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Voornaam voogd"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="guardian-lastName" className="text-xs font-medium text-gray-700">
+                          Achternaam
+                        </Label>
+                        <Input
+                          id="guardian-lastName"
+                          value={guardianFormData.lastName}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, lastName: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Achternaam voogd"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="guardian-relationship" className="text-xs font-medium text-gray-700">
+                          Relatie tot student
+                        </Label>
+                        <Select
+                          value={guardianFormData.relationship}
+                          onValueChange={(value) => setGuardianFormData({ ...guardianFormData, relationship: value })}
+                        >
+                          <SelectTrigger id="guardian-relationship" className="mt-1 h-9 text-sm bg-white border-gray-200">
+                            <SelectValue placeholder="Selecteer relatie" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ouder">Ouder</SelectItem>
+                            <SelectItem value="voogd">Voogd</SelectItem>
+                            <SelectItem value="grootouder">Grootouder</SelectItem>
+                            <SelectItem value="noodcontact">Noodcontact</SelectItem>
+                            <SelectItem value="ander">Ander</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="guardian-occupation" className="text-xs font-medium text-gray-700">
+                          Beroep
+                        </Label>
+                        <Input
+                          id="guardian-occupation"
+                          value={guardianFormData.occupation}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, occupation: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Beroep"
+                        />
+                      </div>
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="guardian-relationship" className="text-xs font-medium text-gray-700">
-                        Relatie
-                      </Label>
-                      <Select
-                        value={guardianFormData.relationship}
-                        onValueChange={(value) => setGuardianFormData({ ...guardianFormData, relationship: value })}
-                      >
-                        <SelectTrigger id="guardian-relationship" className="mt-1 h-9 text-sm bg-white border-gray-200">
-                          <SelectValue placeholder="Selecteer relatie" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ouder">Ouder</SelectItem>
-                          <SelectItem value="voogd">Voogd</SelectItem>
-                          <SelectItem value="grootouder">Grootouder</SelectItem>
-                          <SelectItem value="noodcontact">Noodcontact</SelectItem>
-                          <SelectItem value="ander">Ander</SelectItem>
-                        </SelectContent>
-                      </Select>
+                  </div>
+                  
+                  {/* Contactgegevens sectie */}
+                  <div className="mb-6">
+                    <div className="flex items-center mb-3">
+                      <Phone className="h-4 w-4 text-primary mr-2" />
+                      <h4 className="text-sm font-medium text-gray-800">Contactgegevens</h4>
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="guardian-email" className="text-xs font-medium text-gray-700">
-                        Email
-                      </Label>
-                      <Input
-                        id="guardian-email"
-                        type="email"
-                        value={guardianFormData.email}
-                        onChange={(e) => setGuardianFormData({ ...guardianFormData, email: e.target.value })}
-                        className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="email@voorbeeld.nl"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="guardian-email" className="text-xs font-medium text-gray-700">
+                          Email
+                        </Label>
+                        <Input
+                          id="guardian-email"
+                          type="email"
+                          value={guardianFormData.email}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, email: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="email@voorbeeld.nl"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="guardian-phone" className="text-xs font-medium text-gray-700">
+                          Telefoonnummer
+                        </Label>
+                        <Input
+                          id="guardian-phone"
+                          value={guardianFormData.phone}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, phone: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="06 1234 5678"
+                        />
+                      </div>
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="guardian-phone" className="text-xs font-medium text-gray-700">
-                        Telefoonnummer
-                      </Label>
-                      <Input
-                        id="guardian-phone"
-                        value={guardianFormData.phone}
-                        onChange={(e) => setGuardianFormData({ ...guardianFormData, phone: e.target.value })}
-                        className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="06 1234 5678"
-                      />
+                  </div>
+                  
+                  {/* Adresgegevens sectie */}
+                  <div className="mb-6">
+                    <div className="flex items-center mb-3">
+                      <MapPin className="h-4 w-4 text-primary mr-2" />
+                      <h4 className="text-sm font-medium text-gray-800">Adresgegevens</h4>
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="guardian-occupation" className="text-xs font-medium text-gray-700">
-                        Beroep
-                      </Label>
-                      <Input
-                        id="guardian-occupation"
-                        value={guardianFormData.occupation}
-                        onChange={(e) => setGuardianFormData({ ...guardianFormData, occupation: e.target.value })}
-                        className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="Beroep"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="md:col-span-2">
+                        <Label htmlFor="guardian-street" className="text-xs font-medium text-gray-700">
+                          Straat
+                        </Label>
+                        <Input
+                          id="guardian-street"
+                          value={guardianFormData.street}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, street: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Straatnaam"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="guardian-houseNumber" className="text-xs font-medium text-gray-700">
+                          Huisnummer
+                        </Label>
+                        <Input
+                          id="guardian-houseNumber"
+                          value={guardianFormData.houseNumber}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, houseNumber: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="123"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="guardian-postalCode" className="text-xs font-medium text-gray-700">
+                          Postcode
+                        </Label>
+                        <Input
+                          id="guardian-postalCode"
+                          value={guardianFormData.postalCode}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, postalCode: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="1234 AB"
+                        />
+                      </div>
+                      
+                      <div className="md:col-span-2">
+                        <Label htmlFor="guardian-city" className="text-xs font-medium text-gray-700">
+                          Stad
+                        </Label>
+                        <Input
+                          id="guardian-city"
+                          value={guardianFormData.city}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, city: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Amsterdam"
+                        />
+                      </div>
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="guardian-street" className="text-xs font-medium text-gray-700">
-                        Straat
-                      </Label>
-                      <Input
-                        id="guardian-street"
-                        value={guardianFormData.street}
-                        onChange={(e) => setGuardianFormData({ ...guardianFormData, street: e.target.value })}
-                        className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="Straatnaam"
-                      />
+                  </div>
+                  
+                  {/* Noodcontact sectie */}
+                  <div className="mb-4">
+                    <div className="flex items-center mb-3">
+                      <AlertCircle className="h-4 w-4 text-primary mr-2" />
+                      <h4 className="text-sm font-medium text-gray-800">Noodcontact</h4>
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="guardian-houseNumber" className="text-xs font-medium text-gray-700">
-                        Huisnummer
-                      </Label>
-                      <Input
-                        id="guardian-houseNumber"
-                        value={guardianFormData.houseNumber}
-                        onChange={(e) => setGuardianFormData({ ...guardianFormData, houseNumber: e.target.value })}
-                        className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="123"
-                      />
+                    <div className="p-3 bg-gray-50 rounded-md border">
+                      <div className="flex items-center space-x-2 mb-3">
+                        <Checkbox
+                          id="guardian-isEmergencyContact"
+                          checked={guardianFormData.isEmergencyContact}
+                          onCheckedChange={(checked) => setGuardianFormData({ 
+                            ...guardianFormData, 
+                            isEmergencyContact: checked as boolean 
+                          })}
+                        />
+                        <Label htmlFor="guardian-isEmergencyContact" className="text-sm font-medium text-gray-700">
+                          Deze voogd is ook het primaire noodcontact
+                        </Label>
+                      </div>
+                      
+                      {guardianFormData.isEmergencyContact && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <div>
+                            <Label htmlFor="guardian-emergencyContactName" className="text-xs font-medium text-gray-700">
+                              Alternatieve noodcontact naam
+                            </Label>
+                            <Input
+                              id="guardian-emergencyContactName"
+                              value={guardianFormData.emergencyContactName}
+                              onChange={(e) => setGuardianFormData({ ...guardianFormData, emergencyContactName: e.target.value })}
+                              className="mt-1 h-8 text-sm bg-white border-gray-200"
+                              placeholder="Naam alternatief contact"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="guardian-emergencyContactPhone" className="text-xs font-medium text-gray-700">
+                              Alternatieve telefoon
+                            </Label>
+                            <Input
+                              id="guardian-emergencyContactPhone"
+                              value={guardianFormData.emergencyContactPhone}
+                              onChange={(e) => setGuardianFormData({ ...guardianFormData, emergencyContactPhone: e.target.value })}
+                              className="mt-1 h-8 text-sm bg-white border-gray-200"
+                              placeholder="06 1234 5678"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="guardian-emergencyContactRelation" className="text-xs font-medium text-gray-700">
+                              Relatie tot student
+                            </Label>
+                            <Input
+                              id="guardian-emergencyContactRelation"
+                              value={guardianFormData.emergencyContactRelation}
+                              onChange={(e) => setGuardianFormData({ ...guardianFormData, emergencyContactRelation: e.target.value })}
+                              className="mt-1 h-8 text-sm bg-white border-gray-200"
+                              placeholder="Bijv. tante, oom"
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="guardian-postalCode" className="text-xs font-medium text-gray-700">
-                        Postcode
-                      </Label>
-                      <Input
-                        id="guardian-postalCode"
-                        value={guardianFormData.postalCode}
-                        onChange={(e) => setGuardianFormData({ ...guardianFormData, postalCode: e.target.value })}
-                        className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="1234 AB"
-                      />
+                  </div>
+                  
+                  {/* Notities sectie */}
+                  <div>
+                    <div className="flex items-center mb-3">
+                      <FileText className="h-4 w-4 text-primary mr-2" />
+                      <h4 className="text-sm font-medium text-gray-800">Aanvullende informatie</h4>
                     </div>
-                    
                     <div>
-                      <Label htmlFor="guardian-city" className="text-xs font-medium text-gray-700">
-                        Stad
-                      </Label>
-                      <Input
-                        id="guardian-city"
-                        value={guardianFormData.city}
-                        onChange={(e) => setGuardianFormData({ ...guardianFormData, city: e.target.value })}
-                        className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="Amsterdam"
-                      />
-                    </div>
-                    
-                    <div className="md:col-span-2">
                       <Label htmlFor="guardian-notes" className="text-xs font-medium text-gray-700">
                         Notities
                       </Label>
@@ -2173,68 +2271,9 @@ export default function Students() {
                         value={guardianFormData.notes}
                         onChange={(e) => setGuardianFormData({ ...guardianFormData, notes: e.target.value })}
                         className="mt-1 h-9 text-sm bg-white border-gray-200"
-                        placeholder="Aanvullende informatie..."
+                        placeholder="Aanvullende informatie over deze voogd..."
                       />
                     </div>
-                  </div>
-                  
-                  <div className="mt-4 p-3 bg-gray-50 rounded-md border">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="guardian-isEmergencyContact"
-                        checked={guardianFormData.isEmergencyContact}
-                        onCheckedChange={(checked) => setGuardianFormData({ 
-                          ...guardianFormData, 
-                          isEmergencyContact: checked as boolean 
-                        })}
-                      />
-                      <Label htmlFor="guardian-isEmergencyContact" className="text-sm font-medium text-gray-700">
-                        Dit is een noodcontact
-                      </Label>
-                    </div>
-                    
-                    {guardianFormData.isEmergencyContact && (
-                      <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div>
-                          <Label htmlFor="guardian-emergencyContactName" className="text-xs font-medium text-gray-700">
-                            Noodcontact naam
-                          </Label>
-                          <Input
-                            id="guardian-emergencyContactName"
-                            value={guardianFormData.emergencyContactName}
-                            onChange={(e) => setGuardianFormData({ ...guardianFormData, emergencyContactName: e.target.value })}
-                            className="mt-1 h-8 text-sm bg-white border-gray-200"
-                            placeholder="Naam noodcontact"
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="guardian-emergencyContactPhone" className="text-xs font-medium text-gray-700">
-                            Noodcontact telefoon
-                          </Label>
-                          <Input
-                            id="guardian-emergencyContactPhone"
-                            value={guardianFormData.emergencyContactPhone}
-                            onChange={(e) => setGuardianFormData({ ...guardianFormData, emergencyContactPhone: e.target.value })}
-                            className="mt-1 h-8 text-sm bg-white border-gray-200"
-                            placeholder="06 1234 5678"
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="guardian-emergencyContactRelation" className="text-xs font-medium text-gray-700">
-                            Relatie noodcontact
-                          </Label>
-                          <Input
-                            id="guardian-emergencyContactRelation"
-                            value={guardianFormData.emergencyContactRelation}
-                            onChange={(e) => setGuardianFormData({ ...guardianFormData, emergencyContactRelation: e.target.value })}
-                            className="mt-1 h-8 text-sm bg-white border-gray-200"
-                            placeholder="Bijv. tante, oom"
-                          />
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               </TabsContent>

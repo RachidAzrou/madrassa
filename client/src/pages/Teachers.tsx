@@ -570,12 +570,6 @@ const Teachers = () => {
             icon={<GraduationCap className="h-10 w-10 opacity-30" />}
             title="Geen docenten gevonden"
             description={searchQuery ? `Geen resultaten voor "${searchQuery}". Probeer een andere zoekopdracht of pas de filters aan.` : "Er zijn nog geen docenten toegevoegd aan het systeem."}
-            action={
-              <Button onClick={() => setIsCreateDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Docent toevoegen
-              </Button>
-            }
           />
         )}
       </div>

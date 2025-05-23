@@ -9,6 +9,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { formatDateToDisplayFormat } from "@/lib/utils";
+
+const ChalkBoard = (props: any) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg" 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    {...props}
+  >
+    <rect x="2" y="2" width="20" height="14" rx="2" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <line x1="6" y1="12" x2="6" y2="20" />
+    <line x1="18" y1="12" x2="18" y2="20" />
+    <ellipse cx="12" cy="18" rx="3" ry="2" />
+    <path d="M10 4h4" />
+    <path d="M8 8h8" />
+  </svg>
+);
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -701,7 +724,7 @@ const Teachers = () => {
                   <span>Vakken</span>
                 </TabsTrigger>
                 <TabsTrigger value="classes" className="flex items-center gap-1 px-3">
-                  <School className="h-4 w-4" />
+                  <ChalkBoard className="h-4 w-4" />
                   <span>Klassen</span>
                 </TabsTrigger>
               </TabsList>

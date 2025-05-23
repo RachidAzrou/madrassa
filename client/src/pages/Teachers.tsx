@@ -5,6 +5,7 @@ import * as XLSX from 'xlsx';
 import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image, BookText, XCircle, LucideIcon, School, Download } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -86,6 +87,7 @@ const Teachers = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<any>(null);
+  const [selectedTeachers, setSelectedTeachers] = useState<number[]>([]);
   
   // Fetch next teacher ID
   const { data: nextTeacherIdData, isLoading: isLoadingNextId } = useQuery({
@@ -291,6 +293,54 @@ const Teachers = () => {
     deleteTeacherMutation.mutate(selectedTeacher.id);
   };
   
+  // Functies voor selecteren van docenten
+  const handleSelectTeacher = (teacherId: number) => {
+    setSelectedTeachers(prev => 
+      prev.includes(teacherId) 
+        ? prev.filter(id => id !== teacherId) 
+        : [...prev, teacherId]
+    );
+  };
+  
+  const handleSelectAll = (checked: boolean) => {
+    if (checked && teachersData?.teachers) {
+      // Selecteer alle docenten
+      setSelectedTeachers(teachersData.teachers.map((teacher: any) => teacher.id));
+    } else {
+      // Deselecteer alle docenten
+      setSelectedTeachers([]);
+    }
+  };
+  
+  const handleDeleteMultipleTeachers = () => {
+    // Implementeer verwijderen van meerdere docenten
+    if (selectedTeachers.length === 0) return;
+    
+    // Bevestigingsdialoog tonen
+    if (window.confirm(`Weet je zeker dat je ${selectedTeachers.length} docent(en) wilt verwijderen?`)) {
+      // Voer verwijderingen uit één voor één
+      Promise.all(selectedTeachers.map(id => 
+        apiRequest(`/api/teachers/${id}`, 'DELETE')
+      ))
+      .then(() => {
+        toast({
+          title: "Docenten verwijderd",
+          description: `${selectedTeachers.length} docent(en) succesvol verwijderd.`,
+        });
+        setSelectedTeachers([]);
+        queryClient.invalidateQueries({queryKey: ['/api/teachers']});
+      })
+      .catch(error => {
+        console.error("Error deleting teachers:", error);
+        toast({
+          title: "Fout bij verwijderen",
+          description: "Er is een fout opgetreden bij het verwijderen van de docenten.",
+          variant: "destructive",
+        });
+      });
+    }
+  };
+  
   const handleViewTeacher = (teacher: any) => {
     setSelectedTeacher(teacher);
     setIsViewDialogOpen(true);
@@ -422,21 +472,23 @@ const Teachers = () => {
           <div className="border-b border-gray-200 pb-4 mb-4"></div>
           
           <div className="mt-4">
-            <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-4">
-              {/* Zoek- en filteropties */}
-              <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                <div className="relative w-full sm:w-64">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                  <Input
-                    type="search"
-                    placeholder="Zoek op naam of docent ID..."
-                    className="w-full pl-9 h-8 bg-white border-gray-200 shadow-sm"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                
-                <div className="flex items-center w-full sm:w-auto">
+            <div className="flex flex-col gap-4">
+              {/* Zoekbalk - volledige breedte */}
+              <div className="relative w-full">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                <Input
+                  type="search"
+                  placeholder="Zoek op naam of docent ID..."
+                  className="w-full pl-9 h-8 bg-white border-gray-200 shadow-sm"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              
+              {/* Filters en knoppen op één rij onder de zoekbalk */}
+              <div className="flex flex-wrap justify-between items-center gap-3">
+                {/* Filter op status */}
+                <div className="flex items-center">
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-full sm:w-40 h-8 bg-white border-gray-200 shadow-sm">
                       <SelectValue placeholder="Filter op status" />
@@ -448,18 +500,18 @@ const Teachers = () => {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-              
-              {/* Actieknoppen */}
-              <div className="flex items-center gap-2 w-full sm:w-auto mt-3 sm:mt-0">
-                <Button variant="outline" size="sm" className="h-8 border-gray-200 shadow-sm" onClick={handleExportTeachers}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Exporteren
-                </Button>
-                <Button size="sm" className="h-8" onClick={() => setIsCreateDialogOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nieuw
-                </Button>
+                
+                {/* Actieknoppen */}
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="h-8 border-gray-200 shadow-sm" onClick={handleExportTeachers}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Exporteren
+                  </Button>
+                  <Button size="sm" className="h-8" onClick={() => setIsCreateDialogOpen(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nieuw
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -473,6 +525,13 @@ const Teachers = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
+                <th scope="col" className="px-3 py-3 text-left">
+                  <Checkbox 
+                    checked={selectedTeachers.length > 0 && teachersData?.teachers && selectedTeachers.length === teachersData.teachers.length}
+                    onCheckedChange={handleSelectAll}
+                    aria-label="Selecteer alle docenten"
+                  />
+                </th>
                 <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DOCENT ID</th>
                 <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NAAM</th>
                 <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KLAS</th>
@@ -509,6 +568,13 @@ const Teachers = () => {
               {/* Docenten lijst */}
               {!isLoading && teachersData?.teachers && teachersData.teachers.map((teacher: any, index: number) => (
                 <tr key={teacher.id} className="group hover:bg-gray-50 border-b border-gray-200">
+                  <td className="px-3 py-4 whitespace-nowrap text-sm">
+                    <Checkbox
+                      checked={selectedTeachers.includes(teacher.id)}
+                      onCheckedChange={() => handleSelectTeacher(teacher.id)}
+                      aria-label={`Selecteer ${teacher.firstName} ${teacher.lastName}`}
+                    />
+                  </td>
                   <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{teacher.teacherId}</td>
                   <td className="px-3 py-4 whitespace-nowrap">
                     <div className="flex items-center">

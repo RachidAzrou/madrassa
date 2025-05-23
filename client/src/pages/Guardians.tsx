@@ -185,6 +185,13 @@ export default function Guardians() {
       });
     }
   }, [toast]);
+  
+  // Ververs de gekoppelde studenten wanneer het dialoogvenster opent of sluit
+  useEffect(() => {
+    if (showAddDialog && newGuardian.id && refetchGuardianStudents) {
+      refetchGuardianStudents();
+    }
+  }, [showAddDialog, newGuardian.id, refetchGuardianStudents]);
 
   // Fetch all students for student assignment
   const {
@@ -208,17 +215,20 @@ export default function Guardians() {
     },
   });
 
-  // Fetch associated students for selected guardian
+  // Fetch associated students for selected guardian or guardian being edited
+  const guardianIdForStudents = selectedGuardian?.id || (showAddDialog && newGuardian.id ? newGuardian.id : undefined);
+  
   const {
     data: guardianStudentsData = [] as any[],
     isLoading: guardianStudentsLoading,
     isError: isGuardianStudentsError,
+    refetch: refetchGuardianStudents
   } = useQuery({
-    queryKey: ['/api/guardians/students', selectedGuardian?.id],
+    queryKey: ['/api/guardians/students', guardianIdForStudents],
     queryFn: async () => {
-      if (!selectedGuardian) return [];
+      if (!guardianIdForStudents) return [];
       try {
-        return await apiRequest(`/api/guardians/${selectedGuardian.id}/students`);
+        return await apiRequest(`/api/guardians/${guardianIdForStudents}/students`);
       } catch (error) {
         console.error('Error fetching guardian students:', error);
         toast({
@@ -229,7 +239,7 @@ export default function Guardians() {
         return [];
       }
     },
-    enabled: !!selectedGuardian,
+    enabled: !!guardianIdForStudents,
   });
 
   // Delete Guardian mutation

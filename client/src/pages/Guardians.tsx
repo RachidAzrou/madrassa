@@ -436,15 +436,15 @@ export default function Guardians() {
                 </svg>
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <DialogTitle className="text-primary text-lg font-bold">Voogd Details</DialogTitle>
+                <DialogTitle className="text-primary text-lg font-bold">Voogd Details</DialogTitle>
+                <div className="flex items-center gap-2 text-gray-500 text-sm mt-1">
+                  <DialogDescription>
+                    {selectedGuardian?.firstName} {selectedGuardian?.lastName}
+                  </DialogDescription>
                   {selectedGuardian?.isEmergencyContact && (
-                    <Badge variant="destructive" size="sm" className="h-5">Noodcontact</Badge>
+                    <Badge variant="destructive" className="text-xs">Noodcontact</Badge>
                   )}
                 </div>
-                <DialogDescription className="text-gray-500 text-sm mt-1">
-                  {selectedGuardian?.firstName} {selectedGuardian?.lastName}
-                </DialogDescription>
               </div>
             </div>
           </DialogHeader>

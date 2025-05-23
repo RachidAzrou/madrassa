@@ -434,8 +434,8 @@ const Teachers = () => {
                 </th>
                 <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">ID</th>
                 <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">NAAM</th>
-                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">E-MAIL</th>
-                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">TELEFOONNUMMER</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">KLAS</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">VAKKEN</th>
                 <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">STATUS</th>
                 <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right"></th>
               </tr>
@@ -468,12 +468,45 @@ const Teachers = () => {
                         </Avatar>
                         <div>
                           <p className="font-medium">{teacher.firstName} {teacher.lastName}</p>
-                          <p className="text-xs text-gray-500">{teacher.assignedClasses?.length || 0} klassen</p>
                         </div>
                       </div>
                     </td>
-                    <td className="py-3 px-4">{teacher.email}</td>
-                    <td className="py-3 px-4">{teacher.phone}</td>
+                    <td className="py-3 px-4">
+                      {teacher.assignedClasses && teacher.assignedClasses.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {teacher.assignedClasses.slice(0, 2).map((cls, index) => (
+                            <Badge key={index} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                              {cls.name}
+                            </Badge>
+                          ))}
+                          {teacher.assignedClasses.length > 2 && (
+                            <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200">
+                              +{teacher.assignedClasses.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">Geen klassen</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4">
+                      {teacher.specialties && teacher.specialties.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {teacher.specialties.slice(0, 2).map((specialty, index) => (
+                            <Badge key={index} variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                              {specialty}
+                            </Badge>
+                          ))}
+                          {teacher.specialties.length > 2 && (
+                            <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200">
+                              +{teacher.specialties.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">Geen vakken</span>
+                      )}
+                    </td>
                     <td className="py-3 px-4">{renderStatusBadge(teacher.isActive)}</td>
                     <td className="py-3 px-4 text-right">
                       <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

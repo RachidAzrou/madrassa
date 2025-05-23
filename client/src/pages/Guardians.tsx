@@ -906,13 +906,15 @@ export default function Guardians() {
       
       {/* Add/Edit Guardian Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-primary flex items-center">
-              <UserCheck className="h-6 w-6 mr-2" />
+        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto">
+          <DialogHeader className="pb-3 border-b">
+            <DialogTitle className="text-xl font-semibold flex items-center text-primary">
+              <div className="bg-blue-100 rounded-full p-1.5 mr-3">
+                <UserCheck className="h-5 w-5 text-primary" />
+              </div>
               {newGuardian.id ? 'Voogd Bewerken' : 'Nieuwe Voogd Toevoegen'}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-gray-500 mt-1">
               {newGuardian.id 
                 ? 'Werk de informatie bij voor deze voogd.' 
                 : 'Vul alle benodigde informatie in om een nieuwe voogd toe te voegen.'}
@@ -921,64 +923,22 @@ export default function Guardians() {
 
           <form onSubmit={handleSubmitGuardian} className="mt-4 space-y-6">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 p-1 bg-blue-900/10">
-                <TabsTrigger value="personal" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+              <TabsList className="grid w-full grid-cols-3 p-1 bg-blue-900/10 rounded-md mb-4">
+                <TabsTrigger value="personal" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                   <UserCircle className="h-4 w-4" />
                   <span>Persoonlijke Informatie</span>
                 </TabsTrigger>
-                <TabsTrigger value="contact" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                <TabsTrigger value="contact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                   <Phone className="h-4 w-4" />
                   <span>Contactgegevens</span>
                 </TabsTrigger>
-                <TabsTrigger value="students" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                <TabsTrigger value="students" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                   <Users className="h-4 w-4" />
                   <span>Studenten</span>
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="personal" className="space-y-4 pt-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Voornaam <span className="text-[#3b5998]">*</span></Label>
-                    <Input 
-                      id="firstName"
-                      name="firstName"
-                      value={newGuardian.firstName || ''}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Achternaam <span className="text-[#3b5998]">*</span></Label>
-                    <Input 
-                      id="lastName"
-                      name="lastName"
-                      value={newGuardian.lastName || ''}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="relationship">Relatie tot student <span className="text-[#3b5998]">*</span></Label>
-                  <Select 
-                    name="relationship" 
-                    defaultValue={newGuardian.relationship}
-                    onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecteer relatie" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="parent">Ouder</SelectItem>
-                      <SelectItem value="guardian">Voogd</SelectItem>
-                      <SelectItem value="grandparent">Grootouder</SelectItem>
-                      <SelectItem value="other">Anders</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <TabsContent value="personal" className="mt-0">
 
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">

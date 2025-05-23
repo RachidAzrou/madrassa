@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -801,105 +801,135 @@ export default function Guardians() {
                 
                 <TabsContent value="personal" className="space-y-6">
                   <div className="flex flex-col md:flex-row gap-6">
-                    <div className="w-full md:w-1/2 space-y-5">
-                      <div className="flex items-center space-x-4">
-                        <Avatar className="h-16 w-16">
-                          <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
-                            {selectedGuardian.firstName.charAt(0)}{selectedGuardian.lastName.charAt(0)}
+                    <div className="w-full md:w-1/3 space-y-5">
+                      <div className="flex flex-col items-center text-center p-6 border rounded-md bg-white shadow-sm">
+                        <Avatar className="h-24 w-24 mb-4">
+                          <AvatarFallback className="bg-[#1e3a8a] text-white text-2xl">
+                            {selectedGuardian.firstName ? selectedGuardian.firstName.charAt(0) : ''}{selectedGuardian.lastName ? selectedGuardian.lastName.charAt(0) : ''}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <h2 className="text-xl font-bold">{selectedGuardian.firstName} {selectedGuardian.lastName}</h2>
-                          <p className="text-gray-500">{getRelationshipLabel(selectedGuardian.relationship)}</p>
-                          {selectedGuardian.isEmergencyContact && (
-                            <Badge variant="destructive" className="mt-1">Noodcontact</Badge>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div>
-                          <Label className="text-sm font-medium text-gray-700">
-                            Relatie
-                          </Label>
-                          <div className="mt-1 p-2 border rounded-md bg-gray-50">
-                            {getRelationshipLabel(selectedGuardian.relationship)}
-                          </div>
-                        </div>
+                        <h2 className="text-xl font-bold">{selectedGuardian.firstName} {selectedGuardian.lastName}</h2>
+                        <p className="text-gray-500 mb-2">{getRelationshipLabel(selectedGuardian.relationship)}</p>
+                        {selectedGuardian.isEmergencyContact && (
+                          <Badge variant="destructive" className="mt-1">Noodcontact</Badge>
+                        )}
                       </div>
                     </div>
                     
-                    <div className="w-full md:w-1/2 space-y-5">
-                      {selectedGuardian.notes && (
-                        <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                          <Label htmlFor="notes" className="text-sm font-medium text-gray-700 mb-3 block">
-                            Notities
+                    <div className="w-full md:w-2/3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-gray-700">
+                            Relatie
                           </Label>
-                          <div className="p-3 bg-gray-50 rounded-md min-h-[120px] border border-gray-200 text-sm">
-                            {selectedGuardian.notes}
+                          <div className="p-3 border rounded-md bg-gray-50">
+                            {getRelationshipLabel(selectedGuardian.relationship)}
                           </div>
                         </div>
-                      )}
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-gray-700">
+                            Beroep
+                          </Label>
+                          <div className="p-3 border rounded-md bg-gray-50">
+                            {selectedGuardian.occupation || 'Niet ingevuld'}
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2 md:col-span-2">
+                          <Label className="text-sm font-medium text-gray-700">
+                            Adres
+                          </Label>
+                          <div className="p-3 border rounded-md bg-gray-50">
+                            {selectedGuardian.street} {selectedGuardian.houseNumber}, {selectedGuardian.postalCode} {selectedGuardian.city}
+                          </div>
+                        </div>
+                        
+                        {selectedGuardian.notes && (
+                          <div className="md:col-span-2 space-y-2">
+                            <Label className="text-sm font-medium text-gray-700">
+                              Notities
+                            </Label>
+                            <div className="p-3 bg-gray-50 rounded-md min-h-[100px] border border-gray-200 text-sm">
+                              {selectedGuardian.notes}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </TabsContent>
                 
                 <TabsContent value="contact" className="space-y-4 pt-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Email</Label>
-                      <div className="p-2 border rounded-md bg-gray-50">
-                        {selectedGuardian.email}
+                  <div className="bg-white border rounded-lg p-6 shadow-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-5 w-5 text-primary" />
+                            <Label className="text-sm font-medium text-gray-700">Email</Label>
+                          </div>
+                          <div className="p-3 border rounded-md bg-gray-50">
+                            {selectedGuardian.email || 'Niet ingevuld'}
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-5 w-5 text-primary" />
+                            <Label className="text-sm font-medium text-gray-700">Telefoonnummer</Label>
+                          </div>
+                          <div className="p-3 border rounded-md bg-gray-50">
+                            {selectedGuardian.phone || 'Niet ingevuld'}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Telefoonnummer</Label>
-                      <div className="p-2 border rounded-md bg-gray-50">
-                        {selectedGuardian.phone || 'Niet ingevuld'}
+                      
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Home className="h-5 w-5 text-primary" />
+                            <Label className="text-sm font-medium text-gray-700">Adres</Label>
+                          </div>
+                          <div className="p-3 border rounded-md bg-gray-50">
+                            {selectedGuardian.street} {selectedGuardian.houseNumber}, {selectedGuardian.postalCode} {selectedGuardian.city}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                   
-                  {(selectedGuardian.emergencyContactName || selectedGuardian.emergencyContactPhone) && (
-                    <div className="mt-4 p-4 border rounded-md bg-blue-50">
-                      <div className="flex items-center mb-2">
-                        <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mr-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-700">
-                            <path d="M13.73 21a9.97 9.97 0 0 1-10.5-10.05C3.25 6.75 6.8 3.25 11 3.25v2a.75.75 0 0 0 1.5 0v-2a.75.75 0 0 0-1.5 0" />
-                            <path d="m12.92 6.74 5.56 5.56a1 1 0 0 1-1.41 1.41l-5.56-5.56a.997.997 0 0 1 0-1.41.997.997 0 0 1 1.41 0Z" />
-                            <path d="M16.24 20.25 3.75 7.76" />
-                          </svg>
+                  {selectedGuardian.isEmergencyContact && (
+                    <div className="mt-4 p-6 border rounded-lg bg-red-50 border-red-100">
+                      <div className="flex items-center mb-4">
+                        <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                          <AlertTriangle className="h-5 w-5 text-red-600" />
                         </div>
-                        <Label className="text-sm font-medium text-blue-700">Secundair Noodcontact</Label>
+                        <h3 className="text-lg font-medium text-red-800">Noodcontact</h3>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                        <div className="space-y-1">
-                          <Label className="text-xs text-gray-500">Naam</Label>
-                          <div className="p-2 border rounded-md bg-white">
-                            {selectedGuardian.emergencyContactName || 'Niet ingevuld'}
-                          </div>
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs text-gray-500">Telefoonnummer</Label>
-                          <div className="p-2 border rounded-md bg-white">
-                            {selectedGuardian.emergencyContactPhone || 'Niet ingevuld'}
-                          </div>
+                      <p className="text-sm text-red-700 mb-4">
+                        Dit contact is aangeduid als noodcontact voor één of meerdere studenten. Deze persoon kan gecontacteerd worden in noodgevallen.
+                      </p>
+                      
+                      <div className="bg-white rounded-md p-4 border border-red-100">
+                        <h4 className="text-sm font-medium text-gray-700 mb-3">Studenten waarvoor dit een noodcontact is:</h4>
+                        <div className="space-y-2">
+                          {guardianStudentsData.map((relation: any) => (
+                            relation.student && (
+                              <div key={relation.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded border">
+                                <UserCircle className="h-4 w-4 text-primary" />
+                                <span className="text-sm">{relation.student.firstName} {relation.student.lastName}</span>
+                              </div>
+                            )
+                          ))}
+                          {guardianStudentsData.length === 0 && (
+                            <div className="p-3 text-sm text-gray-500 italic bg-gray-50 rounded border">
+                              Geen studenten gekoppeld aan dit noodcontact
+                            </div>
+                          )}
                         </div>
                       </div>
-                      
-                      {selectedGuardian.emergencyContactRelation && (
-                        <div className="space-y-1 mt-2">
-                          <Label className="text-xs text-gray-500">Relatie tot student</Label>
-                          <div className="p-2 border rounded-md bg-white">
-                            {selectedGuardian.emergencyContactRelation === 'parent' && 'Ouder'}
-                            {selectedGuardian.emergencyContactRelation === 'family' && 'Familielid'}
-                            {selectedGuardian.emergencyContactRelation === 'friend' && 'Vriend(in)'}
-                            {selectedGuardian.emergencyContactRelation === 'neighbor' && 'Buur'}
-                            {selectedGuardian.emergencyContactRelation === 'other' && 'Anders'}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )}
                   

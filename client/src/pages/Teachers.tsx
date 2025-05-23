@@ -793,6 +793,158 @@ const Teachers = () => {
               
               {/* Persoonlijke informatie tab */}
               <TabsContent value="personal" className="space-y-3">
+                <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-4">
+                  {/* Foto upload sectie */}
+                  <div className="flex items-start">
+                    <div className="relative">
+                      <div 
+                        className="w-28 h-28 flex items-center justify-center overflow-hidden relative group cursor-pointer rounded-full shadow-md bg-gradient-to-b from-blue-50 to-blue-100 border-4 border-white outline outline-2 outline-blue-100"
+                        onClick={() => {
+                          const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
+                          fileInput?.click();
+                        }}
+                      >
+                        <img id="teacher-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
+                        <div id="teacher-photo-placeholder" className="w-full h-full flex items-center justify-center">
+                          <User className="h-12 w-12 text-blue-300/60" />
+                        </div>
+                        
+                        {/* Upload indicator overlay bij hover */}
+                        <div className="absolute inset-0 bg-blue-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
+                          <div className="bg-white/90 rounded-full p-2.5 shadow-md">
+                            <Upload className="h-5 w-5 text-primary" />
+                          </div>
+                        </div>
+                        
+                        {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
+                        <div 
+                          className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden rounded-full"
+                          id="photo-delete-overlay"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                            const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                            const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                            const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
+                            
+                            if (photoPreview && photoPlaceholder && fileInput && photoDeleteOverlay) {
+                              photoPreview.src = '';
+                              photoPreview.classList.add('hidden');
+                              photoPlaceholder.classList.remove('hidden');
+                              photoDeleteOverlay.classList.add('hidden');
+                              fileInput.value = '';
+                            }
+                          }}
+                        >
+                          <div className="bg-white/90 rounded-full p-2.5 shadow-md">
+                            <Trash2 className="h-5 w-5 text-red-500" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 bg-primary rounded-full p-2 shadow-lg ring-2 ring-white">
+                        <Camera className="h-4 w-4 text-white" />
+                      </div>
+                    </div>
+                    
+                    <input 
+                      type="file" 
+                      id="teacher-photo" 
+                      accept="image/*" 
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = function(event) {
+                            const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                            const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                            const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                            
+                            if (photoPreview && photoPlaceholder && photoDeleteOverlay && event.target?.result) {
+                              photoPreview.src = event.target.result as string;
+                              photoPreview.classList.remove('hidden');
+                              photoPlaceholder.classList.add('hidden');
+                              photoDeleteOverlay.classList.remove('hidden');
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex items-center h-9 border border-gray-200 text-sm shadow-sm hover:bg-blue-50"
+                    onClick={() => {
+                      // Simulate loading teacher ID data
+                      toast({
+                        title: "eID detectie",
+                        description: "Zoeken naar eID-kaartlezer...",
+                      });
+                      
+                      // Simulate eID detection
+                      setTimeout(() => {
+                        toast({
+                          title: "eID gedetecteerd",
+                          description: "Gegevens worden geladen van de identiteitskaart...",
+                        });
+                        
+                        // Simulate loading eID data after 2 seconds
+                        setTimeout(() => {
+                          // Mock eID data
+                          const eidData = {
+                            firstName: "Jan",
+                            lastName: "de Vries",
+                            birthDate: "1985-08-15",
+                            gender: "Mannelijk",
+                            street: "Leidseplein",
+                            houseNumber: "12",
+                            postalCode: "1017PT",
+                            city: "Amsterdam",
+                            photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID"
+                          };
+                          
+                          // Simulate loading photo from eID
+                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                          const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                          
+                          if (photoPreview && photoPlaceholder && photoDeleteOverlay) {
+                            photoPreview.src = eidData.photoUrl;
+                            photoPreview.classList.remove('hidden');
+                            photoPlaceholder.classList.add('hidden');
+                            photoDeleteOverlay.classList.remove('hidden');
+                          }
+                          
+                          // Fill the form with eID data
+                          setNewTeacher({
+                            ...newTeacher,
+                            firstName: eidData.firstName,
+                            lastName: eidData.lastName,
+                            dateOfBirth: eidData.birthDate,
+                            gender: eidData.gender === "Mannelijk" ? "man" : "vrouw",
+                            street: eidData.street,
+                            houseNumber: eidData.houseNumber,
+                            postalCode: eidData.postalCode,
+                            city: eidData.city
+                          });
+                          
+                          // Add a message that the data was loaded
+                          toast({
+                            title: "Gegevens geladen",
+                            description: "De gegevens van de eID zijn succesvol ingeladen.",
+                          });
+                        }, 2000);
+                      }, 1500);
+                    }}
+                  >
+                    <span className="mr-2 bg-[#77CC9A] text-white rounded-md px-1 font-bold text-xs py-0.5">be|ID</span>
+                    Gegevens laden via eID
+                  </Button>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName" className="text-xs">Voornaam *</Label>

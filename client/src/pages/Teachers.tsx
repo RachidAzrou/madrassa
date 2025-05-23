@@ -422,9 +422,15 @@ const Teachers = () => {
         </div>
         
         {/* Teachers Table */}
-        <div className="rounded-md border overflow-hidden">
+        <div className="bg-white rounded-md border shadow-sm overflow-hidden">
+          <div className="bg-gray-50 px-4 py-3 border-b flex items-center">
+            <div className="h-6 w-6 rounded-full bg-[#1e3a8a]/10 flex items-center justify-center mr-2">
+              <GraduationCap className="h-3.5 w-3.5 text-[#1e3a8a]" />
+            </div>
+            <h3 className="text-base font-medium text-gray-900">Alle docenten</h3>
+          </div>
           <table className="w-full text-sm">
-            <thead className="bg-gray-100 uppercase text-xs">
+            <thead className="bg-gray-50 uppercase text-xs">
               <tr>
                 <th className="py-3 px-4 font-medium text-left">
                   <Checkbox 
@@ -443,7 +449,11 @@ const Teachers = () => {
             <tbody className="divide-y">
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="py-4 text-center">Gegevens laden...</td>
+                  <td colSpan={7} className="py-8 text-center">
+                    <div className="flex justify-center items-center">
+                      <div className="w-6 h-6 border-2 border-t-primary rounded-full animate-spin"></div>
+                    </div>
+                  </td>
                 </tr>
               ) : paginatedTeachers.length > 0 ? (
                 paginatedTeachers.map((teacher) => (

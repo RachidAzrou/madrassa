@@ -533,8 +533,6 @@ export default function Guardians() {
                   </TableHead>
                   <TableHead className="py-3 font-medium">Naam</TableHead>
                   <TableHead className="py-3 font-medium">Relatie</TableHead>
-                  <TableHead className="py-3 font-medium">Contact</TableHead>
-                  <TableHead className="py-3 font-medium">Adres</TableHead>
                   <TableHead className="w-[100px] text-center py-3 font-medium">Status</TableHead>
                   <TableHead className="text-right w-[120px] py-3 font-medium">Acties</TableHead>
                 </TableRow>

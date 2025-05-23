@@ -29,7 +29,7 @@ export function DetailDialogHeader({
   onClose 
 }: DetailDialogHeaderProps) {
   return (
-    <div className="bg-blue-600 text-white px-6 py-5 rounded-t-lg">
+    <div className="bg-[#1e3a8a] text-white px-6 py-5 rounded-t-lg">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           {icon && (
@@ -60,7 +60,7 @@ export function DetailDialogHeader({
           <Button
             type="button"
             variant="ghost"
-            className="text-white hover:bg-blue-700 hover:text-white"
+            className="text-white hover:bg-[#1e3a8a]/80 hover:text-white"
             onClick={onClose}
           >
             <X className="h-4 w-4 mr-2" />

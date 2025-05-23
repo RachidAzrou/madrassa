@@ -253,10 +253,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Log de binnenkomende data voor debugging
       console.log("Received student data:", req.body);
       
-      // Genereer een nieuw studentnummer en voeg dit toe aan de data
-      const studentData = { ...req.body };
+      // Haal guardianId uit de data (indien opgegeven)
+      const { guardianId, ...studentData } = req.body;
       
-      // Als er geen studentnummer is meegegeven of als we het altijd willen overschrijven
+      // Genereer een nieuw studentnummer en voeg dit toe aan de data
       studentData.studentId = await generateNextStudentId();
       
       console.log("Gegenereerd studentnummer:", studentData.studentId);
@@ -270,6 +270,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Stuur de data door naar storage zonder verdere aanpassingen
       const newStudent = await storage.createStudent(validatedData);
+      
+      // Als er een guardianId is opgegeven, maak een student-guardian relatie
+      if (guardianId) {
+        try {
+          console.log(`Koppelen van student ${newStudent.id} aan voogd ${guardianId}`);
+          const studentGuardianData = {
+            studentId: newStudent.id,
+            guardianId: parseInt(guardianId),
+            relationshipType: 'Voogd',
+            isPrimary: true,
+            hasEmergencyContact: true,
+            notes: ''
+          };
+          
+          // Valideer de data
+          const validatedRelation = insertStudentGuardianSchema.parse(studentGuardianData);
+          
+          // Maak de relatie aan
+          await storage.createStudentGuardian(validatedRelation);
+          console.log("Student-voogd relatie succesvol aangemaakt");
+        } catch (relationError) {
+          console.error("Error creating student-guardian relation:", relationError);
+          // Relatie maken mislukt, maar student is wel aangemaakt
+          // We gaan door met de verwerking
+        }
+      }
       
       // Maak automatisch een collegegeldrecord aan voor de nieuwe student
       try {

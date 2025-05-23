@@ -177,22 +177,27 @@ export default function Students() {
 
   // Create student mutation
   const createStudentMutation = useMutation({
-    mutationFn: (data: any) => {
+    mutationFn: async (data: any) => {
+      // Maak eerst de student aan
+      let studentResponse;
+      
       // Als er een gevonden voogd is, voegen we deze toe aan de student
       if (foundGuardian && !data.id) {
-        return apiRequest('/api/students', {
+        studentResponse = await apiRequest('/api/students', {
           method: 'POST',
           body: {
             ...data,
-            guardianId: foundGuardian.id // Koppel de voogd aan de student
+            guardianId: foundGuardian.id // Stuur voogd-ID mee naar de server
           }
+        });
+      } else {
+        studentResponse = await apiRequest('/api/students', {
+          method: 'POST',
+          body: data
         });
       }
       
-      return apiRequest('/api/students', {
-        method: 'POST',
-        body: data
-      });
+      return studentResponse;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });

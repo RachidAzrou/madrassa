@@ -404,7 +404,7 @@ export default function Guardians() {
         </div>
       </div>
       
-      <div className="flex flex-wrap items-center gap-3 mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
@@ -414,7 +414,9 @@ export default function Guardians() {
               <Filter className="mr-2 h-4 w-4" />
               Filter
             </Button>
-            
+          </div>
+          
+          <div className="flex items-center gap-2">  
             <div className="relative">
               <Button 
                 variant="outline" 

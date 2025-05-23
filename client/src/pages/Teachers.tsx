@@ -807,7 +807,7 @@ const Teachers = () => {
                 <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm min-h-[600px]">
                   <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
                   
-                  {/* Foto upload sectie */}
+                  {/* Foto upload sectie met knoppen ernaast */}
                   <div className="flex mb-4 items-start">
                     <div 
                       className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-4"
@@ -873,9 +873,157 @@ const Teachers = () => {
                         }
                       }}
                     />
+                    
+                    <div className="flex flex-col gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="flex items-center border border-gray-300 h-7 text-xs"
+                        onClick={() => {
+                          // Get access to toast context within this function
+                          const localToast = toast;
+                          
+                          localToast({
+                            title: "eID detectie",
+                            description: "Zoeken naar eID-kaartlezer...",
+                          });
+                          
+                          // Simuleer eID detectie (in werkelijkheid zou dit een echte API-integratie zijn)
+                          setTimeout(() => {
+                            localToast({
+                              title: "eID gedetecteerd",
+                              description: "Gegevens worden geladen van de identiteitskaart...",
+                            });
+                            
+                            // Simuleer laden van eID gegevens na 2 seconden
+                            setTimeout(() => {
+                              // Hier zouden we de kaartgegevens verwerken
+                              // In een echte implementatie zou dit komen van de eID API
+                              const eidData = {
+                                firstName: "Ahmed",
+                                lastName: "El Khatib",
+                                birthDate: "1985-08-21",
+                                nationalRegisterNumber: "850821378914",
+                                gender: "Mannelijk",
+                                street: "Leuvensestraat",
+                                houseNumber: "12B",
+                                postalCode: "1030",
+                                city: "Schaarbeek",
+                                photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID"
+                              };
+                              
+                              // Simuleer het laden van de foto uit de eID
+                              const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                              const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                              
+                              if (photoPreview && photoPlaceholder) {
+                                photoPreview.src = eidData.photoUrl;
+                                photoPreview.classList.remove('hidden');
+                                photoPlaceholder.classList.add('hidden');
+                              }
+                              
+                              // Vul het formulier in met eID-gegevens
+                              setTeacherFormData({
+                                ...teacherFormData,
+                                firstName: eidData.firstName,
+                                lastName: eidData.lastName,
+                                dateOfBirth: eidData.birthDate,
+                                gender: eidData.gender === "Mannelijk" ? "man" : "vrouw",
+                                street: eidData.street,
+                                houseNumber: eidData.houseNumber,
+                                postalCode: eidData.postalCode,
+                                city: eidData.city
+                              });
+                              
+                              // Bericht tonen dat de gegevens zijn geladen
+                              localToast({
+                                title: "Gegevens geladen",
+                                description: "De gegevens van de eID zijn succesvol ingeladen.",
+                              });
+                            }, 2000);
+                          }, 1500);
+                        }}
+                      >
+                        <span className="mr-2 bg-[#77CC9A] text-white rounded-md px-1 font-bold text-xs py-0.5">be|ID</span>
+                        Laden via eID
+                      </Button>
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="flex items-center border border-gray-300 h-7 text-xs"
+                        onClick={() => {
+                          // Get access to toast context within this function
+                          const localToast = toast;
+                          
+                          localToast({
+                            title: "itsme® app",
+                            description: "Open de itsme® app op uw smartphone om verder te gaan...",
+                          });
+                          
+                          // Simuleer itsme detectie
+                          setTimeout(() => {
+                            localToast({
+                              title: "itsme® verbinding",
+                              description: "Verbinding gemaakt met itsme®. Gegevens worden opgehaald...",
+                            });
+                            
+                            // Simuleer laden van itsme gegevens na 2 seconden
+                            setTimeout(() => {
+                              // Hier zouden we de itsme-gegevens verwerken
+                              // In een echte implementatie zou dit komen van de itsme API
+                              const itsmeData = {
+                                firstName: "Mohamed",
+                                lastName: "Ben Ali",
+                                birthDate: "1980-03-12",
+                                nationalRegisterNumber: "80031215987",
+                                gender: "Mannelijk",
+                                street: "Antwerpsesteenweg",
+                                houseNumber: "24",
+                                postalCode: "2800",
+                                city: "Mechelen",
+                                photoUrl: "https://placehold.co/400x400/eee/FF4D27?text=Foto+itsme"
+                              };
+                              
+                              // Simuleer het laden van de foto uit itsme
+                              const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                              const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                              
+                              if (photoPreview && photoPlaceholder) {
+                                photoPreview.src = itsmeData.photoUrl;
+                                photoPreview.classList.remove('hidden');
+                                photoPlaceholder.classList.add('hidden');
+                              }
+                              
+                              // Vul het formulier in met itsme-gegevens
+                              setTeacherFormData({
+                                ...teacherFormData,
+                                firstName: itsmeData.firstName,
+                                lastName: itsmeData.lastName,
+                                dateOfBirth: itsmeData.birthDate,
+                                gender: itsmeData.gender === "Mannelijk" ? "man" : "vrouw",
+                                street: itsmeData.street,
+                                houseNumber: itsmeData.houseNumber,
+                                postalCode: itsmeData.postalCode,
+                                city: itsmeData.city
+                              });
+                              
+                              // Bericht tonen dat de gegevens zijn geladen
+                              localToast({
+                                title: "Gegevens geladen",
+                                description: "De itsme® gegevens zijn succesvol ingeladen.",
+                              });
+                            }, 2500);
+                          }, 2000);
+                        }}
+                      >
+                        <span className="mr-2 bg-[#FF4D27] text-white rounded-md px-2 font-bold text-xs py-0.5">itsme</span>
+                        Laden via itsme®
+                      </Button>
+                    </div>
                   </div>
                   
-                  <div className="flex mb-4 justify-end gap-2">
+                  <div className="hidden">
                     <Button 
                       variant="outline" 
                       size="sm"

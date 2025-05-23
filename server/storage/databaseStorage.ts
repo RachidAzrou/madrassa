@@ -424,20 +424,31 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getStudentGuardiansByGuardian(guardianId: number): Promise<any[]> {
-    // Haal student-voogd relaties op met volledige studentgegevens
-    const relations = await db.select({
-      id: studentGuardians.id,
-      studentId: studentGuardians.studentId,
-      guardianId: studentGuardians.guardianId,
-      isPrimary: studentGuardians.isPrimary,
-      relationship: studentGuardians.relationship,
-      student: students
-    })
-    .from(studentGuardians)
-    .leftJoin(students, eq(studentGuardians.studentId, students.id))
-    .where(eq(studentGuardians.guardianId, guardianId));
-    
-    return relations;
+    try {
+      // Haal student-voogd relaties op met volledige studentgegevens
+      const relations = await db.select({
+        id: studentGuardians.id,
+        studentId: studentGuardians.studentId,
+        guardianId: studentGuardians.guardianId,
+        isPrimary: studentGuardians.isPrimary,
+        relationship: studentGuardians.relationship,
+        student: {
+          id: students.id,
+          studentId: students.studentId,
+          firstName: students.firstName,
+          lastName: students.lastName,
+          status: students.status
+        }
+      })
+      .from(studentGuardians)
+      .leftJoin(students, eq(studentGuardians.studentId, students.id))
+      .where(eq(studentGuardians.guardianId, guardianId));
+      
+      return relations;
+    } catch (error) {
+      console.error("Fout bij ophalen van student-voogd relaties:", error);
+      return [];
+    }
   }
   
   async createStudentGuardian(relationData: InsertStudentGuardian): Promise<StudentGuardian> {

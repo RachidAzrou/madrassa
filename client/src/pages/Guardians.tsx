@@ -336,69 +336,83 @@ export default function Guardians() {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {searchResults.map((guardian: any) => (
-            <div 
-              key={guardian.id}
-              className="bg-white rounded-lg border shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-            >
-              <div className="p-5">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarFallback className="bg-primary text-white">
-                        {guardian.firstName.charAt(0)}{guardian.lastName.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{guardian.firstName} {guardian.lastName}</h3>
-                      <p className="text-sm text-gray-500">{getRelationshipLabel(guardian.relationship)}</p>
-                    </div>
-                  </div>
-                  
-                  {guardian.isEmergencyContact && (
-                    <Badge variant="destructive">Noodcontact</Badge>
-                  )}
-                </div>
-                
-                <div className="mt-4 space-y-2 text-sm">
-                  <div className="flex items-center text-gray-700">
-                    <Mail className="h-4 w-4 mr-2 text-gray-500" />
-                    {guardian.email}
-                  </div>
-                  
-                  {guardian.phone && (
-                    <div className="flex items-center text-gray-700">
-                      <Phone className="h-4 w-4 mr-2 text-gray-500" />
-                      {guardian.phone}
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              <div className="bg-gray-50 p-3 flex justify-end border-t gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-blue-600"
-                  onClick={() => handleShowGuardianDetails(guardian)}
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  Details
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-blue-600"
-                  onClick={() => handleEditGuardian(guardian)}
-                >
-                  <Pencil className="h-4 w-4 mr-1" />
-                  Bewerken
-                </Button>
-              </div>
-            </div>
-          ))}
+        <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-gray-700">
+                <tr className="border-b">
+                  <th className="py-3 px-4 text-left font-medium">Voogd</th>
+                  <th className="py-3 px-4 text-left font-medium">Contact</th>
+                  <th className="py-3 px-4 text-left font-medium">Relatie</th>
+                  <th className="py-3 px-4 text-left font-medium">Status</th>
+                  <th className="py-3 px-4 text-right"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {searchResults.map((guardian: any) => (
+                  <tr 
+                    key={guardian.id} 
+                    className="border-b hover:bg-gray-50"
+                  >
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="bg-primary text-white">
+                            {guardian.firstName ? guardian.firstName.charAt(0) : ''}
+                            {guardian.lastName ? guardian.lastName.charAt(0) : ''}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium">{guardian.firstName} {guardian.lastName}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center text-gray-700">
+                          <Mail className="h-4 w-4 mr-2 text-gray-500" />
+                          {guardian.email || '-'}
+                        </div>
+                        <div className="flex items-center text-gray-700">
+                          <Phone className="h-4 w-4 mr-2 text-gray-500" />
+                          {guardian.phone || '-'}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div>{getRelationshipLabel(guardian.relationship)}</div>
+                    </td>
+                    <td className="py-3 px-4">
+                      {guardian.isEmergencyContact && (
+                        <Badge variant="destructive">Noodcontact</Badge>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-blue-600"
+                          onClick={() => handleShowGuardianDetails(guardian)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-blue-600"
+                          onClick={() => handleEditGuardian(guardian)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
       

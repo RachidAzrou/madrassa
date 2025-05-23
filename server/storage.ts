@@ -1,8 +1,33 @@
-// Import Storage interface
-import { IStorage } from './storage/IStorage';
+import { users, type User, type InsertUser } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
-// Import de storage implementatie
-import { storage } from './storage/index';
+// Interface voor storage operaties
+export interface IStorage {
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(insertUser: InsertUser): Promise<User>;
+}
 
-// Exporteer de storage interface en de storage instantie
-export { storage };
+// DatabaseStorage implementatie die gebruik maakt van de database
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+}
+
+export const storage = new DatabaseStorage();

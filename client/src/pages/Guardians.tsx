@@ -1207,34 +1207,32 @@ export default function Guardians() {
                       </Select>
                     </div>
                     
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Noodcontact</Label>
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id="isEmergencyContact"
+                          name="isEmergencyContact" 
+                          checked={newGuardian.isEmergencyContact}
+                          onCheckedChange={(checked) => 
+                            setNewGuardian({...newGuardian, isEmergencyContact: !!checked})
+                          }
+                        />
+                        <Label 
+                          htmlFor="isEmergencyContact" 
+                          className="text-sm text-red-600"
+                        >
+                          Dit is een noodcontact
+                        </Label>
+                      </div>
+                      {newGuardian.isEmergencyContact && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Deze persoon zal gecontacteerd worden in geval van nood.
+                        </p>
+                      )}
+                    </div>
 
                   </div>
-                </div>
-                
-
-                
-                <div className="border rounded-lg p-4">
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id="isEmergencyContact"
-                      name="isEmergencyContact" 
-                      checked={newGuardian.isEmergencyContact}
-                      onCheckedChange={(checked) => 
-                        setNewGuardian({...newGuardian, isEmergencyContact: !!checked})
-                      }
-                    />
-                    <Label 
-                      htmlFor="isEmergencyContact" 
-                      className="font-medium text-red-600"
-                    >
-                      Dit is een noodcontact
-                    </Label>
-                  </div>
-                  {newGuardian.isEmergencyContact && (
-                    <p className="text-sm text-gray-500 mt-2">
-                      Deze persoon zal gecontacteerd worden in geval van nood.
-                    </p>
-                  )}
                 </div>
                 
                 <div className="border rounded-lg p-4">

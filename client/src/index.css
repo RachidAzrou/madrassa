@@ -60,3 +60,24 @@
     @apply h-full min-h-screen;
   }
 }
+
+/* Dialoogvenster verbeteringen */
+.dialog-large {
+  width: 95vw !important;
+  max-width: 1400px !important;
+  height: calc(100vh - 80px) !important;
+}
+
+/* Zorgt ervoor dat de dialoog content container niet scrollt */
+[role="dialog"] [data-state="open"] {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Maakt het tabblad-gedeelte scrollbaar */
+[role="tabpanel"] {
+  overflow-y: auto;
+  padding-right: 8px;
+  max-height: calc(80vh - 180px);
+}

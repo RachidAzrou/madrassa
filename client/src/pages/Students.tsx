@@ -75,6 +75,10 @@ export default function Students() {
   const [isFeeNotificationOpen, setIsFeeNotificationOpen] = useState(false);
   const [feeDetails, setFeeDetails] = useState<any>(null);
   
+  // Voogd gevonden via e-ID
+  const [foundGuardian, setFoundGuardian] = useState<any>(null);
+  const [showGuardianConfirmDialog, setShowGuardianConfirmDialog] = useState(false);
+  
   // Import dialoog state
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [importType, setImportType] = useState<'csv' | 'excel'>('excel');
@@ -1639,20 +1643,29 @@ export default function Students() {
                               city: eidData.city
                             });
                             
-                            // Voeg een extra bericht toe dat de foto ook beschikbaar is in de foto-tab
+                            // Simuleer het vinden van een bijbehorende voogd
+                            const guardianData = {
+                              id: 10,
+                              firstName: "Samir",
+                              lastName: "El Alaoui",
+                              relationship: "parent",
+                              email: "samir.elalaoui@gmail.com",
+                              phone: "0477 12 34 56",
+                              street: "Molenbeekstraat",
+                              houseNumber: "45",
+                              postalCode: "1080",
+                              city: "Brussel",
+                              isEmergencyContact: true
+                            };
+                            
+                            // Sla de gevonden voogdgegevens op voor later gebruik
+                            setFoundGuardian(guardianData);
+                            
+                            // Voeg een extra bericht toe dat de gegevens zijn ingeladen
                             localToast({
                               title: "Gegevens geladen",
-                              description: "De gegevens van de eID zijn succesvol ingeladen. De foto is ook zichtbaar in de foto-tab.",
+                              description: "De gegevens van de eID zijn succesvol ingeladen.",
                             });
-                            
-                            // Toon een visuele hint dat er ook naar de foto tab gekeken moet worden
-                            const photoTabTrigger = document.querySelector('button[value="photo"]');
-                            if (photoTabTrigger) {
-                              photoTabTrigger.classList.add('animate-pulse');
-                              setTimeout(() => {
-                                photoTabTrigger.classList.remove('animate-pulse');
-                              }, 3000);
-                            }
                           }, 2000);
                         }, 1500);
                       }}

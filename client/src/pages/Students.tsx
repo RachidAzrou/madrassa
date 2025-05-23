@@ -2483,7 +2483,7 @@ export default function Students() {
             </Tabs>
           </div>
           
-          <div className="mt-8 mb-12 flex gap-4 justify-center">
+          <div className="mt-8 mb-12 flex gap-4 justify-end pr-8">
             <Button variant="outline" size="lg" onClick={() => {
               resetForm();
               setIsCreateDialogOpen(false);

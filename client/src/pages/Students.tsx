@@ -2959,33 +2959,55 @@ export default function Students() {
 
       {/* Student Detail Dialog */}
       <Dialog open={isStudentDetailDialogOpen} onOpenChange={setIsStudentDetailDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto">
-          <DialogHeader>
-            <DialogTitle>Student Details</DialogTitle>
-            <DialogDescription>
-              Gedetailleerde informatie over {selectedStudent?.firstName} {selectedStudent?.lastName}
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto p-0">
+          {/* Blauwe header */}
+          <div className="bg-[#1e3a8a] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <User className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">
+                    {selectedStudent?.firstName} {selectedStudent?.lastName}
+                  </h2>
+                  <span className="text-sm text-blue-100 font-medium">
+                    Gedetailleerde informatie over deze student
+                  </span>
+                </div>
+              </div>
+              
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-white hover:bg-[#1e3a8a]/80 hover:text-white"
+                onClick={() => setIsStudentDetailDialogOpen(false)}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Sluiten
+              </Button>
+            </div>
+          </div>
           
           {selectedStudent && (
-            <div className="py-2">
+            <div className="px-6 py-4">
               <Tabs defaultValue="personal" className="w-full">
-                <TabsList className="grid grid-cols-4 mb-2">
-                  <TabsTrigger value="personal">
-                    <User className="mr-2 h-4 w-4" />
-                    Persoonlijk
+                <TabsList className="grid grid-cols-4 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
+                  <TabsTrigger value="personal" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                    <User className="h-4 w-4" />
+                    <span>Persoonlijk</span>
                   </TabsTrigger>
-                  <TabsTrigger value="contact">
-                    <Phone className="mr-2 h-4 w-4" />
-                    Contact
+                  <TabsTrigger value="contact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                    <Phone className="h-4 w-4" />
+                    <span>Contact</span>
                   </TabsTrigger>
-                  <TabsTrigger value="address">
-                    <MapPin className="mr-2 h-4 w-4" />
-                    Adres
+                  <TabsTrigger value="address" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                    <MapPin className="h-4 w-4" />
+                    <span>Adres</span>
                   </TabsTrigger>
-                  <TabsTrigger value="class">
-                    <ChalkBoard className="mr-2 h-4 w-4" />
-                    Klas
+                  <TabsTrigger value="class" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                    <ChalkBoard className="h-4 w-4" />
+                    <span>Klas</span>
                   </TabsTrigger>
                 </TabsList>
                 
@@ -3196,7 +3218,7 @@ export default function Students() {
                 </TabsContent>
               </Tabs>
               
-              <div className="flex justify-end gap-2 mt-6">
+              <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
                 <Button 
                   variant="outline" 
                   onClick={() => setIsStudentDetailDialogOpen(false)}
@@ -3205,6 +3227,7 @@ export default function Students() {
                 </Button>
                 <Button 
                   variant="default" 
+                  className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/80"
                   onClick={() => {
                     setIsStudentDetailDialogOpen(false);
                     handleEditStudent(selectedStudent);

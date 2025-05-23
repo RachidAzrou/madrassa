@@ -1543,7 +1543,7 @@ export default function Students() {
           
           <div className="px-6 py-4">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-4 mb-4 p-1 bg-blue-900/10 rounded-md">
+              <TabsList className="grid grid-cols-4 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
                 <TabsTrigger value="personal" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                   <User className="h-4 w-4" />
                   <span>Persoonlijk</span>

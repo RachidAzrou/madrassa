@@ -717,11 +717,8 @@ export default function Guardians() {
                   </div>
                 </div>
                 
-                <div className="flex items-center">
-                  <X 
-                    className="h-5 w-5 text-white/70 hover:text-white cursor-pointer transition-colors" 
-                    onClick={() => setSelectedGuardian(null)}
-                  />
+                <div>
+                  {/* Sluiticoon verwijderd zoals gevraagd */}
                 </div>
               </div>
             </div>

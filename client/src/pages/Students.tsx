@@ -609,8 +609,15 @@ export default function Students() {
       return;
     }
 
-    // Als er een voogd is gevonden via e-ID, toon dan de bevestigingsdialoog
-    if (foundGuardian && !studentFormData.id) {
+    // Als er een noodcontact is gevonden via e-ID, toon dan de bevestigingsdialoog
+    // Dit wordt alleen getoond als de gebruiker op "Student toevoegen" klikt
+    if (foundGuardian && foundGuardian.phone && foundGuardian.phone.startsWith('+') && !studentFormData.id) {
+      setShowGuardianConfirmDialog(true);
+      return;
+    }
+    
+    // Als er een reguliere voogd is gevonden (niet een noodcontact), toon dan ook de bevestigingsdialoog
+    if (foundGuardian && !foundGuardian.phone?.startsWith('+') && !studentFormData.id) {
       setShowGuardianConfirmDialog(true);
       return;
     }
@@ -1689,7 +1696,7 @@ export default function Students() {
                               // Toon bericht dat er een noodcontactnummer is gedetecteerd
                               localToast({
                                 title: "Noodcontact gedetecteerd",
-                                description: `Noodcontactnummer ${eidData.emergencyContactPhone} gevonden op eID.`,
+                                description: `Noodcontactnummer ${eidData.emergencyContactPhone} gevonden op eID. Vul het formulier verder in en klik op "Student toevoegen" om het noodcontact te kunnen koppelen.`,
                               });
                               
                               // Maak een tijdelijke voogd met het noodcontactnummer (nog niet opslaan in database)
@@ -1709,8 +1716,8 @@ export default function Students() {
                               // Sla de tijdelijke voogd op zodat deze in de popup getoond kan worden
                               setFoundGuardian(newGuardian);
                               
-                              // Toon de popup met het voorgestelde noodcontact
-                              setShowGuardianConfirmDialog(true);
+                              // Wacht met tonen van de popup tot de gebruiker op "Student toevoegen" klikt
+                              // De popup wordt nu niet direct getoond, maar pas bij het submitten van het formulier
                             } else {
                               // Zoek naar mogelijke voogden met dezelfde achternaam (als fallback)
                               const lastName = eidData.lastName;

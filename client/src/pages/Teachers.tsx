@@ -1137,6 +1137,16 @@ const Teachers = () => {
               <TabsContent value="professional" className="space-y-3">
                 <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
+                    <Label htmlFor="profession" className="text-xs">Beroep</Label>
+                    <Input 
+                      id="profession" 
+                      className="h-9" 
+                      value={newTeacher.profession} 
+                      onChange={(e) => setNewTeacher({...newTeacher, profession: e.target.value})} 
+                    />
+                  </div>
+                
+                  <div className="space-y-2">
                     <Label className="text-xs">Opleidingen</Label>
                     <div className="flex flex-wrap gap-2">
                       {newTeacher.educations.map((education, index) => (
@@ -1174,16 +1184,6 @@ const Teachers = () => {
                         <Button type="submit" size="sm" className="h-9">Toevoegen</Button>
                       </form>
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="profession" className="text-xs">Beroep</Label>
-                    <Input 
-                      id="profession" 
-                      className="h-9" 
-                      value={newTeacher.profession} 
-                      onChange={(e) => setNewTeacher({...newTeacher, profession: e.target.value})} 
-                    />
                   </div>
 
                   <div className="space-y-2">

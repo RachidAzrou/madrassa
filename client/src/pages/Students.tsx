@@ -1597,16 +1597,6 @@ export default function Students() {
                   </span>
                 </div>
               </div>
-              
-              <Button
-                type="button"
-                variant="ghost"
-                className="text-white hover:bg-[#1e3a8a]/80 hover:text-white"
-                onClick={() => setIsCreateDialogOpen(false)}
-              >
-                <X className="h-4 w-4 mr-2" />
-                Sluiten
-              </Button>
             </div>
           </div>
           

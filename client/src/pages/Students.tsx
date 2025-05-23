@@ -3228,30 +3228,31 @@ export default function Students() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  {/* Bij noodcontacten tonen we geen persoonsnaam */}
+                  {/* Bij noodcontacten tonen we alleen het telefoonnummer en een badge */}
                   {(foundGuardian?.phone && foundGuardian?.phone.startsWith('+')) ? (
-                    <h3 className="font-medium text-red-600">Noodcontactnummer gedetecteerd</h3>
+                    <div className="flex items-center mb-1">
+                      <Phone className="h-5 w-5 mr-2 text-red-600" />
+                      <span className="font-medium text-red-600">{foundGuardian?.phone}</span>
+                      <Badge className="ml-2 bg-red-600 text-white">Noodgeval</Badge>
+                    </div>
                   ) : (
                     <h3 className="font-medium">
                       {foundGuardian?.firstName} {foundGuardian?.lastName}
                     </h3>
                   )}
                   
-                  <p className="text-sm text-gray-600 mt-0.5">
-                    {foundGuardian?.relationship === 'noodcontact' ? 'Noodcontact' :
-                    foundGuardian?.relationship === 'parent' ? 'Ouder' : 
-                    foundGuardian?.relationship === 'guardian' ? 'Voogd' : 'Contactpersoon'}
-                  </p>
+                  {/* Bij noodcontacten tonen we geen relatietype */}
+                  {!(foundGuardian?.phone && foundGuardian?.phone.startsWith('+')) && (
+                    <p className="text-sm text-gray-600 mt-0.5">
+                      {foundGuardian?.relationship === 'noodcontact' ? 'Noodcontact' :
+                      foundGuardian?.relationship === 'parent' ? 'Ouder' : 
+                      foundGuardian?.relationship === 'guardian' ? 'Voogd' : 'Contactpersoon'}
+                    </p>
+                  )}
                   
                   <div className="mt-2 text-sm">
-                    {/* Bij noodcontacten tonen we alleen relevante informatie */}
-                    {(foundGuardian?.phone && foundGuardian?.phone.startsWith('+')) ? (
-                      <div className="flex items-center mt-1">
-                        <Phone className="h-4 w-4 mr-2 text-red-600" />
-                        <span className="font-medium">{foundGuardian?.phone}</span>
-                        <Badge className="ml-2 bg-red-600 text-white text-xs">Noodgeval</Badge>
-                      </div>
-                    ) : (
+                    {/* Bij noodcontacten tonen we geen verdere informatie */}
+                    {!(foundGuardian?.phone && foundGuardian?.phone.startsWith('+')) && (
                       <>
                         {foundGuardian?.email && (
                           <div className="flex items-center mt-1">

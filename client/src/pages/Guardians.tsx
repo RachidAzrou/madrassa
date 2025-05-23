@@ -858,15 +858,10 @@ export default function Guardians() {
                   </div>
                 </div>
                 
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="text-white hover:bg-blue-700 hover:text-white"
-                  onClick={() => setSelectedStudent(null)}
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Sluiten
-                </Button>
+                <X 
+                  className="h-6 w-6 text-white/80 hover:text-white cursor-pointer" 
+                  onClick={() => setSelectedStudent(null)} 
+                />
               </div>
             </div>
 

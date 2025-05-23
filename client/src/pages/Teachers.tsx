@@ -873,76 +873,157 @@ const Teachers = () => {
                     />
                   </div>
 
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="flex items-center h-9 border border-gray-200 text-sm shadow-sm hover:bg-blue-50"
-                    onClick={() => {
-                      // Simulate loading teacher ID data
-                      toast({
-                        title: "eID detectie",
-                        description: "Zoeken naar eID-kaartlezer...",
-                      });
-                      
-                      // Simulate eID detection
-                      setTimeout(() => {
+                  <div className="flex flex-col gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex items-center h-9 border border-gray-200 text-sm shadow-sm hover:bg-blue-50"
+                      onClick={() => {
+                        // Simulate loading teacher ID data
                         toast({
-                          title: "eID gedetecteerd",
-                          description: "Gegevens worden geladen van de identiteitskaart...",
+                          title: "eID detectie",
+                          description: "Zoeken naar eID-kaartlezer...",
                         });
                         
-                        // Simulate loading eID data after 2 seconds
+                        // Simulate eID detection
                         setTimeout(() => {
-                          // Mock eID data
-                          const eidData = {
-                            firstName: "Jan",
-                            lastName: "de Vries",
-                            birthDate: "1985-08-15",
-                            gender: "Mannelijk",
-                            street: "Leidseplein",
-                            houseNumber: "12",
-                            postalCode: "1017PT",
-                            city: "Amsterdam",
-                            photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID"
-                          };
-                          
-                          // Simulate loading photo from eID
-                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
-                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
-                          const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
-                          
-                          if (photoPreview && photoPlaceholder && photoDeleteOverlay) {
-                            photoPreview.src = eidData.photoUrl;
-                            photoPreview.classList.remove('hidden');
-                            photoPlaceholder.classList.add('hidden');
-                            photoDeleteOverlay.classList.remove('hidden');
-                          }
-                          
-                          // Fill the form with eID data
-                          setNewTeacher({
-                            ...newTeacher,
-                            firstName: eidData.firstName,
-                            lastName: eidData.lastName,
-                            dateOfBirth: eidData.birthDate,
-                            gender: eidData.gender === "Mannelijk" ? "man" : "vrouw",
-                            street: eidData.street,
-                            houseNumber: eidData.houseNumber,
-                            postalCode: eidData.postalCode,
-                            city: eidData.city
-                          });
-                          
-                          // Add a message that the data was loaded
                           toast({
-                            title: "Gegevens geladen",
-                            description: "De gegevens van de eID zijn succesvol ingeladen.",
+                            title: "eID gedetecteerd",
+                            description: "Gegevens worden geladen van de identiteitskaart...",
                           });
-                        }, 2000);
-                      }, 1500);
-                    }}
-                  >
-                    <span className="mr-2 bg-[#77CC9A] text-white rounded-md px-1 font-bold text-xs py-0.5">be|ID</span>
-                    Gegevens laden via eID
-                  </Button>
+                          
+                          // Simulate loading eID data after 2 seconds
+                          setTimeout(() => {
+                            // Mock eID data
+                            const eidData = {
+                              firstName: "Jan",
+                              lastName: "de Vries",
+                              birthDate: "1985-08-15",
+                              gender: "Mannelijk",
+                              street: "Leidseplein",
+                              houseNumber: "12",
+                              postalCode: "1017PT",
+                              city: "Amsterdam",
+                              photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID"
+                            };
+                            
+                            // Simulate loading photo from eID
+                            const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                            const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                            const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                            
+                            if (photoPreview && photoPlaceholder && photoDeleteOverlay) {
+                              photoPreview.src = eidData.photoUrl;
+                              photoPreview.classList.remove('hidden');
+                              photoPlaceholder.classList.add('hidden');
+                              photoDeleteOverlay.classList.remove('hidden');
+                            }
+                            
+                            // Fill the form with eID data
+                            setNewTeacher({
+                              ...newTeacher,
+                              firstName: eidData.firstName,
+                              lastName: eidData.lastName,
+                              dateOfBirth: eidData.birthDate,
+                              gender: eidData.gender === "Mannelijk" ? "man" : "vrouw",
+                              street: eidData.street,
+                              houseNumber: eidData.houseNumber,
+                              postalCode: eidData.postalCode,
+                              city: eidData.city
+                            });
+                            
+                            // Add a message that the data was loaded
+                            toast({
+                              title: "Gegevens geladen",
+                              description: "De gegevens van de eID zijn succesvol ingeladen.",
+                            });
+                          }, 2000);
+                        }, 1500);
+                      }}
+                    >
+                      <span className="mr-2 bg-[#77CC9A] text-white rounded-md px-1 font-bold text-xs py-0.5">be|ID</span>
+                      Gegevens laden via eID
+                    </Button>
+
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex items-center h-9 border border-gray-200 text-sm shadow-sm hover:bg-blue-50"
+                      onClick={() => {
+                        // Simulate itsme authentication
+                        toast({
+                          title: "itsme authenticatie",
+                          description: "Opening itsme app op uw mobiele apparaat...",
+                        });
+                        
+                        // Simulate itsme connection
+                        setTimeout(() => {
+                          toast({
+                            title: "itsme verbonden",
+                            description: "Identiteit wordt geverifieerd...",
+                          });
+                          
+                          // Simulate loading itsme data after 2 seconds
+                          setTimeout(() => {
+                            // Mock itsme data
+                            const itsmeData = {
+                              firstName: "Mohammed",
+                              lastName: "Youssef",
+                              birthDate: "1982-04-22",
+                              gender: "Mannelijk",
+                              email: "mohammed.youssef@example.com",
+                              phone: "+32470123456",
+                              street: "Brusselstraat",
+                              houseNumber: "45",
+                              postalCode: "1000",
+                              city: "Brussel",
+                              photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+itsme"
+                            };
+                            
+                            // Simulate loading photo from itsme
+                            const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                            const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                            const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                            
+                            if (photoPreview && photoPlaceholder && photoDeleteOverlay) {
+                              photoPreview.src = itsmeData.photoUrl;
+                              photoPreview.classList.remove('hidden');
+                              photoPlaceholder.classList.add('hidden');
+                              photoDeleteOverlay.classList.remove('hidden');
+                            }
+                            
+                            // Fill the form with itsme data
+                            setNewTeacher({
+                              ...newTeacher,
+                              firstName: itsmeData.firstName,
+                              lastName: itsmeData.lastName,
+                              dateOfBirth: itsmeData.birthDate,
+                              gender: itsmeData.gender === "Mannelijk" ? "man" : "vrouw",
+                              email: itsmeData.email,
+                              phone: itsmeData.phone,
+                              street: itsmeData.street,
+                              houseNumber: itsmeData.houseNumber,
+                              postalCode: itsmeData.postalCode,
+                              city: itsmeData.city
+                            });
+                            
+                            // Add a message that the data was loaded
+                            toast({
+                              title: "Gegevens geladen",
+                              description: "De gegevens van itsme zijn succesvol ingeladen.",
+                            });
+                          }, 2000);
+                        }, 1500);
+                      }}
+                    >
+                      <img 
+                        src="/src/assets/itsme_logo.svg" 
+                        alt="itsme" 
+                        className="h-5 mr-2"
+                      />
+                      Inloggen met itsme
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

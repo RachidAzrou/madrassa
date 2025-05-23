@@ -1582,7 +1582,7 @@ export default function Students() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
           {/* Blauwe header */}
-          <div className="bg-[#1e3a8a] text-white px-6 py-5 rounded-t-lg">
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -3250,7 +3250,7 @@ export default function Students() {
       <Dialog open={isStudentDetailDialogOpen} onOpenChange={setIsStudentDetailDialogOpen}>
         <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto p-0">
           {/* Blauwe header */}
-          <div className="bg-[#1e3a8a] text-white px-6 py-5 rounded-t-lg">
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">

@@ -9,7 +9,7 @@ export const students = pgTable("students", {
   studentId: text("student_id").notNull().unique(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
-  email: text("email").notNull().unique(),
+  email: text("email").unique(), // Maak email optioneel maar wel uniek
   phone: text("phone"),
   dateOfBirth: date("date_of_birth"), // Terugzetten naar date type
   address: text("address"), // Oude adresveld (behouden voor compatibiliteit)

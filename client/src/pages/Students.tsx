@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StudentEmptyState } from '@/components/ui/empty-states';
 import * as XLSX from 'xlsx';
@@ -7,7 +7,8 @@ import {
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle, Check,
   ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
   Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, CreditCard, AlertCircle,
-  FileUp, Upload, FilePlus2, FileSpreadsheet, Image, School, UserRound, Camera, CheckSquare, SquareSlash
+  FileUp, Upload, FilePlus2, FileSpreadsheet, Image, School, UserRound, Camera, CheckSquare, SquareSlash,
+  UserCheck, CalendarDays, Hash, Save
 } from 'lucide-react';
 
 // Aangepast ChalkboardTeacher icoon
@@ -55,8 +56,8 @@ import { apiRequest } from '@/lib/queryClient';
 import { formatDateToDisplayFormat } from '@/lib/utils';
 
 export default function Students() {
-  const queryClient = useQueryClient();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [page, setPage] = useState(1);
@@ -75,6 +76,11 @@ export default function Students() {
   const [isFeeNotificationOpen, setIsFeeNotificationOpen] = useState(false);
   const [feeDetails, setFeeDetails] = useState<any>(null);
   
+  // State voor voogd-gerelateerde dialogen
+  const [foundGuardian, setFoundGuardian] = useState<any>(null);
+  const [showGuardianConfirmDialog, setShowGuardianConfirmDialog] = useState(false); 
+  const [showGuardianFormDialog, setShowGuardianFormDialog] = useState(false);
+  
   // Import dialoog state
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [importType, setImportType] = useState<'csv' | 'excel'>('excel');
@@ -83,6 +89,17 @@ export default function Students() {
   const [importColumns, setImportColumns] = useState<string[]>([]);
   const [columnMappings, setColumnMappings] = useState<{[key: string]: string}>({});
   const [isImporting, setIsImporting] = useState(false);
+  
+  // Functie om huidige datum in YYYY-MM-DD formaat te krijgen
+  const getCurrentDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  
+  // Dit is een commentaar om de dubbele declaratie te vervangen
   
   // State voor het studentformulier
   const [studentFormData, setStudentFormData] = useState({
@@ -101,7 +118,7 @@ export default function Students() {
     yearLevel: '',
     schoolYear: '' as string | null,
     studentGroupId: null as number | null,
-    enrollmentDate: '',
+    enrollmentDate: getCurrentDate(), // Huidige datum als standaard
     status: 'active' as string,
     notes: '',
     gender: '' as string,
@@ -112,6 +129,25 @@ export default function Students() {
     programId: number;
     yearLevel: string;
   }[]>([]);
+
+  // State voor voogd formulier data
+  const [guardianFormData, setGuardianFormData] = useState({
+    firstName: '',
+    lastName: '',
+    relationship: 'ouder',
+    email: '',
+    phone: '',
+    address: '',
+    street: '',
+    houseNumber: '',
+    postalCode: '',
+    city: '',
+    isEmergencyContact: false,
+    emergencyContactName: '',
+    emergencyContactPhone: '',
+    emergencyContactRelation: '',
+    notes: ''
+  });
 
   // Statusopties voor dropdown
   const statusOptions = [
@@ -145,6 +181,30 @@ export default function Students() {
   });
 
   // Ophalen studenten
+  // Effect om voogden formulier te resetten wanneer het dialoog opent
+  useEffect(() => {
+    if (isCreateDialogOpen) {
+      setGuardianFormData({
+        firstName: '',
+        lastName: '',
+        relationship: 'ouder',
+        email: '',
+        phone: '',
+        address: '',
+        street: '',
+        houseNumber: '',
+        postalCode: '',
+        city: '',
+        isEmergencyContact: false,
+        emergencyContactName: '',
+        emergencyContactPhone: '',
+        emergencyContactRelation: '',
+        notes: ''
+      });
+      setFoundGuardian(null);
+    }
+  }, [isCreateDialogOpen]);
+
   const { data: studentsData = {}, isLoading } = useQuery({
     queryKey: ['/api/students', { 
       page, 
@@ -163,14 +223,65 @@ export default function Students() {
 
   // Create student mutation
   const createStudentMutation = useMutation({
-    mutationFn: (data: any) => {
-      return apiRequest('/api/students', {
+    mutationFn: async (data: any) => {
+      // Maak eerst de student aan
+      const studentResponse = await apiRequest('/api/students', {
         method: 'POST',
         body: data
       });
+      
+      // Check of er voogd gegevens zijn ingevuld
+      const hasGuardianData = guardianFormData.firstName.trim() || 
+                              guardianFormData.lastName.trim() || 
+                              guardianFormData.email.trim() || 
+                              guardianFormData.phone.trim();
+      
+      if (hasGuardianData) {
+        // Maak de voogd aan
+        const guardianResponse = await apiRequest('/api/guardians', {
+          method: 'POST',
+          body: {
+            firstName: guardianFormData.firstName,
+            lastName: guardianFormData.lastName,
+            relationship: guardianFormData.relationship,
+            email: guardianFormData.email,
+            phone: guardianFormData.phone,
+            address: guardianFormData.address,
+            street: guardianFormData.street,
+            houseNumber: guardianFormData.houseNumber,
+            postalCode: guardianFormData.postalCode,
+            city: guardianFormData.city,
+            isEmergencyContact: guardianFormData.isEmergencyContact,
+            emergencyContactName: guardianFormData.emergencyContactName,
+            emergencyContactPhone: guardianFormData.emergencyContactPhone,
+            emergencyContactRelation: guardianFormData.emergencyContactRelation,
+            notes: guardianFormData.notes
+          }
+        });
+        
+        // Koppel de voogd aan de student
+        await apiRequest('/api/student-guardians', {
+          method: 'POST',
+          body: {
+            studentId: studentResponse.id,
+            guardianId: guardianResponse.id
+          }
+        });
+      }
+      
+      return studentResponse;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      // Invalideer ook de voogdgegevens als er een voogd was gekoppeld
+      if (foundGuardian) {
+        queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
+        // Reset de gevonden voogd
+        setFoundGuardian(null);
+        setShowGuardianConfirmDialog(false);
+      }
+      
       resetForm();
       setIsCreateDialogOpen(false);
       
@@ -188,9 +299,13 @@ export default function Students() {
         setIsFeeNotificationOpen(true);
       } else {
         // Fallback bericht als er geen betalingsrecord is gemaakt
+        const description = foundGuardian 
+          ? "De student is succesvol toegevoegd en gekoppeld aan een voogd."
+          : "De student is succesvol toegevoegd.";
+        
         toast({
           title: "Student toegevoegd",
-          description: "De student is succesvol toegevoegd.",
+          description: description,
         });
       }
     },
@@ -547,7 +662,7 @@ export default function Students() {
       yearLevel: '',
       schoolYear: '',
       studentGroupId: null,
-      enrollmentDate: '',
+      enrollmentDate: getCurrentDate(), // Huidige datum als standaard
       status: 'enrolled',
       notes: '',
       gender: '',
@@ -560,6 +675,19 @@ export default function Students() {
     // Validatie
     if (!studentFormData.firstName || !studentFormData.lastName) {
       alert('Vul alstublieft voornaam en achternaam in');
+      return;
+    }
+
+    // Als er een noodcontact is gevonden via e-ID, toon dan de bevestigingsdialoog
+    // Dit wordt alleen getoond als de gebruiker op "Student toevoegen" klikt
+    if (foundGuardian && foundGuardian.phone && foundGuardian.phone.startsWith('+') && !studentFormData.id) {
+      setShowGuardianConfirmDialog(true);
+      return;
+    }
+    
+    // Als er een reguliere voogd is gevonden (niet een noodcontact), toon dan ook de bevestigingsdialoog
+    if (foundGuardian && !foundGuardian.phone?.startsWith('+') && !studentFormData.id) {
+      setShowGuardianConfirmDialog(true);
       return;
     }
 
@@ -1184,12 +1312,12 @@ export default function Students() {
                     aria-label="Selecteer alle studenten"
                   />
                 </th>
-                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>
-                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Naam</th>
-                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klas</th>
-                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Schooljaar</th>
-                <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STUDENT ID</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NAAM</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KLAS</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SCHOOLJAAR</th>
+                <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS</th>
+                <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -1218,7 +1346,7 @@ export default function Students() {
                 </tr>
               ) : (
                 (Array.isArray(studentsData) ? studentsData : []).map((student: any) => (
-                  <tr key={student.id} className="hover:bg-gray-50">
+                  <tr key={student.id} className="group hover:bg-gray-50">
                     <td className="px-3 py-4 whitespace-nowrap">
                       <Checkbox 
                         checked={selectedStudents.includes(student.id)}
@@ -1251,27 +1379,27 @@ export default function Students() {
                       {renderStatusBadge(student.status)}
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap text-right text-sm">
-                      <div className="flex justify-end gap-1">
+                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button 
                           variant="ghost" 
-                          size="icon"
-                          className="h-7 w-7"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                           onClick={() => handleViewStudentDetails(student)}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button 
                           variant="ghost" 
-                          size="icon"
-                          className="h-7 w-7"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
                           onClick={() => handleEditStudent(student)}
                         >
-                          <Edit className="h-4 w-4" />
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         <Button 
                           variant="ghost" 
-                          size="icon"
-                          className="h-7 w-7"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
                           onClick={() => {
                             setSelectedStudent(student);
                             setIsDeleteDialogOpen(true);
@@ -1326,27 +1454,27 @@ export default function Students() {
                     
                     <div className="flex items-center">
                       {renderStatusBadge(student.status)}
-                      <div className="flex ml-2">
+                      <div className="flex ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                           onClick={() => handleViewStudentDetails(student)}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
                           onClick={() => handleEditStudent(student)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
                           onClick={() => {
                             setSelectedStudent(student);
                             setIsDeleteDialogOpen(true);
@@ -1452,118 +1580,138 @@ export default function Students() {
 
       {/* Create Student Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold flex items-center text-primary">
-              <PlusCircle className="mr-2 h-5 w-5 text-primary" />
-              Nieuwe Student Toevoegen
-            </DialogTitle>
-            <DialogDescription>
-              Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
+          {/* Blauwe header */}
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <PlusCircle className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">
+                    Nieuwe Student Toevoegen
+                  </h2>
+                  <span className="text-sm text-blue-100 font-medium">
+                    Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
           
-          <div className="py-2">
+          <div className="px-6 py-4">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-4 mb-2">
-                <TabsTrigger value="personal">
-                  <User className="mr-2 h-4 w-4" />
-                  Persoonlijk
+              <TabsList className="grid grid-cols-5 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
+                <TabsTrigger value="personal" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <User className="h-4 w-4" />
+                  <span>Persoonlijk</span>
                 </TabsTrigger>
-                <TabsTrigger value="contact">
-                  <Phone className="mr-2 h-4 w-4" />
-                  Contact
+                <TabsTrigger value="contact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <Phone className="h-4 w-4" />
+                  <span>Contact</span>
                 </TabsTrigger>
-                <TabsTrigger value="address">
-                  <MapPin className="mr-2 h-4 w-4" />
-                  Adres
+                <TabsTrigger value="address" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <MapPin className="h-4 w-4" />
+                  <span>Adres</span>
                 </TabsTrigger>
-                <TabsTrigger value="class">
-                  <ChalkBoard className="mr-2 h-4 w-4" />
-                  Klas
+                <TabsTrigger value="class" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <ChalkBoard className="h-4 w-4" />
+                  <span>Klas</span>
+                </TabsTrigger>
+                <TabsTrigger value="guardian" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <UserCheck className="h-4 w-4" />
+                  <span>Voogden</span>
                 </TabsTrigger>
               </TabsList>
               
-
-              
               {/* Persoonlijke informatie tab */}
-              <TabsContent value="personal" className="space-y-3">
-                <div className="p-3 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-base font-semibold text-primary mb-1">Persoonlijke gegevens</h3>
-                  
-                  {/* Foto upload sectie */}
-                  <div className="flex mb-0 mt-0 items-start">
-                    <div 
-                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-4"
-                      onClick={() => {
-                        const fileInput = document.getElementById('student-photo') as HTMLInputElement;
-                        fileInput?.click();
-                      }}
-                    >
-                      <img id="student-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
-                      <div id="student-photo-placeholder" className="w-full h-full flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-full">
-                        <User className="h-10 w-10 text-gray-300" />
-                        <div className="absolute bottom-0 right-0 bg-[#1e3a8a] rounded-full p-1.5 shadow-sm">
-                          <Upload className="h-3.5 w-3.5 text-white" />
+              <TabsContent value="personal" className="mt-0">
+                <div className="p-4 bg-white rounded-lg min-h-[450px]">
+                  <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-4">
+                    {/* Foto upload sectie */}
+                    <div className="flex items-start">
+                      <div className="relative">
+                        <div 
+                          className="w-28 h-28 flex items-center justify-center overflow-hidden relative group cursor-pointer rounded-full shadow-md bg-gradient-to-b from-blue-50 to-blue-100 border-4 border-white outline outline-2 outline-blue-100"
+                          onClick={() => {
+                            const fileInput = document.getElementById('student-photo') as HTMLInputElement;
+                            fileInput?.click();
+                          }}
+                        >
+                          <img id="student-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
+                          <div id="student-photo-placeholder" className="w-full h-full flex items-center justify-center">
+                            <User className="h-12 w-12 text-blue-300/60" />
+                          </div>
+                          
+                          {/* Upload indicator overlay bij hover */}
+                          <div className="absolute inset-0 bg-blue-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
+                            <div className="bg-white/90 rounded-full p-2.5 shadow-md">
+                              <Upload className="h-5 w-5 text-primary" />
+                            </div>
+                          </div>
+                          
+                          {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
+                          <div 
+                            className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden rounded-full"
+                            id="photo-delete-overlay"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
+                              const photoPlaceholder = document.getElementById('student-photo-placeholder');
+                              const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                              const fileInput = document.getElementById('student-photo') as HTMLInputElement;
+                              
+                              if (photoPreview && photoPlaceholder && fileInput && photoDeleteOverlay) {
+                                photoPreview.src = '';
+                                photoPreview.classList.add('hidden');
+                                photoPlaceholder.classList.remove('hidden');
+                                photoDeleteOverlay.classList.add('hidden');
+                                fileInput.value = '';
+                              }
+                            }}
+                          >
+                            <div className="bg-white/90 rounded-full p-2.5 shadow-md">
+                              <Trash2 className="h-5 w-5 text-red-500" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 bg-primary rounded-full p-2 shadow-lg ring-2 ring-white">
+                          <Camera className="h-4 w-4 text-white" />
                         </div>
                       </div>
                       
-                      {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
-                      <div 
-                        className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden"
-                        id="photo-delete-overlay"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
-                          const photoPlaceholder = document.getElementById('student-photo-placeholder');
-                          const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
-                          const fileInput = document.getElementById('student-photo') as HTMLInputElement;
-                          
-                          if (photoPreview && photoPlaceholder && fileInput && photoDeleteOverlay) {
-                            photoPreview.src = '';
-                            photoPreview.classList.add('hidden');
-                            photoPlaceholder.classList.remove('hidden');
-                            photoDeleteOverlay.classList.add('hidden');
-                            fileInput.value = '';
+                      <input 
+                        type="file" 
+                        id="student-photo" 
+                        accept="image/*" 
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function(event) {
+                              const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
+                              const photoPlaceholder = document.getElementById('student-photo-placeholder');
+                              const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                              
+                              if (photoPreview && photoPlaceholder && photoDeleteOverlay && event.target?.result) {
+                                photoPreview.src = event.target.result as string;
+                                photoPreview.classList.remove('hidden');
+                                photoPlaceholder.classList.add('hidden');
+                                photoDeleteOverlay.classList.remove('hidden');
+                              }
+                            };
+                            reader.readAsDataURL(file);
                           }
                         }}
-                      >
-                        <Trash2 className="h-6 w-6 text-white" />
-                      </div>
+                      />
                     </div>
                     
-                    <input 
-                      type="file" 
-                      id="student-photo" 
-                      accept="image/*" 
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = function(event) {
-                            const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
-                            const photoPlaceholder = document.getElementById('student-photo-placeholder');
-                            const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
-                            
-                            if (photoPreview && photoPlaceholder && photoDeleteOverlay && event.target?.result) {
-                              photoPreview.src = event.target.result as string;
-                              photoPreview.classList.remove('hidden');
-                              photoPlaceholder.classList.add('hidden');
-                              photoDeleteOverlay.classList.remove('hidden');
-                            }
-                          };
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                    />
-                  </div>
-                  
-                  <div className="flex mt-0 mb-0 justify-end">
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="flex items-center border border-gray-300 text-xs h-7"
+                      className="flex items-center h-9 border border-gray-200 text-sm shadow-sm hover:bg-blue-50"
                       onClick={() => {
                         // Get access to toast context within this function
                         const localToast = toast;
@@ -1594,7 +1742,9 @@ export default function Students() {
                               houseNumber: "45",
                               postalCode: "1080",
                               city: "Brussel",
-                              photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID"
+                              photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID",
+                              // Nieuw veld voor noodcontactnummer
+                              emergencyContactPhone: "+32 487 65 43 21"
                             };
                             
                             // Simuleer het laden van de foto uit de eID
@@ -1621,20 +1771,83 @@ export default function Students() {
                               city: eidData.city
                             });
                             
-                            // Voeg een extra bericht toe dat de foto ook beschikbaar is in de foto-tab
+                            // Controleer of er een noodcontactnummer is gedetecteerd in de eID
+                            if (eidData.emergencyContactPhone) {
+                              // Toon bericht dat er een noodcontactnummer is gedetecteerd
+                              localToast({
+                                title: "Noodcontact gedetecteerd",
+                                description: `Noodcontactnummer ${eidData.emergencyContactPhone} gevonden op eID. Vul het formulier verder in en klik op "Student toevoegen" om het noodcontact te kunnen koppelen.`,
+                              });
+                              
+                              // Maak een tijdelijke voogd met het noodcontactnummer (nog niet opslaan in database)
+                              const newGuardian = {
+                                firstName: "", // Leeg, moet ingevuld worden
+                                lastName: eidData.lastName, // Zelfde achternaam als student
+                                relationship: "noodcontact",
+                                email: "",
+                                phone: eidData.emergencyContactPhone, // Gebruik het noodcontactnummer
+                                street: eidData.street,
+                                houseNumber: eidData.houseNumber,
+                                postalCode: eidData.postalCode,
+                                city: eidData.city,
+                                isEmergencyContact: true
+                              };
+                              
+                              // Vul ook de voogden tab in met het gedetecteerde noodcontact
+                              setGuardianFormData({
+                                firstName: "",
+                                lastName: eidData.lastName,
+                                relationship: "noodcontact",
+                                email: "",
+                                phone: eidData.emergencyContactPhone,
+                                address: "",
+                                street: eidData.street,
+                                houseNumber: eidData.houseNumber,
+                                postalCode: eidData.postalCode,
+                                city: eidData.city,
+                                isEmergencyContact: true,
+                                emergencyContactName: "",
+                                emergencyContactPhone: "",
+                                emergencyContactRelation: "",
+                                notes: ""
+                              });
+                              
+                              // Sla de tijdelijke voogd op zodat deze in de popup getoond kan worden
+                              setFoundGuardian(newGuardian);
+                              
+                              // Wacht met tonen van de popup tot de gebruiker op "Student toevoegen" klikt
+                              // De popup wordt nu niet direct getoond, maar pas bij het submitten van het formulier
+                            } else {
+                              // Zoek naar mogelijke voogden met dezelfde achternaam (als fallback)
+                              const lastName = eidData.lastName;
+                              
+                              // Haal de guardians data op (als dat er is)
+                              apiRequest(`/api/guardians/search?lastName=${encodeURIComponent(lastName)}`)
+                                .then((matchingGuardians) => {
+                                  if (matchingGuardians && matchingGuardians.length > 0) {
+                                    // Neem de eerste gevonden voogd met dezelfde achternaam
+                                    setFoundGuardian(matchingGuardians[0]);
+                                    
+                                    // Toon bericht dat er een mogelijke voogd is gevonden
+                                    localToast({
+                                      title: "Mogelijke voogd gevonden",
+                                      description: `${matchingGuardians[0].firstName} ${matchingGuardians[0].lastName} is gevonden als mogelijke voogd.`,
+                                    });
+                                    
+                                    // Toon het bevestigingsdialoog
+                                    setShowGuardianConfirmDialog(true);
+                                  }
+                                })
+                                .catch(error => {
+                                  console.error("Fout bij zoeken naar voogden:", error);
+                                });
+                            }
+                            
+                            // Voeg een extra bericht toe dat de gegevens zijn ingeladen
                             localToast({
                               title: "Gegevens geladen",
-                              description: "De gegevens van de eID zijn succesvol ingeladen. De foto is ook zichtbaar in de foto-tab.",
+                              description: "De gegevens van de eID zijn succesvol ingeladen.",
                             });
-                            
-                            // Toon een visuele hint dat er ook naar de foto tab gekeken moet worden
-                            const photoTabTrigger = document.querySelector('button[value="photo"]');
-                            if (photoTabTrigger) {
-                              photoTabTrigger.classList.add('animate-pulse');
-                              setTimeout(() => {
-                                photoTabTrigger.classList.remove('animate-pulse');
-                              }, 3000);
-                            }
                           }, 2000);
                         }, 1500);
                       }}
@@ -1643,7 +1856,8 @@ export default function Students() {
                       Gegevens laden via eID
                     </Button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
                     <div>
                       <Label htmlFor="studentId" className="text-xs font-medium text-gray-700">
                         StudentID <span className="text-muted-foreground text-xs">(automatisch)</span>
@@ -1652,7 +1866,7 @@ export default function Students() {
                         id="studentId"
                         value={nextStudentIdData?.nextStudentId || "Wordt geladen..."}
                         disabled
-                        className="mt-0.5 h-8 text-sm bg-gray-100 text-gray-500 font-medium"
+                        className="mt-1 h-9 text-sm bg-gray-50 text-gray-500 font-medium border-gray-200"
                       />
                     </div>
                     
@@ -1664,11 +1878,32 @@ export default function Students() {
                         value={studentFormData.status}
                         onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
                       >
-                        <SelectTrigger id="status" className="mt-0.5 h-8 text-sm bg-white">
+                        <SelectTrigger id="status" className="mt-1 h-9 text-sm bg-white border-gray-200">
                           <SelectValue placeholder="Selecteer status" />
                         </SelectTrigger>
                         <SelectContent>
                           {statusOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="gender" className="text-xs font-medium text-gray-700">
+                        Geslacht
+                      </Label>
+                      <Select
+                        value={studentFormData.gender}
+                        onValueChange={(value) => setStudentFormData({ ...studentFormData, gender: value })}
+                      >
+                        <SelectTrigger id="gender" className="mt-1 h-9 text-sm bg-white border-gray-200">
+                          <SelectValue placeholder="Selecteer geslacht" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {genderOptions.map(option => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>
@@ -1685,7 +1920,7 @@ export default function Students() {
                         id="firstName"
                         value={studentFormData.firstName}
                         onChange={(e) => setStudentFormData({ ...studentFormData, firstName: e.target.value })}
-                        className="mt-0.5 h-8 text-sm bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="Voornaam"
                       />
                     </div>
@@ -1698,34 +1933,13 @@ export default function Students() {
                         id="lastName"
                         value={studentFormData.lastName}
                         onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
-                        className="mt-0.5 h-8 text-sm bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="Achternaam"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
-                        Geslacht
-                      </Label>
-                      <Select
-                        value={studentFormData.gender}
-                        onValueChange={(value) => setStudentFormData({ ...studentFormData, gender: value })}
-                      >
-                        <SelectTrigger id="gender" className="mt-1 bg-white">
-                          <SelectValue placeholder="Selecteer geslacht" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {genderOptions.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">
                         Geboortedatum
                       </Label>
                       <Input
@@ -1733,21 +1947,21 @@ export default function Students() {
                         type="date"
                         value={studentFormData.dateOfBirth || ''}
                         onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                       />
                     </div>
                     
-                    <div className="md:col-span-2">
-                      <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
+                    <div className="md:col-span-3">
+                      <Label htmlFor="notes" className="text-xs font-medium text-gray-700">
                         Notities
                       </Label>
                       <Textarea
                         id="notes"
                         value={studentFormData.notes}
                         onChange={(e) => setStudentFormData({ ...studentFormData, notes: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 text-sm bg-white border-gray-200"
                         placeholder="Voeg hier aanvullende informatie toe..."
-                        rows={4}
+                        rows={3}
                       />
                     </div>
                   </div>
@@ -1755,12 +1969,11 @@ export default function Students() {
               </TabsContent>
               
               {/* Contact informatie tab */}
-              <TabsContent value="contact" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TabsContent value="contact" className="mt-0">
+                <div className="p-4 bg-white rounded-lg min-h-[450px]">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="email" className="text-xs font-medium text-gray-700">
                         Email
                       </Label>
                       <Input
@@ -1768,26 +1981,26 @@ export default function Students() {
                         type="email"
                         value={studentFormData.email}
                         onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="student@mymadrassa.nl"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="phone" className="text-xs font-medium text-gray-700">
                         Telefoonnummer
                       </Label>
                       <Input
                         id="phone"
                         value={studentFormData.phone}
                         onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="06 1234 5678"
                       />
                     </div>
                     
-                    <div className="md:col-span-2">
-                      <Label htmlFor="enrollmentDate" className="text-sm font-medium text-gray-700">
+                    <div>
+                      <Label htmlFor="enrollmentDate" className="text-xs font-medium text-gray-700">
                         Inschrijvingsdatum
                       </Label>
                       <Input
@@ -1795,7 +2008,7 @@ export default function Students() {
                         type="date"
                         value={studentFormData.enrollmentDate}
                         onChange={(e) => setStudentFormData({ ...studentFormData, enrollmentDate: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                       />
                     </div>
                   </div>
@@ -1803,58 +2016,57 @@ export default function Students() {
               </TabsContent>
               
               {/* Adres informatie tab */}
-              <TabsContent value="address" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TabsContent value="address" className="mt-0">
+                <div className="p-4 bg-white rounded-lg min-h-[450px]">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="street" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="street" className="text-xs font-medium text-gray-700">
                         Straat
                       </Label>
                       <Input
                         id="street"
                         value={studentFormData.street}
                         onChange={(e) => setStudentFormData({ ...studentFormData, street: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="Straatnaam"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="houseNumber" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="houseNumber" className="text-xs font-medium text-gray-700">
                         Huisnummer
                       </Label>
                       <Input
                         id="houseNumber"
                         value={studentFormData.houseNumber}
                         onChange={(e) => setStudentFormData({ ...studentFormData, houseNumber: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="123"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="postalCode" className="text-xs font-medium text-gray-700">
                         Postcode
                       </Label>
                       <Input
                         id="postalCode"
                         value={studentFormData.postalCode}
                         onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="1234 AB"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="city" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="city" className="text-xs font-medium text-gray-700">
                         Stad
                       </Label>
                       <Input
                         id="city"
                         value={studentFormData.city}
                         onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="Amsterdam"
                       />
                     </div>
@@ -1862,95 +2074,289 @@ export default function Students() {
                 </div>
               </TabsContent>
               
+              {/* Voogden tab */}
+              <TabsContent value="guardian" className="mt-0">
+                <div className="p-4 bg-white rounded-lg min-h-[450px]">
+                  
+                  {/* Persoonlijke informatie sectie */}
+                  <div className="mb-6">
+                    <div className="flex items-center mb-3">
+                      <User className="h-4 w-4 text-primary mr-2" />
+                      <h4 className="text-sm font-medium text-gray-800">Persoonlijke informatie</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor="guardian-firstName" className="text-xs font-medium text-gray-700">
+                          Voornaam
+                        </Label>
+                        <Input
+                          id="guardian-firstName"
+                          value={guardianFormData.firstName}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, firstName: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Voornaam voogd"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="guardian-lastName" className="text-xs font-medium text-gray-700">
+                          Achternaam
+                        </Label>
+                        <Input
+                          id="guardian-lastName"
+                          value={guardianFormData.lastName}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, lastName: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Achternaam voogd"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="guardian-relationship" className="text-xs font-medium text-gray-700">
+                          Relatie tot student
+                        </Label>
+                        <Select
+                          value={guardianFormData.relationship}
+                          onValueChange={(value) => setGuardianFormData({ ...guardianFormData, relationship: value })}
+                        >
+                          <SelectTrigger id="guardian-relationship" className="mt-1 h-9 text-sm bg-white border-gray-200">
+                            <SelectValue placeholder="Selecteer relatie" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ouder">Ouder</SelectItem>
+                            <SelectItem value="voogd">Voogd</SelectItem>
+                            <SelectItem value="grootouder">Grootouder</SelectItem>
+                            <SelectItem value="noodcontact">Noodcontact</SelectItem>
+                            <SelectItem value="ander">Ander</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Contactgegevens sectie */}
+                  <div className="mb-6">
+                    <div className="flex items-center mb-3">
+                      <Phone className="h-4 w-4 text-primary mr-2" />
+                      <h4 className="text-sm font-medium text-gray-800">Contactgegevens</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="guardian-email" className="text-xs font-medium text-gray-700">
+                          Email
+                        </Label>
+                        <Input
+                          id="guardian-email"
+                          type="email"
+                          value={guardianFormData.email}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, email: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="email@voorbeeld.nl"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="guardian-phone" className="text-xs font-medium text-gray-700">
+                          Telefoonnummer
+                        </Label>
+                        <Input
+                          id="guardian-phone"
+                          value={guardianFormData.phone}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, phone: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="06 1234 5678"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Adresgegevens sectie */}
+                  <div className="mb-6">
+                    <div className="flex items-center mb-3">
+                      <MapPin className="h-4 w-4 text-primary mr-2" />
+                      <h4 className="text-sm font-medium text-gray-800">Adresgegevens</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="md:col-span-2">
+                        <Label htmlFor="guardian-street" className="text-xs font-medium text-gray-700">
+                          Straat
+                        </Label>
+                        <Input
+                          id="guardian-street"
+                          value={guardianFormData.street}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, street: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Straatnaam"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="guardian-houseNumber" className="text-xs font-medium text-gray-700">
+                          Huisnummer
+                        </Label>
+                        <Input
+                          id="guardian-houseNumber"
+                          value={guardianFormData.houseNumber}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, houseNumber: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="123"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="guardian-postalCode" className="text-xs font-medium text-gray-700">
+                          Postcode
+                        </Label>
+                        <Input
+                          id="guardian-postalCode"
+                          value={guardianFormData.postalCode}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, postalCode: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="1234 AB"
+                        />
+                      </div>
+                      
+                      <div className="md:col-span-2">
+                        <Label htmlFor="guardian-city" className="text-xs font-medium text-gray-700">
+                          Stad
+                        </Label>
+                        <Input
+                          id="guardian-city"
+                          value={guardianFormData.city}
+                          onChange={(e) => setGuardianFormData({ ...guardianFormData, city: e.target.value })}
+                          className="mt-1 h-9 text-sm bg-white border-gray-200"
+                          placeholder="Amsterdam"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Noodcontact sectie */}
+                  <div className="mb-4">
+                    <div className="flex items-center mb-3">
+                      <AlertCircle className="h-4 w-4 text-primary mr-2" />
+                      <h4 className="text-sm font-medium text-gray-800">Noodcontact</h4>
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-md border">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="guardian-isEmergencyContact"
+                          checked={guardianFormData.isEmergencyContact}
+                          onCheckedChange={(checked) => setGuardianFormData({ 
+                            ...guardianFormData, 
+                            isEmergencyContact: checked as boolean 
+                          })}
+                        />
+                        <Label htmlFor="guardian-isEmergencyContact" className="text-sm font-medium text-gray-700">
+                          Deze voogd is het primaire noodcontact
+                        </Label>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Vink aan als deze voogd het eerste contactpersoon moet zijn in noodsituaties.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Notities sectie */}
+                  <div>
+                    <div className="flex items-center mb-3">
+                      <FileText className="h-4 w-4 text-primary mr-2" />
+                      <h4 className="text-sm font-medium text-gray-800">Aanvullende informatie</h4>
+                    </div>
+                    <div>
+                      <Label htmlFor="guardian-notes" className="text-xs font-medium text-gray-700">
+                        Notities
+                      </Label>
+                      <Input
+                        id="guardian-notes"
+                        value={guardianFormData.notes}
+                        onChange={(e) => setGuardianFormData({ ...guardianFormData, notes: e.target.value })}
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
+                        placeholder="Aanvullende informatie over deze voogd..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
               {/* Klas toewijzing tab */}
-              <TabsContent value="class" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-primary">Klas Toewijzing</h3>
+              <TabsContent value="class" className="mt-0">
+                <div className="p-4 bg-white rounded-lg min-h-[450px]">
+                  <div className="flex justify-between items-center mb-2">
                     {studentFormData.studentGroupId && (
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
+                      <Badge variant="outline" className="bg-blue-50 text-primary border-blue-100 font-medium py-1">
+                        <Check className="h-3.5 w-3.5 mr-1" />
                         Klas toegewezen
                       </Badge>
                     )}
                   </div>
-                  <div className="space-y-6">
-                    <p className="text-sm text-gray-500">
-                      Wijs de student toe aan een klas. Een student kan maar in één klas zitten.
-                    </p>
-                    
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="schoolYear" className="text-sm font-medium text-gray-700">
-                            Schooljaar <span className="text-primary">*</span>
-                          </Label>
-                          <div className="mt-1">
-                            <Select
-                              value={studentFormData.schoolYear || 'geen'}
-                              onValueChange={(value) => setStudentFormData({ 
-                                ...studentFormData, 
-                                schoolYear: value === 'geen' ? '' : value
-                              })}
-                            >
-                              <SelectTrigger className="border-gray-200 bg-white h-9">
-                                <SelectValue placeholder="Selecteer schooljaar" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="geen">Selecteer schooljaar</SelectItem>
-                                <SelectItem value="2024-2025">2024-2025</SelectItem>
-                                <SelectItem value="2025-2026">2025-2026</SelectItem>
-                                <SelectItem value="2026-2027">2026-2027</SelectItem>
-                                <SelectItem value="2027-2028">2027-2028</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="studentGroupId" className="text-sm font-medium text-gray-700">
-                            Selecteer klas
-                          </Label>
-                          <div className="mt-1">
-                            <Select
-                              value={studentFormData.studentGroupId?.toString() || 'none'}
-                              onValueChange={(value) => setStudentFormData({ 
-                                ...studentFormData, 
-                                studentGroupId: value === 'none' ? null : parseInt(value) 
-                              })}
-                            >
-                              <SelectTrigger className="border-gray-200 bg-white h-9">
-                                <SelectValue placeholder="Selecteer klas" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="none">Geen klas</SelectItem>
-                                {studentGroups.map((group: any) => (
-                                  <SelectItem key={group.id} value={group.id.toString()}>
-                                    {group.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                    <div>
+                      <Label htmlFor="schoolYear" className="text-xs font-medium text-gray-700">
+                        Schooljaar <span className="text-primary">*</span>
+                      </Label>
+                      <Select
+                        value={studentFormData.schoolYear || 'geen'}
+                        onValueChange={(value) => setStudentFormData({ 
+                          ...studentFormData, 
+                          schoolYear: value === 'geen' ? '' : value
+                        })}
+                      >
+                        <SelectTrigger className="border-gray-200 bg-white h-9 mt-1 text-sm">
+                          <SelectValue placeholder="Selecteer schooljaar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="geen">Selecteer schooljaar</SelectItem>
+                          <SelectItem value="2024-2025">2024-2025</SelectItem>
+                          <SelectItem value="2025-2026">2025-2026</SelectItem>
+                          <SelectItem value="2026-2027">2026-2027</SelectItem>
+                          <SelectItem value="2027-2028">2027-2028</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     
-                    {studentFormData.studentGroupId && (
-                      <div className="flex items-center p-4 mt-4 rounded-md bg-blue-50 border border-blue-100">
-                        <div className="mr-4 p-2 bg-primary rounded-full">
-                          <Users className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-primary">
-                            {studentGroups.find((g: any) => g.id === studentFormData.studentGroupId)?.name}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            De student wordt toegewezen aan deze klas
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                    <div>
+                      <Label htmlFor="studentGroupId" className="text-xs font-medium text-gray-700">
+                        Selecteer klas
+                      </Label>
+                      <Select
+                        value={studentFormData.studentGroupId?.toString() || 'none'}
+                        onValueChange={(value) => setStudentFormData({ 
+                          ...studentFormData, 
+                          studentGroupId: value === 'none' ? null : parseInt(value) 
+                        })}
+                      >
+                        <SelectTrigger className="border-gray-200 bg-white h-9 mt-1 text-sm">
+                          <SelectValue placeholder="Selecteer klas" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Geen klas</SelectItem>
+                          {studentGroups.map((group: any) => (
+                            <SelectItem key={group.id} value={group.id.toString()}>
+                              {group.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
+                  
+                  {studentFormData.studentGroupId && (
+                    <div className="flex items-center p-3 mt-4 rounded-md bg-blue-50 border border-blue-100">
+                      <div className="mr-3 p-2 bg-primary rounded-full">
+                        <Users className="h-4 w-4 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-primary">
+                          {studentGroups.find((g: any) => g.id === studentFormData.studentGroupId)?.name}
+                        </h4>
+                        <p className="text-xs text-gray-600">
+                          De student wordt toegewezen aan deze klas
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
               
@@ -2077,8 +2483,8 @@ export default function Students() {
             </Tabs>
           </div>
           
-          <DialogFooter>
-            <Button variant="outline" onClick={() => {
+          <div className="mt-8 mb-12 flex gap-4 justify-end pr-8">
+            <Button variant="outline" size="lg" onClick={() => {
               resetForm();
               setIsCreateDialogOpen(false);
             }}>
@@ -2086,15 +2492,19 @@ export default function Students() {
             </Button>
             <Button 
               type="submit" 
+              size="lg"
+              className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
               onClick={handleCreateStudent}
               disabled={createStudentMutation.isPending}
             >
-              {createStudentMutation.isPending && (
+              {createStudentMutation.isPending ? (
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></div>
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
               )}
               Student toevoegen
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -2840,158 +3250,265 @@ export default function Students() {
 
       {/* Student Detail Dialog */}
       <Dialog open={isStudentDetailDialogOpen} onOpenChange={setIsStudentDetailDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto">
-          <DialogHeader>
-            <DialogTitle>Student Details</DialogTitle>
-            <DialogDescription>
-              Gedetailleerde informatie over {selectedStudent?.firstName} {selectedStudent?.lastName}
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto p-0">
+          {/* Blauwe header */}
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <User className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-semibold text-white">
+                    {selectedStudent?.firstName} {selectedStudent?.lastName}
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-blue-100 font-medium">
+                    Gedetailleerde informatie over deze student
+                  </DialogDescription>
+                </div>
+              </div>
+              
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-white hover:bg-[#1e3a8a]/80 hover:text-white"
+                onClick={() => setIsStudentDetailDialogOpen(false)}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Sluiten
+              </Button>
+            </div>
+          </div>
           
           {selectedStudent && (
-            <div className="py-2">
+            <div className="px-6 py-4">
               <Tabs defaultValue="personal" className="w-full">
-                <TabsList className="grid grid-cols-4 mb-2">
-                  <TabsTrigger value="personal">
-                    <User className="mr-2 h-4 w-4" />
-                    Persoonlijk
+                <TabsList className="grid grid-cols-5 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
+                  <TabsTrigger value="personal" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-2">
+                    <User className="h-4 w-4" />
+                    <span>Persoonlijk</span>
                   </TabsTrigger>
-                  <TabsTrigger value="contact">
-                    <Phone className="mr-2 h-4 w-4" />
-                    Contact
+                  <TabsTrigger value="contact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-2">
+                    <Phone className="h-4 w-4" />
+                    <span>Contact</span>
                   </TabsTrigger>
-                  <TabsTrigger value="address">
-                    <MapPin className="mr-2 h-4 w-4" />
-                    Adres
+                  <TabsTrigger value="address" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-2">
+                    <MapPin className="h-4 w-4" />
+                    <span>Adres</span>
                   </TabsTrigger>
-                  <TabsTrigger value="class">
-                    <ChalkBoard className="mr-2 h-4 w-4" />
-                    Klas
+                  <TabsTrigger value="class" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-2">
+                    <ChalkBoard className="h-4 w-4" />
+                    <span>Klas</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="guardians" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-2">
+                    <Users className="h-4 w-4" />
+                    <span>Voogden</span>
                   </TabsTrigger>
                 </TabsList>
                 
                 {/* Persoonlijke informatie tab */}
-                <TabsContent value="personal" className="pt-2">
-                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                      <div className="md:col-span-2 flex">
-                        <div className="mr-4">
-                          <Avatar className="h-16 w-16">
-                            <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
-                              {selectedStudent.firstName[0]}{selectedStudent.lastName[0]}
-                            </AvatarFallback>
-                          </Avatar>
+                <TabsContent value="personal" className="pt-0">
+                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[#1e3a8a] rounded-full">
+                          <User className="h-5 w-5 text-white" />
                         </div>
+                        <h3 className="text-lg font-semibold text-[#1e3a8a]">Persoonlijke gegevens</h3>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6 space-y-6">
+                      {/* Profiel sectie */}
+                      <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                        <Avatar className="h-16 w-16 ring-2 ring-[#1e3a8a]/20">
+                          <AvatarFallback className="bg-[#1e3a8a] text-white text-xl">
+                            {selectedStudent.firstName[0]}{selectedStudent.lastName[0]}
+                          </AvatarFallback>
+                        </Avatar>
                         <div>
-                          <h2 className="text-xl font-semibold mb-1">
+                          <h2 className="text-xl font-semibold text-gray-900 mb-1">
                             {selectedStudent.firstName} {selectedStudent.lastName}
                           </h2>
-                          <p className="text-gray-600">{selectedStudent.studentId}</p>
-                          <div className="mt-2">
+                          <p className="text-[#1e3a8a] font-medium mb-2">{selectedStudent.studentId}</p>
+                          <div>
                             {renderStatusBadge(selectedStudent.status)}
                           </div>
                         </div>
                       </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                      <div className="md:col-span-1">
-                        <p className="text-sm font-medium text-gray-700">Geboortedatum</p>
-                        <p className="mt-1">{selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "Niet ingevuld"}</p>
+
+                      {/* Basis informatie */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <CalendarDays className="h-4 w-4" />
+                            Geboortedatum
+                          </label>
+                          <p className="text-gray-900 font-medium bg-gray-50 px-3 py-2 rounded-md">
+                            {selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "Niet ingevuld"}
+                          </p>
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            Geslacht
+                          </label>
+                          <p className="text-gray-900 font-medium bg-gray-50 px-3 py-2 rounded-md">
+                            {selectedStudent.gender === 'man' ? 'Man' : 
+                             selectedStudent.gender === 'vrouw' ? 'Vrouw' : 'Niet ingevuld'}
+                          </p>
+                        </div>
                       </div>
-                      <div className="md:col-span-1">
-                        <p className="text-sm font-medium text-gray-700">Geslacht</p>
-                        <p className="mt-1">
-                          {selectedStudent.gender === 'man' ? 'Man' : 
-                           selectedStudent.gender === 'vrouw' ? 'Vrouw' : 'Niet ingevuld'}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Notities</p>
-                        <p className="mt-1 whitespace-pre-wrap">{selectedStudent.notes || "Geen notities"}</p>
+                      
+                      {/* Notities sectie */}
+                      <div className="space-y-3">
+                        <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Notities
+                        </label>
+                        <div className="bg-gray-50 border rounded-md p-4 min-h-[80px]">
+                          <p className="text-gray-900 whitespace-pre-wrap">
+                            {selectedStudent.notes || "Geen notities beschikbaar"}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </TabsContent>
                 
                 {/* Contact tab */}
-                <TabsContent value="contact" className="pt-2">
-                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
+                <TabsContent value="contact" className="pt-0">
+                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[#1e3a8a] rounded-full">
+                          <Phone className="h-5 w-5 text-white" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-[#1e3a8a]">Contactgegevens</h3>
+                      </div>
+                    </div>
                     
-                    <div className="grid grid-cols-1 gap-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Email</p>
-                          <p className="mt-1 flex items-center">
-                            <Mail className="h-4 w-4 mr-2 text-gray-500" />
-                            {selectedStudent.email || "Niet ingevuld"}
-                          </p>
+                    <div className="p-6 space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <Mail className="h-4 w-4" />
+                            Email adres
+                          </label>
+                          <div className="bg-gray-50 border rounded-md px-3 py-2">
+                            <p className="text-gray-900 font-medium">
+                              {selectedStudent.email || "Niet ingevuld"}
+                            </p>
+                          </div>
                         </div>
                         
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Telefoonnummer</p>
-                          <p className="mt-1 flex items-center">
-                            <Phone className="h-4 w-4 mr-2 text-gray-500" />
-                            {selectedStudent.phone || "Niet ingevuld"}
-                          </p>
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <Phone className="h-4 w-4" />
+                            Telefoonnummer
+                          </label>
+                          <div className="bg-gray-50 border rounded-md px-3 py-2">
+                            <p className="text-gray-900 font-medium">
+                              {selectedStudent.phone || "Niet ingevuld"}
+                            </p>
+                          </div>
                         </div>
                       </div>
                       
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Inschrijvingsdatum</p>
-                        <p className="mt-1">
-                          {selectedStudent.enrollmentDate 
-                            ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) 
-                            : "Niet ingevuld"}
-                        </p>
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                          <CalendarDays className="h-4 w-4" />
+                          Inschrijvingsdatum
+                        </label>
+                        <div className="bg-gray-50 border rounded-md px-3 py-2">
+                          <p className="text-gray-900 font-medium">
+                            {selectedStudent.enrollmentDate 
+                              ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) 
+                              : "Niet ingevuld"}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </TabsContent>
                 
                 {/* Adres tab */}
-                <TabsContent value="address" className="pt-2">
-                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
+                <TabsContent value="address" className="pt-0">
+                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[#1e3a8a] rounded-full">
+                          <MapPin className="h-5 w-5 text-white" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-[#1e3a8a]">Adresgegevens</h3>
+                      </div>
+                    </div>
                     
-                    <div className="grid grid-cols-1 gap-6">
-                      <div className="flex items-start">
-                        <MapPin className="h-5 w-5 mr-2 mt-0.5 text-gray-500" />
-                        <div>
-                          <p className="font-medium">
-                            {selectedStudent.street} {selectedStudent.houseNumber}
-                          </p>
-                          <p className="text-gray-600">
-                            {selectedStudent.postalCode} {selectedStudent.city}
-                          </p>
+                    <div className="p-6 space-y-6">
+                      {/* Volledig adres */}
+                      <div className="bg-gray-50 border rounded-lg p-4">
+                        <div className="flex items-start gap-3">
+                          <MapPin className="h-5 w-5 text-[#1e3a8a] mt-0.5" />
+                          <div>
+                            <p className="font-semibold text-gray-900 text-lg">
+                              {selectedStudent.street} {selectedStudent.houseNumber}
+                            </p>
+                            <p className="text-gray-600 text-base">
+                              {selectedStudent.postalCode} {selectedStudent.city}
+                            </p>
+                          </div>
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Straat</p>
-                          <p className="mt-1">{selectedStudent.street || "Niet ingevuld"}</p>
+                      {/* Gedetailleerde adres informatie */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <Home className="h-4 w-4" />
+                            Straatnaam
+                          </label>
+                          <div className="bg-gray-50 border rounded-md px-3 py-2">
+                            <p className="text-gray-900 font-medium">
+                              {selectedStudent.street || "Niet ingevuld"}
+                            </p>
+                          </div>
                         </div>
                         
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Huisnummer</p>
-                          <p className="mt-1">{selectedStudent.houseNumber || "Niet ingevuld"}</p>
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <Home className="h-4 w-4" />
+                            Huisnummer
+                          </label>
+                          <div className="bg-gray-50 border rounded-md px-3 py-2">
+                            <p className="text-gray-900 font-medium">
+                              {selectedStudent.houseNumber || "Niet ingevuld"}
+                            </p>
+                          </div>
                         </div>
                         
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Postcode</p>
-                          <p className="mt-1">{selectedStudent.postalCode || "Niet ingevuld"}</p>
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <Mail className="h-4 w-4" />
+                            Postcode
+                          </label>
+                          <div className="bg-gray-50 border rounded-md px-3 py-2">
+                            <p className="text-gray-900 font-medium">
+                              {selectedStudent.postalCode || "Niet ingevuld"}
+                            </p>
+                          </div>
                         </div>
                         
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Stad</p>
-                          <p className="mt-1">{selectedStudent.city || "Niet ingevuld"}</p>
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <MapPin className="h-4 w-4" />
+                            Stad
+                          </label>
+                          <div className="bg-gray-50 border rounded-md px-3 py-2">
+                            <p className="text-gray-900 font-medium">
+                              {selectedStudent.city || "Niet ingevuld"}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -3075,9 +3592,30 @@ export default function Students() {
                     )}
                   </div>
                 </TabsContent>
+                
+                {/* Voogden tab */}
+                <TabsContent value="guardians" className="pt-0">
+                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[#1e3a8a] rounded-full">
+                          <Users className="h-5 w-5 text-white" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-[#1e3a8a]">Voogden & Contactpersonen</h3>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6">
+                      <ManageStudentGuardians 
+                        studentId={selectedStudent.id}
+                        readonly={true}
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
               </Tabs>
               
-              <div className="flex justify-end gap-2 mt-6">
+              <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
                 <Button 
                   variant="outline" 
                   onClick={() => setIsStudentDetailDialogOpen(false)}
@@ -3086,6 +3624,7 @@ export default function Students() {
                 </Button>
                 <Button 
                   variant="default" 
+                  className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/80"
                   onClick={() => {
                     setIsStudentDetailDialogOpen(false);
                     handleEditStudent(selectedStudent);
@@ -3097,6 +3636,310 @@ export default function Students() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Guardian Confirmation Dialog */}
+      <Dialog open={showGuardianConfirmDialog} onOpenChange={setShowGuardianConfirmDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader className="pb-3 border-b">
+            <DialogTitle className="text-xl font-semibold flex items-center text-primary">
+              <div className="bg-blue-100 rounded-full p-1.5 mr-3">
+                {foundGuardian?.phone && foundGuardian?.phone.startsWith('+') ? 
+                  <AlertCircle className="h-5 w-5 text-primary" /> : 
+                  <UserCheck className="h-5 w-5 text-primary" />
+                }
+              </div>
+              {foundGuardian?.phone && foundGuardian?.phone.startsWith('+') ? 
+                'Noodcontact gedetecteerd' : 
+                'Voogd gevonden'
+              }
+            </DialogTitle>
+            <DialogDescription className="text-gray-500 mt-1">
+              {foundGuardian?.phone && foundGuardian?.phone.startsWith('+') ? 
+                `Er is een noodcontactnummer (${foundGuardian?.phone}) gedetecteerd op de eID. Wilt u dit nummer koppelen als contactpersoon?` : 
+                'Er is een voogd gevonden met dezelfde achternaam. Wilt u deze koppelen aan de student?'
+              }
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <div className="p-4 border rounded-lg bg-blue-50">
+              <div className="flex items-start">
+                <Avatar className="h-10 w-10 mr-3">
+                  <AvatarFallback className="bg-primary text-white">
+                    {foundGuardian?.firstName?.[0]}{foundGuardian?.lastName?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  {/* Bij noodcontacten tonen we alleen het telefoonnummer en een badge */}
+                  {(foundGuardian?.phone && foundGuardian?.phone.startsWith('+')) ? (
+                    <div className="flex items-center mb-1">
+                      <Phone className="h-5 w-5 mr-2 text-red-600" />
+                      <span className="font-medium text-red-600">{foundGuardian?.phone}</span>
+                      <Badge className="ml-2 bg-red-600 text-white">Noodgeval</Badge>
+                    </div>
+                  ) : (
+                    <h3 className="font-medium">
+                      {foundGuardian?.firstName} {foundGuardian?.lastName}
+                    </h3>
+                  )}
+                  
+                  {/* Bij noodcontacten tonen we geen relatietype */}
+                  {!(foundGuardian?.phone && foundGuardian?.phone.startsWith('+')) && (
+                    <p className="text-sm text-gray-600 mt-0.5">
+                      {foundGuardian?.relationship === 'noodcontact' ? 'Noodcontact' :
+                      foundGuardian?.relationship === 'parent' ? 'Ouder' : 
+                      foundGuardian?.relationship === 'guardian' ? 'Voogd' : 'Contactpersoon'}
+                    </p>
+                  )}
+                  
+                  <div className="mt-2 text-sm">
+                    {/* Bij noodcontacten tonen we geen verdere informatie */}
+                    {!(foundGuardian?.phone && foundGuardian?.phone.startsWith('+')) && (
+                      <>
+                        {foundGuardian?.email && (
+                          <div className="flex items-center mt-1">
+                            <Mail className="h-4 w-4 mr-2 text-gray-500" />
+                            <span>{foundGuardian?.email}</span>
+                          </div>
+                        )}
+                        {foundGuardian?.phone && (
+                          <div className="flex items-center mt-1">
+                            <Phone className="h-4 w-4 mr-2 text-gray-500" />
+                            <span>{foundGuardian?.phone}</span>
+                          </div>
+                        )}
+                        {(foundGuardian?.street || foundGuardian?.city) && (
+                          <div className="flex items-center mt-1">
+                            <Home className="h-4 w-4 mr-2 text-gray-500" />
+                            <span>
+                              {foundGuardian?.street} {foundGuardian?.houseNumber}, {foundGuardian?.postalCode} {foundGuardian?.city}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex space-x-2 justify-end border-t pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowGuardianConfirmDialog(false);
+                
+                // Als het een noodcontactnummer is, verwijderen we de tijdelijke voogd
+                if (foundGuardian?.phone && foundGuardian?.phone.startsWith('+') && !foundGuardian.id) {
+                  setFoundGuardian(null);
+                }
+              }}
+            >
+              {foundGuardian?.phone && foundGuardian?.phone.startsWith('+') 
+                ? "Afwijzen" 
+                : "Annuleren"}
+            </Button>
+            
+            {/* Als het een bestaande voogd is met ID, toon dan de bewerken knop */}
+            {foundGuardian && foundGuardian.id && (
+              <Button
+                type="button"
+                variant="outline"
+                className="border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-primary"
+                onClick={() => {
+                  // Sla de studentgegevens tijdelijk op
+                  const tempStudent = {...studentFormData};
+                  setShowGuardianConfirmDialog(false);
+                  
+                  // Redirect naar de voogdenpagina met de voogd-ID in een query parameter
+                  window.location.href = `/guardians?edit=${foundGuardian.id}&returnToStudent=true`;
+                  
+                  toast({
+                    title: "Voogd bewerken",
+                    description: "U wordt doorgestuurd naar de voogdbewerking. Na het opslaan kunt u terugkeren naar de student.",
+                  });
+                }}
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Bewerken
+              </Button>
+            )}
+            
+            {/* Als het een noodcontactnummer is zonder ID, toon dan een andere bewerken knop */}
+            {foundGuardian?.phone && foundGuardian?.phone.startsWith('+') && !foundGuardian.id && (
+              <Button
+                type="button"
+                variant="outline"
+                className="border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-primary"
+                onClick={() => {
+                  // Aanmaken van een nieuwe voogd met het noodcontactnummer
+                  const newGuardian = {
+                    firstName: "",
+                    lastName: "",
+                    relationship: "noodcontact",
+                    email: "",
+                    phone: foundGuardian.phone,
+                    isEmergencyContact: true
+                  };
+                  
+                  // Direct naar de Guardians pagina en de dialoog openen
+                  // We sturen het telefoonnummer mee in localStorage voor tijdelijke opslag
+                  localStorage.setItem('temp_noodcontact_phone', foundGuardian.phone);
+                  localStorage.setItem('temp_student_return', 'true');
+                  
+                  // Markeer de dialoog om te openen op Guardians pagina
+                  localStorage.setItem('open_guardian_dialog', 'true');
+                  
+                  // We redirecten naar de Guardians pagina
+                  setShowGuardianConfirmDialog(false);
+                  window.location.href = '/guardians';
+                  
+                  toast({
+                    title: "Noodcontact bewerken",
+                    description: "U wordt doorgestuurd naar de voogdenpagina om het noodcontact toe te voegen.",
+                  });
+                }}
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Bewerken
+              </Button>
+            )}
+            
+            <Button
+              type="button"
+              onClick={() => {
+                // Als het een tijdelijk noodcontact object is (zonder ID), maak eerst een voogdrecord aan
+                if (foundGuardian && !foundGuardian.id && foundGuardian.phone && foundGuardian.phone.startsWith('+')) {
+                  apiRequest('/api/guardians', {
+                    method: 'POST',
+                    body: foundGuardian
+                  })
+                  .then(createdGuardian => {
+                    // Maak een kopie van de data om te versturen, zonder studentId
+                    const { studentId, ...restData } = studentFormData;
+                    const dataToSubmit = {
+                      ...restData,
+                      programs: selectedPrograms.length > 0 ? selectedPrograms : 
+                        (studentFormData.programId ? [{ 
+                          programId: studentFormData.programId, 
+                          yearLevel: studentFormData.yearLevel 
+                        }] : [])
+                    };
+                    
+                    // Voeg de student toe
+                    createStudentMutation.mutate(dataToSubmit, {
+                      onSuccess: (createdStudent) => {
+                        // Na toevoegen van de student, koppel de voogd eraan
+                        apiRequest('/api/student-guardians', {
+                          method: 'POST',
+                          body: {
+                            studentId: createdStudent.id,
+                            guardianId: createdGuardian.id,
+                            relationship: "noodcontact",
+                            isPrimary: false
+                          }
+                        })
+                        .then(() => {
+                          toast({
+                            title: "Student en noodcontact opgeslagen",
+                            description: "De student is aangemaakt en het noodcontact is gekoppeld.",
+                          });
+                        })
+                        .catch(error => {
+                          console.error("Fout bij koppelen noodcontact:", error);
+                          toast({
+                            variant: "destructive",
+                            title: "Fout bij koppelen noodcontact",
+                            description: "Student is aangemaakt, maar kon niet aan het noodcontact worden gekoppeld.",
+                          });
+                        });
+                      }
+                    });
+                    
+                    setShowGuardianConfirmDialog(false);
+                  })
+                  .catch(error => {
+                    console.error("Fout bij aanmaken noodcontact:", error);
+                    toast({
+                      variant: "destructive",
+                      title: "Fout bij aanmaken noodcontact",
+                      description: "Er is een fout opgetreden bij het aanmaken van het noodcontact.",
+                    });
+                  });
+                } else {
+                  // Maak een kopie van de data om te versturen, zonder studentId
+                  const { studentId, ...restData } = studentFormData;
+                  const dataToSubmit = {
+                    firstName: restData.firstName || "",
+                    lastName: restData.lastName || "",
+                    email: restData.email || "",
+                    phone: restData.phone || "",
+                    dateOfBirth: restData.dateOfBirth || null,
+                    address: restData.address || "",
+                    street: restData.street || "",
+                    houseNumber: restData.houseNumber || "",
+                    postalCode: restData.postalCode || "",
+                    city: restData.city || "",
+                    status: restData.status || "actief",
+                    enrollmentDate: restData.enrollmentDate || null,
+                    schoolYear: restData.schoolYear || "",
+                    studentGroupId: restData.studentGroupId || null,
+                    notes: restData.notes || "",
+                    gender: restData.gender || "",
+                    nationality: restData.nationality || "",
+                    placeOfBirth: restData.placeOfBirth || "",
+                    nationalNumber: restData.nationalNumber || "",
+                    programs: selectedPrograms.length > 0 ? selectedPrograms : 
+                      (studentFormData.programId ? [{ 
+                        programId: studentFormData.programId, 
+                        yearLevel: studentFormData.yearLevel 
+                      }] : [])
+                  };
+                  
+                  // Voeg de student toe
+                  createStudentMutation.mutate(dataToSubmit, {
+                    onSuccess: (createdStudent) => {
+                      // Als er een bestaande voogd was geselecteerd, koppel deze aan de nieuwe student
+                      if (foundGuardian && foundGuardian.id) {
+                        apiRequest('/api/student-guardians', {
+                          method: 'POST',
+                          body: {
+                            studentId: createdStudent.id,
+                            guardianId: foundGuardian.id,
+                            relationship: foundGuardian.relationship || "parent",
+                            isPrimary: true
+                          }
+                        })
+                        .then(() => {
+                          toast({
+                            title: "Student en voogd gekoppeld",
+                            description: "De student is aangemaakt en aan de voogd gekoppeld.",
+                          });
+                        })
+                        .catch(error => {
+                          console.error("Fout bij koppelen voogd:", error);
+                          toast({
+                            variant: "destructive",
+                            title: "Fout bij koppelen voogd",
+                            description: "Student is aangemaakt, maar kon niet aan de voogd worden gekoppeld.",
+                          });
+                        });
+                      }
+                    }
+                  });
+                  
+                  setShowGuardianConfirmDialog(false);
+                }
+              }}
+            >
+              <Check className="h-4 w-4 mr-2" />
+              Bevestigen en opslaan
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

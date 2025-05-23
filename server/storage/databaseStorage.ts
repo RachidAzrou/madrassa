@@ -423,8 +423,42 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(studentGuardians).where(eq(studentGuardians.studentId, studentId));
   }
   
-  async getStudentGuardiansByGuardian(guardianId: number): Promise<StudentGuardian[]> {
-    return await db.select().from(studentGuardians).where(eq(studentGuardians.guardianId, guardianId));
+  async getStudentGuardiansByGuardian(guardianId: number): Promise<any[]> {
+    try {
+      // Simpelere aanpak: eerst de relaties ophalen
+      const relations = await db.select()
+        .from(studentGuardians)
+        .where(eq(studentGuardians.guardianId, guardianId));
+      
+      // Vervolgens voor elke relatie de studentgegevens ophalen
+      const result = [];
+      for (const relation of relations) {
+        const [student] = await db.select()
+          .from(students)
+          .where(eq(students.id, relation.studentId));
+        
+        if (student) {
+          result.push({
+            ...relation,
+            student: {
+              id: student.id,
+              studentId: student.studentId,
+              firstName: student.firstName,
+              lastName: student.lastName,
+              status: student.status
+            }
+          });
+        } else {
+          // Als er geen student is gevonden, toch de relatie opnemen zonder studentgegevens
+          result.push(relation);
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error("Fout bij ophalen van student-voogd relaties:", error);
+      return [];
+    }
   }
   
   async createStudentGuardian(relationData: InsertStudentGuardian): Promise<StudentGuardian> {

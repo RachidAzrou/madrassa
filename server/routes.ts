@@ -131,22 +131,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Haal alle bestaande studenten op
       const allStudents = await storage.getStudents();
       
-      // Als er geen studenten zijn, begin met ST001
+      // Huidige jaar (laatste 2 cijfers)
+      const currentYear = new Date().getFullYear() % 100;
+      const prefix = `ST${currentYear}`;
+      
+      // Als er geen studenten zijn, begin met ST + jaar + 001
       if (!allStudents || allStudents.length === 0) {
-        return "ST001";
+        return `${prefix}001`;
       }
       
-      // Filter alle geldige IDs die beginnen met ST gevolgd door nummers
-      const validNums = allStudents
+      // Filter IDs die het nieuwe format volgen: ST + jaar + volgnummer
+      // EN IDs die het oude format volgen (alleen voor dit jaar)
+      const stPattern = new RegExp(`^ST\\d+$`); // Alle ST-nummers
+      const yearPattern = new RegExp(`^${prefix}\\d+$`); // Specifiek voor dit jaar
+      
+      // Eerst alles verzamelen wat in de vorm ST + nummers is
+      const allStNums = allStudents
         .map(student => student.studentId)
-        .filter(id => /^ST\d+$/.test(id))
-        .map(id => parseInt(id.substring(2), 10)) // Verwijder "ST" en converteren naar nummer
+        .filter(id => stPattern.test(id));
+        
+      // Dan alleen de nummers voor dit jaar eruit filteren
+      const validNums = allStNums
+        .filter(id => yearPattern.test(id))
+        .map(id => parseInt(id.substring(4), 10)) // Verwijder "ST" + jaar en converteer naar nummer
         .filter(num => !isNaN(num))
         .sort((a, b) => a - b); // Sorteer op numerieke volgorde
       
-      // Als er geen geldige numerieke IDs zijn, begin met ST001
+      // En als fallback ook de oude formaten meenemen 
+      const oldFormatNums = allStNums
+        .filter(id => !yearPattern.test(id) && id.startsWith('ST'))
+        .map(id => parseInt(id.substring(2), 10)) // Verwijder "ST" en converteer naar nummer
+        .filter(num => !isNaN(num))
+        .sort((a, b) => a - b);
+      
+      // Als er geen geldige numerieke IDs zijn voor dit jaar, begin met 001
       if (validNums.length === 0) {
-        return "ST001";
+        return `${prefix}001`;
       }
 
       // Zoek naar "gaten" in de reeks
@@ -157,18 +177,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const num of validNums) {
         if (num > expectedNum) {
           // We hebben een gat gevonden
-          return `ST${expectedNum.toString().padStart(3, '0')}`;
+          return `${prefix}${expectedNum.toString().padStart(3, '0')}`;
         }
         // Ga door naar het volgende verwachte nummer
         expectedNum = num + 1;
       }
       
       // Als er geen gaten zijn, gebruik dan het volgende nummer na het hoogste ID
-      return `ST${expectedNum.toString().padStart(3, '0')}`;
+      return `${prefix}${expectedNum.toString().padStart(3, '0')}`;
     } catch (error) {
       console.error("Fout bij genereren studentnummer:", error);
-      // Fallback naar gewoon oplopend nummer als er een fout optreedt
-      return `ST${Math.floor(Math.random() * 999 + 1).toString().padStart(3, '0')}`;
+      // Fallback naar huidige jaar en random nummer als er een fout optreedt
+      const currentYear = new Date().getFullYear() % 100;
+      return `ST${currentYear}${Math.floor(Math.random() * 999 + 1).toString().padStart(3, '0')}`;
     }
   }
   
@@ -253,10 +274,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Log de binnenkomende data voor debugging
       console.log("Received student data:", req.body);
       
-      // Genereer een nieuw studentnummer en voeg dit toe aan de data
-      const studentData = { ...req.body };
+      // Haal guardianId uit de data (indien opgegeven)
+      const { guardianId, ...studentData } = req.body;
       
-      // Als er geen studentnummer is meegegeven of als we het altijd willen overschrijven
+      // Genereer een nieuw studentnummer en voeg dit toe aan de data
       studentData.studentId = await generateNextStudentId();
       
       console.log("Gegenereerd studentnummer:", studentData.studentId);
@@ -270,6 +291,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Stuur de data door naar storage zonder verdere aanpassingen
       const newStudent = await storage.createStudent(validatedData);
+      
+      // Als er een guardianId is opgegeven, maak een student-guardian relatie
+      if (guardianId) {
+        try {
+          console.log(`Koppelen van student ${newStudent.id} aan voogd ${guardianId}`);
+          const studentGuardianData = {
+            studentId: newStudent.id,
+            guardianId: parseInt(guardianId),
+            relationshipType: 'Voogd',
+            isPrimary: true,
+            hasEmergencyContact: true,
+            notes: ''
+          };
+          
+          // Valideer de data
+          const validatedRelation = insertStudentGuardianSchema.parse(studentGuardianData);
+          
+          // Maak de relatie aan
+          await storage.createStudentGuardian(validatedRelation);
+          console.log("Student-voogd relatie succesvol aangemaakt");
+        } catch (relationError) {
+          console.error("Error creating student-guardian relation:", relationError);
+          // Relatie maken mislukt, maar student is wel aangemaakt
+          // We gaan door met de verwerking
+        }
+      }
       
       // Maak automatisch een collegegeldrecord aan voor de nieuwe student
       try {
@@ -2397,6 +2444,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(guardians);
     } catch (error) {
       res.status(500).json({ message: "Error fetching guardians" });
+    }
+  });
+  
+  // Zoek voogden op basis van achternaam
+  apiRouter.get("/api/guardians/search", async (req, res) => {
+    try {
+      const { lastName } = req.query;
+      if (!lastName) {
+        return res.status(400).json({ message: "Last name is required for search" });
+      }
+      
+      // Haal alle voogden op en filter op de server
+      const allGuardians = await storage.getGuardians();
+      const matchingGuardians = allGuardians.filter(
+        guardian => guardian.lastName.toLowerCase() === (lastName as string).toLowerCase()
+      );
+      
+      res.json(matchingGuardians);
+    } catch (error) {
+      console.error("Error searching guardians by last name:", error);
+      res.status(500).json({ message: "Error searching guardians by last name" });
+    }
+  });
+
+  apiRouter.get("/api/guardians/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
+      
+      const guardian = await storage.getGuardian(id);
+      if (!guardian) {
+        return res.status(404).json({ message: "Guardian not found" });
+      }
+      
+      res.json(guardian);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching guardian" });
     }
   });
 

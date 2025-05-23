@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle, FileDown, FileSpreadsheet, GraduationCap, ExternalLink, UserX, User, MapPin } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,30 +16,6 @@ import {
   DialogHeader, 
   DialogTitle 
 } from '@/components/ui/dialog';
-import {
-  DetailDialog,
-  DetailDialogHeader,
-  DetailDialogContent,
-  DetailSection,
-  DataCard,
-  DataRow,
-  HoverCardItem,
-  EmptyState
-} from '@/components/ui/detail-dialog';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
@@ -63,7 +39,7 @@ type GuardianType = {
   emergencyContactPhone?: string;
   emergencyContactRelation?: string;
   notes?: string;
-
+  occupation?: string;
 };
 
 type StudentType = {
@@ -72,329 +48,493 @@ type StudentType = {
   firstName: string;
   lastName: string;
   status?: string;
-  email?: string;
-  phone?: string;
-};
-
-type GuardianStudentRelationType = {
-  id: number;
-  guardianId: number;
-  studentId: number;
-  isPrimary: boolean;
-  student?: StudentType;
 };
 
 export default function Guardians() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [searchQuery, setSearchQuery] = useState('');
+  // URL parameters gebruiken voor automatisch openen van voogdbewerking
+  const [searchParams] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      editId: params.get('edit'),
+      returnToStudent: params.get('returnToStudent') === 'true'
+    };
+  });
+  // States
+  const [searchTerm, setSearchTerm] = useState('');
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
+  const [viewMode, setViewMode] = useState<'all' | 'emergency'>('all');
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<StudentType | null>(null);
+  const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
+  const [isEditMode, setIsEditMode] = useState(false);
   
-  const initialNewGuardian = {
+  // States voor verwijderbevestiging
+  const [guardianToDelete, setGuardianToDelete] = useState<GuardianType | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [newGuardian, setNewGuardian] = useState<Partial<GuardianType>>({
     firstName: '',
     lastName: '',
     relationship: 'parent',
     email: '',
     phone: '',
+    address: '',
     street: '',
     houseNumber: '',
     postalCode: '',
     city: '',
-    occupation: '',
     isEmergencyContact: false,
+    emergencyContactName: '',
+    emergencyContactPhone: '',
+    emergencyContactRelation: '',
     notes: ''
-  };
+  });
   
-  const [newGuardian, setNewGuardian] = useState<any>(initialNewGuardian);
-  const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
-  const [primaryStudentId, setPrimaryStudentId] = useState<number | null>(null);
-  const [filteredStudentIds, setFilteredStudentIds] = useState<number[]>([]);
-  const [studentSearchQuery, setStudentSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Queries en Mutations
-  const { data: guardiansData = [] } = useQuery({ 
-    queryKey: ['/api/guardians'],
-    staleTime: 1000 * 60 * 5, // 5 minutes
+  // Debounce search term
+  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+  
+//Deze effecthook wordt later toegevoegd nadat guardians is gedefinieerd
+  
+  // Handle navigation after saving
+  useEffect(() => {
+    // Als we het dialoogvenster sluiten na het bewerken van een voogd vanuit een student
+    if (!showAddDialog && searchParams.returnToStudent) {
+      // Navigeer terug naar studenten pagina om het studentformulier weer te openen
+      window.location.href = '/students?add=true';
+    }
+  }, [showAddDialog, searchParams.returnToStudent]);
+
+  // Fetch guardians data
+  const {
+    data: guardiansResponse,
+    isLoading,
+    isError,
+    refetch
+  } = useQuery<GuardianType[]>({
+    queryKey: ['/api/guardians', { page: currentPage, limit: itemsPerPage, search: debouncedSearch }],
   });
   
-  const { data: studentsData = [] } = useQuery({ 
-    queryKey: ['/api/students'], 
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
+  // Extract guardians with proper type safety and create a fallback for pagination
+  const guardians: GuardianType[] = Array.isArray(guardiansResponse) ? guardiansResponse : [];
+  const totalGuardians: number = guardians.length; // Gebruik de daadwerkelijke lengte van de array
   
-  // Query voor alle voogd-student relaties (voor weergave in tabel)
-  const guardianStudentsQuery = useQuery({
-    queryKey: ['/api/student-guardians'],
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
+  const totalPages = Math.ceil(totalGuardians / itemsPerPage);
   
-  // Query voor relaties van de geselecteerde voogd (voor detailweergave)
-  const { data: guardianStudentsData = [], isLoading: guardianStudentsLoading } = useQuery({
-    queryKey: ['/api/guardians', selectedGuardian?.id, 'students'],
-    enabled: !!selectedGuardian?.id,
-  });
+  // Auto-open edit dialog when navigating from student page with a guardian ID
+  useEffect(() => {
+    const editGuardianId = searchParams.editId;
+    if (editGuardianId && guardians.length > 0) {
+      // Zoek de voogd in de lijst
+      const guardianToEdit = guardians.find(g => g.id.toString() === editGuardianId);
+      if (guardianToEdit) {
+        // Open het dialoogvenster voor bewerking
+        setNewGuardian({...guardianToEdit});
+        setShowAddDialog(true);
+        
+        // Toon een toast om aan te geven dat we in de bewerkmodus zitten
+        toast({
+          title: "Voogd bewerken",
+          description: "U bewerkt een voogd die u wilt koppelen aan een student.",
+        });
+      }
+    }
+  }, [searchParams.editId, guardians, toast]);
   
-  const createGuardianMutation = useMutation({
-    mutationFn: (guardian: any) => 
-      apiRequest(`/api/guardians`, {
-        method: 'POST',
-        body: JSON.stringify(guardian)
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
-      toast({
-        title: "Voogd toegevoegd",
-        description: "De voogd is succesvol toegevoegd.",
+  // Controleer of we een noodcontactnummer moeten openen vanuit de studentenpagina
+  useEffect(() => {
+    // Check of er een noodcontactnummer in localStorage is gezet
+    const noodcontactPhone = localStorage.getItem('temp_noodcontact_phone');
+    const shouldOpenDialog = localStorage.getItem('open_guardian_dialog');
+    const returnToStudent = localStorage.getItem('temp_student_return');
+    
+    if (noodcontactPhone && shouldOpenDialog === 'true') {
+      // Verwijder de flags uit localStorage
+      localStorage.removeItem('temp_noodcontact_phone');
+      localStorage.removeItem('open_guardian_dialog');
+      
+      // Open een nieuwe voogd dialoog met het noodcontactnummer ingevuld
+      setNewGuardian({
+        firstName: "",
+        lastName: "",
+        relationship: "noodcontact",
+        email: "",
+        phone: noodcontactPhone,
+        isEmergencyContact: true,
+        street: "",
+        houseNumber: "",
+        postalCode: "",
+        city: ""
       });
-      setShowAddDialog(false);
-      setNewGuardian(initialNewGuardian);
-      setSelectedStudentIds([]);
-      setPrimaryStudentId(null);
-    },
-    onError: (error: any) => {
+      
+      setShowAddDialog(true);
+      setIsEditMode(false);
+      
+      // Toon een toast met instructies
       toast({
-        title: "Fout",
-        description: "Er is een fout opgetreden bij het toevoegen van de voogd: " + (error.message || error),
-        variant: "destructive",
+        title: "Noodcontact toevoegen",
+        description: "Vul de gegevens voor het noodcontact aan en sla op.",
       });
     }
-  });
+  }, [toast]);
   
-  const updateGuardianMutation = useMutation({
-    mutationFn: (guardian: any) => 
-      apiRequest(`/api/guardians/${guardian.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(guardian)
-      }),
+  // Fetch all students for student assignment
+  const {
+    data: allStudents = [] as StudentType[],
+    isLoading: allStudentsLoading,
+    isError: isAllStudentsError,
+  } = useQuery<StudentType[]>({
+    queryKey: ['/api/students'],
+    queryFn: async () => {
+      try {
+        return await apiRequest('/api/students');
+      } catch (error) {
+        console.error('Error fetching students for assignment:', error);
+        toast({
+          title: "Fout bij ophalen studenten",
+          description: "Kon de lijst met studenten niet laden voor toewijzing.",
+          variant: "destructive",
+        });
+        return [];
+      }
+    },
+  });
+
+  // Fetch associated students for selected guardian or guardian being edited
+  const guardianIdForStudents = selectedGuardian?.id || (showAddDialog && newGuardian.id ? newGuardian.id : undefined);
+  
+  const {
+    data: guardianStudentsData = [] as any[],
+    isLoading: guardianStudentsLoading,
+    isError: isGuardianStudentsError,
+    refetch: refetchGuardianStudents
+  } = useQuery({
+    queryKey: ['/api/guardians/students', guardianIdForStudents],
+    queryFn: async () => {
+      if (!guardianIdForStudents) return [];
+      try {
+        return await apiRequest(`/api/guardians/${guardianIdForStudents}/students`);
+      } catch (error) {
+        console.error('Error fetching guardian students:', error);
+        toast({
+          title: "Fout bij ophalen gerelateerde studenten",
+          description: "Kon de studenten die aan deze voogd gekoppeld zijn niet laden.",
+          variant: "destructive",
+        });
+        return [];
+      }
+    },
+    enabled: !!guardianIdForStudents,
+  });
+
+  // Ververs de gekoppelde studenten wanneer een voogd wordt toegevoegd of bijgewerkt
+  useEffect(() => {
+    if (guardianIdForStudents && refetchGuardianStudents) {
+      refetchGuardianStudents();
+    }
+  }, [guardianIdForStudents, refetchGuardianStudents, showAddDialog, isEditMode]);
+
+  // Delete Guardian mutation
+  const deleteGuardianMutation = useMutation({
+    mutationFn: async (guardianId: number) => {
+      try {
+        return await apiRequest(`/api/guardians/${guardianId}`, {
+          method: 'DELETE'
+        });
+      } catch (error: any) {
+        console.error('Delete guardian error:', error);
+        throw new Error(error?.message || 'Fout bij het verwijderen van voogd');
+      }
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
       toast({
-        title: "Voogd bijgewerkt",
-        description: "De voogd is succesvol bijgewerkt.",
+        title: "Voogd verwijderd",
+        description: "De voogd is succesvol verwijderd uit het systeem",
       });
-      setShowAddDialog(false);
+      // Invalideer alle relevante queries
+      queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/guardian-students'] });
+      
       setSelectedGuardian(null);
+      setIsDeleteDialogOpen(false);
+      setGuardianToDelete(null);
     },
     onError: (error: any) => {
       toast({
-        title: "Fout",
-        description: "Er is een fout opgetreden bij het bijwerken van de voogd: " + (error.message || error),
+        title: "Fout bij verwijderen",
+        description: error?.message || "Er is een fout opgetreden bij het verwijderen van de voogd. Mogelijk zijn er nog actieve relaties met studenten.",
         variant: "destructive",
       });
-    }
+      console.error('Delete error:', error);
+      setIsDeleteDialogOpen(false);
+    },
   });
 
-  const addGuardianStudentRelationMutation = useMutation({
-    mutationFn: (data: { guardianId: number, studentId: number, isPrimary: boolean }) => 
-      apiRequest(`/api/guardians/${data.guardianId}/students`, {
-        method: 'POST',
-        body: JSON.stringify({ 
-          studentId: data.studentId,
-          isPrimary: data.isPrimary
-        })
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when search changes
+  };
+
+  // Handle adding a new guardian
+  const handleAddNewGuardian = () => {
+    setNewGuardian({
+      firstName: '',
+      lastName: '',
+      relationship: 'parent',
+      email: '',
+      phone: '',
+      address: '',
+      street: '',
+      houseNumber: '',
+      postalCode: '',
+      city: '',
+      isEmergencyContact: false,
+      emergencyContactName: '',
+      emergencyContactPhone: '',
+      emergencyContactRelation: '',
+      notes: ''
+    });
+    setSelectedStudentIds([]);
+    setShowAddDialog(true);
+    setIsEditMode(false);
+    console.log("Add new guardian");
+  };
+  
+  // Add/Update Guardian mutation
+  const guardianMutation = useMutation({
+    mutationFn: async (data: { guardian: Partial<GuardianType>, studentIds: number[] }) => {
+      try {
+        let guardian;
+        
+        if (data.guardian.id) {
+          // Update existing guardian
+          guardian = await apiRequest(`/api/guardians/${data.guardian.id}`, {
+            method: 'PUT',
+            body: data.guardian
+          });
+        } else {
+          // Create new guardian
+          guardian = await apiRequest('/api/guardians', {
+            method: 'POST',
+            body: data.guardian
+          });
+          
+          // Assign students if any were selected (only for new guardians)
+          if (data.studentIds.length > 0 && guardian.id) {
+            const studentGuardianPromises = data.studentIds.map(studentId => 
+              apiRequest('/api/student-guardians', {
+                method: 'POST',
+                body: {
+                  studentId,
+                  guardianId: guardian.id
+                }
+              })
+            );
+            await Promise.all(studentGuardianPromises);
+          }
+        }
+        
+        return guardian;
+      } catch (error: any) {
+        console.error('Guardian mutation error:', error);
+        throw new Error(error?.message || 'Fout bij het opslaan van voogdgegevens');
+      }
     },
-    onError: (error: any) => {
+    onSuccess: (result, variables) => {
+      const isEdit = !!variables.guardian.id;
       toast({
-        title: "Fout",
-        description: "Er is een fout opgetreden bij het koppelen van de student: " + (error.message || error),
+        title: isEdit ? "Voogd bijgewerkt" : "Voogd toegevoegd",
+        description: isEdit 
+          ? `De gegevens van ${variables.guardian.firstName} ${variables.guardian.lastName} zijn succesvol bijgewerkt.` 
+          : `${variables.guardian.firstName} ${variables.guardian.lastName} is succesvol toegevoegd${variables.studentIds.length > 0 ? ' en gekoppeld aan de geselecteerde studenten' : ''}.`,
+      });
+      
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/guardians/students'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
+      
+      // Reset UI state
+      setShowAddDialog(false);
+      setSelectedStudentIds([]);
+      
+      // Reset form data
+      setNewGuardian({
+        firstName: '',
+        lastName: '',
+        relationship: 'parent',
+        email: '',
+        phone: '',
+        address: '',
+        street: '',
+        houseNumber: '',
+        postalCode: '',
+        city: '',
+        isEmergencyContact: false,
+        notes: ''
+      });
+    },
+    onError: (error: any, variables) => {
+      const isEdit = !!variables.guardian.id;
+      toast({
+        title: isEdit ? "Fout bij bijwerken" : "Fout bij toevoegen",
+        description: error?.message || (isEdit 
+          ? "Er is een fout opgetreden bij het bijwerken van de voogdgegevens. Controleer of alle verplichte velden correct zijn ingevuld." 
+          : "Er is een fout opgetreden bij het toevoegen van de voogd. Controleer of alle verplichte velden correct zijn ingevuld."),
         variant: "destructive",
       });
-    }
+      console.error(isEdit ? 'Update guardian error:' : 'Add guardian error:', error);
+    },
   });
   
-  // Filter guardians based on search query
-  useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setSearchResults(guardiansData);
-      return;
-    }
-    
-    const query = searchQuery.toLowerCase();
-    const filtered = guardiansData.filter((guardian: any) => {
-      return (
-        guardian.firstName.toLowerCase().includes(query) ||
-        guardian.lastName.toLowerCase().includes(query) ||
-        guardian.email.toLowerCase().includes(query) ||
-        (guardian.phone && guardian.phone.includes(query))
-      );
+  // Handle form submission
+  const handleSubmitGuardian = (e: React.FormEvent) => {
+    e.preventDefault();
+    guardianMutation.mutate({
+      guardian: newGuardian,
+      studentIds: selectedStudentIds
     });
-    
-    setSearchResults(filtered);
-  }, [searchQuery, guardiansData]);
-  
-  // Students that can be added to a guardian
-  useEffect(() => {
-    if (studentSearchQuery.trim() === '') {
-      setFilteredStudentIds(
-        studentsData
-          .filter((student: any) => !selectedStudentIds.includes(student.id))
-          .map((student: any) => student.id)
-      );
-      return;
-    }
-    
-    const query = studentSearchQuery.toLowerCase();
-    const filtered = studentsData.filter((student: any) => {
-      return (
-        !selectedStudentIds.includes(student.id) &&
-        (student.firstName.toLowerCase().includes(query) ||
-         student.lastName.toLowerCase().includes(query) ||
-         student.studentId.toLowerCase().includes(query))
-      );
-    });
-    
-    setFilteredStudentIds(filtered.map((student: any) => student.id));
-  }, [studentSearchQuery, studentsData, selectedStudentIds]);
-  
-  // Event Handlers
-  const handleShowGuardianDetails = (guardian: any) => {
-    setSelectedGuardian(guardian);
   };
   
-  const handleAddNewGuardian = () => {
-    setNewGuardian(initialNewGuardian);
-    setSelectedStudentIds([]);
-    setPrimaryStudentId(null);
-    setShowAddDialog(true);
+  // Handle input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target as HTMLInputElement;
+    
+    // Handle checkboxes separately
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setNewGuardian({ ...newGuardian, [name]: checked });
+    } else {
+      setNewGuardian({ ...newGuardian, [name]: value });
+    }
   };
-  
-  const handleEditGuardian = (guardian: any) => {
+
+  // Handle editing a guardian
+  const handleEditGuardian = (guardian: GuardianType) => {
     setNewGuardian({
       ...guardian
     });
     setShowAddDialog(true);
+    setIsEditMode(true);
+    console.log("Edit guardian:", guardian);
   };
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNewGuardian(prev => ({ ...prev, [name]: value }));
-  };
-  
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setNewGuardian(prev => ({ ...prev, [name]: checked }));
-  };
-  
-  const handleSubmitGuardian = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const guardianData = { ...newGuardian };
-    
-    if (guardianData.id) {
-      // Update
-      updateGuardianMutation.mutate(guardianData);
-    } else {
-      // Create
-      createGuardianMutation.mutate(guardianData);
-      
-      // After creating, add student relations
-      createGuardianMutation.isSuccess && guardianData.id && selectedStudentIds.forEach(studentId => {
-        addGuardianStudentRelationMutation.mutate({
-          guardianId: guardianData.id,
-          studentId,
-          isPrimary: primaryStudentId === studentId
-        });
-      });
-    }
-  };
-  
-  // Utility for relationship display
-  const getRelationshipLabel = (relationship: string) => {
-    const labels: { [key: string]: string } = {
-      'parent': 'Ouder',
-      'guardian': 'Voogd',
-      'family': 'Familie',
-      'noodcontact': 'Noodcontact',
-      'other': 'Anders'
-    };
-    
-    return labels[relationship] || relationship;
-  };
-  
-  // State variables voor filtering en selectie
-  const [showFilterOptions, setShowFilterOptions] = useState(false);
-  const [selectedRelationshipFilter, setSelectedRelationshipFilter] = useState('all');
-  const [selectedEmergencyFilter, setSelectedEmergencyFilter] = useState('all');
-  const [selectedGuardians, setSelectedGuardians] = useState<number[]>([]);
-  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  
-  // Helper functions voor selectie
-  const handleToggleAllGuardians = (checked: boolean) => {
-    if (checked) {
-      // Select all guardians from current search results
-      const ids = searchResults.map((guardian: GuardianType) => guardian.id);
-      setSelectedGuardians(ids);
-    } else {
-      // Deselect all
-      setSelectedGuardians([]);
-    }
-  };
-  
-  const toggleGuardianSelection = (guardianId: number) => {
-    setSelectedGuardians(prev => {
-      if (prev.includes(guardianId)) {
-        return prev.filter(id => id !== guardianId);
-      } else {
-        return [...prev, guardianId];
-      }
-    });
-  };
-  
-  // Handle delete selected guardians
-  const handleDeleteSelected = () => {
-    if (selectedGuardians.length > 0) {
-      if (window.confirm(`Weet u zeker dat u ${selectedGuardians.length} voogden wilt verwijderen?`)) {
-        // Hier zou een batch delete functie komen
-        toast({
-          title: "Functie nog niet beschikbaar",
-          description: "Het verwijderen van meerdere voogden is momenteel niet geïmplementeerd.",
-          variant: "destructive"
-        });
-        setSelectedGuardians([]);
-      }
-    }
-  };
-  
-  // Handle delete single guardian
-  const handleDelete = (guardian: GuardianType) => {
-    setSelectedGuardian(guardian);
+
+  // Handle deleting a guardian - open confirmation dialog
+  const handleDeleteGuardian = (guardian: GuardianType) => {
+    setGuardianToDelete(guardian);
     setIsDeleteDialogOpen(true);
   };
   
-  const handleShowStudentDetails = (student: StudentType) => {
-    setSelectedStudent(student);
-  };
-  
-  const confirmDelete = () => {
-    if (selectedGuardian) {
-      toast({
-        title: "Voogd verwijderd",
-        description: `${selectedGuardian.firstName} ${selectedGuardian.lastName} is succesvol verwijderd.`,
-      });
-      setIsDeleteDialogOpen(false);
-      setSelectedGuardian(null);
+  // Confirm guardian deletion after dialog confirmation
+  const confirmDeleteGuardian = () => {
+    if (guardianToDelete) {
+      deleteGuardianMutation.mutate(guardianToDelete.id);
     }
   };
+
+  // Handle viewing a guardian's details
+  const handleViewGuardian = (guardian: GuardianType) => {
+    setSelectedGuardian(guardian);
+  };
+
+  // Get relationship label
+  const getRelationshipLabel = (relationship: string): string => {
+    const relationships: Record<string, string> = {
+      "parent": "Ouder",
+      "guardian": "Voogd",
+      "grandparent": "Grootouder",
+      "sibling": "Broer/Zus",
+      "other": "Andere"
+    };
+    return relationships[relationship] || relationship;
+  };
   
-  // Render
+  // Get status label in Dutch
+  const getStatusLabel = (status: string): string => {
+    const statuses: Record<string, string> = {
+      "Active": "Actief",
+      "Inactive": "Inactief",
+      "Pending": "In Afwachting",
+      "Graduated": "Afgestudeerd",
+      "Withdrawn": "Teruggetrokken",
+      "Suspended": "Geschorst"
+    };
+    return statuses[status] || status;
+  };
+
+  // Render guardians page
   return (
-    <div className="container px-4 md:px-6 max-w-7xl">
+    <div className="p-4 md:p-6 space-y-6">
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Voogd verwijderen</DialogTitle>
+            <DialogDescription>
+              Weet u zeker dat u {guardianToDelete?.firstName} {guardianToDelete?.lastName} wilt verwijderen?
+              {guardianStudentsData && guardianStudentsData.length > 0 && (
+                <div className="mt-2 text-red-500">
+                  <span className="font-semibold">Let op:</span> Deze voogd is aan {guardianStudentsData.length} student{guardianStudentsData.length !== 1 ? 'en' : ''} gekoppeld.
+                </div>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-between">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={deleteGuardianMutation.isPending}
+            >
+              Annuleren
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeleteGuardian}
+              disabled={deleteGuardianMutation.isPending}
+              className="gap-1"
+            >
+              {deleteGuardianMutation.isPending ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Bezig met verwijderen...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4" />
+                  Verwijderen
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Page Title */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
           <div className="flex items-center gap-4 mb-2 md:mb-0">
             <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
-              <Users className="h-7 w-7" />
+              <UserCheck className="h-7 w-7" />
             </div>
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Voogden</h1>
-              <p className="text-base text-gray-500 mt-1">Bekijk en beheer alle voogdgegevens</p>
+              <p className="text-base text-gray-500 mt-1">Beheer voogden en hun relaties met studenten</p>
             </div>
           </div>
         </div>
@@ -407,1049 +547,830 @@ export default function Guardians() {
           <Input
             type="search"
             placeholder="Zoek voogden..."
-            className="pl-8 bg-white w-full"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8 bg-white"
+            value={searchTerm}
+            onChange={handleSearchChange}
           />
         </div>
       </div>
       
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              className="shrink-0"
-              onClick={() => setShowFilterOptions(!showFilterOptions)}
-            >
-              <Filter className="mr-2 h-4 w-4" />
-              Filter
-            </Button>
-            
-            <div className="relative">
-              <Button 
-                variant="outline" 
-                className="shrink-0"
-                onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
+      {/* View tabs & Actions */}
+      <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+        <div>
+          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'all' | 'emergency')}>
+            <TabsList className="p-1 bg-blue-900/10">
+              <TabsTrigger 
+                value="all" 
+                className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
               >
-                <Download className="mr-2 h-4 w-4" />
-                Exporteren
-              </Button>
-              
-              {isExportMenuOpen && (
-                <div 
-                  id="export-menu"
-                  className="absolute right-0 top-full mt-2 w-48 bg-white shadow-lg rounded-md overflow-hidden z-10 border"
+                <UserCheck className="h-4 w-4" />
+                Alle Voogden
+              </TabsTrigger>
+              <TabsTrigger 
+                value="emergency" 
+                className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  className="h-4 w-4"
                 >
-                  <div className="p-2">
-                    <button
-                      onClick={() => {
-                        // Export als PDF
-                        setIsExportMenuOpen(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-md flex items-center"
-                    >
-                      <FileDown className="mr-2 h-4 w-4" />
-                      Exporteren als PDF
-                    </button>
-                    <button
-                      onClick={() => {
-                        // Export als Excel
-                        setIsExportMenuOpen(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-md flex items-center"
-                    >
-                      <FileSpreadsheet className="mr-2 h-4 w-4" />
-                      Exporteren als Excel
-                    </button>
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                Noodcontacten
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+        
+        <Button 
+          onClick={handleAddNewGuardian} 
+          variant="default" 
+          size="default" 
+          className="bg-primary hover:bg-primary/90"
+        >
+          <PlusCircle className="mr-2 h-4 w-4" />
+          <span>Voogd Toevoegen</span>
+        </Button>
+      </div>
+      
+      {/* Voogden lijst */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div className="flex items-center">
+                    Voogd
                   </div>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <Button 
-            onClick={handleAddNewGuardian} 
-            className="bg-primary hover:bg-primary/90 text-white gap-2 ml-auto"
-          >
-            <PlusCircle className="h-4 w-4" />
-            Nieuwe Voogd
-          </Button>
-        </div>
-      
-      {/* Filter opties */}
-      {showFilterOptions && (
-        <div className="mt-4 p-4 bg-gray-50 border rounded-lg">
-          <h3 className="text-sm font-medium mb-3">Filter voogden</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="relationshipFilter" className="text-xs">Relatie</Label>
-              <Select
-                value={selectedRelationshipFilter}
-                onValueChange={setSelectedRelationshipFilter}
-              >
-                <SelectTrigger id="relationshipFilter" className="mt-1">
-                  <SelectValue placeholder="Selecteer relatie" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle relaties</SelectItem>
-                  <SelectItem value="parent">Ouder</SelectItem>
-                  <SelectItem value="guardian">Voogd</SelectItem>
-                  <SelectItem value="family">Familie</SelectItem>
-                  <SelectItem value="noodcontact">Noodcontact</SelectItem>
-                  <SelectItem value="other">Anders</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="emergencyFilter" className="text-xs">Noodcontact</Label>
-              <Select
-                value={selectedEmergencyFilter}
-                onValueChange={setSelectedEmergencyFilter}
-              >
-                <SelectTrigger id="emergencyFilter" className="mt-1">
-                  <SelectValue placeholder="Selecteer type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle voogden</SelectItem>
-                  <SelectItem value="yes">Alleen noodcontacten</SelectItem>
-                  <SelectItem value="no">Geen noodcontacten</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <div className="mt-4 flex justify-end">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setSelectedRelationshipFilter('all');
-                setSelectedEmergencyFilter('all');
-              }}
-              className="mr-2"
-            >
-              Reset filters
-            </Button>
-          </div>
-        </div>
-      )}
-      
-      <div className="py-6">
-        {searchResults.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4 text-center border rounded-lg bg-gray-50">
-            <div className="h-20 w-20 rounded-full bg-blue-50 flex items-center justify-center mb-6">
-              <UserCheck className="h-10 w-10 text-primary opacity-30" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Geen voogden gevonden</h3>
-            <p className="text-muted-foreground max-w-md mx-auto mb-6">
-              {searchQuery.trim() !== '' 
-                ? 'Geen voogden gevonden die overeenkomen met je zoekopdracht. Probeer een andere zoekterm.' 
-                : 'Er zijn nog geen voogden toegevoegd in het systeem. Klik op de knop "Nieuwe Voogd" om een voogd toe te voegen.'}
-            </p>
-            {searchQuery && (
-              <Button 
-                variant="outline"
-                className="gap-2" 
-                onClick={() => setSearchQuery('')}
-              >
-                <XCircle className="h-4 w-4" />
-                Wis Zoekopdracht
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-            <Table>
-              <TableHeader className="bg-gray-50">
-                <TableRow className="border-b border-gray-200">
-                  <TableHead className="w-[40px] py-3">
-                    <Checkbox 
-                      checked={selectedGuardians.length > 0 && selectedGuardians.length === searchResults.length}
-                      onCheckedChange={handleToggleAllGuardians}
-                    />
-                  </TableHead>
-                  <TableHead className="py-3 font-medium">Naam</TableHead>
-                  <TableHead className="py-3 font-medium">Relatie</TableHead>
-                  <TableHead className="py-3 font-medium">Studenten</TableHead>
-                  <TableHead className="text-right w-[120px] py-3 font-medium">Acties</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {searchResults.map((guardian: GuardianType) => (
-                  <TableRow 
-                    key={guardian.id} 
-                    className="group hover:bg-gray-50 border-b border-gray-200"
-                  >
-                    <TableCell className="py-3">
-                      <Checkbox
-                        checked={selectedGuardians.includes(guardian.id)}
-                        onCheckedChange={() => toggleGuardianSelection(guardian.id)}
-                      />
-                    </TableCell>
-                    <TableCell className="py-3 font-medium">
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-primary text-white text-xs">
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relatie</th>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-4 text-center">
+                    <div className="flex justify-center">
+                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  </td>
+                </tr>
+              ) : isError ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-4 text-center text-red-500">
+                    Fout bij het laden van voogden. Probeer het opnieuw.
+                  </td>
+                </tr>
+              ) : guardians.length === 0 ? (
+                <tr>
+                  <td colSpan={5}>
+                    <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                      <div className="text-[#1e3a8a] mb-2">
+                        <UserCheck className="h-12 w-12 mx-auto opacity-30" />
+                      </div>
+                      <p className="text-sm font-medium">Geen voogden beschikbaar</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                guardians
+                  .filter(guardian => viewMode === 'all' || guardian.isEmergencyContact)
+                  .map((guardian: GuardianType) => (
+                  <tr key={guardian.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Avatar className="h-9 w-9">
+                          <AvatarFallback className="bg-[#1e3a8a] text-white">
                             {guardian.firstName.charAt(0)}{guardian.lastName.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <div className="font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</div>
+                          <div className="text-xs text-gray-500">{guardian.email}</div>
                         </div>
                       </div>
-                    </TableCell>
-                    <TableCell className="py-3">
-                      <div className="flex items-center">
-                        <Badge variant="outline" className={`${guardian.isEmergencyContact ? "bg-red-50 text-red-700 border-red-200" : "bg-blue-50 text-blue-700 border-blue-200"}`}>
-                          {getRelationshipLabel(guardian.relationship)}
-                        </Badge>
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell className="py-3">
-                      {guardianStudentsQuery.data && guardianStudentsQuery.data.some((rel: any) => rel.guardianId === guardian.id) ? (
-                        <div className="flex -space-x-2 overflow-hidden">
-                          {guardianStudentsQuery.data
-                            .filter((rel: any) => rel.guardianId === guardian.id)
-                            .slice(0, 3)
-                            .map((rel: any) => {
-                              const student = studentsData.find((s: any) => s.id === rel.studentId);
-                              return student ? (
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Avatar 
-                                        key={rel.id} 
-                                        className="h-7 w-7 border-2 border-white cursor-pointer hover:scale-110 hover:z-10 transition-transform"
-                                        onClick={() => handleShowStudentDetails(student)}
-                                      >
-                                        <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
-                                          {student.firstName?.charAt(0)}{student.lastName?.charAt(0)}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top">
-                                      {student.firstName} {student.lastName}
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              ) : null;
-                            })}
-                          {guardianStudentsQuery.data.filter((rel: any) => rel.guardianId === guardian.id).length > 3 && (
-                            <div 
-                              className="flex items-center justify-center h-7 w-7 rounded-full bg-gray-100 border-2 border-white text-xs font-medium text-gray-600 cursor-pointer hover:bg-gray-200 transition-colors"
-                              onClick={() => handleShowGuardianDetails(guardian)}
-                            >
-                              +{guardianStudentsQuery.data.filter((rel: any) => rel.guardianId === guardian.id).length - 3}
-                            </div>
-                          )}
-                        </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {getRelationshipLabel(guardian.relationship)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      {guardian.isEmergencyContact ? (
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                          </svg>
+                          Noodcontact
+                        </span>
                       ) : (
-                        <span className="text-xs text-gray-400">Geen studenten</span>
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                          Standaard
+                        </span>
                       )}
-                    </TableCell>
-
-                    <TableCell className="text-right py-3">
-                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
+                      <div className="flex justify-center items-center space-x-1">
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                          onClick={() => handleShowGuardianDetails(guardian)}
+                          onClick={() => handleViewGuardian(guardian)}
+                          className="h-8 w-8 p-0"
                         >
+                          <span className="sr-only">Bekijken</span>
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
                           onClick={() => handleEditGuardian(guardian)}
+                          className="h-8 w-8 p-0"
                         >
+                          <span className="sr-only">Bewerken</span>
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
-                          onClick={() => handleDelete(guardian)}
+                          onClick={() => handleDeleteGuardian(guardian)}
+                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
                         >
+                          <span className="sr-only">Verwijderen</span>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            
-            {/* Actieknoppen voor geselecteerde voogden */}
-            {selectedGuardians.length > 0 && (
-              <div className="px-4 py-2 bg-gray-50 border-t flex items-center justify-between">
-                <span className="text-sm">
-                  {selectedGuardians.length} {selectedGuardians.length === 1 ? 'voogd' : 'voogden'} geselecteerd
-                </span>
-                <Button 
-                  variant="destructive" 
-                  size="sm"
-                  onClick={handleDeleteSelected}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Pagination */}
+        {!isLoading && !isError && totalPages > 1 && (
+          <div className="border-t border-gray-200 px-4 py-3 flex items-center justify-between">
+            <div className="hidden sm:block">
+              <p className="text-sm text-gray-700">
+                Pagina <span className="font-medium">{currentPage}</span> van <span className="font-medium">{totalPages}</span>
+              </p>
+            </div>
+            <div className="flex-1 flex justify-center sm:justify-end">
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Verwijderen
-                </Button>
-              </div>
-            )}
+                  <span className="sr-only">Vorige</span>
+                  &larr;
+                </button>
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
+                      currentPage === i + 1
+                        ? 'bg-primary text-white'
+                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  <span className="sr-only">Volgende</span>
+                  &rarr;
+                </button>
+              </nav>
+            </div>
           </div>
         )}
       </div>
       
       {/* Voogd details dialoog */}
       <Dialog open={!!selectedGuardian} onOpenChange={() => setSelectedGuardian(null)}>
-        <DialogContent className="w-[90vw] sm:max-w-[900px] max-h-[80vh] overflow-y-auto bg-white p-0">
-          <div className="px-6 py-4">
-            <DialogHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <UserCheck className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <DialogTitle className="text-xl font-semibold">
-                        {selectedGuardian?.firstName} {selectedGuardian?.lastName}
-                      </DialogTitle>
-                      {selectedGuardian?.isEmergencyContact && (
-                        <Badge variant="destructive" className="text-xs">Noodcontact</Badge>
-                      )}
-                    </div>
-                    <DialogDescription className="text-gray-500 text-sm mt-1">
-                      {selectedGuardian && getRelationshipLabel(selectedGuardian.relationship)}
-                    </DialogDescription>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      handleEditGuardian(selectedGuardian!);
-                      setSelectedGuardian(null);
-                    }}
-                  >
-                    <Pencil className="h-4 w-4 mr-2" />
-                    Bewerken
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => {
-                      setIsDeleteDialogOpen(true);
-                      setSelectedGuardian(null);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Verwijderen
-                  </Button>
-                </div>
-              </div>
-            </DialogHeader>
-
-            {selectedGuardian && (
-              <div className="mt-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <h3 className="text-sm font-medium mb-3 text-gray-500">Contactgegevens</h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Mail className="h-4 w-4 text-gray-500" />
-                        <span>{selectedGuardian.email}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 text-sm">
-                        <Phone className="h-4 w-4 text-gray-500" />
-                        <span>{selectedGuardian.phone || "Geen telefoonnummer"}</span>
-                      </div>
-                      
-                      <div className="flex items-start gap-2 text-sm">
-                        <Home className="h-4 w-4 text-gray-500 mt-0.5" />
-                        <div>
-                          {selectedGuardian.street && selectedGuardian.houseNumber && (
-                            <div>{selectedGuardian.street} {selectedGuardian.houseNumber}</div>
-                          )}
-                          {selectedGuardian.postalCode && selectedGuardian.city && (
-                            <div>{selectedGuardian.postalCode} {selectedGuardian.city}</div>
-                          )}
-                          {(!selectedGuardian.street && !selectedGuardian.city) && (
-                            <span className="text-gray-400">Geen adres opgegeven</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {selectedGuardian.notes && (
-                      <div className="mt-6">
-                        <h3 className="text-sm font-medium mb-2 text-gray-500">Notities</h3>
-                        <div className="border rounded-md p-3 bg-gray-50 text-sm whitespace-pre-line">
-                          {selectedGuardian.notes}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-sm font-medium mb-3 text-gray-500">Gekoppelde studenten</h3>
-                    
-                    {guardianStudentsLoading ? (
-                      <div className="flex justify-center items-center h-32">
-                        <div className="w-6 h-6 border-2 border-t-primary rounded-full animate-spin"></div>
-                      </div>
-                    ) : guardianStudentsData.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {guardianStudentsData.map((rel: GuardianStudentRelationType) => (
-                          <div key={rel.id} className="border rounded-lg p-3 bg-gray-50 flex justify-between items-start">
-                            <div>
-                              <p className="font-medium text-sm">{rel.student?.firstName} {rel.student?.lastName}</p>
-                              <p className="text-xs text-gray-500">ID: {rel.student?.studentId}</p>
-                            </div>
-                            {rel.isPrimary && (
-                              <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200 text-xs">Primair</Badge>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-6 bg-gray-50 border rounded-md">
-                        <p className="text-gray-500 text-sm">Geen studenten gekoppeld aan deze voogd</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <DialogFooter className="px-6 py-4 border-t">
-            <Button
-              variant="outline"
-              onClick={() => setSelectedGuardian(null)}
-            >
-              Sluiten
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Student details dialoog */}
-      <Dialog open={!!selectedStudent} onOpenChange={() => setSelectedStudent(null)}>
-            {/* Header met blauwe achtergrond */}
-            <div className="bg-[#1e3a8a] text-white px-6 py-5 rounded-t-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <UserCircle className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold">
-                      {selectedStudent?.firstName} {selectedStudent?.lastName}
-                    </h2>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-blue-100 font-medium">
-                        {selectedStudent?.studentId}
-                      </span>
-                      <Badge className="bg-white/20 text-white border-transparent hover:bg-white/30">
-                        {selectedStudent?.status === 'enrolled' ? 'Ingeschreven' : (selectedStudent?.status || 'Actief')}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-                
-
-              </div>
-            </div>
-
-            <div className="px-6 pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <div className="flex items-center mb-4">
-                    <GraduationCap className="h-5 w-5 text-blue-600 mr-2" />
-                    <h3 className="text-base font-medium text-gray-900">Studentgegevens</h3>
-                  </div>
-                  
-                  <div className="bg-gray-50 border rounded-md overflow-hidden">
-                    <div className="grid grid-cols-1 divide-y">
-                      <div className="p-4 flex">
-                        <div className="w-1/3">
-                          <p className="text-xs font-medium text-gray-500 uppercase">Naam</p>
-                        </div>
-                        <div className="w-2/3">
-                          <p className="font-medium text-gray-900">{selectedStudent?.firstName} {selectedStudent?.lastName}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 flex">
-                        <div className="w-1/3">
-                          <p className="text-xs font-medium text-gray-500 uppercase">Student ID</p>
-                        </div>
-                        <div className="w-2/3">
-                          <p className="font-medium text-gray-900">{selectedStudent?.studentId}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 flex">
-                        <div className="w-1/3">
-                          <p className="text-xs font-medium text-gray-500 uppercase">Email</p>
-                        </div>
-                        <div className="w-2/3">
-                          <p className="font-medium text-gray-900">
-                            {selectedStudent?.email || <span className="text-gray-400 italic">Niet beschikbaar</span>}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 flex">
-                        <div className="w-1/3">
-                          <p className="text-xs font-medium text-gray-500 uppercase">Telefoon</p>
-                        </div>
-                        <div className="w-2/3">
-                          <p className="font-medium text-gray-900">
-                            {selectedStudent?.phone || <span className="text-gray-400 italic">Niet beschikbaar</span>}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 flex">
-                        <div className="w-1/3">
-                          <p className="text-xs font-medium text-gray-500 uppercase">Status</p>
-                        </div>
-                        <div className="w-2/3">
-                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                            {selectedStudent?.status === 'enrolled' ? 'Ingeschreven' : (selectedStudent?.status || 'Actief')}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-
-                  
-
-                </div>
-                
-                <div>
-                  <div className="flex items-center mb-4">
-                    <UserCircle className="h-5 w-5 text-blue-600 mr-2" />
-                    <h3 className="text-base font-medium text-gray-900">Voogdgegevens</h3>
-                  </div>
-                  
-                  <div className="bg-gray-50 border rounded-md overflow-hidden">
-                    <div className="divide-y">
-                      {guardianStudentsQuery.data && guardianStudentsQuery.data
-                        .filter((rel: any) => rel.studentId === selectedStudent?.id)
-                        .map((rel: any) => {
-                          const guardian = guardiansData?.find((g: any) => g.id === rel.guardianId);
-                          return guardian ? (
-                            <div key={rel.id} className="group hover:bg-blue-50/50 transition-colors">
-                              <div className="p-4">
-                                <div className="flex items-start justify-between">
-                                  <div className="flex gap-3">
-                                    <Avatar className="h-10 w-10 mt-0.5">
-                                      <AvatarFallback className="bg-blue-100 text-blue-700">
-                                        {guardian.firstName.charAt(0)}{guardian.lastName.charAt(0)}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                      <div className="flex items-center gap-2">
-                                        <p className="font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</p>
-                                        {rel.isPrimary && (
-                                          <Badge 
-                                            variant="outline" 
-                                            className="px-1.5 py-0 h-5 text-[10px] bg-blue-50 text-blue-700 border-blue-200"
-                                          >
-                                            Primair
-                                          </Badge>
-                                        )}
-                                      </div>
-                                      
-                                      <div className="mt-1 flex items-center gap-2">
-                                        <Badge 
-                                          variant="outline" 
-                                          className="px-1.5 py-0 h-5 text-[10px] bg-[#1e3a8a]/10 text-[#1e3a8a] border-[#1e3a8a]/20"
-                                        >
-                                          {getRelationshipLabel(guardian.relationship)}
-                                        </Badge>
-                                      </div>
-                                      
-                                      <div className="grid grid-cols-1 gap-1 mt-2">
-                                        {guardian.phone && (
-                                          <div className="flex items-center gap-1.5">
-                                            <Phone className="h-3 w-3 text-gray-400" />
-                                            <span className="text-xs text-gray-600">{guardian.phone}</span>
-                                          </div>
-                                        )}
-                                        
-                                        {guardian.email && (
-                                          <div className="flex items-center gap-1.5">
-                                            <Mail className="h-3 w-3 text-gray-400" />
-                                            <span className="text-xs text-gray-600">{guardian.email}</span>
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="flex items-center gap-2">
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="h-8 invisible group-hover:visible transition-all opacity-0 group-hover:opacity-100 text-[#1e3a8a] hover:text-[#1e3a8a] hover:bg-blue-50 border-[#1e3a8a]/20"
-                                      onClick={() => {
-                                        setSelectedStudent(null);
-                                        handleShowGuardianDetails(guardian);
-                                      }}
-                                    >
-                                      <Eye className="h-3.5 w-3.5 mr-1.5" />
-                                      Details
-                                    </Button>
-                                    {guardian.isEmergencyContact && (
-                                      <Badge variant="outline" className="border-red-200 bg-red-50 text-red-600 text-[10px]">
-                                        <AlertTriangle className="h-3 w-3 mr-1" />
-                                        Noodcontact
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          ) : null;
-                        })}
-                        
-                      {!guardianStudentsQuery.data || 
-                      !guardianStudentsQuery.data.some((rel: any) => rel.studentId === selectedStudent?.id) && (
-                        <div className="py-8 px-4">
-                          <div className="flex flex-col items-center justify-center text-center">
-                            <div className="h-12 w-12 rounded-full bg-blue-100/50 flex items-center justify-center mb-3">
-                              <UserX className="h-6 w-6 text-blue-500/30" />
-                            </div>
-                            <p className="text-gray-500 text-sm">
-                              Geen voogden gekoppeld aan deze student
-                            </p>
-                            <Button 
-                              variant="link" 
-                              size="sm" 
-                              className="mt-2 h-auto p-0 text-blue-600 text-xs"
-                              onClick={() => {
-                                setSelectedStudent(null);
-                                handleAddNewGuardian();
-                              }}
-                            >
-                              Voogd toevoegen
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Verwijder dialoog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Voogd verwijderen</DialogTitle>
-            <DialogDescription>
-              Weet u zeker dat u deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex items-center gap-2 mt-2 mb-5 bg-red-50 p-3 rounded-md border border-red-200">
-            <AlertTriangle className="h-5 w-5 text-red-600" />
-            <p className="text-sm text-red-600">Alle koppelingen met studenten worden ook verwijderd.</p>
-          </div>
-          
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteDialogOpen(false)}
-            >
-              Annuleren
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDelete}
-            >
-              Verwijderen
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Toevoegen/bewerken dialoog */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="sm:max-w-[95%] md:max-w-[80%] lg:max-w-[70%] h-[80vh] max-h-[80vh] overflow-hidden flex flex-col">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] px-6 py-4 -mx-6 -mt-6 mb-6">
+        <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto bg-gradient-to-b from-white to-blue-50/40">
+          <DialogHeader className="border-b pb-4 mb-6">
             <div className="flex items-center gap-3">
-              <div className="bg-white/20 rounded-full p-2">
-                <UserCheck className="h-5 w-5 text-white" />
+              <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M3 8a13 13 0 0 1 18 0"></path>
+                  <path d="M21 8a13 13 0 0 0-18 0"></path>
+                </svg>
               </div>
               <div>
-                <DialogTitle className="text-xl font-bold text-white">
-                  {newGuardian.id ? 'Voogd Bewerken' : 'Nieuwe Voogd Toevoegen'}
-                </DialogTitle>
-                <DialogDescription className="text-blue-100 text-sm mt-1">
-                  {newGuardian.id 
-                    ? 'Werk de gegevens bij voor deze voogd.'
-                    : 'Voeg een nieuwe voogd toe aan het systeem.'}
+                <DialogTitle className="text-primary text-xl font-bold">Voogd Details</DialogTitle>
+                <DialogDescription className="text-gray-500">
+                  Gedetailleerde informatie over {selectedGuardian?.firstName} {selectedGuardian?.lastName}
                 </DialogDescription>
               </div>
             </div>
-          </div>
+          </DialogHeader>
           
-          <form onSubmit={handleSubmitGuardian} className="flex flex-col flex-1 overflow-hidden">
-            <Tabs defaultValue="personal" className="w-full flex flex-col flex-1 overflow-hidden">
-              <TabsList className="grid grid-cols-3 mb-6 bg-gray-100 rounded-lg h-12 flex-shrink-0">
-                <TabsTrigger 
-                  value="personal" 
-                  className="flex items-center gap-2 font-medium data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-sm rounded-md"
-                >
-                  <User className="h-4 w-4" />
-                  Persoonlijk
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="contact" 
-                  className="flex items-center gap-2 font-medium data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-sm rounded-md"
-                >
-                  <MapPin className="h-4 w-4" />
-                  Contact & Adres
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="students" 
-                  className="flex items-center gap-2 font-medium data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-sm rounded-md"
-                >
-                  <Users className="h-4 w-4" />
-                  Studenten
-                </TabsTrigger>
-              </TabsList>
-
-              <div className="flex-1 overflow-y-auto">
-                <TabsContent value="personal" className="mt-0">
-                  <div className="p-4 bg-white rounded-lg min-h-[450px]">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">
-                          Voornaam <span className="text-primary">*</span>
-                        </Label>
-                        <Input
-                          id="firstName"
-                          name="firstName"
-                          value={newGuardian.firstName}
-                          onChange={handleInputChange}
-                          className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="Voornaam"
-                          required
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">
-                          Achternaam <span className="text-primary">*</span>
-                        </Label>
-                        <Input
-                          id="lastName"
-                          name="lastName"
-                          value={newGuardian.lastName}
-                          onChange={handleInputChange}
-                          className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="Achternaam"
-                          required
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="email" className="text-xs font-medium text-gray-700">
-                          E-mail <span className="text-primary">*</span>
-                        </Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={newGuardian.email}
-                          onChange={handleInputChange}
-                          className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="email@example.com"
-                          required
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="phone" className="text-xs font-medium text-gray-700">
-                          Telefoon
-                        </Label>
-                        <Input
-                          id="phone"
-                          name="phone"
-                          value={newGuardian.phone || ''}
-                          onChange={handleInputChange}
-                          className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="06 1234 5678"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="relationship" className="text-xs font-medium text-gray-700">
-                          Relatie tot student
-                        </Label>
-                        <Select
-                          name="relationship"
-                          value={newGuardian.relationship}
-                          onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
-                        >
-                          <SelectTrigger className="mt-1 h-9 text-sm bg-white border-gray-200">
-                            <SelectValue placeholder="Selecteer relatie" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="parent">Ouder</SelectItem>
-                            <SelectItem value="guardian">Voogd</SelectItem>
-                            <SelectItem value="family">Familie</SelectItem>
-                            <SelectItem value="noodcontact">Noodcontact</SelectItem>
-                            <SelectItem value="other">Anders</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div>
-                        <Label className="text-xs font-medium text-gray-700">Noodcontact</Label>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Checkbox
-                            id="isEmergencyContact"
-                            name="isEmergencyContact" 
-                            checked={newGuardian.isEmergencyContact}
-                            onCheckedChange={(checked) => 
-                              setNewGuardian({...newGuardian, isEmergencyContact: !!checked})
-                            }
-                          />
-                          <Label 
-                            htmlFor="isEmergencyContact" 
-                            className="text-xs text-red-600"
-                          >
-                            Dit is een noodcontact
-                          </Label>
-                        </div>
-                        {newGuardian.isEmergencyContact && (
-                          <p className="text-xs text-gray-500 mt-1">
-                            Deze persoon zal gecontacteerd worden in geval van nood.
-                          </p>
+          {selectedGuardian && (
+            <div className="space-y-6">
+                
+                <TabsContent value="personal" className="space-y-6">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="w-full md:w-1/3 space-y-5">
+                      <div className="flex flex-col items-center text-center p-6 border rounded-md bg-white shadow-sm">
+                        <Avatar className="h-24 w-24 mb-4">
+                          <AvatarFallback className="bg-[#1e3a8a] text-white text-2xl">
+                            {selectedGuardian.firstName ? selectedGuardian.firstName.charAt(0) : ''}{selectedGuardian.lastName ? selectedGuardian.lastName.charAt(0) : ''}
+                          </AvatarFallback>
+                        </Avatar>
+                        <h2 className="text-xl font-bold">{selectedGuardian.firstName} {selectedGuardian.lastName}</h2>
+                        <p className="text-gray-500 mb-2">{getRelationshipLabel(selectedGuardian.relationship)}</p>
+                        {selectedGuardian.isEmergencyContact && (
+                          <Badge variant="destructive" className="mt-1">Noodcontact</Badge>
                         )}
                       </div>
-
-                      <div className="md:col-span-3">
-                        <Label htmlFor="notes" className="text-xs font-medium text-gray-700">
-                          Notities
-                        </Label>
-                        <Textarea
-                          id="notes"
-                          name="notes"
-                          placeholder="Extra informatie over deze voogd..."
-                          value={newGuardian.notes || ''}
-                          onChange={handleInputChange}
-                          className="mt-1 text-sm bg-white border-gray-200"
-                          rows={3}
-                        />
-                      </div>
                     </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="contact" className="mt-0">
-                  <div className="p-4 bg-white rounded-lg min-h-[450px]">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <Label htmlFor="street" className="text-xs font-medium text-gray-700">
-                          Straat
-                        </Label>
-                        <Input
-                          id="street"
-                          name="street"
-                          value={newGuardian.street || ''}
-                          onChange={handleInputChange}
-                          className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="Straatnaam"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="houseNumber" className="text-xs font-medium text-gray-700">
-                          Huisnummer
-                        </Label>
-                        <Input
-                          id="houseNumber"
-                          name="houseNumber"
-                          value={newGuardian.houseNumber || ''}
-                          onChange={handleInputChange}
-                          className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="123"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="postalCode" className="text-xs font-medium text-gray-700">
-                          Postcode
-                        </Label>
-                        <Input
-                          id="postalCode"
-                          name="postalCode"
-                          value={newGuardian.postalCode || ''}
-                          onChange={handleInputChange}
-                          className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="1234 AB"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="city" className="text-xs font-medium text-gray-700">
-                          Stad
-                        </Label>
-                        <Input
-                          id="city"
-                          name="city"
-                          value={newGuardian.city || ''}
-                          onChange={handleInputChange}
-                          className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="Amsterdam"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="students" className="mt-0">
-                  <div className="p-4 bg-white rounded-lg min-h-[450px]">
-              {!newGuardian.id && (
-                <div className="space-y-4">
-                  <h3 className="text-sm font-medium text-gray-800 mb-4">Koppel Studenten</h3>
-                  
-                  <div className="space-y-2 mb-4">
-                    <Label htmlFor="studentSearch" className="text-xs font-medium text-gray-700">Zoek student</Label>
-                    <div className="relative">
-                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                      <Input
-                        id="studentSearch"
-                        placeholder="Zoek op naam of ID..."
-                        className="pl-9 mt-1 h-9 text-sm bg-white border-gray-200"
-                        value={studentSearchQuery}
-                        onChange={(e) => setStudentSearchQuery(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3 max-h-[350px] overflow-y-auto">
-                    {studentsData
-                      .filter((student: any) => 
-                        filteredStudentIds.includes(student.id)  
-                      )
-                      .map((student: any) => (
-                        <div key={student.id} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`student-${student.id}`}
-                            checked={selectedStudentIds.includes(student.id)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setSelectedStudentIds(prev => [...prev, student.id]);
-                              } else {
-                                setSelectedStudentIds(prev => prev.filter(id => id !== student.id));
-                                if (primaryStudentId === student.id) {
-                                  setPrimaryStudentId(null);
-                                }
-                              }
-                            }}
-                          />
-                          <div className="grid gap-0.5">
-                            <Label htmlFor={`student-${student.id}`} className="font-medium">
-                              {student.firstName} {student.lastName}
-                            </Label>
-                            <p className="text-xs text-gray-500">{student.studentId}</p>
+                    
+                    <div className="w-full md:w-2/3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-gray-700">
+                            Relatie
+                          </Label>
+                          <div className="p-3 border rounded-md bg-gray-50">
+                            {getRelationshipLabel(selectedGuardian.relationship)}
                           </div>
                         </div>
-                      ))}
-                    
-                    {filteredStudentIds.length === 0 && (
-                      <p className="text-sm text-gray-500 text-center py-3">
-                        {studentSearchQuery.trim() !== ''
-                          ? 'Geen studenten gevonden voor deze zoekopdracht.'
-                          : 'Geen studenten beschikbaar om te koppelen.'}
-                      </p>
-                    )}
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-gray-700">
+                            Beroep
+                          </Label>
+                          <div className="p-3 border rounded-md bg-gray-50">
+                            {selectedGuardian.occupation || 'Niet ingevuld'}
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2 md:col-span-2">
+                          <Label className="text-sm font-medium text-gray-700">
+                            Adres
+                          </Label>
+                          <div className="p-3 border rounded-md bg-gray-50">
+                            {selectedGuardian.street} {selectedGuardian.houseNumber}, {selectedGuardian.postalCode} {selectedGuardian.city}
+                          </div>
+                        </div>
+                        
+                        {selectedGuardian.notes && (
+                          <div className="md:col-span-2 space-y-2">
+                            <Label className="text-sm font-medium text-gray-700">
+                              Notities
+                            </Label>
+                            <div className="p-3 bg-gray-50 rounded-md min-h-[100px] border border-gray-200 text-sm">
+                              {selectedGuardian.notes}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="contact" className="space-y-4 pt-4">
+                  <div className="bg-white border rounded-lg p-6 shadow-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-5 w-5 text-primary" />
+                            <Label className="text-sm font-medium text-gray-700">Email</Label>
+                          </div>
+                          <div className="p-3 border rounded-md bg-gray-50">
+                            {selectedGuardian.email || 'Niet ingevuld'}
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-5 w-5 text-primary" />
+                            <Label className="text-sm font-medium text-gray-700">Telefoonnummer</Label>
+                          </div>
+                          <div className="p-3 border rounded-md bg-gray-50">
+                            {selectedGuardian.phone || 'Niet ingevuld'}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Home className="h-5 w-5 text-primary" />
+                            <Label className="text-sm font-medium text-gray-700">Adres</Label>
+                          </div>
+                          <div className="p-3 border rounded-md bg-gray-50">
+                            {selectedGuardian.street} {selectedGuardian.houseNumber}, {selectedGuardian.postalCode} {selectedGuardian.city}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   
-                  {selectedStudentIds.length > 0 && (
-                    <div className="mt-4 border-t pt-4">
-                      <h4 className="text-base font-semibold mb-2">Geselecteerde studenten:</h4>
-                      <div className="space-y-3">
-                        {selectedStudentIds.map(id => {
-                          const student = studentsData.find((s: any) => s.id === id);
+
+                  
+
+                </TabsContent>
+                
+                <TabsContent value="students" className="space-y-6 pt-4">
+                  {selectedGuardian.isEmergencyContact && (
+                    <div className="mb-6 p-5 border-l-4 border-red-600 bg-red-50 rounded-r-lg shadow-sm">
+                      <div className="flex items-center mb-3">
+                        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-red-100 mr-3">
+                          <AlertTriangle className="h-5 w-5 text-red-600" />
+                        </div>
+                        <h3 className="text-lg font-medium text-red-800">Noodcontact</h3>
+                      </div>
+                      
+                      <p className="text-sm text-red-700 mb-3 ml-11">
+                        Dit contact is aangeduid als noodcontact voor de onderstaande studenten en kan gecontacteerd worden in noodgevallen.
+                      </p>
+                    </div>
+                  )}
+                
+                  {guardianStudentsLoading ? (
+                    <div className="flex justify-center my-4">
+                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : guardianStudentsData.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg border border-gray-200">
+                      <Users className="h-12 w-12 text-gray-300 mb-3" />
+                      <h3 className="text-lg font-medium text-gray-500 mb-1">Geen studenten gekoppeld</h3>
+                      <p className="text-sm text-gray-400">Deze voogd heeft nog geen gekoppelde studenten</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-medium">Toegewezen studenten</h3>
+                        <Badge variant={selectedGuardian.isEmergencyContact ? "destructive" : "outline"} className="ml-2">
+                          {guardianStudentsData.length} {guardianStudentsData.length === 1 ? 'student' : 'studenten'}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {guardianStudentsData.map((relation: any) => {
                           return (
-                            <div key={id} className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Avatar className="h-6 w-6">
-                                  <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
-                                    {student?.firstName.charAt(0)}{student?.lastName.charAt(0)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm">{student?.firstName} {student?.lastName}</span>
+                            <div
+                              key={relation.id}
+                              className="flex items-center p-4 bg-white hover:bg-gray-50 border rounded-lg shadow-sm"
+                            >
+                              <Avatar className="h-12 w-12">
+                                <AvatarFallback className="bg-[#1e3a8a] text-white text-lg">
+                                  {relation.student?.firstName?.[0] || '?'}{relation.student?.lastName?.[0] || '?'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="ml-4 flex-1">
+                                {relation.student ? (
+                                  <>
+                                    <div className="text-md font-medium">{relation.student.firstName} {relation.student.lastName}</div>
+                                    <div className="text-sm text-gray-500 flex items-center">
+                                      <span className="mr-3">#{relation.student.studentId}</span>
+                                      {relation.isPrimary && (
+                                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                          Primair contact
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div className="text-sm text-gray-500">Student #{relation.studentId}</div>
+                                )}
                               </div>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 w-6 p-0"
-                                  onClick={() => {
-                                    setSelectedStudentIds(prev => prev.filter(studentId => studentId !== id));
-                                    if (primaryStudentId === id) {
-                                      setPrimaryStudentId(null);
-                                    }
-                                  }}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-gray-400 hover:text-blue-600"
+                                onClick={() => {
+                                  // Implementation for when the button is clicked
+                                }}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
                             </div>
                           );
                         })}
                       </div>
                     </div>
                   )}
-                </div>
-              )}
-                  </div>
-              </TabsContent>
+                </TabsContent>
+              </Tabs>
+            </div>
+          )}
+          
+          <DialogFooter className="mt-6 pt-4 border-t border-gray-200">
+            <Button
+              variant="outline"
+              onClick={() => setSelectedGuardian(null)}
+            >
+              Sluiten
+            </Button>
+            {selectedGuardian && (
+              <Button
+                onClick={() => handleEditGuardian(selectedGuardian)}
+                className="bg-[#3b5998] hover:bg-[#2d4373]"
+              >
+                Bewerken
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Add/Edit Guardian Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto">
+          <DialogHeader className="pb-3 border-b">
+            <DialogTitle className="text-xl font-semibold flex items-center text-primary">
+              <div className="bg-blue-100 rounded-full p-1.5 mr-3">
+                <UserCheck className="h-5 w-5 text-primary" />
               </div>
+              {newGuardian.id ? 'Voogd Bewerken' : 'Nieuwe Voogd Toevoegen'}
+            </DialogTitle>
+            <DialogDescription className="text-gray-500 mt-1">
+              {newGuardian.id 
+                ? 'Werk de informatie bij voor deze voogd.' 
+                : 'Vul alle benodigde informatie in om een nieuwe voogd toe te voegen.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmitGuardian} className="mt-4 space-y-6">
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 p-1 bg-blue-900/10 rounded-md mb-4">
+                <TabsTrigger value="personal" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <UserCircle className="h-4 w-4" />
+                  <span>Persoonlijke Informatie</span>
+                </TabsTrigger>
+                <TabsTrigger value="contact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <Phone className="h-4 w-4" />
+                  <span>Contactgegevens</span>
+                </TabsTrigger>
+                <TabsTrigger value="students" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <Users className="h-4 w-4" />
+                  <span>Studenten</span>
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="personal" className="mt-0">
+                {/* Basisinformatie */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">Voornaam</Label>
+                    <Input 
+                      id="firstName"
+                      name="firstName"
+                      value={newGuardian.firstName || ''}
+                      onChange={handleInputChange}
+                      placeholder="Voornaam"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Achternaam</Label>
+                    <Input 
+                      id="lastName"
+                      name="lastName"
+                      value={newGuardian.lastName || ''}
+                      onChange={handleInputChange}
+                      placeholder="Achternaam"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="relationship">Relatie tot student</Label>
+                    <Select 
+                      name="relationship"
+                      value={newGuardian.relationship || 'parent'}
+                      onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecteer relatie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="parent">Ouder</SelectItem>
+                        <SelectItem value="guardian">Voogd</SelectItem>
+                        <SelectItem value="family">Familie</SelectItem>
+                        <SelectItem value="noodcontact">Noodcontact</SelectItem>
+                        <SelectItem value="other">Anders</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="isEmergencyContact" 
+                      name="isEmergencyContact"
+                      checked={newGuardian.isEmergencyContact || false}
+                      onCheckedChange={(checked) => setNewGuardian({...newGuardian, isEmergencyContact: checked === true})}
+                    />
+                    <Label htmlFor="isEmergencyContact" className="cursor-pointer">
+                      Noodcontact
+                    </Label>
+                  </div>
+                  
+                  {newGuardian.isEmergencyContact && (
+                    <div className="ml-7 border-l-2 pl-4 border-blue-200 space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="hasSecondaryContact" 
+                          checked={!!(newGuardian.emergencyContactName || newGuardian.emergencyContactPhone || newGuardian.emergencyContactRelation)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              // Als het vakje wordt aangevinkt, zet lege waarden
+                              setNewGuardian({
+                                ...newGuardian,
+                                emergencyContactName: ' ', // Spatie om te zorgen dat de velden verschijnen
+                                emergencyContactPhone: '',
+                                emergencyContactRelation: ''
+                              });
+                            } else {
+                              // Als het vakje wordt uitgevinkt, verwijder de waarden
+                              setNewGuardian({
+                                ...newGuardian,
+                                emergencyContactName: '',
+                                emergencyContactPhone: '',
+                                emergencyContactRelation: ''
+                              });
+                            }
+                          }}
+                        />
+                        <Label htmlFor="hasSecondaryContact" className="cursor-pointer">
+                          Secundair noodcontact opgeven
+                        </Label>
+                      </div>
+                      
+                      {!!(newGuardian.emergencyContactName || newGuardian.emergencyContactPhone || newGuardian.emergencyContactRelation) && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="emergencyContactName">Naam</Label>
+                            <Input 
+                              id="emergencyContactName"
+                              name="emergencyContactName"
+                              value={newGuardian.emergencyContactName || ''}
+                              onChange={handleInputChange}
+                              placeholder="Volledige naam van noodcontact"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="emergencyContactPhone">Telefoonnummer</Label>
+                            <Input 
+                              id="emergencyContactPhone"
+                              name="emergencyContactPhone"
+                              value={newGuardian.emergencyContactPhone || ''}
+                              onChange={handleInputChange}
+                              placeholder="06-12345678"
+                            />
+                          </div>
+                          <div className="space-y-2 col-span-2">
+                            <Label htmlFor="emergencyContactRelation">Relatie tot student</Label>
+                            <Select 
+                              name="emergencyContactRelation"
+                              value={newGuardian.emergencyContactRelation || ''}
+                              onValueChange={(value) => setNewGuardian({...newGuardian, emergencyContactRelation: value})}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecteer relatie" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="parent">Ouder</SelectItem>
+                                <SelectItem value="family">Familielid</SelectItem>
+                                <SelectItem value="friend">Vriend(in)</SelectItem>
+                                <SelectItem value="neighbor">Buur</SelectItem>
+                                <SelectItem value="other">Anders</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="notes">Notities</Label>
+                  <Textarea 
+                    id="notes"
+                    name="notes"
+                    value={newGuardian.notes || ''}
+                    onChange={handleInputChange}
+                    placeholder="Notities over deze voogd..."
+                    className="min-h-[120px]"
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="contact" className="space-y-4 pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email <span className="text-[#3b5998]">*</span></Label>
+                    <Input 
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={newGuardian.email || ''}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Telefoonnummer <span className="text-[#3b5998]">*</span></Label>
+                    <Input 
+                      id="phone"
+                      name="phone"
+                      value={newGuardian.phone || ''}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Verwijder de secundaire noodcontact sectie hier omdat deze nu in het persoonlijk tabblad zit */}
+
+                <div className="space-y-2">
+                  <Label htmlFor="street">Straat</Label>
+                  <Input 
+                    id="street"
+                    name="street"
+                    value={newGuardian.street || ''}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="houseNumber">Huisnummer</Label>
+                    <Input 
+                      id="houseNumber"
+                      name="houseNumber"
+                      value={newGuardian.houseNumber || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="postalCode">Postcode</Label>
+                    <Input 
+                      id="postalCode"
+                      name="postalCode"
+                      value={newGuardian.postalCode || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="city">Plaats</Label>
+                    <Input 
+                      id="city"
+                      name="city"
+                      value={newGuardian.city || ''}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="students" className="space-y-4 pt-4">
+                <div className="space-y-4">
+                  <h3 className="text-md font-medium">Studenten toewijzen</h3>
+                  <p className="text-sm text-gray-500">
+                    Selecteer de studenten die aan deze voogd moeten worden toegewezen.
+                  </p>
+                  
+                  <div className="relative">
+                    <Input
+                      placeholder="Zoek studenten..."
+                      value={studentSearchTerm}
+                      onChange={(e) => setStudentSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  </div>
+                  
+                  {allStudentsLoading ? (
+                    <div className="flex justify-center my-4">
+                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : allStudents.length === 0 ? (
+                    <div className="text-center p-4 bg-gray-50 rounded-md">
+                      <p className="text-gray-500">Geen studenten gevonden.</p>
+                    </div>
+                  ) : (
+                    <div className="border rounded-md divide-y">
+                      {allStudents
+                        .filter((student: StudentType) => 
+                          studentSearchTerm === '' || 
+                          `${student.firstName} ${student.lastName}`.toLowerCase().includes(studentSearchTerm.toLowerCase()) ||
+                          student.studentId.toLowerCase().includes(studentSearchTerm.toLowerCase())
+                        )
+                        .map((student: StudentType) => (
+                          <div key={student.id} className="p-3 flex items-center justify-between hover:bg-gray-50">
+                            <div className="flex items-center">
+                              <Checkbox 
+                                id={`student-${student.id}`}
+                                checked={selectedStudentIds.includes(student.id)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedStudentIds([...selectedStudentIds, student.id]);
+                                  } else {
+                                    setSelectedStudentIds(selectedStudentIds.filter(id => id !== student.id));
+                                  }
+                                }}
+                              />
+                              <Label htmlFor={`student-${student.id}`} className="ml-2 cursor-pointer">
+                                <div className="font-medium">{student.firstName} {student.lastName}</div>
+                                <div className="text-xs text-gray-500">#{student.studentId}</div>
+                              </Label>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+                
+                {newGuardian.id && (
+                  <div className="mt-6">
+                    <h3 className="text-md font-medium mb-2">Huidige gekoppelde studenten</h3>
+                    <div className="border rounded-md p-4">
+                      {guardianStudentsLoading ? (
+                        <div className="flex items-center justify-center p-4">
+                          <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                          <span className="ml-2">Gegevens laden...</span>
+                        </div>
+                      ) : (
+                        <div>
+                          {guardianStudentsData && (guardianStudentsData.length > 0) ? (
+                            <div className="space-y-2">
+                              {guardianStudentsData.map((studentGuardian: any) => (
+                                <div key={studentGuardian.id} className="flex justify-between items-center p-2 border-b">
+                                  <div>
+                                    <p className="font-medium">{studentGuardian.student?.firstName} {studentGuardian.student?.lastName}</p>
+                                    <p className="text-xs text-gray-500">#{studentGuardian.student?.studentId}</p>
+                                  </div>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    className="h-8 text-red-500 hover:text-red-700"
+                                    onClick={() => {
+                                      // Implementeer verwijderen van de koppeling in toekomstige versie
+                                      console.log("Ontkoppel student:", studentGuardian);
+                                    }}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-center py-4 text-gray-500">
+                              <p>Deze voogd is nog niet gekoppeld aan studenten.</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
             </Tabs>
-            
-            <div className="mt-8 mb-12 flex gap-4 justify-end pr-8">
+
+            <DialogFooter className="pt-4">
               <Button 
-                type="button" 
                 variant="outline" 
-                size="lg"
+                type="button" 
                 onClick={() => setShowAddDialog(false)}
               >
                 Annuleren
               </Button>
               <Button 
-                type="submit"
-                size="lg"
-                className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
+                type="submit" 
+                className="bg-[#3b5998] hover:bg-[#2d4373]" 
+                disabled={guardianMutation.isPending}
               >
-                {newGuardian.id ? 'Opslaan' : 'Toevoegen'}
+                {guardianMutation.isPending ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Bezig met opslaan...
+                  </>
+                ) : (
+                  newGuardian.id ? 'Voogd Bijwerken' : 'Voogd Toevoegen'
+                )}
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>

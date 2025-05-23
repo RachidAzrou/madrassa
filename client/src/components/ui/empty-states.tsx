@@ -5,7 +5,7 @@ import EmptyState from './empty-state';
 // Voor studenten pagina
 export const StudentEmptyState = ({ description = "Er zijn momenteel geen studenten beschikbaar." }) => (
   <EmptyState 
-    icon={Users} 
+    icon={<Users className="h-10 w-10 opacity-30" />}
     title="Geen studenten gevonden" 
     description={description} 
   />
@@ -14,7 +14,7 @@ export const StudentEmptyState = ({ description = "Er zijn momenteel geen studen
 // Voor klassen pagina
 export const ClassEmptyState = ({ description = "Er zijn momenteel geen klassen beschikbaar." }) => (
   <EmptyState 
-    icon={GraduationCap} 
+    icon={<GraduationCap className="h-10 w-10 opacity-30" />}
     title="Geen klassen gevonden" 
     description={description} 
   />
@@ -23,7 +23,7 @@ export const ClassEmptyState = ({ description = "Er zijn momenteel geen klassen 
 // Voor vakken/cursussen pagina
 export const CourseEmptyState = ({ description = "Er zijn momenteel geen vakken beschikbaar." }) => (
   <EmptyState 
-    icon={BookOpen} 
+    icon={<BookOpen className="h-10 w-10 opacity-30" />}
     title="Geen vakken gevonden" 
     description={description} 
   />
@@ -32,7 +32,7 @@ export const CourseEmptyState = ({ description = "Er zijn momenteel geen vakken 
 // Voor facturen/betalingen pagina
 export const FeeEmptyState = ({ description = "Er zijn momenteel geen facturen beschikbaar." }) => (
   <EmptyState 
-    icon={CreditCard} 
+    icon={<CreditCard className="h-10 w-10 opacity-30" />}
     title="Geen facturen gevonden" 
     description={description} 
   />
@@ -41,7 +41,7 @@ export const FeeEmptyState = ({ description = "Er zijn momenteel geen facturen b
 // Voor examens pagina
 export const ExamEmptyState = ({ description = "Er zijn momenteel geen examens beschikbaar." }) => (
   <EmptyState 
-    icon={ClipboardCheck} 
+    icon={<ClipboardCheck className="h-10 w-10 opacity-30" />}
     title="Geen examens gevonden" 
     description={description} 
   />

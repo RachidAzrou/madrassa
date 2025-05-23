@@ -423,8 +423,21 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(studentGuardians).where(eq(studentGuardians.studentId, studentId));
   }
   
-  async getStudentGuardiansByGuardian(guardianId: number): Promise<StudentGuardian[]> {
-    return await db.select().from(studentGuardians).where(eq(studentGuardians.guardianId, guardianId));
+  async getStudentGuardiansByGuardian(guardianId: number): Promise<any[]> {
+    // Haal student-voogd relaties op met volledige studentgegevens
+    const relations = await db.select({
+      id: studentGuardians.id,
+      studentId: studentGuardians.studentId,
+      guardianId: studentGuardians.guardianId,
+      isPrimary: studentGuardians.isPrimary,
+      relationship: studentGuardians.relationship,
+      student: students
+    })
+    .from(studentGuardians)
+    .leftJoin(students, eq(studentGuardians.studentId, students.id))
+    .where(eq(studentGuardians.guardianId, guardianId));
+    
+    return relations;
   }
   
   async createStudentGuardian(relationData: InsertStudentGuardian): Promise<StudentGuardian> {

@@ -763,29 +763,29 @@ const Teachers = () => {
           </DialogHeader>
           
           <div className="p-6 overflow-y-auto" style={{ height: "calc(80vh - 170px)" }}>
-            <Tabs defaultValue="personal">
-              <TabsList className="flex mb-4 overflow-x-auto space-x-1">
-                <TabsTrigger value="personal" className="flex items-center gap-1 px-3">
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid grid-cols-6 p-1 bg-[#1e3a8a]/10 rounded-md mb-4">
+                <TabsTrigger value="personal" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                   <User className="h-4 w-4" />
                   <span>Persoonlijk</span>
                 </TabsTrigger>
-                <TabsTrigger value="contact" className="flex items-center gap-1 px-3">
+                <TabsTrigger value="contact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                   <Phone className="h-4 w-4" />
                   <span>Contact</span>
                 </TabsTrigger>
-                <TabsTrigger value="address" className="flex items-center gap-1 px-3">
+                <TabsTrigger value="address" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                   <MapPin className="h-4 w-4" />
                   <span>Adres</span>
                 </TabsTrigger>
-                <TabsTrigger value="professional" className="flex items-center gap-1 px-3">
+                <TabsTrigger value="professional" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                   <Briefcase className="h-4 w-4" />
                   <span>Professioneel</span>
                 </TabsTrigger>
-                <TabsTrigger value="subjects" className="flex items-center gap-1 px-3">
+                <TabsTrigger value="subjects" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                   <Book className="h-4 w-4" />
                   <span>Vakken</span>
                 </TabsTrigger>
-                <TabsTrigger value="classes" className="flex items-center gap-1 px-3">
+                <TabsTrigger value="classes" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                   <ChalkBoard className="h-4 w-4" />
                   <span>Klassen</span>
                 </TabsTrigger>

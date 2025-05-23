@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle, Briefcase, StickyNote } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle, AlertTriangle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -783,22 +783,7 @@ export default function Guardians() {
           </DialogHeader>
           
           {selectedGuardian && (
-            <div className="mt-2">
-              <Tabs defaultValue="personal" className="w-full">
-                <TabsList className="grid grid-cols-3 mb-6">
-                  <TabsTrigger value="personal" className="flex gap-2 items-center">
-                    <UserCircle className="h-4 w-4" />
-                    Persoonlijk
-                  </TabsTrigger>
-                  <TabsTrigger value="contact" className="flex gap-2 items-center">
-                    <Mail className="h-4 w-4" />
-                    Contact
-                  </TabsTrigger>
-                  <TabsTrigger value="students" className="flex gap-2 items-center">
-                    <Users className="h-4 w-4" />
-                    Studenten
-                  </TabsTrigger>
-                </TabsList>
+            <div className="space-y-6">
                 
                 <TabsContent value="personal" className="space-y-6">
                   <div className="flex flex-col md:flex-row gap-6">

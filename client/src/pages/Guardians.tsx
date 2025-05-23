@@ -1475,7 +1475,7 @@ export default function Guardians() {
                 className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90"
               >
                 <Save className="mr-2 h-4 w-4" />
-                {newGuardian.id ? 'Opslaan' : 'Toevoegen'}
+                {newGuardian.id ? 'Opslaan' : 'Voogd toevoegen'}
               </Button>
             </div>
           </form>

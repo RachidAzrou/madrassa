@@ -103,6 +103,33 @@ export default function Guardians() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
   
+//Deze effecthook wordt later toegevoegd nadat guardians is gedefinieerd
+  
+  // Handle navigation after saving
+  useEffect(() => {
+    // Als we het dialoogvenster sluiten na het bewerken van een voogd vanuit een student
+    if (!showAddDialog && searchParams.returnToStudent) {
+      // Navigeer terug naar studenten pagina om het studentformulier weer te openen
+      window.location.href = '/students?add=true';
+    }
+  }, [showAddDialog, searchParams.returnToStudent]);
+
+  // Fetch guardians data
+  const {
+    data: guardiansResponse,
+    isLoading,
+    isError,
+    refetch
+  } = useQuery<GuardianType[]>({
+    queryKey: ['/api/guardians', { page: currentPage, limit: itemsPerPage, search: debouncedSearch }],
+  });
+  
+  // Extract guardians with proper type safety and create a fallback for pagination
+  const guardians: GuardianType[] = Array.isArray(guardiansResponse) ? guardiansResponse : [];
+  const totalGuardians: number = guardians.length; // Gebruik de daadwerkelijke lengte van de array
+  
+  const totalPages = Math.ceil(totalGuardians / itemsPerPage);
+  
   // Auto-open edit dialog when navigating from student page with a guardian ID
   useEffect(() => {
     const editGuardianId = searchParams.editId;
@@ -121,32 +148,7 @@ export default function Guardians() {
         });
       }
     }
-  }, [searchParams.editId, guardians]);
-  
-  // Handle navigation after saving
-  useEffect(() => {
-    // Als we het dialoogvenster sluiten na het bewerken van een voogd vanuit een student
-    if (!showAddDialog && searchParams.returnToStudent && searchParams.editId) {
-      // Navigeer terug naar studenten pagina met add=true om het studentformulier weer te openen
-      window.location.href = '/students?add=true';
-    }
-  }, [showAddDialog, searchParams.returnToStudent, searchParams.editId]);
-
-  // Fetch guardians data
-  const {
-    data: guardiansResponse,
-    isLoading,
-    isError,
-    refetch
-  } = useQuery<GuardianType[]>({
-    queryKey: ['/api/guardians', { page: currentPage, limit: itemsPerPage, search: debouncedSearch }],
-  });
-  
-  // Extract guardians with proper type safety and create a fallback for pagination
-  const guardians: GuardianType[] = Array.isArray(guardiansResponse) ? guardiansResponse : [];
-  const totalGuardians: number = guardians.length; // Gebruik de daadwerkelijke lengte van de array
-  
-  const totalPages = Math.ceil(totalGuardians / itemsPerPage);
+  }, [searchParams.editId, guardians, toast]);
 
   // Fetch all students for student assignment
   const {

@@ -1093,17 +1093,24 @@ export default function Guardians() {
       
       {/* Toevoegen/bewerken dialoog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {newGuardian.id ? 'Voogd Bewerken' : 'Nieuwe Voogd Toevoegen'}
-            </DialogTitle>
-            <DialogDescription>
-              {newGuardian.id 
-                ? 'Bewerk de gegevens van deze voogd.'
-                : 'Voer de gegevens in van de nieuwe voogd.'}
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[95%] md:max-w-[80%] lg:max-w-[70%] h-auto max-h-[96vh] overflow-y-auto">
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] px-6 py-4 -mx-6 -mt-6 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 rounded-full p-2">
+                <UserCheck className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold text-white">
+                  {newGuardian.id ? 'Voogd Bewerken' : 'Nieuwe Voogd Toevoegen'}
+                </DialogTitle>
+                <DialogDescription className="text-blue-100 text-sm mt-1">
+                  {newGuardian.id 
+                    ? 'Bewerk de gegevens van deze voogd'
+                    : 'Voer de gegevens in van de nieuwe voogd'}
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
           
           <form onSubmit={handleSubmitGuardian}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-4">

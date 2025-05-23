@@ -1452,118 +1452,116 @@ export default function Students() {
 
       {/* Create Student Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold flex items-center text-primary">
-              <PlusCircle className="mr-2 h-5 w-5 text-primary" />
+        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto">
+          <DialogHeader className="pb-3 border-b">
+            <DialogTitle className="text-xl font-semibold flex items-center text-primary">
+              <div className="bg-blue-100 rounded-full p-1.5 mr-3">
+                <PlusCircle className="h-5 w-5 text-primary" />
+              </div>
               Nieuwe Student Toevoegen
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-gray-500 mt-1">
               Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="py-2">
+          <div className="py-4">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-4 mb-2">
-                <TabsTrigger value="personal">
-                  <User className="mr-2 h-4 w-4" />
-                  Persoonlijk
+              <TabsList className="grid grid-cols-4 mb-4 p-1 bg-blue-900/10 rounded-md">
+                <TabsTrigger value="personal" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <User className="h-4 w-4" />
+                  <span>Persoonlijk</span>
                 </TabsTrigger>
-                <TabsTrigger value="contact">
-                  <Phone className="mr-2 h-4 w-4" />
-                  Contact
+                <TabsTrigger value="contact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <Phone className="h-4 w-4" />
+                  <span>Contact</span>
                 </TabsTrigger>
-                <TabsTrigger value="address">
-                  <MapPin className="mr-2 h-4 w-4" />
-                  Adres
+                <TabsTrigger value="address" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <MapPin className="h-4 w-4" />
+                  <span>Adres</span>
                 </TabsTrigger>
-                <TabsTrigger value="class">
-                  <ChalkBoard className="mr-2 h-4 w-4" />
-                  Klas
+                <TabsTrigger value="class" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <ChalkBoard className="h-4 w-4" />
+                  <span>Klas</span>
                 </TabsTrigger>
               </TabsList>
               
-
-              
               {/* Persoonlijke informatie tab */}
-              <TabsContent value="personal" className="space-y-3">
-                <div className="p-3 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-base font-semibold text-primary mb-1">Persoonlijke gegevens</h3>
-                  
-                  {/* Foto upload sectie */}
-                  <div className="flex mb-0 mt-0 items-start">
-                    <div 
-                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-4"
-                      onClick={() => {
-                        const fileInput = document.getElementById('student-photo') as HTMLInputElement;
-                        fileInput?.click();
-                      }}
-                    >
-                      <img id="student-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
-                      <div id="student-photo-placeholder" className="w-full h-full flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-full">
-                        <User className="h-10 w-10 text-gray-300" />
-                        <div className="absolute bottom-0 right-0 bg-[#1e3a8a] rounded-full p-1.5 shadow-sm">
-                          <Upload className="h-3.5 w-3.5 text-white" />
-                        </div>
-                      </div>
-                      
-                      {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
+              <TabsContent value="personal" className="space-y-4">
+                <div className="p-4 bg-white rounded-lg">
+                  <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-4">
+                    {/* Foto upload sectie */}
+                    <div className="flex items-start">
                       <div 
-                        className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden"
-                        id="photo-delete-overlay"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
-                          const photoPlaceholder = document.getElementById('student-photo-placeholder');
-                          const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                        className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-4 rounded-full border-2 border-blue-100 shadow-sm"
+                        onClick={() => {
                           const fileInput = document.getElementById('student-photo') as HTMLInputElement;
-                          
-                          if (photoPreview && photoPlaceholder && fileInput && photoDeleteOverlay) {
-                            photoPreview.src = '';
-                            photoPreview.classList.add('hidden');
-                            photoPlaceholder.classList.remove('hidden');
-                            photoDeleteOverlay.classList.add('hidden');
-                            fileInput.value = '';
-                          }
+                          fileInput?.click();
                         }}
                       >
-                        <Trash2 className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
-                    
-                    <input 
-                      type="file" 
-                      id="student-photo" 
-                      accept="image/*" 
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = function(event) {
+                        <img id="student-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
+                        <div id="student-photo-placeholder" className="w-full h-full flex items-center justify-center bg-blue-50 rounded-full">
+                          <User className="h-10 w-10 text-blue-300" />
+                          <div className="absolute bottom-0 right-0 bg-primary rounded-full p-1.5 shadow-sm">
+                            <Upload className="h-3.5 w-3.5 text-white" />
+                          </div>
+                        </div>
+                        
+                        {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
+                        <div 
+                          className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden rounded-full"
+                          id="photo-delete-overlay"
+                          onClick={(e) => {
+                            e.stopPropagation();
                             const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
                             const photoPlaceholder = document.getElementById('student-photo-placeholder');
                             const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                            const fileInput = document.getElementById('student-photo') as HTMLInputElement;
                             
-                            if (photoPreview && photoPlaceholder && photoDeleteOverlay && event.target?.result) {
-                              photoPreview.src = event.target.result as string;
-                              photoPreview.classList.remove('hidden');
-                              photoPlaceholder.classList.add('hidden');
-                              photoDeleteOverlay.classList.remove('hidden');
+                            if (photoPreview && photoPlaceholder && fileInput && photoDeleteOverlay) {
+                              photoPreview.src = '';
+                              photoPreview.classList.add('hidden');
+                              photoPlaceholder.classList.remove('hidden');
+                              photoDeleteOverlay.classList.add('hidden');
+                              fileInput.value = '';
                             }
-                          };
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                    />
-                  </div>
-                  
-                  <div className="flex mt-0 mb-0 justify-end">
+                          }}
+                        >
+                          <Trash2 className="h-6 w-6 text-white" />
+                        </div>
+                      </div>
+                      
+                      <input 
+                        type="file" 
+                        id="student-photo" 
+                        accept="image/*" 
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function(event) {
+                              const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
+                              const photoPlaceholder = document.getElementById('student-photo-placeholder');
+                              const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                              
+                              if (photoPreview && photoPlaceholder && photoDeleteOverlay && event.target?.result) {
+                                photoPreview.src = event.target.result as string;
+                                photoPreview.classList.remove('hidden');
+                                photoPlaceholder.classList.add('hidden');
+                                photoDeleteOverlay.classList.remove('hidden');
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </div>
+                    
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="flex items-center border border-gray-300 text-xs h-7"
+                      className="flex items-center h-9 border border-gray-200 text-sm shadow-sm hover:bg-blue-50"
                       onClick={() => {
                         // Get access to toast context within this function
                         const localToast = toast;
@@ -1643,7 +1641,8 @@ export default function Students() {
                       Gegevens laden via eID
                     </Button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
                     <div>
                       <Label htmlFor="studentId" className="text-xs font-medium text-gray-700">
                         StudentID <span className="text-muted-foreground text-xs">(automatisch)</span>
@@ -1652,7 +1651,7 @@ export default function Students() {
                         id="studentId"
                         value={nextStudentIdData?.nextStudentId || "Wordt geladen..."}
                         disabled
-                        className="mt-0.5 h-8 text-sm bg-gray-100 text-gray-500 font-medium"
+                        className="mt-1 h-9 text-sm bg-gray-50 text-gray-500 font-medium border-gray-200"
                       />
                     </div>
                     
@@ -1664,11 +1663,32 @@ export default function Students() {
                         value={studentFormData.status}
                         onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
                       >
-                        <SelectTrigger id="status" className="mt-0.5 h-8 text-sm bg-white">
+                        <SelectTrigger id="status" className="mt-1 h-9 text-sm bg-white border-gray-200">
                           <SelectValue placeholder="Selecteer status" />
                         </SelectTrigger>
                         <SelectContent>
                           {statusOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="gender" className="text-xs font-medium text-gray-700">
+                        Geslacht
+                      </Label>
+                      <Select
+                        value={studentFormData.gender}
+                        onValueChange={(value) => setStudentFormData({ ...studentFormData, gender: value })}
+                      >
+                        <SelectTrigger id="gender" className="mt-1 h-9 text-sm bg-white border-gray-200">
+                          <SelectValue placeholder="Selecteer geslacht" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {genderOptions.map(option => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>
@@ -1685,7 +1705,7 @@ export default function Students() {
                         id="firstName"
                         value={studentFormData.firstName}
                         onChange={(e) => setStudentFormData({ ...studentFormData, firstName: e.target.value })}
-                        className="mt-0.5 h-8 text-sm bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="Voornaam"
                       />
                     </div>
@@ -1698,34 +1718,13 @@ export default function Students() {
                         id="lastName"
                         value={studentFormData.lastName}
                         onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
-                        className="mt-0.5 h-8 text-sm bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="Achternaam"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
-                        Geslacht
-                      </Label>
-                      <Select
-                        value={studentFormData.gender}
-                        onValueChange={(value) => setStudentFormData({ ...studentFormData, gender: value })}
-                      >
-                        <SelectTrigger id="gender" className="mt-1 bg-white">
-                          <SelectValue placeholder="Selecteer geslacht" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {genderOptions.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">
                         Geboortedatum
                       </Label>
                       <Input
@@ -1733,21 +1732,21 @@ export default function Students() {
                         type="date"
                         value={studentFormData.dateOfBirth || ''}
                         onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                       />
                     </div>
                     
-                    <div className="md:col-span-2">
-                      <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
+                    <div className="md:col-span-3">
+                      <Label htmlFor="notes" className="text-xs font-medium text-gray-700">
                         Notities
                       </Label>
                       <Textarea
                         id="notes"
                         value={studentFormData.notes}
                         onChange={(e) => setStudentFormData({ ...studentFormData, notes: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 text-sm bg-white border-gray-200"
                         placeholder="Voeg hier aanvullende informatie toe..."
-                        rows={4}
+                        rows={3}
                       />
                     </div>
                   </div>
@@ -1755,12 +1754,11 @@ export default function Students() {
               </TabsContent>
               
               {/* Contact informatie tab */}
-              <TabsContent value="contact" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TabsContent value="contact" className="space-y-4">
+                <div className="p-4 bg-white rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="email" className="text-xs font-medium text-gray-700">
                         Email
                       </Label>
                       <Input
@@ -1768,26 +1766,26 @@ export default function Students() {
                         type="email"
                         value={studentFormData.email}
                         onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="student@mymadrassa.nl"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="phone" className="text-xs font-medium text-gray-700">
                         Telefoonnummer
                       </Label>
                       <Input
                         id="phone"
                         value={studentFormData.phone}
                         onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="06 1234 5678"
                       />
                     </div>
                     
-                    <div className="md:col-span-2">
-                      <Label htmlFor="enrollmentDate" className="text-sm font-medium text-gray-700">
+                    <div>
+                      <Label htmlFor="enrollmentDate" className="text-xs font-medium text-gray-700">
                         Inschrijvingsdatum
                       </Label>
                       <Input
@@ -1795,7 +1793,7 @@ export default function Students() {
                         type="date"
                         value={studentFormData.enrollmentDate}
                         onChange={(e) => setStudentFormData({ ...studentFormData, enrollmentDate: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                       />
                     </div>
                   </div>
@@ -1803,58 +1801,57 @@ export default function Students() {
               </TabsContent>
               
               {/* Adres informatie tab */}
-              <TabsContent value="address" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TabsContent value="address" className="space-y-4">
+                <div className="p-4 bg-white rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="street" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="street" className="text-xs font-medium text-gray-700">
                         Straat
                       </Label>
                       <Input
                         id="street"
                         value={studentFormData.street}
                         onChange={(e) => setStudentFormData({ ...studentFormData, street: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="Straatnaam"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="houseNumber" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="houseNumber" className="text-xs font-medium text-gray-700">
                         Huisnummer
                       </Label>
                       <Input
                         id="houseNumber"
                         value={studentFormData.houseNumber}
                         onChange={(e) => setStudentFormData({ ...studentFormData, houseNumber: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="123"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="postalCode" className="text-xs font-medium text-gray-700">
                         Postcode
                       </Label>
                       <Input
                         id="postalCode"
                         value={studentFormData.postalCode}
                         onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="1234 AB"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="city" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="city" className="text-xs font-medium text-gray-700">
                         Stad
                       </Label>
                       <Input
                         id="city"
                         value={studentFormData.city}
                         onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 h-9 text-sm bg-white border-gray-200"
                         placeholder="Amsterdam"
                       />
                     </div>
@@ -1863,94 +1860,83 @@ export default function Students() {
               </TabsContent>
               
               {/* Klas toewijzing tab */}
-              <TabsContent value="class" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-primary">Klas Toewijzing</h3>
+              <TabsContent value="class" className="space-y-4">
+                <div className="p-4 bg-white rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
                     {studentFormData.studentGroupId && (
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
+                      <Badge variant="outline" className="bg-blue-50 text-primary border-blue-100 font-medium py-1">
+                        <CheckCircle className="h-3.5 w-3.5 mr-1" />
                         Klas toegewezen
                       </Badge>
                     )}
                   </div>
-                  <div className="space-y-6">
-                    <p className="text-sm text-gray-500">
-                      Wijs de student toe aan een klas. Een student kan maar in één klas zitten.
-                    </p>
-                    
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="schoolYear" className="text-sm font-medium text-gray-700">
-                            Schooljaar <span className="text-primary">*</span>
-                          </Label>
-                          <div className="mt-1">
-                            <Select
-                              value={studentFormData.schoolYear || 'geen'}
-                              onValueChange={(value) => setStudentFormData({ 
-                                ...studentFormData, 
-                                schoolYear: value === 'geen' ? '' : value
-                              })}
-                            >
-                              <SelectTrigger className="border-gray-200 bg-white h-9">
-                                <SelectValue placeholder="Selecteer schooljaar" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="geen">Selecteer schooljaar</SelectItem>
-                                <SelectItem value="2024-2025">2024-2025</SelectItem>
-                                <SelectItem value="2025-2026">2025-2026</SelectItem>
-                                <SelectItem value="2026-2027">2026-2027</SelectItem>
-                                <SelectItem value="2027-2028">2027-2028</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="studentGroupId" className="text-sm font-medium text-gray-700">
-                            Selecteer klas
-                          </Label>
-                          <div className="mt-1">
-                            <Select
-                              value={studentFormData.studentGroupId?.toString() || 'none'}
-                              onValueChange={(value) => setStudentFormData({ 
-                                ...studentFormData, 
-                                studentGroupId: value === 'none' ? null : parseInt(value) 
-                              })}
-                            >
-                              <SelectTrigger className="border-gray-200 bg-white h-9">
-                                <SelectValue placeholder="Selecteer klas" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="none">Geen klas</SelectItem>
-                                {studentGroups.map((group: any) => (
-                                  <SelectItem key={group.id} value={group.id.toString()}>
-                                    {group.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                    <div>
+                      <Label htmlFor="schoolYear" className="text-xs font-medium text-gray-700">
+                        Schooljaar <span className="text-primary">*</span>
+                      </Label>
+                      <Select
+                        value={studentFormData.schoolYear || 'geen'}
+                        onValueChange={(value) => setStudentFormData({ 
+                          ...studentFormData, 
+                          schoolYear: value === 'geen' ? '' : value
+                        })}
+                      >
+                        <SelectTrigger className="border-gray-200 bg-white h-9 mt-1 text-sm">
+                          <SelectValue placeholder="Selecteer schooljaar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="geen">Selecteer schooljaar</SelectItem>
+                          <SelectItem value="2024-2025">2024-2025</SelectItem>
+                          <SelectItem value="2025-2026">2025-2026</SelectItem>
+                          <SelectItem value="2026-2027">2026-2027</SelectItem>
+                          <SelectItem value="2027-2028">2027-2028</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     
-                    {studentFormData.studentGroupId && (
-                      <div className="flex items-center p-4 mt-4 rounded-md bg-blue-50 border border-blue-100">
-                        <div className="mr-4 p-2 bg-primary rounded-full">
-                          <Users className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-primary">
-                            {studentGroups.find((g: any) => g.id === studentFormData.studentGroupId)?.name}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            De student wordt toegewezen aan deze klas
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                    <div>
+                      <Label htmlFor="studentGroupId" className="text-xs font-medium text-gray-700">
+                        Selecteer klas
+                      </Label>
+                      <Select
+                        value={studentFormData.studentGroupId?.toString() || 'none'}
+                        onValueChange={(value) => setStudentFormData({ 
+                          ...studentFormData, 
+                          studentGroupId: value === 'none' ? null : parseInt(value) 
+                        })}
+                      >
+                        <SelectTrigger className="border-gray-200 bg-white h-9 mt-1 text-sm">
+                          <SelectValue placeholder="Selecteer klas" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Geen klas</SelectItem>
+                          {studentGroups.map((group: any) => (
+                            <SelectItem key={group.id} value={group.id.toString()}>
+                              {group.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
+                  
+                  {studentFormData.studentGroupId && (
+                    <div className="flex items-center p-3 mt-4 rounded-md bg-blue-50 border border-blue-100">
+                      <div className="mr-3 p-2 bg-primary rounded-full">
+                        <Users className="h-4 w-4 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-primary">
+                          {studentGroups.find((g: any) => g.id === studentFormData.studentGroupId)?.name}
+                        </h4>
+                        <p className="text-xs text-gray-600">
+                          De student wordt toegewezen aan deze klas
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
               

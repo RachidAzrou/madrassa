@@ -19,9 +19,10 @@ import { useToast } from '@/hooks/use-toast';
 interface ManageStudentGuardiansProps {
   studentId: number;
   onClose?: () => void;
+  readonly?: boolean;
 }
 
-export default function ManageStudentGuardians({ studentId, onClose }: ManageStudentGuardiansProps) {
+export default function ManageStudentGuardians({ studentId, onClose, readonly = false }: ManageStudentGuardiansProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
   const queryClient = useQueryClient();

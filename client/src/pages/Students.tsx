@@ -2992,22 +2992,26 @@ export default function Students() {
           {selectedStudent && (
             <div className="px-6 py-4">
               <Tabs defaultValue="personal" className="w-full">
-                <TabsList className="grid grid-cols-4 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
-                  <TabsTrigger value="personal" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                <TabsList className="grid grid-cols-5 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
+                  <TabsTrigger value="personal" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-2">
                     <User className="h-4 w-4" />
                     <span>Persoonlijk</span>
                   </TabsTrigger>
-                  <TabsTrigger value="contact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <TabsTrigger value="contact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-2">
                     <Phone className="h-4 w-4" />
                     <span>Contact</span>
                   </TabsTrigger>
-                  <TabsTrigger value="address" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <TabsTrigger value="address" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-2">
                     <MapPin className="h-4 w-4" />
                     <span>Adres</span>
                   </TabsTrigger>
-                  <TabsTrigger value="class" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <TabsTrigger value="class" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-2">
                     <ChalkBoard className="h-4 w-4" />
                     <span>Klas</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="guardians" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-2">
+                    <Users className="h-4 w-4" />
+                    <span>Voogden</span>
                   </TabsTrigger>
                 </TabsList>
                 
@@ -3297,6 +3301,27 @@ export default function Students() {
                     )}
                   </div>
                 </TabsContent>
+                
+                {/* Voogden tab */}
+                <TabsContent value="guardians" className="pt-0">
+                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-[#1e3a8a] rounded-full">
+                          <Users className="h-5 w-5 text-white" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-[#1e3a8a]">Voogden & Contactpersonen</h3>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6">
+                      <ManageStudentGuardians 
+                        studentId={selectedStudent.id}
+                        readonly={true}
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
               </Tabs>
               
               <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
@@ -3558,7 +3583,25 @@ export default function Students() {
                   // Maak een kopie van de data om te versturen, zonder studentId
                   const { studentId, ...restData } = studentFormData;
                   const dataToSubmit = {
-                    ...restData,
+                    firstName: restData.firstName || "",
+                    lastName: restData.lastName || "",
+                    email: restData.email || "",
+                    phone: restData.phone || "",
+                    dateOfBirth: restData.dateOfBirth || null,
+                    address: restData.address || "",
+                    street: restData.street || "",
+                    houseNumber: restData.houseNumber || "",
+                    postalCode: restData.postalCode || "",
+                    city: restData.city || "",
+                    status: restData.status || "actief",
+                    enrollmentDate: restData.enrollmentDate || null,
+                    schoolYear: restData.schoolYear || "",
+                    studentGroupId: restData.studentGroupId || null,
+                    notes: restData.notes || "",
+                    gender: restData.gender || "",
+                    nationality: restData.nationality || "",
+                    placeOfBirth: restData.placeOfBirth || "",
+                    nationalNumber: restData.nationalNumber || "",
                     programs: selectedPrograms.length > 0 ? selectedPrograms : 
                       (studentFormData.programId ? [{ 
                         programId: studentFormData.programId, 

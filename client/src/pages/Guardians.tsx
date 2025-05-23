@@ -573,10 +573,10 @@ export default function Guardians() {
                       onCheckedChange={handleToggleAllGuardians}
                     />
                   </TableHead>
-                  <TableHead className="py-3 font-medium">Naam</TableHead>
-                  <TableHead className="py-3 font-medium">Relatie</TableHead>
-                  <TableHead className="py-3 font-medium">Studenten</TableHead>
-                  <TableHead className="text-right w-[120px] py-3 font-medium"></TableHead>
+                  <TableHead className="py-3 font-medium text-xs uppercase text-gray-500">NAAM</TableHead>
+                  <TableHead className="py-3 font-medium text-xs uppercase text-gray-500">RELATIE</TableHead>
+                  <TableHead className="py-3 font-medium text-xs uppercase text-gray-500">STUDENTEN</TableHead>
+                  <TableHead className="text-right w-[120px] py-3 font-medium text-xs uppercase text-gray-500"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

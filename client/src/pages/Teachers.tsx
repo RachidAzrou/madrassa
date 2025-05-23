@@ -685,7 +685,7 @@ const Teachers = () => {
           </div>
           
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             <div className="space-y-6">
               <div className="bg-white p-4 rounded-lg border border-gray-200">
                 <h3 className="text-sm font-medium text-gray-500 mb-3">Basisinformatie</h3>
@@ -853,8 +853,8 @@ const Teachers = () => {
       
       {/* Create Teacher Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95vw] h-[95vh] p-0">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+        <DialogContent className="sm:max-w-[95vw] h-[95vh]">
+          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg -mx-6 -mt-6">
             <div className="flex items-center">
               <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-4">
                 <GraduationCap className="h-6 w-6 text-white" />
@@ -868,7 +868,7 @@ const Teachers = () => {
                 </DialogDescription>
               </div>
             </div>
-          </div>
+          </DialogHeader>
           
           <div className="mt-2 overflow-y-auto pr-1" style={{ height: "calc(95vh - 100px)" }}>
             <Tabs defaultValue="personal">

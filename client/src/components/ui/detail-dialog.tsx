@@ -29,7 +29,7 @@ export function DetailDialogHeader({
   onClose 
 }: DetailDialogHeaderProps) {
   return (
-    <div className="bg-[#1e3a8a] text-white px-6 py-5 rounded-t-lg">
+    <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           {icon && (
@@ -60,7 +60,7 @@ export function DetailDialogHeader({
           <Button
             type="button"
             variant="ghost"
-            className="text-white hover:bg-[#1e3a8a]/80 hover:text-white"
+            className="text-white hover:bg-blue-700 hover:text-white"
             onClick={onClose}
           >
             <X className="h-4 w-4 mr-2" />
@@ -138,7 +138,7 @@ export function HoverCardItem({ children, actions }: HoverCardItemProps) {
         <div className="flex items-start justify-between">
           {children}
           {actions && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               {actions}
             </div>
           )}

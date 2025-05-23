@@ -1298,10 +1298,23 @@ const Teachers = () => {
               </TabsContent>
               
               {/* Professionele informatie tab */}
-              <TabsContent value="professional" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Professionele gegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TabsContent value="professional" className="space-y-3">
+                <div className="p-3 border border-gray-200 rounded-lg bg-white shadow-sm min-h-[365px]">
+                  <h3 className="text-lg font-semibold text-primary mb-2">Professionele gegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-3">
+                    <div>
+                      <Label htmlFor="profession" className="text-sm font-medium text-gray-700">
+                        Beroep
+                      </Label>
+                      <Input
+                        id="profession"
+                        placeholder="Beroep"
+                        value={teacherFormData.profession || ""}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, profession: e.target.value })}
+                        className="mt-1 bg-white h-8"
+                      />
+                    </div>
+                    
                     <div>
                       <Label htmlFor="educationLevel" className="text-sm font-medium text-gray-700">
                         Opleidingsniveau
@@ -1310,7 +1323,7 @@ const Teachers = () => {
                         value={teacherFormData.educationLevel}
                         onValueChange={(value) => setTeacherFormData({ ...teacherFormData, educationLevel: value })}
                       >
-                        <SelectTrigger className="w-full mt-1 bg-white">
+                        <SelectTrigger className="w-full mt-1 bg-white h-8">
                           <SelectValue placeholder="Selecteer opleidingsniveau" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1324,125 +1337,26 @@ const Teachers = () => {
                     </div>
                     
                     <div>
-                      <Label htmlFor="yearsOfExperience" className="text-sm font-medium text-gray-700">
-                        Jaren ervaring
+                      <Label htmlFor="educationDetail" className="text-sm font-medium text-gray-700">
+                        Opleidingsdetails
                       </Label>
                       <Input
-                        id="yearsOfExperience"
-                        type="number"
-                        value={teacherFormData.yearsOfExperience.toString()}
-                        onChange={(e) => setTeacherFormData({
-                          ...teacherFormData,
-                          yearsOfExperience: parseInt(e.target.value) || 0
-                        })}
-                        className="mt-1 bg-white"
-                        min="0"
-                        max="50"
+                        id="educationDetail"
+                        placeholder="Specifieke opleiding"
+                        value={teacherFormData.educationDetail || ""}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, educationDetail: e.target.value })}
+                        className="mt-1 bg-white h-8"
                       />
                     </div>
                     
-                    <div className="md:col-span-2">
-                      <Label className="text-sm font-medium text-gray-700 mb-1 block">
-                        Certificeringen
-                      </Label>
-                      <div className="grid grid-cols-1 gap-2">
-                        <Input
-                          placeholder="Voeg een certificering toe en druk op Enter"
-                          className="bg-white"
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && e.currentTarget.value.trim() !== '') {
-                              e.preventDefault();
-                              const value = e.currentTarget.value.trim();
-                              if (!teacherFormData.certifications.includes(value)) {
-                                setTeacherFormData({
-                                  ...teacherFormData,
-                                  certifications: [...teacherFormData.certifications, value]
-                                });
-                              }
-                              e.currentTarget.value = '';
-                            }
-                          }}
-                        />
-                        
-                        {teacherFormData.certifications.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {teacherFormData.certifications.map((cert, index) => (
-                              <div key={index} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center">
-                                {cert}
-                                <button
-                                  type="button"
-                                  className="ml-1 text-green-600 hover:text-green-800"
-                                  onClick={() => {
-                                    setTeacherFormData({
-                                      ...teacherFormData,
-                                      certifications: teacherFormData.certifications.filter((_, i) => i !== index)
-                                    });
-                                  }}
-                                >
-                                  <X className="h-3 w-3" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="md:col-span-2">
-                      <Label className="text-sm font-medium text-gray-700 mb-1 block">
-                        Specialisaties
-                      </Label>
-                      <div className="grid grid-cols-1 gap-2">
-                        <Input
-                          placeholder="Voeg een specialisatie toe en druk op Enter"
-                          className="bg-white"
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && e.currentTarget.value.trim() !== '') {
-                              e.preventDefault();
-                              const value = e.currentTarget.value.trim();
-                              if (!teacherFormData.specialties.includes(value)) {
-                                setTeacherFormData({
-                                  ...teacherFormData,
-                                  specialties: [...teacherFormData.specialties, value]
-                                });
-                              }
-                              e.currentTarget.value = '';
-                            }
-                          }}
-                        />
-                        
-                        {teacherFormData.specialties.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {teacherFormData.specialties.map((specialty, index) => (
-                              <div key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center">
-                                {specialty}
-                                <button
-                                  type="button"
-                                  className="ml-1 text-blue-600 hover:text-blue-800"
-                                  onClick={() => {
-                                    setTeacherFormData({
-                                      ...teacherFormData,
-                                      specialties: teacherFormData.specialties.filter((_, i) => i !== index)
-                                    });
-                                  }}
-                                >
-                                  <X className="h-3 w-3" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="md:col-span-2">
+                    <div className="md:col-span-3">
                       <Label className="text-sm font-medium text-gray-700 mb-1 block">
                         Talen
                       </Label>
                       <div className="grid grid-cols-1 gap-2">
                         <Input
                           placeholder="Voeg een taal toe en druk op Enter"
-                          className="bg-white"
+                          className="bg-white h-8"
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' && e.currentTarget.value.trim() !== '') {
                               e.preventDefault();
@@ -1461,11 +1375,11 @@ const Teachers = () => {
                         {teacherFormData.languages.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1">
                             {teacherFormData.languages.map((language, index) => (
-                              <div key={index} className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full flex items-center">
+                              <div key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-md flex items-center group">
                                 {language}
                                 <button
                                   type="button"
-                                  className="ml-1 text-purple-600 hover:text-purple-800"
+                                  className="ml-1 text-blue-600 hover:text-blue-800 opacity-60 group-hover:opacity-100"
                                   onClick={() => {
                                     setTeacherFormData({
                                       ...teacherFormData,

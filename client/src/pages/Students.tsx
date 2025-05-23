@@ -1513,7 +1513,7 @@ export default function Students() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
           {/* Blauwe header */}
-          <div className="bg-blue-600 text-white px-6 py-5 rounded-t-lg">
+          <div className="bg-[#1e3a8a] text-white px-6 py-5 rounded-t-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -1532,7 +1532,7 @@ export default function Students() {
               <Button
                 type="button"
                 variant="ghost"
-                className="text-white hover:bg-blue-700 hover:text-white"
+                className="text-white hover:bg-[#1e3a8a]/80 hover:text-white"
                 onClick={() => setIsCreateDialogOpen(false)}
               >
                 <X className="h-4 w-4 mr-2" />

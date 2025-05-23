@@ -368,6 +368,7 @@ const Teachers = () => {
             </div>
           </div>
         </div>
+        <div className="border-b border-gray-200 mb-6"></div>
         
         {/* Search and Filter Section */}
         <div className="flex flex-col space-y-4">
@@ -506,7 +507,7 @@ const Teachers = () => {
                         <span className="text-xs text-gray-400">Geen vakken</span>
                       )}
                     </td>
-                    <td className="py-3 px-4">{renderStatusBadge(teacher.isActive)}</td>
+
                     <td className="py-3 px-4 text-right">
                       <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button

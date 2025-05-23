@@ -25,26 +25,26 @@
 --radius: 0.5rem;
   }
   .dark {
-      --background: 240 10% 3.9%;
---foreground: 0 0% 98%;
---muted: 240 3.7% 15.9%;
---muted-foreground: 240 5% 64.9%;
---popover: 240 10% 3.9%;
---popover-foreground: 0 0% 98%;
---card: 240 10% 3.9%;
---card-foreground: 0 0% 98%;
---border: 240 3.7% 15.9%;
---input: 240 3.7% 15.9%;
---primary: 219 85% 34%;
---primary-foreground: 211 100% 99%;
---secondary: 240 3.7% 15.9%;
---secondary-foreground: 0 0% 98%;
---accent: 240 3.7% 15.9%;
---accent-foreground: 0 0% 98%;
---destructive: 0 62.8% 30.6%;
---destructive-foreground: 0 0% 98%;
---ring: 240 4.9% 83.9%;
---radius: 0.5rem;
+      --background: 220 18% 14%;
+      --foreground: 220 10% 98%;
+      --muted: 220 15% 20%;
+      --muted-foreground: 220 10% 70%;
+      --popover: 220 18% 14%;
+      --popover-foreground: 220 10% 98%;
+      --card: 220 18% 16%;
+      --card-foreground: 220 10% 98%;
+      --border: 220 15% 25%;
+      --input: 220 15% 25%;
+      --primary: 219 85% 45%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 220 15% 25%;
+      --secondary-foreground: 220 10% 98%;
+      --accent: 219 70% 25%;
+      --accent-foreground: 220 10% 98%;
+      --destructive: 0 62.8% 40%;
+      --destructive-foreground: 0 0% 98%;
+      --ring: 219 85% 45%;
+      --radius: 0.5rem;
   }
 
 @layer base {
@@ -52,7 +52,60 @@
     @apply border-border;
   }
 
-  body {
-    @apply font-sans antialiased bg-background text-foreground;
+  html, body {
+    @apply h-full font-sans antialiased bg-gray-50 text-foreground;
   }
+  
+  #root {
+    @apply h-full min-h-screen;
+  }
+}
+
+/* Globale dialoogvenster verbeteringen voor de hele app */
+
+/* Maak het dialoogvenster groter */
+div[role="dialog"] > div[role="document"] {
+  max-width: 95vw !important;
+  width: auto !important;
+  height: auto !important;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  background-color: white !important;
+}
+
+/* Maak de inhoud van tabs scrollbaar */
+div[role="tabpanel"] {
+  overflow-y: auto !important;
+  max-height: calc(80vh - 200px) !important;
+  padding-right: 8px !important;
+}
+
+/* TabsList sticky bovenaan */
+div[role="tablist"] {
+  position: sticky !important;
+  top: 0 !important;
+  background-color: white !important;
+  z-index: 10 !important;
+  padding-bottom: 10px !important;
+  border-bottom: 1px solid #f1f1f1 !important;
+  margin-bottom: 10px !important;
+}
+
+/* Beter opmaak voor dialoogvensters */
+div[role="dialog"] > div[role="document"] > div:last-child {
+  overflow-y: auto !important;
+  flex: 1 !important;
+}
+
+/* Dialoogvoettekst sticky onderaan */
+div[role="dialog"] footer {
+  position: sticky !important;
+  bottom: 0 !important;
+  background: white !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  border-top: 1px solid #f1f1f1 !important;
+  z-index: 10 !important;
 }

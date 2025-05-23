@@ -57,11 +57,24 @@ const flexibleDateSchema = z.union([
   z.date()
 ]).nullable().optional().catch(null);
 
+// Hulpfunctie voor het omzetten van string naar integer of null
+const flexibleIntegerSchema = z.union([
+  z.string().transform(val => {
+    if (!val || val === "") return null;
+    const num = parseInt(val, 10);
+    return isNaN(num) ? null : num;
+  }),
+  z.number(),
+  z.null(),
+  z.undefined()
+]).nullable().optional().catch(null);
+
 // Pas het schema aan met aangepaste validatie
 export const insertStudentSchema = baseInsertStudentSchema.extend({
   // Validatie voor alle datum velden
   dateOfBirth: flexibleDateSchema,
-  enrollmentDate: flexibleDateSchema
+  enrollmentDate: flexibleDateSchema,
+  yearLevel: flexibleIntegerSchema
 });
 
 export type InsertStudent = z.infer<typeof insertStudentSchema>;
@@ -696,5 +709,34 @@ export const teacherAttendanceRelations = relations(teacherAttendance, ({ one })
     fields: [teacherAttendance.replacementTeacherId],
     references: [teachers.id],
     relationName: "replacements"
+  })
+}));
+
+// Notificaties
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  type: text("type").notNull(), // info, warning, error, success
+  isRead: boolean("is_read").default(false),
+  link: text("link"), // Optional link to navigate to
+  createdAt: timestamp("created_at").defaultNow(),
+  category: text("category"), // e.g. 'student', 'fee', 'attendance', etc.
+  relatedEntityId: integer("related_entity_id"), // ID of the related entity (optional)
+});
+
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type Notification = typeof notifications.$inferSelect;
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id]
   })
 }));

@@ -3,7 +3,7 @@ import {
   Filter, CheckCircle, XCircle, Clock, 
   ArrowLeft, ArrowRight, Save,
   ClipboardCheck, GraduationCap, Users2,
-  Loader2
+  Loader2, Users, Building
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -412,17 +412,17 @@ export default function Attendance() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <ClipboardCheck className="h-6 w-6" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <ClipboardCheck className="h-7 w-7" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Aanwezigheid</h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Aanwezigheid</h1>
+              <p className="text-base text-gray-500 mt-1">Registreer en beheer aanwezigheid van studenten en docenten</p>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Registreer en beheer aanwezigheid van studenten en docenten
-          </p>
         </div>
       </div>
       
@@ -698,8 +698,11 @@ export default function Attendance() {
                         </div>
                       </div>
                     ) : (
-                      <div className="py-8 text-center border rounded-md">
-                        <p className="text-sm text-gray-500">Geen studenten gevonden</p>
+                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                        <div className="text-[#1e3a8a] mb-2">
+                          <Users className="h-12 w-12 mx-auto opacity-30" />
+                        </div>
+                        <p className="text-sm font-medium">Geen studenten gevonden</p>
                       </div>
                     )}
                   </div>
@@ -818,8 +821,11 @@ export default function Attendance() {
                         </div>
                       </div>
                     ) : (
-                      <div className="py-8 text-center border rounded-md">
-                        <p className="text-sm text-gray-500">Geen docenten gevonden</p>
+                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                        <div className="text-[#1e3a8a] mb-2">
+                          <GraduationCap className="h-12 w-12 mx-auto opacity-30" />
+                        </div>
+                        <p className="text-sm font-medium">Geen docenten gevonden</p>
                       </div>
                     )}
                   </div>

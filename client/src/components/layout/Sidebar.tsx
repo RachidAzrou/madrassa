@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { useSidebar } from "@/contexts/SidebarContext";
+import useSidebar from "@/hooks/use-sidebar";
 
 interface NavItemProps {
   to: string;

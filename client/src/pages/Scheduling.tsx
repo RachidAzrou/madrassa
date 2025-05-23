@@ -4,7 +4,7 @@ import {
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, 
   Calendar, Clock, Users, Repeat, Landmark, GraduationCap, 
   Building, BookOpen, ChevronRight, MapPin, Check, X,
-  AlertCircle, Calendar as CalendarIcon
+  AlertCircle, Calendar as CalendarIcon, XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -507,39 +507,41 @@ export default function Scheduling() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <Clock className="h-6 w-6" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <Clock className="h-7 w-7" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Planning</h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Planning</h1>
+              <p className="text-base text-gray-500 mt-1">Beheer cursusroosters, lokalen en lesschema's</p>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beheer cursusroosters, lokalen en lesschema's
-          </p>
         </div>
       </div>
       
       {/* Geen widgets op verzoek van gebruiker */}
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-          <TabsList className="p-1 bg-blue-900/10">
-            <TabsTrigger value="instructor-schedule" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Docentenrooster</TabsTrigger>
-            <TabsTrigger value="room-allocation" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lokalenverdeling</TabsTrigger>
-          </TabsList>
-          
-          <div className="flex items-center gap-4">
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Zoek planning..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="pl-10 w-full"
+      <div className="mb-4">
+        <div className="flex flex-col gap-4 w-full mb-4">
+          <div className="relative w-full">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Zoek planning..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="pl-8 bg-white w-full"
+            />
+            {searchTerm && (
+              <XCircle
+                className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                onClick={() => setSearchTerm("")}
               />
-            </div>
+            )}
+          </div>
+          
+          <div className="flex justify-end">
             <Button 
               onClick={handleAddSchedule} 
               variant="default"
@@ -550,6 +552,15 @@ export default function Scheduling() {
               <span>Planning Toevoegen</span>
             </Button>
           </div>
+        </div>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+          <TabsList className="p-1 bg-blue-900/10">
+            <TabsTrigger value="instructor-schedule" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Docentenrooster</TabsTrigger>
+            <TabsTrigger value="room-allocation" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lokalenverdeling</TabsTrigger>
+          </TabsList>
         </div>
         
         <TabsContent value="room-allocation">
@@ -592,8 +603,11 @@ export default function Scheduling() {
                         </div>
                       ))
                     ) : (
-                      <div className="p-6 text-center text-gray-500">
-                        Geen lokaalgegevens beschikbaar
+                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                        <div className="text-[#1e3a8a] mb-2">
+                          <Building className="h-12 w-12 mx-auto opacity-30" />
+                        </div>
+                        <p className="text-sm font-medium">Geen lokaalgegevens beschikbaar</p>
                       </div>
                     )}
                   </div>
@@ -651,8 +665,11 @@ export default function Scheduling() {
                         </div>
                       ))
                     ) : (
-                      <div className="p-6 text-center text-gray-500">
-                        Geen docentroosters beschikbaar
+                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                        <div className="text-[#1e3a8a] mb-2">
+                          <Calendar className="h-12 w-12 mx-auto opacity-30" />
+                        </div>
+                        <p className="text-sm font-medium">Geen rooster gevonden</p>
                       </div>
                     )}
                   </div>

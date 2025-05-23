@@ -503,17 +503,17 @@ export default function Cijfers() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <Percent className="h-6 w-6" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <Percent className="h-7 w-7" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Cijfers</h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Cijfers</h1>
+              <p className="text-base text-gray-500 mt-1">Beheer cijfers en gedragsbeoordelingen van studenten</p>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beheer cijfers en gedragsbeoordelingen van studenten
-          </p>
         </div>
       </div>
 
@@ -601,12 +601,13 @@ export default function Cijfers() {
                   {/* Cijferstabel */}
                   <div className="bg-white shadow rounded-lg border overflow-hidden">
                     {!selectedClass ? (
-                      <div className="p-8 text-center text-gray-500">
-                        <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
-                        <h3 className="mt-2 text-sm font-medium">Geen gegevens beschikbaar</h3>
-                        <p className="mt-1 text-sm text-gray-500">
-                          Selecteer een klas om cijfers te beheren.
-                        </p>
+                      <div className="p-8 text-center">
+                        <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                          <div className="text-[#1e3a8a] mb-2">
+                            <Percent className="h-12 w-12 mx-auto opacity-30" />
+                          </div>
+                          <p className="text-sm font-medium">Selecteer een klas om cijfers te beheren</p>
+                        </div>
                       </div>
                     ) : isLoadingClassStudents || isLoadingGrades ? (
                       <div className="p-8 text-center">

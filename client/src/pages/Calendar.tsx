@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, 
   FilePlus, GraduationCap, Palmtree, PartyPopper, Pencil, BookOpen, Timer,
-  MapPin, Clock
+  MapPin, Clock, Search, XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -55,6 +55,7 @@ export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<'month' | 'week' | 'day'>('month');
   const [filter, setFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [isAddEventDialogOpen, setIsAddEventDialogOpen] = useState(false);
   const [newEvent, setNewEvent] = useState({
     title: '',
@@ -88,7 +89,8 @@ export default function Calendar() {
         year: currentDate.getFullYear(), 
         month: currentDate.getMonth() + 1,
         view,
-        filter
+        filter,
+        search: searchTerm
       }
     ],
     staleTime: 30000,
@@ -96,10 +98,20 @@ export default function Calendar() {
 
   const events: CalendarEvent[] = data?.events || [];
   
-  // Filter evenementen gebaseerd op filter
+  // Filter evenementen gebaseerd op filter en zoekterm
   const filteredEvents = events.filter(event => {
-    if (filter === 'all') return true;
-    return event.type === filter;
+    // Eerst filteren op type
+    const typeMatch = filter === 'all' || event.type === filter;
+    
+    // Dan filteren op zoekterm als er een is
+    const searchMatch = !searchTerm || 
+      event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (event.description && event.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (event.location && event.location.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (event.courseName && event.courseName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (event.className && event.className.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    return typeMatch && searchMatch;
   });
 
   // Navigate to previous/next period based on current view
@@ -356,21 +368,41 @@ export default function Calendar() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <CalendarIcon className="h-6 w-6" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <CalendarIcon className="h-7 w-7" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Kalender</h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Kalender</h1>
+              <p className="text-base text-gray-500 mt-1">Beheer academische evenementen en schoolactiviteiten</p>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beheer academische evenementen en schoolactiviteiten
-          </p>
         </div>
       </div>
       
-      {/* Controls and filters - onder de streep */}
+      {/* Zoekbalk - onder de paginatitel geplaatst */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoek evenementen..."
+            className="pl-8 bg-white"
+            value={searchTerm || ""}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm && (
+            <XCircle
+              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+              onClick={() => setSearchTerm("")}
+            />
+          )}
+        </div>
+      </div>
+      
+      {/* Controls and filters - onder de zoekbalk */}
       <div className="flex flex-col gap-4 mb-4">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
@@ -397,7 +429,7 @@ export default function Calendar() {
               </TabsList>
             </Tabs>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 flex-wrap gap-3">
             <Select value={filter} onValueChange={handleFilterChange}>
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Filter Evenementen" />

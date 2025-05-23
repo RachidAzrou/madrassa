@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, DollarSign, CreditCard, CheckCircle, 
   Users, Settings, Percent, AlertCircle, ChevronDown, FileText, UserPlus, Euro, Coins, 
-  Mail, Phone, Home, CalendarIcon, Plus, User, X, MapPin, School
+  Mail, Phone, Home, CalendarIcon, Plus, User, X, MapPin, School, XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -467,33 +467,39 @@ export default function Fees() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <Coins className="h-6 w-6" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <Coins className="h-7 w-7" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Betalingsbeheer</h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Betalingsbeheer</h1>
+              <p className="text-base text-gray-500 mt-1">Beheer van collegegelden, betalingen, kortingen en schulden</p>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beheer van collegegelden, betalingen, kortingen en schulden
-          </p>
         </div>
       </div>
 
       {/* Zoek en acties */}
-      <div className="flex flex-col md:flex-row justify-end items-center gap-4 mb-6">
-        <div className="relative w-full md:w-64 order-2 md:order-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+      <div className="space-y-4">
+        <div className="relative w-full">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             placeholder="Zoek betalingsrecords of studenten..."
             value={searchTerm}
             onChange={handleSearchChange}
-            className="w-full pl-10"
+            className="pl-8 bg-white w-full"
           />
+          {searchTerm && (
+            <XCircle
+              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+              onClick={() => setSearchTerm("")}
+            />
+          )}
         </div>
         
-        <div className="flex items-center gap-1 order-1 md:order-2">
+        <div className="flex justify-end">
           <Button 
             onClick={() => setShowAddOptionsDialog(true)} 
             className="flex items-center bg-[#1e3a8a] hover:bg-blue-800"
@@ -846,8 +852,11 @@ export default function Fees() {
                   <p className="text-red-500">Fout bij het laden van betalingsgegevens. Probeer de pagina te vernieuwen.</p>
                 </div>
               ) : feeRecords.length === 0 ? (
-                <div className="py-12 text-center">
-                  <p className="text-gray-500">Geen betalingsrecords gevonden.</p>
+                <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                  <div className="text-[#1e3a8a] mb-2">
+                    <Euro className="h-12 w-12 mx-auto opacity-30" />
+                  </div>
+                  <p className="text-sm font-medium">Geen betalingsrecords gevonden</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -1414,8 +1423,11 @@ export default function Fees() {
             </CardHeader>
             <CardContent>
               {feeSettings.length === 0 ? (
-                <div className="py-8 text-center">
-                  <p className="text-gray-500">Geen collegegeld instellingen gevonden.</p>
+                <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                  <div className="text-[#1e3a8a] mb-2">
+                    <Euro className="h-12 w-12 mx-auto opacity-30" />
+                  </div>
+                  <p className="text-sm font-medium">Geen collegegeld instellingen gevonden</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -1667,8 +1679,13 @@ export default function Fees() {
                       <tbody className="bg-white divide-y divide-gray-200">
                         {/* Bij geen data dit weergeven: */}
                         <tr>
-                          <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                            Geen activiteiten gevonden. Voeg een nieuwe activiteit toe met de knop hierboven.
+                          <td colSpan={6} className="px-0 py-0">
+                            <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                              <div className="text-[#1e3a8a] mb-2">
+                                <MapPin className="h-12 w-12 mx-auto opacity-30" />
+                              </div>
+                              <p className="text-sm font-medium">Geen activiteiten gevonden</p>
+                            </div>
                           </td>
                         </tr>
                         
@@ -1808,8 +1825,11 @@ export default function Fees() {
             </CardHeader>
             <CardContent>
               {discounts.length === 0 ? (
-                <div className="py-8 text-center">
-                  <p className="text-gray-500">Geen kortingsregels gevonden.</p>
+                <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                  <div className="text-[#1e3a8a] mb-2">
+                    <Percent className="h-12 w-12 mx-auto opacity-30" />
+                  </div>
+                  <p className="text-sm font-medium">Geen kortingsregels gevonden</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -2046,8 +2066,11 @@ export default function Fees() {
             </CardHeader>
             <CardContent>
               {outstandingDebts.length === 0 ? (
-                <div className="py-8 text-center">
-                  <p className="text-gray-500">Geen openstaande schulden gevonden.</p>
+                <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                  <div className="text-[#1e3a8a] mb-2">
+                    <Euro className="h-12 w-12 mx-auto opacity-30" />
+                  </div>
+                  <p className="text-sm font-medium">Geen openstaande schulden gevonden</p>
                 </div>
               ) : (
                 <>
@@ -2523,8 +2546,11 @@ export default function Fees() {
           
           <div className="space-y-4">
             {!guardianData || guardianData.length === 0 ? (
-              <div className="py-8 text-center">
-                <p className="text-gray-500">Geen voogden gevonden voor deze student.</p>
+              <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                <div className="text-[#1e3a8a] mb-2">
+                  <Users className="h-12 w-12 mx-auto opacity-30" />
+                </div>
+                <p className="text-sm font-medium">Geen voogden gevonden voor deze student</p>
               </div>
             ) : (
               <div className="space-y-4">

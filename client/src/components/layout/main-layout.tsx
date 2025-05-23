@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
-import Sidebar from "./Sidebar";
-import Header from "./Header";
+import Sidebar from "./sidebar-fixed";
+import Header from "./header";
+import TestBanner from "./test-banner";
 import { useMobile } from "@/hooks/use-mobile";
 
 type MainLayoutProps = {
@@ -54,7 +55,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="flex h-full min-h-screen">
       {/* Mobile sidebar backdrop */}
       {isMobile && sidebarOpen && (
         <div
@@ -67,19 +68,20 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <div 
         className={`fixed md:static inset-y-0 left-0 transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 z-30 transition duration-200 ease-in-out h-screen md:h-auto flex-shrink-0`}
+        } md:translate-x-0 z-30 transition duration-200 ease-in-out h-screen flex-shrink-0`}
       >
         <Sidebar 
           isMobile={isMobile} 
           onClose={() => setSidebarOpen(false)} 
-        />
+          className="h-full" />
       </div>
 
       {/* Main content */}
-      <div className="flex flex-col flex-1 min-h-screen overflow-hidden">
+      <div className="flex flex-col flex-1 overflow-hidden bg-gray-50">
+        <TestBanner />
         <Header onMenuClick={toggleSidebar} title={pageTitle} />
-        <main className="flex-1 p-2 sm:p-4 md:p-6 pt-10 overflow-x-auto border-l border-gray-200">
-          <div className="max-w-7xl mx-auto w-full">
+        <main className="flex-1 p-2 sm:p-4 md:p-6 pt-10 overflow-x-auto overflow-y-auto border-l border-gray-200" style={{ minHeight: "calc(100vh - 64px)" }}>
+          <div className="max-w-7xl mx-auto w-full min-h-full pb-12">
             {children}
           </div>
         </main>

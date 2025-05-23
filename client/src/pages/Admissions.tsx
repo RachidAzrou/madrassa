@@ -393,17 +393,17 @@ export default function Admissions() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <FileText className="h-6 w-6" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <FileText className="h-7 w-7" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Aanmeldingen</h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Aanmeldingen</h1>
+              <p className="text-base text-gray-500 mt-1">Beoordeel en verwerk studentaanmeldingen en toelatingen</p>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beoordeel en verwerk studentaanmeldingen en toelatingen
-          </p>
         </div>
       </div>
       
@@ -448,6 +448,20 @@ export default function Admissions() {
         </div>
       </div>
 
+      {/* Zoekbalk */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoek aanmeldingen..."
+            className="pl-8 bg-white"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </div>
+      </div>
+      
       <div className="mb-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -581,8 +595,13 @@ export default function Admissions() {
                     </tr>
                   ) : applicants.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                        Geen aanmelders gevonden
+                      <td colSpan={5} className="px-6 py-8">
+                        <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                          <div className="text-[#1e3a8a] mb-2">
+                            <FileText className="h-12 w-12 mx-auto opacity-30" />
+                          </div>
+                          <p className="text-sm font-medium">Geen aanmelders beschikbaar</p>
+                        </div>
                       </td>
                     </tr>
                   ) : (

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, X, UserCircle, Mail, Home, BookOpen, Phone } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, Users, UserCheck, X, UserCircle, Mail, Home, BookOpen, Phone, XCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -436,20 +436,31 @@ export default function Guardians() {
       </Dialog>
       
       {/* Page Title */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
-              </svg>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <UserCheck className="h-7 w-7" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Voogden</h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Voogden</h1>
+              <p className="text-base text-gray-500 mt-1">Beheer voogden en hun relaties met studenten</p>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beheer voogden en hun relaties met studenten
-          </p>
+        </div>
+      </div>
+      
+      {/* Zoekbalk */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoek voogden..."
+            className="pl-8 bg-white"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
         </div>
       </div>
       
@@ -462,10 +473,7 @@ export default function Guardians() {
                 value="all" 
                 className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
-                </svg>
+                <UserCheck className="h-4 w-4" />
                 Alle Voogden
               </TabsTrigger>
               <TabsTrigger 
@@ -505,17 +513,6 @@ export default function Guardians() {
       
       {/* Voogden lijst */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex justify-end items-center">
-          <div className="relative">
-            <Input
-              placeholder="Zoek voogden..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="w-full md:w-64 pl-10"
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          </div>
-        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -547,8 +544,13 @@ export default function Guardians() {
                 </tr>
               ) : guardians.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                    Geen voogden gevonden.
+                  <td colSpan={5}>
+                    <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                      <div className="text-[#1e3a8a] mb-2">
+                        <UserCheck className="h-12 w-12 mx-auto opacity-30" />
+                      </div>
+                      <p className="text-sm font-medium">Geen voogden beschikbaar</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -907,10 +909,7 @@ export default function Guardians() {
         <DialogContent className="w-[95vw] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-primary flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m12.1-.7-.7.7m0 11.4.7.7m-12.1-.7-.7.7"></path>
-              </svg>
+              <UserCheck className="h-6 w-6 mr-2" />
               {newGuardian.id ? 'Voogd Bewerken' : 'Nieuwe Voogd Toevoegen'}
             </DialogTitle>
             <DialogDescription>

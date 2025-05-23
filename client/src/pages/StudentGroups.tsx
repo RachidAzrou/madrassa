@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, School, 
   Pencil, MoreVertical, Plus, GraduationCap, BookOpen, UsersRound,
-  CalendarIcon, Loader2, 
+  CalendarIcon, Loader2, XCircle, Users2,
 } from 'lucide-react';
 import ManageStudentEnrollments from "@/components/student-groups/ManageStudentEnrollments";
 // Aangepast ChalkboardTeacher icoon
@@ -304,45 +304,49 @@ export default function StudentGroups() {
   // Render the page
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <ChalkBoard className="h-6 w-6" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <ChalkBoard className="h-7 w-7" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Klassen</h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Klassen</h1>
+              <p className="text-base text-gray-500 mt-1">Beheer klassen, secties en activiteitengroepen</p>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beheer klassen, secties en activiteitengroepen
-          </p>
+        </div>
+      </div>
+      
+      {/* Zoekbalk - onder de paginatitel geplaatst */}
+      <div className="space-y-4">
+        <div className="relative w-full">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoek klassen..."
+            className="pl-8 bg-white w-full"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          {searchTerm && (
+            <XCircle
+              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+              onClick={() => setSearchTerm("")}
+            />
+          )}
+        </div>
+        
+        <div className="flex justify-end items-center">
+          <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            <span>Klas Aanmaken</span>
+          </Button>
         </div>
       </div>
 
       {/* Main content area */}
       <Tabs defaultValue="grid" className="space-y-4">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-          <TabsList className="p-1 bg-blue-900/10">
-            <TabsTrigger value="grid" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Rasterweergave</TabsTrigger>
-            <TabsTrigger value="list" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lijstweergave</TabsTrigger>
-          </TabsList>
-
-          <div className="flex items-center gap-4">
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Zoek klassen..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="pl-10 w-full"
-              />
-            </div>
-            
-            <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              <span>Klas Aanmaken</span>
-            </Button>
-          </div>
-        </div>
         
         <div className="student-groups-filters bg-white rounded-lg shadow-sm p-4 border border-gray-200 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -430,12 +434,11 @@ export default function StudentGroups() {
               </Button>
             </div>
           ) : studentGroups.length === 0 ? (
-            <div className="text-center py-10">
-              <School className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-              <h3 className="text-lg font-medium mb-2">Geen klassen gevonden</h3>
-              <p className="text-gray-500 mb-4">
-                Er zijn geen klassen die overeenkomen met de geselecteerde filters.
-              </p>
+            <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+              <div className="text-[#1e3a8a] mb-2">
+                <ChalkBoard className="h-12 w-12 mx-auto opacity-30" />
+              </div>
+              <p className="text-sm font-medium">Geen klassen beschikbaar</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -609,9 +612,13 @@ export default function StudentGroups() {
                   ))
                 ) : studentGroups.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="p-8 text-center">
-                      <School className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-gray-500">Geen klassen gevonden</p>
+                    <td colSpan={7}>
+                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                        <div className="text-[#1e3a8a] mb-2">
+                          <ChalkBoard className="h-12 w-12 mx-auto opacity-30" />
+                        </div>
+                        <p className="text-sm font-medium">Geen klassen beschikbaar</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
@@ -727,7 +734,7 @@ export default function StudentGroups() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <Tabs defaultValue="algemeen" className="w-full">
-                <TabsList className="grid grid-cols-5 w-full p-1 bg-blue-900/10">
+                <TabsList className="grid grid-cols-5 w-full h-10 p-1 bg-blue-900/10">
                   <TabsTrigger value="algemeen" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
                     <ChalkBoard className="h-4 w-4" />
                     <span>Algemeen</span>

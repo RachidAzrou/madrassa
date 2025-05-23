@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image, BookText } from "lucide-react";
+import * as XLSX from 'xlsx';
+import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image, BookText, XCircle, LucideIcon, School, Download } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { formatDateToDisplayFormat } from "@/lib/utils";
+
+const ChalkBoard = (props: any) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg" 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    {...props}
+  >
+    <rect x="2" y="2" width="20" height="14" rx="2" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <line x1="6" y1="12" x2="6" y2="20" />
+    <line x1="18" y1="12" x2="18" y2="20" />
+    <ellipse cx="12" cy="18" rx="3" ry="2" />
+    <path d="M10 4h4" />
+    <path d="M8 8h8" />
+  </svg>
+);
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -18,123 +42,58 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import ManageTeacherAssignments from "@/components/teachers/ManageTeacherAssignments";
+import EmptyState from "@/components/ui/empty-state";
 
-type TeacherType = {
-  id: number;
-  teacherId: string;
-  firstName: string;
-  lastName: string;
-  gender?: string;
-  email: string;
-  phone?: string;
-  dateOfBirth?: Date;
-  street?: string;
-  houseNumber?: string;
-  postalCode?: string;
-  city?: string;
-  isActive: boolean;
-  hireDate?: Date;
-  profession?: string; // Toegevoegd voor beroep
-  notes?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-};
-
-// Interface voor de API respons met het volgende docent ID
-interface NextTeacherIdResponse {
-  nextTeacherId: string;
-}
-
-type AvailabilityType = {
-  id: number;
-  teacherId: number;
-  dayOfWeek: number;
-  startTime: string;
-  endTime: string;
-  isBackup: boolean;
-  notes?: string;
-};
-
-type LanguageType = {
-  id: number;
-  teacherId: number;
-  language: string;
-  proficiencyLevel: string;
-};
-
-type CourseAssignmentType = {
-  id: number;
-  teacherId: number;
-  courseId: number;
-  isPrimary: boolean;
-  startDate: Date;
-  endDate?: Date;
-  notes?: string;
-  courseName?: string; // Voor weergave
-};
-
-export default function Teachers() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
-  const [selectedTeacher, setSelectedTeacher] = useState<TeacherType | null>(null);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isAssignmentsDialogOpen, setIsAssignmentsDialogOpen] = useState(false);
-  const [teacherFormData, setTeacherFormData] = useState({
-    teacherId: '',
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    street: '',
-    houseNumber: '',
-    postalCode: '',
-    city: '',
-    dateOfBirth: '',
-    profession: '',
-    education: '',
-    gender: '',
-    notes: '',
-    isActive: true,
-    assignedSubjects: [] as number[],
-    assignedClasses: [] as number[]
-  });
-  
-  // State voor beschikbare vakken en klassen
-  const [availableSubjects, setAvailableSubjects] = useState<{id: number, name: string}[]>([]);
-  const [availableClasses, setAvailableClasses] = useState<{id: number, name: string}[]>([]);
-  
+const Teachers = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  // Query voor het ophalen van een nieuw docent ID
-  const { 
-    data: nextTeacherIdData,
-    isLoading: isLoadingNextId,
-    isError: isNextIdError
-  } = useQuery<NextTeacherIdResponse>({
-    queryKey: ['/api/next-teacher-id'],
-    queryFn: async () => {
-      try {
-        return await apiRequest('/api/next-teacher-id');
-      } catch (error) {
-        console.error('Error fetching next teacher ID:', error);
-        toast({
-          title: "Fout bij ophalen docent ID",
-          description: "Kon geen nieuw docent ID genereren. Probeer het later opnieuw.",
-          variant: "destructive",
-        });
-        return { nextTeacherId: '' };
-      }
-    },
-    enabled: isCreateDialogOpen, // Alleen ophalen wanneer het formulier open is
+  
+  // State for teacher form data
+  const [teacherFormData, setTeacherFormData] = useState({
+    teacherId: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    isActive: true,
+    street: "",
+    houseNumber: "",
+    postalCode: "",
+    city: "",
+    dateOfBirth: "",
+    gender: "man",
+    notes: "",
+    certifications: [],
+    languages: [],
+    specialties: [],
+    educationLevel: "Bachelor",
+    yearsOfExperience: 0,
+    documents: [],
+    availability: [],
+    assignedCourses: [],
+    assignedClasses: [],
+    profession: "",
+    educations: []
   });
-
+  
+  // State for search and filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedTeacher, setSelectedTeacher] = useState<any>(null);
+  
+  // Fetch next teacher ID
+  const { data: nextTeacherIdData, isLoading: isLoadingNextId } = useQuery({
+    queryKey: ['/api/next-teacher-id'],
+    enabled: isCreateDialogOpen, // Only fetch when create dialog is opened
+  });
+  
   useEffect(() => {
-    // Als er een nieuw ID is opgehaald, update dan het formulier
     if (nextTeacherIdData?.nextTeacherId && isCreateDialogOpen) {
       setTeacherFormData(prev => ({
         ...prev,
@@ -143,1025 +102,1487 @@ export default function Teachers() {
     }
   }, [nextTeacherIdData, isCreateDialogOpen]);
   
-  // Query voor het ophalen van beschikbare programma's (als vakken)
+  // Fetch teachers data
   const { 
-    data: programsData,
-    isLoading: isLoadingPrograms,
-    isError: isErrorPrograms
+    data: teachersData, 
+    isLoading, 
+    isError 
   } = useQuery({
-    queryKey: ['/api/programs'],
-    queryFn: async () => {
-      try {
-        return await apiRequest('/api/programs');
-      } catch (error) {
-        console.error('Error fetching programs:', error);
-        toast({
-          title: "Fout bij ophalen programma's",
-          description: "Kon de vakgegevens niet laden voor de docent.",
-          variant: "destructive",
-        });
-        return [];
-      }
-    },
-    enabled: isCreateDialogOpen,
+    queryKey: ['/api/teachers', searchQuery, statusFilter, currentPage, rowsPerPage],
+    select: (data) => ({
+      teachers: data.teachers || [],
+      totalCount: data.totalCount || 0
+    }),
   });
   
-  // Query voor het ophalen van beschikbare klassen (student groups)
-  const { 
-    data: classesData,
-    isLoading: isLoadingClasses,
-    isError: isErrorClasses
-  } = useQuery({
-    queryKey: ['/api/student-groups'],
-    queryFn: async () => {
-      try {
-        return await apiRequest('/api/student-groups');
-      } catch (error) {
-        console.error('Error fetching student groups:', error);
-        toast({
-          title: "Fout bij ophalen klasgroepen",
-          description: "Kon de klasgroepgegevens niet laden voor de docent.",
-          variant: "destructive",
-        });
-        return [];
-      }
-    },
-    enabled: isCreateDialogOpen,
-  });
-  
-  // Effect voor het verwerken van opgehaalde programma's en klassen
-  useEffect(() => {
-    if (programsData && Array.isArray(programsData)) {
-      setAvailableSubjects(programsData.map((program: any) => ({
-        id: program.id,
-        name: program.name
-      })));
-    }
+  // Calculate total pages
+  const totalPages = teachersData?.totalCount 
+    ? Math.ceil(teachersData.totalCount / rowsPerPage) 
+    : 0;
     
-    if (classesData && Array.isArray(classesData)) {
-      setAvailableClasses(classesData.map((group: any) => ({
-        id: group.id,
-        name: group.name || `Groep ${group.id}`
-      })));
-    }
-  }, [programsData, classesData]);
-
-  // Fetching teachers data
-  const {
-    data: teachersResponse,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    queryKey: ['/api/teachers', { page: currentPage, search: searchTerm }],
-    queryFn: async () => {
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: itemsPerPage.toString(),
-        search: searchTerm,
-      });
+  // Functie om docenten te exporteren naar Excel of CSV
+  const handleExportTeachers = async () => {
+    try {
+      // Verkrijg alle docenten van de API zonder paginatie
+      const response = await fetch('/api/teachers?export=true');
+      if (!response.ok) throw new Error('Kon docentgegevens niet ophalen voor export');
+      const data = await response.json();
       
-      try {
-        return await apiRequest(`/api/teachers?${params.toString()}`);
-      } catch (error) {
-        console.error('Error fetching teachers:', error);
+      if (!data.teachers || data.teachers.length === 0) {
         toast({
-          title: "Fout bij ophalen docenten",
-          description: "Er is een probleem opgetreden bij het laden van de docentengegevens. Probeer het later opnieuw.",
-          variant: "destructive",
+          title: "Geen gegevens om te exporteren",
+          description: "Er zijn geen docentgegevens beschikbaar om te exporteren.",
+          variant: "destructive"
         });
-        return { teachers: [], totalCount: 0 };
+        return;
       }
-    },
-  });
-
-  // Extract teachers and total count from response
-  const teachers = teachersResponse?.teachers || [];
-  const totalTeachers = teachersResponse?.totalCount || 0;
-  const totalPages = Math.ceil(totalTeachers / itemsPerPage);
-
-  // Fetch availability data for selected teacher
-  const {
-    data: availabilityData = [],
-    isLoading: isLoadingAvailabilityData,
-    isError: isAvailabilityError,
-  } = useQuery({
-    queryKey: ['/api/teacher-availability', selectedTeacher?.id],
-    queryFn: async () => {
-      if (!selectedTeacher) return [];
-      try {
-        return await apiRequest(`/api/teacher-availability?teacherId=${selectedTeacher.id}`);
-      } catch (error) {
-        console.error('Error fetching teacher availability:', error);
-        toast({
-          title: "Fout bij ophalen beschikbaarheid",
-          description: "Kon de beschikbaarheidsgegevens van de docent niet laden.",
-          variant: "destructive",
-        });
-        return [];
-      }
-    },
-    enabled: !!selectedTeacher,
-  });
-
-  // Fetch language data for selected teacher
-  const {
-    data: languageData = [],
-    isLoading: isLoadingLanguageData,
-    isError: isLanguageError,
-  } = useQuery({
-    queryKey: ['/api/teacher-languages', selectedTeacher?.id],
-    queryFn: async () => {
-      if (!selectedTeacher) return [];
-      try {
-        return await apiRequest(`/api/teacher-languages?teacherId=${selectedTeacher.id}`);
-      } catch (error) {
-        console.error('Error fetching teacher languages:', error);
-        toast({
-          title: "Fout bij ophalen taalvaardigheden",
-          description: "Kon de taalvaardigheidsgegevens van de docent niet laden.",
-          variant: "destructive",
-        });
-        return [];
-      }
-    },
-    enabled: !!selectedTeacher,
-  });
-
-  // Fetch course assignments for selected teacher
-  const {
-    data: courseAssignmentsData = [],
-    isLoading: isLoadingCourseAssignmentsData,
-    isError: isCourseAssignmentsError,
-  } = useQuery({
-    queryKey: ['/api/teacher-course-assignments', selectedTeacher?.id],
-    queryFn: async () => {
-      if (!selectedTeacher) return [];
-      try {
-        return await apiRequest(`/api/teacher-course-assignments?teacherId=${selectedTeacher.id}`);
-      } catch (error) {
-        console.error('Error fetching teacher course assignments:', error);
-        toast({
-          title: "Fout bij ophalen curriculum",
-          description: "Kon de cursustoewijzingen van de docent niet laden.",
-          variant: "destructive",
-        });
-        return [];
-      }
-    },
-    enabled: !!selectedTeacher,
-  });
-
-  // Delete Mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (teacherId: number) => {
-      try {
-        return await apiRequest(`/api/teachers/${teacherId}`, { method: 'DELETE' });
-      } catch (error: any) {
-        console.error('Delete teacher error:', error);
-        throw new Error(error?.message || 'Fout bij het verwijderen van docent');
-      }
-    },
-    onSuccess: (_, teacherId) => {
+      
+      // Bereid gegevens voor voor export
+      const exportData = data.teachers.map((teacher: any) => ({
+        ID: teacher.teacherId,
+        Voornaam: teacher.firstName,
+        Achternaam: teacher.lastName,
+        Email: teacher.email,
+        Telefoon: teacher.phone,
+        Status: teacher.isActive ? 'Actief' : 'Inactief',
+        Adres: `${teacher.street || ''} ${teacher.houseNumber || ''}`,
+        Postcode: teacher.postalCode,
+        Woonplaats: teacher.city,
+        Geboortedatum: teacher.dateOfBirth,
+        Geslacht: teacher.gender,
+        Specialisaties: teacher.specialties?.join(", ") || '',
+        AanmaakDatum: new Date(teacher.createdAt).toLocaleDateString('nl-NL')
+      }));
+      
+      // Genereer Excel bestand en download
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Docenten");
+      
+      const fileName = `Docenten_Export_${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
       toast({
-        title: "Docent verwijderd",
-        description: "De docent is succesvol verwijderd uit het systeem",
+        title: "Export succesvol",
+        description: `${exportData.length} docenten succesvol geëxporteerd naar ${fileName}`,
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
-      // Ook gerelateerde docent-data invalideren
-      queryClient.invalidateQueries({ queryKey: ['/api/teacher-availability'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/teacher-languages'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/teacher-course-assignments'] });
-      setSelectedTeacher(null);
-    },
-    onError: (error: any) => {
+    } catch (error) {
+      console.error("Fout bij exporteren docenten:", error);
       toast({
-        title: "Fout bij verwijderen",
-        description: error?.message || "Er is een fout opgetreden bij het verwijderen van de docent. Mogelijk zijn er nog actieve relaties met andere gegevens.",
-        variant: "destructive",
+        title: "Export mislukt",
+        description: "Er is een fout opgetreden bij het exporteren van de docentgegevens.",
+        variant: "destructive"
       });
-      console.error('Delete error:', error);
-    },
-  });
-
-  // Handle search input change
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when search changes
+    }
   };
-
-  // Create Teacher Mutation
+  
+  // Mutations
   const createTeacherMutation = useMutation({
-    mutationFn: async (formData: any) => {
-      try {
-        return await apiRequest('/api/teachers', {
-          method: 'POST',
-          body: formData
-        });
-      } catch (error: any) {
-        console.error('Create teacher error:', error);
-        throw new Error(error?.message || 'Fout bij het aanmaken van docent');
-      }
-    },
+    mutationFn: (data: any) => apiRequest('/api/teachers', 'POST', data),
     onSuccess: () => {
       toast({
         title: "Docent toegevoegd",
-        description: "De nieuwe docent is succesvol toegevoegd aan het systeem",
+        description: "De docent is succesvol toegevoegd aan het systeem.",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
       setIsCreateDialogOpen(false);
-      resetTeacherForm();
+      // Reset form
+      setTeacherFormData({
+        teacherId: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        isActive: true,
+        street: "",
+        houseNumber: "",
+        postalCode: "",
+        city: "",
+        dateOfBirth: "",
+        gender: "man",
+        notes: "",
+        certifications: [],
+        languages: [],
+        specialties: [],
+        educationLevel: "Bachelor",
+        yearsOfExperience: 0,
+        documents: [],
+        availability: [],
+        assignedCourses: [],
+        assignedClasses: []
+      });
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({queryKey: ['/api/teachers']});
     },
     onError: (error: any) => {
+      console.error("Error creating teacher:", error);
       toast({
         title: "Fout bij toevoegen",
-        description: error?.message || "Er is een fout opgetreden bij het toevoegen van de docent. Controleer de ingevoerde gegevens en probeer het opnieuw.",
+        description: error?.message || "Er is een fout opgetreden bij het toevoegen van de docent.",
         variant: "destructive",
       });
-      console.error('Create error:', error);
     },
   });
   
-  // Update Teacher Mutation
   const updateTeacherMutation = useMutation({
-    mutationFn: async (data: { id: number, formData: any }) => {
-      try {
-        return await apiRequest(`/api/teachers/${data.id}`, {
-          method: 'PUT',
-          body: data.formData
-        });
-      } catch (error: any) {
-        console.error('Update teacher error:', error);
-        throw new Error(error?.message || 'Fout bij het bijwerken van docent');
-      }
-    },
-    onSuccess: (_, variables) => {
-      const teacherName = `${variables.formData.firstName} ${variables.formData.lastName}`;
+    mutationFn: (data: any) => apiRequest(`/api/teachers/${data.id}`, 'PUT', data),
+    onSuccess: () => {
       toast({
         title: "Docent bijgewerkt",
-        description: `Docent ${teacherName} is succesvol bijgewerkt`,
+        description: "De docentgegevens zijn succesvol bijgewerkt.",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/teacher-availability', selectedTeacher?.id] });
-      queryClient.invalidateQueries({ queryKey: ['/api/teacher-languages', selectedTeacher?.id] });
-      queryClient.invalidateQueries({ queryKey: ['/api/teacher-course-assignments', selectedTeacher?.id] });
-      setIsCreateDialogOpen(false);
-      resetTeacherForm();
-      setSelectedTeacher(null);
+      setIsEditDialogOpen(false);
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({queryKey: ['/api/teachers']});
     },
     onError: (error: any) => {
+      console.error("Error updating teacher:", error);
       toast({
         title: "Fout bij bijwerken",
-        description: error?.message || "Er is een fout opgetreden bij het bijwerken van de docent. Controleer de ingevoerde gegevens en probeer het opnieuw.",
+        description: error?.message || "Er is een fout opgetreden bij het bijwerken van de docent.",
         variant: "destructive",
       });
-      console.error('Update error:', error);
     },
   });
-
-  // Reset teacher form
-  const resetTeacherForm = () => {
-    setTeacherFormData({
-      teacherId: '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      street: '',
-      houseNumber: '',
-      postalCode: '',
-      city: '',
-      dateOfBirth: '',
-      profession: '',
-      education: '',
-      gender: '',
-      notes: '',
-      isActive: true,
-      assignedSubjects: [],
-      assignedClasses: []
-    });
-  };
-
-  // Handle form input change
-  const handleFormInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setTeacherFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  // Handle checkbox change
-  const handleCheckboxChange = (checked: boolean) => {
-    setTeacherFormData(prev => ({
-      ...prev,
-      isActive: checked
-    }));
-  };
-
-  // Handle subject selection
-  const handleSubjectSelection = (subjectId: number) => {
-    setTeacherFormData(prev => {
-      const currentSubjects = [...prev.assignedSubjects];
-      
-      if (currentSubjects.includes(subjectId)) {
-        return {
-          ...prev,
-          assignedSubjects: currentSubjects.filter(id => id !== subjectId)
-        };
-      } else {
-        return {
-          ...prev,
-          assignedSubjects: [...currentSubjects, subjectId]
-        };
-      }
-    });
-  };
-
-  // Handle class selection
-  const handleClassSelection = (classId: number) => {
-    setTeacherFormData(prev => {
-      const currentClasses = [...prev.assignedClasses];
-      
-      if (currentClasses.includes(classId)) {
-        return {
-          ...prev,
-          assignedClasses: currentClasses.filter(id => id !== classId)
-        };
-      } else {
-        return {
-          ...prev,
-          assignedClasses: [...currentClasses, classId]
-        };
-      }
-    });
-  };
-
-  // Handle form submission
-  const handleSubmitTeacherForm = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Uitgebreide validatie van verplichte velden
-    const requiredFields = {
-      firstName: "Voornaam",
-      lastName: "Achternaam",
-      email: "E-mailadres"
+  
+  const deleteTeacherMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/teachers/${id}`, 'DELETE'),
+    onSuccess: () => {
+      toast({
+        title: "Docent verwijderd",
+        description: "De docent is succesvol verwijderd uit het systeem.",
+      });
+      setIsDeleteDialogOpen(false);
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({queryKey: ['/api/teachers']});
+    },
+    onError: (error: any) => {
+      console.error("Error deleting teacher:", error);
+      toast({
+        title: "Fout bij verwijderen",
+        description: error?.message || "Er is een fout opgetreden bij het verwijderen van de docent.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Handlers
+  const handleCreateTeacher = () => {
+    const payload = {
+      ...teacherFormData,
     };
     
-    const missingFields: string[] = [];
-    
-    Object.entries(requiredFields).forEach(([field, label]) => {
-      if (!teacherFormData[field as keyof typeof teacherFormData]) {
-        missingFields.push(label);
-      }
-    });
-    
-    if (missingFields.length > 0) {
-      toast({
-        title: "Ontbrekende verplichte velden",
-        description: `Vul de volgende verplichte velden in: ${missingFields.join(", ")}`,
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // E-mail validatie
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(teacherFormData.email)) {
-      toast({
-        title: "Ongeldig e-mailadres",
-        description: "Voer een geldig e-mailadres in",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Laat gebruiker weten dat we bezig zijn met verwerken
-    toast({
-      title: selectedTeacher ? "Docent bijwerken..." : "Docent toevoegen...",
-      description: "Een moment geduld terwijl we uw verzoek verwerken",
-    });
-    
-    if (selectedTeacher) {
-      // Update existing teacher
-      updateTeacherMutation.mutate({
-        id: selectedTeacher.id,
-        formData: teacherFormData
-      });
-    } else {
-      // Create new teacher
-      createTeacherMutation.mutate(teacherFormData);
-    }
+    console.log("Add new teacher", payload);
+    createTeacherMutation.mutate(payload);
   };
-
-  // Handle adding a new teacher
-  const handleAddNewTeacher = () => {
-    // Reset form and open dialog
-    resetTeacherForm();
-    setSelectedTeacher(null);
-    setIsCreateDialogOpen(true);
+  
+  const handleUpdateTeacher = () => {
+    if (!selectedTeacher?.id) return;
+    
+    const payload = {
+      ...teacherFormData,
+      id: selectedTeacher.id
+    };
+    
+    updateTeacherMutation.mutate(payload);
   };
-
-  // Handle editing a teacher
-  const handleEditTeacher = (teacher: TeacherType) => {
+  
+  const handleDeleteTeacher = () => {
+    if (!selectedTeacher?.id) return;
+    deleteTeacherMutation.mutate(selectedTeacher.id);
+  };
+  
+  const handleViewTeacher = (teacher: any) => {
     setSelectedTeacher(teacher);
-    
-    // Populate form with teacher data
-    setTeacherFormData({
-      teacherId: teacher.teacherId,
-      firstName: teacher.firstName,
-      lastName: teacher.lastName,
-      email: teacher.email,
-      phone: teacher.phone || '',
-      street: teacher.street || '',
-      houseNumber: teacher.houseNumber || '',
-      postalCode: teacher.postalCode || '',
-      city: teacher.city || '',
-      dateOfBirth: teacher.dateOfBirth ? new Date(teacher.dateOfBirth).toISOString().split('T')[0] : '',
-      profession: teacher.profession || '',
-      education: '',
-      gender: teacher.gender || '',
-      notes: teacher.notes || '',
-      isActive: teacher.isActive,
-      assignedSubjects: [],
-      assignedClasses: []
-    });
-    
-    // Open edit dialog
-    setIsCreateDialogOpen(true);
+    setIsViewDialogOpen(true);
   };
-
-  // State voor bevestigingsdialoog
-  const [teacherToDelete, setTeacherToDelete] = useState<TeacherType | null>(null);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  // Handle het openen van de bevestigingsdialoog voor het verwijderen
-  const handleDeleteTeacher = (teacher: TeacherType) => {
-    setTeacherToDelete(teacher);
+  
+  const handleEditTeacher = (teacher: any) => {
+    setSelectedTeacher(teacher);
+    setTeacherFormData({
+      teacherId: teacher.teacherId || "",
+      firstName: teacher.firstName || "",
+      lastName: teacher.lastName || "",
+      email: teacher.email || "",
+      phone: teacher.phone || "",
+      isActive: teacher.isActive ?? true,
+      street: teacher.street || "",
+      houseNumber: teacher.houseNumber || "",
+      postalCode: teacher.postalCode || "",
+      city: teacher.city || "",
+      dateOfBirth: teacher.dateOfBirth || "",
+      gender: teacher.gender || "man",
+      notes: teacher.notes || "",
+      certifications: teacher.certifications || [],
+      languages: teacher.languages || [],
+      specialties: teacher.specialties || [],
+      educationLevel: teacher.educationLevel || "Bachelor",
+      yearsOfExperience: teacher.yearsOfExperience || 0,
+      documents: teacher.documents || [],
+      availability: teacher.availability || [],
+      assignedCourses: teacher.assignedCourses || [],
+      assignedClasses: teacher.assignedClasses || []
+    });
+    setIsEditDialogOpen(true);
+  };
+  
+  const openDeleteDialog = (teacher: any) => {
+    setSelectedTeacher(teacher);
     setIsDeleteDialogOpen(true);
   };
   
-  // Handle de daadwerkelijke verwijdering na bevestiging
-  const confirmDeleteTeacher = () => {
-    if (teacherToDelete) {
-      toast({
-        title: "Bezig met verwijderen...",
-        description: `Docent ${teacherToDelete.firstName} ${teacherToDelete.lastName} wordt verwijderd`,
-      });
-      deleteMutation.mutate(teacherToDelete.id);
-      setIsDeleteDialogOpen(false);
-      setTeacherToDelete(null);
-    }
+  // Render status badge
+  const renderStatusBadge = (isActive: boolean) => {
+    return isActive ? (
+      <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+        Actief
+      </span>
+    ) : (
+      <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
+        Inactief
+      </span>
+    );
   };
-
-  // Handle viewing a teacher's details
-  const handleViewTeacher = (teacher: TeacherType) => {
-    setSelectedTeacher(teacher);
-  };
-
-  // Get day name from number
-  const getDayName = (dayNumber: number): string => {
-    const days = {
-      0: "Zondag",
-      1: "Maandag",
-      2: "Dinsdag",
-      3: "Woensdag",
-      4: "Donderdag",
-      5: "Vrijdag",
-      6: "Zaterdag"
-    };
-    return days[dayNumber as keyof typeof days] || `Dag ${dayNumber}`;
-  };
-
-  // Get language proficiency level label
-  const getLanguageProficiencyLabel = (level: string): string => {
-    const levels = {
-      "beginner": "Beginner",
-      "intermediate": "Gemiddeld",
-      "advanced": "Gevorderd",
-      "native": "Moedertaal",
-      "fluent": "Vloeiend",
-    };
-    return levels[level as keyof typeof levels] || level;
-  };
-
-  // Render teachers page
-  return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* Page Title */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <GraduationCap className="h-6 w-6" />
+  
+  if (isLoading) {
+    return (
+      <div className="p-4 md:p-6 space-y-6">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+            <div className="flex items-center gap-4 mb-2 md:mb-0">
+              <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+                <GraduationCap className="h-7 w-7" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Docenten</h1>
+                <p className="text-base text-gray-500 mt-1">Bekijk en beheer alle docenten in het systeem</p>
+              </div>
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Docenten</h1>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beheer en monitor alle docenten en hun vaardigheden
-          </p>
-        </div>
-      </div>
-      
-      {/* Zoek en acties */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-        <div className="relative w-full md:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Zoek docenten..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="w-full pl-10"
-          />
         </div>
         
-        <Button 
-          onClick={handleAddNewTeacher} 
-          variant="default" 
-          size="default" 
-          className="bg-primary hover:bg-primary/90 flex items-center"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          <span>Docent Toevoegen</span>
-        </Button>
-      </div>
-      
-      {/* Docenten lijst */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex justify-end items-center">
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="border-primary/30 text-primary hover:text-primary hover:bg-primary/5 hover:border-primary/50"
-              onClick={() => refetch()}
-            >
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                width="16" 
-                height="16" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                className="mr-2 h-4 w-4"
-              >
-                <path d="M21 2v6h-6"></path>
-                <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
-                <path d="M3 22v-6h6"></path>
-                <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
-              </svg>
-              Vernieuwen
-            </Button>
+        <div className="border rounded-lg p-8 bg-white shadow-sm">
+          <div className="flex items-center justify-center h-40">
+            <div className="text-center">
+              <div className="inline-block animate-spin h-8 w-8 border-4 border-[#1e3a8a] border-t-transparent rounded-full mb-4"></div>
+              <p className="text-gray-500">Docenten laden...</p>
+            </div>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <div className="flex items-center">
-                    Docent
-                  </div>
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefoon</th>
-                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {isLoading ? (
+      </div>
+    );
+  }
+  
+  if (isError) {
+    return (
+      <div className="p-4 md:p-6 space-y-6">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+            <div className="flex items-center gap-4 mb-2 md:mb-0">
+              <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+                <GraduationCap className="h-7 w-7" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Docenten</h1>
+                <p className="text-base text-gray-500 mt-1">Bekijk en beheer alle docenten in het systeem</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="border rounded-lg p-8 bg-white shadow-sm">
+          <div className="text-center py-8">
+            <XCircle className="mx-auto h-12 w-12 text-red-400" />
+            <h3 className="mt-2 text-lg font-medium text-gray-900">Fout bij laden</h3>
+            <p className="mt-1 text-gray-500">Er is een fout opgetreden bij het laden van de docenten.</p>
+            <div className="mt-6">
+              <Button onClick={() => queryClient.invalidateQueries({queryKey: ['/api/teachers']})}>
+                Opnieuw proberen
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="p-4 md:p-6 space-y-6">
+      <div className="flex flex-col mb-8">
+        <div className="w-full">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <GraduationCap className="h-7 w-7" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Docenten</h1>
+              <p className="text-base text-gray-500 mt-1">Bekijk en beheer alle docenten in het systeem</p>
+            </div>
+          </div>
+          
+          <div className="border-b border-gray-200 pb-4 mb-4"></div>
+          
+          <div className="mt-4">
+            <div className="relative w-full mb-4">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <Input
+                type="search"
+                placeholder="Zoek op naam of docent ID..."
+                className="w-full pl-9 bg-white"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            <div className="flex justify-end">
+              <Button onClick={() => setIsCreateDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Docent toevoegen
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
+        
+        {/* Docententabel of lege staat */}
+        {teachersData?.teachers && teachersData.teachers.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center">
-                    <div className="flex justify-center">
-                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  </td>
+                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Docent ID</th>
+                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Naam</th>
+                  <th className="py-3.5 px-4 text-left text-sm font-medium text-gray-500">Klas</th>
+                  <th className="py-3.5 px-4 text-right text-sm font-medium text-gray-500">Acties</th>
                 </tr>
-              ) : isError ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-red-500">
-                    Fout bij het laden van docenten. Probeer het opnieuw.
-                  </td>
-                </tr>
-              ) : teachers.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                    Geen docenten gevonden.
-                  </td>
-                </tr>
-              ) : (
-                teachers.map((teacher: TeacherType) => (
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {teachersData.teachers.map((teacher: any, index: number) => (
                   <tr key={teacher.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="py-4 px-4 text-sm text-gray-700 align-top">{teacher.teacherId}</td>
+                    <td className="py-4 px-4 text-sm align-top">
                       <div className="flex items-center">
-                        <Avatar className="h-9 w-9">
-                          <AvatarFallback className="bg-[#1e3a8a] text-white">
-                            {teacher.firstName.charAt(0)}{teacher.lastName.charAt(0)}
+                        <Avatar className="h-9 w-9 mr-3 bg-blue-100 text-blue-600">
+                          <AvatarFallback>
+                            {teacher.firstName?.[0]}{teacher.lastName?.[0]}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{teacher.firstName} {teacher.lastName}</div>
-                          <div className="text-xs text-gray-500">ID: {teacher.teacherId}</div>
+                        <div>
+                          <div className="font-medium text-gray-900">{teacher.firstName} {teacher.lastName}</div>
+                          <div className="text-gray-500 text-xs mt-1">
+                            {teacher.email}
+                          </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{teacher.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{teacher.phone || 'Onbekend'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        teacher.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {teacher.isActive ? 'Actief' : 'Inactief'}
-                      </span>
+                    <td className="py-4 px-4 text-sm text-gray-500 align-top">
+                      <div className="flex flex-wrap gap-1">
+                        {teacher.assignedClasses && teacher.assignedClasses.length > 0 ? 
+                          teacher.assignedClasses.map((klas: string, index: number) => (
+                            <span key={index} className="inline-flex px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                              {klas}
+                            </span>
+                          )) 
+                          : 
+                          <span className="text-gray-400">Geen klassen toegewezen</span>
+                        }
+                      </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                      <div className="flex justify-center space-x-2">
+                    <td className="py-4 px-4 text-sm text-gray-500 text-right align-top">
+                      <div className="flex justify-end gap-2">
                         <Button 
                           variant="ghost" 
-                          size="sm" 
+                          size="icon"
                           onClick={() => handleViewTeacher(teacher)}
-                          title="Details bekijken"
-                          className="h-8 w-8 p-0"
                         >
-                          <Eye className="h-4 w-4 text-gray-500" />
-                          <span className="sr-only">Bekijken</span>
+                          <Eye className="h-4 w-4 text-gray-600" />
                         </Button>
                         <Button 
                           variant="ghost" 
-                          size="sm" 
+                          size="icon"
                           onClick={() => handleEditTeacher(teacher)}
-                          title="Docent bewerken"
-                          className="h-8 w-8 p-0"
                         >
-                          <Pencil className="h-4 w-4 text-gray-500" />
-                          <span className="sr-only">Bewerken</span>
+                          <Pencil className="h-4 w-4 text-gray-600" />
                         </Button>
                         <Button 
                           variant="ghost" 
-                          size="sm" 
-                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                          onClick={() => handleDeleteTeacher(teacher)}
-                          title="Docent verwijderen"
+                          size="icon"
+                          onClick={() => openDeleteDialog(teacher)}
                         >
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Verwijderen</span>
+                          <Trash2 className="h-4 w-4 text-red-500" />
                         </Button>
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="bg-white mt-4 px-4 py-3 flex items-center justify-between border border-gray-200 rounded-lg sm:px-6">
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700">
-                Tonen <span className="font-medium">{(currentPage - 1) * 10 + 1}</span> tot <span className="font-medium">{Math.min(currentPage * 10, totalTeachers)}</span> van <span className="font-medium">{totalTeachers}</span> resultaten
-              </p>
-            </div>
-            <div>
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Paginering">
-                <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                >
-                  <span className="sr-only">Vorige</span>
-                  &larr;
-                </button>
-                {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
-                      currentPage === i + 1
-                        ? 'bg-primary text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
                 ))}
-                <button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+              </tbody>
+            </table>
+            
+            {/* Paginering */}
+            <div className="p-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="text-sm text-gray-500">
+                Toont {((currentPage - 1) * rowsPerPage) + 1}-{Math.min(currentPage * rowsPerPage, teachersData.totalCount)} van {teachersData.totalCount} docenten
+              </div>
+              
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 >
-                  <span className="sr-only">Volgende</span>
-                  &rarr;
-                </button>
-              </nav>
+                  Vorige
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                >
+                  Volgende
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <EmptyState
+            icon={<GraduationCap className="h-10 w-10 opacity-30" />}
+            title="Geen docenten gevonden"
+            description={searchQuery ? `Geen resultaten voor "${searchQuery}". Probeer een andere zoekopdracht of pas de filters aan.` : "Er zijn nog geen docenten toegevoegd aan het systeem."}
+          />
+        )}
+      </div>
       
-      {/* Docent details dialoog */}
-      <Dialog open={!!selectedTeacher} onOpenChange={() => setSelectedTeacher(null)}>
-        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+      {/* Weergave van docentgegevens Dialog */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="sm:max-w-[85vw]">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">
-              {selectedTeacher && `${selectedTeacher.firstName} ${selectedTeacher.lastName}`}
+            <DialogTitle className="text-xl font-bold text-primary flex items-center gap-2">
+              <GraduationCap className="h-5 w-5" />
+              {selectedTeacher?.firstName} {selectedTeacher?.lastName}
             </DialogTitle>
             <DialogDescription>
-              Details en beheer van docentinformatie
+              Docentgegevens bekijken
             </DialogDescription>
           </DialogHeader>
           
-      {/* Docent vakken beheren dialoog */}
-      {selectedTeacher && (
-        <ManageTeacherAssignments
-          teacherId={selectedTeacher.id}
-          onClose={() => setIsAssignmentsDialogOpen(false)}
-          open={isAssignmentsDialogOpen}
-        />
-      )}
-          
-          {selectedTeacher && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-md font-medium">Persoonlijke Informatie</h3>
-                <Button 
-                  onClick={() => setIsAssignmentsDialogOpen(true)}
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1"
-                >
-                  <BookText className="h-4 w-4 text-[#1e3a8a]" />
-                  <span>Vakken beheren</span>
-                </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+            <div className="space-y-6">
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-500 mb-3">Basisinformatie</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs text-gray-500">Docent ID</p>
+                    <p className="font-medium">{selectedTeacher?.teacherId || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Status</p>
+                    <p>{renderStatusBadge(selectedTeacher?.isActive)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Voornaam</p>
+                    <p className="font-medium">{selectedTeacher?.firstName || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Achternaam</p>
+                    <p className="font-medium">{selectedTeacher?.lastName || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Geslacht</p>
+                    <p className="font-medium">{selectedTeacher?.gender === "man" ? "Man" : "Vrouw"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Geboortedatum</p>
+                    <p className="font-medium">{selectedTeacher?.dateOfBirth ? formatDateToDisplayFormat(selectedTeacher.dateOfBirth) : "-"}</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <span className="w-32 text-sm text-gray-500">Docent ID:</span>
-                    <span>{selectedTeacher.teacherId || 'Niet beschikbaar'}</span>
+              
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-500 mb-3">Contactgegevens</h3>
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-xs text-gray-500">E-mail</p>
+                    <p className="font-medium">{selectedTeacher?.email || "-"}</p>
                   </div>
-                  <div className="flex items-center">
-                    <span className="w-32 text-sm text-gray-500">Email:</span>
-                    <span>{selectedTeacher.email}</span>
+                  <div>
+                    <p className="text-xs text-gray-500">Telefoonnummer</p>
+                    <p className="font-medium">{selectedTeacher?.phone || "-"}</p>
                   </div>
-                  <div className="flex items-center">
-                    <span className="w-32 text-sm text-gray-500">Telefoon:</span>
-                    <span>{selectedTeacher.phone || 'Niet beschikbaar'}</span>
+                </div>
+              </div>
+              
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-500 mb-3">Adresgegevens</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs text-gray-500">Straat</p>
+                    <p className="font-medium">{selectedTeacher?.street || "-"}</p>
                   </div>
-                  <div className="flex items-center">
-                    <span className="w-32 text-sm text-gray-500">Status:</span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                      selectedTeacher.isActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {selectedTeacher.isActive ? 'Actief' : 'Inactief'}
-                    </span>
+                  <div>
+                    <p className="text-xs text-gray-500">Huisnummer</p>
+                    <p className="font-medium">{selectedTeacher?.houseNumber || "-"}</p>
                   </div>
-                  {selectedTeacher.gender && (
-                    <div className="flex items-center">
-                      <span className="w-32 text-sm text-gray-500">Geslacht:</span>
-                      <span>{selectedTeacher.gender}</span>
+                  <div>
+                    <p className="text-xs text-gray-500">Postcode</p>
+                    <p className="font-medium">{selectedTeacher?.postalCode || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Plaats</p>
+                    <p className="font-medium">{selectedTeacher?.city || "-"}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-500 mb-3">Professionele informatie</h3>
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-xs text-gray-500">Opleidingsniveau</p>
+                    <p className="font-medium">{selectedTeacher?.educationLevel || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Jaren ervaring</p>
+                    <p className="font-medium">{selectedTeacher?.yearsOfExperience || "0"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Specialisaties</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {selectedTeacher?.specialties && selectedTeacher.specialties.length > 0 ? (
+                        selectedTeacher.specialties.map((specialty: string, index: number) => (
+                          <span key={index} className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">
+                            {specialty}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-gray-500">-</span>
+                      )}
                     </div>
-                  )}
-                  {selectedTeacher.dateOfBirth && (
-                    <div className="flex items-center">
-                      <span className="w-32 text-sm text-gray-500">Geboortedatum:</span>
-                      <span>{formatDateToDisplayFormat(selectedTeacher.dateOfBirth.toString())}</span>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Certificeringen</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {selectedTeacher?.certifications && selectedTeacher.certifications.length > 0 ? (
+                        selectedTeacher.certifications.map((cert: string, index: number) => (
+                          <span key={index} className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
+                            {cert}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-gray-500">-</span>
+                      )}
                     </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Talen</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {selectedTeacher?.languages && selectedTeacher.languages.length > 0 ? (
+                        selectedTeacher.languages.map((lang: string, index: number) => (
+                          <span key={index} className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full">
+                            {lang}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-gray-500">-</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-500 mb-3">Toegewezen klassen</h3>
+                <div className="grid grid-cols-1 gap-3">
+                  {selectedTeacher?.assignedClasses && selectedTeacher.assignedClasses.length > 0 ? (
+                    selectedTeacher.assignedClasses.map((cls: any, index: number) => (
+                      <div key={index} className="p-2 bg-gray-50 rounded border border-gray-200">
+                        <p className="font-medium">{cls.name}</p>
+                        <p className="text-xs text-gray-500">{cls.description}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500">Geen klassen toegewezen</p>
                   )}
                 </div>
               </div>
               
-              <div>
-                <h3 className="text-md font-medium mb-2">Adresgegevens</h3>
-                <div className="space-y-2">
-                  {selectedTeacher.street && (
-                    <div className="flex items-center">
-                      <span className="w-32 text-sm text-gray-500">Straat:</span>
-                      <span>{selectedTeacher.street} {selectedTeacher.houseNumber || ''}</span>
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-500 mb-3">Notities</h3>
+                <p className="text-sm text-gray-700 whitespace-pre-line min-h-[60px]">
+                  {selectedTeacher?.notes || "Geen notities"}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
+              Sluiten
+            </Button>
+            <Button onClick={() => {
+              setIsViewDialogOpen(false);
+              handleEditTeacher(selectedTeacher);
+            }}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Bewerken
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Create Teacher Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[95vw] h-[95vh]">
+          <DialogHeader className="pb-1">
+            <DialogTitle className="text-xl font-bold text-primary flex items-center">
+              <GraduationCap className="mr-2 h-5 w-5" />
+              Nieuwe Docent Toevoegen
+            </DialogTitle>
+            <DialogDescription className="text-sm">
+              Vul alle benodigde informatie in om een nieuwe docent toe te voegen aan het systeem.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-2 overflow-y-auto pr-1" style={{ height: "calc(95vh - 100px)" }}>
+            <Tabs defaultValue="personal">
+              <TabsList className="flex mb-2 overflow-x-auto">
+                <TabsTrigger value="personal" className="flex items-center gap-1 px-3">
+                  <User className="h-4 w-4" />
+                  <span>Persoonlijk</span>
+                </TabsTrigger>
+                <TabsTrigger value="contact" className="flex items-center gap-1 px-3">
+                  <Phone className="h-4 w-4" />
+                  <span>Contact</span>
+                </TabsTrigger>
+                <TabsTrigger value="address" className="flex items-center gap-1 px-3">
+                  <MapPin className="h-4 w-4" />
+                  <span>Adres</span>
+                </TabsTrigger>
+                <TabsTrigger value="professional" className="flex items-center gap-1 px-3">
+                  <Briefcase className="h-4 w-4" />
+                  <span>Professioneel</span>
+                </TabsTrigger>
+                <TabsTrigger value="subjects" className="flex items-center gap-1 px-3">
+                  <Book className="h-4 w-4" />
+                  <span>Vakken</span>
+                </TabsTrigger>
+                <TabsTrigger value="classes" className="flex items-center gap-1 px-3">
+                  <ChalkBoard className="h-4 w-4" />
+                  <span>Klassen</span>
+                </TabsTrigger>
+              </TabsList>
+            
+
+              
+              {/* Persoonlijke informatie tab */}
+              <TabsContent value="personal" className="space-y-3">
+                <div className="p-3 border border-gray-200 rounded-lg bg-white shadow-sm min-h-[365px]">
+                  <h3 className="text-lg font-semibold text-primary mb-2">Persoonlijke gegevens</h3>
+                  
+                  {/* Foto upload sectie met knoppen rechts */}
+                  <div className="flex mb-2 items-start justify-between">
+                    <div 
+                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer"
+                      onClick={() => {
+                        const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
+                        fileInput?.click();
+                      }}
+                    >
+                      <img id="teacher-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
+                      <div id="teacher-photo-placeholder" className="w-full h-full flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-full">
+                        <GraduationCap className="h-10 w-10 text-gray-300" />
+                        <div className="absolute bottom-0 right-0 bg-[#1e3a8a] rounded-full p-1.5 shadow-sm">
+                          <Upload className="h-3.5 w-3.5 text-white" />
+                        </div>
+                      </div>
+                      
+                      {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
+                      <div 
+                        className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity hidden"
+                        id="photo-delete-overlay"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                          const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                          const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
+                          
+                          if (photoPreview && photoPlaceholder && fileInput && photoDeleteOverlay) {
+                            photoPreview.src = '';
+                            photoPreview.classList.add('hidden');
+                            photoPlaceholder.classList.remove('hidden');
+                            photoDeleteOverlay.classList.add('hidden');
+                            fileInput.value = '';
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-6 w-6 text-white" />
+                      </div>
                     </div>
-                  )}
-                  {selectedTeacher.postalCode && (
-                    <div className="flex items-center">
-                      <span className="w-32 text-sm text-gray-500">Postcode:</span>
-                      <span>{selectedTeacher.postalCode}</span>
-                    </div>
-                  )}
-                  {selectedTeacher.city && (
-                    <div className="flex items-center">
-                      <span className="w-32 text-sm text-gray-500">Plaats:</span>
-                      <span>{selectedTeacher.city}</span>
-                    </div>
-                  )}
-                </div>
-                
-                {selectedTeacher.hireDate && (
-                  <div className="mt-6">
-                    <h3 className="text-md font-medium mb-2">Werkgeversinformatie</h3>
-                    <div className="flex items-center">
-                      <span className="w-32 text-sm text-gray-500">In dienst sinds:</span>
-                      <span>{formatDateToDisplayFormat(selectedTeacher.hireDate.toString())}</span>
+                    
+                    <input 
+                      type="file" 
+                      id="teacher-photo" 
+                      accept="image/*" 
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = function(event) {
+                            const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                            const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                            const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                            
+                            if (photoPreview && photoPlaceholder && photoDeleteOverlay && event.target?.result) {
+                              photoPreview.src = event.target.result as string;
+                              photoPreview.classList.remove('hidden');
+                              photoPlaceholder.classList.add('hidden');
+                              photoDeleteOverlay.classList.remove('hidden');
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    
+                    <div className="flex flex-col gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="flex items-center border border-gray-300 h-7 text-xs"
+                        onClick={() => {
+                          // Get access to toast context within this function
+                          const localToast = toast;
+                          
+                          localToast({
+                            title: "eID detectie",
+                            description: "Zoeken naar eID-kaartlezer...",
+                          });
+                          
+                          // Simuleer eID detectie (in werkelijkheid zou dit een echte API-integratie zijn)
+                          setTimeout(() => {
+                            localToast({
+                              title: "eID gedetecteerd",
+                              description: "Gegevens worden geladen van de identiteitskaart...",
+                            });
+                            
+                            // Simuleer laden van eID gegevens na 2 seconden
+                            setTimeout(() => {
+                              // Hier zouden we de kaartgegevens verwerken
+                              // In een echte implementatie zou dit komen van de eID API
+                              const eidData = {
+                                firstName: "Ahmed",
+                                lastName: "El Khatib",
+                                birthDate: "1985-08-21",
+                                nationalRegisterNumber: "850821378914",
+                                gender: "Mannelijk",
+                                street: "Leuvensestraat",
+                                houseNumber: "12B",
+                                postalCode: "1030",
+                                city: "Schaarbeek",
+                                photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID"
+                              };
+                              
+                              // Simuleer het laden van de foto uit de eID
+                              const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                              const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                              
+                              if (photoPreview && photoPlaceholder) {
+                                photoPreview.src = eidData.photoUrl;
+                                photoPreview.classList.remove('hidden');
+                                photoPlaceholder.classList.add('hidden');
+                              }
+                              
+                              // Vul het formulier in met eID-gegevens
+                              setTeacherFormData({
+                                ...teacherFormData,
+                                firstName: eidData.firstName,
+                                lastName: eidData.lastName,
+                                dateOfBirth: eidData.birthDate,
+                                gender: eidData.gender === "Mannelijk" ? "man" : "vrouw",
+                                street: eidData.street,
+                                houseNumber: eidData.houseNumber,
+                                postalCode: eidData.postalCode,
+                                city: eidData.city
+                              });
+                              
+                              // Bericht tonen dat de gegevens zijn geladen
+                              localToast({
+                                title: "Gegevens geladen",
+                                description: "De gegevens van de eID zijn succesvol ingeladen.",
+                              });
+                            }, 2000);
+                          }, 1500);
+                        }}
+                      >
+                        <span className="mr-2 bg-[#77CC9A] text-white rounded-md px-1 font-bold text-xs py-0.5">be|ID</span>
+                        Laden via eID
+                      </Button>
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="flex items-center border border-gray-300 h-7 text-xs"
+                        onClick={() => {
+                          // Get access to toast context within this function
+                          const localToast = toast;
+                          
+                          localToast({
+                            title: "itsme® app",
+                            description: "Open de itsme® app op uw smartphone om verder te gaan...",
+                          });
+                          
+                          // Simuleer itsme detectie
+                          setTimeout(() => {
+                            localToast({
+                              title: "itsme® verbinding",
+                              description: "Verbinding gemaakt met itsme®. Gegevens worden opgehaald...",
+                            });
+                            
+                            // Simuleer laden van itsme gegevens na 2 seconden
+                            setTimeout(() => {
+                              // Hier zouden we de itsme-gegevens verwerken
+                              // In een echte implementatie zou dit komen van de itsme API
+                              const itsmeData = {
+                                firstName: "Mohamed",
+                                lastName: "Ben Ali",
+                                birthDate: "1980-03-12",
+                                nationalRegisterNumber: "80031215987",
+                                gender: "Mannelijk",
+                                street: "Antwerpsesteenweg",
+                                houseNumber: "24",
+                                postalCode: "2800",
+                                city: "Mechelen",
+                                photoUrl: "https://placehold.co/400x400/eee/FF4D27?text=Foto+itsme"
+                              };
+                              
+                              // Simuleer het laden van de foto uit itsme
+                              const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                              const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                              
+                              if (photoPreview && photoPlaceholder) {
+                                photoPreview.src = itsmeData.photoUrl;
+                                photoPreview.classList.remove('hidden');
+                                photoPlaceholder.classList.add('hidden');
+                              }
+                              
+                              // Vul het formulier in met itsme-gegevens
+                              setTeacherFormData({
+                                ...teacherFormData,
+                                firstName: itsmeData.firstName,
+                                lastName: itsmeData.lastName,
+                                dateOfBirth: itsmeData.birthDate,
+                                gender: itsmeData.gender === "Mannelijk" ? "man" : "vrouw",
+                                street: itsmeData.street,
+                                houseNumber: itsmeData.houseNumber,
+                                postalCode: itsmeData.postalCode,
+                                city: itsmeData.city
+                              });
+                              
+                              // Bericht tonen dat de gegevens zijn geladen
+                              localToast({
+                                title: "Gegevens geladen",
+                                description: "De itsme® gegevens zijn succesvol ingeladen.",
+                              });
+                            }, 2500);
+                          }, 2000);
+                        }}
+                      >
+                        <span className="mr-2 bg-[#FF4D27] text-white rounded-md px-2 font-bold text-xs py-0.5">itsme</span>
+                        Laden via itsme®
+                      </Button>
                     </div>
                   </div>
-                )}
+                  
+                  <div className="hidden">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex items-center border border-gray-300"
+                      onClick={() => {
+                        // Get access to toast context within this function
+                        const localToast = toast;
+                        
+                        localToast({
+                          title: "eID detectie",
+                          description: "Zoeken naar eID-kaartlezer...",
+                        });
+                        
+                        // Simuleer eID detectie (in werkelijkheid zou dit een echte API-integratie zijn)
+                        setTimeout(() => {
+                          localToast({
+                            title: "eID gedetecteerd",
+                            description: "Gegevens worden geladen van de identiteitskaart...",
+                          });
+                          
+                          // Simuleer laden van eID gegevens na 2 seconden
+                          setTimeout(() => {
+                            // Hier zouden we de kaartgegevens verwerken
+                            // In een echte implementatie zou dit komen van de eID API
+                            const eidData = {
+                              firstName: "Ahmed",
+                              lastName: "El Khatib",
+                              birthDate: "1985-08-21",
+                              nationalRegisterNumber: "850821378914",
+                              gender: "Mannelijk",
+                              street: "Leuvensestraat",
+                              houseNumber: "12B",
+                              postalCode: "1030",
+                              city: "Schaarbeek",
+                              photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID"
+                            };
+                            
+                            // Simuleer het laden van de foto uit de eID
+                            const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                            const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                            
+                            if (photoPreview && photoPlaceholder) {
+                              photoPreview.src = eidData.photoUrl;
+                              photoPreview.classList.remove('hidden');
+                              photoPlaceholder.classList.add('hidden');
+                            }
+                            
+                            // Vul het formulier in met eID-gegevens
+                            setTeacherFormData({
+                              ...teacherFormData,
+                              firstName: eidData.firstName,
+                              lastName: eidData.lastName,
+                              dateOfBirth: eidData.birthDate,
+                              gender: eidData.gender === "Mannelijk" ? "man" : "vrouw",
+                              street: eidData.street,
+                              houseNumber: eidData.houseNumber,
+                              postalCode: eidData.postalCode,
+                              city: eidData.city
+                            });
+                            
+                            // Voeg een extra bericht toe dat de foto ook beschikbaar is in de foto-tab
+                            localToast({
+                              title: "Gegevens geladen",
+                              description: "De gegevens van de eID zijn succesvol ingeladen. De foto is ook zichtbaar in de foto-tab.",
+                            });
+                            
+                            // Toon een visuele hint dat er ook naar de foto tab gekeken moet worden
+                            const photoTabTrigger = document.querySelector('button[value="photo"]');
+                            if (photoTabTrigger) {
+                              photoTabTrigger.classList.add('animate-pulse');
+                              setTimeout(() => {
+                                photoTabTrigger.classList.remove('animate-pulse');
+                              }, 3000);
+                            }
+                          }, 2000);
+                        }, 1500);
+                      }}
+                    >
+                      <span className="mr-2 bg-[#77CC9A] text-white rounded-md px-1 font-bold text-xs py-0.5">be|ID</span>
+                      Gegevens laden via eID
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex items-center border border-gray-300"
+                      onClick={() => {
+                        // Get access to toast context within this function
+                        const localToast = toast;
+                        
+                        localToast({
+                          title: "itsme® app",
+                          description: "Open de itsme® app op uw smartphone om verder te gaan...",
+                        });
+                        
+                        // Simuleer itsme detectie
+                        setTimeout(() => {
+                          localToast({
+                            title: "itsme® verbinding",
+                            description: "Verbinding gemaakt met itsme®. Gegevens worden opgehaald...",
+                          });
+                          
+                          // Simuleer laden van itsme gegevens na 2 seconden
+                          setTimeout(() => {
+                            // Hier zouden we de itsme-gegevens verwerken
+                            // In een echte implementatie zou dit komen van de itsme API
+                            const itsmeData = {
+                              firstName: "Mohamed",
+                              lastName: "Ben Ali",
+                              birthDate: "1980-03-12",
+                              nationalRegisterNumber: "80031215987",
+                              gender: "Mannelijk",
+                              street: "Antwerpsesteenweg",
+                              houseNumber: "24",
+                              postalCode: "2800",
+                              city: "Mechelen",
+                              photoUrl: "https://placehold.co/400x400/eee/FF4D27?text=Foto+itsme"
+                            };
+                            
+                            // Simuleer het laden van de foto uit itsme
+                            const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
+                            const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
+                            
+                            if (photoPreview && photoPlaceholder) {
+                              photoPreview.src = itsmeData.photoUrl;
+                              photoPreview.classList.remove('hidden');
+                              photoPlaceholder.classList.add('hidden');
+                            }
+                            
+                            // Vul het formulier in met itsme-gegevens
+                            setTeacherFormData({
+                              ...teacherFormData,
+                              firstName: itsmeData.firstName,
+                              lastName: itsmeData.lastName,
+                              dateOfBirth: itsmeData.birthDate,
+                              gender: itsmeData.gender === "Mannelijk" ? "man" : "vrouw",
+                              street: itsmeData.street,
+                              houseNumber: itsmeData.houseNumber,
+                              postalCode: itsmeData.postalCode,
+                              city: itsmeData.city
+                            });
+                            
+                            // Voeg een extra bericht toe dat de foto ook beschikbaar is in de foto-tab
+                            localToast({
+                              title: "Gegevens geladen",
+                              description: "De itsme® gegevens zijn succesvol ingeladen. De foto is ook zichtbaar in de foto-tab.",
+                            });
+                            
+                            // Toon een visuele hint dat er ook naar de foto tab gekeken moet worden
+                            const photoTabTrigger = document.querySelector('button[value="photo"]');
+                            if (photoTabTrigger) {
+                              photoTabTrigger.classList.add('animate-pulse');
+                              setTimeout(() => {
+                                photoTabTrigger.classList.remove('animate-pulse');
+                              }, 3000);
+                            }
+                          }, 2500);
+                        }, 2000);
+                      }}
+                    >
+                      <span className="mr-2 bg-[#FF4D27] text-white rounded-md px-2 font-bold text-xs py-0.5">itsme</span>
+                      Gegevens laden via itsme®
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-3">
+                    <div>
+                      <Label htmlFor="teacherId" className="text-sm font-medium text-gray-700">
+                        Docent ID <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="teacherId"
+                        value={teacherFormData.teacherId}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, teacherId: e.target.value })}
+                        className="mt-1 bg-white h-8"
+                        placeholder="Automatisch gegenereerd..."
+                        disabled={!!nextTeacherIdData?.nextTeacherId}
+                      />
+                      {isLoadingNextId && <div className="text-xs text-gray-500">ID wordt geladen...</div>}
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+                        Status <span className="text-primary">*</span>
+                      </Label>
+                      <Select
+                        value={teacherFormData.isActive ? "actief" : "inactief"}
+                        onValueChange={(value) => setTeacherFormData({ ...teacherFormData, isActive: value === "actief" })}
+                      >
+                        <SelectTrigger className="w-full mt-1 bg-white h-8">
+                          <SelectValue placeholder="Selecteer status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="actief">Actief</SelectItem>
+                          <SelectItem value="inactief">Inactief</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
+                        Geslacht
+                      </Label>
+                      <Select
+                        value={teacherFormData.gender}
+                        onValueChange={(value) => setTeacherFormData({ ...teacherFormData, gender: value })}
+                      >
+                        <SelectTrigger className="w-full mt-1 bg-white h-8">
+                          <SelectValue placeholder="Selecteer geslacht" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="man">Man</SelectItem>
+                          <SelectItem value="vrouw">Vrouw</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                        Voornaam <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="firstName"
+                        value={teacherFormData.firstName}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, firstName: e.target.value })}
+                        className="mt-1 bg-white h-8"
+                        placeholder="Voornaam"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                        Achternaam <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="lastName"
+                        value={teacherFormData.lastName}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, lastName: e.target.value })}
+                        className="mt-1 bg-white h-8"
+                        placeholder="Achternaam"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700">
+                        Geboortedatum
+                      </Label>
+                      <Input
+                        id="dateOfBirth"
+                        type="date"
+                        value={teacherFormData.dateOfBirth || ''}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, dateOfBirth: e.target.value })}
+                        className="mt-1 bg-white h-8"
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-3">
+                      <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
+                        Notities
+                      </Label>
+                      <Textarea
+                        id="notes"
+                        value={teacherFormData.notes}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, notes: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Voeg hier aanvullende informatie toe..."
+                        rows={2}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Contact informatie tab */}
+              <TabsContent value="contact" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                        Email <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={teacherFormData.email}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, email: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="email@mymadrassa.nl"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                        Telefoonnummer <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="phone"
+                        value={teacherFormData.phone}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, phone: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="06 1234 5678"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Adres informatie tab */}
+              <TabsContent value="address" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label htmlFor="street" className="text-sm font-medium text-gray-700">
+                        Straat
+                      </Label>
+                      <Input
+                        id="street"
+                        value={teacherFormData.street}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, street: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Straatnaam"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="houseNumber" className="text-sm font-medium text-gray-700">
+                        Huisnummer
+                      </Label>
+                      <Input
+                        id="houseNumber"
+                        value={teacherFormData.houseNumber}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, houseNumber: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="123"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
+                        Postcode
+                      </Label>
+                      <Input
+                        id="postalCode"
+                        value={teacherFormData.postalCode}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, postalCode: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="1234 AB"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="city" className="text-sm font-medium text-gray-700">
+                        Plaats
+                      </Label>
+                      <Input
+                        id="city"
+                        value={teacherFormData.city}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, city: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Amsterdam"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Professionele informatie tab */}
+              <TabsContent value="professional" className="space-y-3">
+                <div className="p-3 border border-gray-200 rounded-lg bg-white shadow-sm min-h-[365px]">
+                  <h3 className="text-lg font-semibold text-primary mb-2">Professionele gegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-3">
+                    <div className="md:col-span-3">
+                      <Label htmlFor="profession" className="text-sm font-medium text-gray-700">
+                        Beroep
+                      </Label>
+                      <Input
+                        id="profession"
+                        placeholder="Beroep"
+                        value={teacherFormData.profession || ""}
+                        onChange={(e) => setTeacherFormData({ ...teacherFormData, profession: e.target.value })}
+                        className="mt-1 bg-white h-8"
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-3">
+                      <Label className="text-sm font-medium text-gray-700 mb-1 block">
+                        Opleidingen
+                      </Label>
+                      <div className="grid grid-cols-1 gap-2">
+                        <Input
+                          placeholder="Voeg een opleiding toe en druk op Enter"
+                          className="bg-white h-8"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && e.currentTarget.value.trim() !== '') {
+                              e.preventDefault();
+                              const value = e.currentTarget.value.trim();
+                              if (!teacherFormData.educations) {
+                                setTeacherFormData({
+                                  ...teacherFormData,
+                                  educations: [value]
+                                });
+                              } else if (!teacherFormData.educations.includes(value)) {
+                                setTeacherFormData({
+                                  ...teacherFormData,
+                                  educations: [...teacherFormData.educations, value]
+                                });
+                              }
+                              e.currentTarget.value = '';
+                            }
+                          }}
+                        />
+                        
+                        {teacherFormData.educations && teacherFormData.educations.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {teacherFormData.educations.map((education, index) => (
+                              <div key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-md flex items-center group">
+                                {education}
+                                <button
+                                  type="button"
+                                  className="ml-1 text-blue-600 hover:text-blue-800 opacity-60 group-hover:opacity-100"
+                                  onClick={() => {
+                                    setTeacherFormData({
+                                      ...teacherFormData,
+                                      educations: teacherFormData.educations.filter((_, i) => i !== index)
+                                    });
+                                  }}
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="md:col-span-3">
+                      <Label className="text-sm font-medium text-gray-700 mb-1 block">
+                        Talen
+                      </Label>
+                      <div className="grid grid-cols-1 gap-2">
+                        <Input
+                          placeholder="Voeg een taal toe en druk op Enter"
+                          className="bg-white h-8"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && e.currentTarget.value.trim() !== '') {
+                              e.preventDefault();
+                              const value = e.currentTarget.value.trim();
+                              if (!teacherFormData.languages.includes(value)) {
+                                setTeacherFormData({
+                                  ...teacherFormData,
+                                  languages: [...teacherFormData.languages, value]
+                                });
+                              }
+                              e.currentTarget.value = '';
+                            }
+                          }}
+                        />
+                        
+                        {teacherFormData.languages.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {teacherFormData.languages.map((language, index) => (
+                              <div key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-md flex items-center group">
+                                {language}
+                                <button
+                                  type="button"
+                                  className="ml-1 text-blue-600 hover:text-blue-800 opacity-60 group-hover:opacity-100"
+                                  onClick={() => {
+                                    setTeacherFormData({
+                                      ...teacherFormData,
+                                      languages: teacherFormData.languages.filter((_, i) => i !== index)
+                                    });
+                                  }}
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Vakken tab */}
+              <TabsContent value="subjects" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Vakken</h3>
+                  <p className="text-gray-500 mb-4">Vakken worden toegewezen na het aanmaken van de docent.</p>
+                </div>
+              </TabsContent>
+              
+              {/* Klassen tab */}
+              <TabsContent value="classes" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Klassen</h3>
+                  <p className="text-gray-500 mb-4">Klassen worden toegewezen na het aanmaken van de docent.</p>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+          
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button onClick={handleCreateTeacher} disabled={createTeacherMutation.isPending}>
+              {createTeacherMutation.isPending ? (
+                <>
+                  <div className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full" />
+                  Toevoegen...
+                </>
+              ) : (
+                <>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Docent toevoegen
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Verwijderbevestiging Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-destructive flex items-center">
+              <Trash2 className="mr-2 h-5 w-5" />
+              Docent verwijderen
+            </DialogTitle>
+            <DialogDescription>
+              Weet u zeker dat u de volgende docent wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedTeacher && (
+            <div className="p-4 border border-gray-200 rounded-lg bg-white my-4">
+              <div className="flex items-center">
+                <Avatar className="h-9 w-9 mr-3 bg-blue-100 text-blue-600">
+                  <AvatarFallback>
+                    {selectedTeacher.firstName?.[0]}{selectedTeacher.lastName?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="font-medium">{selectedTeacher.firstName} {selectedTeacher.lastName}</div>
+                  <div className="text-sm text-gray-500">{selectedTeacher.teacherId}</div>
+                </div>
               </div>
             </div>
           )}
           
-          {selectedTeacher && (
-            <div className="mt-6">
-              <Tabs defaultValue="beschikbaarheid">
-                <TabsList className="mb-4 p-1 bg-blue-900/10">
-                  <TabsTrigger value="beschikbaarheid" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Beschikbaarheid</TabsTrigger>
-                  <TabsTrigger value="talen" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Talen</TabsTrigger>
-                  <TabsTrigger value="cursussen" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Cursussen</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="beschikbaarheid">
-                  <div className="bg-gray-50 p-4 rounded-md">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-md font-medium">Beschikbaarheid</h3>
-                      <Button variant="outline" size="sm" className="h-8">
-                        <Plus className="h-4 w-4 mr-1" />
-                        Toevoegen
-                      </Button>
-                    </div>
-                    
-                    {isLoadingAvailabilityData ? (
-                      <div className="flex justify-center my-8">
-                        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    ) : availabilityData.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
-                        Geen beschikbaarheidsgegevens gevonden
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {availabilityData.map((availability: AvailabilityType) => (
-                          <div key={availability.id} className="flex justify-between items-center p-3 bg-white rounded-md border">
-                            <div>
-                              <div className="font-medium text-sm">
-                                {getDayName(availability.dayOfWeek)}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {availability.startTime} - {availability.endTime}
-                              </div>
-                              {availability.isBackup && (
-                                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full mt-1 inline-block">
-                                  Reserve
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex space-x-1">
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <Pencil className="h-4 w-4 text-gray-500" />
-                              </Button>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <Trash2 className="h-4 w-4 text-red-500" />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="talen">
-                  <div className="bg-gray-50 p-4 rounded-md">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-md font-medium">Talen</h3>
-                      <Button variant="outline" size="sm" className="h-8">
-                        <Plus className="h-4 w-4 mr-1" />
-                        Toevoegen
-                      </Button>
-                    </div>
-                    
-                    {isLoadingLanguageData ? (
-                      <div className="flex justify-center my-8">
-                        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    ) : languageData.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
-                        Geen taalgegevens gevonden
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {languageData.map((language: LanguageType) => (
-                          <div key={language.id} className="flex justify-between items-center p-3 bg-white rounded-md border">
-                            <div>
-                              <div className="font-medium text-sm">
-                                {language.language}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                Niveau: {getLanguageProficiencyLabel(language.proficiencyLevel)}
-                              </div>
-                            </div>
-                            <div className="flex space-x-1">
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <Pencil className="h-4 w-4 text-gray-500" />
-                              </Button>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <Trash2 className="h-4 w-4 text-red-500" />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="cursussen">
-                  <div className="bg-gray-50 p-4 rounded-md">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-md font-medium">Curriculum</h3>
-                      <Button variant="outline" size="sm" className="h-8">
-                        <Plus className="h-4 w-4 mr-1" />
-                        Toevoegen
-                      </Button>
-                    </div>
-                    
-                    {isLoadingCourseAssignmentsData ? (
-                      <div className="flex justify-center my-8">
-                        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    ) : courseAssignmentsData.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
-                        Geen cursustoewijzingen gevonden
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {courseAssignmentsData.map((assignment: CourseAssignmentType) => (
-                          <div key={assignment.id} className="flex justify-between items-center p-3 bg-white rounded-md border">
-                            <div>
-                              <div className="font-medium text-sm">
-                                {assignment.courseName || 'Onbekende cursus'}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                Startdatum: {assignment.startDate ? formatDateToDisplayFormat(assignment.startDate.toString()) : 'Niet ingesteld'}
-                              </div>
-                              {!assignment.isPrimary && (
-                                <span className="text-xs bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full mt-1 inline-block">
-                                  Secundair
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex space-x-1">
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <Pencil className="h-4 w-4 text-gray-500" />
-                              </Button>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <Trash2 className="h-4 w-4 text-red-500" />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-          )}
-          
-          <DialogFooter className="mt-6">
-            <Button 
-              variant="outline" 
-              onClick={() => setSelectedTeacher(null)}
-            >
-              Sluiten
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Annuleren
             </Button>
-            {selectedTeacher && (
-              <Button 
-                variant="default" 
-                onClick={() => handleEditTeacher(selectedTeacher)}
-              >
-                Bewerken
-              </Button>
-            )}
+            <Button variant="destructive" onClick={handleDeleteTeacher} disabled={deleteTeacherMutation.isPending}>
+              {deleteTeacherMutation.isPending ? (
+                <>
+                  <div className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full" />
+                  Verwijderen...
+                </>
+              ) : (
+                "Definitief verwijderen"
+              )}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Create Teacher Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+      
+      {/* Edit Teacher Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[95vw] sm:h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-primary flex items-center">
               <User className="mr-2 h-5 w-5" />
-              Nieuwe Docent Toevoegen
+              Docent bewerken
             </DialogTitle>
             <DialogDescription>
-              Vul alle benodigde informatie in om een nieuwe docent toe te voegen aan het systeem.
+              Bewerk de gegevens van deze docent.
             </DialogDescription>
           </DialogHeader>
           
@@ -1192,272 +1613,15 @@ export default function Teachers() {
                 <span>Vakken</span>
               </TabsTrigger>
               <TabsTrigger value="classes" className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4" />
+                <ChalkBoard className="h-4 w-4" />
                 <span>Klassen</span>
               </TabsTrigger>
             </TabsList>
             
-            {/* Foto upload tab */}
-            <TabsContent value="photo" className="space-y-6">
-              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                <h3 className="text-lg font-semibold text-primary mb-4">Foto uploaden</h3>
-                <div className="flex flex-col items-center justify-center gap-4">
-                  <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center overflow-hidden bg-gray-50 relative group cursor-pointer">
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Upload className="h-8 w-8 text-gray-500" />
-                      <p className="text-sm text-gray-500 mt-2">Bestand kiezen</p>
-                    </div>
-                    <img id="teacher-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
-                    <div id="teacher-photo-placeholder" className="flex flex-col items-center justify-center">
-                      <User className="h-12 w-12 text-gray-300" />
-                      <p className="text-sm text-gray-400 mt-2">Geen foto</p>
-                    </div>
-                  </div>
-                  
-                  <input 
-                    type="file" 
-                    id="teacher-photo" 
-                    accept="image/*" 
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(event) {
-                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
-                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
-                          
-                          if (photoPreview && photoPlaceholder && event.target?.result) {
-                            photoPreview.src = event.target.result as string;
-                            photoPreview.classList.remove('hidden');
-                            photoPlaceholder.classList.add('hidden');
-                          }
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
-                  
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="mt-2"
-                      onClick={() => {
-                        const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
-                        fileInput?.click();
-                      }}
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      Foto uploaden
-                    </Button>
-                    
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="mt-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                      onClick={() => {
-                        const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
-                        const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
-                        const fileInput = document.getElementById('teacher-photo') as HTMLInputElement;
-                        
-                        if (photoPreview && photoPlaceholder && fileInput) {
-                          photoPreview.src = '';
-                          photoPreview.classList.add('hidden');
-                          photoPlaceholder.classList.remove('hidden');
-                          fileInput.value = '';
-                        }
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Verwijderen
-                    </Button>
-                  </div>
-
-                  <div className="w-full mt-4">
-                    <Label className="text-sm font-medium text-gray-700">
-                      Richtlijnen voor foto's
-                    </Label>
-                    <ul className="mt-2 text-sm text-gray-600 space-y-1 list-disc list-inside">
-                      <li>Upload een duidelijke, recente foto</li>
-                      <li>Foto moet het volledige gezicht tonen</li>
-                      <li>Neutrale achtergrond</li>
-                      <li>Maximum bestandsgrootte: 5MB</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
-            {/* Persoonlijke informatie tab */}
+            {/* Similar content as create dialog, but with edit functionality */}
             <TabsContent value="personal" className="space-y-6">
               <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
                 <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
-                <div className="flex mb-4 justify-end gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="flex items-center border border-gray-300"
-                    onClick={() => {
-                      // Get access to toast context within this function
-                      const localToast = toast;
-                      
-                      localToast({
-                        title: "eID detectie",
-                        description: "Zoeken naar eID-kaartlezer...",
-                      });
-                      
-                      // Simuleer eID detectie (in werkelijkheid zou dit een echte API-integratie zijn)
-                      setTimeout(() => {
-                        localToast({
-                          title: "eID gedetecteerd",
-                          description: "Gegevens worden geladen van de identiteitskaart...",
-                        });
-                        
-                        // Simuleer laden van eID gegevens na 2 seconden
-                        setTimeout(() => {
-                          // Hier zouden we de kaartgegevens verwerken
-                          // In een echte implementatie zou dit komen van de eID API
-                          const eidData = {
-                            firstName: "Ahmed",
-                            lastName: "El Khatib",
-                            birthDate: "1985-08-21",
-                            nationalRegisterNumber: "850821378914",
-                            gender: "Mannelijk",
-                            street: "Leuvensestraat",
-                            houseNumber: "12B",
-                            postalCode: "1030",
-                            city: "Schaarbeek",
-                            photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID"
-                          };
-                          
-                          // Simuleer het laden van de foto uit de eID
-                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
-                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
-                          
-                          if (photoPreview && photoPlaceholder) {
-                            photoPreview.src = eidData.photoUrl;
-                            photoPreview.classList.remove('hidden');
-                            photoPlaceholder.classList.add('hidden');
-                          }
-                          
-                          // Vul het formulier in met eID-gegevens
-                          setTeacherFormData({
-                            ...teacherFormData,
-                            firstName: eidData.firstName,
-                            lastName: eidData.lastName,
-                            dateOfBirth: eidData.birthDate,
-                            gender: eidData.gender === "Mannelijk" ? "man" : "vrouw",
-                            street: eidData.street,
-                            houseNumber: eidData.houseNumber,
-                            postalCode: eidData.postalCode,
-                            city: eidData.city
-                          });
-                          
-                          // Voeg een extra bericht toe dat de foto ook beschikbaar is in de foto-tab
-                          localToast({
-                            title: "Gegevens geladen",
-                            description: "De gegevens van de eID zijn succesvol ingeladen. De foto is ook zichtbaar in de foto-tab.",
-                          });
-                          
-                          // Toon een visuele hint dat er ook naar de foto tab gekeken moet worden
-                          const photoTabTrigger = document.querySelector('button[value="photo"]');
-                          if (photoTabTrigger) {
-                            photoTabTrigger.classList.add('animate-pulse');
-                            setTimeout(() => {
-                              photoTabTrigger.classList.remove('animate-pulse');
-                            }, 3000);
-                          }
-                        }, 2000);
-                      }, 1500);
-                    }}
-                  >
-                    <span className="mr-2 bg-[#77CC9A] text-white rounded-md px-1 font-bold text-xs py-0.5">be|ID</span>
-                    Gegevens laden via eID
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="flex items-center border border-gray-300"
-                    onClick={() => {
-                      // Get access to toast context within this function
-                      const localToast = toast;
-                      
-                      localToast({
-                        title: "itsme® app",
-                        description: "Open de itsme® app op uw smartphone om verder te gaan...",
-                      });
-                      
-                      // Simuleer itsme detectie
-                      setTimeout(() => {
-                        localToast({
-                          title: "itsme® verbinding",
-                          description: "Verbinding gemaakt met itsme®. Gegevens worden opgehaald...",
-                        });
-                        
-                        // Simuleer laden van itsme gegevens na 2 seconden
-                        setTimeout(() => {
-                          // Hier zouden we de itsme-gegevens verwerken
-                          // In een echte implementatie zou dit komen van de itsme API
-                          const itsmeData = {
-                            firstName: "Mohamed",
-                            lastName: "Ben Ali",
-                            birthDate: "1980-03-12",
-                            nationalRegisterNumber: "80031215987",
-                            gender: "Mannelijk",
-                            street: "Antwerpsesteenweg",
-                            houseNumber: "24",
-                            postalCode: "2800",
-                            city: "Mechelen",
-                            photoUrl: "https://placehold.co/400x400/eee/FF4D27?text=Foto+itsme"
-                          };
-                          
-                          // Simuleer het laden van de foto uit itsme
-                          const photoPreview = document.getElementById('teacher-photo-preview') as HTMLImageElement;
-                          const photoPlaceholder = document.getElementById('teacher-photo-placeholder');
-                          
-                          if (photoPreview && photoPlaceholder) {
-                            photoPreview.src = itsmeData.photoUrl;
-                            photoPreview.classList.remove('hidden');
-                            photoPlaceholder.classList.add('hidden');
-                          }
-                          
-                          // Vul het formulier in met itsme-gegevens
-                          setTeacherFormData({
-                            ...teacherFormData,
-                            firstName: itsmeData.firstName,
-                            lastName: itsmeData.lastName,
-                            dateOfBirth: itsmeData.birthDate,
-                            gender: itsmeData.gender === "Mannelijk" ? "man" : "vrouw",
-                            street: itsmeData.street,
-                            houseNumber: itsmeData.houseNumber,
-                            postalCode: itsmeData.postalCode,
-                            city: itsmeData.city
-                          });
-                          
-                          // Voeg een extra bericht toe dat de foto ook beschikbaar is in de foto-tab
-                          localToast({
-                            title: "Gegevens geladen",
-                            description: "De itsme® gegevens zijn succesvol ingeladen. De foto is ook zichtbaar in de foto-tab.",
-                          });
-                          
-                          // Toon een visuele hint dat er ook naar de foto tab gekeken moet worden
-                          const photoTabTrigger = document.querySelector('button[value="photo"]');
-                          if (photoTabTrigger) {
-                            photoTabTrigger.classList.add('animate-pulse');
-                            setTimeout(() => {
-                              photoTabTrigger.classList.remove('animate-pulse');
-                            }, 3000);
-                          }
-                        }, 2500);
-                      }, 2000);
-                    }}
-                  >
-                    <span className="mr-2 bg-[#FF4D27] text-white rounded-md px-2 font-bold text-xs py-0.5">itsme</span>
-                    Gegevens laden via itsme®
-                  </Button>
-                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <Label htmlFor="teacherId" className="text-sm font-medium text-gray-700">
@@ -1466,12 +1630,9 @@ export default function Teachers() {
                     <Input
                       id="teacherId"
                       value={teacherFormData.teacherId}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, teacherId: e.target.value })}
                       className="mt-1 bg-white"
-                      placeholder="Automatisch gegenereerd..."
-                      disabled={!!nextTeacherIdData?.nextTeacherId}
+                      disabled
                     />
-                    {isLoadingNextId && <div className="text-xs text-gray-500 mt-1">ID wordt geladen...</div>}
                   </div>
                   
                   <div>
@@ -1517,399 +1678,30 @@ export default function Teachers() {
                       placeholder="Achternaam"
                     />
                   </div>
-                  
-                  <div>
-                    <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
-                      Geslacht
-                    </Label>
-                    <Select
-                      value={teacherFormData.gender}
-                      onValueChange={(value) => setTeacherFormData({ ...teacherFormData, gender: value })}
-                    >
-                      <SelectTrigger className="w-full mt-1 bg-white">
-                        <SelectValue placeholder="Selecteer geslacht" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="man">Man</SelectItem>
-                        <SelectItem value="vrouw">Vrouw</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700">
-                      Geboortedatum
-                    </Label>
-                    <Input
-                      id="dateOfBirth"
-                      type="date"
-                      value={teacherFormData.dateOfBirth || ''}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, dateOfBirth: e.target.value })}
-                      className="mt-1 bg-white"
-                    />
-                  </div>
-                  
-                  <div className="md:col-span-2">
-                    <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
-                      Notities
-                    </Label>
-                    <Textarea
-                      id="notes"
-                      value={teacherFormData.notes}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, notes: e.target.value })}
-                      className="mt-1 bg-white"
-                      placeholder="Voeg hier aanvullende informatie toe..."
-                      rows={4}
-                    />
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
-            {/* Contact informatie tab */}
-            <TabsContent value="contact" className="space-y-6">
-              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                      Email <span className="text-primary">*</span>
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={teacherFormData.email}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, email: e.target.value })}
-                      className="mt-1 bg-white"
-                      placeholder="email@mymadrassa.nl"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
-                      Telefoonnummer <span className="text-primary">*</span>
-                    </Label>
-                    <Input
-                      id="phone"
-                      value={teacherFormData.phone}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, phone: e.target.value })}
-                      className="mt-1 bg-white"
-                      placeholder="06 1234 5678"
-                    />
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
-            {/* Adres informatie tab */}
-            <TabsContent value="address" className="space-y-6">
-              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label htmlFor="street" className="text-sm font-medium text-gray-700">
-                      Straat
-                    </Label>
-                    <Input
-                      id="street"
-                      value={teacherFormData.street}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, street: e.target.value })}
-                      className="mt-1 bg-white"
-                      placeholder="Straatnaam"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="houseNumber" className="text-sm font-medium text-gray-700">
-                      Huisnummer
-                    </Label>
-                    <Input
-                      id="houseNumber"
-                      value={teacherFormData.houseNumber}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, houseNumber: e.target.value })}
-                      className="mt-1 bg-white"
-                      placeholder="123"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
-                      Postcode
-                    </Label>
-                    <Input
-                      id="postalCode"
-                      value={teacherFormData.postalCode}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, postalCode: e.target.value })}
-                      className="mt-1 bg-white"
-                      placeholder="1234 AB"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="city" className="text-sm font-medium text-gray-700">
-                      Plaats
-                    </Label>
-                    <Input
-                      id="city"
-                      value={teacherFormData.city}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, city: e.target.value })}
-                      className="mt-1 bg-white"
-                      placeholder="Amsterdam"
-                    />
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
-            {/* Professionele informatie tab */}
-            <TabsContent value="professional" className="space-y-6">
-              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                <h3 className="text-lg font-semibold text-primary mb-4">Professionele gegevens</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label htmlFor="profession" className="text-sm font-medium text-gray-700">
-                      Beroep
-                    </Label>
-                    <Input
-                      id="profession"
-                      value={teacherFormData.profession}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, profession: e.target.value })}
-                      className="mt-1 bg-white"
-                      placeholder="Bijv. Islamitische studies"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="education" className="text-sm font-medium text-gray-700">
-                      Gevolgde opleiding
-                    </Label>
-                    <Input
-                      id="education"
-                      value={teacherFormData.education}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, education: e.target.value })}
-                      className="mt-1 bg-white"
-                      placeholder="Bijv. Islamitische theologie"
-                    />
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
-            {/* Vakken tab */}
-            <TabsContent value="subjects" className="space-y-6">
-              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                <h3 className="text-lg font-semibold text-primary mb-4">Vakken</h3>
-                <div className="space-y-6">
-                  <p className="text-sm text-gray-500">
-                    Selecteer de vakken die deze docent zal geven.
-                  </p>
-                  
-                  {availableSubjects.length > 0 ? (
-                    <div className="space-y-4">
-                      {availableSubjects.map(subject => (
-                        <div key={subject.id} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-50">
-                          <Checkbox 
-                            id={`subject-${subject.id}`}
-                            checked={teacherFormData.assignedSubjects.includes(subject.id)}
-                            onCheckedChange={(checked) => {
-                              const newAssignedSubjects = checked 
-                                ? [...teacherFormData.assignedSubjects, subject.id]
-                                : teacherFormData.assignedSubjects.filter(id => id !== subject.id);
-                              
-                              setTeacherFormData({
-                                ...teacherFormData,
-                                assignedSubjects: newAssignedSubjects
-                              });
-                            }}
-                          />
-                          <Label htmlFor={`subject-${subject.id}`} className="cursor-pointer w-full">
-                            {subject.name}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="border border-dashed border-gray-200 rounded-md p-4 text-center text-gray-500">
-                      <Book className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p>Geen vakken beschikbaar</p>
-                    </div>
-                  )}
-                  
-                  {teacherFormData.assignedSubjects.length > 0 && (
-                    <div className="mt-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Geselecteerde vakken:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {teacherFormData.assignedSubjects.map(subjectId => {
-                          const subject = availableSubjects.find(s => s.id === subjectId);
-                          return (
-                            <Badge key={subjectId} variant="outline" className="flex items-center gap-1">
-                              {subject?.name}
-                              <Button 
-                                type="button" 
-                                variant="ghost" 
-                                className="h-4 w-4 p-0 text-gray-500 hover:text-red-500"
-                                onClick={() => {
-                                  setTeacherFormData({
-                                    ...teacherFormData,
-                                    assignedSubjects: teacherFormData.assignedSubjects.filter(id => id !== subjectId)
-                                  });
-                                }}
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
-                            </Badge>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </TabsContent>
-            
-            {/* Klassen toewijzing tab */}
-            <TabsContent value="classes" className="space-y-6">
-              <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                <h3 className="text-lg font-semibold text-primary mb-4">Klas Toewijzing</h3>
-                <div className="space-y-6">
-                  <p className="text-sm text-gray-500">
-                    Selecteer de klassen waar deze docent les zal geven.
-                  </p>
-                  
-                  {availableClasses.length > 0 ? (
-                    <div className="space-y-4">
-                      {availableClasses.map(classItem => (
-                        <div key={classItem.id} className="flex items-center space-x-2 p-2 border rounded-md hover:bg-gray-50">
-                          <Checkbox 
-                            id={`class-${classItem.id}`}
-                            checked={teacherFormData.assignedClasses.includes(classItem.id)}
-                            onCheckedChange={(checked) => {
-                              const newAssignedClasses = checked 
-                                ? [...teacherFormData.assignedClasses, classItem.id]
-                                : teacherFormData.assignedClasses.filter(id => id !== classItem.id);
-                              
-                              setTeacherFormData({
-                                ...teacherFormData,
-                                assignedClasses: newAssignedClasses
-                              });
-                            }}
-                          />
-                          <Label htmlFor={`class-${classItem.id}`} className="cursor-pointer w-full">
-                            {classItem.name}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="border border-dashed border-gray-200 rounded-md p-4 text-center text-gray-500">
-                      <BookOpen className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p>Geen klassen beschikbaar</p>
-                    </div>
-                  )}
-                  
-                  {teacherFormData.assignedClasses.length > 0 && (
-                    <div className="mt-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Geselecteerde klassen:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {teacherFormData.assignedClasses.map(classId => {
-                          const classItem = availableClasses.find(c => c.id === classId);
-                          return (
-                            <Badge key={classId} variant="outline" className="flex items-center gap-1">
-                              {classItem?.name}
-                              <Button 
-                                type="button" 
-                                variant="ghost" 
-                                className="h-4 w-4 p-0 text-gray-500 hover:text-red-500"
-                                onClick={() => {
-                                  setTeacherFormData({
-                                    ...teacherFormData,
-                                    assignedClasses: teacherFormData.assignedClasses.filter(id => id !== classId)
-                                  });
-                                }}
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
-                            </Badge>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </TabsContent>
           </Tabs>
           
           <DialogFooter className="mt-6">
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
               Annuleren
             </Button>
-            <Button 
-              type="submit" 
-              onClick={() => {
-                // Hier zou je normaal een createTeacherMutation aanroepen
-                toast({
-                  title: "Functie in ontwikkeling",
-                  description: "Het toevoegen van docenten is nog niet volledig geïmplementeerd.",
-                });
-                setIsCreateDialogOpen(false);
-              }}
-            >
-              Docent toevoegen
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Verwijderbevestiging Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-red-600">
-              Docent verwijderen
-            </DialogTitle>
-            <DialogDescription>
-              {teacherToDelete && (
-                <p>
-                  Weet u zeker dat u docent <span className="font-semibold">{teacherToDelete.firstName} {teacherToDelete.lastName}</span> wilt verwijderen? 
-                  Deze actie kan niet ongedaan worden gemaakt.
-                </p>
+            <Button onClick={handleUpdateTeacher} disabled={updateTeacherMutation.isPending}>
+              {updateTeacherMutation.isPending ? (
+                <>
+                  <div className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full" />
+                  Opslaan...
+                </>
+              ) : (
+                "Wijzigingen opslaan"
               )}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="mt-4 flex flex-col space-y-4">
-            <div className="bg-amber-50 border border-amber-200 rounded-md p-3 text-amber-700 text-sm">
-              <div className="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 mr-2 mt-0.5 text-amber-500">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
-                  <line x1="12" y1="9" x2="12" y2="13"></line>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <div>
-                  Als deze docent nog gerelateerd is aan klassen, vakken of andere gegevens, zal de verwijdering mogelijk niet kunnen worden uitgevoerd zonder eerst die relaties te verbreken.
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <DialogFooter className="flex flex-row space-x-3 justify-end">
-            <Button 
-              variant="outline" 
-              onClick={() => setIsDeleteDialogOpen(false)}
-            >
-              Annuleren
-            </Button>
-            <Button 
-              variant="destructive" 
-              onClick={confirmDeleteTeacher}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Verwijderen
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
-}
+};
+
+export default Teachers;

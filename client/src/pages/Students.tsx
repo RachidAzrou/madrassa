@@ -1,11 +1,38 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { StudentEmptyState } from '@/components/ui/empty-states';
+import * as XLSX from 'xlsx';
+import Papa from 'papaparse';
 import { 
-  Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle,
+  Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle, Check,
   ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
   Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, CreditCard, AlertCircle,
-  Image, Upload
+  FileUp, Upload, FilePlus2, FileSpreadsheet, Image, School, UserRound, Camera, CheckSquare, SquareSlash
 } from 'lucide-react';
+
+// Aangepast ChalkboardTeacher icoon
+const ChalkBoard = (props: any) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg" 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    {...props}
+  >
+    <rect x="2" y="2" width="20" height="14" rx="2" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <line x1="6" y1="12" x2="6" y2="20" />
+    <line x1="18" y1="12" x2="18" y2="20" />
+    <ellipse cx="12" cy="18" rx="3" ry="2" />
+    <path d="M10 4h4" />
+    <path d="M8 8h8" />
+  </svg>
+);
 import ManageStudentGuardians from '@/components/guardians/ManageStudentGuardians';
 import { useToast } from '@/hooks/use-toast';
 
@@ -30,6 +57,8 @@ import { formatDateToDisplayFormat } from '@/lib/utils';
 export default function Students() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProgramFilter, setSelectedProgramFilter] = useState('all');
@@ -45,6 +74,15 @@ export default function Students() {
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [isFeeNotificationOpen, setIsFeeNotificationOpen] = useState(false);
   const [feeDetails, setFeeDetails] = useState<any>(null);
+  
+  // Import dialoog state
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [importType, setImportType] = useState<'csv' | 'excel'>('excel');
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importPreview, setImportPreview] = useState<any[]>([]);
+  const [importColumns, setImportColumns] = useState<string[]>([]);
+  const [columnMappings, setColumnMappings] = useState<{[key: string]: string}>({});
+  const [isImporting, setIsImporting] = useState(false);
   
   // State voor het studentformulier
   const [studentFormData, setStudentFormData] = useState({
@@ -77,9 +115,9 @@ export default function Students() {
 
   // Statusopties voor dropdown
   const statusOptions = [
-    { value: 'active', label: 'Actief' },
-    { value: 'pending', label: 'In Afwachting' },
-    { value: 'inactive', label: 'Inactief' },
+    { value: 'enrolled', label: 'Ingeschreven' },
+    { value: 'unenrolled', label: 'Uitgeschreven' },
+    { value: 'suspended', label: 'Geschorst' },
     { value: 'graduated', label: 'Afgestudeerd' }
   ];
 
@@ -269,6 +307,229 @@ export default function Students() {
   });
 
   // Function to reset form
+  // Functie voor het verwerken van geïmporteerde bestanden
+  const handleImportFile = (file: File) => {
+    setImportFile(file);
+    setImportPreview([]);
+    setImportColumns([]);
+    setColumnMappings({});
+    
+    if (file.name.endsWith('.csv')) {
+      setImportType('csv');
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          if (results.data && results.data.length > 0) {
+            setImportPreview(results.data.slice(0, 5) as any[]);
+            if (results.meta.fields) {
+              setImportColumns(results.meta.fields);
+            }
+          }
+        },
+        error: (error) => {
+          toast({
+            title: "Error bij importeren",
+            description: `Er is een fout opgetreden bij het verwerken van het CSV bestand: ${error.message}`,
+            variant: "destructive"
+          });
+        }
+      });
+    } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+      setImportType('excel');
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = e.target?.result;
+          if (data) {
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            
+            if (json.length > 0) {
+              const headers = json[0] as string[];
+              setImportColumns(headers);
+              
+              const rows = [];
+              for (let i = 1; i < Math.min(json.length, 6); i++) {
+                const row = json[i] as any[];
+                const rowData: {[key: string]: any} = {};
+                for (let j = 0; j < headers.length; j++) {
+                  rowData[headers[j]] = row[j];
+                }
+                rows.push(rowData);
+              }
+              setImportPreview(rows);
+            }
+          }
+        } catch (error: any) {
+          toast({
+            title: "Error bij importeren",
+            description: `Er is een fout opgetreden bij het verwerken van het Excel bestand: ${error.message}`,
+            variant: "destructive"
+          });
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      toast({
+        title: "Niet-ondersteund bestandsformaat",
+        description: "Alleen CSV, XLS en XLSX bestanden worden ondersteund.",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  // Functie om de geïmporteerde data te verwerken
+  const importStudents = async () => {
+    if (!importFile || importPreview.length === 0 || Object.keys(columnMappings).length === 0) {
+      toast({
+        title: "Kan niet importeren",
+        description: "Zorg ervoor dat u een bestand heeft geselecteerd en kolomtoewijzingen heeft gemaakt.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsImporting(true);
+    
+    try {
+      // Lees alle gegevens uit het bestand
+      let allData: any[] = [];
+      
+      if (importType === 'csv') {
+        const parsePromise = new Promise<any[]>((resolve, reject) => {
+          Papa.parse(importFile, {
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => resolve(results.data),
+            error: reject
+          });
+        });
+        
+        allData = await parsePromise;
+      } else if (importType === 'excel') {
+        const reader = new FileReader();
+        const readPromise = new Promise<any[]>((resolve, reject) => {
+          reader.onload = (e) => {
+            try {
+              const data = e.target?.result;
+              if (data) {
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const json = XLSX.utils.sheet_to_json(worksheet);
+                resolve(json);
+              } else {
+                reject(new Error("Kon bestand niet lezen"));
+              }
+            } catch (error) {
+              reject(error);
+            }
+          };
+          reader.onerror = reject;
+          reader.readAsArrayBuffer(importFile);
+        });
+        
+        allData = await readPromise;
+      }
+      
+      // Map de gegevens naar het juiste formaat
+      const formattedData = allData.map(row => {
+        const student: any = {
+          studentId: '',
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          dateOfBirth: null,
+          address: '',
+          city: '',
+          postalCode: '',
+          country: 'Nederland',
+          status: 'enrolled', // Standaard status: ingeschreven
+          notes: '',
+          gender: '',
+          street: '',
+          houseNumber: ''
+        };
+        
+        // Verwerk de kolomtoewijzingen
+        Object.entries(columnMappings).forEach(([sourceColumn, targetField]) => {
+          if (row[sourceColumn] !== undefined && row[sourceColumn] !== null) {
+            if (targetField === 'dateOfBirth' && row[sourceColumn]) {
+              // Zorg ervoor dat de datum in het juiste formaat is
+              try {
+                // Probeer datum te parsen (kan verschillende formaten zijn)
+                const parsedDate = new Date(row[sourceColumn]);
+                if (!isNaN(parsedDate.getTime())) {
+                  // Formatteer naar YYYY-MM-DD
+                  const year = parsedDate.getFullYear();
+                  const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                  const day = String(parsedDate.getDate()).padStart(2, '0');
+                  student[targetField] = `${year}-${month}-${day}`;
+                }
+              } catch (e) {
+                // Als het parsen mislukt, gebruik de waarde als string
+                student[targetField] = row[sourceColumn];
+              }
+            } else {
+              student[targetField] = row[sourceColumn];
+            }
+          }
+        });
+        
+        return student;
+      });
+      
+      // Valideer de gegevens
+      const validStudents = formattedData.filter(s => 
+        s.firstName && s.lastName // Minimale vereisten
+      );
+      
+      if (validStudents.length === 0) {
+        toast({
+          title: "Geen geldige studentgegevens",
+          description: "De geïmporteerde gegevens bevatten geen geldige studentinformatie. Controleer of de kolomtoewijzingen correct zijn.",
+          variant: "destructive"
+        });
+        setIsImporting(false);
+        return;
+      }
+      
+      // Voeg de studenten toe
+      const apiPromises = validStudents.map(student => 
+        apiRequest("POST", "/api/students", student)
+      );
+      
+      await Promise.all(apiPromises);
+      
+      // Invalideer de query om de studentenlijst te vernieuwen
+      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      
+      toast({
+        title: "Import voltooid",
+        description: `${validStudents.length} studenten succesvol geïmporteerd.`,
+      });
+      
+      // Sluit het dialoogvenster en reset de state
+      setIsImportDialogOpen(false);
+      setImportFile(null);
+      setImportPreview([]);
+      setImportColumns([]);
+      setColumnMappings({});
+    } catch (error: any) {
+      toast({
+        title: "Import mislukt",
+        description: `Er is een fout opgetreden: ${error.message}`,
+        variant: "destructive"
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   const resetForm = () => {
     setStudentFormData({
       studentId: '',
@@ -287,7 +548,7 @@ export default function Students() {
       schoolYear: '',
       studentGroupId: null,
       enrollmentDate: '',
-      status: 'active',
+      status: 'enrolled',
       notes: '',
       gender: '',
     });
@@ -350,9 +611,22 @@ export default function Students() {
 
   // Function to view student details
   const handleViewStudentDetails = async (student: any) => {
-    const details = await getStudentDetails(student.id);
-    setSelectedStudent(details);
-    setIsStudentDetailDialogOpen(true);
+    try {
+      // Stuur een API-verzoek om de volledige details van de student op te halen
+      const response = await fetch(`/api/students/${student.id}`);
+      if (!response.ok) throw new Error('Kon studentgegevens niet ophalen');
+      
+      const details = await response.json();
+      setSelectedStudent(details);
+      setIsStudentDetailDialogOpen(true);
+    } catch (error) {
+      console.error("Fout bij ophalen studentdetails:", error);
+      toast({
+        title: "Fout bij ophalen gegevens",
+        description: "Er is een probleem opgetreden bij het ophalen van de studentgegevens.",
+        variant: "destructive"
+      });
+    }
   };
 
   // Function to edit student
@@ -396,8 +670,11 @@ export default function Students() {
     setIsEditDialogOpen(true);
   };
 
-  // Function to export student data as PDF
+  // Functie om studentgegevens te exporteren als PDF
   const exportStudentsAsPDF = () => {
+    // Verberg het exportmenu na selectie
+    document.getElementById('export-menu')?.classList.add('hidden');
+    
     const doc = new jsPDF();
     
     // Title
@@ -445,7 +722,106 @@ export default function Students() {
       }
     });
     
-    doc.save('studentenlijst.pdf');
+    doc.save(`studenten_${new Date().toISOString().split('T')[0]}.pdf`);
+    
+    toast({
+      title: "PDF geëxporteerd",
+      description: "De studentenlijst is succesvol geëxporteerd als PDF.",
+    });
+  };
+  
+  // Functie om studentgegevens te exporteren als Excel bestand
+  const exportStudentsAsExcel = () => {
+    // Verberg het exportmenu na selectie
+    document.getElementById('export-menu')?.classList.add('hidden');
+    
+    const students = studentsData.students || [];
+    
+    // Gegevens voorbereiden voor Excel export
+    const worksheetData = students.map((student: any) => {
+      return {
+        'Student ID': student.studentId,
+        'Voornaam': student.firstName,
+        'Achternaam': student.lastName,
+        'Email': student.email,
+        'Telefoon': student.phone,
+        'Geboortedatum': student.dateOfBirth,
+        'Adres': student.address,
+        'Straat': student.street,
+        'Huisnummer': student.houseNumber,
+        'Postcode': student.postalCode,
+        'Plaats': student.city,
+        'Status': student.status === 'active' ? 'Actief' : 
+                student.status === 'pending' ? 'In Afwachting' : 
+                student.status === 'inactive' ? 'Inactief' : 'Afgestudeerd',
+        'Geslacht': student.gender === 'M' ? 'Man' : student.gender === 'F' ? 'Vrouw' : '-',
+        'Notities': student.notes
+      };
+    });
+    
+    // Maak een nieuwe werkmap en werkblad
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+    
+    // Voeg het werkblad toe aan de werkmap
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Studenten');
+    
+    // Exporteer als Excel-bestand
+    XLSX.writeFile(workbook, `studenten_${new Date().toISOString().split('T')[0]}.xlsx`);
+    
+    toast({
+      title: "Excel geëxporteerd",
+      description: "De studentenlijst is succesvol geëxporteerd als Excel bestand.",
+    });
+  };
+  
+  // Functie om studentgegevens te exporteren als CSV
+  const exportStudentsAsCSV = () => {
+    // Verberg het exportmenu na selectie
+    document.getElementById('export-menu')?.classList.add('hidden');
+    
+    const students = studentsData.students || [];
+    
+    // Gegevens voorbereiden voor CSV export
+    const csvData = students.map((student: any) => {
+      return {
+        'Student ID': student.studentId,
+        'Voornaam': student.firstName,
+        'Achternaam': student.lastName,
+        'Email': student.email,
+        'Telefoon': student.phone,
+        'Geboortedatum': student.dateOfBirth,
+        'Adres': student.address,
+        'Straat': student.street,
+        'Huisnummer': student.houseNumber,
+        'Postcode': student.postalCode,
+        'Plaats': student.city,
+        'Status': student.status === 'active' ? 'Actief' : 
+                student.status === 'pending' ? 'In Afwachting' : 
+                student.status === 'inactive' ? 'Inactief' : 'Afgestudeerd',
+        'Geslacht': student.gender === 'M' ? 'Man' : student.gender === 'F' ? 'Vrouw' : '-',
+        'Notities': student.notes
+      };
+    });
+    
+    // Converteer naar CSV en download
+    const csv = Papa.unparse(csvData);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `studenten_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "CSV geëxporteerd",
+      description: "De studentenlijst is succesvol geëxporteerd als CSV bestand.",
+    });
   };
 
   // Filter unique year levels for dropdown
@@ -468,24 +844,38 @@ export default function Students() {
 
   // Handle select all
   const handleSelectAll = () => {
-    if (selectedStudents.length === (studentsData.students || []).length) {
+    const studentList = Array.isArray(studentsData) 
+      ? studentsData
+      : (studentsData?.students || []);
+      
+    const studentIds = studentList.map((s: any) => s.id);
+    
+    if (selectedStudents.length === studentIds.length && 
+        studentIds.every((id: number) => selectedStudents.includes(id))) {
       setSelectedStudents([]);
     } else {
-      setSelectedStudents((studentsData.students || []).map((s: any) => s.id));
+      setSelectedStudents(studentIds);
     }
   };
 
   // Function to render status badge
   const renderStatusBadge = (status: string) => {
     switch (status) {
-      case 'active':
-        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">Actief</Badge>;
-      case 'pending':
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">In Afwachting</Badge>;
-      case 'inactive':
-        return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">Inactief</Badge>;
+      case 'enrolled':
+        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">Ingeschreven</Badge>;
+      case 'unenrolled':
+        return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">Uitgeschreven</Badge>;
+      case 'suspended':
+        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">Geschorst</Badge>;
       case 'graduated':
         return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">Afgestudeerd</Badge>;
+      // Fallback voor oude statuswaarden
+      case 'active':
+        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">Ingeschreven</Badge>;
+      case 'inactive':
+        return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">Uitgeschreven</Badge>;
+      case 'pending':
+        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">In Afwachting</Badge>;
       default:
         return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">{status}</Badge>;
     }
@@ -497,17 +887,17 @@ export default function Students() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <Users className="h-6 w-6" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <Users className="h-7 w-7" />
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Studenten</h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Studenten</h1>
+              <p className="text-base text-gray-500 mt-1">Bekijk en beheer alle studentgegevens</p>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Bekijk en beheer alle studentgegevens
-          </p>
         </div>
       </div>
 
@@ -579,20 +969,23 @@ export default function Students() {
         </DialogContent>
       </Dialog>
       
-      <div className="mb-6 flex flex-col md:flex-row gap-4 justify-between">
-        <div className="flex flex-col md:flex-row gap-4 flex-1">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="search"
-              placeholder="Zoek studenten..."
-              className="pl-8 bg-white"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          <div className="flex gap-2">
+      {/* Zoekbalk */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoek studenten..."
+            className="pl-8 bg-white"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+      
+      <div className="mb-6 flex flex-col gap-4">
+        <div className="flex flex-wrap gap-2 justify-between">
+          <div className="flex flex-wrap gap-2">
             <Button 
               variant="outline" 
               size="default"
@@ -602,82 +995,90 @@ export default function Students() {
               <Filter className="mr-2 h-4 w-4" /> Filteren
             </Button>
             
+            <div className="relative">
+              <Button 
+                variant="outline" 
+                size="default"
+                className="border-gray-300 text-gray-700"
+                onClick={() => document.getElementById('export-menu')?.classList.toggle('hidden')}
+              >
+                <FileUp className="mr-2 h-4 w-4" /> Exporteren
+              </Button>
+              
+              <div 
+                id="export-menu" 
+                className="hidden absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+              >
+                <div className="py-1">
+                  <button 
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" 
+                    onClick={exportStudentsAsPDF}
+                  >
+                    <FileUp className="mr-2 h-4 w-4" /> PDF bestand
+                  </button>
+                  <button 
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" 
+                    onClick={exportStudentsAsExcel}
+                  >
+                    <FileSpreadsheet className="mr-2 h-4 w-4" /> Excel bestand
+                  </button>
+                  <button 
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" 
+                    onClick={exportStudentsAsCSV}
+                  >
+                    <FileText className="mr-2 h-4 w-4" /> CSV bestand
+                  </button>
+                </div>
+              </div>
+            </div>
+            
             <Button 
               variant="outline" 
               size="default"
               className="border-gray-300 text-gray-700"
-              onClick={exportStudentsAsPDF}
+              onClick={() => setIsImportDialogOpen(true)}
             >
-              <Download className="mr-2 h-4 w-4" /> Exporteren
+              <FileDown className="mr-2 h-4 w-4" /> Importeren
             </Button>
           </div>
+          
+          <Button 
+            variant="default" 
+            size="default" 
+            className="bg-primary hover:bg-primary/90"
+            onClick={() => {
+              resetForm();
+              setIsCreateDialogOpen(true);
+            }}
+          >
+            <PlusCircle className="mr-2 h-4 w-4" /> Student Toevoegen
+          </Button>
         </div>
-        
-        <Button 
-          variant="default" 
-          size="default" 
-          className="bg-primary hover:bg-primary/90"
-          onClick={() => {
-            resetForm();
-            setIsCreateDialogOpen(true);
-          }}
-        >
-          <PlusCircle className="mr-2 h-4 w-4" /> Student Toevoegen
-        </Button>
       </div>
 
       {/* Filter opties */}
       {showFilterOptions && (
         <div className="mb-6 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
-          <h3 className="text-lg font-medium mb-4">Filter Opties</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-700">Filters</h3>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowFilterOptions(false)}
+              className="h-7 w-7 p-0"
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <Label htmlFor="program-filter">Programma</Label>
-              <Select 
-                value={selectedProgramFilter} 
-                onValueChange={setSelectedProgramFilter}
-              >
-                <SelectTrigger id="program-filter" className="bg-white">
-                  <SelectValue placeholder="Alle programma's" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle programma's</SelectItem>
-                  {programs.map((program: any) => (
-                    <SelectItem key={program.id} value={program.id.toString()}>
-                      {program.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="year-filter">Leerjaar</Label>
-              <Select 
-                value={selectedYearLevelFilter} 
-                onValueChange={setSelectedYearLevelFilter}
-              >
-                <SelectTrigger id="year-filter" className="bg-white">
-                  <SelectValue placeholder="Alle leerjaren" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle leerjaren</SelectItem>
-                  {yearLevels.map((year: any) => (
-                    <SelectItem key={year} value={year}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="status-filter">Status</Label>
+              <Label htmlFor="status-filter" className="text-xs text-gray-600 mb-1 block">Status</Label>
               <Select 
                 value={selectedStatusFilter} 
                 onValueChange={setSelectedStatusFilter}
               >
-                <SelectTrigger id="status-filter" className="bg-white">
+                <SelectTrigger id="status-filter" className="h-8 text-xs">
                   <SelectValue placeholder="Alle statussen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -692,12 +1093,12 @@ export default function Students() {
             </div>
             
             <div>
-              <Label htmlFor="group-filter">Klas</Label>
+              <Label htmlFor="group-filter" className="text-xs text-gray-600 mb-1 block">Klas</Label>
               <Select 
                 value={selectedStudentGroupFilter} 
                 onValueChange={setSelectedStudentGroupFilter}
               >
-                <SelectTrigger id="group-filter" className="bg-white">
+                <SelectTrigger id="group-filter" className="h-8 text-xs">
                   <SelectValue placeholder="Alle klassen" />
                 </SelectTrigger>
                 <SelectContent>
@@ -710,6 +1111,51 @@ export default function Students() {
                 </SelectContent>
               </Select>
             </div>
+            
+            <div>
+              <Label htmlFor="year-filter" className="text-xs text-gray-600 mb-1 block">Schooljaar</Label>
+              <Select 
+                value={selectedYearLevelFilter} 
+                onValueChange={setSelectedYearLevelFilter}
+              >
+                <SelectTrigger id="year-filter" className="h-8 text-xs">
+                  <SelectValue placeholder="Alle schooljaren" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle schooljaren</SelectItem>
+                  {yearLevels.map((year: any) => (
+                    <SelectItem key={year} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex gap-2 mt-3 border-t border-gray-100 pt-3 justify-end">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => {
+                setSelectedStatusFilter("all");
+                setSelectedStudentGroupFilter("all");
+                setSelectedYearLevelFilter("all");
+              }}
+              className="text-xs h-7"
+            >
+              Wissen
+            </Button>
+            <Button 
+              size="sm" 
+              onClick={() => {
+                setPage(1);
+                setShowFilterOptions(false);
+              }}
+              className="text-xs h-7 bg-[#1e3a8a]"
+            >
+              Toepassen
+            </Button>
           </div>
         </div>
       )}
@@ -718,84 +1164,98 @@ export default function Students() {
       <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
         {/* Desktop weergave */}
         <div className="hidden md:block overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
                   <Checkbox 
                     checked={
-                      selectedStudents.length > 0 && 
-                      selectedStudents.length === (studentsData.students || []).length
+                      (() => {
+                        const studentList = Array.isArray(studentsData) 
+                          ? studentsData
+                          : (studentsData?.students || []);
+                        const studentIds = studentList.map((s: any) => s.id);
+                        return studentIds.length > 0 && 
+                          selectedStudents.length === studentIds.length &&
+                          studentIds.every(id => selectedStudents.includes(id));
+                      })()
                     }
                     onCheckedChange={handleSelectAll}
-                    aria-label="Select all"
+                    aria-label="Selecteer alle studenten"
                   />
-                </TableHead>
-                <TableHead>Student ID</TableHead>
-                <TableHead>Naam</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Programma</TableHead>
-                <TableHead>Leerjaar</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Acties</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+                </th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student ID</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Naam</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klas</th>
+                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Schooljaar</th>
+                <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th scope="col" className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+            
+            {/* Lege state wanneer er geen studenten zijn - onder de headers */}
+            {!isLoading && (
+              (Array.isArray(studentsData) && studentsData.length === 0) ||
+              (!Array.isArray(studentsData) && (!studentsData?.students || studentsData?.students.length === 0))
+            ) && (
+              <tr>
+                <td colSpan={8}>
+                  <div className="py-6">
+                    <StudentEmptyState description="Er zijn momenteel geen studenten in het systeem. Klik op 'Nieuw' om een student toe te voegen." />
+                  </div>
+                </td>
+              </tr>
+            )}
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                <tr>
+                  <td colSpan={8} className="px-6 py-4 text-center">
                     <div className="flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                       <span className="ml-2">Laden...</span>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ) : (Array.isArray(studentsData) ? studentsData : []).length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
-                    Geen studenten gevonden
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : (
                 (Array.isArray(studentsData) ? studentsData : []).map((student: any) => (
-                  <TableRow key={student.id}>
-                    <TableCell>
+                  <tr key={student.id} className="hover:bg-gray-50">
+                    <td className="px-3 py-4 whitespace-nowrap">
                       <Checkbox 
                         checked={selectedStudents.includes(student.id)}
                         onCheckedChange={() => handleSelectStudent(student.id)}
                         aria-label={`Select ${student.firstName}`}
                       />
-                    </TableCell>
-                    <TableCell className="font-medium">{student.studentId}</TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{student.studentId}</td>
+                    <td className="px-3 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <Avatar className="h-8 w-8 mr-2">
                           <AvatarFallback className="bg-[#1e3a8a] text-white">
                             {student.firstName[0]}{student.lastName[0]}
                           </AvatarFallback>
                         </Avatar>
-                        {student.firstName} {student.lastName}
+                        <div className="text-sm text-gray-900">{student.firstName} {student.lastName}</div>
                       </div>
-                    </TableCell>
-                    <TableCell>{student.email}</TableCell>
-                    <TableCell>
-                      {student.programs && student.programs[0] 
-                        ? programs.find((p: any) => p.id === student.programs[0].programId)?.name 
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {student.studentGroups && student.studentGroups.length > 0
+                        ? student.studentGroups[0].groupName
                         : '-'}
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
                       {student.programs && student.programs[0] 
                         ? student.programs[0].yearLevel 
                         : '-'}
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-center">
                       {renderStatusBadge(student.status)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-right text-sm">
+                      <div className="flex justify-end gap-1">
                         <Button 
                           variant="ghost" 
                           size="icon"
+                          className="h-7 w-7"
                           onClick={() => handleViewStudentDetails(student)}
                         >
                           <Eye className="h-4 w-4" />
@@ -803,6 +1263,7 @@ export default function Students() {
                         <Button 
                           variant="ghost" 
                           size="icon"
+                          className="h-7 w-7"
                           onClick={() => handleEditStudent(student)}
                         >
                           <Edit className="h-4 w-4" />
@@ -810,6 +1271,7 @@ export default function Students() {
                         <Button 
                           variant="ghost" 
                           size="icon"
+                          className="h-7 w-7"
                           onClick={() => {
                             setSelectedStudent(student);
                             setIsDeleteDialogOpen(true);
@@ -818,26 +1280,22 @@ export default function Students() {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))
               )}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
         
-        {/* Mobiele kaartweergave */}
+        {/* Mobiele kaartweergave - alleen tonen als er studenten zijn en de lege state niet wordt getoond */}
         <div className="md:hidden">
           {isLoading ? (
             <div className="flex justify-center items-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               <span className="ml-2">Laden...</span>
             </div>
-          ) : (Array.isArray(studentsData) ? studentsData : []).length === 0 ? (
-            <div className="text-center py-8">
-              Geen studenten gevonden
-            </div>
-          ) : (
+          ) : (studentsData?.students?.length === 0) ? null : (
             <div className="divide-y divide-gray-200">
               {(Array.isArray(studentsData) ? studentsData : []).map((student: any) => (
                 <div key={student.id} className="p-4">
@@ -873,7 +1331,7 @@ export default function Students() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => handleViewStudent(student.id)}
+                          onClick={() => handleViewStudentDetails(student)}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -881,7 +1339,7 @@ export default function Students() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => handleEditStudent(student.id)}
+                          onClick={() => handleEditStudent(student)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -902,24 +1360,24 @@ export default function Students() {
                   
                   <div className="ml-10 space-y-1 text-sm">
                     <div className="flex items-baseline">
-                      <span className="text-gray-500 w-24">Email:</span>
-                      <span className="text-sm text-gray-900 truncate">{student.email}</span>
-                    </div>
-                    <div className="flex items-baseline">
-                      <span className="text-gray-500 w-24">Programma:</span>
-                      <span className="text-sm text-gray-900">
-                        {student.programs && student.programs[0] 
-                          ? programs.find((p: any) => p.id === student.programs[0].programId)?.name 
+                      <span className="text-gray-500 w-24">Klas:</span>
+                      <span className="text-sm text-gray-900 truncate">
+                        {student.studentGroups && student.studentGroups.length > 0
+                          ? student.studentGroups[0].groupName
                           : '-'}
                       </span>
                     </div>
                     <div className="flex items-baseline">
-                      <span className="text-gray-500 w-24">Leerjaar:</span>
+                      <span className="text-gray-500 w-24">Schooljaar:</span>
                       <span className="text-sm text-gray-900">
                         {student.programs && student.programs[0] 
                           ? student.programs[0].yearLevel 
                           : '-'}
                       </span>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="text-gray-500 w-24">Email:</span>
+                      <span className="text-sm text-gray-900 truncate">{student.email}</span>
                     </div>
                   </div>
                 </div>
@@ -994,21 +1452,20 @@ export default function Students() {
 
       {/* Create Student Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto">
           <DialogHeader>
-            <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
+            <DialogTitle className="text-xl font-bold flex items-center text-primary">
+              <PlusCircle className="mr-2 h-5 w-5 text-primary" />
+              Nieuwe Student Toevoegen
+            </DialogTitle>
             <DialogDescription>
               Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="py-4">
-            <Tabs defaultValue="photo" className="w-full">
-              <TabsList className="grid grid-cols-6 mb-4">
-                <TabsTrigger value="photo">
-                  <Image className="mr-2 h-4 w-4" />
-                  Foto
-                </TabsTrigger>
+          <div className="py-2">
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid grid-cols-4 mb-2">
                 <TabsTrigger value="personal">
                   <User className="mr-2 h-4 w-4" />
                   Persoonlijk
@@ -1022,29 +1479,56 @@ export default function Students() {
                   Adres
                 </TabsTrigger>
                 <TabsTrigger value="class">
-                  <Users className="mr-2 h-4 w-4" />
+                  <ChalkBoard className="mr-2 h-4 w-4" />
                   Klas
-                </TabsTrigger>
-                <TabsTrigger value="subjects">
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Vakken
                 </TabsTrigger>
               </TabsList>
               
-              {/* Foto upload tab */}
-              <TabsContent value="photo" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Foto uploaden</h3>
-                  <div className="flex flex-col items-center justify-center gap-4">
-                    <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center overflow-hidden bg-gray-50 relative group cursor-pointer">
-                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Upload className="h-8 w-8 text-gray-500" />
-                        <p className="text-sm text-gray-500 mt-2">Bestand kiezen</p>
-                      </div>
+
+              
+              {/* Persoonlijke informatie tab */}
+              <TabsContent value="personal" className="space-y-3">
+                <div className="p-3 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-base font-semibold text-primary mb-1">Persoonlijke gegevens</h3>
+                  
+                  {/* Foto upload sectie */}
+                  <div className="flex mb-0 mt-0 items-start">
+                    <div 
+                      className="w-24 h-24 flex items-center justify-center overflow-hidden relative group cursor-pointer mr-4"
+                      onClick={() => {
+                        const fileInput = document.getElementById('student-photo') as HTMLInputElement;
+                        fileInput?.click();
+                      }}
+                    >
                       <img id="student-photo-preview" src="" alt="" className="w-full h-full object-cover hidden" />
-                      <div id="student-photo-placeholder" className="flex flex-col items-center justify-center">
-                        <User className="h-12 w-12 text-gray-300" />
-                        <p className="text-sm text-gray-400 mt-2">Geen foto</p>
+                      <div id="student-photo-placeholder" className="w-full h-full flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-full">
+                        <User className="h-10 w-10 text-gray-300" />
+                        <div className="absolute bottom-0 right-0 bg-[#1e3a8a] rounded-full p-1.5 shadow-sm">
+                          <Upload className="h-3.5 w-3.5 text-white" />
+                        </div>
+                      </div>
+                      
+                      {/* Verwijder-knop verschijnt alleen bij hover als er een foto is */}
+                      <div 
+                        className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hidden"
+                        id="photo-delete-overlay"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
+                          const photoPlaceholder = document.getElementById('student-photo-placeholder');
+                          const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
+                          const fileInput = document.getElementById('student-photo') as HTMLInputElement;
+                          
+                          if (photoPreview && photoPlaceholder && fileInput && photoDeleteOverlay) {
+                            photoPreview.src = '';
+                            photoPreview.classList.add('hidden');
+                            photoPlaceholder.classList.remove('hidden');
+                            photoDeleteOverlay.classList.add('hidden');
+                            fileInput.value = '';
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-6 w-6 text-white" />
                       </div>
                     </div>
                     
@@ -1060,80 +1544,26 @@ export default function Students() {
                           reader.onload = function(event) {
                             const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
                             const photoPlaceholder = document.getElementById('student-photo-placeholder');
+                            const photoDeleteOverlay = document.getElementById('photo-delete-overlay');
                             
-                            if (photoPreview && photoPlaceholder && event.target?.result) {
+                            if (photoPreview && photoPlaceholder && photoDeleteOverlay && event.target?.result) {
                               photoPreview.src = event.target.result as string;
                               photoPreview.classList.remove('hidden');
                               photoPlaceholder.classList.add('hidden');
+                              photoDeleteOverlay.classList.remove('hidden');
                             }
                           };
                           reader.readAsDataURL(file);
                         }
                       }}
                     />
-                    
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-2"
-                        onClick={() => {
-                          const fileInput = document.getElementById('student-photo') as HTMLInputElement;
-                          fileInput?.click();
-                        }}
-                      >
-                        <Upload className="h-4 w-4 mr-2" />
-                        Foto uploaden
-                      </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => {
-                          const photoPreview = document.getElementById('student-photo-preview') as HTMLImageElement;
-                          const photoPlaceholder = document.getElementById('student-photo-placeholder');
-                          const fileInput = document.getElementById('student-photo') as HTMLInputElement;
-                          
-                          if (photoPreview && photoPlaceholder && fileInput) {
-                            photoPreview.src = '';
-                            photoPreview.classList.add('hidden');
-                            photoPlaceholder.classList.remove('hidden');
-                            fileInput.value = '';
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Verwijderen
-                      </Button>
-                    </div>
-                    
-
-
-                    <div className="w-full mt-4">
-                      <Label className="text-sm font-medium text-gray-700">
-                        Richtlijnen voor foto's
-                      </Label>
-                      <ul className="mt-2 text-sm text-gray-600 space-y-1 list-disc list-inside">
-                        <li>Upload een duidelijke, recente foto</li>
-                        <li>Foto moet het volledige gezicht tonen</li>
-                        <li>Neutrale achtergrond</li>
-                        <li>Maximum bestandsgrootte: 5MB</li>
-                      </ul>
-                    </div>
                   </div>
-                </div>
-              </TabsContent>
-              
-              {/* Persoonlijke informatie tab */}
-              <TabsContent value="personal" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
-                  <div className="flex mb-4 justify-end">
+                  
+                  <div className="flex mt-0 mb-0 justify-end">
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="flex items-center border border-gray-300"
+                      className="flex items-center border border-gray-300 text-xs h-7"
                       onClick={() => {
                         // Get access to toast context within this function
                         const localToast = toast;
@@ -1213,28 +1643,28 @@ export default function Students() {
                       Gegevens laden via eID
                     </Button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <Label htmlFor="studentId" className="text-sm font-medium text-gray-700">
-                        StudentID <span className="text-muted-foreground text-xs">(wordt automatisch gegenereerd)</span>
+                      <Label htmlFor="studentId" className="text-xs font-medium text-gray-700">
+                        StudentID <span className="text-muted-foreground text-xs">(automatisch)</span>
                       </Label>
                       <Input
                         id="studentId"
                         value={nextStudentIdData?.nextStudentId || "Wordt geladen..."}
                         disabled
-                        className="mt-1 bg-gray-100 text-gray-500 font-medium"
+                        className="mt-0.5 h-8 text-sm bg-gray-100 text-gray-500 font-medium"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="status" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="status" className="text-xs font-medium text-gray-700">
                         Status <span className="text-primary">*</span>
                       </Label>
                       <Select
                         value={studentFormData.status}
                         onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
                       >
-                        <SelectTrigger id="status" className="mt-1 bg-white">
+                        <SelectTrigger id="status" className="mt-0.5 h-8 text-sm bg-white">
                           <SelectValue placeholder="Selecteer status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1248,27 +1678,27 @@ export default function Students() {
                     </div>
                     
                     <div>
-                      <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">
                         Voornaam <span className="text-primary">*</span>
                       </Label>
                       <Input
                         id="firstName"
                         value={studentFormData.firstName}
                         onChange={(e) => setStudentFormData({ ...studentFormData, firstName: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-0.5 h-8 text-sm bg-white"
                         placeholder="Voornaam"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                      <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">
                         Achternaam <span className="text-primary">*</span>
                       </Label>
                       <Input
                         id="lastName"
                         value={studentFormData.lastName}
                         onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-0.5 h-8 text-sm bg-white"
                         placeholder="Achternaam"
                       />
                     </div>
@@ -1448,39 +1878,39 @@ export default function Students() {
                       Wijs de student toe aan een klas. Een student kan maar in één klas zitten.
                     </p>
                     
-                    <div className="grid grid-cols-1 gap-6">
-                      <div>
-                        <Label htmlFor="schoolYear" className="text-sm font-medium text-gray-700">
-                          Schooljaar <span className="text-primary">*</span>
-                        </Label>
-                        <div className="mt-2">
-                          <Select
-                            value={studentFormData.schoolYear || 'geen'}
-                            onValueChange={(value) => setStudentFormData({ 
-                              ...studentFormData, 
-                              schoolYear: value === 'geen' ? '' : value
-                            })}
-                          >
-                            <SelectTrigger className="border-gray-200 bg-white">
-                              <SelectValue placeholder="Selecteer schooljaar" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="geen">Selecteer schooljaar</SelectItem>
-                              <SelectItem value="2024-2025">2024-2025</SelectItem>
-                              <SelectItem value="2025-2026">2025-2026</SelectItem>
-                              <SelectItem value="2026-2027">2026-2027</SelectItem>
-                              <SelectItem value="2027-2028">2027-2028</SelectItem>
-                            </SelectContent>
-                          </Select>
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="schoolYear" className="text-sm font-medium text-gray-700">
+                            Schooljaar <span className="text-primary">*</span>
+                          </Label>
+                          <div className="mt-1">
+                            <Select
+                              value={studentFormData.schoolYear || 'geen'}
+                              onValueChange={(value) => setStudentFormData({ 
+                                ...studentFormData, 
+                                schoolYear: value === 'geen' ? '' : value
+                              })}
+                            >
+                              <SelectTrigger className="border-gray-200 bg-white h-9">
+                                <SelectValue placeholder="Selecteer schooljaar" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="geen">Selecteer schooljaar</SelectItem>
+                                <SelectItem value="2024-2025">2024-2025</SelectItem>
+                                <SelectItem value="2025-2026">2025-2026</SelectItem>
+                                <SelectItem value="2026-2027">2026-2027</SelectItem>
+                                <SelectItem value="2027-2028">2027-2028</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="studentGroupId" className="text-sm font-medium text-gray-700">
-                          Selecteer klas
-                        </Label>
-                        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
+                        
+                        <div>
+                          <Label htmlFor="studentGroupId" className="text-sm font-medium text-gray-700">
+                            Selecteer klas
+                          </Label>
+                          <div className="mt-1">
                             <Select
                               value={studentFormData.studentGroupId?.toString() || 'none'}
                               onValueChange={(value) => setStudentFormData({ 
@@ -1488,7 +1918,7 @@ export default function Students() {
                                 studentGroupId: value === 'none' ? null : parseInt(value) 
                               })}
                             >
-                              <SelectTrigger className="border-gray-200 bg-white">
+                              <SelectTrigger className="border-gray-200 bg-white h-9">
                                 <SelectValue placeholder="Selecteer klas" />
                               </SelectTrigger>
                               <SelectContent>
@@ -1668,9 +2098,223 @@ export default function Students() {
         </DialogContent>
       </Dialog>
 
+      {/* Import Students Dialog */}
+      <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+        <DialogContent className="sm:max-w-[95%] md:max-w-[80%] lg:max-w-[70%] h-auto max-h-[96vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center text-primary">
+              <FileUp className="mr-2 h-5 w-5 text-primary" />
+              Studenten Importeren
+            </DialogTitle>
+            <DialogDescription>
+              Importeer meerdere studenten vanuit een Excel of CSV bestand. Zorg dat de benodigde velden correct worden herkend.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+              <h3 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
+                <AlertCircle className="h-4 w-4 mr-2" />
+                Benodigde velden in importbestand
+              </h3>
+              <p className="text-sm text-blue-700 mb-2">
+                Voor een succesvolle import moet uw bestand de volgende velden bevatten:
+              </p>
+              <ul className="text-xs text-blue-600 list-disc pl-5 grid grid-cols-1 md:grid-cols-2 gap-1">
+                <li><strong>firstName</strong> - Voornaam (verplicht)</li>
+                <li><strong>lastName</strong> - Achternaam (verplicht)</li>
+                <li><strong>email</strong> - E-mailadres</li>
+                <li><strong>phone</strong> - Telefoonnummer</li>
+                <li><strong>dateOfBirth</strong> - Geboortedatum (DD-MM-YYYY)</li>
+                <li><strong>gender</strong> - Geslacht (M/V)</li>
+                <li><strong>street</strong> - Straatnaam</li>
+                <li><strong>houseNumber</strong> - Huisnummer</li>
+                <li><strong>postalCode</strong> - Postcode</li>
+                <li><strong>city</strong> - Plaats</li>
+                <li><strong>status</strong> - Status (enrolled, graduated, suspended, withdrawn)</li>
+              </ul>
+
+            </div>
+            
+            {!importFile ? (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <div className="mx-auto w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                  <FileSpreadsheet className="h-8 w-8" />
+                </div>
+                <h3 className="text-lg font-medium mb-2">Sleep een bestand hierheen of</h3>
+                <Button 
+                  variant="outline" 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-2"
+                >
+                  <Upload className="mr-2 h-4 w-4" /> Selecteer bestand
+                </Button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept=".csv,.xls,.xlsx"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleImportFile(file);
+                    }
+                  }}
+                />
+                <p className="text-sm text-gray-500 mt-2">
+                  Ondersteunde bestandsformaten: .CSV, .XLS, .XLSX
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between items-center pb-2 border-b">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-blue-50 rounded-lg mr-3">
+                      {importType === 'csv' ? (
+                        <FileText className="h-6 w-6 text-blue-600" />
+                      ) : (
+                        <FileSpreadsheet className="h-6 w-6 text-blue-600" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium">{importFile.name}</p>
+                      <p className="text-sm text-gray-500">
+                        {importType === 'csv' ? 'CSV Bestand' : 'Excel Bestand'} • {(importFile.size / 1024).toFixed(2)} KB
+                      </p>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      setImportFile(null);
+                      setImportPreview([]);
+                      setImportColumns([]);
+                      setColumnMappings({});
+                    }}
+                  >
+                    <X className="h-4 w-4 mr-1" /> Verwijderen
+                  </Button>
+                </div>
+                
+                {importPreview.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="font-medium text-lg">Voorbeeldgegevens</h3>
+                    <div className="overflow-x-auto rounded-lg border">
+                      <table className="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            {importColumns.map((column, idx) => (
+                              <th 
+                                key={idx} 
+                                className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                              >
+                                {column}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {importPreview.map((row, rowIdx) => (
+                            <tr key={rowIdx}>
+                              {importColumns.map((column, colIdx) => (
+                                <td key={colIdx} className="px-4 py-2 whitespace-nowrap text-gray-900">
+                                  {row[column] !== undefined ? String(row[column]) : '-'}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    <div className="space-y-4 pt-2">
+                      <h3 className="font-medium text-lg">Kolomtoewijzingen</h3>
+                      <p className="text-sm text-gray-500">
+                        Verbind de kolommen uit uw bestand met de juiste studentvelden
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {importColumns.map((column) => (
+                          <div key={column} className="space-y-1">
+                            <Label className="text-sm font-medium">
+                              {column}
+                            </Label>
+                            <Select
+                              value={columnMappings[column] || ''}
+                              onValueChange={(value) => {
+                                if (value) {
+                                  setColumnMappings({
+                                    ...columnMappings,
+                                    [column]: value
+                                  });
+                                } else {
+                                  const newMappings = {...columnMappings};
+                                  delete newMappings[column];
+                                  setColumnMappings(newMappings);
+                                }
+                              }}
+                            >
+                              <SelectTrigger className="h-8">
+                                <SelectValue placeholder="Selecteer veld" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="">Negeer deze kolom</SelectItem>
+                                <SelectItem value="firstName">Voornaam</SelectItem>
+                                <SelectItem value="lastName">Achternaam</SelectItem>
+                                <SelectItem value="email">E-mail</SelectItem>
+                                <SelectItem value="phone">Telefoon</SelectItem>
+                                <SelectItem value="dateOfBirth">Geboortedatum</SelectItem>
+                                <SelectItem value="gender">Geslacht</SelectItem>
+                                <SelectItem value="street">Straat</SelectItem>
+                                <SelectItem value="houseNumber">Huisnummer</SelectItem>
+                                <SelectItem value="postalCode">Postcode</SelectItem>
+                                <SelectItem value="city">Woonplaats</SelectItem>
+                                <SelectItem value="status">Status</SelectItem>
+                                <SelectItem value="notes">Notities</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsImportDialogOpen(false)}
+            >
+              Annuleren
+            </Button>
+            <Button 
+              variant="default"
+              className="bg-[#1e3a8a]"
+              onClick={importStudents}
+              disabled={!importFile || importPreview.length === 0 || Object.keys(columnMappings).length === 0 || isImporting}
+            >
+              {isImporting ? (
+                <>
+                  <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                  Importeren...
+                </>
+              ) : (
+                <>
+                  <Check className="mr-2 h-4 w-4" /> Importeren
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Student Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[95%] max-h-[90vh] h-auto">
           <DialogHeader>
             <DialogTitle>Student Bewerken</DialogTitle>
             <DialogDescription>
@@ -1694,7 +2338,7 @@ export default function Students() {
                   Adres
                 </TabsTrigger>
                 <TabsTrigger value="class">
-                  <Users className="mr-2 h-4 w-4" />
+                  <ChalkBoard className="mr-2 h-4 w-4" />
                   Klas
                 </TabsTrigger>
                 <TabsTrigger value="subjects">
@@ -2196,7 +2840,7 @@ export default function Students() {
 
       {/* Student Detail Dialog */}
       <Dialog open={isStudentDetailDialogOpen} onOpenChange={setIsStudentDetailDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[95%] max-h-[96vh] h-auto">
           <DialogHeader>
             <DialogTitle>Student Details</DialogTitle>
             <DialogDescription>
@@ -2205,9 +2849,9 @@ export default function Students() {
           </DialogHeader>
           
           {selectedStudent && (
-            <div className="py-4">
+            <div className="py-2">
               <Tabs defaultValue="personal" className="w-full">
-                <TabsList className="grid grid-cols-5 mb-4">
+                <TabsList className="grid grid-cols-4 mb-2">
                   <TabsTrigger value="personal">
                     <User className="mr-2 h-4 w-4" />
                     Persoonlijk
@@ -2221,12 +2865,8 @@ export default function Students() {
                     Adres
                   </TabsTrigger>
                   <TabsTrigger value="class">
-                    <Users className="mr-2 h-4 w-4" />
+                    <ChalkBoard className="mr-2 h-4 w-4" />
                     Klas
-                  </TabsTrigger>
-                  <TabsTrigger value="subjects">
-                    <BookOpen className="mr-2 h-4 w-4" />
-                    Vakken
                   </TabsTrigger>
                 </TabsList>
                 

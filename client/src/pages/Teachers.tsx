@@ -607,7 +607,7 @@ const Teachers = () => {
         <DialogContent className="sm:max-w-[85vw]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-primary flex items-center gap-2">
-              <User className="h-5 w-5" />
+              <GraduationCap className="h-5 w-5" />
               {selectedTeacher?.firstName} {selectedTeacher?.lastName}
             </DialogTitle>
             <DialogDescription>

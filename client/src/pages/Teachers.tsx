@@ -804,7 +804,7 @@ const Teachers = () => {
               
               {/* Persoonlijke informatie tab */}
               <TabsContent value="personal" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm min-h-[550px]">
+                <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm min-h-[450px]">
                   <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
                   
                   {/* Foto upload sectie met knoppen rechts */}
@@ -1188,7 +1188,7 @@ const Teachers = () => {
                       Gegevens laden via itsme®
                     </Button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-3">
                     <div>
                       <Label htmlFor="teacherId" className="text-sm font-medium text-gray-700">
                         Docent ID <span className="text-primary">*</span>
@@ -1197,11 +1197,11 @@ const Teachers = () => {
                         id="teacherId"
                         value={teacherFormData.teacherId}
                         onChange={(e) => setTeacherFormData({ ...teacherFormData, teacherId: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 bg-white h-8"
                         placeholder="Automatisch gegenereerd..."
                         disabled={!!nextTeacherIdData?.nextTeacherId}
                       />
-                      {isLoadingNextId && <div className="text-xs text-gray-500 mt-1">ID wordt geladen...</div>}
+                      {isLoadingNextId && <div className="text-xs text-gray-500">ID wordt geladen...</div>}
                     </div>
                     
                     <div>
@@ -1212,12 +1212,30 @@ const Teachers = () => {
                         value={teacherFormData.isActive ? "actief" : "inactief"}
                         onValueChange={(value) => setTeacherFormData({ ...teacherFormData, isActive: value === "actief" })}
                       >
-                        <SelectTrigger className="w-full mt-1 bg-white">
+                        <SelectTrigger className="w-full mt-1 bg-white h-8">
                           <SelectValue placeholder="Selecteer status" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="actief">Actief</SelectItem>
                           <SelectItem value="inactief">Inactief</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
+                        Geslacht
+                      </Label>
+                      <Select
+                        value={teacherFormData.gender}
+                        onValueChange={(value) => setTeacherFormData({ ...teacherFormData, gender: value })}
+                      >
+                        <SelectTrigger className="w-full mt-1 bg-white h-8">
+                          <SelectValue placeholder="Selecteer geslacht" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="man">Man</SelectItem>
+                          <SelectItem value="vrouw">Vrouw</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1230,7 +1248,7 @@ const Teachers = () => {
                         id="firstName"
                         value={teacherFormData.firstName}
                         onChange={(e) => setTeacherFormData({ ...teacherFormData, firstName: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 bg-white h-8"
                         placeholder="Voornaam"
                       />
                     </div>
@@ -1243,27 +1261,9 @@ const Teachers = () => {
                         id="lastName"
                         value={teacherFormData.lastName}
                         onChange={(e) => setTeacherFormData({ ...teacherFormData, lastName: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 bg-white h-8"
                         placeholder="Achternaam"
                       />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
-                        Geslacht
-                      </Label>
-                      <Select
-                        value={teacherFormData.gender}
-                        onValueChange={(value) => setTeacherFormData({ ...teacherFormData, gender: value })}
-                      >
-                        <SelectTrigger className="w-full mt-1 bg-white">
-                          <SelectValue placeholder="Selecteer geslacht" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="man">Man</SelectItem>
-                          <SelectItem value="vrouw">Vrouw</SelectItem>
-                        </SelectContent>
-                      </Select>
                     </div>
                     
                     <div>
@@ -1275,11 +1275,11 @@ const Teachers = () => {
                         type="date"
                         value={teacherFormData.dateOfBirth || ''}
                         onChange={(e) => setTeacherFormData({ ...teacherFormData, dateOfBirth: e.target.value })}
-                        className="mt-1 bg-white"
+                        className="mt-1 bg-white h-8"
                       />
                     </div>
                     
-                    <div className="md:col-span-2">
+                    <div className="md:col-span-3">
                       <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
                         Notities
                       </Label>
@@ -1289,7 +1289,7 @@ const Teachers = () => {
                         onChange={(e) => setTeacherFormData({ ...teacherFormData, notes: e.target.value })}
                         className="mt-1 bg-white"
                         placeholder="Voeg hier aanvullende informatie toe..."
-                        rows={4}
+                        rows={2}
                       />
                     </div>
                   </div>

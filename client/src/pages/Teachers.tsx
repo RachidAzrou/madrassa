@@ -288,15 +288,25 @@ const Teachers = () => {
   
   if (isLoading) {
     return (
-      <div className="container mx-auto py-10">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Docenten</h1>
+      <div className="p-4 md:p-6 space-y-6">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+            <div className="flex items-center gap-4 mb-2 md:mb-0">
+              <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+                <GraduationCap className="h-7 w-7" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Docenten</h1>
+                <p className="text-base text-gray-500 mt-1">Bekijk en beheer alle docenten in het systeem</p>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <div className="border rounded-lg p-8 bg-white">
+        <div className="border rounded-lg p-8 bg-white shadow-sm">
           <div className="flex items-center justify-center h-40">
             <div className="text-center">
-              <div className="inline-block animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
+              <div className="inline-block animate-spin h-8 w-8 border-4 border-[#1e3a8a] border-t-transparent rounded-full mb-4"></div>
               <p className="text-gray-500">Docenten laden...</p>
             </div>
           </div>
@@ -307,12 +317,22 @@ const Teachers = () => {
   
   if (isError) {
     return (
-      <div className="container mx-auto py-10">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Docenten</h1>
+      <div className="p-4 md:p-6 space-y-6">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+            <div className="flex items-center gap-4 mb-2 md:mb-0">
+              <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+                <GraduationCap className="h-7 w-7" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Docenten</h1>
+                <p className="text-base text-gray-500 mt-1">Bekijk en beheer alle docenten in het systeem</p>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <div className="border rounded-lg p-8 bg-white">
+        <div className="border rounded-lg p-8 bg-white shadow-sm">
           <div className="text-center py-8">
             <XCircle className="mx-auto h-12 w-12 text-red-400" />
             <h3 className="mt-2 text-lg font-medium text-gray-900">Fout bij laden</h3>
@@ -329,44 +349,48 @@ const Teachers = () => {
   }
   
   return (
-    <div className="container mx-auto py-10">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center">
-          <div className="bg-blue-100 p-2 rounded-lg mr-3">
-            <GraduationCap className="h-6 w-6 text-blue-700" />
+    <div className="p-4 md:p-6 space-y-6">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+              <GraduationCap className="h-7 w-7" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Docenten</h1>
+              <p className="text-base text-gray-500 mt-1">Bekijk en beheer alle docenten in het systeem</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">Docenten</h1>
-            <p className="text-sm text-gray-500">Beheer alle docenten in het systeem</p>
+          
+          <div className="ml-auto">
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Docent toevoegen
+            </Button>
           </div>
         </div>
-        
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Docent toevoegen
-        </Button>
       </div>
       
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
         {/* Filters en zoekvak */}
-        <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="search"
-              placeholder="Zoek op naam of docent ID..."
-              className="w-full pl-9 bg-white"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
-          <div className="flex items-center space-x-2 w-full sm:w-auto">
+        <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-2 w-full md:w-auto">
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <Input
+                type="search"
+                placeholder="Zoek op naam of docent ID..."
+                className="w-full pl-9 bg-white"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
             <Select
               value={statusFilter}
               onValueChange={(value) => setStatusFilter(value)}
             >
-              <SelectTrigger className="w-full sm:w-[140px] bg-white">
+              <SelectTrigger className="w-full md:w-[140px] bg-white">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>

@@ -50,6 +50,14 @@ type StudentType = {
 };
 
 export default function Guardians() {
+  // URL parameters gebruiken voor automatisch openen van voogdbewerking
+  const [searchParams] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      editId: params.get('edit'),
+      returnToStudent: params.get('returnToStudent') === 'true'
+    };
+  });
   // States
   const [searchTerm, setSearchTerm] = useState('');
   const [studentSearchTerm, setStudentSearchTerm] = useState('');
@@ -94,6 +102,35 @@ export default function Guardians() {
     
     return () => clearTimeout(timer);
   }, [searchTerm]);
+  
+  // Auto-open edit dialog when navigating from student page with a guardian ID
+  useEffect(() => {
+    const editGuardianId = searchParams.editId;
+    if (editGuardianId && guardians.length > 0) {
+      // Zoek de voogd in de lijst
+      const guardianToEdit = guardians.find(g => g.id.toString() === editGuardianId);
+      if (guardianToEdit) {
+        // Open het dialoogvenster voor bewerking
+        setNewGuardian({...guardianToEdit});
+        setShowAddDialog(true);
+        
+        // Toon een toast om aan te geven dat we in de bewerkmodus zitten
+        toast({
+          title: "Voogd bewerken",
+          description: "U bewerkt een voogd die u wilt koppelen aan een student.",
+        });
+      }
+    }
+  }, [searchParams.editId, guardians]);
+  
+  // Handle navigation after saving
+  useEffect(() => {
+    // Als we het dialoogvenster sluiten na het bewerken van een voogd vanuit een student
+    if (!showAddDialog && searchParams.returnToStudent && searchParams.editId) {
+      // Navigeer terug naar studenten pagina met add=true om het studentformulier weer te openen
+      window.location.href = '/students?add=true';
+    }
+  }, [showAddDialog, searchParams.returnToStudent, searchParams.editId]);
 
   // Fetch guardians data
   const {

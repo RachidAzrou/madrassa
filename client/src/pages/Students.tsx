@@ -3214,11 +3214,20 @@ export default function Students() {
               variant="outline"
               className="border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-primary"
               onClick={() => {
+                // Sla de studentgegevens tijdelijk op
+                const tempStudent = {...studentFormData};
                 setShowGuardianConfirmDialog(false);
-                // Hier zouden we de voogdbewerking kunnen starten
+                
+                // Open voogdbewerking dialoog
+                // We doen dit door naar de Guardian pagina te navigeren en daar de bewerking te openen
+                // Simuleer dit hier door een functie aan te roepen die de voogdbewerking zou starten
+                
+                // Redirect naar de voogdenpagina met de voogd-ID in een query parameter
+                window.location.href = `/guardians?edit=${foundGuardian.id}&returnToStudent=true`;
+                
                 toast({
                   title: "Voogd bewerken",
-                  description: "Deze functionaliteit wordt binnenkort toegevoegd.",
+                  description: "U wordt doorgestuurd naar de voogdbewerking. Na het opslaan kunt u terugkeren naar de student.",
                 });
               }}
             >

@@ -784,7 +784,7 @@ export default function Guardians() {
           {selectedGuardian && (
             <div className="mt-2">
               <Tabs defaultValue="personal" className="w-full">
-                <TabsList className="grid grid-cols-5 mb-6">
+                <TabsList className="grid grid-cols-3 mb-6">
                   <TabsTrigger value="personal" className="flex gap-2 items-center">
                     <UserCircle className="h-4 w-4" />
                     Persoonlijk
@@ -793,17 +793,9 @@ export default function Guardians() {
                     <Mail className="h-4 w-4" />
                     Contact
                   </TabsTrigger>
-                  <TabsTrigger value="address" className="flex gap-2 items-center">
-                    <Home className="h-4 w-4" />
-                    Adres
-                  </TabsTrigger>
-                  <TabsTrigger value="class" className="flex gap-2 items-center">
+                  <TabsTrigger value="students" className="flex gap-2 items-center">
                     <Users className="h-4 w-4" />
-                    Klas
-                  </TabsTrigger>
-                  <TabsTrigger value="courses" className="flex gap-2 items-center">
-                    <BookOpen className="h-4 w-4" />
-                    Vakken
+                    Studenten
                   </TabsTrigger>
                 </TabsList>
                 

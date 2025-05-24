@@ -1,17 +1,14 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen, Building, BookText, XCircle, GraduationCap, X, FileText } from 'lucide-react';
+import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen, Building, BookText, XCircle, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { CustomDialogContent } from "@/components/ui/custom-dialog-content";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
 
 interface Program {
   id: number;
@@ -455,515 +452,347 @@ export default function Programs() {
 
       {/* Vak Toevoegen Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <CustomDialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
-          {/* Blauwe header */}
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <BookOpen className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <DialogTitle className="text-xl font-semibold text-white">
-                    Vak Toevoegen
-                  </DialogTitle>
-                  <DialogDescription className="text-sm text-blue-100 font-medium">
-                    Vul de onderstaande velden in om een nieuw vak toe te voegen.
-                  </DialogDescription>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsAddDialogOpen(false)}
-                className="h-8 w-8 rounded-full p-0 text-white hover:bg-white/20"
-              >
-                <X className="h-5 w-5" />
-                <span className="sr-only">Sluiten</span>
-              </Button>
-            </div>
-          </div>
-          <div className="px-6 py-4">
-            <form onSubmit={handleSubmitProgram}>
-              <div className="space-y-6 py-4">
-                <div>
-                  <h3 className="text-lg font-medium mb-4 border-b pb-2">Algemene Informatie</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="text-right">
-                        Naam van het vak <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="name"
-                        required
-                        value={programFormData.name}
-                        onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="code" className="text-right">
-                        Vakcode <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="code"
-                        required
-                        value={programFormData.code}
-                        onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="duration" className="text-right">
-                        Duur
-                      </Label>
-                      <Select
-                        value={programFormData.duration.toString()}
-                        onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
-                      >
-                        <SelectTrigger id="duration" className="mt-1">
-                          <SelectValue placeholder="Selecteer duur" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">Jaar</SelectItem>
-                          <SelectItem value="2">Semester</SelectItem>
-                          <SelectItem value="3">Trimester</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="status" className="text-right">
-                        Status
-                      </Label>
-                      <Select
-                        value={programFormData.isActive ? "true" : "false"}
-                        onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
-                      >
-                        <SelectTrigger id="status" className="mt-1">
-                          <SelectValue placeholder="Selecteer status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="true">Actief</SelectItem>
-                          <SelectItem value="false">Inactief</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 mt-4">
-                    <Label htmlFor="description" className="text-right">
-                      Beschrijving van het vak
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Vak Toevoegen</DialogTitle>
+            <DialogDescription>
+              Vul de onderstaande velden in om een nieuw vak toe te voegen.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmitProgram}>
+            <div className="space-y-6 py-4">
+              <div>
+                <h3 className="text-lg font-medium mb-4 border-b pb-2">Algemene Informatie</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-right">
+                      Naam van het vak <span className="text-red-500">*</span>
                     </Label>
-                    <textarea
-                      id="description"
-                      className="w-full min-h-[100px] p-2 mt-1 border rounded-md"
-                      value={programFormData.description}
-                      onChange={(e) => setProgramFormData({ ...programFormData, description: e.target.value })}
-                      placeholder="Geef een korte beschrijving van de lesstof en leerdoelen van dit vak"
+                    <Input
+                      id="name"
+                      required
+                      value={programFormData.name}
+                      onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="code" className="text-right">
+                      Vakcode <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="code"
+                      required
+                      value={programFormData.code}
+                      onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
+                      className="mt-1"
                     />
                   </div>
                 </div>
                 
-                <div>
-                  <h3 className="text-lg font-medium mb-4 border-b pb-2">Toewijzing</h3>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="classes">Klassen waarin dit vak wordt gegeven</Label>
-                      <div className="p-4 border rounded-md bg-gray-50">
-                        <div className="flex justify-between items-center mb-2">
-                          <p className="text-sm text-gray-500">Selecteer één of meerdere klassen</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="duration" className="text-right">
+                      Duur
+                    </Label>
+                    <Select
+                      value={programFormData.duration.toString()}
+                      onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
+                    >
+                      <SelectTrigger id="duration" className="mt-1">
+                        <SelectValue placeholder="Selecteer duur" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Jaar</SelectItem>
+                        <SelectItem value="2">Semester</SelectItem>
+                        <SelectItem value="3">Trimester</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="status" className="text-right">
+                      Status
+                    </Label>
+                    <Select
+                      value={programFormData.isActive ? "true" : "false"}
+                      onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
+                    >
+                      <SelectTrigger id="status" className="mt-1">
+                        <SelectValue placeholder="Selecteer status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="true">Actief</SelectItem>
+                        <SelectItem value="false">Inactief</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mt-4">
+                  <Label htmlFor="description" className="text-right">
+                    Beschrijving van het vak
+                  </Label>
+                  <textarea
+                    id="description"
+                    className="w-full min-h-[100px] p-2 mt-1 border rounded-md"
+                    value={programFormData.description}
+                    onChange={(e) => setProgramFormData({ ...programFormData, description: e.target.value })}
+                    placeholder="Geef een korte beschrijving van de lesstof en leerdoelen van dit vak"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-medium mb-4 border-b pb-2">Toewijzing</h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="classes">Klassen waarin dit vak wordt gegeven</Label>
+                    <div className="p-4 border rounded-md bg-gray-50">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm text-gray-500">Selecteer één of meerdere klassen</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {/* Hier zouden normaal checkboxen komen voor beschikbare klassen */}
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="class1" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="class1" className="text-sm">Klas 1A</Label>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {/* Hier zouden normaal checkboxen komen voor beschikbare klassen */}
-                          <div className="flex items-center space-x-2">
-                            <input type="checkbox" id="class1" className="h-4 w-4 text-primary" />
-                            <Label htmlFor="class1" className="text-sm">Klas 1A</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <input type="checkbox" id="class2" className="h-4 w-4 text-primary" />
-                            <Label htmlFor="class2" className="text-sm">Klas 2B</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <input type="checkbox" id="class3" className="h-4 w-4 text-primary" />
-                            <Label htmlFor="class3" className="text-sm">Klas 3C</Label>
-                          </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="class2" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="class2" className="text-sm">Klas 2B</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="class3" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="class3" className="text-sm">Klas 3C</Label>
                         </div>
                       </div>
                     </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="teachers">Docenten die dit vak geven</Label>
-                      <div className="p-4 border rounded-md bg-gray-50">
-                        <div className="flex justify-between items-center mb-2">
-                          <p className="text-sm text-gray-500">Selecteer één of meerdere docenten</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="teachers">Docenten die dit vak geven</Label>
+                    <div className="p-4 border rounded-md bg-gray-50">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm text-gray-500">Selecteer één of meerdere docenten</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {/* Hier zouden normaal checkboxen komen voor beschikbare docenten */}
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="teacher1" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="teacher1" className="text-sm">Mohammed Youssef</Label>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {/* Hier zouden normaal checkboxen komen voor beschikbare docenten */}
-                          <div className="flex items-center space-x-2">
-                            <input type="checkbox" id="teacher1" className="h-4 w-4 text-primary" />
-                            <Label htmlFor="teacher1" className="text-sm">Mohammed Youssef</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <input type="checkbox" id="teacher2" className="h-4 w-4 text-primary" />
-                            <Label htmlFor="teacher2" className="text-sm">Fatima El Amrani</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <input type="checkbox" id="teacher3" className="h-4 w-4 text-primary" />
-                            <Label htmlFor="teacher3" className="text-sm">Ibrahim Bouali</Label>
-                          </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="teacher2" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="teacher2" className="text-sm">Fatima El Amrani</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="teacher3" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="teacher3" className="text-sm">Ibrahim Bouali</Label>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 mt-4 -mx-6 -mb-4 flex justify-end space-x-4 border-t">
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  Annuleren
-                </Button>
-                <Button 
-                  type="submit" 
-                  disabled={createProgramMutation.isPending}
-                >
-                  {createProgramMutation.isPending ? (
-                    <>
-                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
-                      Bezig met toevoegen...
-                    </>
-                  ) : (
-                    "Toevoegen"
-                  )}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </CustomDialogContent>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                Annuleren
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={createProgramMutation.isPending}
+              >
+                {createProgramMutation.isPending ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+                    Bezig met toevoegen...
+                  </>
+                ) : (
+                  "Toevoegen"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
       </Dialog>
 
       {/* Vak bewerken dialoogvenster */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <CustomDialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
-          {/* Blauwe header */}
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Edit className="h-6 w-6 text-white" />
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Vak bewerken</DialogTitle>
+            <DialogDescription>
+              Vul de onderstaande velden in om dit vak bij te werken.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmitEditProgram}>
+            <div className="space-y-6 py-4">
+              <div>
+                <h3 className="text-lg font-medium mb-4 border-b pb-2">Algemene Informatie</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-name" className="text-right">
+                      Naam van het vak <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="edit-name"
+                      required
+                      value={programFormData.name}
+                      onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-code" className="text-right">
+                      Vakcode <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="edit-code"
+                      required
+                      value={programFormData.code}
+                      onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <DialogTitle className="text-xl font-semibold text-white">
-                    Vak bewerken
-                  </DialogTitle>
-                  <DialogDescription className="text-sm text-blue-100 font-medium">
-                    Vul de onderstaande velden in om dit vak bij te werken.
-                  </DialogDescription>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-duration" className="text-right">
+                      Duur
+                    </Label>
+                    <Select
+                      value={programFormData.duration.toString()}
+                      onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
+                    >
+                      <SelectTrigger id="edit-duration" className="mt-1">
+                        <SelectValue placeholder="Selecteer duur" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Jaar</SelectItem>
+                        <SelectItem value="2">Semester</SelectItem>
+                        <SelectItem value="3">Trimester</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-status" className="text-right">
+                      Status
+                    </Label>
+                    <Select
+                      value={programFormData.isActive ? "true" : "false"}
+                      onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
+                    >
+                      <SelectTrigger id="edit-status" className="mt-1">
+                        <SelectValue placeholder="Selecteer status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="true">Actief</SelectItem>
+                        <SelectItem value="false">Inactief</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mt-4">
+                  <Label htmlFor="edit-description" className="text-right">
+                    Beschrijving van het vak
+                  </Label>
+                  <textarea
+                    id="edit-description"
+                    className="w-full min-h-[100px] p-2 mt-1 border rounded-md"
+                    value={programFormData.description}
+                    onChange={(e) => setProgramFormData({ ...programFormData, description: e.target.value })}
+                    placeholder="Geef een korte beschrijving van de lesstof en leerdoelen van dit vak"
+                  />
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsEditDialogOpen(false)}
-                className="h-8 w-8 rounded-full p-0 text-white hover:bg-white/20"
-              >
-                <X className="h-5 w-5" />
-                <span className="sr-only">Sluiten</span>
-              </Button>
-            </div>
-          </div>
-          <div className="px-6 py-4">
-            <form onSubmit={handleSubmitEditProgram} className="space-y-4">
-              <Tabs defaultValue="algemeen" className="w-full">
-                <TabsList className="grid grid-cols-4 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
-                  <TabsTrigger value="algemeen" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <BookOpen className="h-4 w-4" />
-                    <span>Algemeen</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="toewijzing" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <Users className="h-4 w-4" />
-                    <span>Toewijzing</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="studiepunten" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <GraduationCap className="h-4 w-4" />
-                    <span>Studiepunten</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="leerdoelen" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <FileText className="h-4 w-4" />
-                    <span>Leerdoelen</span>
-                  </TabsTrigger>
-                </TabsList>
-
-                {/* Algemene informatie tabblad */}
-                <TabsContent value="algemeen" className="mt-0 bg-white rounded-lg min-h-[450px]">
-                  <div className="p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-name" className="text-xs font-medium text-gray-700">
-                          Naam van het vak <span className="text-primary">*</span>
-                        </Label>
-                        <Input
-                          id="edit-name"
-                          required
-                          value={programFormData.name}
-                          onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
-                          className="h-9 text-sm bg-white border-gray-200"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-code" className="text-xs font-medium text-gray-700">
-                          Vakcode <span className="text-primary">*</span>
-                        </Label>
-                        <Input
-                          id="edit-code"
-                          required
-                          value={programFormData.code}
-                          onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
-                          className="h-9 text-sm bg-white border-gray-200"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-duration" className="text-xs font-medium text-gray-700">Duur</Label>
-                        <Select
-                          value={programFormData.duration.toString()}
-                          onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
-                        >
-                          <SelectTrigger id="edit-duration" className="h-9 text-sm bg-white border-gray-200">
-                            <SelectValue placeholder="Selecteer duur" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1">Jaar</SelectItem>
-                            <SelectItem value="2">Semester</SelectItem>
-                            <SelectItem value="3">Trimester</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-status" className="text-xs font-medium text-gray-700">Status</Label>
-                        <Select
-                          value={programFormData.isActive ? "true" : "false"}
-                          onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
-                        >
-                          <SelectTrigger id="edit-status" className="h-9 text-sm bg-white border-gray-200">
-                            <SelectValue placeholder="Selecteer status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="true">Actief</SelectItem>
-                            <SelectItem value="false">Inactief</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2 mt-4">
-                      <Label htmlFor="edit-description" className="text-xs font-medium text-gray-700">
-                        Beschrijving van het vak
-                      </Label>
-                      <Textarea
-                        id="edit-description"
-                        className="min-h-[100px] resize-y text-sm bg-white border-gray-200"
-                        value={programFormData.description}
-                        onChange={(e) => setProgramFormData({ ...programFormData, description: e.target.value })}
-                        placeholder="Geef een korte beschrijving van de lesstof en leerdoelen van dit vak"
-                      />
-                    </div>
-                  </div>
-                </TabsContent>
-
-                {/* Toewijzing tabblad */}
-                <TabsContent value="toewijzing" className="mt-0 bg-white rounded-lg min-h-[450px]">
-                  <div className="p-4">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-classes" className="text-xs font-medium text-gray-700">Klassen waarin dit vak wordt gegeven</Label>
-                        <div className="p-4 border rounded-md bg-gray-50">
-                          <div className="flex justify-between items-center mb-2">
-                            <p className="text-sm text-gray-500">Selecteer één of meerdere klassen</p>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            {/* Hier zouden normaal checkboxen komen voor beschikbare klassen */}
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="edit-class1" className="h-4 w-4 text-primary" />
-                              <Label htmlFor="edit-class1" className="text-sm">Klas 1A</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="edit-class2" className="h-4 w-4 text-primary" />
-                              <Label htmlFor="edit-class2" className="text-sm">Klas 2B</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="edit-class3" className="h-4 w-4 text-primary" />
-                              <Label htmlFor="edit-class3" className="text-sm">Klas 3C</Label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-teachers" className="text-xs font-medium text-gray-700">Docenten die dit vak geven</Label>
-                        <div className="p-4 border rounded-md bg-gray-50">
-                          <div className="flex justify-between items-center mb-2">
-                            <p className="text-sm text-gray-500">Selecteer één of meerdere docenten</p>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            {/* Hier zouden normaal checkboxen komen voor beschikbare docenten */}
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="edit-teacher1" className="h-4 w-4 text-primary" />
-                              <Label htmlFor="edit-teacher1" className="text-sm">Mohammed Youssef</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="edit-teacher2" className="h-4 w-4 text-primary" />
-                              <Label htmlFor="edit-teacher2" className="text-sm">Fatima El Amrani</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox id="edit-teacher3" className="h-4 w-4 text-primary" />
-                              <Label htmlFor="edit-teacher3" className="text-sm">Ibrahim Bouali</Label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                {/* Studiepunten tabblad */}
-                <TabsContent value="studiepunten" className="mt-0 bg-white rounded-lg min-h-[450px]">
-                  <div className="p-4">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-credits" className="text-xs font-medium text-gray-700">Aantal studiepunten</Label>
-                        <Input
-                          id="edit-credits"
-                          type="number"
-                          className="h-9 text-sm bg-white border-gray-200"
-                          placeholder="Bijv. 5"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Geef het aantal studiepunten (ECTS) voor dit vak aan.
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-prerequisites" className="text-xs font-medium text-gray-700">Voorvereisten</Label>
-                        <Textarea
-                          id="edit-prerequisites"
-                          className="min-h-[100px] resize-y text-sm bg-white border-gray-200"
-                          placeholder="Beschrijf welke voorkennis of vakken vereist zijn om dit vak te kunnen volgen"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-assessment" className="text-xs font-medium text-gray-700">Toetsing</Label>
-                        <Select defaultValue="1">
-                          <SelectTrigger id="edit-assessment" className="h-9 text-sm bg-white border-gray-200">
-                            <SelectValue placeholder="Selecteer toetsvorm" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1">Schriftelijk tentamen</SelectItem>
-                            <SelectItem value="2">Mondeling tentamen</SelectItem>
-                            <SelectItem value="3">Portfolio</SelectItem>
-                            <SelectItem value="4">Praktijkopdracht</SelectItem>
-                            <SelectItem value="5">Gecombineerd</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                {/* Leerdoelen tabblad */}
-                <TabsContent value="leerdoelen" className="mt-0 bg-white rounded-lg min-h-[450px]">
-                  <div className="p-4">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-learningObjectives" className="text-xs font-medium text-gray-700">Leerdoelen</Label>
-                        <Textarea
-                          id="edit-learningObjectives"
-                          className="min-h-[150px] resize-y text-sm bg-white border-gray-200"
-                          placeholder="Beschrijf de leerdoelen van dit vak"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Beschrijf wat studenten na het succesvol afronden van dit vak moeten kennen en kunnen.
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-competencies" className="text-xs font-medium text-gray-700">Competenties</Label>
-                        <Textarea
-                          id="edit-competencies"
-                          className="min-h-[150px] resize-y text-sm bg-white border-gray-200"
-                          placeholder="Beschrijf de competenties die in dit vak worden ontwikkeld"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
               
-              <div className="bg-gray-50 px-6 py-4 mt-4 -mx-6 -mb-4 flex justify-end space-x-4 border-t">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setIsEditDialogOpen(false)}
-                >
-                  Annuleren
-                </Button>
-                <Button 
-                  type="submit"
-                  disabled={updateProgramMutation.isPending}
-                >
-                  {updateProgramMutation.isPending ? (
-                    <>
-                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
-                      Bezig met bijwerken...
-                    </>
-                  ) : (
-                    "Opslaan"
-                  )}
-                </Button>
+              <div>
+                <h3 className="text-lg font-medium mb-4 border-b pb-2">Toewijzing</h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-classes">Klassen waarin dit vak wordt gegeven</Label>
+                    <div className="p-4 border rounded-md bg-gray-50">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm text-gray-500">Selecteer één of meerdere klassen</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {/* Hier zouden normaal checkboxen komen voor beschikbare klassen */}
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="edit-class1" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="edit-class1" className="text-sm">Klas 1A</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="edit-class2" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="edit-class2" className="text-sm">Klas 2B</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="edit-class3" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="edit-class3" className="text-sm">Klas 3C</Label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-teachers">Docenten die dit vak geven</Label>
+                    <div className="p-4 border rounded-md bg-gray-50">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm text-gray-500">Selecteer één of meerdere docenten</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {/* Hier zouden normaal checkboxen komen voor beschikbare docenten */}
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="edit-teacher1" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="edit-teacher1" className="text-sm">Mohammed Youssef</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="edit-teacher2" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="edit-teacher2" className="text-sm">Fatima El Amrani</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="edit-teacher3" className="h-4 w-4 text-primary" />
+                          <Label htmlFor="edit-teacher3" className="text-sm">Ibrahim Bouali</Label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </form>
-          </div>
-        </CustomDialogContent>
+            </div>
+            <DialogFooter>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="submit"
+                disabled={updateProgramMutation.isPending}
+              >
+                {updateProgramMutation.isPending ? 'Bezig met bijwerken...' : 'Opslaan'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
       </Dialog>
 
       {/* Vak verwijderen dialoogvenster */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <CustomDialogContent className="sm:max-w-[500px] max-h-[90vh] h-auto overflow-y-auto p-0">
-          {/* Blauwe header */}
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Trash2 className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <DialogTitle className="text-xl font-semibold text-white">
-                    Vak verwijderen
-                  </DialogTitle>
-                  <DialogDescription className="text-sm text-blue-100 font-medium">
-                    Weet je zeker dat je dit vak wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-                  </DialogDescription>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsDeleteDialogOpen(false)}
-                className="h-8 w-8 rounded-full p-0 text-white hover:bg-white/20"
-              >
-                <X className="h-5 w-5" />
-                <span className="sr-only">Sluiten</span>
-              </Button>
-            </div>
-          </div>
-          <div className="px-6 py-4">
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Vak verwijderen</DialogTitle>
+            <DialogDescription>
+              Weet je zeker dat je dit vak wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            </DialogDescription>
+          </DialogHeader>
           
           {selectedProgram && (
             <div className="py-4 space-y-3">
@@ -996,7 +825,7 @@ export default function Programs() {
             </div>
           )}
           
-          <div className="bg-gray-50 px-6 py-4 mt-4 -mx-6 -mb-4 flex justify-end space-x-4 border-t">
+          <DialogFooter>
             <Button 
               variant="outline" 
               onClick={() => setIsDeleteDialogOpen(false)}
@@ -1014,9 +843,8 @@ export default function Programs() {
               )}
               {deleteProgramMutation.isPending ? 'Bezig met verwijderen...' : 'Verwijderen'}
             </Button>
-          </div>
-          </div>
-        </CustomDialogContent>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
     </div>
   );

@@ -721,10 +721,10 @@ export default function StudentGroups() {
                           name="instructor"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-xs font-medium text-gray-700">Hoofddocent</FormLabel>
+                              <FormLabel className="text-xs font-medium text-gray-700">Klastitularis</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="Naam van hoofddocent"
+                                  placeholder="Naam van klastitularis"
                                   {...field}
                                   className="mt-1 h-9 text-sm bg-white border-gray-200"
                                 />

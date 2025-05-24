@@ -179,15 +179,12 @@ export default function Guardians() {
                   </DialogDescription>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
+              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white/20 cursor-pointer"
                 onClick={() => setShowNewGuardianDialog(false)}
-                className="h-8 w-8 rounded-full p-0 text-white hover:bg-white/20"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4 text-white" />
                 <span className="sr-only">Sluiten</span>
-              </Button>
+              </div>
             </div>
           </div>
           
@@ -230,12 +227,14 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="relationship">Relatie tot Student</Label>
+                      <div className="flex items-center h-9 mb-1">
+                        <Label className="h-6 flex items-center" htmlFor="relationship">Relatie tot Student</Label>
+                      </div>
                       <Select 
                         value={newGuardian.relationship} 
                         onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="h-10">
                           <SelectValue placeholder="Selecteer relatie" />
                         </SelectTrigger>
                         <SelectContent>

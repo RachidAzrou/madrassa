@@ -210,16 +210,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* LOKALEN BEHEER BELANGRIJKE KNOP */}
-      <div className="mb-6">
-        <Button 
-          className="w-full bg-red-600 hover:bg-red-700 text-white font-bold p-6 text-lg flex items-center justify-center"
-          onClick={() => window.location.href = "/rooms"}
-        >
-          <Building className="h-6 w-6 mr-2" />
-          LOKALEN BEHEER
-        </Button>
-      </div>
+
 
       {/* Main Content */}
       <div className="grid grid-cols-1 gap-4 sm:gap-6">

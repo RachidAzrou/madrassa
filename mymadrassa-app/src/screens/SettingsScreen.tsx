@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
-import AuthService from '../services/AuthService';
+import { useAppContext } from '../store/AppContext';
 
 // Type definitie voor navigatieparameters
 type RootStackParamList = {
@@ -38,18 +38,31 @@ interface AppSettings {
 }
 
 const SettingsScreen: React.FC<Props> = ({ navigation }) => {
+  // Haal context data en functies op
+  const { auth, logout, darkMode, setDarkMode, language, setLanguage, isLoading: contextLoading } = useAppContext();
+  
   const [settings, setSettings] = useState<AppSettings>({
-    darkMode: false,
+    darkMode: darkMode,
     notifications: true,
     offlineMode: false,
     autoSync: true,
-    language: 'nl',
+    language: language,
     fontSize: 'medium'
   });
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const currentUser = AuthService.getCurrentUser();
+  const currentUser = auth.user;
+
+  // Controleer authenticatie
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }]
+      });
+    }
+  }, [auth.isAuthenticated, navigation]);
 
   // Laden van instellingen
   useEffect(() => {
@@ -60,8 +73,12 @@ const SettingsScreen: React.FC<Props> = ({ navigation }) => {
         // Voor nu simuleren we een vertraging
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        // In een echte app zou je hier een API-call maken of lokale opslag gebruiken
-        // setSettings(loadedSettings);
+        // Update darkMode en language vanuit de context
+        setSettings(prev => ({
+          ...prev,
+          darkMode: darkMode,
+          language: language
+        }));
       } catch (error) {
         console.error('Error loading settings:', error);
         Alert.alert('Fout', 'Er is een fout opgetreden bij het laden van de instellingen.');
@@ -70,21 +87,31 @@ const SettingsScreen: React.FC<Props> = ({ navigation }) => {
       }
     };
 
-    loadSettings();
-  }, []);
+    if (auth.isAuthenticated) {
+      loadSettings();
+    }
+  }, [auth.isAuthenticated, darkMode, language]);
 
   const handleToggleSetting = (key: keyof AppSettings, value: boolean) => {
     setSettings(prev => ({
       ...prev,
       [key]: value
     }));
+    
+    // Update de context voor bepaalde instellingen
+    if (key === 'darkMode') {
+      setDarkMode(value);
+    }
   };
 
-  const handleChangeLanguage = (language: 'nl' | 'en' | 'ar') => {
+  const handleChangeLanguage = (lang: 'nl' | 'en' | 'ar') => {
     setSettings(prev => ({
       ...prev,
-      language
+      language: lang
     }));
+    
+    // Update de context
+    setLanguage(lang);
   };
 
   const handleChangeFontSize = (fontSize: 'small' | 'medium' | 'large') => {
@@ -92,6 +119,8 @@ const SettingsScreen: React.FC<Props> = ({ navigation }) => {
       ...prev,
       fontSize
     }));
+    
+    // In een echte app zou je dit in de context opslaan
   };
 
   const handleSaveSettings = async () => {
@@ -110,11 +139,8 @@ const SettingsScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleLogout = async () => {
     try {
-      await AuthService.logout();
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
+      await logout();
+      // Navigatie gebeurt automatisch via het auth effect bovenaan
     } catch (error) {
       console.error('Logout error:', error);
       Alert.alert('Fout', 'Er is een fout opgetreden bij het uitloggen.');

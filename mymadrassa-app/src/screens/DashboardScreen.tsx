@@ -7,10 +7,12 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Platform,
-  Dimensions
+  Dimensions,
+  Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useAppContext } from '../store/AppContext';
 
 // Type definitie voor navigatieparameters
 type RootStackParamList = {
@@ -19,6 +21,7 @@ type RootStackParamList = {
   Teachers: undefined;
   Classes: undefined;
   Settings: undefined;
+  Login: undefined;
 };
 
 type DashboardScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Dashboard'>;
@@ -27,40 +30,79 @@ type Props = {
   navigation: DashboardScreenNavigationProp;
 };
 
-// Dummy-data voor de dashboardkaarten
-const dashboardData = {
-  totalStudents: 283,
-  activeStudents: 254,
-  totalTeachers: 38,
-  activeTeachers: 32,
-  totalClasses: 26,
-  activeClasses: 18,
-  upcomingEvents: [
-    { id: 1, title: 'Eindexamens', date: '15-06-2025', type: 'exam' },
-    { id: 2, title: 'Ouderavond', date: '22-06-2025', type: 'meeting' },
-    { id: 3, title: 'Zomervakantie', date: '01-07-2025', type: 'holiday' }
-  ],
-  recentNotifications: [
-    { id: 1, title: 'Nieuw lesprogramma geüpload', time: '2 uur geleden', read: false },
-    { id: 2, title: 'Vergadering verplaatst naar vrijdag', time: '4 uur geleden', read: true },
-    { id: 3, title: 'Nieuwe leerling ingeschreven', time: '1 dag geleden', read: true }
-  ]
+// Type definitie voor event en notificatie
+type Event = {
+  id: number;
+  title: string;
+  date: string;
+  type: 'exam' | 'meeting' | 'holiday';
+};
+
+type Notification = {
+  id: number;
+  title: string;
+  time: string;
+  read: boolean;
 };
 
 const DashboardScreen: React.FC<Props> = ({ navigation }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState(dashboardData);
+  // Haal context data en functies op
+  const { auth, students, teachers, classes, isLoading: contextLoading, fetchStudents, fetchTeachers, fetchClasses } = useAppContext();
   
+  // Lokale state voor aanvullende data
+  const [isLoading, setIsLoading] = useState(true);
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+  const [recentNotifications, setRecentNotifications] = useState<Notification[]>([]);
+  
+  // Controleer authenticatie
   useEffect(() => {
-    // Simuleer het laden van data
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    if (!auth.isAuthenticated) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }]
+      });
+    }
+  }, [auth.isAuthenticated, navigation]);
+  
+  // Laad data wanneer component mount
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        // Haal data op via context
+        await Promise.all([
+          fetchStudents(),
+          fetchTeachers(),
+          fetchClasses()
+        ]);
+        
+        // Laad aanvullende data (in een echte app zou dit via API gaan)
+        // Voor nu gebruiken we hardcoded data
+        setUpcomingEvents([
+          { id: 1, title: 'Eindexamens', date: '15-06-2025', type: 'exam' },
+          { id: 2, title: 'Ouderavond', date: '22-06-2025', type: 'meeting' },
+          { id: 3, title: 'Zomervakantie', date: '01-07-2025', type: 'holiday' }
+        ]);
+        
+        setRecentNotifications([
+          { id: 1, title: 'Nieuw lesprogramma geüpload', time: '2 uur geleden', read: false },
+          { id: 2, title: 'Vergadering verplaatst naar vrijdag', time: '4 uur geleden', read: true },
+          { id: 3, title: 'Nieuwe leerling ingeschreven', time: '1 dag geleden', read: true }
+        ]);
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        Alert.alert('Fout', 'Er is een fout opgetreden bij het laden van de dashboard gegevens.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  if (isLoading) {
+    if (auth.isAuthenticated) {
+      loadData();
+    }
+  }, [auth.isAuthenticated, fetchStudents, fetchTeachers, fetchClasses]);
+
+  if (isLoading || contextLoading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#1e3a8a" />
@@ -89,8 +131,8 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
           >
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Studenten</Text>
-              <Text style={styles.cardNumber}>{data.activeStudents}</Text>
-              <Text style={styles.cardDescription}>van {data.totalStudents} ingeschreven</Text>
+              <Text style={styles.cardNumber}>{students.filter(s => s.status === 'active').length}</Text>
+              <Text style={styles.cardDescription}>van {students.length} ingeschreven</Text>
             </View>
           </TouchableOpacity>
 
@@ -101,8 +143,8 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
           >
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Docenten</Text>
-              <Text style={styles.cardNumber}>{data.activeTeachers}</Text>
-              <Text style={styles.cardDescription}>van {data.totalTeachers} ingeschreven</Text>
+              <Text style={styles.cardNumber}>{teachers.filter(t => t.status === 'active').length}</Text>
+              <Text style={styles.cardDescription}>van {teachers.length} ingeschreven</Text>
             </View>
           </TouchableOpacity>
 
@@ -113,15 +155,15 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
           >
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Klassen</Text>
-              <Text style={styles.cardNumber}>{data.activeClasses}</Text>
-              <Text style={styles.cardDescription}>van {data.totalClasses} aangemaakt</Text>
+              <Text style={styles.cardNumber}>{classes.filter(c => c.status === 'active').length}</Text>
+              <Text style={styles.cardDescription}>van {classes.length} aangemaakt</Text>
             </View>
           </TouchableOpacity>
         </View>
 
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Aankomende Evenementen</Text>
-          {data.upcomingEvents.map(event => (
+          {upcomingEvents.map(event => (
             <View key={event.id} style={styles.eventItem}>
               <View style={[styles.eventIndicator, styles[`${event.type}Indicator`]]} />
               <View style={styles.eventDetails}>
@@ -134,7 +176,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
 
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Recente Notificaties</Text>
-          {data.recentNotifications.map(notification => (
+          {recentNotifications.map(notification => (
             <View key={notification.id} style={styles.notificationItem}>
               {!notification.read && <View style={styles.unreadDot} />}
               <View style={styles.notificationContent}>

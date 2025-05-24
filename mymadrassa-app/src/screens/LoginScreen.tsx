@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useAppContext } from '../store/AppContext';
 
 // Hier zou je later je logo importeren
 // import Logo from '../assets/images/logo.png';
@@ -33,38 +34,43 @@ type Props = {
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
+  
+  // Haal de context op
+  const { login, auth, error: contextError, clearError } = useAppContext();
+
+  // Effect voor het doorsturen naar Dashboard bij succesvol inloggen
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Dashboard' }],
+      });
+    }
+  }, [auth.isAuthenticated, navigation]);
+
+  // Effect voor het afhandelen van context errors
+  useEffect(() => {
+    if (contextError) {
+      setLocalError(contextError);
+      clearError();
+    }
+  }, [contextError, clearError]);
 
   const handleLogin = async () => {
     // Valideren van invoervelden
     if (!username || !password) {
-      setError('Vul alstublieft alle velden in');
+      setLocalError('Vul alstublieft alle velden in');
       return;
     }
 
-    setIsLoading(true);
-    setError('');
-
-    try {
-      // In een echte app zou dit een API-call zijn
-      // Hier simuleren we gewoon een succesvolle login
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Voor demonstratie: controle op standaard inloggegevens
-      if (username === 'admin' && password === 'admin') {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Dashboard' }],
-        });
-      } else {
-        setError('Ongeldige gebruikersnaam of wachtwoord');
-      }
-    } catch (err) {
-      setError('Er is een fout opgetreden. Probeer het later opnieuw.');
-      console.error('Login error:', err);
-    } finally {
-      setIsLoading(false);
+    setLocalError('');
+    
+    // Gebruik de login functie van de context
+    const success = await login(username, password);
+    
+    if (!success && !contextError) {
+      setLocalError('Ongeldige gebruikersnaam of wachtwoord');
     }
   };
 
@@ -86,7 +92,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.formContainer}>
             <Text style={styles.title}>Inloggen</Text>
             
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            {localError ? <Text style={styles.errorText}>{localError}</Text> : null}
             
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Gebruikersnaam</Text>
@@ -97,6 +103,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
                 placeholder="Voer uw gebruikersnaam in"
                 autoCapitalize="none"
                 testID="usernameInput"
+                editable={!auth.isLoading}
               />
             </View>
 
@@ -109,12 +116,14 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
                 placeholder="Voer uw wachtwoord in"
                 secureTextEntry
                 testID="passwordInput"
+                editable={!auth.isLoading}
               />
             </View>
 
             <TouchableOpacity 
               style={styles.forgotPasswordContainer}
               onPress={() => Alert.alert('Wachtwoord vergeten', 'Neem contact op met de beheerder om uw wachtwoord te resetten.')}
+              disabled={auth.isLoading}
             >
               <Text style={styles.forgotPasswordText}>Wachtwoord vergeten?</Text>
             </TouchableOpacity>
@@ -122,10 +131,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             <TouchableOpacity 
               style={styles.loginButton} 
               onPress={handleLogin}
-              disabled={isLoading}
+              disabled={auth.isLoading}
               testID="loginButton"
             >
-              {isLoading ? (
+              {auth.isLoading ? (
                 <ActivityIndicator color="#ffffff" />
               ) : (
                 <Text style={styles.loginButtonText}>Inloggen</Text>

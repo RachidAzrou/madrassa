@@ -677,7 +677,7 @@ export default function Guardians() {
       </div>
       
       {/* Voogd details dialoog */}
-      <Dialog open={!!selectedGuardian} onOpenChange={() => setSelectedGuardian(null)}>
+      <Dialog open={!!selectedGuardian && !isDeleteDialogOpen} onOpenChange={() => setSelectedGuardian(null)}>
         <DialogContent className="sm:max-w-[900px] h-[calc(100vh-100px)] max-h-[900px] overflow-hidden p-0 bg-white rounded-lg border shadow-lg">
           <div className="flex flex-col h-full">
             {/* Header met blauwe achtergrond */}

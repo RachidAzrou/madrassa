@@ -411,18 +411,8 @@ export default function Courses() {
         </div>
       </div>
       
-      {/* Main Tabs for Courses/Classes and Filter Tabs for Status */}
+      {/* Filter Tabs for Status */}
       <div className="flex flex-col md:flex-row md:items-center gap-4 mb-5 mt-6">
-        <Tabs defaultValue="courses" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="p-1 bg-blue-900/10 mb-0 flex w-auto">
-            <TabsTrigger value="courses" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-              Vakken
-            </TabsTrigger>
-            <TabsTrigger value="classes" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-              Klassen
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
         
         <Tabs defaultValue="active" className="w-auto">
           <TabsList className="p-1 bg-blue-900/10 mb-0 flex w-auto">

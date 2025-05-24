@@ -876,9 +876,9 @@ export default function Calendar() {
       {/* Add Event Dialog */}
       <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
         <DialogContent className="max-w-[95vw] w-[720px] max-h-[85vh] overflow-y-auto">
-          <DialogHeader className="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-4 rounded-t-lg">
-            <DialogTitle className="text-xl font-bold text-white">Evenement Toevoegen</DialogTitle>
-            <DialogDescription className="text-blue-100">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Evenement Toevoegen</DialogTitle>
+            <DialogDescription>
               Voeg een nieuw evenement toe aan de academische kalender
             </DialogDescription>
           </DialogHeader>

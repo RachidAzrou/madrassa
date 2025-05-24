@@ -366,11 +366,41 @@ export default function Programs() {
             Fout bij het laden van vakken. Probeer het opnieuw.
           </div>
         ) : programs.length === 0 ? (
-          <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-            <div className="text-[#1e3a8a] mb-2">
-              <BookText className="h-12 w-12 mx-auto opacity-30" />
-            </div>
-            <p className="text-sm font-medium">Geen vakken beschikbaar</p>
+          <div className="bg-white rounded-md border shadow-sm overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr className="border-b border-gray-200">
+                  <th className="py-3 px-2 w-10 font-medium text-xs uppercase text-gray-500 text-center">
+                    <Checkbox 
+                      className="translate-y-[2px]"
+                      onCheckedChange={(checked) => {
+                        // Hier later functionaliteit toevoegen voor 'selecteer alles'
+                      }}
+                    />
+                    <span className="sr-only">Selecteer Alles</span>
+                  </th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Vak</th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Code</th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Duur</th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Klas</th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right">
+                    <span className="sr-only">Acties</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
+                  <td colSpan={6} className="py-12">
+                    <div className="flex flex-col items-center justify-center text-gray-500">
+                      <div className="text-[#1e3a8a] mb-2">
+                        <BookText className="h-12 w-12 mx-auto opacity-30" />
+                      </div>
+                      <p className="text-sm font-medium">Geen vakken beschikbaar</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         ) : (
           programs.map((program: Program) => (

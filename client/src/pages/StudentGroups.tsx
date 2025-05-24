@@ -11,6 +11,7 @@ import {
   CalendarIcon, Loader2, XCircle, Users2, X, AlertTriangle
 } from 'lucide-react';
 import ManageStudentEnrollments from "@/components/student-groups/ManageStudentEnrollments";
+import { ClassEmptyState } from "@/components/ui/empty-states";
 // Aangepast ChalkboardTeacher icoon
 const ChalkBoard = (props: any) => (
   <svg
@@ -451,16 +452,12 @@ export default function StudentGroups() {
                   <tbody>
                     {studentGroups.length === 0 ? (
                       <tr>
-                        <td colSpan={4} className="text-center py-8">
-                          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-2">
-                            <ChalkBoard className="h-8 w-8 text-blue-600" />
-                          </div>
-                          <h3 className="text-lg font-medium text-gray-900 mb-2">Geen klassen gevonden</h3>
-                          <p className="text-gray-500 mb-4 max-w-md mx-auto">
-                            {searchTerm 
+                        <td colSpan={4} className="py-8">
+                          <ClassEmptyState description={
+                            searchTerm 
                               ? `Er zijn geen klassen gevonden die overeenkomen met "${searchTerm}". Probeer een andere zoekopdracht.` 
-                              : 'Er zijn nog geen klassen aangemaakt.'}
-                          </p>
+                              : 'Er zijn nog geen klassen aangemaakt.'
+                          } />
                         </td>
                       </tr>
                     ) : (

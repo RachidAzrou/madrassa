@@ -56,7 +56,7 @@ export function CustomDialogContent({
         {children}
       </div>
       {footer && (
-        <DialogFooter className="px-6 py-4 border-t">
+        <DialogFooter className="px-6 py-4 border-t bg-gray-50">
           {footer}
         </DialogFooter>
       )}

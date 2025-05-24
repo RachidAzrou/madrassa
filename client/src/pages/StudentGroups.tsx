@@ -843,30 +843,32 @@ export default function StudentGroups() {
                   </TabsContent>
                 </Tabs>
 
-                <DialogFooter className="pt-6 flex justify-between">
-                  <Button
-                    type="button"
-                    variant="outline" 
-                    onClick={() => {
-                      isEditDialogOpen ? setIsEditDialogOpen(false) : setIsAddDialogOpen(false);
-                      setIsDialogOpen(false);
-                    }}
-                  >
-                    Annuleren
-                  </Button>
-                  <Button 
-                    type="submit"
-                    className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white"
-                    disabled={createStudentGroupMutation.isPending || updateStudentGroupMutation.isPending}
-                  >
-                    {(createStudentGroupMutation.isPending || updateStudentGroupMutation.isPending) && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    {isEditDialogOpen ? "Opslaan" : "Aanmaken"}
-                  </Button>
-                </DialogFooter>
+
               </form>
             </Form>
+          </div>
+          <div className="px-6 py-4 border-t bg-gray-50 flex justify-between">
+            <Button
+              type="button"
+              variant="outline" 
+              onClick={() => {
+                isEditDialogOpen ? setIsEditDialogOpen(false) : setIsAddDialogOpen(false);
+                setIsDialogOpen(false);
+              }}
+            >
+              Annuleren
+            </Button>
+            <Button 
+              type="button"
+              onClick={form.handleSubmit(onSubmit)}
+              className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white"
+              disabled={createStudentGroupMutation.isPending || updateStudentGroupMutation.isPending}
+            >
+              {(createStudentGroupMutation.isPending || updateStudentGroupMutation.isPending) && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              {isEditDialogOpen ? "Opslaan" : "Aanmaken"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -443,12 +443,8 @@ export default function StudentGroups() {
               <p className="text-gray-500 mb-6 max-w-md mx-auto">
                 {searchTerm 
                   ? `Er zijn geen klassen gevonden die overeenkomen met "${searchTerm}". Probeer een andere zoekopdracht.` 
-                  : 'Er zijn nog geen klassen aangemaakt. Klik op de knop hieronder om je eerste klas toe te voegen.'}
+                  : 'Er zijn nog geen klassen aangemaakt.'}
               </p>
-              <Button onClick={handleAddStudentGroup} className="flex items-center gap-2">
-                <PlusCircle className="h-4 w-4" />
-                <span>Klas Aanmaken</span>
-              </Button>
             </div>
           ) : (
             <>

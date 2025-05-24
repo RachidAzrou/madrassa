@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CustomDialogContent } from "@/components/ui/custom-dialog-content";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -452,12 +453,24 @@ export default function Programs() {
 
       {/* Vak Toevoegen Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Vak Toevoegen</DialogTitle>
-            <DialogDescription>
-              Vul de onderstaande velden in om een nieuw vak toe te voegen.
-            </DialogDescription>
+        <CustomDialogContent className="sm:max-w-[700px]">
+          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white p-6 flex items-center gap-2 rounded-t-lg">
+            <div className="bg-white/20 p-2 rounded-full">
+              <GraduationCap className="h-6 w-6" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl">Vak Toevoegen</DialogTitle>
+              <DialogDescription className="text-white/80">
+                Vul de onderstaande velden in om een nieuw vak toe te voegen.
+              </DialogDescription>
+            </div>
+            <button 
+              onClick={() => setIsAddDialogOpen(false)} 
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            >
+              <XCircle className="h-6 w-6 text-white" />
+              <span className="sr-only">Close</span>
+            </button>
           </DialogHeader>
           <form onSubmit={handleSubmitProgram}>
             <div className="space-y-6 py-4">

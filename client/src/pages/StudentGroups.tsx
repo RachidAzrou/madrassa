@@ -348,40 +348,10 @@ export default function StudentGroups() {
             )}
           </div>
           
-          <div className="flex flex-col md:flex-row gap-4 items-end">
-            <div className="w-full md:w-64 space-y-2">
-              <Label htmlFor="selectClassCurriculum">Curriculum details bewerken</Label>
-              <Select
-                onValueChange={(value) => {
-                  const selectedGroup = studentGroups.find((g) => g.id.toString() === value);
-                  if (selectedGroup) {
-                    handleEditStudentGroup(selectedGroup);
-                  }
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecteer een klas" />
-                </SelectTrigger>
-                <SelectContent>
-                  {studentGroups && studentGroups.length > 0 ? (
-                    studentGroups.map((group) => (
-                      <SelectItem key={group.id} value={group.id.toString()}>
-                        {group.name}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="none" disabled>Geen klassen beschikbaar</SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-gray-500">Selecteer een klas om instroomvereisten en leerplan in te voeren</p>
-            </div>
-            
-            <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              <span>Nieuwe Klas</span>
-            </Button>
-          </div>
+          <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            <span>Klas Aanmaken</span>
+          </Button>
         </div>
       </div>
 

@@ -394,19 +394,19 @@ export default function Rooms() {
                 <Table>
                   <TableHeader className="bg-gray-50 border-b">
                     <TableRow>
-                      <TableHead className="py-3 font-semibold">Lokaalnaam</TableHead>
-                      <TableHead className="py-3 font-semibold">Status</TableHead>
-                      <TableHead className="py-3 font-semibold">Capaciteit</TableHead>
-                      <TableHead className="py-3 font-semibold text-right">Acties</TableHead>
+                      <TableHead className="h-12 px-4 align-middle text-muted-foreground [&:has([role=checkbox])]:pr-0 py-3 font-semibold text-center">Lokaalnaam</TableHead>
+                      <TableHead className="h-12 px-4 align-middle text-muted-foreground [&:has([role=checkbox])]:pr-0 py-3 font-semibold text-center">Status</TableHead>
+                      <TableHead className="h-12 px-4 align-middle text-muted-foreground [&:has([role=checkbox])]:pr-0 py-3 font-semibold text-center">Capaciteit</TableHead>
+                      <TableHead className="h-12 px-4 align-middle text-muted-foreground [&:has([role=checkbox])]:pr-0 py-3 font-semibold text-right">Acties</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {rooms.map((room) => (
                       <TableRow key={room.id} className="group hover:bg-slate-50">
-                        <TableCell className="font-medium">{room.name}</TableCell>
-                        <TableCell>{getStatusBadge(room.status)}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center">
+                        <TableCell className="font-medium text-center">{room.name}</TableCell>
+                        <TableCell className="text-center">{getStatusBadge(room.status)}</TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex items-center justify-center">
                             <Users className="h-4 w-4 mr-1 text-gray-500" />
                             {room.capacity}
                           </div>

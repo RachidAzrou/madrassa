@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doorsturen naar Lokalen</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 100px;
+            background-color: #f0f4f8;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #1e3a8a;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1e3a8a;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .button {
+            display: inline-block;
+            background-color: #1e3a8a;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Doorsturen naar Lokalen Beheer</h1>
+        <p>Je wordt automatisch doorgestuurd naar de Lokalen Beheer pagina...</p>
+        <div class="loader"></div>
+        <p>Klik op de knop als je niet automatisch wordt doorgestuurd:</p>
+        <a href="/rooms" class="button">Ga naar Lokalen Beheer</a>
+    </div>
+
+    <script>
+        // Doorsturen naar de Rooms pagina na 2 seconden
+        setTimeout(function() {
+            window.location.href = "/rooms";
+        }, 2000);
+    </script>
+</body>
+</html>

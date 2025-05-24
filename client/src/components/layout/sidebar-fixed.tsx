@@ -18,6 +18,7 @@ import {
   LogOut,
   Menu,
   X,
+  Building,
   CreditCard,
   UserPlus,
   Settings,
@@ -141,42 +142,34 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
     }
   };
 
-  const handleLogoClick = () => {
-    if (isMobile && onClose) {
-      onClose();
-    }
-  };
-
   return (
-    <div className={cn("h-full w-64 relative", className)}>
-      <div className="absolute inset-0 bg-white border-r border-gray-200 flex flex-col">
-        {/* Logo and header */}
-        <div className="flex items-center justify-center px-2 py-4 border-b border-gray-200">
+    <div className={cn("h-screen", className)}>
+      <div className="flex flex-col h-full bg-white border-r border-gray-200">
+        {/* Header met logo en mobiele sluiten knop */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
           <Link href="/">
-            <div className="w-full flex items-center justify-center">
-              <img 
-                src={myMadrassaLogo} 
-                alt="myMadrassa Logo" 
-                className="w-full object-contain" 
-                style={{ maxHeight: "60px" }}
+            <div className="flex items-center cursor-pointer">
+              <img
+                src={myMadrassaLogo}
+                alt="myMadrassa Logo"
+                className="h-12 w-auto object-contain"
               />
-              <span className="sr-only">myMadrassa</span>
             </div>
           </Link>
           {isMobile && (
-            <button 
-              onClick={onClose} 
-              className="p-1 rounded-full text-gray-500 hover:bg-gray-100"
+            <button
+              onClick={onClose}
+              className="p-2 rounded-md text-gray-500 hover:bg-gray-100"
             >
               <X className="h-5 w-5" />
             </button>
           )}
         </div>
-
-        {/* Ingelogde gebruiker informatie - vast bovenaan */}
-        <div className="px-3 pt-4 pb-2 border-b border-gray-100">
+        
+        {/* Ingelogde gebruiker informatie - fixed top */}
+        <div className="px-3 py-3 border-b border-gray-200">
           <div 
-            className="bg-blue-50 rounded-md p-3 mb-2 cursor-pointer hover:bg-blue-100 transition-colors"
+            className="bg-blue-50 rounded-md p-3 cursor-pointer hover:bg-blue-100 transition-colors"
             onClick={() => {
               window.location.href = "/mijn-account";
               if (onClose) onClose();
@@ -254,6 +247,13 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   icon={<ChalkBoard className="h-5 w-5" />}
                   label="Klassen"
                   isActive={location.startsWith("/student-groups")}
+                  onClick={handleLinkClick}
+                />
+                <SidebarLink
+                  href="/rooms"
+                  icon={<Building className="h-5 w-5" />}
+                  label="Lokalen"
+                  isActive={location.startsWith("/rooms")}
                   onClick={handleLinkClick}
                 />
               </div>

@@ -411,35 +411,8 @@ export default function Courses() {
         </div>
       </div>
       
-      {/* Filter Tabs for Status */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 mb-5 mt-6">
-        
-        <Tabs defaultValue="active" className="w-auto">
-          <TabsList className="p-1 bg-blue-900/10 mb-0 flex w-auto">
-            <TabsTrigger 
-              value="active" 
-              className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
-              onClick={() => handleStatusFilterChange('active')}
-            >
-              Actief
-            </TabsTrigger>
-            <TabsTrigger 
-              value="inactive" 
-              className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
-              onClick={() => handleStatusFilterChange('inactive')}
-            >
-              Inactief
-            </TabsTrigger>
-            <TabsTrigger 
-              value="all" 
-              className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
-              onClick={() => handleStatusFilterChange('all')}
-            >
-              Alle vakken
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
+      {/* Spacing element */}
+      <div className="mb-5 mt-6"></div>
       
       {/* Content Tabs */}
       <Tabs defaultValue="courses" className="w-full" value={activeTab}>

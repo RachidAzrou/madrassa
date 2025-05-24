@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { CustomDialogContent } from "@/components/ui/custom-dialog-content";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -453,7 +452,7 @@ export default function Programs() {
 
       {/* Vak Toevoegen Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <CustomDialogContent className="sm:max-w-[700px]">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white p-6 flex items-center gap-2 rounded-t-lg">
             <div className="bg-white/20 p-2 rounded-full">
               <GraduationCap className="h-6 w-6" />

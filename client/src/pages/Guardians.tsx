@@ -409,7 +409,7 @@ export default function Guardians() {
         <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
           <div className="flex items-center gap-4 mb-2 md:mb-0">
             <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
-              <Users className="h-7 w-7" />
+              <UserCheck className="h-7 w-7" />
             </div>
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Voogden</h1>

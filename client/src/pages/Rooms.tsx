@@ -401,7 +401,6 @@ export default function Rooms() {
                       <TableHead>Capaciteit</TableHead>
                       <TableHead>Locatie</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Huidig Gebruik</TableHead>
                       <TableHead className="text-right">Acties</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -417,7 +416,6 @@ export default function Rooms() {
                         </TableCell>
                         <TableCell>{room.location}</TableCell>
                         <TableCell>{getStatusBadge(room.status)}</TableCell>
-                        <TableCell>{room.currentUse || "-"}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button

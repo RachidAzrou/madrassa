@@ -875,21 +875,13 @@ export default function Calendar() {
 
       {/* Add Event Dialog */}
       <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
-        <DialogContent className="max-w-[95vw] w-[720px] max-h-[85vh] overflow-y-auto p-0">
-          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] p-6 rounded-t-lg flex flex-col gap-2">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <CalendarIcon className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <DialogTitle className="text-xl font-semibold text-white">Evenement Toevoegen</DialogTitle>
-                <DialogDescription className="text-sm text-blue-100">
-                  Voeg een nieuw evenement toe aan de academische kalender
-                </DialogDescription>
-              </div>
-            </div>
+        <DialogContent className="max-w-[95vw] w-[720px] max-h-[85vh] overflow-y-auto">
+          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white p-4 rounded-t-lg">
+            <DialogTitle className="text-xl font-bold text-white">Evenement Toevoegen</DialogTitle>
+            <DialogDescription className="text-blue-100">
+              Voeg een nieuw evenement toe aan de academische kalender
+            </DialogDescription>
           </DialogHeader>
-          <div className="p-6">
           
           <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value as 'exam' | 'class' | 'holiday' | 'event')}>
             <TabsList className="grid grid-cols-4 mt-2 p-1 bg-blue-900/10">

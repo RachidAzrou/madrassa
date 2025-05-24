@@ -1597,6 +1597,12 @@ export default function Students() {
                   </span>
                 </div>
               </div>
+              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white/20 cursor-pointer"
+                onClick={() => setShowNewStudentDialog(false)}
+              >
+                <X className="h-4 w-4 text-white" />
+                <span className="sr-only">Sluiten</span>
+              </div>
             </div>
           </div>
           

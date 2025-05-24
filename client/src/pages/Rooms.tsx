@@ -414,61 +414,61 @@ export default function Rooms() {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader className="bg-gray-50 border-b">
-                    <TableRow>
-                      <TableHead className="w-[50px] h-12 px-4 align-middle text-muted-foreground py-3 font-semibold text-center">
+                    <TableRow className="border-b border-gray-200">
+                      <TableHead className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">
                         <Checkbox 
                           checked={selectedRooms.length === rooms.length && rooms.length > 0}
                           onCheckedChange={handleSelectAllRooms}
                           aria-label="Selecteer alle rijen"
                         />
                       </TableHead>
-                      <TableHead className="h-12 px-4 align-middle text-muted-foreground [&:has([role=checkbox])]:pr-0 py-3 font-semibold text-center">Lokaalnaam</TableHead>
-                      <TableHead className="h-12 px-4 align-middle text-muted-foreground [&:has([role=checkbox])]:pr-0 py-3 font-semibold text-center">Status</TableHead>
-                      <TableHead className="h-12 px-4 align-middle text-muted-foreground [&:has([role=checkbox])]:pr-0 py-3 font-semibold text-center">Capaciteit</TableHead>
-                      <TableHead className="h-12 px-4 align-middle text-muted-foreground [&:has([role=checkbox])]:pr-0 py-3 font-semibold text-right">Acties</TableHead>
+                      <TableHead className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">LOKAALNAAM</TableHead>
+                      <TableHead className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">STATUS</TableHead>
+                      <TableHead className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">CAPACITEIT</TableHead>
+                      <TableHead className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {rooms.map((room) => (
-                      <TableRow key={room.id} className="group hover:bg-slate-50">
-                        <TableCell className="w-[50px] text-center">
+                      <TableRow key={room.id} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
+                        <TableCell className="py-3 px-4">
                           <Checkbox 
                             checked={selectedRooms.includes(room.id)}
                             onCheckedChange={() => handleSelectRoom(room.id)}
                             aria-label={`Selecteer ${room.name}`}
                           />
                         </TableCell>
-                        <TableCell className="font-medium text-center">{room.name}</TableCell>
-                        <TableCell className="text-center">{getStatusBadge(room.status)}</TableCell>
-                        <TableCell className="text-center">
-                          <div className="flex items-center justify-center">
+                        <TableCell className="py-3 px-4 font-medium">{room.name}</TableCell>
+                        <TableCell className="py-3 px-4">{getStatusBadge(room.status)}</TableCell>
+                        <TableCell className="py-3 px-4">
+                          <div className="flex items-center">
                             <Users className="h-4 w-4 mr-1 text-gray-500" />
                             {room.capacity}
                           </div>
                         </TableCell>
-                        <TableCell className="text-right">
-                          <div className="opacity-0 group-hover:opacity-100 flex justify-end gap-2 transition-opacity">
+                        <TableCell className="py-3 px-4 text-right">
+                          <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Button
                               variant="ghost"
-                              size="icon"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                               onClick={() => handleViewRoom(room)}
-                              className="h-8 w-8 text-slate-600 hover:text-slate-900"
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
-                              size="icon"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
                               onClick={() => handleEditRoom(room)}
-                              className="h-8 w-8 text-slate-600 hover:text-slate-900"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
-                              size="icon"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
                               onClick={() => handleDeleteRoom(room)}
-                              className="h-8 w-8 text-red-600 hover:text-red-900"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

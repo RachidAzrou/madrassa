@@ -393,15 +393,18 @@ export default function Admissions() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
-          <div className="flex items-center gap-4 mb-2 md:mb-0">
-            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
-              <FileText className="h-7 w-7" />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Aanmeldingen</h1>
-              <p className="text-base text-gray-500 mt-1">Beoordeel en verwerk studentaanmeldingen en toelatingen</p>
+      {/* Page header */}
+      <div className="mb-8">
+        <div className="rounded-lg overflow-hidden shadow-sm">
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] p-6">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <FileText className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">Aanmeldingen</h1>
+                <p className="text-base text-blue-100 mt-1">Beoordeel en verwerk studentaanmeldingen en toelatingen</p>
+              </div>
             </div>
           </div>
         </div>

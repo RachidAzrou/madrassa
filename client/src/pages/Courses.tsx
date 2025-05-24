@@ -777,7 +777,7 @@ export default function Courses() {
           setIsEditDialogOpen(false);
         }
       }}>
-        <DialogContent className="sm:max-w-[95vw] md:max-w-[85vw] lg:max-w-[80vw] xl:max-w-[75vw] sm:h-[85vh] p-0 gap-0 bg-white overflow-hidden">
+        <DialogContent className="sm:max-w-[95vw] md:max-w-[85vw] lg:max-w-[80vw] xl:max-w-[75vw] sm:h-[85vh] p-0 gap-0 bg-white overflow-hidden [&>button>svg]:text-white">
           <DialogHeader className="p-6 border-b bg-gradient-to-r from-[#1e3a8a] to-[#4268c7] text-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

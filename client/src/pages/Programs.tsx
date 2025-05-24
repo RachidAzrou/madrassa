@@ -588,26 +588,7 @@ export default function Programs() {
                         </Select>
                       </div>
                       
-                      <div className="space-y-2">
-                        <Label htmlFor="department" className="text-xs font-medium text-gray-700">
-                          Afdeling
-                        </Label>
-                        <Select
-                          value={programFormData.department || ""}
-                          onValueChange={(value) => setProgramFormData({ ...programFormData, department: value })}
-                        >
-                          <SelectTrigger id="department" className="mt-1 h-9 text-sm bg-white border-gray-200">
-                            <SelectValue placeholder="Selecteer afdeling" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="islamitisch">Islamitisch</SelectItem>
-                            <SelectItem value="arabisch">Arabisch</SelectItem>
-                            <SelectItem value="taalencultuur">Taal & Cultuur</SelectItem>
-                            <SelectItem value="wiskunde">Wiskunde</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
+
                       <div className="col-span-1 md:col-span-2">
                         <Label htmlFor="description" className="text-xs font-medium text-gray-700">
                           Beschrijving

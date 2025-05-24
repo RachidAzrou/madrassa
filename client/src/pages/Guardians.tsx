@@ -81,6 +81,7 @@ export default function Guardians() {
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<StudentType | null>(null);
+  const [guardianToDelete, setGuardianToDelete] = useState<GuardianType | null>(null);
   
   const initialNewGuardian = {
     firstName: '',
@@ -382,24 +383,48 @@ export default function Guardians() {
     }
   };
   
-  // Handle delete single guardian
-  const handleDelete = (guardian: GuardianType) => {
-    // Bij het verwijderen hoeven we de guardian alleen in te stellen voor het verwijdervenster
-    // We tonen niet eerst de details, maar alleen het verwijdervenster
-    setSelectedGuardian(guardian);
-    setIsDeleteDialogOpen(true);
+  // Nieuwe functie voor het openen van het verwijderdialoog
+  const openDeleteConfirmation = (guardian: GuardianType) => {
+    // Eerst controleren of er andere dialogen open zijn en deze sluiten
+    setSelectedStudent(null);
+    setSelectedGuardian(null);
+    
+    // Kort timeout om te zorgen dat eventuele andere dialogen eerst sluiten
+    setTimeout(() => {
+      // Daarna de voogd instellen voor verwijdering
+      setGuardianToDelete(guardian);
+      setIsDeleteDialogOpen(true);
+    }, 50);
   };
   
+  // Nieuwe functie voor het verwijderen van een voogd
+  const executeDelete = () => {
+    if (guardianToDelete) {
+      // API-aanroep om voogd te verwijderen
+      deleteGuardianMutation.mutate(guardianToDelete.id, {
+        onSuccess: () => {
+          // Succes afhandeling
+          toast({
+            title: "Voogd verwijderd",
+            description: `${guardianToDelete.firstName} ${guardianToDelete.lastName} is succesvol verwijderd.`,
+          });
+          // Reset state
+          setIsDeleteDialogOpen(false);
+          setGuardianToDelete(null);
+        }
+      });
+    }
+  };
+  
+  // Functie voor het annuleren van verwijdering
+  const cancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+    setGuardianToDelete(null);
+  };
+  
+  // Functie voor het tonen van studentdetails
   const handleShowStudentDetails = (student: StudentType) => {
     setSelectedStudent(student);
-  };
-  
-  const confirmDelete = () => {
-    if (selectedGuardian) {
-      deleteGuardianMutation.mutate(selectedGuardian.id);
-      setIsDeleteDialogOpen(false);
-      setSelectedGuardian(null);
-    }
   };
   
   // Render
@@ -638,7 +663,7 @@ export default function Guardians() {
                           variant="ghost"
                           size="sm"
                           className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
-                          onClick={() => handleDelete(guardian)}
+                          onClick={() => openDeleteConfirmation(guardian)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -1131,7 +1156,7 @@ export default function Guardians() {
             </Button>
             <Button
               variant="destructive"
-              onClick={confirmDelete}
+              onClick={executeDelete}
             >
               Verwijderen
             </Button>
@@ -1503,7 +1528,7 @@ export default function Guardians() {
         </DialogContent>
       </Dialog>
       {/* Nieuwe verwijderbevestiging - volledig nieuw ontwerp */}
-      {isDeleteDialogOpen && selectedGuardian && (
+      {isDeleteDialogOpen && guardianToDelete && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md overflow-hidden transform transition-all">
             <div className="bg-red-50 p-4 flex gap-3 items-start">
@@ -1524,8 +1549,8 @@ export default function Guardians() {
                   <UserCheck className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900">{selectedGuardian.firstName} {selectedGuardian.lastName}</h4>
-                  <p className="text-sm text-gray-600">{getRelationshipLabel(selectedGuardian.relationship)}</p>
+                  <h4 className="font-medium text-gray-900">{guardianToDelete.firstName} {guardianToDelete.lastName}</h4>
+                  <p className="text-sm text-gray-600">{getRelationshipLabel(guardianToDelete.relationship)}</p>
                 </div>
               </div>
             </div>
@@ -1534,14 +1559,14 @@ export default function Guardians() {
               <button 
                 type="button"
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                onClick={() => setIsDeleteDialogOpen(false)}
+                onClick={cancelDelete}
               >
                 Annuleren
               </button>
               <button
                 type="button"
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center"
-                onClick={confirmDelete}
+                onClick={executeDelete}
                 disabled={deleteGuardianMutation.isPending}
               >
                 {deleteGuardianMutation.isPending ? (

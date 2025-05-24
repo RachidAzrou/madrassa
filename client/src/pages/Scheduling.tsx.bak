@@ -687,7 +687,7 @@ export default function Scheduling() {
       </Tabs>
       {/* Planning Toevoegen Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[85%] p-0 h-[85vh] max-h-[85vh]">
+        <DialogContent className="sm:max-w-[85%] p-0 h-[85vh] max-h-[85vh] overflow-hidden">
           <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -1083,7 +1083,6 @@ export default function Scheduling() {
               </Button>
             </DialogFooter>
           </form>
-          </div>
         </DialogContent>
       </Dialog>
     </div>

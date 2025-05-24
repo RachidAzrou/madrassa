@@ -111,6 +111,6 @@ div[role="dialog"] footer {
 }
 
 /* Verberg de automatische sluitknop in dialoogvensters */
-div[role="dialog"] [data-radix-dialog-close] {
+button[data-radix-collection-item] {
   display: none !important;
 }

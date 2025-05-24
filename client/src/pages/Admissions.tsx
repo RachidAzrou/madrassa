@@ -459,10 +459,7 @@ export default function Admissions() {
         </div>
       </div>
       
-      <div className="mb-4">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-xl font-semibold text-gray-800">Aanmeldingen</div>
-          
+      <div className="mb-4 flex justify-end">
           <Button 
             onClick={handleAddApplicant} 
             variant="default" 
@@ -472,7 +469,6 @@ export default function Admissions() {
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Nieuwe Aanmelding</span>
           </Button>
-        </div>
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">

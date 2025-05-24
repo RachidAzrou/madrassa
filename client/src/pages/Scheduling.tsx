@@ -554,16 +554,6 @@ export default function Scheduling() {
       </div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-          <TabsList className="grid grid-cols-2 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
-            <TabsTrigger value="instructor-schedule" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-              <Users className="h-4 w-4" />
-              <span>Docentenrooster</span>
-            </TabsTrigger>
-            <TabsTrigger value="room-allocation" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-              <Building className="h-4 w-4" />
-              <span>Lokalenbeheer</span>
-            </TabsTrigger>
-          </TabsList>
         </div>
         
         <TabsContent value="room-allocation">

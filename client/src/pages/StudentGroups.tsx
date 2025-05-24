@@ -448,74 +448,68 @@ export default function StudentGroups() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {studentGroups.map((group: any) => (
-                  <Card key={group.id} className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-lg font-semibold">{group.name}</CardTitle>
-                          <CardDescription className="text-sm text-gray-500">
-                            {group.academicYear}
-                          </CardDescription>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEditStudentGroup(group)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              <span>Bewerken</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleDeleteStudentGroup(group)}
-                              className="text-red-600 focus:text-red-600">
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              <span>Verwijderen</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-gray-500">Capaciteit:</span>
-                          <span className="font-medium">{group.maxCapacity || 'Onbeperkt'}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-gray-500">Ingeschreven:</span>
-                          <span className="font-medium">{group.enrolledCount || 0} studenten</span>
-                        </div>
-                        {group.instructor && (
-                          <div className="flex justify-between items-center text-sm">
-                            <span className="text-gray-500">Docent:</span>
-                            <span className="font-medium">{group.instructor}</span>
-                          </div>
-                        )}
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-gray-500">Status:</span>
+              <div className="rounded-md border overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-slate-50 text-slate-700">
+                    <tr>
+                      <th className="py-3 px-4 text-left font-medium text-sm">KLAS</th>
+                      <th className="py-3 px-4 text-left font-medium text-sm">TITULARIS</th>
+                      <th className="py-3 px-4 text-left font-medium text-sm">STATUS</th>
+                      <th className="py-3 px-4 text-right font-medium text-sm">
+                        <span className="sr-only">ACTIES</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 bg-white">
+                    {studentGroups.map((group: any) => (
+                      <tr key={group.id} className="group hover:bg-slate-50">
+                        <td className="p-4 text-sm">
+                          <div className="font-medium text-slate-900">{group.name}</div>
+                          <div className="text-slate-500 text-xs">{group.academicYear} • {group.enrolledCount || 0} studenten</div>
+                        </td>
+                        <td className="p-4 text-sm text-slate-700">
+                          {group.instructor || "-"}
+                        </td>
+                        <td className="p-4 text-sm">
                           <Badge variant={group.isActive ? "default" : "outline"} className={group.isActive ? "bg-green-100 text-green-800 hover:bg-green-100" : "text-gray-500"}>
                             {group.isActive ? "Actief" : "Inactief"}
                           </Badge>
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Button 
-                        variant="outline" 
-                        className="w-full text-primary hover:bg-primary/5 border-primary/20"
-                        onClick={() => handleEditStudentGroup(group)}
-                      >
-                        <Eye className="mr-2 h-4 w-4" />
-                        <span>Details bekijken</span>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                ))}
+                        </td>
+                        <td className="p-4 text-sm text-right">
+                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 w-8 p-0 text-blue-600"
+                              onClick={() => handleEditStudentGroup(group)}
+                            >
+                              <Eye className="h-4 w-4" />
+                              <span className="sr-only">Details bekijken</span>
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 w-8 p-0 text-slate-600"
+                              onClick={() => handleEditStudentGroup(group)}
+                            >
+                              <Edit className="h-4 w-4" />
+                              <span className="sr-only">Bewerken</span>
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 w-8 p-0 text-red-600"
+                              onClick={() => handleDeleteStudentGroup(group)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Verwijderen</span>
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
 
               {/* Pagination */}

@@ -823,7 +823,7 @@ export default function Courses() {
             )}
             
             <div className="border-b border-gray-200 pb-4 mb-4">
-              <h3 className="text-md font-medium mb-4">Vak informatie</h3>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Naam *</Label>

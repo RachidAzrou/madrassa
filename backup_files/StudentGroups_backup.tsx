@@ -157,7 +157,6 @@ export default function StudentGroups() {
         description: 'De klas is succesvol aangemaakt in het systeem.',
       });
       setIsAddDialogOpen(false);
-      setIsDialogOpen(false);
       form.reset();
       queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
     },
@@ -196,7 +195,6 @@ export default function StudentGroups() {
         description: 'De klas is succesvol bijgewerkt in het systeem.',
       });
       setIsEditDialogOpen(false);
-      setIsDialogOpen(false);
       setSelectedGroup(null);
       queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
     },
@@ -415,153 +413,187 @@ export default function StudentGroups() {
                   </CardHeader>
                   <CardContent>
                     <div className="h-4 bg-gray-200 rounded w-full mb-3"></div>
-                    <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                    <div className="h-4 bg-gray-200 rounded w-5/6 mb-3"></div>
+                    <div className="flex -space-x-2 mt-4">
+                      {Array(3).fill(null).map((_, j) => (
+                        <div key={j} className="h-8 w-8 rounded-full bg-gray-200 border-2 border-white"></div>
+                      ))}
+                    </div>
                   </CardContent>
-                  <CardFooter>
-                    <div className="h-8 bg-gray-200 rounded w-full"></div>
+                  <CardFooter className="border-t pt-4">
+                    <div className="h-6 bg-gray-200 rounded w-1/3"></div>
                   </CardFooter>
                 </Card>
               ))}
             </div>
           ) : isError ? (
             <div className="text-center py-10">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
-                <AlertTriangle className="h-8 w-8 text-red-600" />
+              <div className="bg-red-50 inline-flex rounded-full p-4 mb-4">
+                <XCircle className="h-6 w-6 text-red-500" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Fout bij laden</h3>
-              <p className="text-gray-500 mb-4">Er is een fout opgetreden bij het laden van de klassen. Probeer de pagina te vernieuwen.</p>
-              <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] })}>
+              <h3 className="text-lg font-medium">Fout bij ophalen van klassen</h3>
+              <p className="text-gray-500 mt-2 max-w-md mx-auto">
+                Er is een probleem opgetreden bij het laden van de klassen. Probeer de pagina te vernieuwen of neem contact op met de beheerder.
+              </p>
+              <Button variant="outline" className="mt-4" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] })}>
                 Opnieuw proberen
               </Button>
             </div>
           ) : studentGroups.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
-                <ChalkBoard className="h-8 w-8 text-blue-600" />
+            <div className="text-center py-10 bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+              <div className="bg-blue-50 inline-flex rounded-full p-4 mb-4">
+                <ChalkBoard className="h-6 w-6 text-blue-500" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Geen klassen gevonden</h3>
-              <p className="text-gray-500 mb-6 max-w-md mx-auto">
-                {searchTerm 
-                  ? `Er zijn geen klassen gevonden die overeenkomen met "${searchTerm}". Probeer een andere zoekopdracht.` 
-                  : 'Er zijn nog geen klassen aangemaakt. Klik op de knop hieronder om je eerste klas toe te voegen.'}
+              <h3 className="text-lg font-medium">Geen klassen gevonden</h3>
+              <p className="text-gray-500 mt-2 max-w-md mx-auto">
+                {searchTerm || academicYear !== 'all' || program !== 'all' 
+                  ? 'Er zijn geen klassen gevonden die aan je zoekcriteria voldoen. Pas je filters aan of maak een nieuwe klas aan.' 
+                  : 'Er zijn nog geen klassen aangemaakt in het systeem. Klik op de knop hieronder om je eerste klas aan te maken.'}
               </p>
-              <Button onClick={handleAddStudentGroup} className="flex items-center gap-2">
-                <PlusCircle className="h-4 w-4" />
-                <span>Klas Aanmaken</span>
+              <Button className="mt-4 bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white" onClick={handleAddStudentGroup}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Klas Aanmaken
               </Button>
             </div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {studentGroups.map((group: any) => (
-                  <Card key={group.id} className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <Card key={group.id} className="hover:shadow-md transition-shadow">
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-start">
                         <div>
-                          <CardTitle className="text-lg font-semibold">{group.name}</CardTitle>
-                          <CardDescription className="text-sm text-gray-500">
-                            {group.academicYear}
+                          <CardTitle className="text-lg">{group.name}</CardTitle>
+                          <CardDescription>
+                            {group.academicYear} {group.programName && `• ${group.programName}`}
                           </CardDescription>
                         </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleEditStudentGroup(group)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              <span>Bewerken</span>
+                              <Pencil className="mr-2 h-4 w-4" />
+                              Bewerken
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleDeleteStudentGroup(group)}
-                              className="text-red-600 focus:text-red-600">
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => handleDeleteStudentGroup(group)}
+                            >
                               <Trash2 className="mr-2 h-4 w-4" />
-                              <span>Verwijderen</span>
+                              Verwijderen
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-gray-500">Capaciteit:</span>
-                          <span className="font-medium">{group.maxCapacity || 'Onbeperkt'}</span>
+                      <div className="text-sm text-gray-500 mb-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <GraduationCap className="h-4 w-4 text-gray-400" />
+                          <span>{group.instructor || "Geen hoofddocent toegewezen"}</span>
                         </div>
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-gray-500">Ingeschreven:</span>
-                          <span className="font-medium">{group.enrolledCount || 0} studenten</span>
-                        </div>
-                        {group.instructor && (
-                          <div className="flex justify-between items-center text-sm">
-                            <span className="text-gray-500">Docent:</span>
-                            <span className="font-medium">{group.instructor}</span>
-                          </div>
-                        )}
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-gray-500">Status:</span>
-                          <Badge variant={group.isActive ? "default" : "outline"} className={group.isActive ? "bg-green-100 text-green-800 hover:bg-green-100" : "text-gray-500"}>
-                            {group.isActive ? "Actief" : "Inactief"}
-                          </Badge>
+                        <div className="flex items-center gap-2">
+                          <UsersRound className="h-4 w-4 text-gray-400" />
+                          <span>{group.enrollmentCount || 0} student{group.enrollmentCount !== 1 ? 'en' : ''}</span>
+                          {group.maxCapacity && (
+                            <span className="text-xs text-gray-400">
+                              (max: {group.maxCapacity})
+                            </span>
+                          )}
                         </div>
                       </div>
+                      
+                      {/* Student avatars */}
+                      <div className="flex -space-x-2 mt-4">
+                        {/* Toon avatars of fallback wanneer er geen studenten zijn */}
+                        {Array(Math.min(group.enrollmentCount || 0, 3)).fill(null).map((_, i) => (
+                          <Avatar key={i} className="border-2 border-white">
+                            <AvatarFallback className="bg-blue-100 text-blue-800 text-xs">
+                              S{i+1}
+                            </AvatarFallback>
+                          </Avatar>
+                        ))}
+                        {group.enrollmentCount > 3 && (
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 border-2 border-white text-xs font-medium text-gray-600">
+                            +{group.enrollmentCount - 3}
+                          </div>
+                        )}
+                        {group.enrollmentCount === 0 && (
+                          <div className="text-xs text-gray-400 mt-1">Nog geen studenten ingeschreven</div>
+                        )}
+                      </div>
                     </CardContent>
-                    <CardFooter>
-                      <Button 
-                        variant="outline" 
-                        className="w-full text-primary hover:bg-primary/5 border-primary/20"
-                        onClick={() => handleEditStudentGroup(group)}
-                      >
-                        <Eye className="mr-2 h-4 w-4" />
-                        <span>Details bekijken</span>
+                    <CardFooter className="border-t pt-3 flex justify-between">
+                      <Badge variant={group.isActive ? "default" : "secondary"}>
+                        {group.isActive ? "Actief" : "Inactief"}
+                      </Badge>
+                      <Button variant="ghost" size="sm" className="gap-1" onClick={() => handleEditStudentGroup(group)}>
+                        <Eye className="h-4 w-4" />
+                        Details
                       </Button>
                     </CardFooter>
                   </Card>
                 ))}
               </div>
-
-              {/* Pagination */}
+              
               {totalPages > 1 && (
-                <div className="flex justify-center mt-6">
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious 
-                          onClick={() => handlePageChange(Math.max(1, currentPage - 1))} 
-                          className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                        />
+                <Pagination className="mt-6">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        href="#" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (currentPage > 1) handlePageChange(currentPage - 1);
+                        }}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: totalPages }).map((_, i) => (
+                      <PaginationItem key={i}>
+                        <PaginationLink 
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePageChange(i + 1);
+                          }}
+                          isActive={currentPage === i + 1}
+                        >
+                          {i + 1}
+                        </PaginationLink>
                       </PaginationItem>
-                      
-                      {Array.from({ length: totalPages }).map((_, i) => (
-                        <PaginationItem key={i}>
-                          <PaginationLink 
-                            isActive={currentPage === i + 1}
-                            onClick={() => handlePageChange(i + 1)}
-                          >
-                            {i + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-                      
-                      <PaginationItem>
-                        <PaginationNext 
-                          onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))} 
-                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                </div>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext 
+                        href="#" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (currentPage < totalPages) handlePageChange(currentPage + 1);
+                        }}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
               )}
             </>
           )}
         </TabsContent>
       </Tabs>
 
-      {/* Add/Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      {/* Add/Edit dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          setIsAddDialogOpen(false);
+          setIsEditDialogOpen(false);
+          setIsDialogOpen(false);
+        }
+      }}>
         <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
           {/* Blauwe header */}
           <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
@@ -597,8 +629,7 @@ export default function StudentGroups() {
               </Button>
             </div>
           </div>
-          
-          <div className="px-6 py-4">
+          <div className="px-6 py-4 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 130px)' }}>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <Tabs defaultValue="algemeen" className="w-full">
@@ -691,279 +722,142 @@ export default function StudentGroups() {
                               </FormControl>
                               <FormMessage />
                             </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="programId"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-xs font-medium text-gray-700">Opleiding</FormLabel>
-                              <Select
-                                onValueChange={(value) => field.onChange(parseInt(value))}
-                                value={field.value?.toString()}
-                              >
-                                <FormControl>
-                                  <SelectTrigger className="mt-1 h-9 text-sm bg-white border-gray-200">
-                                    <SelectValue placeholder="Selecteer opleiding" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {programs.map((program: any) => (
-                                    <SelectItem key={program.id} value={program.id.toString()}>
-                                      {program.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="instructor"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-xs font-medium text-gray-700">Hoofddocent</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="Naam van hoofddocent"
-                                  {...field}
-                                  className="mt-1 h-9 text-sm bg-white border-gray-200"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="isActive"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm mt-4">
-                              <div className="space-y-0.5">
-                                <FormLabel className="text-xs font-medium text-gray-700">Actieve Status</FormLabel>
-                                <FormDescription className="text-xs">
-                                  Bepaalt of deze klas actief is in het systeem
-                                </FormDescription>
-                              </div>
-                              <FormControl>
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        <div className="col-span-1 md:col-span-2">
-                          <FormField
-                            control={form.control}
-                            name="description"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-xs font-medium text-gray-700">Beschrijving</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Voeg een beschrijving toe..."
-                                    className="resize-none text-sm bg-white border-gray-200"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  {/* Studenten tabblad */}
-                  <TabsContent value="studenten" className="mt-0">
-                    <div className="p-4 bg-white rounded-lg min-h-[450px]">
-                      <div className="flex flex-col gap-4">
-                        <div className="flex justify-between items-center">
-                          <h3 className="text-lg font-medium">Ingeschreven Studenten</h3>
-                          <Button 
-                            variant="outline" 
-                            className="flex items-center text-sm"
-                            disabled={!isEditDialogOpen}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              // Hier zou je een functie kunnen aanroepen om studenten toe te voegen
-                              toast({
-                                title: "Info",
-                                description: "Eerst de klas opslaan voordat studenten kunnen worden toegevoegd."
-                              });
-                            }}
-                          >
-                            <Plus className="mr-1 h-4 w-4" />
-                            <span>Studenten Toevoegen</span>
-                          </Button>
-                        </div>
-                        
-                        {!isEditDialogOpen ? (
-                          <div className="text-center p-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                            <Users2 className="mx-auto h-10 w-10 text-gray-400 mb-3" />
-                            <h3 className="text-sm font-medium text-gray-700 mb-1">Nog geen studenten ingeschreven</h3>
-                            <p className="text-xs text-gray-500">Sla de klas eerst op voordat je studenten kunt toevoegen.</p>
-                          </div>
-                        ) : (
-                          <ManageStudentEnrollments groupId={selectedGroup?.id} />
                         )}
-                      </div>
-                    </div>
-                  </TabsContent>
-                  
-                  {/* Docenten tabblad */}
-                  <TabsContent value="docenten" className="mt-0">
-                    <div className="p-4 bg-white rounded-lg min-h-[450px]">
-                      <div className="text-center p-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                        <GraduationCap className="mx-auto h-10 w-10 text-gray-400 mb-3" />
-                        <h3 className="text-sm font-medium text-gray-700 mb-1">Docenttoewijzingen</h3>
-                        <p className="text-xs text-gray-500">Docenten kunnen worden toegewezen nadat de klas is aangemaakt.</p>
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  {/* Vakken tabblad */}
-                  <TabsContent value="vakken" className="mt-0">
-                    <div className="p-4 bg-white rounded-lg min-h-[450px]">
+                      />
                       <FormField
                         control={form.control}
-                        name="courseId"
+                        name="instructor"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs font-medium text-gray-700">Hoofd Vak</FormLabel>
-                            <Select
-                              onValueChange={(value) => field.onChange(parseInt(value))}
-                              value={field.value?.toString()}
-                            >
-                              <FormControl>
-                                <SelectTrigger className="mt-1 h-9 text-sm bg-white border-gray-200">
-                                  <SelectValue placeholder="Selecteer hoofdvak" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {courses.map((course: any) => (
-                                  <SelectItem key={course.id} value={course.id.toString()}>
-                                    {course.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormDescription className="text-xs">
-                              Het primaire vak dat aan deze klas wordt onderwezen
-                            </FormDescription>
+                            <FormLabel>Hoofddocent</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Naam van hoofddocent" {...field} />
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      
-                      <div className="mt-8">
-                        <h3 className="text-sm font-medium text-gray-700 mb-3">Aanvullende Vakken</h3>
-                        <div className="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                          <BookOpen className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                          <p className="text-xs text-gray-500">Aanvullende vakken kunnen worden toegewezen nadat de klas is aangemaakt.</p>
-                        </div>
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem className="col-span-2">
+                            <FormLabel>Beschrijving</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Geef een beschrijving van de klas en doelstellingen"
+                                className="min-h-24"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                            <div className="space-y-0.5">
+                              <FormLabel>Status Actief</FormLabel>
+                              <FormDescription>
+                                Als dit niet actief is, kan de klas niet worden gebruikt voor nieuwe inschrijvingen.
+                              </FormDescription>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </TabsContent>
+
+                  {/* Studenten tabblad */}
+                  <TabsContent value="studenten" className="pt-4">
+                    {isEditDialogOpen && selectedGroup ? (
+                      <ManageStudentEnrollments groupId={selectedGroup.id} />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center p-8 text-center">
+                        <p className="text-gray-500 mb-2">
+                          Sla de klas eerst op om studenten toe te kunnen wijzen.
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          Na het aanmaken kun je vanuit het bewerkscherm studenten toewijzen.
+                        </p>
                       </div>
+                    )}
+                  </TabsContent>
+
+                  {/* Docenten tabblad */}
+                  <TabsContent value="docenten" className="pt-4">
+                    <div className="flex flex-col items-center justify-center p-8 text-center">
+                      <p className="text-gray-500 mb-2">
+                        Sla de klas eerst op om docenten toe te kunnen wijzen.
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Na het aanmaken kun je vanuit het bewerkscherm docenten toewijzen.
+                      </p>
+                    </div>
+                  </TabsContent>
+
+                  {/* Vakken tabblad */}
+                  <TabsContent value="vakken" className="pt-4">
+                    <FormField
+                      control={form.control}
+                      name="courseId"
+                      render={({ field }) => (
+                        <FormItem className="mb-4">
+                          <FormLabel>Hoofdvak</FormLabel>
+                          <Select 
+                            onValueChange={(value) => field.onChange(Number(value))}
+                            value={field.value?.toString()}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecteer hoofdvak" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {courses.map((course) => (
+                                <SelectItem key={course.id} value={course.id.toString()}>
+                                  {course.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex flex-col items-center justify-center p-4 text-center">
+                      <p className="text-gray-500 mb-2">
+                        Sla de klas eerst op om meer vakken toe te kunnen wijzen.
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Na het aanmaken kun je vanuit het bewerkscherm meerdere vakken toewijzen.
+                      </p>
                     </div>
                   </TabsContent>
 
                   {/* Planning tabblad */}
-                  <TabsContent value="planning" className="mt-0">
-                    <div className="p-4 bg-white rounded-lg min-h-[450px]">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="startDate"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-col">
-                              <FormLabel className="text-xs font-medium text-gray-700">Startdatum</FormLabel>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <FormControl>
-                                    <Button
-                                      variant={"outline"}
-                                      className={cn(
-                                        "pl-3 text-left font-normal mt-1 h-9 text-sm bg-white border-gray-200",
-                                        !field.value && "text-muted-foreground"
-                                      )}
-                                    >
-                                      {field.value ? (
-                                        format(field.value, "dd-MM-yyyy")
-                                      ) : (
-                                        <span>Selecteer datum</span>
-                                      )}
-                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                    </Button>
-                                  </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                  <Calendar
-                                    mode="single"
-                                    selected={field.value}
-                                    onSelect={field.onChange}
-                                    initialFocus
-                                  />
-                                </PopoverContent>
-                              </Popover>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="endDate"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-col">
-                              <FormLabel className="text-xs font-medium text-gray-700">Einddatum</FormLabel>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <FormControl>
-                                    <Button
-                                      variant={"outline"}
-                                      className={cn(
-                                        "pl-3 text-left font-normal mt-1 h-9 text-sm bg-white border-gray-200",
-                                        !field.value && "text-muted-foreground"
-                                      )}
-                                    >
-                                      {field.value ? (
-                                        format(field.value, "dd-MM-yyyy")
-                                      ) : (
-                                        <span>Selecteer datum</span>
-                                      )}
-                                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                    </Button>
-                                  </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                  <Calendar
-                                    mode="single"
-                                    selected={field.value}
-                                    onSelect={field.onChange}
-                                    initialFocus
-                                  />
-                                </PopoverContent>
-                              </Popover>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      
-                      <div className="mt-8">
-                        <h3 className="text-sm font-medium text-gray-700 mb-3">Lesroosters</h3>
-                        <div className="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                          <CalendarIcon className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                          <p className="text-xs text-gray-500">Lesroosters kunnen worden ingesteld nadat de klas is aangemaakt.</p>
-                        </div>
-                      </div>
+                  <TabsContent value="planning" className="pt-4">
+                    <div className="flex flex-col items-center justify-center p-8 text-center">
+                      <p className="text-gray-500 mb-2">
+                        Sla de klas eerst op om planning toe te kunnen voegen.
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Na het aanmaken kun je vanuit het bewerkscherm planningen toevoegen.
+                      </p>
                     </div>
                   </TabsContent>
                 </Tabs>
+
+
               </form>
             </Form>
           </div>
@@ -972,8 +866,7 @@ export default function StudentGroups() {
               type="button"
               variant="outline" 
               onClick={() => {
-                setIsAddDialogOpen(false);
-                setIsEditDialogOpen(false);
+                isEditDialogOpen ? setIsEditDialogOpen(false) : setIsAddDialogOpen(false);
                 setIsDialogOpen(false);
               }}
               className="border-gray-300"
@@ -997,32 +890,68 @@ export default function StudentGroups() {
 
       {/* Delete confirmation dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent className="max-w-md">
-          <AlertDialogHeader>
-            <div className="flex items-center gap-3 text-red-600">
-              <AlertTriangle className="h-5 w-5" />
-              <AlertDialogTitle>Klas verwijderen</AlertDialogTitle>
+        <AlertDialogContent className="max-w-md p-0 gap-0 bg-white overflow-hidden">
+          <div className="p-6 border-b">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Trash2 className="h-5 w-5 text-red-500" />
+                <AlertDialogTitle className="text-xl m-0">Klas verwijderen</AlertDialogTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsDeleteDialogOpen(false)}
+                className="h-8 w-8 rounded-full p-0 text-gray-400 hover:text-gray-500"
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Sluiten</span>
+              </Button>
             </div>
-            <AlertDialogDescription>
-              Weet je zeker dat je deze klas wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            <AlertDialogDescription className="text-gray-500 mt-2">
+              Weet je zeker dat je deze klas wilt verwijderen?
+              Deze actie kan niet ongedaan worden gemaakt.
             </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="px-6 py-3 text-sm border-t border-b border-gray-100 bg-gray-50 my-2">
-            <p className="font-medium mb-1">{selectedGroup?.name}</p>
-            <p className="text-gray-500">{selectedGroup?.academicYear}</p>
+            
+            {selectedGroup && (
+              <div className="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-red-100 p-2 rounded-full">
+                    <Trash2 className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-red-800">
+                      Alle inschrijvingen en roosters gekoppeld aan deze klas worden ook verwijderd.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuleren</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => selectedGroup && deleteStudentGroupMutation.mutate(selectedGroup.id)}
-              className="bg-red-600 hover:bg-red-700 text-white"
+          
+          <div className="p-4 border-t flex justify-end gap-3 bg-gray-50">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Annuleren
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (selectedGroup) {
+                  deleteStudentGroupMutation.mutate(selectedGroup.id);
+                }
+              }}
+              className="gap-1"
+              disabled={deleteStudentGroupMutation.isPending}
             >
               {deleteStudentGroupMutation.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
+              <Trash2 className="h-4 w-4 mr-1" />
               Verwijderen
-            </AlertDialogAction>
-          </AlertDialogFooter>
+            </Button>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </div>

@@ -1490,60 +1490,73 @@ export default function Guardians() {
           </form>
         </DialogContent>
       </Dialog>
-      {/* Nieuwe verwijderbevestiging - volledig nieuw ontwerp */}
+      {/* Nieuwe verwijderbevestiging - aansluitend bij app UI stijl */}
       {isDeleteDialogOpen && guardianToDelete && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md overflow-hidden transform transition-all">
-            <div className="bg-red-50 p-4 flex gap-3 items-start">
-              <div className="rounded-full bg-red-100 p-2 flex-shrink-0">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-gray-900">Voogd verwijderen</h3>
-                <p className="mt-1 text-sm text-gray-600">
-                  Weet je zeker dat je deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-                </p>
-              </div>
-            </div>
-            
-            <div className="p-4 border-t border-gray-100">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="bg-blue-100 rounded-full p-2 flex-shrink-0">
-                  <UserCheck className="h-5 w-5 text-blue-600" />
+            <div className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-6">
+              <div className="flex items-center gap-6">
+                <div className="bg-white/20 rounded-full p-3">
+                  <AlertTriangle className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900">{guardianToDelete.firstName} {guardianToDelete.lastName}</h4>
-                  <p className="text-sm text-gray-600">{getRelationshipLabel(guardianToDelete.relationship)}</p>
+                  <h3 className="text-xl font-bold text-white mb-1.5">Voogd verwijderen</h3>
+                  <p className="text-red-100 text-sm">
+                    Weet u zeker dat u deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+                  </p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-gray-50 px-4 py-3 flex justify-end gap-2">
-              <button 
-                type="button"
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            <div className="p-5">
+              <div className="flex items-center gap-2 mb-5 bg-red-50 p-3 rounded-md border border-red-200">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+                <p className="text-sm text-red-600">Alle koppelingen met studenten worden ook verwijderd.</p>
+              </div>
+              
+              <div className="flex items-center space-x-3 mb-2 bg-gray-50 p-4 rounded-md border border-gray-100">
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-primary text-white text-xs">
+                    {guardianToDelete.firstName.charAt(0)}{guardianToDelete.lastName.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h4 className="font-medium text-gray-900">{guardianToDelete.firstName} {guardianToDelete.lastName}</h4>
+                  <div className="flex items-center mt-1">
+                    <Badge variant="outline" className={`${guardianToDelete.isEmergencyContact ? "bg-red-50 text-red-700 border-red-200" : "bg-blue-50 text-blue-700 border-blue-200"}`}>
+                      {getRelationshipLabel(guardianToDelete.relationship)}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 px-6 py-4 border-t flex justify-end gap-2">
+              <Button
+                variant="outline"
                 onClick={cancelDelete}
+                className="mr-2"
               >
                 Annuleren
-              </button>
-              <button
-                type="button"
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center"
+              </Button>
+              <Button
+                variant="destructive"
                 onClick={executeDelete}
                 disabled={deleteGuardianMutation.isPending}
+                className="gap-2"
               >
                 {deleteGuardianMutation.isPending ? (
                   <>
-                    <div className="h-4 w-4 border-2 border-t-transparent border-white rounded-full animate-spin mr-2"></div>
+                    <div className="h-4 w-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
                     Bezig...
                   </>
                 ) : (
                   <>
-                    <Trash2 className="h-4 w-4 mr-2" />
+                    <Trash2 className="h-4 w-4" />
                     Verwijderen
                   </>
                 )}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

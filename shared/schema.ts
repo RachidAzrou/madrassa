@@ -740,3 +740,25 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
     references: [users.id]
   })
 }));
+
+// Lokalen (Rooms)
+export const rooms = pgTable("rooms", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  capacity: integer("capacity").notNull().default(30),
+  location: text("location").notNull(),
+  status: text("status", { enum: ["available", "occupied", "reserved"] }).notNull().default("available"),
+  currentUse: text("current_use"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertRoomSchema = createInsertSchema(rooms).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertRoom = z.infer<typeof insertRoomSchema>;
+export type Room = typeof rooms.$inferSelect;

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, School, 
   Pencil, MoreVertical, Plus, GraduationCap, BookOpen, UsersRound,
-  CalendarIcon, Loader2, XCircle, Users2, X
+  CalendarIcon, Loader2, XCircle, Users2, X, AlertTriangle
 } from 'lucide-react';
 import ManageStudentEnrollments from "@/components/student-groups/ManageStudentEnrollments";
 // Aangepast ChalkboardTeacher icoon
@@ -686,7 +686,7 @@ export default function StudentGroups() {
           <div className="p-6 border-b">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
+                <Trash2 className="h-5 w-5 text-red-500" />
                 <AlertDialogTitle className="text-xl m-0">Klas verwijderen</AlertDialogTitle>
               </div>
               <Button
@@ -708,7 +708,7 @@ export default function StudentGroups() {
               <div className="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
                 <div className="flex items-center gap-3">
                   <div className="bg-red-100 p-2 rounded-full">
-                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                    <Trash2 className="h-5 w-5 text-red-600" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-red-800">

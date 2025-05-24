@@ -829,23 +829,53 @@ export default function StudentGroups() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel className="text-xs font-medium text-gray-700">Curriculum</FormLabel>
-                              <Select
-                                onValueChange={field.onChange}
-                                value={field.value || undefined}
-                              >
-                                <FormControl>
-                                  <SelectTrigger className="mt-1 h-9 text-sm bg-white border-gray-200">
-                                    <SelectValue placeholder="Selecteer curriculum" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="arabisch">Arabisch</SelectItem>
-                                  <SelectItem value="islamitisch">Islamitisch</SelectItem>
-                                  <SelectItem value="taal">Taal & Cultuur</SelectItem>
-                                  <SelectItem value="wiskunde">Wiskunde</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormDescription className="text-xs">
+                              <div className="space-y-3 mt-2">
+                                <div className="flex items-center space-x-2">
+                                  <input
+                                    type="radio"
+                                    id="arabisch"
+                                    value="arabisch"
+                                    checked={field.value === "arabisch"}
+                                    onChange={() => field.onChange("arabisch")}
+                                    className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                                  />
+                                  <label htmlFor="arabisch" className="text-sm text-gray-700">Arabisch</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <input
+                                    type="radio"
+                                    id="islamitisch"
+                                    value="islamitisch"
+                                    checked={field.value === "islamitisch"}
+                                    onChange={() => field.onChange("islamitisch")}
+                                    className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                                  />
+                                  <label htmlFor="islamitisch" className="text-sm text-gray-700">Islamitisch</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <input
+                                    type="radio"
+                                    id="taal"
+                                    value="taal"
+                                    checked={field.value === "taal"}
+                                    onChange={() => field.onChange("taal")}
+                                    className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                                  />
+                                  <label htmlFor="taal" className="text-sm text-gray-700">Taal & Cultuur</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <input
+                                    type="radio"
+                                    id="wiskunde"
+                                    value="wiskunde"
+                                    checked={field.value === "wiskunde"}
+                                    onChange={() => field.onChange("wiskunde")}
+                                    className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                                  />
+                                  <label htmlFor="wiskunde" className="text-sm text-gray-700">Wiskunde</label>
+                                </div>
+                              </div>
+                              <FormDescription className="text-xs mt-2">
                                 Het curriculum dat deze klas volgt
                               </FormDescription>
                               <FormMessage />

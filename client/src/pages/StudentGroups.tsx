@@ -353,57 +353,6 @@ export default function StudentGroups() {
 
       {/* Main content area */}
       <Tabs defaultValue="grid" className="space-y-4">
-        
-        <div className="student-groups-filters bg-white rounded-lg shadow-sm p-4 border border-gray-200 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Academisch Jaar</label>
-              <Select value={academicYear} onValueChange={handleAcademicYearChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Alle Jaren" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Jaren</SelectItem>
-                  <SelectItem value="2025-2026">2025-2026</SelectItem>
-                  <SelectItem value="2024-2025">2024-2025</SelectItem>
-                  <SelectItem value="2023-2024">2023-2024</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Opleiding</label>
-              <Select value={program} onValueChange={handleProgramChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Alle Opleidingen" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Opleidingen</SelectItem>
-                  {Array.isArray(programs) ? programs.map((program: any) => (
-                    <SelectItem key={program.id} value={program.id.toString()}>
-                      {program.name}
-                    </SelectItem>
-                  )) : null}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-              <Select defaultValue="all" onValueChange={(value) => {
-                // Status filter handler
-                setCurrentPage(1);
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Alle Statussen" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Statussen</SelectItem>
-                  <SelectItem value="active">Actief</SelectItem>
-                  <SelectItem value="inactive">Inactief</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
 
         <TabsContent value="grid" className="space-y-4">
           {isLoading ? (

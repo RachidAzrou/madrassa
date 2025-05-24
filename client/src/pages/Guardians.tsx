@@ -1120,47 +1120,10 @@ export default function Guardians() {
         </DialogContent>
       </Dialog>
 
-      {/* Verwijder dialoog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden">
-          <div className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-6 -mx-6 -mt-6">
-            <div className="flex items-center gap-7 pl-3">
-              <div className="bg-white/20 rounded-full p-3 mt-1">
-                <AlertTriangle className="h-6 w-6 text-white" />
-              </div>
-              <div className="mt-0.5">
-                <DialogTitle className="text-xl font-bold text-white mb-1.5">
-                  Voogd verwijderen
-                </DialogTitle>
-                <DialogDescription className="text-red-100 text-sm">
-                  Weet u zeker dat u deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-                </DialogDescription>
-              </div>
-            </div>
-          </div>
-          
-          <div className="px-6 py-4">
-            <div className="flex items-center gap-2 mb-5 bg-red-50 p-3 rounded-md border border-red-200">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-              <p className="text-sm text-red-600">Alle koppelingen met studenten worden ook verwijderd.</p>
-            </div>
-          </div>
-          
-          <div className="px-6 py-4 border-t bg-gray-50 flex justify-end">
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteDialogOpen(false)}
-              className="mr-2"
-            >
-              Annuleren
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={executeDelete}
-            >
-              Verwijderen
-            </Button>
-          </div>
+      {/* Verwijder dialoog - Deze is leeg, we gebruiken alleen het nieuwe verwijdervenster */}
+      <Dialog open={false} onOpenChange={() => {}}>
+        <DialogContent>
+          <div></div>
         </DialogContent>
       </Dialog>
       

@@ -376,12 +376,8 @@ export default function Rooms() {
       </div>
 
       <div className="space-y-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-[#0e40a1] text-lg font-medium">Lokalen Overzicht</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
+        <Card className="p-6">
+          {isLoading ? (
               <div className="flex justify-center py-8">
                 <span className="loading loading-spinner loading-md"></span>
               </div>
@@ -478,7 +474,6 @@ export default function Rooms() {
                 ))}
               </div>
             )}
-          </CardContent>
         </Card>
       </div>
 

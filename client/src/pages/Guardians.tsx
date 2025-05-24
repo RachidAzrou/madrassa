@@ -158,7 +158,7 @@ export default function Guardians() {
     <div className="container mx-auto px-4 py-8">
       {/* Voogd toevoegen/bewerken dialog */}
       <Dialog open={showNewGuardianDialog} onOpenChange={setShowNewGuardianDialog}>
-        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
+        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0 [&>button[aria-label='Close']]:hidden">
           {/* Blauwe header */}
           <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
             <div className="flex items-center justify-between">
@@ -401,7 +401,7 @@ export default function Guardians() {
       
       {/* Delete bevestiging dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="sm:max-w-md p-0 gap-0 bg-white overflow-hidden">
+        <DialogContent className="sm:max-w-md p-0 gap-0 bg-white overflow-hidden [&>button[aria-label='Close']]:hidden">
           <div className="p-6 border-b">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">

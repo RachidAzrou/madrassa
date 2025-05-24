@@ -427,12 +427,12 @@ export default function Courses() {
         <div className="rounded-md border bg-white">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50 hover:bg-gray-50">
-                <TableHead className="font-medium">Naam</TableHead>
-                <TableHead className="font-medium">Soort</TableHead>
-                <TableHead className="font-medium">Aanmaakdatum</TableHead>
-                <TableHead className="font-medium">Status</TableHead>
-                <TableHead className="text-right font-medium">Acties</TableHead>
+              <TableRow className="bg-blue-50/50 hover:bg-blue-50/50">
+                <TableHead className="h-10 px-2 text-xs font-semibold text-[#1e3a8a]">Naam</TableHead>
+                <TableHead className="h-10 px-2 text-xs font-semibold text-[#1e3a8a]">Soort</TableHead>
+                <TableHead className="h-10 px-2 text-xs font-semibold text-[#1e3a8a]">Aanmaakdatum</TableHead>
+                <TableHead className="h-10 px-2 text-xs font-semibold text-[#1e3a8a]">Status</TableHead>
+                <TableHead className="h-10 px-2 text-xs font-semibold text-[#1e3a8a] text-right">Acties</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

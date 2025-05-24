@@ -308,13 +308,16 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   isActive={location.startsWith("/scheduling")}
                   onClick={handleLinkClick}
                 />
-                <SidebarLink
-                  href="/rooms"
-                  icon={<Building className="h-5 w-5" />}
-                  label="Lokalen"
-                  isActive={location.startsWith("/rooms")}
-                  onClick={handleLinkClick}
-                />
+                <div 
+                  className="flex items-center py-2 px-3 rounded-md text-gray-700 hover:bg-[#1e3a8a]/10 cursor-pointer font-medium"
+                  onClick={() => {
+                    window.location.href = "/rooms";
+                    if (onClose) onClose();
+                  }}
+                >
+                  <School className="h-5 w-5 mr-3 text-gray-500" />
+                  <span>Lokalen Beheer</span>
+                </div>
                 <SidebarLink
                   href="/calendar"
                   icon={<Calendar className="h-5 w-5" />}

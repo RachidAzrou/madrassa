@@ -213,6 +213,27 @@ export default function Dashboard() {
 
 
       {/* Main Content */}
+      {/* Speciale directe link naar Lokalen */}
+      <div className="mb-6 p-4 bg-blue-100 rounded-lg border border-blue-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <Building className="h-6 w-6 mr-2 text-blue-700" />
+            <h3 className="font-medium text-blue-800">Lokalen Beheer</h3>
+          </div>
+          <Button 
+            variant="default"
+            size="sm"
+            onClick={() => window.location.href = "/rooms"}
+            className="bg-blue-700 hover:bg-blue-800"
+          >
+            Ga naar Lokalen
+          </Button>
+        </div>
+        <p className="text-sm text-blue-700 mt-2">
+          Beheer alle lokalen en ruimtes binnen de onderwijsinstelling.
+        </p>
+      </div>
+
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
         {/* Studenten per klas grafiek */}
         <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5">

@@ -614,7 +614,7 @@ export default function Scheduling() {
           <div className="grid grid-cols-1 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl font-semibold leading-none tracking-tight text-[#0e40a1]">Docentenrooster</CardTitle>
+                <CardTitle className="text-2xl font-semibold leading-none tracking-tight text-[#1e3a8a]">Docentenrooster</CardTitle>
                 <div className="flex flex-col gap-3">
                   <Tabs defaultValue="today" className="w-full">
                     <TabsList className="grid grid-cols-3 p-1 bg-[#1e3a8a]/10 rounded-md">
@@ -710,16 +710,6 @@ export default function Scheduling() {
                 onValueChange={setDialogActiveTab} 
                 className="w-full"
               >
-                <TabsList className="grid grid-cols-2 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
-                  <TabsTrigger value="instructor-schedule" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <GraduationCap className="h-4 w-4" />
-                    <span>Docentenrooster</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="room-allocation" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <Building className="h-4 w-4" />
-                    <span>Lokalenverdeling</span>
-                  </TabsTrigger>
-                </TabsList>
               
               {/* Docenten Rooster Tab Content */}
               <TabsContent value="instructor-schedule" className="space-y-4 mt-2">

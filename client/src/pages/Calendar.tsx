@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, 
   FilePlus, GraduationCap, Palmtree, PartyPopper, Pencil, BookOpen, Timer,
-  MapPin, Clock, Search, XCircle, X
+  MapPin, Clock, Search, XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

@@ -18,13 +18,13 @@ import Reports from "@/pages/Reports";
 import Guardians from "@/pages/Guardians";
 import Teachers from "@/pages/Teachers";
 import Admissions from "@/pages/Admissions";
+import Rooms from "@/pages/Rooms";
 import StudentGroups from "@/pages/StudentGroups";
 import Notifications from "@/pages/Notifications";
 import MyAccount from "@/pages/MyAccount";
 import Login from "@/pages/Login";
 
 import Scheduling from "@/pages/Scheduling";
-import Rooms from "@/pages/Rooms";
 import Fees from "@/pages/Fees";
 import Settings from "@/pages/Settings";
 

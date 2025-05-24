@@ -1586,7 +1586,7 @@ export default function Students() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <PlusCircle className="h-6 w-6 text-white" />
+                  <Users className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h2 className="text-xl font-semibold">

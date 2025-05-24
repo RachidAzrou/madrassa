@@ -459,17 +459,7 @@ export default function Admissions() {
         </div>
       </div>
       
-      <div className="mb-4 flex justify-end">
-          <Button 
-            onClick={handleAddApplicant} 
-            variant="default" 
-            size="default" 
-            className="bg-primary hover:bg-primary/90 md:w-auto"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Nieuwe Aanmelding</span>
-          </Button>
-      </div>
+
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         

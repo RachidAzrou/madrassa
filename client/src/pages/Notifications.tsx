@@ -385,7 +385,7 @@ const NotificationsPage: React.FC = () => {
             <span>Alle notificaties ({filteredNotifications.length})</span>
           </TabsTrigger>
           <TabsTrigger value="unread" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-            <BellOff className="h-4 w-4" />
+            <Bell className="h-4 w-4" />
             <span>Ongelezen ({filteredUnreadNotifications.length})</span>
           </TabsTrigger>
           <TabsTrigger value="read" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">

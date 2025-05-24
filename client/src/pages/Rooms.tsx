@@ -354,8 +354,7 @@ export default function Rooms() {
       </div>
 
       <div className="mb-6">
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="relative col-span-2">
                 <Search className="absolute left-2.5 top-3 h-4 w-4 text-gray-500" />
@@ -423,7 +422,6 @@ export default function Rooms() {
                 </Button>
               </div>
             </div>
-          </CardContent>
         </Card>
       </div>
 

@@ -306,29 +306,35 @@ const NotificationsPage: React.FC = () => {
 
   return (
     <div className="container max-w-6xl p-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-200 pb-4 mb-8 gap-4">
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
-            <Bell className="h-7 w-7" />
+      {/* Page header */}
+      <div className="mb-8">
+        <div className="rounded-lg overflow-hidden shadow-sm">
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Bell className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-white">Notificaties</h1>
+                  <p className="text-base text-blue-100 mt-1">Beheer hier al uw notificaties</p>
+                </div>
+              </div>
+              <div className="md:flex-shrink-0">
+                {unreadNotifications.length > 0 && (
+                  <Button
+                    variant="outline"
+                    onClick={handleMarkAllAsRead}
+                    className="h-9 p-2 flex items-center gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
+                    title="Markeer alles als gelezen"
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Markeer alles als gelezen</span>
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Notificaties</h1>
-            <p className="text-base text-gray-500 mt-1">Beheer hier al uw notificaties</p>
-          </div>
-        </div>
-
-        <div className="md:flex-shrink-0">
-          {unreadNotifications.length > 0 && (
-            <Button
-              variant="outline"
-              onClick={handleMarkAllAsRead}
-              className="h-9 p-2 flex items-center gap-2"
-              title="Markeer alles als gelezen"
-            >
-              <CheckCircle className="h-4 w-4" />
-              <span>Markeer alles als gelezen</span>
-            </Button>
-          )}
         </div>
       </div>
 

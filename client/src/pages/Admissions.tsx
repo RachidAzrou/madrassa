@@ -479,67 +479,7 @@ export default function Admissions() {
         
         <TabsContent value="applications" className="space-y-4">
           {/* Filters */}
-          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Zoeken</label>
-                <div className="relative">
-                  <Input
-                    placeholder="Zoek aanmeldingen..."
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    className="pl-10"
-                  />
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Programma</label>
-                <Select value={program} onValueChange={handleProgramChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Alle Programma's" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle Programma's</SelectItem>
-                    {programs.map(program => (
-                      <SelectItem key={program.id} value={program.id.toString()}>
-                        {program.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <Select value={status} onValueChange={handleStatusChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Alle Statussen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle Statussen</SelectItem>
-                    <SelectItem value="pending">In afwachting</SelectItem>
-                    <SelectItem value="approved">Goedgekeurd</SelectItem>
-                    <SelectItem value="rejected">Afgewezen</SelectItem>
-                    <SelectItem value="enrolled">Ingeschreven</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Academisch Jaar</label>
-                <Select value={academicYear} onValueChange={handleAcademicYearChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Alle Jaren" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle Jaren</SelectItem>
-                    <SelectItem value="2025-2026">2025-2026</SelectItem>
-                    <SelectItem value="2024-2025">2024-2025</SelectItem>
-                    <SelectItem value="2023-2024">2023-2024</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
+
 
           {/* Applicant List Table */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">

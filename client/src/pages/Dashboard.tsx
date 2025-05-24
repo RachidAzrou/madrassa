@@ -5,7 +5,8 @@ import {
   BookOpen, 
   GraduationCap, 
   Calendar,
-  LayoutDashboard
+  LayoutDashboard,
+  Building
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format, startOfWeek, endOfWeek, addDays, parseISO, isToday, isWithinInterval } from 'date-fns';
@@ -207,6 +208,17 @@ export default function Dashboard() {
           <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Vakken</h3>
           <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.activeCourses}</p>
         </div>
+      </div>
+
+      {/* LOKALEN BEHEER BELANGRIJKE KNOP */}
+      <div className="mb-6">
+        <Button 
+          className="w-full bg-red-600 hover:bg-red-700 text-white font-bold p-6 text-lg flex items-center justify-center"
+          onClick={() => window.location.href = "/rooms"}
+        >
+          <Building className="h-6 w-6 mr-2" />
+          LOKALEN BEHEER
+        </Button>
       </div>
 
       {/* Main Content */}

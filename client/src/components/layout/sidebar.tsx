@@ -18,6 +18,7 @@ import {
   LogOut,
   Menu,
   X,
+  Building,
   CreditCard,
   UserPlus,
   Settings,
@@ -173,8 +174,22 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         )}
       </div>
 
+      {/* LOKALEN BEHEER SUPER BELANGRIJKE KNOP */}
+      <div className="px-3 pt-4">
+        <Link 
+          href="/rooms"
+          className="bg-red-600 text-white font-bold rounded-md p-3 mb-4 flex items-center justify-center hover:bg-red-700 transition-colors"
+          onClick={() => {
+            if (onClose) onClose();
+          }}
+        >
+          <Building className="h-5 w-5 mr-2" />
+          <span>LOKALEN BEHEER</span>
+        </Link>
+      </div>
+      
       {/* Ingelogde gebruiker informatie - vast bovenaan */}
-      <div className="px-3 pt-4 pb-2 border-b border-gray-100">
+      <div className="px-3 pb-2 border-b border-gray-100">
         <div 
           className="bg-blue-50 rounded-md p-3 mb-2 cursor-pointer hover:bg-blue-100 transition-colors"
           onClick={() => {

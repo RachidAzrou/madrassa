@@ -208,7 +208,7 @@ export default function Courses() {
               <BookOpen className="h-7 w-7" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Vakken</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Curriculum</h1>
               <p className="text-base text-gray-500 mt-1">Beheer vakken, curricula en lesmaterialen</p>
             </div>
           </div>
@@ -240,7 +240,7 @@ export default function Courses() {
             className="flex items-center bg-primary hover:bg-primary/90"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Vak Toevoegen</span>
+            <span>Curriculum Toevoegen</span>
           </Button>
         </div>
       </div>

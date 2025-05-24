@@ -489,21 +489,20 @@ export default function Rooms() {
         </div>
 
         {totalPages > 1 && (
-              <div className="flex items-center justify-center space-x-2 py-4 border-t">
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <Button
-                    key={i}
-                    variant={currentPage === i + 1 ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handlePageChange(i + 1)}
-                    className={currentPage === i + 1 ? "bg-[#1e3a8a]" : ""}
-                  >
-                    {i + 1}
-                  </Button>
-                ))}
-              </div>
-            )}
-        </div>
+          <div className="flex items-center justify-center space-x-2 py-4 border-t">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <Button
+                key={i}
+                variant={currentPage === i + 1 ? "default" : "outline"}
+                size="sm"
+                onClick={() => handlePageChange(i + 1)}
+                className={currentPage === i + 1 ? "bg-[#1e3a8a]" : ""}
+              >
+                {i + 1}
+              </Button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Lokaal Toevoegen Dialog */}

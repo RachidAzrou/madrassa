@@ -383,8 +383,8 @@ export default function Rooms() {
               </div>
             ) : rooms.length === 0 ? (
               <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-                <div className="mb-2">
-                  <Building className="h-10 w-10 text-[#1e3a8a]" />
+                <div className="text-[#1e3a8a] mb-2">
+                  <Building className="h-10 w-10 opacity-30" />
                 </div>
                 <p className="text-sm font-medium">
                   {searchTerm 

@@ -16,6 +16,7 @@ import {
   DialogHeader, 
   DialogTitle 
 } from '@/components/ui/dialog';
+import { CustomDialogContent } from '@/components/ui/custom-dialog-content';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -461,7 +462,7 @@ export default function Courses() {
       
       {/* Add/Edit/View Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
+        <CustomDialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
           {/* Blauwe header */}
           <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
             <div className="flex items-center justify-between">
@@ -732,7 +733,7 @@ export default function Courses() {
               </div>
             </form>
           </div>
-        </DialogContent>
+        </CustomDialogContent>
       </Dialog>
     </div>
   );

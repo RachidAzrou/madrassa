@@ -48,6 +48,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -329,28 +330,58 @@ export default function StudentGroups() {
       
       {/* Zoekbalk - onder de paginatitel geplaatst */}
       <div className="space-y-4">
-        <div className="relative w-full">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            type="search"
-            placeholder="Zoek klassen..."
-            className="pl-8 bg-white w-full"
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-          {searchTerm && (
-            <XCircle
-              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
-              onClick={() => setSearchTerm("")}
+        <div className="flex flex-col md:flex-row gap-4 justify-between">
+          <div className="relative w-full md:w-1/2">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="search"
+              placeholder="Zoek klassen..."
+              className="pl-8 bg-white w-full"
+              value={searchTerm}
+              onChange={handleSearchChange}
             />
-          )}
-        </div>
-        
-        <div className="flex justify-end items-center">
-          <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Klas Aanmaken</span>
-          </Button>
+            {searchTerm && (
+              <XCircle
+                className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                onClick={() => setSearchTerm("")}
+              />
+            )}
+          </div>
+          
+          <div className="flex flex-col md:flex-row gap-4 items-end">
+            <div className="w-full md:w-64 space-y-2">
+              <Label htmlFor="selectClassCurriculum">Curriculum details bewerken</Label>
+              <Select
+                onValueChange={(value) => {
+                  const selectedGroup = studentGroups.find((g) => g.id.toString() === value);
+                  if (selectedGroup) {
+                    handleEditStudentGroup(selectedGroup);
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecteer een klas" />
+                </SelectTrigger>
+                <SelectContent>
+                  {studentGroups && studentGroups.length > 0 ? (
+                    studentGroups.map((group) => (
+                      <SelectItem key={group.id} value={group.id.toString()}>
+                        {group.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>Geen klassen beschikbaar</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">Selecteer een klas om instroomvereisten en leerplan in te voeren</p>
+            </div>
+            
+            <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              <span>Nieuwe Klas</span>
+            </Button>
+          </div>
         </div>
       </div>
 

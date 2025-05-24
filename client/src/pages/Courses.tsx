@@ -398,7 +398,35 @@ export default function Courses() {
           )}
         </div>
         
-        <div className="flex justify-end">
+        <div className="flex flex-col md:flex-row justify-between items-end gap-4">
+          <div className="w-full md:w-1/2 space-y-2">
+            <Label htmlFor="selectCourse">Selecteer een vak voor curriculum details</Label>
+            <Select
+              onValueChange={(value) => {
+                const selectedCourse = courses.find((c) => c.id.toString() === value);
+                if (selectedCourse) {
+                  handleEditCourse(selectedCourse);
+                }
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Kies een vak om details in te voeren" />
+              </SelectTrigger>
+              <SelectContent>
+                {courses.length > 0 ? (
+                  courses.map((course) => (
+                    <SelectItem key={course.id} value={course.id.toString()}>
+                      {course.name} ({course.code})
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="none" disabled>Geen vakken beschikbaar</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-gray-500">Selecteer een bestaand vak om Instroomvereisten, Uitstroomvereisten en Leerdoelen/Leerplan in te voeren</p>
+          </div>
+          
           <Button 
             onClick={handleAddCourse} 
             variant="default"
@@ -406,7 +434,7 @@ export default function Courses() {
             className="bg-primary hover:bg-primary/90 flex items-center"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Curriculum Toevoegen</span>
+            <span>Nieuw Vak Toevoegen</span>
           </Button>
         </div>
       </div>

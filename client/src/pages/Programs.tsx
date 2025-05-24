@@ -366,75 +366,11 @@ export default function Programs() {
             Fout bij het laden van vakken. Probeer het opnieuw.
           </div>
         ) : programs.length === 0 ? (
-          <div className="space-y-6">
-            <div className="h-24 flex flex-col items-center justify-center text-gray-500">
-              <div className="text-[#1e3a8a] mb-2">
-                <BookText className="h-12 w-12 mx-auto opacity-30" />
-              </div>
-              <p className="text-sm font-medium">Geen vakken beschikbaar</p>
+          <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+            <div className="text-[#1e3a8a] mb-2">
+              <BookText className="h-12 w-12 mx-auto opacity-30" />
             </div>
-            
-            <div className="bg-white rounded-md border shadow-sm overflow-hidden">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr className="border-b border-gray-200">
-                    <th className="py-3 px-2 w-10 font-medium text-xs uppercase text-gray-500 text-center">
-                      <Checkbox 
-                        className="translate-y-[2px]"
-                        onCheckedChange={(checked) => {
-                          // Hier later functionaliteit toevoegen voor 'selecteer alles'
-                        }}
-                      />
-                      <span className="sr-only">Selecteer Alles</span>
-                    </th>
-                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Vak</th>
-                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Code</th>
-                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Duur</th>
-                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Klas</th>
-                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right">
-                      <span className="sr-only">Acties</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
-                    <td className="py-3 px-2 text-center">
-                      <Checkbox 
-                        className="translate-y-[2px]"
-                        onCheckedChange={(checked) => {
-                          // Hier later functionaliteit toevoegen voor individuele selectie
-                        }}
-                      />
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="font-medium text-gray-900">Geen vakken toegevoegd</div>
-                      <div className="text-gray-500 text-xs">Voeg vakken toe aan het curriculum</div>
-                    </td>
-                    <td className="py-3 px-4 text-gray-700">-</td>
-                    <td className="py-3 px-4 text-gray-700">-</td>
-                    <td className="py-3 px-4 text-gray-700">-</td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 w-8 p-0 text-slate-600"
-                        >
-                          <Pencil className="h-4 w-4" />
-                          <span className="sr-only">Bewerken</span>
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className="mt-2 flex justify-end">
-              <Button variant="outline" size="sm" className="text-xs flex items-center">
-                <PlusCircle className="h-3 w-3 mr-1" />
-                Module toevoegen
-              </Button>
-            </div>
+            <p className="text-sm font-medium">Geen vakken beschikbaar</p>
           </div>
         ) : (
           programs.map((program: Program) => (
@@ -713,39 +649,10 @@ export default function Programs() {
                       
                       <div className="space-y-2 mt-4">
                         <Label className="text-xs font-medium text-gray-700">Curriculum</Label>
-                        <div className="border rounded-md overflow-hidden">
-                          <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                              <tr>
-                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Checkbox</th>
-                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vak</th>
-                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duur</th>
-                                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klas</th>
-                                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
-                              </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                              <tr className="hover:bg-gray-50">
-                                <td className="px-4 py-3 text-sm text-gray-500">
-                                  <Checkbox id="checkbox-1" />
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-500 font-medium">
-                                  <div className="flex items-center">
-                                    <span>Geen vakken toegevoegd</span>
-                                  </div>
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-500">-</td>
-                                <td className="px-4 py-3 text-sm text-gray-500">-</td>
-                                <td className="px-4 py-3 text-sm text-gray-500">-</td>
-                                <td className="px-4 py-3 text-sm text-gray-500 text-right">
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                    <Pencil className="h-4 w-4" />
-                                  </Button>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
+                        <div className="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                          <BookText className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                          <p className="text-sm font-medium text-gray-700 mb-1">Geen curriculum modules beschikbaar</p>
+                          <p className="text-xs text-gray-500">Voeg modules toe aan het curriculum voor dit vak.</p>
                         </div>
                         <div className="mt-2 flex justify-end">
                           <Button variant="outline" size="sm" className="text-xs flex items-center">
@@ -753,9 +660,6 @@ export default function Programs() {
                             Module toevoegen
                           </Button>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Voeg modules toe aan het curriculum voor dit vak.
-                        </p>
                       </div>
                     </div>
                   </div>

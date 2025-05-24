@@ -430,27 +430,39 @@ export default function Attendance() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Datum selectie paneel */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-blue-900 flex items-center">
-              <Clock className="h-5 w-5 mr-2 text-blue-900" />
+        <Card className="overflow-hidden border-0 shadow-md">
+          <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+            <CardTitle className="text-blue-900 flex items-center text-lg">
+              <div className="mr-3 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                <Clock className="h-4 w-4 text-blue-800" />
+              </div>
               Datum
             </CardTitle>
             <p className="text-sm font-medium text-gray-700">{formatDate(selectedDate)}</p>
             <p className="text-sm text-gray-500">Selecteer een datum om aanwezigheid te registreren</p>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 bg-white">
             <div className="flex flex-col space-y-4">
               <div className="flex space-x-3">
-                <Button variant="outline" size="sm" onClick={() => handleDateChange(-1)} className="flex-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleDateChange(-1)} 
+                  className="flex-1 border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800"
+                >
                   <ArrowLeft className="h-4 w-4 mr-1" /> 
                   <span>Vorige dag</span>
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleDateChange(1)} className="flex-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleDateChange(1)} 
+                  className="flex-1 border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800"
+                >
                   <span>Volgende dag</span> <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               </div>
-              <div className="mt-3 text-center p-2 bg-blue-50 border border-blue-100 rounded-md">
+              <div className="mt-3 text-center p-3 bg-blue-50 border border-blue-100 rounded-md shadow-sm">
                 <span className="text-blue-900 font-medium">{formatDate(selectedDate)}</span>
               </div>
             </div>
@@ -458,35 +470,40 @@ export default function Attendance() {
         </Card>
         
         {/* Filters */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-blue-900 flex items-center">
-              <Filter className="h-5 w-5 mr-2 text-blue-900" />
+        <Card className="overflow-hidden border-0 shadow-md">
+          <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+            <CardTitle className="text-blue-900 flex items-center text-lg">
+              <div className="mr-3 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                <Filter className="h-4 w-4 text-blue-800" />
+              </div>
               Filters
             </CardTitle>
             <p className="text-sm text-gray-500">Selecteer gegevens om de aanwezigheid te filteren</p>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 bg-white">
             <Tabs defaultValue="vak" onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
-              <TabsList className="w-full mb-4 bg-blue-900/10">
-                <TabsTrigger value="vak">Vak</TabsTrigger>
-                <TabsTrigger value="klas">Klas</TabsTrigger>
+              <TabsList className="w-full mb-4 bg-blue-900/10 rounded-md">
+                <TabsTrigger value="vak" className="data-[state=active]:bg-white data-[state=active]:text-blue-900 data-[state=active]:shadow-sm">Vak</TabsTrigger>
+                <TabsTrigger value="klas" className="data-[state=active]:bg-white data-[state=active]:text-blue-900 data-[state=active]:shadow-sm">Klas</TabsTrigger>
               </TabsList>
               
               <TabsContent value="vak">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Vak</label>
+                <div className="bg-white rounded-md p-4 border border-blue-100 shadow-sm">
+                  <label className="block text-sm font-medium text-blue-800 mb-2">Vak</label>
                   <Select value={selectedCourse} onValueChange={handleCourseChange}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full border-blue-200 focus:ring-blue-500">
                       <SelectValue placeholder="Selecteer vak" />
                     </SelectTrigger>
                     <SelectContent>
                       {isLoadingCourses ? (
-                        <SelectItem value="loading" disabled>Vakken laden...</SelectItem>
+                        <div className="flex items-center justify-center p-2">
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600" />
+                          <SelectItem value="loading" disabled>Vakken laden...</SelectItem>
+                        </div>
                       ) : coursesData && Array.isArray(coursesData) ? (
                         coursesData.map((course: Program) => (
                           <SelectItem key={course.id} value={course.id.toString()}>
-                            {course.code} - {course.name}
+                            <span className="font-medium">{course.code}</span> - {course.name}
                           </SelectItem>
                         ))
                       ) : (
@@ -498,15 +515,18 @@ export default function Attendance() {
               </TabsContent>
               
               <TabsContent value="klas">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Klas</label>
+                <div className="bg-white rounded-md p-4 border border-blue-100 shadow-sm">
+                  <label className="block text-sm font-medium text-blue-800 mb-2">Klas</label>
                   <Select value={selectedClass} onValueChange={handleClassChange}>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full border-blue-200 focus:ring-blue-500">
                       <SelectValue placeholder="Selecteer klas" />
                     </SelectTrigger>
                     <SelectContent>
                       {isLoadingClasses ? (
-                        <SelectItem value="loading" disabled>Klassen laden...</SelectItem>
+                        <div className="flex items-center justify-center p-2">
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600" />
+                          <SelectItem value="loading" disabled>Klassen laden...</SelectItem>
+                        </div>
                       ) : classesData && Array.isArray(classesData) ? (
                         classesData.map((classroom: StudentGroup) => (
                           <SelectItem key={classroom.id} value={classroom.id.toString()}>
@@ -526,25 +546,27 @@ export default function Attendance() {
       </div>
 
       {/* Attendance Content */}
-      <Card className="mt-6">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-blue-900 flex items-center">
-            <ClipboardCheck className="h-5 w-5 mr-2 text-blue-900" />
+      <Card className="mt-6 border-0 shadow-md overflow-hidden">
+        <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+          <CardTitle className="text-blue-900 flex items-center text-lg">
+            <div className="mr-3 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+              <ClipboardCheck className="h-4 w-4 text-blue-800" />
+            </div>
             Aanwezigheidsregistratie
           </CardTitle>
-          <p className="text-sm text-gray-500">Registreer en beheer de aanwezigheid van studenten en docenten</p>
+          <p className="text-sm text-gray-600">Registreer en beheer de aanwezigheid van studenten en docenten</p>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-6 bg-white">
           <div className="mb-6">
             <div className="flex justify-between items-center">
               <Tabs defaultValue="students" className="w-full">
                 <div className="flex justify-between items-center">
-                  <TabsList className="w-3/4 grid grid-cols-2 bg-blue-900/10">
-                    <TabsTrigger value="students">
+                  <TabsList className="w-3/4 grid grid-cols-2 bg-blue-900/10 rounded-md">
+                    <TabsTrigger value="students" className="data-[state=active]:bg-white data-[state=active]:text-blue-900 data-[state=active]:shadow-sm">
                       <Users2 className="h-4 w-4 mr-2" />
                       Studenten
                     </TabsTrigger>
-                    <TabsTrigger value="teachers">
+                    <TabsTrigger value="teachers" className="data-[state=active]:bg-white data-[state=active]:text-blue-900 data-[state=active]:shadow-sm">
                       <GraduationCap className="h-4 w-4 mr-2" />
                       Docenten
                     </TabsTrigger>
@@ -553,7 +575,7 @@ export default function Attendance() {
                   <Button 
                     variant="default" 
                     size="sm" 
-                    className="bg-blue-900 hover:bg-blue-800" 
+                    className="bg-blue-700 hover:bg-blue-800 text-white shadow-sm flex items-center gap-2"
                     onClick={handleSave}
                     disabled={isSaving || (Object.keys(studentAttendance).length === 0 && Object.keys(teacherAttendance).length === 0)}
                   >
@@ -568,19 +590,24 @@ export default function Attendance() {
 
                 <TabsContent value="students">
                   <div className="space-y-4 mt-6">
-                    <div className="bg-slate-50 p-4 rounded-md border shadow-sm mb-6">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3">
-                        <div className="text-base font-medium text-blue-800 mb-2 sm:mb-0">Groepsacties</div>
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-lg border border-blue-100 shadow-sm mb-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-blue-100 rounded-md">
+                            <Users2 className="h-5 w-5 text-blue-700" />
+                          </div>
+                          <div className="text-base font-medium text-blue-800 mb-1 sm:mb-0">Groepsacties</div>
+                        </div>
                         
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                        <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
+                          <div className="text-xs px-3 py-1.5 bg-white text-blue-800 rounded-md border border-blue-200 shadow-sm font-medium">
                             {selectedType === 'vak' 
                               ? `Vak: ${coursesData?.find((c: any) => c.id.toString() === selectedCourse)?.name || ''}` 
                               : `Klas: ${classesData?.find((c: any) => c.id.toString() === selectedClass)?.name || ''}`}
-                          </span>
-                          <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                          </div>
+                          <div className="text-xs px-3 py-1.5 bg-white text-blue-800 rounded-md border border-blue-200 shadow-sm font-medium">
                             Datum: {formatDate(selectedDate)}
-                          </span>
+                          </div>
                         </div>
                       </div>
                       
@@ -589,7 +616,7 @@ export default function Attendance() {
                           variant="outline" 
                           size="sm" 
                           onClick={markAllStudentsPresent} 
-                          className="bg-white border-green-600 text-green-600 hover:bg-green-50 flex-1"
+                          className="bg-white border-green-500 text-green-600 hover:bg-green-50 flex-1 font-medium shadow-sm"
                           disabled={!studentsData || !Array.isArray(studentsData) || studentsData.length === 0}
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
@@ -599,7 +626,7 @@ export default function Attendance() {
                           variant="outline" 
                           size="sm" 
                           onClick={markAllStudentsAbsent} 
-                          className="bg-white border-red-600 text-red-600 hover:bg-red-50 flex-1"
+                          className="bg-white border-red-500 text-red-600 hover:bg-red-50 flex-1 font-medium shadow-sm"
                           disabled={!studentsData || !Array.isArray(studentsData) || studentsData.length === 0}
                         >
                           <XCircle className="h-4 w-4 mr-2" />
@@ -618,9 +645,12 @@ export default function Attendance() {
                     </div>
                     
                     {isLoadingStudents ? (
-                      <div className="py-8 text-center">
-                        <Loader2 className="h-8 w-8 mx-auto animate-spin text-blue-500" />
-                        <p className="mt-2 text-sm text-gray-500">Studenten laden...</p>
+                      <div className="py-10 text-center bg-white rounded-lg border border-blue-100 shadow-sm">
+                        <div className="h-12 w-12 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-3">
+                          <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+                        </div>
+                        <p className="text-sm font-medium text-blue-800">Studenten laden...</p>
+                        <p className="mt-1 text-xs text-gray-500">Even geduld a.u.b.</p>
                       </div>
                     ) : studentsData && Array.isArray(studentsData) && studentsData.length > 0 ? (
                       <div className="rounded-md border shadow-sm overflow-hidden">

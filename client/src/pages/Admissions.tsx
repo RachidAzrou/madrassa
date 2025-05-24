@@ -493,10 +493,10 @@ export default function Admissions() {
                         Aanmelder
                       </div>
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Programma</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klas</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aanmelddatum</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -519,7 +519,7 @@ export default function Admissions() {
                     </tr>
                   ) : (
                     applicants.map((applicant) => (
-                      <tr key={applicant.id} className="hover:bg-gray-50">
+                      <tr key={applicant.id} className="group hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <input 
@@ -537,7 +537,7 @@ export default function Admissions() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{applicant.programName}</div>
+                          <div className="text-sm text-gray-900">{applicant.programName || "Geen klas"}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {formatDate(applicant.applicationDate)}
@@ -546,27 +546,29 @@ export default function Admissions() {
                           {getStatusBadge(applicant.status)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button 
-                            className="text-blue-600 hover:text-blue-900 mr-3"
-                            onClick={() => handleViewApplicant(applicant)}
-                            title="Bekijken"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <button 
-                            className="text-green-600 hover:text-green-900 mr-3"
-                            onClick={() => handleEditApplicant(applicant)}
-                            title="Bewerken"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button 
-                            className="text-red-600 hover:text-red-900"
-                            onClick={() => handleDeleteApplicant(applicant)}
-                            title="Verwijderen"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                            <button 
+                              className="text-blue-600 hover:text-blue-900 mr-3"
+                              onClick={() => handleViewApplicant(applicant)}
+                              title="Bekijken"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <button 
+                              className="text-green-600 hover:text-green-900 mr-3"
+                              onClick={() => handleEditApplicant(applicant)}
+                              title="Bewerken"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button 
+                              className="text-red-600 hover:text-red-900"
+                              onClick={() => handleDeleteApplicant(applicant)}
+                              title="Verwijderen"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))

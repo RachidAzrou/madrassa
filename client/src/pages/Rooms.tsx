@@ -355,11 +355,7 @@ export default function Rooms() {
 
       <div className="mb-6">
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-[#0e40a1] text-lg font-medium">Lokalen Zoeken</CardTitle>
-            <CardDescription>Zoek en filter lokalen op naam, status of locatie</CardDescription>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="relative col-span-2">
                 <Search className="absolute left-2.5 top-3 h-4 w-4 text-gray-500" />

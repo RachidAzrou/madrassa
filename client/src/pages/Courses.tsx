@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Eye, Pencil, Trash2, BookOpen, Users, XCircle, X } from 'lucide-react';
+import { Search, PlusCircle, Filter, Eye, Pencil, Trash2, BookOpen, Users, XCircle, X, GraduationCap, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -474,7 +474,7 @@ export default function Courses() {
                 </div>
                 <div>
                   <DialogTitle className="text-xl font-semibold text-white">
-                    {isEditingCourse ? "Vak Bewerken" : isAddingCourse ? "Nieuw Vak Toevoegen" : "Vak Details"}
+                    {isEditingCourse ? "Vak Bewerken" : isAddingCourse ? "Curriculum Toevoegen" : "Vak Details"}
                   </DialogTitle>
                   <DialogDescription className="text-sm text-blue-100 font-medium">
                     {isEditingCourse 
@@ -504,32 +504,52 @@ export default function Courses() {
           
           <div className="px-6 py-4">
             <form onSubmit={handleDialogSubmit} className="space-y-4">
-              <Tabs defaultValue="algemeen" className="w-full">
-                <TabsList className="grid grid-cols-3 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
-                  <TabsTrigger value="algemeen" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+              <Tabs defaultValue="vaktoewijzing" className="w-full">
+                <TabsList className="grid grid-cols-4 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
+                  <TabsTrigger value="vaktoewijzing" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                     <BookOpen className="h-4 w-4" />
-                    <span>Algemeen</span>
+                    <span>Vaktoewijzing</span>
                   </TabsTrigger>
-                  <TabsTrigger value="curriculum" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <TabsTrigger value="instroomvereisten" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                    <GraduationCap className="h-4 w-4" />
+                    <span>Instroomvereisten</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="leerdoelen" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                     <BookOpen className="h-4 w-4" />
-                    <span>Curriculum</span>
+                    <span>Leerdoelen</span>
                   </TabsTrigger>
-                  <TabsTrigger value="studenten" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <Users className="h-4 w-4" />
-                    <span>Studenten</span>
+                  <TabsTrigger value="onderwerpen" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                    <FileText className="h-4 w-4" />
+                    <span>Onderwerpen</span>
                   </TabsTrigger>
                 </TabsList>
 
-                {/* Algemeen tabblad */}
-                <TabsContent value="algemeen" className="mt-0 bg-white rounded-lg min-h-[450px]">
+                {/* Vaktoewijzing tabblad */}
+                <TabsContent value="vaktoewijzing" className="mt-0 bg-white rounded-lg min-h-[450px]">
                   <div className="p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="name" className="text-xs font-medium text-gray-700">Naam <span className="text-primary">*</span></Label>
+                        <Label htmlFor="studentGroup" className="text-xs font-medium text-gray-700">Klas <span className="text-primary">*</span></Label>
+                        <Select
+                          disabled={isViewingCourse}
+                          defaultValue=""
+                        >
+                          <SelectTrigger className="h-9 text-sm bg-white border-gray-200">
+                            <SelectValue placeholder="Selecteer een klas" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {studentGroups.map((group: StudentGroupType) => (
+                              <SelectItem key={group.id} value={group.id.toString()}>{group.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="text-xs font-medium text-gray-700">Vak <span className="text-primary">*</span></Label>
                         <Input 
                           id="name" 
                           name="name"
-                          placeholder="Naam van het vak" 
+                          placeholder="Naam van het vak (bijv. Biologie)" 
                           disabled={isViewingCourse}
                           className="h-9 text-sm bg-white border-gray-200"
                           defaultValue={currentCourse?.name || ""}
@@ -540,39 +560,23 @@ export default function Courses() {
                         <Input 
                           id="code" 
                           name="code"
-                          placeholder="Vakcode (bijv. MATH101)" 
+                          placeholder="Vakcode (bijv. BIO4)" 
                           disabled={isViewingCourse}
                           className="h-9 text-sm bg-white border-gray-200"
                           defaultValue={currentCourse?.code || ""}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="credits" className="text-xs font-medium text-gray-700">Studiepunten</Label>
+                        <Label htmlFor="weeklyHours" className="text-xs font-medium text-gray-700">Aantal lesuren/week <span className="text-primary">*</span></Label>
                         <Input 
-                          id="credits" 
-                          name="credits"
+                          id="weeklyHours" 
+                          name="weeklyHours"
                           type="number" 
-                          placeholder="Aantal studiepunten"
+                          placeholder="Bijv. 3"
                           disabled={isViewingCourse}
                           className="h-9 text-sm bg-white border-gray-200"
-                          defaultValue={currentCourse?.credits || ""}
+                          defaultValue=""
                         />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="programId" className="text-xs font-medium text-gray-700">Programma</Label>
-                        <Select
-                          disabled={isViewingCourse}
-                          defaultValue={currentCourse?.programId?.toString() || ""}
-                        >
-                          <SelectTrigger className="h-9 text-sm bg-white border-gray-200">
-                            <SelectValue placeholder="Selecteer een programma" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {programs.map((program: ProgramType) => (
-                              <SelectItem key={program.id} value={program.id.toString()}>{program.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="instructor" className="text-xs font-medium text-gray-700">Docent</Label>
@@ -604,7 +608,7 @@ export default function Courses() {
                           name="description"
                           placeholder="Beschrijving van het vak"
                           disabled={isViewingCourse}
-                          className="min-h-[100px] text-sm bg-white border-gray-200"
+                          className="min-h-[80px] text-sm bg-white border-gray-200"
                           defaultValue={currentCourse?.description || ""}
                         />
                       </div>
@@ -612,87 +616,88 @@ export default function Courses() {
                   </div>
                 </TabsContent>
 
-                {/* Curriculum tabblad */}
-                <TabsContent value="curriculum" className="mt-0 bg-white rounded-lg min-h-[450px]">
+                {/* Instroomvereisten tabblad */}
+                <TabsContent value="instroomvereisten" className="mt-0 bg-white rounded-lg min-h-[450px]">
                   <div className="p-4 space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="prerequisites" className="text-xs font-medium text-gray-700">Instroomvereisten</Label>
                       <Textarea
                         id="prerequisites"
                         name="prerequisites"
-                        placeholder="Vereiste voorkennis of vaardigheden voor dit vak"
+                        placeholder="Wat moeten leerlingen al kennen of kunnen vóór ze dit vak op dit niveau volgen?"
                         disabled={isViewingCourse}
-                        className="min-h-[80px] text-sm bg-white border-gray-200"
+                        className="min-h-[200px] text-sm bg-white border-gray-200"
                         defaultValue={currentCourse?.prerequisites || ""}
                       />
                       <p className="text-xs text-gray-500">
-                        Wat moeten studenten weten of kunnen voordat ze aan dit vak beginnen?
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="learningObjectives" className="text-xs font-medium text-gray-700">Leerdoelen / Leerplan</Label>
-                      <Textarea
-                        id="learningObjectives"
-                        name="learningObjectives"
-                        placeholder="Wat studenten zullen leren bij dit vak"
-                        disabled={isViewingCourse}
-                        className="min-h-[80px] text-sm bg-white border-gray-200"
-                        defaultValue={currentCourse?.learningObjectives || ""}
-                      />
-                      <p className="text-xs text-gray-500">
-                        Welke kennis en vaardigheden worden verwacht dat studenten verwerven?
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="competencies" className="text-xs font-medium text-gray-700">Uitstroomvereisten / Competenties</Label>
-                      <Textarea
-                        id="competencies"
-                        name="competencies"
-                        placeholder="Competenties die studenten ontwikkelen"
-                        disabled={isViewingCourse}
-                        className="min-h-[80px] text-sm bg-white border-gray-200"
-                        defaultValue={currentCourse?.competencies || ""}
-                      />
-                      <p className="text-xs text-gray-500">
-                        Welke competenties moeten studenten hebben verworven na afronding?
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="materials" className="text-xs font-medium text-gray-700">Leermateriaal</Label>
-                      <Textarea
-                        id="materials"
-                        name="materials"
-                        placeholder="Boeken, artikelen en andere leermaterialen"
-                        disabled={isViewingCourse}
-                        className="min-h-[80px] text-sm bg-white border-gray-200"
-                        defaultValue={currentCourse?.materials || ""}
-                      />
-                      <p className="text-xs text-gray-500">
-                        Welke materialen worden gebruikt voor dit vak?
+                        Specificeer welke voorkennis of vaardigheden nodig zijn om dit vak te kunnen volgen.
                       </p>
                     </div>
                   </div>
                 </TabsContent>
 
-                {/* Studenten tabblad */}
-                <TabsContent value="studenten" className="mt-0 bg-white rounded-lg min-h-[450px]">
-                  <div className="p-4">
+                {/* Leerdoelen tabblad */}
+                <TabsContent value="leerdoelen" className="mt-0 bg-white rounded-lg min-h-[450px]">
+                  <div className="p-4 space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="learningObjectives" className="text-xs font-medium text-gray-700">Leerdoelen / Eindtermen</Label>
+                      <Textarea
+                        id="learningObjectives"
+                        name="learningObjectives"
+                        placeholder="Wat moeten leerlingen aan het einde van deze cursus beheersen?"
+                        disabled={isViewingCourse}
+                        className="min-h-[200px] text-sm bg-white border-gray-200"
+                        defaultValue={currentCourse?.learningObjectives || ""}
+                      />
+                      <p className="text-xs text-gray-500">
+                        Dit kan worden gestructureerd per periode/module of als lijst.
+                      </p>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Onderwerpen tabblad */}
+                <TabsContent value="onderwerpen" className="mt-0 bg-white rounded-lg min-h-[450px]">
+                  <div className="p-4 space-y-4">
                     <div className="space-y-4">
-                      <div className="text-sm text-gray-500 italic">
-                        {isViewingCourse ? (
-                          currentCourse?.enrolledStudents ? (
-                            <p>Er zijn {currentCourse.enrolledStudents} studenten ingeschreven voor dit vak.</p>
-                          ) : (
-                            <p>Er zijn nog geen studenten ingeschreven voor dit vak.</p>
-                          )
-                        ) : (
-                          <p>
-                            Studenten kunnen worden toegewezen aan dit vak nadat het is aangemaakt.
-                          </p>
-                        )}
+                      <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+                        <Label className="text-xs font-medium text-gray-700">Periode 1</Label>
+                        <Textarea
+                          placeholder="Onderwerpen voor periode 1, bijv. Breuken, Verhoudingen"
+                          disabled={isViewingCourse}
+                          className="min-h-[80px] text-sm bg-white border-gray-200"
+                          defaultValue=""
+                        />
+                      </div>
+                      
+                      <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+                        <Label className="text-xs font-medium text-gray-700">Periode 2</Label>
+                        <Textarea
+                          placeholder="Onderwerpen voor periode 2, bijv. Vergelijkingen, Meetkunde"
+                          disabled={isViewingCourse}
+                          className="min-h-[80px] text-sm bg-white border-gray-200"
+                          defaultValue=""
+                        />
+                      </div>
+                      
+                      <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+                        <Label className="text-xs font-medium text-gray-700">Periode 3</Label>
+                        <Textarea
+                          placeholder="Onderwerpen voor periode 3"
+                          disabled={isViewingCourse}
+                          className="min-h-[80px] text-sm bg-white border-gray-200"
+                          defaultValue=""
+                        />
+                      </div>
+                      
+                      <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+                        <Label className="text-xs font-medium text-gray-700">Periode 4</Label>
+                        <Textarea
+                          placeholder="Onderwerpen voor periode 4"
+                          disabled={isViewingCourse}
+                          className="min-h-[80px] text-sm bg-white border-gray-200"
+                          defaultValue=""
+                        />
                       </div>
                     </div>
                   </div>

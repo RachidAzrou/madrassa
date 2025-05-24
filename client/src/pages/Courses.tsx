@@ -778,17 +778,17 @@ export default function Courses() {
         }
       }}>
         <DialogContent className="sm:max-w-[95vw] md:max-w-[85vw] lg:max-w-[80vw] xl:max-w-[75vw] sm:h-[85vh] p-0 gap-0 bg-white overflow-hidden">
-          <DialogHeader className="p-6 border-b bg-white">
+          <DialogHeader className="p-6 border-b bg-gradient-to-r from-[#1e3a8a] to-[#4268c7] text-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <BookOpen className="h-6 w-6 text-[#1e3a8a]" />
-                <DialogTitle className="text-xl text-[#1e3a8a]">
+                <BookOpen className="h-6 w-6" />
+                <DialogTitle className="text-xl">
                   {isEditDialogOpen ? 'Curriculum Bewerken' : 'Nieuw Curriculum Toevoegen'}
                 </DialogTitle>
               </div>
 
             </div>
-            <DialogDescription className="text-gray-500 mt-2">
+            <DialogDescription className="text-white/80 mt-2">
               {isEditDialogOpen
                 ? 'Bewerk de gegevens van dit curriculum hieronder.'
                 : 'Vul de onderstaande velden in om een nieuw curriculum toe te voegen.'}

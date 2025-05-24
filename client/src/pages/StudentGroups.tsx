@@ -445,7 +445,7 @@ export default function StudentGroups() {
                       <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Titularis</th>
                       <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Status</th>
                       <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right">
-                        Acties
+                        <span className="sr-only">Acties</span>
                       </th>
                     </tr>
                   </thead>

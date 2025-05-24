@@ -687,33 +687,49 @@ export default function Scheduling() {
       </Tabs>
       {/* Planning Toevoegen Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[95vw] h-[85vh] max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold flex items-center">
-              <PlusCircle className="mr-2 h-5 w-5 text-primary" />
-              Planning Toevoegen
-            </DialogTitle>
-            <DialogDescription>
-              Wijs docenten toe aan vakken of ken lokalen toe aan lessen.
-            </DialogDescription>
+        <DialogContent className="sm:max-w-[85%] p-0 h-[85vh] max-h-[85vh] overflow-hidden">
+          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-semibold text-white">
+                    Planning Toevoegen
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-blue-100 font-medium mt-1">
+                    Wijs docenten toe aan vakken of ken lokalen toe aan lessen.
+                  </DialogDescription>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white/20 cursor-pointer"
+                onClick={() => setIsDialogOpen(false)}
+              >
+                <X className="h-4 w-4 text-white" />
+                <span className="sr-only">Sluiten</span>
+              </div>
+            </div>
           </DialogHeader>
           
-          <form onSubmit={handleFormSubmit} className="space-y-6 mt-4">
-            <Tabs 
-              value={dialogActiveTab} 
-              onValueChange={setDialogActiveTab} 
-              className="w-full"
-            >
-              <TabsList className="grid grid-cols-2 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
-                <TabsTrigger value="instructor-schedule" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                  <GraduationCap className="h-4 w-4" />
-                  <span>Docentenrooster</span>
-                </TabsTrigger>
-                <TabsTrigger value="room-allocation" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                  <Building className="h-4 w-4" />
-                  <span>Lokalenverdeling</span>
-                </TabsTrigger>
-              </TabsList>
+          <div className="px-6 py-5 overflow-y-auto" style={{ height: "calc(85vh - 170px)" }}>
+            <form onSubmit={handleFormSubmit} className="space-y-6">
+              <Tabs 
+                value={dialogActiveTab} 
+                onValueChange={setDialogActiveTab} 
+                className="w-full"
+              >
+                <TabsList className="grid grid-cols-2 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
+                  <TabsTrigger value="instructor-schedule" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                    <GraduationCap className="h-4 w-4" />
+                    <span>Docentenrooster</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="room-allocation" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                    <Building className="h-4 w-4" />
+                    <span>Lokalenverdeling</span>
+                  </TabsTrigger>
+                </TabsList>
               
               {/* Docenten Rooster Tab Content */}
               <TabsContent value="instructor-schedule" className="space-y-4 mt-2">

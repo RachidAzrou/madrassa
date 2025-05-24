@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Dialog, 
   DialogContent, 
@@ -19,14 +20,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 // Type definities
 type CourseType = {
@@ -424,166 +417,183 @@ export default function Courses() {
       
       <div className="w-full">
         {/* Table with Courses and Student Groups */}
-        <div className="rounded-md border bg-white">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-blue-50/50 hover:bg-blue-50/50">
-                <TableHead className="h-10 px-2 text-xs font-semibold text-[#1e3a8a]">Naam</TableHead>
-                <TableHead className="h-10 px-2 text-xs font-semibold text-[#1e3a8a]">Soort</TableHead>
-                <TableHead className="h-10 px-2 text-xs font-semibold text-[#1e3a8a]">Aanmaakdatum</TableHead>
-                <TableHead className="h-10 px-2 text-xs font-semibold text-[#1e3a8a]">Status</TableHead>
-                <TableHead className="h-10 px-2 text-xs font-semibold text-[#1e3a8a] text-right">Acties</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        <div className="bg-white rounded-md border shadow-sm overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr className="border-b border-gray-200">
+                <th className="py-3 px-2 w-10 font-medium text-xs uppercase text-gray-500 text-center">
+                  <Checkbox 
+                    className="translate-y-[2px]"
+                    onCheckedChange={(checked) => {
+                      // Hier later functionaliteit toevoegen voor 'selecteer alles'
+                    }}
+                  />
+                  <span className="sr-only">Selecteer Alles</span>
+                </th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Naam</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Soort</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Aanmaakdatum</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Status</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right">
+                  <span className="sr-only">Acties</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-10">
+                <tr>
+                  <td colSpan={6} className="text-center py-8">
                     <div className="flex justify-center">
                       <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : isError ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-10 text-red-500">
+                <tr>
+                  <td colSpan={6} className="text-center py-8 text-red-500">
                     Fout bij het laden van curriculum. Probeer het opnieuw.
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : courses.length === 0 && studentGroups.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-10">
+                <tr>
+                  <td colSpan={6} className="text-center py-8">
                     <div className="h-32 flex flex-col items-center justify-center text-gray-500">
                       <div className="text-[#1e3a8a] mb-2">
                         <BookOpen className="h-12 w-12 mx-auto opacity-30" />
                       </div>
                       <p className="text-sm font-medium">Geen curriculum beschikbaar</p>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : (
                 <>
                   {/* Courses rows */}
                   {courses.map((course) => (
-                    <TableRow 
-                      key={`course-${course.id}`} 
-                      className="hover:bg-gray-50 group"
-                    >
-                      <TableCell className="font-medium flex items-center gap-2">
-                        <div className="flex flex-col">
-                          <span>{course.name}</span>
-                          <span className="text-xs text-gray-500">{course.code}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-800">
+                    <tr key={`course-${course.id}`} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
+                      <td className="py-3 px-2 text-center">
+                        <Checkbox 
+                          className="translate-y-[2px]"
+                          onCheckedChange={(checked) => {
+                            // Hier later functionaliteit toevoegen voor individuele selectie
+                          }}
+                        />
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="font-medium text-gray-900">{course.name}</div>
+                        <div className="text-gray-500 text-xs">{course.code} • {course.credits || 0} studiepunten</div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-800 hover:bg-blue-50">
                           Vak
                         </Badge>
-                      </TableCell>
-                      <TableCell>
+                      </td>
+                      <td className="py-3 px-4 text-gray-700">
                         {course.createdAt ? new Date(course.createdAt).toLocaleDateString('nl-NL') : 'Onbekend'}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={course.isActive ? "default" : "secondary"}>
+                      </td>
+                      <td className="py-3 px-4">
+                        <Badge variant={course.isActive ? "default" : "outline"} className={course.isActive ? "bg-green-100 text-green-800 hover:bg-green-100" : "text-gray-500"}>
                           {course.isActive ? "Actief" : "Inactief"}
                         </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            variant="ghost"
-                            size="sm"
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 text-blue-600"
                             onClick={() => handleViewCourse(course)}
-                            className="h-8 w-8 p-0"
                           >
-                            <span className="sr-only">Bekijken</span>
                             <Eye className="h-4 w-4" />
+                            <span className="sr-only">Details bekijken</span>
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 text-slate-600"
                             onClick={() => handleEditCourse(course)}
-                            className="h-8 w-8 p-0"
                           >
-                            <span className="sr-only">Bewerken</span>
                             <Pencil className="h-4 w-4" />
+                            <span className="sr-only">Bewerken</span>
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 text-red-600"
                             onClick={() => handleDeleteCourse(course)}
-                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
                           >
-                            <span className="sr-only">Verwijderen</span>
                             <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Verwijderen</span>
                           </Button>
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   ))}
                   
                   {/* Student Groups rows */}
                   {studentGroups.map((group) => (
-                    <TableRow 
-                      key={`group-${group.id}`} 
-                      className="hover:bg-gray-50 group"
-                    >
-                      <TableCell className="font-medium flex items-center gap-2">
-                        <div className="flex flex-col">
-                          <span>{group.name}</span>
-                          <span className="text-xs text-gray-500">{group.academicYear}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-green-50 border-green-200 text-green-800">
+                    <tr key={`group-${group.id}`} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
+                      <td className="py-3 px-2 text-center">
+                        <Checkbox 
+                          className="translate-y-[2px]"
+                          onCheckedChange={(checked) => {
+                            // Hier later functionaliteit toevoegen voor individuele selectie
+                          }}
+                        />
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="font-medium text-gray-900">{group.name}</div>
+                        <div className="text-gray-500 text-xs">{group.academicYear} • {group.enrolledStudents || 0} studenten</div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <Badge variant="outline" className="bg-green-50 border-green-200 text-green-800 hover:bg-green-50">
                           Klas
                         </Badge>
-                      </TableCell>
-                      <TableCell>
+                      </td>
+                      <td className="py-3 px-4 text-gray-700">
                         {group.createdAt ? new Date(group.createdAt).toLocaleDateString('nl-NL') : 'Onbekend'}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={group.isActive ? "default" : "secondary"}>
+                      </td>
+                      <td className="py-3 px-4">
+                        <Badge variant={group.isActive ? "default" : "outline"} className={group.isActive ? "bg-green-100 text-green-800 hover:bg-green-100" : "text-gray-500"}>
                           {group.isActive ? "Actief" : "Inactief"}
                         </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            variant="ghost"
-                            size="sm"
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 text-blue-600"
                             onClick={() => {/* Handle view group */}}
-                            className="h-8 w-8 p-0"
                           >
-                            <span className="sr-only">Bekijken</span>
                             <Eye className="h-4 w-4" />
+                            <span className="sr-only">Details bekijken</span>
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 text-slate-600"
                             onClick={() => {/* Handle edit group */}}
-                            className="h-8 w-8 p-0"
                           >
-                            <span className="sr-only">Bewerken</span>
                             <Pencil className="h-4 w-4" />
+                            <span className="sr-only">Bewerken</span>
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0 text-red-600"
                             onClick={() => {/* Handle delete group */}}
-                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
                           >
-                            <span className="sr-only">Verwijderen</span>
                             <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Verwijderen</span>
                           </Button>
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   ))}
                 </>
               )}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
         
         {/* Pagination */}

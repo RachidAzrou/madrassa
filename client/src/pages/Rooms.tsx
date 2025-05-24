@@ -383,10 +383,14 @@ export default function Rooms() {
               </div>
             ) : rooms.length === 0 ? (
               <div className="text-center py-8">
-                <Building className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-lg font-medium text-gray-900">Geen lokalen gevonden</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  Er zijn geen lokalen die voldoen aan de zoekcriteria.
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-2">
+                  <Building className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Geen lokalen gevonden</h3>
+                <p className="text-gray-500 mb-4 max-w-md mx-auto">
+                  {searchTerm 
+                    ? `Er zijn geen lokalen gevonden die overeenkomen met "${searchTerm}". Probeer een andere zoekopdracht.` 
+                    : 'Er zijn nog geen lokalen aangemaakt.'}
                 </p>
               </div>
             ) : (

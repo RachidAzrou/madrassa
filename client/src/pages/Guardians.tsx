@@ -133,11 +133,12 @@ export default function Guardians() {
   };
 
   const handleAddNewGuardian = () => {
-    setShowNewGuardianDialog(true);
     toast({
       title: "Voogd toevoegen",
-      description: "Deze functie is nog in ontwikkeling.",
+      description: "Deze functie wordt binnenkort beschikbaar.",
     });
+    // Tijdelijke fix totdat de dialoog is geïmplementeerd
+    setShowNewGuardianDialog(true);
   };
 
   const handleDeleteSelectedGuardians = () => {

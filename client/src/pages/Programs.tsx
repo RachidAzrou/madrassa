@@ -311,17 +311,19 @@ export default function Programs() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 border-b pb-4">
-        <div>
-          <div className="flex items-center">
-            <div className="mr-3 text-[#1e3a8a] bg-blue-100 rounded-lg p-2">
-              <BookText className="h-6 w-6" />
+      <div className="mb-8">
+        <div className="rounded-lg overflow-hidden shadow-sm">
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] p-6">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <BookText className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">Vakken</h1>
+                <p className="text-base text-blue-100 mt-1">Beheer en organiseer alle vakken in het curriculum</p>
+              </div>
             </div>
-            <h1 className="text-2xl font-semibold text-[#1e3a8a]">Vakken</h1>
           </div>
-          <p className="text-gray-500 text-sm mt-1 ml-11">
-            Beheer en organiseer alle vakken in het curriculum
-          </p>
         </div>
       </div>
       {/* Zoek en Voeg toe knoppen - onder de streep */}

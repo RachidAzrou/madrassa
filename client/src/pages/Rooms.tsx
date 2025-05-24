@@ -235,7 +235,6 @@ export default function Rooms() {
       capacity: 30,
       location: '',
       status: 'available',
-      currentUse: '',
       notes: ''
     });
   };
@@ -310,7 +309,7 @@ export default function Rooms() {
       capacity: room.capacity,
       location: room.location,
       status: room.status,
-      currentUse: room.currentUse || '',
+
       notes: room.notes || ''
     });
     setIsEditDialogOpen(true);
@@ -497,19 +496,19 @@ export default function Rooms() {
           
           <div className="px-6 py-5 overflow-y-auto" style={{ height: "calc(85vh - 170px)" }}>
             <form onSubmit={handleFormSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Lokaalnaam <span className="text-red-500">*</span></Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => handleFormChange('name', e.target.value)}
-                      placeholder="Bijv. Lokaal A1-01"
-                      required
-                    />
-                  </div>
+              <div className="space-y-6">
+                <div>
+                  <Label htmlFor="name">Lokaalnaam <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => handleFormChange('name', e.target.value)}
+                    placeholder="Bijv. Lokaal A1-01"
+                    required
+                  />
+                </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="capacity">Capaciteit <span className="text-red-500">*</span></Label>
                     <Input
@@ -535,22 +534,31 @@ export default function Rooms() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="status">Status</Label>
-                    <Select
-                      value={formData.status}
-                      onValueChange={(value: 'available' | 'occupied') => handleFormChange('status', value)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecteer status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="available">Beschikbaar</SelectItem>
-                        <SelectItem value="occupied">Bezet</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div>
+                  <Label htmlFor="notes">Notities</Label>
+                  <Textarea
+                    id="notes"
+                    value={formData.notes || ""}
+                    onChange={(e) => handleFormChange('notes', e.target.value)}
+                    placeholder="Bijzonderheden over dit lokaal"
+                    rows={3}
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="status">Status</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value: 'available' | 'occupied') => handleFormChange('status', value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecteer status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="available">Beschikbaar</SelectItem>
+                      <SelectItem value="occupied">Bezet</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               
@@ -598,75 +606,69 @@ export default function Rooms() {
           
           <div className="px-6 py-5 overflow-y-auto" style={{ height: "calc(85vh - 170px)" }}>
             <form onSubmit={handleFormSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-6">
                 <div>
-                  <div className="mb-4">
-                    <Label htmlFor="name">Lokaalnaam <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="name">Lokaalnaam <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => handleFormChange('name', e.target.value)}
+                    placeholder="Bijv. Lokaal A1-01"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="capacity">Capaciteit <span className="text-red-500">*</span></Label>
                     <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => handleFormChange('name', e.target.value)}
-                      placeholder="Bijv. Lokaal A1-01"
+                      type="number"
+                      id="capacity"
+                      min={1}
+                      value={formData.capacity || ""}
+                      onChange={(e) => handleFormChange('capacity', parseInt(e.target.value))}
+                      placeholder="Aantal studenten"
                       required
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <Label htmlFor="capacity">Capaciteit <span className="text-red-500">*</span></Label>
-                      <Input
-                        type="number"
-                        id="capacity"
-                        min={1}
-                        value={formData.capacity || ""}
-                        onChange={(e) => handleFormChange('capacity', parseInt(e.target.value))}
-                        placeholder="Aantal studenten"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="location">Locatie <span className="text-red-500">*</span></Label>
-                      <Input
-                        id="location"
-                        value={formData.location}
-                        onChange={(e) => handleFormChange('location', e.target.value)}
-                        placeholder="Bijv. Gebouw A, 1e verdieping"
-                        required
-                      />
-                    </div>
-                  </div>
-                
                   <div>
-                    <Label htmlFor="notes">Notities</Label>
-                    <Textarea
-                      id="notes"
-                      value={formData.notes || ""}
-                      onChange={(e) => handleFormChange('notes', e.target.value)}
-                      placeholder="Bijzonderheden over dit lokaal"
-                      rows={3}
+                    <Label htmlFor="location">Locatie <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="location"
+                      value={formData.location}
+                      onChange={(e) => handleFormChange('location', e.target.value)}
+                      placeholder="Bijv. Gebouw A, 1e verdieping"
+                      required
                     />
                   </div>
                 </div>
+                
+                <div>
+                  <Label htmlFor="notes">Notities</Label>
+                  <Textarea
+                    id="notes"
+                    value={formData.notes || ""}
+                    onChange={(e) => handleFormChange('notes', e.target.value)}
+                    placeholder="Bijzonderheden over dit lokaal"
+                    rows={3}
+                  />
+                </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="status">Status</Label>
-                    <Select
-                      value={formData.status}
-                      onValueChange={(value: 'available' | 'occupied') => handleFormChange('status', value)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecteer status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="available">Beschikbaar</SelectItem>
-                        <SelectItem value="occupied">Bezet</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-
+                <div>
+                  <Label htmlFor="status">Status</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value: 'available' | 'occupied') => handleFormChange('status', value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecteer status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="available">Beschikbaar</SelectItem>
+                      <SelectItem value="occupied">Bezet</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               

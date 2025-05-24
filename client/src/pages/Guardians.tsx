@@ -1502,46 +1502,64 @@ export default function Guardians() {
           </form>
         </DialogContent>
       </Dialog>
-      {/* Verwijder bevestigingsdialoog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Voogd verwijderen</DialogTitle>
-            <DialogDescription>
-              Weet je zeker dat je deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            {selectedGuardian && (
-              <p className="text-sm text-gray-700">
-                Je staat op het punt om <span className="font-semibold">{selectedGuardian.firstName} {selectedGuardian.lastName}</span> te verwijderen.
-              </p>
-            )}
+      {/* Nieuwe verwijderbevestiging - volledig nieuw ontwerp */}
+      {isDeleteDialogOpen && selectedGuardian && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md overflow-hidden transform transition-all">
+            <div className="bg-red-50 p-4 flex gap-3 items-start">
+              <div className="rounded-full bg-red-100 p-2 flex-shrink-0">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Voogd verwijderen</h3>
+                <p className="mt-1 text-sm text-gray-600">
+                  Weet je zeker dat je deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+                </p>
+              </div>
+            </div>
+            
+            <div className="p-4 border-t border-gray-100">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-blue-100 rounded-full p-2 flex-shrink-0">
+                  <UserCheck className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">{selectedGuardian.firstName} {selectedGuardian.lastName}</h4>
+                  <p className="text-sm text-gray-600">{getRelationshipLabel(selectedGuardian.relationship)}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 px-4 py-3 flex justify-end gap-2">
+              <button 
+                type="button"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                onClick={() => setIsDeleteDialogOpen(false)}
+              >
+                Annuleren
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center"
+                onClick={confirmDelete}
+                disabled={deleteGuardianMutation.isPending}
+              >
+                {deleteGuardianMutation.isPending ? (
+                  <>
+                    <div className="h-4 w-4 border-2 border-t-transparent border-white rounded-full animate-spin mr-2"></div>
+                    Bezig...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Verwijderen
+                  </>
+                )}
+              </button>
+            </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Annuleren
-            </Button>
-            <Button 
-              variant="destructive" 
-              onClick={confirmDelete}
-              disabled={deleteGuardianMutation.isPending}
-            >
-              {deleteGuardianMutation.isPending ? (
-                <>
-                  <div className="h-4 w-4 border-2 border-t-transparent border-white rounded-full animate-spin mr-2"></div>
-                  Bezig...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Verwijderen
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
     </div>
   );
 }

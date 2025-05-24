@@ -166,7 +166,7 @@ const NotificationsPage: React.FC = () => {
     if (notificationList.length === 0) {
       return (
         <EmptyState 
-          icon={BellOff}
+          icon={<BellOff className="h-6 w-6" />}
           title="Geen notificaties"
           description={
             activeTab === 'unread' 

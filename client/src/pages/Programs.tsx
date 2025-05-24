@@ -482,7 +482,7 @@ export default function Programs() {
               <Tabs defaultValue="algemeen" className="w-full">
                 <TabsList className="grid grid-cols-3 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
                   <TabsTrigger value="algemeen" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <BookOpen className="h-4 w-4" />
+                    <Info className="h-4 w-4" />
                     <span>Algemeen</span>
                   </TabsTrigger>
                   <TabsTrigger value="curriculum" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">

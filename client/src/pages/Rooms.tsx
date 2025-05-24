@@ -44,8 +44,7 @@ interface Room {
   name: string;
   capacity: number;
   location: string;
-  status: 'available' | 'occupied' | 'reserved';
-  currentUse?: string;
+  status: 'available' | 'occupied';
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -69,8 +68,7 @@ export default function Rooms() {
     name: '',
     capacity: 30,
     location: '',
-    status: 'available' as 'available' | 'occupied' | 'reserved',
-    currentUse: '',
+    status: 'available' as 'available' | 'occupied',
     notes: ''
   });
 
@@ -542,7 +540,7 @@ export default function Rooms() {
                     <Label htmlFor="status">Status</Label>
                     <Select
                       value={formData.status}
-                      onValueChange={(value: 'available' | 'occupied' | 'reserved') => handleFormChange('status', value)}
+                      onValueChange={(value: 'available' | 'occupied') => handleFormChange('status', value)}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Selecteer status" />
@@ -550,21 +548,8 @@ export default function Rooms() {
                       <SelectContent>
                         <SelectItem value="available">Beschikbaar</SelectItem>
                         <SelectItem value="occupied">Bezet</SelectItem>
-                        <SelectItem value="reserved">Gereserveerd</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
-
-
-                  <div>
-                    <Label htmlFor="notes">Notities</Label>
-                    <Textarea
-                      id="notes"
-                      value={formData.notes || ""}
-                      onChange={(e) => handleFormChange('notes', e.target.value)}
-                      placeholder="Bijzonderheden over dit lokaal"
-                      rows={3}
-                    />
                   </div>
                 </div>
               </div>
@@ -649,6 +634,17 @@ export default function Rooms() {
                       required
                     />
                   </div>
+                
+                  <div className="col-span-2">
+                    <Label htmlFor="notes">Notities</Label>
+                    <Textarea
+                      id="notes"
+                      value={formData.notes || ""}
+                      onChange={(e) => handleFormChange('notes', e.target.value)}
+                      placeholder="Bijzonderheden over dit lokaal"
+                      rows={3}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-4">
@@ -656,7 +652,7 @@ export default function Rooms() {
                     <Label htmlFor="status">Status</Label>
                     <Select
                       value={formData.status}
-                      onValueChange={(value: 'available' | 'occupied' | 'reserved') => handleFormChange('status', value)}
+                      onValueChange={(value: 'available' | 'occupied') => handleFormChange('status', value)}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Selecteer status" />
@@ -664,7 +660,6 @@ export default function Rooms() {
                       <SelectContent>
                         <SelectItem value="available">Beschikbaar</SelectItem>
                         <SelectItem value="occupied">Bezet</SelectItem>
-                        <SelectItem value="reserved">Gereserveerd</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

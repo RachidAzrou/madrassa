@@ -412,15 +412,12 @@ export default function Guardians() {
                 <AlertTriangle className="h-5 w-5 text-red-500" />
                 <DialogTitle className="text-xl m-0">Voogd verwijderen</DialogTitle>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
+              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 cursor-pointer"
                 onClick={() => setShowDeleteDialog(false)}
-                className="h-8 w-8 rounded-full p-0 text-gray-400 hover:text-gray-500"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4 text-gray-600" />
                 <span className="sr-only">Sluiten</span>
-              </Button>
+              </div>
             </div>
             <DialogDescription className="text-gray-500 mt-2">
               Weet je zeker dat je deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.

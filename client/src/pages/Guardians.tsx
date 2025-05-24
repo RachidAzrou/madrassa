@@ -528,17 +528,17 @@ export default function Guardians() {
       
       <div className="py-6">
         {searchResults.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4 text-center border rounded-lg bg-gray-50">
-            <div className="h-20 w-20 rounded-full bg-blue-50 flex items-center justify-center mb-6">
-              <UserCheck className="h-10 w-10 text-primary opacity-30" />
+          <div className="flex flex-col items-center justify-center py-16 text-center bg-white border rounded-xl shadow-sm">
+            <div className="mb-6 rounded-full w-16 h-16 bg-[#1e3a8a]/10 flex items-center justify-center">
+              <UserCheck className="h-8 w-8 text-[#1e3a8a]" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Geen voogden gevonden</h3>
-            <p className="text-muted-foreground max-w-md mx-auto mb-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Geen voogden gevonden</h3>
+            <p className="text-gray-500 max-w-md mx-auto mb-6">
               {searchQuery.trim() !== '' 
                 ? 'Geen voogden gevonden die overeenkomen met je zoekopdracht. Probeer een andere zoekterm.' 
-                : 'Er zijn nog geen voogden toegevoegd in het systeem. Klik op de knop "Nieuwe Voogd" om een voogd toe te voegen.'}
+                : 'Er zijn nog geen voogden toegevoegd in het systeem.'}
             </p>
-            {searchQuery && (
+            {searchQuery.trim() !== '' ? (
               <Button 
                 variant="outline"
                 className="gap-2" 
@@ -546,6 +546,14 @@ export default function Guardians() {
               >
                 <XCircle className="h-4 w-4" />
                 Wis Zoekopdracht
+              </Button>
+            ) : (
+              <Button 
+                className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white gap-2"
+                onClick={handleAddNewGuardian}
+              >
+                <PlusCircle className="h-4 w-4" />
+                Nieuwe Voogd
               </Button>
             )}
           </div>

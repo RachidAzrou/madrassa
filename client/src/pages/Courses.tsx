@@ -19,6 +19,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 // Type definities
 type CourseType = {
@@ -414,181 +422,206 @@ export default function Courses() {
       {/* Spacing element */}
       <div className="mb-5 mt-6"></div>
       
-      {/* Content Tabs */}
-      <Tabs defaultValue="courses" className="w-full" value={activeTab}>
-        
-        {/* Courses Tab Content */}
-        <TabsContent value="courses">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {isLoading ? (
-              <div className="col-span-full flex justify-center py-8">
-                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            ) : isError ? (
-              <div className="col-span-full text-center py-8 text-red-500">
-                Fout bij het laden van curriculum. Probeer het opnieuw.
-              </div>
-            ) : courses.length === 0 ? (
-              <div className="col-span-full">
-                <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-                  <div className="text-[#1e3a8a] mb-2">
-                    <BookOpen className="h-12 w-12 mx-auto opacity-30" />
-                  </div>
-                  <p className="text-sm font-medium">Geen curriculum beschikbaar</p>
-                </div>
-              </div>
-            ) : (
-              courses.map((course) => (
-                <div key={course.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="p-5">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold text-lg text-gray-800">{course.name}</h3>
-                        <p className="text-gray-500 text-sm mt-1">{course.code} • {course.credits} Studiepunten</p>
-                      </div>
-                      <Badge variant={course.isActive ? "default" : "secondary"}>
-                        {course.isActive ? "Actief" : "Inactief"}
-                      </Badge>
+      <div className="w-full">
+        {/* Table with Courses and Student Groups */}
+        <div className="rounded-md border bg-white">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50 hover:bg-gray-50">
+                <TableHead className="font-medium">Naam</TableHead>
+                <TableHead className="font-medium">Soort</TableHead>
+                <TableHead className="font-medium">Aanmaakdatum</TableHead>
+                <TableHead className="font-medium">Status</TableHead>
+                <TableHead className="text-right font-medium">Acties</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-10">
+                    <div className="flex justify-center">
+                      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                     </div>
-                    
-                    <div className="mt-3 space-y-2">
-                      <div className="flex items-center text-sm text-gray-500">
-                        <BookOpen className="h-4 w-4 mr-2" />
-                        <span>{getProgramNameById(course.programId)}</span>
+                  </TableCell>
+                </TableRow>
+              ) : isError ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-10 text-red-500">
+                    Fout bij het laden van curriculum. Probeer het opnieuw.
+                  </TableCell>
+                </TableRow>
+              ) : courses.length === 0 && studentGroups.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-10">
+                    <div className="h-32 flex flex-col items-center justify-center text-gray-500">
+                      <div className="text-[#1e3a8a] mb-2">
+                        <BookOpen className="h-12 w-12 mx-auto opacity-30" />
                       </div>
-                      
-                      {course.instructor && (
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Users className="h-4 w-4 mr-2" />
-                          <span>{course.instructor}</span>
+                      <p className="text-sm font-medium">Geen curriculum beschikbaar</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                <>
+                  {/* Courses rows */}
+                  {courses.map((course) => (
+                    <TableRow 
+                      key={`course-${course.id}`} 
+                      className="hover:bg-gray-50 group"
+                    >
+                      <TableCell className="font-medium flex items-center gap-2">
+                        <div className="flex flex-col">
+                          <span>{course.name}</span>
+                          <span className="text-xs text-gray-500">{course.code}</span>
                         </div>
-                      )}
-                    </div>
-                  </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-800">
+                          Vak
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {course.createdAt ? new Date(course.createdAt).toLocaleDateString('nl-NL') : 'Onbekend'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={course.isActive ? "default" : "secondary"}>
+                          {course.isActive ? "Actief" : "Inactief"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleViewCourse(course)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <span className="sr-only">Bekijken</span>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditCourse(course)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <span className="sr-only">Bewerken</span>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteCourse(course)}
+                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                          >
+                            <span className="sr-only">Verwijderen</span>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                   
-                  <div className="px-5 py-3 bg-gray-50 border-t flex justify-end space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleViewCourse(course)}
-                      className="h-8 w-8 p-0"
+                  {/* Student Groups rows */}
+                  {studentGroups.map((group) => (
+                    <TableRow 
+                      key={`group-${group.id}`} 
+                      className="hover:bg-gray-50 group"
                     >
-                      <span className="sr-only">Bekijken</span>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEditCourse(course)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <span className="sr-only">Bewerken</span>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteCourse(course)}
-                      className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                    >
-                      <span className="sr-only">Verwijderen</span>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-          
-          {/* Pagination */}
-          {!isLoading && !isError && totalPages > 1 && (
-            <div className="flex justify-center mt-8">
-              <div className="flex space-x-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                >
-                  Vorige
-                </Button>
-                
-                {[...Array(totalPages)].map((_, i) => (
-                  <Button
-                    key={i}
-                    variant={currentPage === i + 1 ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setCurrentPage(i + 1)}
-                  >
-                    {i + 1}
-                  </Button>
-                ))}
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  Volgende
-                </Button>
-              </div>
-            </div>
-          )}
-        </TabsContent>
+                      <TableCell className="font-medium flex items-center gap-2">
+                        <div className="flex flex-col">
+                          <span>{group.name}</span>
+                          <span className="text-xs text-gray-500">{group.academicYear}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="bg-green-50 border-green-200 text-green-800">
+                          Klas
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {group.createdAt ? new Date(group.createdAt).toLocaleDateString('nl-NL') : 'Onbekend'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={group.isActive ? "default" : "secondary"}>
+                          {group.isActive ? "Actief" : "Inactief"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {/* Handle view group */}}
+                            className="h-8 w-8 p-0"
+                          >
+                            <span className="sr-only">Bekijken</span>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {/* Handle edit group */}}
+                            className="h-8 w-8 p-0"
+                          >
+                            <span className="sr-only">Bewerken</span>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {/* Handle delete group */}}
+                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                          >
+                            <span className="sr-only">Verwijderen</span>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
+            </TableBody>
+          </Table>
+        </div>
         
-        {/* Classes Tab Content */}
-        <TabsContent value="classes">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {isLoadingGroups ? (
-              <div className="col-span-full flex justify-center py-8">
-                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            ) : isErrorGroups ? (
-              <div className="col-span-full text-center py-8 text-red-500">
-                Fout bij het laden van klassen. Probeer het opnieuw.
-              </div>
-            ) : studentGroups.length === 0 ? (
-              <div className="col-span-full">
-                <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-                  <div className="text-[#1e3a8a] mb-2">
-                    <BookOpen className="h-12 w-12 mx-auto opacity-30" />
-                  </div>
-                  <p className="text-sm font-medium">Geen klassen beschikbaar</p>
-                </div>
-              </div>
-            ) : (
-              studentGroups.map((group) => (
-                <div key={group.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="p-5">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold text-lg text-gray-800">{group.name}</h3>
-                        <p className="text-gray-500 text-sm mt-1">Schooljaar: {group.academicYear}</p>
-                      </div>
-                      <Badge variant={group.isActive ? "default" : "secondary"}>
-                        {group.isActive ? "Actief" : "Inactief"}
-                      </Badge>
-                    </div>
-                    
-                    <div className="mt-3 space-y-2">
-                      <div className="flex items-center text-sm text-gray-500">
-                        <BookOpen className="h-4 w-4 mr-2" />
-                        <span>{getProgramNameById(group.programId)}</span>
-                      </div>
-                      
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Users className="h-4 w-4 mr-2" />
-                        <span>{group.enrolledStudents || 0} studenten</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+        {/* Pagination */}
+        {!isLoading && !isError && totalPages > 1 && (
+          <div className="flex justify-center mt-8">
+            <div className="flex space-x-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+              >
+                Vorige
+              </Button>
+              
+              {[...Array(totalPages)].map((_, i) => (
+                <Button
+                  key={i}
+                  variant={currentPage === i + 1 ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </Button>
+              ))}
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Volgende
+              </Button>
+            </div>
           </div>
-        </TabsContent>
-      </Tabs>
+        )}
+      </div>
       
       {/* View Course Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>

@@ -112,7 +112,7 @@ export default function StudentGroups() {
       academicYear: "2024-2025",
       programId: undefined,
       courseId: undefined,
-      curriculum: undefined,
+      curriculum: "arabisch",
       instructor: "",
       description: "",
       maxCapacity: 30,
@@ -831,7 +831,7 @@ export default function StudentGroups() {
                               <FormLabel className="text-xs font-medium text-gray-700">Curriculum</FormLabel>
                               <Select
                                 onValueChange={field.onChange}
-                                defaultValue={field.value}
+                                value={field.value || undefined}
                               >
                                 <FormControl>
                                   <SelectTrigger className="mt-1 h-9 text-sm bg-white border-gray-200">

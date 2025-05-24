@@ -786,7 +786,18 @@ export default function Courses() {
                   {isEditDialogOpen ? 'Curriculum Bewerken' : 'Nieuw Curriculum Toevoegen'}
                 </DialogTitle>
               </div>
-
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setIsAddDialogOpen(false);
+                  setIsEditDialogOpen(false);
+                }}
+                className="h-8 w-8 rounded-full p-0 text-white hover:text-white/80 hover:bg-white/10"
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Sluiten</span>
+              </Button>
             </div>
             <DialogDescription className="text-white/80 mt-2">
               {isEditDialogOpen

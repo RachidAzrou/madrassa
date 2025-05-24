@@ -520,9 +520,7 @@ export default function Scheduling() {
           </div>
         </div>
       </div>
-      
       {/* Geen widgets op verzoek van gebruiker */}
-
       <div className="mb-4">
         <div className="flex flex-col gap-4 w-full mb-4">
           <div className="relative w-full">
@@ -554,12 +552,17 @@ export default function Scheduling() {
           </div>
         </div>
       </div>
-
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-          <TabsList className="p-1 bg-blue-900/10">
-            <TabsTrigger value="instructor-schedule" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Docentenrooster</TabsTrigger>
-            <TabsTrigger value="room-allocation" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Lokalenverdeling</TabsTrigger>
+          <TabsList className="grid grid-cols-2 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
+            <TabsTrigger value="instructor-schedule" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+              <Users className="h-4 w-4" />
+              <span>Docentenrooster</span>
+            </TabsTrigger>
+            <TabsTrigger value="room-allocation" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+              <Building className="h-4 w-4" />
+              <span>Lokalenbeheer</span>
+            </TabsTrigger>
           </TabsList>
         </div>
         
@@ -567,7 +570,8 @@ export default function Scheduling() {
           <div className="grid grid-cols-1 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>Lokalentoewijzing</CardTitle>
+                <CardTitle>Lokalenbeheer
+</CardTitle>
 
               </CardHeader>
               <CardContent>
@@ -624,15 +628,18 @@ export default function Scheduling() {
                 <CardTitle>Docentenrooster</CardTitle>
                 <div className="flex flex-col gap-3">
                   <Tabs defaultValue="today" className="w-full">
-                    <TabsList className="p-1 bg-blue-900/10">
-                      <TabsTrigger value="today" className="flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-                        Vandaag
+                    <TabsList className="grid grid-cols-3 p-1 bg-[#1e3a8a]/10 rounded-md">
+                      <TabsTrigger value="today" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                        <CalendarIcon className="h-4 w-4" />
+                        <span>Vandaag</span>
                       </TabsTrigger>
-                      <TabsTrigger value="week" className="flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-                        Deze week
+                      <TabsTrigger value="week" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                        <Repeat className="h-4 w-4" />
+                        <span>Deze week</span>
                       </TabsTrigger>
-                      <TabsTrigger value="month" className="flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-                        Deze maand
+                      <TabsTrigger value="month" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                        <Calendar className="h-4 w-4" />
+                        <span>Deze maand</span>
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>
@@ -679,7 +686,6 @@ export default function Scheduling() {
           </div>
         </TabsContent>
       </Tabs>
-      
       {/* Planning Toevoegen Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[95vw] h-[85vh] max-h-[85vh] overflow-y-auto">
@@ -699,14 +705,14 @@ export default function Scheduling() {
               onValueChange={setDialogActiveTab} 
               className="w-full"
             >
-              <TabsList className="grid grid-cols-2 mb-4 p-1 bg-blue-900/10">
-                <TabsTrigger value="instructor-schedule" className="flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-                  <GraduationCap className="mr-2 h-4 w-4 text-primary" />
-                  Docentenrooster
+              <TabsList className="grid grid-cols-2 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
+                <TabsTrigger value="instructor-schedule" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <GraduationCap className="h-4 w-4" />
+                  <span>Docentenrooster</span>
                 </TabsTrigger>
-                <TabsTrigger value="room-allocation" className="flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-                  <Building className="mr-2 h-4 w-4 text-primary" />
-                  Lokalenverdeling
+                <TabsTrigger value="room-allocation" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                  <Building className="h-4 w-4" />
+                  <span>Lokalenverdeling</span>
                 </TabsTrigger>
               </TabsList>
               

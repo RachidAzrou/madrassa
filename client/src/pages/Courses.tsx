@@ -215,7 +215,6 @@ export default function Courses() {
           </div>
         </div>
       </div>
-      
       {/* Zoekbalk en acties */}
       <div className="space-y-4">
         <div className="flex flex-col gap-4">
@@ -247,10 +246,8 @@ export default function Courses() {
           </div>
         </div>
       </div>
-      
       {/* Spacing element */}
       <div className="mb-5 mt-6"></div>
-      
       <div className="w-full">
         {/* Table with Courses and Student Groups */}
         <div className="bg-white rounded-md border shadow-sm overflow-hidden">
@@ -461,7 +458,6 @@ export default function Courses() {
           </div>
         )}
       </div>
-      
       {/* Add/Edit/View Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <CustomDialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
@@ -523,7 +519,7 @@ export default function Courses() {
                   </TabsTrigger>
                   <TabsTrigger value="onderwerpen" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                     <FileText className="h-4 w-4" />
-                    <span>Onderwerpen</span>
+                    <span>Modules</span>
                   </TabsTrigger>
                 </TabsList>
 

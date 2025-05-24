@@ -38,6 +38,7 @@ const ChalkBoard = (props: any) => (
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -390,6 +391,15 @@ export default function StudentGroups() {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50">
                     <tr className="border-b border-gray-200">
+                      <th className="py-3 px-2 w-10 font-medium text-xs uppercase text-gray-500 text-center">
+                        <Checkbox 
+                          className="translate-y-[2px]"
+                          onCheckedChange={(checked) => {
+                            // Hier later functionaliteit toevoegen voor 'selecteer alles'
+                          }}
+                        />
+                        <span className="sr-only">Selecteer Alles</span>
+                      </th>
                       <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Klas</th>
                       <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Titularis</th>
                       <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Status</th>
@@ -401,7 +411,7 @@ export default function StudentGroups() {
                   <tbody>
                     {studentGroups.length === 0 ? (
                       <tr>
-                        <td colSpan={4} className="py-8">
+                        <td colSpan={5} className="py-8">
                           <ClassEmptyState description={
                             searchTerm 
                               ? `Er zijn geen klassen gevonden die overeenkomen met "${searchTerm}". Probeer een andere zoekopdracht.` 
@@ -412,6 +422,14 @@ export default function StudentGroups() {
                     ) : (
                       studentGroups.map((group: any) => (
                         <tr key={group.id} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
+                          <td className="py-3 px-2 text-center">
+                            <Checkbox 
+                              className="translate-y-[2px]"
+                              onCheckedChange={(checked) => {
+                                // Hier later functionaliteit toevoegen voor individuele selectie
+                              }}
+                            />
+                          </td>
                           <td className="py-3 px-4">
                             <div className="font-medium text-gray-900">{group.name}</div>
                             <div className="text-gray-500 text-xs">{group.academicYear} • {group.enrolledCount || 0} studenten</div>

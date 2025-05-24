@@ -4,6 +4,7 @@ import {
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, 
   Building, MapPin, Users, Check, X, Save
 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

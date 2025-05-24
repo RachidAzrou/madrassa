@@ -63,6 +63,7 @@ export default function Rooms() {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [selectedRooms, setSelectedRooms] = useState<number[]>([]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -321,6 +322,25 @@ export default function Rooms() {
       deleteRoomMutation.mutate(room.id);
     }
   };
+  
+  const handleSelectRoom = (roomId: number) => {
+    setSelectedRooms((prev) => {
+      if (prev.includes(roomId)) {
+        return prev.filter((id) => id !== roomId);
+      } else {
+        return [...prev, roomId];
+      }
+    });
+  };
+  
+  const handleSelectAllRooms = (checked: boolean) => {
+    if (checked) {
+      const allRoomIds = rooms.map((room) => room.id);
+      setSelectedRooms(allRoomIds);
+    } else {
+      setSelectedRooms([]);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -395,6 +415,13 @@ export default function Rooms() {
                 <Table>
                   <TableHeader className="bg-gray-50 border-b">
                     <TableRow>
+                      <TableHead className="w-[50px] h-12 px-4 align-middle text-muted-foreground py-3 font-semibold text-center">
+                        <Checkbox 
+                          checked={selectedRooms.length === rooms.length && rooms.length > 0}
+                          onCheckedChange={handleSelectAllRooms}
+                          aria-label="Selecteer alle rijen"
+                        />
+                      </TableHead>
                       <TableHead className="h-12 px-4 align-middle text-muted-foreground [&:has([role=checkbox])]:pr-0 py-3 font-semibold text-center">Lokaalnaam</TableHead>
                       <TableHead className="h-12 px-4 align-middle text-muted-foreground [&:has([role=checkbox])]:pr-0 py-3 font-semibold text-center">Status</TableHead>
                       <TableHead className="h-12 px-4 align-middle text-muted-foreground [&:has([role=checkbox])]:pr-0 py-3 font-semibold text-center">Capaciteit</TableHead>
@@ -404,6 +431,13 @@ export default function Rooms() {
                   <TableBody>
                     {rooms.map((room) => (
                       <TableRow key={room.id} className="group hover:bg-slate-50">
+                        <TableCell className="w-[50px] text-center">
+                          <Checkbox 
+                            checked={selectedRooms.includes(room.id)}
+                            onCheckedChange={() => handleSelectRoom(room.id)}
+                            aria-label={`Selecteer ${room.name}`}
+                          />
+                        </TableCell>
                         <TableCell className="font-medium text-center">{room.name}</TableCell>
                         <TableCell className="text-center">{getStatusBadge(room.status)}</TableCell>
                         <TableCell className="text-center">

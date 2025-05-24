@@ -1446,160 +1446,328 @@ const Teachers = () => {
                     <Label className="text-xs">Beschikbare klassen</Label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {/* Hier tonen we de klassen die beschikbaar zijn in de app */}
-                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
-                        <div>
-                          <h4 className="font-medium">Klas 1A</h4>
-                          <p className="text-xs text-gray-500">Beginners niveau, leeftijd 6-8 jaar</p>
+                      <div className="border rounded-md p-3 hover:bg-blue-50 transition-colors">
+                        <div className="flex justify-between items-start cursor-pointer">
+                          <div>
+                            <h4 className="font-medium">Klas 1A</h4>
+                            <p className="text-xs text-gray-500">Beginners niveau, leeftijd 6-8 jaar</p>
+                          </div>
+                          <Checkbox 
+                            checked={newTeacher.assignedClasses.some(c => c.name === "Klas 1A")}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: [...newTeacher.assignedClasses, { 
+                                    name: "Klas 1A", 
+                                    description: "Beginners niveau, leeftijd 6-8 jaar",
+                                    isKlastitularis: false
+                                  }]
+                                });
+                              } else {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 1A")
+                                });
+                              }
+                            }}
+                          />
                         </div>
-                        <Checkbox 
-                          checked={newTeacher.assignedClasses.some(c => c.name === "Klas 1A")}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setNewTeacher({
-                                ...newTeacher,
-                                assignedClasses: [...newTeacher.assignedClasses, { 
-                                  name: "Klas 1A", 
-                                  description: "Beginners niveau, leeftijd 6-8 jaar" 
-                                }]
-                              });
-                            } else {
-                              setNewTeacher({
-                                ...newTeacher,
-                                assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 1A")
-                              });
-                            }
-                          }}
-                        />
+                        
+                        {newTeacher.assignedClasses.some(c => c.name === "Klas 1A") && (
+                          <div className="mt-2 pt-2 border-t border-gray-100 flex items-center gap-2">
+                            <Checkbox 
+                              id="klastitularis-1A"
+                              checked={newTeacher.assignedClasses.find(c => c.name === "Klas 1A")?.isKlastitularis || false}
+                              onCheckedChange={(checked) => {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: newTeacher.assignedClasses.map(cls => 
+                                    cls.name === "Klas 1A" 
+                                      ? { ...cls, isKlastitularis: checked === true } 
+                                      : cls
+                                  )
+                                });
+                              }}
+                            />
+                            <label 
+                              htmlFor="klastitularis-1A" 
+                              className="text-xs font-medium text-gray-700 cursor-pointer"
+                            >
+                              Aanwijzen als klastitularis
+                            </label>
+                          </div>
+                        )}
                       </div>
                       
-                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
-                        <div>
-                          <h4 className="font-medium">Klas 2B</h4>
-                          <p className="text-xs text-gray-500">Gevorderd niveau, leeftijd 8-10 jaar</p>
+                      <div className="border rounded-md p-3 hover:bg-blue-50 transition-colors">
+                        <div className="flex justify-between items-start cursor-pointer">
+                          <div>
+                            <h4 className="font-medium">Klas 2B</h4>
+                            <p className="text-xs text-gray-500">Gevorderd niveau, leeftijd 8-10 jaar</p>
+                          </div>
+                          <Checkbox 
+                            checked={newTeacher.assignedClasses.some(c => c.name === "Klas 2B")}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: [...newTeacher.assignedClasses, { 
+                                    name: "Klas 2B", 
+                                    description: "Gevorderd niveau, leeftijd 8-10 jaar",
+                                    isKlastitularis: false
+                                  }]
+                                });
+                              } else {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 2B")
+                                });
+                              }
+                            }}
+                          />
                         </div>
-                        <Checkbox 
-                          checked={newTeacher.assignedClasses.some(c => c.name === "Klas 2B")}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setNewTeacher({
-                                ...newTeacher,
-                                assignedClasses: [...newTeacher.assignedClasses, { 
-                                  name: "Klas 2B", 
-                                  description: "Gevorderd niveau, leeftijd 8-10 jaar" 
-                                }]
-                              });
-                            } else {
-                              setNewTeacher({
-                                ...newTeacher,
-                                assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 2B")
-                              });
-                            }
-                          }}
-                        />
+                        
+                        {newTeacher.assignedClasses.some(c => c.name === "Klas 2B") && (
+                          <div className="mt-2 pt-2 border-t border-gray-100 flex items-center gap-2">
+                            <Checkbox 
+                              id="klastitularis-2B"
+                              checked={newTeacher.assignedClasses.find(c => c.name === "Klas 2B")?.isKlastitularis || false}
+                              onCheckedChange={(checked) => {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: newTeacher.assignedClasses.map(cls => 
+                                    cls.name === "Klas 2B" 
+                                      ? { ...cls, isKlastitularis: checked === true } 
+                                      : cls
+                                  )
+                                });
+                              }}
+                            />
+                            <label 
+                              htmlFor="klastitularis-2B" 
+                              className="text-xs font-medium text-gray-700 cursor-pointer"
+                            >
+                              Aanwijzen als klastitularis
+                            </label>
+                          </div>
+                        )}
                       </div>
                       
-                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
-                        <div>
-                          <h4 className="font-medium">Klas 3C</h4>
-                          <p className="text-xs text-gray-500">Midden niveau, leeftijd 10-12 jaar</p>
+                      <div className="border rounded-md p-3 hover:bg-blue-50 transition-colors">
+                        <div className="flex justify-between items-start cursor-pointer">
+                          <div>
+                            <h4 className="font-medium">Klas 3C</h4>
+                            <p className="text-xs text-gray-500">Midden niveau, leeftijd 10-12 jaar</p>
+                          </div>
+                          <Checkbox 
+                            checked={newTeacher.assignedClasses.some(c => c.name === "Klas 3C")}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: [...newTeacher.assignedClasses, { 
+                                    name: "Klas 3C", 
+                                    description: "Midden niveau, leeftijd 10-12 jaar",
+                                    isKlastitularis: false
+                                  }]
+                                });
+                              } else {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 3C")
+                                });
+                              }
+                            }}
+                          />
                         </div>
-                        <Checkbox 
-                          checked={newTeacher.assignedClasses.some(c => c.name === "Klas 3C")}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setNewTeacher({
-                                ...newTeacher,
-                                assignedClasses: [...newTeacher.assignedClasses, { 
-                                  name: "Klas 3C", 
-                                  description: "Midden niveau, leeftijd 10-12 jaar" 
-                                }]
-                              });
-                            } else {
-                              setNewTeacher({
-                                ...newTeacher,
-                                assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 3C")
-                              });
-                            }
-                          }}
-                        />
+                        
+                        {newTeacher.assignedClasses.some(c => c.name === "Klas 3C") && (
+                          <div className="mt-2 pt-2 border-t border-gray-100 flex items-center gap-2">
+                            <Checkbox 
+                              id="klastitularis-3C"
+                              checked={newTeacher.assignedClasses.find(c => c.name === "Klas 3C")?.isKlastitularis || false}
+                              onCheckedChange={(checked) => {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: newTeacher.assignedClasses.map(cls => 
+                                    cls.name === "Klas 3C" 
+                                      ? { ...cls, isKlastitularis: checked === true } 
+                                      : cls
+                                  )
+                                });
+                              }}
+                            />
+                            <label 
+                              htmlFor="klastitularis-3C" 
+                              className="text-xs font-medium text-gray-700 cursor-pointer"
+                            >
+                              Aanwijzen als klastitularis
+                            </label>
+                          </div>
+                        )}
                       </div>
                       
-                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
-                        <div>
-                          <h4 className="font-medium">Klas 4D</h4>
-                          <p className="text-xs text-gray-500">Gevorderd niveau, leeftijd 12-14 jaar</p>
+                      <div className="border rounded-md p-3 hover:bg-blue-50 transition-colors">
+                        <div className="flex justify-between items-start cursor-pointer">
+                          <div>
+                            <h4 className="font-medium">Klas 4D</h4>
+                            <p className="text-xs text-gray-500">Gevorderd niveau, leeftijd 12-14 jaar</p>
+                          </div>
+                          <Checkbox 
+                            checked={newTeacher.assignedClasses.some(c => c.name === "Klas 4D")}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: [...newTeacher.assignedClasses, { 
+                                    name: "Klas 4D", 
+                                    description: "Gevorderd niveau, leeftijd 12-14 jaar",
+                                    isKlastitularis: false
+                                  }]
+                                });
+                              } else {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 4D")
+                                });
+                              }
+                            }}
+                          />
                         </div>
-                        <Checkbox 
-                          checked={newTeacher.assignedClasses.some(c => c.name === "Klas 4D")}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setNewTeacher({
-                                ...newTeacher,
-                                assignedClasses: [...newTeacher.assignedClasses, { 
-                                  name: "Klas 4D", 
-                                  description: "Gevorderd niveau, leeftijd 12-14 jaar" 
-                                }]
-                              });
-                            } else {
-                              setNewTeacher({
-                                ...newTeacher,
-                                assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 4D")
-                              });
-                            }
-                          }}
-                        />
+                        
+                        {newTeacher.assignedClasses.some(c => c.name === "Klas 4D") && (
+                          <div className="mt-2 pt-2 border-t border-gray-100 flex items-center gap-2">
+                            <Checkbox 
+                              id="klastitularis-4D"
+                              checked={newTeacher.assignedClasses.find(c => c.name === "Klas 4D")?.isKlastitularis || false}
+                              onCheckedChange={(checked) => {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: newTeacher.assignedClasses.map(cls => 
+                                    cls.name === "Klas 4D" 
+                                      ? { ...cls, isKlastitularis: checked === true } 
+                                      : cls
+                                  )
+                                });
+                              }}
+                            />
+                            <label 
+                              htmlFor="klastitularis-4D" 
+                              className="text-xs font-medium text-gray-700 cursor-pointer"
+                            >
+                              Aanwijzen als klastitularis
+                            </label>
+                          </div>
+                        )}
                       </div>
                       
-                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
-                        <div>
-                          <h4 className="font-medium">Klas 5E</h4>
-                          <p className="text-xs text-gray-500">Vergevorderd niveau, leeftijd 14-16 jaar</p>
+                      <div className="border rounded-md p-3 hover:bg-blue-50 transition-colors">
+                        <div className="flex justify-between items-start cursor-pointer">
+                          <div>
+                            <h4 className="font-medium">Klas 5E</h4>
+                            <p className="text-xs text-gray-500">Vergevorderd niveau, leeftijd 14-16 jaar</p>
+                          </div>
+                          <Checkbox 
+                            checked={newTeacher.assignedClasses.some(c => c.name === "Klas 5E")}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: [...newTeacher.assignedClasses, { 
+                                    name: "Klas 5E", 
+                                    description: "Vergevorderd niveau, leeftijd 14-16 jaar",
+                                    isKlastitularis: false
+                                  }]
+                                });
+                              } else {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 5E")
+                                });
+                              }
+                            }}
+                          />
                         </div>
-                        <Checkbox 
-                          checked={newTeacher.assignedClasses.some(c => c.name === "Klas 5E")}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setNewTeacher({
-                                ...newTeacher,
-                                assignedClasses: [...newTeacher.assignedClasses, { 
-                                  name: "Klas 5E", 
-                                  description: "Vergevorderd niveau, leeftijd 14-16 jaar" 
-                                }]
-                              });
-                            } else {
-                              setNewTeacher({
-                                ...newTeacher,
-                                assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 5E")
-                              });
-                            }
-                          }}
-                        />
+                        
+                        {newTeacher.assignedClasses.some(c => c.name === "Klas 5E") && (
+                          <div className="mt-2 pt-2 border-t border-gray-100 flex items-center gap-2">
+                            <Checkbox 
+                              id="klastitularis-5E"
+                              checked={newTeacher.assignedClasses.find(c => c.name === "Klas 5E")?.isKlastitularis || false}
+                              onCheckedChange={(checked) => {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: newTeacher.assignedClasses.map(cls => 
+                                    cls.name === "Klas 5E" 
+                                      ? { ...cls, isKlastitularis: checked === true } 
+                                      : cls
+                                  )
+                                });
+                              }}
+                            />
+                            <label 
+                              htmlFor="klastitularis-5E" 
+                              className="text-xs font-medium text-gray-700 cursor-pointer"
+                            >
+                              Aanwijzen als klastitularis
+                            </label>
+                          </div>
+                        )}
                       </div>
                       
-                      <div className="border rounded-md p-3 flex justify-between items-start cursor-pointer hover:bg-blue-50 transition-colors">
-                        <div>
-                          <h4 className="font-medium">Klas 6F</h4>
-                          <p className="text-xs text-gray-500">Expert niveau, leeftijd 16-18 jaar</p>
+                      <div className="border rounded-md p-3 hover:bg-blue-50 transition-colors">
+                        <div className="flex justify-between items-start cursor-pointer">
+                          <div>
+                            <h4 className="font-medium">Klas 6F</h4>
+                            <p className="text-xs text-gray-500">Expert niveau, leeftijd 16-18 jaar</p>
+                          </div>
+                          <Checkbox 
+                            checked={newTeacher.assignedClasses.some(c => c.name === "Klas 6F")}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: [...newTeacher.assignedClasses, { 
+                                    name: "Klas 6F", 
+                                    description: "Expert niveau, leeftijd 16-18 jaar",
+                                    isKlastitularis: false
+                                  }]
+                                });
+                              } else {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 6F")
+                                });
+                              }
+                            }}
+                          />
                         </div>
-                        <Checkbox 
-                          checked={newTeacher.assignedClasses.some(c => c.name === "Klas 6F")}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setNewTeacher({
-                                ...newTeacher,
-                                assignedClasses: [...newTeacher.assignedClasses, { 
-                                  name: "Klas 6F", 
-                                  description: "Expert niveau, leeftijd 16-18 jaar" 
-                                }]
-                              });
-                            } else {
-                              setNewTeacher({
-                                ...newTeacher,
-                                assignedClasses: newTeacher.assignedClasses.filter(c => c.name !== "Klas 6F")
-                              });
-                            }
-                          }}
-                        />
+                        
+                        {newTeacher.assignedClasses.some(c => c.name === "Klas 6F") && (
+                          <div className="mt-2 pt-2 border-t border-gray-100 flex items-center gap-2">
+                            <Checkbox 
+                              id="klastitularis-6F"
+                              checked={newTeacher.assignedClasses.find(c => c.name === "Klas 6F")?.isKlastitularis || false}
+                              onCheckedChange={(checked) => {
+                                setNewTeacher({
+                                  ...newTeacher,
+                                  assignedClasses: newTeacher.assignedClasses.map(cls => 
+                                    cls.name === "Klas 6F" 
+                                      ? { ...cls, isKlastitularis: checked === true } 
+                                      : cls
+                                  )
+                                });
+                              }}
+                            />
+                            <label 
+                              htmlFor="klastitularis-6F" 
+                              className="text-xs font-medium text-gray-700 cursor-pointer"
+                            >
+                              Aanwijzen als klastitularis
+                            </label>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

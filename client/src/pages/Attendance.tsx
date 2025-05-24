@@ -807,18 +807,18 @@ export default function Attendance() {
                                 : <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 shadow-sm">Niet ingevuld</span>;
                             
                             return (
-                              <div key={teacher.id} className="grid grid-cols-12 items-center p-4 hover:bg-gray-50">
+                              <div key={teacher.id} className="grid grid-cols-12 items-center p-4 hover:bg-blue-50/30 transition-colors">
                                 <div className="col-span-5 sm:col-span-4 font-medium flex items-center">
-                                  <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-medium mr-2">
+                                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 flex items-center justify-center text-xs font-medium mr-3 border border-blue-200 shadow-sm">
                                     {teacher.firstName.charAt(0)}{teacher.lastName.charAt(0)}
                                   </div>
                                   <div>
-                                    <div>{teacher.firstName} {teacher.lastName}</div>
-                                    <div className="text-xs text-gray-500 sm:hidden">{teacher.teacherId}</div>
+                                    <div className="font-medium text-blue-900">{teacher.firstName} {teacher.lastName}</div>
+                                    <div className="text-xs text-gray-500 sm:hidden mt-0.5">{teacher.teacherId}</div>
                                   </div>
                                 </div>
                                 
-                                <div className="hidden sm:block col-span-3 text-sm text-gray-600">
+                                <div className="hidden sm:block col-span-3 text-sm text-gray-600 font-medium">
                                   {teacher.teacherId}
                                 </div>
                                 
@@ -834,20 +834,20 @@ export default function Attendance() {
                                     size="sm" 
                                     {...getTeacherButtonStyle(teacher.id, 'present')}
                                     onClick={() => markTeacherPresent(teacher.id)}
-                                    className="flex-1 sm:flex-initial max-w-[100px]"
+                                    className="flex-1 sm:flex-initial max-w-[100px] shadow-sm rounded-md"
                                   >
-                                    <CheckCircle className="h-4 w-4 sm:mr-1" />
-                                    <span className="hidden sm:inline">Aanwezig</span>
+                                    <CheckCircle className="h-4 w-4 sm:mr-1.5" />
+                                    <span className="hidden sm:inline font-medium">Aanwezig</span>
                                   </Button>
                                   <Button 
                                     variant="outline" 
                                     size="sm" 
                                     {...getTeacherButtonStyle(teacher.id, 'absent')}
                                     onClick={() => markTeacherAbsent(teacher.id)}
-                                    className="flex-1 sm:flex-initial max-w-[100px]"
+                                    className="flex-1 sm:flex-initial max-w-[100px] shadow-sm rounded-md"
                                   >
-                                    <XCircle className="h-4 w-4 sm:mr-1" />
-                                    <span className="hidden sm:inline">Afwezig</span>
+                                    <XCircle className="h-4 w-4 sm:mr-1.5" />
+                                    <span className="hidden sm:inline font-medium">Afwezig</span>
                                   </Button>
                                 </div>
                               </div>

@@ -43,6 +43,14 @@ export default function Guardians() {
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showNewGuardianDialog, setShowNewGuardianDialog] = useState(false);
+  const [newGuardian, setNewGuardian] = useState<Partial<GuardianType>>({
+    firstName: '',
+    lastName: '',
+    relationship: 'parent',
+    email: '',
+    phone: '',
+    isEmergencyContact: false
+  });
   
   // Data ophalen
   const { data: guardians = [], isLoading, isError } = useQuery({
@@ -161,6 +169,175 @@ export default function Guardians() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Voogd toevoegen/bewerken dialog */}
+      <Dialog open={showNewGuardianDialog} onOpenChange={setShowNewGuardianDialog}>
+        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
+          {/* Blauwe header */}
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <UserCheck className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-semibold text-white">
+                    Nieuwe Voogd Toevoegen
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-blue-100 font-medium">
+                    Vul de gegevens in van de nieuwe voogd of contactpersoon
+                  </DialogDescription>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowNewGuardianDialog(false)}
+                className="h-8 w-8 rounded-full p-0 text-white hover:bg-white/20"
+              >
+                <X className="h-5 w-5" />
+                <span className="sr-only">Sluiten</span>
+              </Button>
+            </div>
+          </div>
+          
+          <div className="px-6 py-4">
+            <form className="space-y-4">
+              <Tabs defaultValue="gegevens" className="w-full">
+                <TabsList className="grid grid-cols-3 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
+                  <TabsTrigger value="gegevens" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                    <UserCheck className="h-4 w-4" />
+                    <span>Persoonlijke Gegevens</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="contact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                    <Phone className="h-4 w-4" />
+                    <span>Contactgegevens</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="noodcontact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                    <AlertTriangle className="h-4 w-4" />
+                    <span>Noodcontact</span>
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="gegevens" className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">Voornaam</Label>
+                      <Input 
+                        id="firstName" 
+                        placeholder="Voornaam" 
+                        value={newGuardian.firstName}
+                        onChange={(e) => setNewGuardian({...newGuardian, firstName: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Achternaam</Label>
+                      <Input 
+                        id="lastName" 
+                        placeholder="Achternaam" 
+                        value={newGuardian.lastName}
+                        onChange={(e) => setNewGuardian({...newGuardian, lastName: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="relationship">Relatie tot Student</Label>
+                      <Select 
+                        value={newGuardian.relationship} 
+                        onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecteer relatie" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="parent">Ouder</SelectItem>
+                          <SelectItem value="guardian">Voogd</SelectItem>
+                          <SelectItem value="grandparent">Grootouder</SelectItem>
+                          <SelectItem value="sibling">Broer/Zus</SelectItem>
+                          <SelectItem value="other">Anders</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="contact" className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">E-mailadres</Label>
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        placeholder="E-mailadres" 
+                        value={newGuardian.email || ''}
+                        onChange={(e) => setNewGuardian({...newGuardian, email: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Telefoonnummer</Label>
+                      <Input 
+                        id="phone" 
+                        placeholder="Telefoonnummer" 
+                        value={newGuardian.phone || ''}
+                        onChange={(e) => setNewGuardian({...newGuardian, phone: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="noodcontact" className="space-y-4">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Checkbox 
+                      id="isEmergencyContact" 
+                      checked={newGuardian.isEmergencyContact}
+                      onCheckedChange={(checked) => 
+                        setNewGuardian({
+                          ...newGuardian, 
+                          isEmergencyContact: checked === true
+                        })
+                      }
+                    />
+                    <label
+                      htmlFor="isEmergencyContact"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Deze persoon is een noodcontact
+                    </label>
+                  </div>
+                  
+                  <div className="rounded-md border border-blue-100 bg-blue-50 p-4">
+                    <p className="text-sm text-blue-800">
+                      Noodcontacten worden gebeld in geval van een noodsituatie waarbij de primaire voogd niet bereikbaar is.
+                    </p>
+                  </div>
+                </TabsContent>
+              </Tabs>
+              
+              <div className="pt-4 border-t flex justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  type="button" 
+                  onClick={() => setShowNewGuardianDialog(false)}
+                >
+                  Annuleren
+                </Button>
+                <Button 
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toast({
+                      title: "Voogd opslaan",
+                      description: "Deze functie wordt binnenkort geïmplementeerd.",
+                    });
+                    setShowNewGuardianDialog(false);
+                  }}
+                >
+                  Voogd Opslaan
+                </Button>
+              </div>
+            </form>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
       {/* Delete bevestiging dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent className="sm:max-w-md p-0 gap-0 bg-white overflow-hidden">

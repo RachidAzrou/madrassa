@@ -581,7 +581,7 @@ export default function StudentGroups() {
                       <span>Docenten</span>
                     </TabsTrigger>
                     <TabsTrigger value="vakken" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                      <Book className="h-4 w-4" />
+                      <BookOpen className="h-4 w-4" />
                       <span>Vakken</span>
                     </TabsTrigger>
                     <TabsTrigger value="planning" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">

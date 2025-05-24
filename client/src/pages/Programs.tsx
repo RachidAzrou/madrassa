@@ -609,7 +609,6 @@ export default function Programs() {
                 <TabsContent value="curriculum" className="mt-0">
                   <div className="p-4 bg-white rounded-lg min-h-[450px]">
                     <div className="space-y-4">
-                      <h3 className="text-md font-medium">Curriculum details</h3>
                       
                       <div className="space-y-2">
                         <Label htmlFor="instroomvereisten" className="text-xs font-medium text-gray-700">Instroomvereisten</Label>
@@ -654,7 +653,6 @@ export default function Programs() {
                 <TabsContent value="planning" className="mt-0">
                   <div className="p-4 bg-white rounded-lg min-h-[450px]">
                     <div className="space-y-4">
-                      <h3 className="text-md font-medium">Klassen toewijzing</h3>
                       <div className="p-4 border rounded-md bg-gray-50">
                         <div className="flex justify-between items-center mb-2">
                           <p className="text-sm text-gray-500">Selecteer één of meerdere klassen</p>

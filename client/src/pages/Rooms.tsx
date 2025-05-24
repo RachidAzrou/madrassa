@@ -776,10 +776,7 @@ export default function Rooms() {
                   <div className="bg-white rounded-lg shadow-lg p-6">
                     <h3 className="text-lg font-medium text-gray-900 mb-4">Extra Informatie</h3>
                     <div className="space-y-3">
-                      <div>
-                        <span className="text-sm font-medium text-gray-500">Huidig gebruik:</span>
-                        <p className="text-gray-900">{selectedRoom.currentUse || "-"}</p>
-                      </div>
+
                       <div>
                         <span className="text-sm font-medium text-gray-500">Notities:</span>
                         <p className="text-gray-900 whitespace-pre-line">{selectedRoom.notes || "-"}</p>

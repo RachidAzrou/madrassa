@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, UserCheck, X, XCircle, FileDown } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, UserCheck, X, XCircle, FileDown, AlertTriangle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
+import EmptyState from '@/components/ui/empty-state';
 
 // Type definities
 type GuardianType = {
@@ -272,36 +273,34 @@ export default function Guardians() {
               ) : searchResults.length === 0 ? (
                 <tr>
                   <td colSpan={5}>
-                    <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-                      <div className="mb-4 rounded-full w-12 h-12 bg-[#1e3a8a]/10 flex items-center justify-center">
-                        <UserCheck className="h-6 w-6 text-[#1e3a8a]" />
-                      </div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">Geen voogden gevonden</h3>
-                      <p className="text-sm text-gray-500 max-w-md mx-auto mb-4">
-                        {searchQuery.trim() !== '' 
+                    <div className="py-6">
+                      <EmptyState
+                        icon={<UserCheck className="h-12 w-12 mx-auto opacity-30" />}
+                        title="Geen voogden gevonden"
+                        description={searchQuery.trim() !== '' 
                           ? 'Geen voogden gevonden die overeenkomen met je zoekopdracht. Probeer een andere zoekterm.' 
                           : 'Er zijn nog geen voogden toegevoegd in het systeem.'}
-                      </p>
-                      {searchQuery.trim() !== '' ? (
-                        <Button 
-                          variant="outline"
-                          className="gap-2" 
-                          onClick={() => setSearchQuery('')}
-                          size="sm"
-                        >
-                          <XCircle className="h-4 w-4" />
-                          Wis Zoekopdracht
-                        </Button>
-                      ) : (
-                        <Button 
-                          className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white gap-2"
-                          onClick={handleAddNewGuardian}
-                          size="sm"
-                        >
-                          <PlusCircle className="h-4 w-4" />
-                          Nieuwe Voogd
-                        </Button>
-                      )}
+                        action={searchQuery.trim() !== '' ? (
+                          <Button 
+                            variant="outline"
+                            className="gap-2" 
+                            onClick={() => setSearchQuery('')}
+                            size="sm"
+                          >
+                            <XCircle className="h-4 w-4" />
+                            Wis Zoekopdracht
+                          </Button>
+                        ) : (
+                          <Button 
+                            className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white gap-2"
+                            onClick={handleAddNewGuardian}
+                            size="sm"
+                          >
+                            <PlusCircle className="h-4 w-4" />
+                            Nieuwe Voogd
+                          </Button>
+                        )}
+                      />
                     </div>
                   </td>
                 </tr>

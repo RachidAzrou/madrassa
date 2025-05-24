@@ -832,14 +832,14 @@ export default function StudentGroups() {
                         name="courseId"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs font-medium text-gray-700">Hoofd Vak</FormLabel>
+                            <FormLabel className="text-xs font-medium text-gray-700">Vakken</FormLabel>
                             <Select
                               onValueChange={(value) => field.onChange(parseInt(value))}
                               value={field.value?.toString()}
                             >
                               <FormControl>
                                 <SelectTrigger className="mt-1 h-9 text-sm bg-white border-gray-200">
-                                  <SelectValue placeholder="Selecteer hoofdvak" />
+                                  <SelectValue placeholder="Selecteer vak" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
@@ -851,7 +851,7 @@ export default function StudentGroups() {
                               </SelectContent>
                             </Select>
                             <FormDescription className="text-xs">
-                              Het primaire vak dat aan deze klas wordt onderwezen
+                              Het vak dat aan deze klas wordt onderwezen
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -859,10 +859,9 @@ export default function StudentGroups() {
                       />
                       
                       <div className="mt-8">
-                        <h3 className="text-sm font-medium text-gray-700 mb-3">Aanvullende Vakken</h3>
                         <div className="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
                           <BookOpen className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                          <p className="text-xs text-gray-500">Aanvullende vakken kunnen worden toegewezen nadat de klas is aangemaakt.</p>
+                          <p className="text-xs text-gray-500">Meerdere vakken kunnen worden toegewezen nadat de klas is aangemaakt.</p>
                         </div>
                       </div>
                     </div>

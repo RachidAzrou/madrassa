@@ -218,8 +218,8 @@ export default function Courses() {
       
       {/* Zoekbalk en acties */}
       <div className="space-y-4">
-        <div className="flex flex-col gap-4">
-          <div className="relative w-full">
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
+          <div className="relative w-full sm:w-1/2">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
             <Input
               type="search"
@@ -238,7 +238,7 @@ export default function Courses() {
           
           <Button 
             onClick={handleAddCourse} 
-            className="flex items-center bg-primary hover:bg-primary/90 w-auto"
+            className="flex items-center bg-primary hover:bg-primary/90"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Curriculum Toevoegen</span>

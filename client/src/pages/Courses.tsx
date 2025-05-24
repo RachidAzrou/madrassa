@@ -790,91 +790,70 @@ export default function Courses() {
           </DialogHeader>
           
           <form onSubmit={isEditDialogOpen ? handleSubmitEditCourse : handleSubmitCourse} className="space-y-6 py-4">
-            {!isEditDialogOpen && (
-              <div className="space-y-2 mb-4">
-                <Label htmlFor="selectExistingCourse">Selecteer een bestaand vak</Label>
-                <Select
-                  onValueChange={(value) => {
-                    const selectedCourse = courses.find((c) => c.id.toString() === value);
-                    if (selectedCourse) {
-                      setCourseFormData({
-                        ...selectedCourse,
-                        programId: selectedCourse.programId || undefined,
-                      });
-                    }
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Of kies een bestaand vak om te bewerken" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {courses.length > 0 ? (
-                      courses.map((course) => (
-                        <SelectItem key={course.id} value={course.id.toString()}>
-                          {course.name} ({course.code})
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="none" disabled>Geen vakken beschikbaar</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Naam *</Label>
-                <Input
-                  id="name"
-                  value={courseFormData.name}
-                  onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="code">Code *</Label>
-                <Input
-                  id="code"
-                  value={courseFormData.code}
-                  onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
-                  required
-                />
-              </div>
+            <div className="space-y-2 mb-4">
+              <Label htmlFor="selectExistingCourse">Selecteer een bestaand vak</Label>
+              <Select
+                onValueChange={(value) => {
+                  const selectedCourse = courses.find((c) => c.id.toString() === value);
+                  if (selectedCourse) {
+                    setCourseFormData({
+                      ...selectedCourse,
+                      programId: selectedCourse.programId || undefined,
+                    });
+                  }
+                }}
+                value={isEditDialogOpen && selectedCourse ? selectedCourse.id.toString() : undefined}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Kies een vak" />
+                </SelectTrigger>
+                <SelectContent>
+                  {courses.length > 0 ? (
+                    courses.map((course) => (
+                      <SelectItem key={course.id} value={course.id.toString()}>
+                        {course.name} ({course.code})
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>Geen vakken beschikbaar</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="programId">Programma</Label>
-                <Select
-                  value={courseFormData.programId?.toString() || ''}
-                  onValueChange={(value) => setCourseFormData({ ...courseFormData, programId: value ? parseInt(value) : null })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer een programma" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Geen programma</SelectItem>
-                    {programs.map((program: ProgramType) => (
-                      <SelectItem key={program.id} value={program.id.toString()}>
-                        {program.name}
+            <div className="space-y-2 mb-4">
+              <Label htmlFor="selectExistingGroup">Of selecteer een klas</Label>
+              <Select
+                onValueChange={(value) => {
+                  const selectedGroup = studentGroups.find((g: any) => g.id.toString() === value);
+                  if (selectedGroup) {
+                    // Logic to load the class data into the form
+                    // This is placeholder logic, actual implementation depends on your data structure
+                    const courseForGroup = courses.find((c) => c.id === selectedGroup.courseId);
+                    if (courseForGroup) {
+                      setCourseFormData({
+                        ...courseForGroup,
+                        programId: courseForGroup.programId || undefined,
+                      });
+                    }
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Kies een klas" />
+                </SelectTrigger>
+                <SelectContent>
+                  {studentGroups.length > 0 ? (
+                    studentGroups.map((group: any) => (
+                      <SelectItem key={group.id} value={group.id.toString()}>
+                        {group.name}
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="credits">Studiepunten</Label>
-                <Input
-                  id="credits"
-                  type="number"
-                  min="0"
-                  value={courseFormData.credits?.toString() || '0'}
-                  onChange={(e) => setCourseFormData({ ...courseFormData, credits: parseInt(e.target.value) || 0 })}
-                />
-              </div>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>Geen klassen beschikbaar</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="space-y-4 border-t border-gray-200 pt-4 mt-4">

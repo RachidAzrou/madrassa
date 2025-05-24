@@ -653,36 +653,36 @@ export default function Attendance() {
                         <p className="mt-1 text-xs text-gray-500">Even geduld a.u.b.</p>
                       </div>
                     ) : studentsData && Array.isArray(studentsData) && studentsData.length > 0 ? (
-                      <div className="rounded-md border shadow-sm overflow-hidden">
-                        <div className="grid grid-cols-12 bg-slate-100 p-3 text-xs font-medium text-slate-700">
+                      <div className="rounded-lg border border-blue-100 shadow-sm overflow-hidden">
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 border-b border-blue-100 text-sm font-medium text-blue-800 grid grid-cols-12">
                           <div className="col-span-4 sm:col-span-4">Student</div>
                           <div className="hidden sm:block col-span-3">Studentnummer</div>
                           <div className="col-span-8 sm:col-span-5 text-right">Aanwezigheidsstatus</div>
                         </div>
-                        <div className="divide-y bg-white">
+                        <div className="divide-y divide-blue-50 bg-white">
                           {studentsData.map((student: Student) => {
                             const status = studentAttendance[student.id]?.status;
                             const statusBadge = status === 'present' 
-                              ? <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" /> Aanwezig</span>
+                              ? <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 border border-green-200 shadow-sm"><CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Aanwezig</span>
                               : status === 'late'
-                                ? <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800"><Clock className="h-3 w-3 mr-1" /> Te laat</span>
+                                ? <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200 shadow-sm"><Clock className="h-3.5 w-3.5 mr-1.5" /> Te laat</span>
                                 : status === 'absent'
-                                  ? <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><XCircle className="h-3 w-3 mr-1" /> Afwezig</span>
-                                  : <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Niet ingevuld</span>;
+                                  ? <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800 border border-red-200 shadow-sm"><XCircle className="h-3.5 w-3.5 mr-1.5" /> Afwezig</span>
+                                  : <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 shadow-sm">Niet ingevuld</span>;
                             
                             return (
-                              <div key={student.id} className="grid grid-cols-12 items-center p-4 hover:bg-gray-50">
+                              <div key={student.id} className="grid grid-cols-12 items-center p-4 hover:bg-blue-50/30 transition-colors">
                                 <div className="col-span-4 sm:col-span-4 font-medium flex items-center">
-                                  <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-medium mr-2">
+                                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 flex items-center justify-center text-xs font-medium mr-3 border border-blue-200 shadow-sm">
                                     {student.firstName.charAt(0)}{student.lastName.charAt(0)}
                                   </div>
                                   <div>
-                                    <div>{student.firstName} {student.lastName}</div>
-                                    <div className="text-xs text-gray-500 sm:hidden">{student.studentId}</div>
+                                    <div className="font-medium text-blue-900">{student.firstName} {student.lastName}</div>
+                                    <div className="text-xs text-gray-500 sm:hidden mt-0.5">{student.studentId}</div>
                                   </div>
                                 </div>
                                 
-                                <div className="hidden sm:block col-span-3 text-sm text-gray-600">
+                                <div className="hidden sm:block col-span-3 text-sm text-gray-600 font-medium">
                                   {student.studentId}
                                 </div>
                                 
@@ -698,30 +698,30 @@ export default function Attendance() {
                                     size="sm" 
                                     {...getStudentButtonStyle(student.id, 'present')}
                                     onClick={() => markStudentPresent(student.id)}
-                                    className="flex-1 sm:flex-initial max-w-[90px]"
+                                    className="flex-1 sm:flex-initial max-w-[90px] shadow-sm rounded-md"
                                   >
-                                    <CheckCircle className="h-4 w-4 sm:mr-1" />
-                                    <span className="hidden sm:inline">Aanwezig</span>
+                                    <CheckCircle className="h-4 w-4 sm:mr-1.5" />
+                                    <span className="hidden sm:inline font-medium">Aanwezig</span>
                                   </Button>
                                   <Button 
                                     variant="outline" 
                                     size="sm" 
                                     {...getStudentButtonStyle(student.id, 'late')}
                                     onClick={() => markStudentLate(student.id)}
-                                    className="flex-1 sm:flex-initial max-w-[90px]"
+                                    className="flex-1 sm:flex-initial max-w-[90px] shadow-sm rounded-md"
                                   >
-                                    <Clock className="h-4 w-4 sm:mr-1" />
-                                    <span className="hidden sm:inline">Te laat</span>
+                                    <Clock className="h-4 w-4 sm:mr-1.5" />
+                                    <span className="hidden sm:inline font-medium">Te laat</span>
                                   </Button>
                                   <Button 
                                     variant="outline" 
                                     size="sm" 
                                     {...getStudentButtonStyle(student.id, 'absent')}
                                     onClick={() => markStudentAbsent(student.id)}
-                                    className="flex-1 sm:flex-initial max-w-[90px]"
+                                    className="flex-1 sm:flex-initial max-w-[90px] shadow-sm rounded-md"
                                   >
-                                    <XCircle className="h-4 w-4 sm:mr-1" />
-                                    <span className="hidden sm:inline">Afwezig</span>
+                                    <XCircle className="h-4 w-4 sm:mr-1.5" />
+                                    <span className="hidden sm:inline font-medium">Afwezig</span>
                                   </Button>
                                 </div>
                               </div>
@@ -783,25 +783,28 @@ export default function Attendance() {
                     </div>
                     
                     {isLoadingTeachers ? (
-                      <div className="py-8 text-center">
-                        <Loader2 className="h-8 w-8 mx-auto animate-spin text-blue-500" />
-                        <p className="mt-2 text-sm text-gray-500">Docenten laden...</p>
+                      <div className="py-10 text-center bg-white rounded-lg border border-blue-100 shadow-sm">
+                        <div className="h-12 w-12 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-3">
+                          <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+                        </div>
+                        <p className="text-sm font-medium text-blue-800">Docenten laden...</p>
+                        <p className="mt-1 text-xs text-gray-500">Even geduld a.u.b.</p>
                       </div>
                     ) : teachersData && teachersData.length > 0 ? (
-                      <div className="rounded-md border shadow-sm overflow-hidden">
-                        <div className="grid grid-cols-12 bg-slate-100 p-3 text-xs font-medium text-slate-700">
+                      <div className="rounded-lg border border-blue-100 shadow-sm overflow-hidden">
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 border-b border-blue-100 text-sm font-medium text-blue-800 grid grid-cols-12">
                           <div className="col-span-5 sm:col-span-4">Docent</div>
                           <div className="hidden sm:block col-span-3">Docentnummer</div>
                           <div className="col-span-7 sm:col-span-5 text-right">Aanwezigheidsstatus</div>
                         </div>
-                        <div className="divide-y bg-white">
+                        <div className="divide-y divide-blue-50 bg-white">
                           {teachersData.map((teacher) => {
                             const status = teacherAttendance[teacher.id]?.status;
                             const statusBadge = status === 'present' 
-                              ? <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" /> Aanwezig</span>
+                              ? <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 border border-green-200 shadow-sm"><CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Aanwezig</span>
                               : status === 'absent'
-                                ? <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><XCircle className="h-3 w-3 mr-1" /> Afwezig</span>
-                                : <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Niet ingevuld</span>;
+                                ? <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800 border border-red-200 shadow-sm"><XCircle className="h-3.5 w-3.5 mr-1.5" /> Afwezig</span>
+                                : <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 shadow-sm">Niet ingevuld</span>;
                             
                             return (
                               <div key={teacher.id} className="grid grid-cols-12 items-center p-4 hover:bg-gray-50">

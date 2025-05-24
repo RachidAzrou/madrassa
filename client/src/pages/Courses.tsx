@@ -862,7 +862,10 @@ export default function Courses() {
               </div>
               
               <div className="space-y-6 border-t border-gray-200 pt-6 mt-6">
-                <h3 className="text-lg font-medium text-[#1e3a8a]">Curriculum details</h3>
+                <div className="flex items-center gap-2 mb-3">
+                  <BookOpen className="h-5 w-5 text-[#1e3a8a]" />
+                  <h3 className="text-lg font-semibold text-[#1e3a8a]">Curriculum details</h3>
+                </div>
                 
                 <div className="space-y-6">
                   <div className="space-y-2">

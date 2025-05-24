@@ -598,11 +598,14 @@ export default function Courses() {
                         <Input 
                           id="instructor" 
                           name="instructor"
-                          placeholder="Naam van de docent" 
-                          disabled={isViewingCourse}
+                          placeholder="Automatisch ingevuld op basis van klas en vak" 
+                          disabled={true}
                           className="h-9 text-sm bg-white border-gray-200"
                           defaultValue={currentCourse?.instructor || ""}
                         />
+                        <p className="text-xs text-gray-500">
+                          De docent wordt automatisch toegewezen op basis van het geselecteerde vak en klas.
+                        </p>
                       </div>
 
                       <div className="col-span-1 md:col-span-2 space-y-2">
@@ -664,45 +667,48 @@ export default function Courses() {
                 <TabsContent value="onderwerpen" className="mt-0 bg-white rounded-lg min-h-[450px]">
                   <div className="p-4 space-y-4">
                     <div className="space-y-4">
+                      {/* We zouden hier useState moeten gebruiken om de periodes dynamisch toe te voegen */}
                       <div className="border border-gray-200 rounded-lg p-4 space-y-3">
-                        <Label className="text-xs font-medium text-gray-700">Periode 1</Label>
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <Input
+                              placeholder="Naam van de periode (bijv. Periode 1, September, Herfst, etc.)"
+                              disabled={isViewingCourse}
+                              className="h-9 text-sm bg-white border-gray-200 font-medium"
+                              defaultValue="Periode 1"
+                            />
+                          </div>
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="sm" 
+                            className="ml-2"
+                            disabled={isViewingCourse}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                         <Textarea
-                          placeholder="Onderwerpen voor periode 1, bijv. Breuken, Verhoudingen"
+                          placeholder="Onderwerpen voor deze periode, bijv. Breuken, Verhoudingen"
                           disabled={isViewingCourse}
                           className="min-h-[80px] text-sm bg-white border-gray-200"
                           defaultValue=""
                         />
                       </div>
                       
-                      <div className="border border-gray-200 rounded-lg p-4 space-y-3">
-                        <Label className="text-xs font-medium text-gray-700">Periode 2</Label>
-                        <Textarea
-                          placeholder="Onderwerpen voor periode 2, bijv. Vergelijkingen, Meetkunde"
-                          disabled={isViewingCourse}
-                          className="min-h-[80px] text-sm bg-white border-gray-200"
-                          defaultValue=""
-                        />
-                      </div>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        className="w-full border-dashed" 
+                        disabled={isViewingCourse}
+                      >
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Periode toevoegen
+                      </Button>
                       
-                      <div className="border border-gray-200 rounded-lg p-4 space-y-3">
-                        <Label className="text-xs font-medium text-gray-700">Periode 3</Label>
-                        <Textarea
-                          placeholder="Onderwerpen voor periode 3"
-                          disabled={isViewingCourse}
-                          className="min-h-[80px] text-sm bg-white border-gray-200"
-                          defaultValue=""
-                        />
-                      </div>
-                      
-                      <div className="border border-gray-200 rounded-lg p-4 space-y-3">
-                        <Label className="text-xs font-medium text-gray-700">Periode 4</Label>
-                        <Textarea
-                          placeholder="Onderwerpen voor periode 4"
-                          disabled={isViewingCourse}
-                          className="min-h-[80px] text-sm bg-white border-gray-200"
-                          defaultValue=""
-                        />
-                      </div>
+                      <p className="text-xs text-gray-500 italic">
+                        Voeg periodes toe en geef elke periode een naam. Voor elke periode kunt u de onderwerpen specificeren die behandeld worden.
+                      </p>
                     </div>
                   </div>
                 </TabsContent>

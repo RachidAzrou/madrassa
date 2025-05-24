@@ -373,7 +373,7 @@ export default function Rooms() {
       </div>
 
       <div className="space-y-4">
-        <Card className="p-6">
+        <div className="bg-white rounded-md border shadow-sm">
           {isLoading ? (
               <div className="flex justify-center py-8">
                 <span className="loading loading-spinner loading-md"></span>
@@ -392,29 +392,27 @@ export default function Rooms() {
             ) : (
               <div className="overflow-x-auto">
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-gray-50 border-b">
                     <TableRow>
-                      <TableHead>Lokaal Naam</TableHead>
-                      <TableHead>Capaciteit</TableHead>
-                      <TableHead>Locatie</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Acties</TableHead>
+                      <TableHead className="py-3 font-semibold">Lokaalnaam</TableHead>
+                      <TableHead className="py-3 font-semibold">Status</TableHead>
+                      <TableHead className="py-3 font-semibold">Capaciteit</TableHead>
+                      <TableHead className="py-3 font-semibold text-right">Acties</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {rooms.map((room) => (
-                      <TableRow key={room.id}>
+                      <TableRow key={room.id} className="group hover:bg-slate-50">
                         <TableCell className="font-medium">{room.name}</TableCell>
+                        <TableCell>{getStatusBadge(room.status)}</TableCell>
                         <TableCell>
                           <div className="flex items-center">
                             <Users className="h-4 w-4 mr-1 text-gray-500" />
                             {room.capacity}
                           </div>
                         </TableCell>
-                        <TableCell>{room.location}</TableCell>
-                        <TableCell>{getStatusBadge(room.status)}</TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
+                          <div className="opacity-0 group-hover:opacity-100 flex justify-end gap-2 transition-opacity">
                             <Button
                               variant="ghost"
                               size="icon"
@@ -449,7 +447,7 @@ export default function Rooms() {
             )}
             
             {totalPages > 1 && (
-              <div className="flex items-center justify-center space-x-2 py-4">
+              <div className="flex items-center justify-center space-x-2 py-4 border-t">
                 {Array.from({ length: totalPages }, (_, i) => (
                   <Button
                     key={i}
@@ -463,7 +461,7 @@ export default function Rooms() {
                 ))}
               </div>
             )}
-        </Card>
+        </div>
       </div>
 
       {/* Lokaal Toevoegen Dialog */}

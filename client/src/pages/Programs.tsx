@@ -901,7 +901,7 @@ export default function Programs() {
             </div>
           )}
           
-          <DialogFooter>
+          <div className="bg-gray-50 px-6 py-4 mt-4 -mx-6 -mb-4 flex justify-end space-x-4 border-t">
             <Button 
               variant="outline" 
               onClick={() => setIsDeleteDialogOpen(false)}
@@ -919,8 +919,9 @@ export default function Programs() {
               )}
               {deleteProgramMutation.isPending ? 'Bezig met verwijderen...' : 'Verwijderen'}
             </Button>
-          </DialogFooter>
-        </DialogContent>
+          </div>
+          </div>
+        </CustomDialogContent>
       </Dialog>
     </div>
   );

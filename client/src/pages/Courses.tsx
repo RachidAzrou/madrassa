@@ -218,12 +218,12 @@ export default function Courses() {
       
       {/* Zoekbalk en acties */}
       <div className="space-y-4">
-        <div className="flex flex-col md:flex-row gap-4 justify-between">
-          <div className="relative w-full md:w-1/2">
+        <div className="flex flex-col gap-4">
+          <div className="relative w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
             <Input
               type="search"
-              placeholder="Zoek vakken..."
+              placeholder="Zoek curriculum..."
               className="pl-8 bg-white w-full"
               value={searchTerm}
               onChange={handleSearchChange}

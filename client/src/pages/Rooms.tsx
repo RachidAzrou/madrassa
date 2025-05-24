@@ -353,76 +353,74 @@ export default function Rooms() {
         </div>
       </div>
 
-      <div className="mb-6">
-        <Card className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="relative col-span-2">
-                <Search className="absolute left-2.5 top-3 h-4 w-4 text-gray-500" />
-                <Input
-                  type="text"
-                  placeholder="Zoek op naam, locatie..."
-                  className="pl-8"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                />
-              </div>
-              
-              <div>
-                <Select value={statusFilter} onValueChange={handleStatusChange}>
-                  <SelectTrigger className="w-full">
-                    <Filter className="mr-2 h-4 w-4" />
-                    <span className="flex-grow text-left">
-                      {statusFilter === 'all' ? 'Alle statussen' : 
-                        statusFilter === 'available' ? 'Beschikbaar' : 
-                        statusFilter === 'occupied' ? 'Bezet' : 
-                        'Gereserveerd'}
-                    </span>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle statussen</SelectItem>
-                    <SelectItem value="available">Beschikbaar</SelectItem>
-                    <SelectItem value="occupied">Bezet</SelectItem>
-                    <SelectItem value="reserved">Gereserveerd</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Select value={locationFilter} onValueChange={handleLocationChange}>
-                  <SelectTrigger className="w-full">
-                    <MapPin className="mr-2 h-4 w-4" />
-                    <span className="flex-grow text-left">
-                      {locationFilter === 'all' ? 'Alle locaties' : locationFilter}
-                    </span>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle locaties</SelectItem>
-                    {locations.map((location, index) => (
-                      <SelectItem key={index} value={location}>{location}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="flex justify-between mt-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">
-                  {totalRooms} {totalRooms === 1 ? 'lokaal' : 'lokalen'} gevonden
+      <div className="mb-6 bg-white rounded-lg shadow-sm border p-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="relative col-span-2">
+            <Search className="absolute left-2.5 top-3 h-4 w-4 text-gray-500" />
+            <Input
+              type="text"
+              placeholder="Zoek op naam, locatie..."
+              className="pl-8"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </div>
+          
+          <div>
+            <Select value={statusFilter} onValueChange={handleStatusChange}>
+              <SelectTrigger className="w-full">
+                <Filter className="mr-2 h-4 w-4" />
+                <span className="flex-grow text-left">
+                  {statusFilter === 'all' ? 'Alle statussen' : 
+                    statusFilter === 'available' ? 'Beschikbaar' : 
+                    statusFilter === 'occupied' ? 'Bezet' : 
+                    'Gereserveerd'}
                 </span>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Button
-                  onClick={handleAddRoom}
-                  className="bg-[#1e3a8a] hover:bg-[#1e40af]"
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Lokaal Toevoegen
-                </Button>
-              </div>
-            </div>
-        </Card>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle statussen</SelectItem>
+                <SelectItem value="available">Beschikbaar</SelectItem>
+                <SelectItem value="occupied">Bezet</SelectItem>
+                <SelectItem value="reserved">Gereserveerd</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Select value={locationFilter} onValueChange={handleLocationChange}>
+              <SelectTrigger className="w-full">
+                <MapPin className="mr-2 h-4 w-4" />
+                <span className="flex-grow text-left">
+                  {locationFilter === 'all' ? 'Alle locaties' : locationFilter}
+                </span>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle locaties</SelectItem>
+                {locations.map((location, index) => (
+                  <SelectItem key={index} value={location}>{location}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        
+        <div className="flex justify-between mt-4">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-500">
+              {totalRooms} {totalRooms === 1 ? 'lokaal' : 'lokalen'} gevonden
+            </span>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={handleAddRoom}
+              className="bg-[#1e3a8a] hover:bg-[#1e40af]"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Lokaal Toevoegen
+            </Button>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-4">

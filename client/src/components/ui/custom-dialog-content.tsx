@@ -1,65 +1,28 @@
-import React from 'react';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter
-} from '@/components/ui/dialog';
+"use client"
 
-interface CustomDialogContentProps {
-  title: string;
-  description?: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-  footer?: React.ReactNode;
-  onClose?: () => void;
-}
+import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { cn } from "@/lib/utils"
 
-export function CustomDialogContent({
-  title,
-  description,
-  icon,
-  children,
-  footer,
-  onClose
-}: CustomDialogContentProps) {
-  return (
-    <DialogContent className="sm:max-w-[95vw] md:max-w-[85vw] lg:max-w-[80vw] xl:max-w-[75vw] sm:h-[85vh] p-0 gap-0 bg-white overflow-hidden">
-      <DialogHeader className="p-6 border-b">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {icon && <div className="text-[#1e3a8a]">{icon}</div>}
-            <DialogTitle className="text-xl">{title}</DialogTitle>
-          </div>
-          {onClose && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="h-8 w-8 rounded-full p-0 text-gray-400 hover:text-gray-500"
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Sluiten</span>
-            </Button>
-          )}
-        </div>
-        {description && (
-          <DialogDescription className="text-gray-500 mt-2">
-            {description}
-          </DialogDescription>
-        )}
-      </DialogHeader>
-      <div className="px-6 py-4 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 130px)' }}>
-        {children}
-      </div>
-      {footer && (
-        <DialogFooter className="px-6 py-4 border-t bg-gray-50">
-          {footer}
-        </DialogFooter>
+const CustomDialogContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DialogPrimitive.Portal>
+    <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-[92vw] min-w-[40vw] translate-x-[-50%] translate-y-[-50%] gap-1 border bg-background p-0 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg overflow-hidden max-h-[90vh] h-auto flex flex-col",
+        className
       )}
-    </DialogContent>
-  );
-}
+      {...props}
+    >
+      {children}
+      {/* Hier is het kruisje weggehaald */}
+    </DialogPrimitive.Content>
+  </DialogPrimitive.Portal>
+))
+CustomDialogContent.displayName = "CustomDialogContent"
+
+export { CustomDialogContent }

@@ -212,6 +212,24 @@ export default function Dashboard() {
 
 
 
+      {/* NOODKNOP VOOR LOKALEN TOEGANG */}
+      <div className="mb-6 p-5 bg-red-600 rounded-lg border-4 border-black shadow-lg animate-pulse">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <Building className="h-8 w-8 mr-3 text-white" />
+            <h3 className="font-bold text-white text-xl">LOKALEN BEHEER - DIRECTE TOEGANG</h3>
+          </div>
+          <Button 
+            variant="default"
+            size="lg"
+            onClick={() => window.location.href = "/rooms"}
+            className="bg-white text-red-700 hover:bg-gray-100 font-bold border-2 border-black"
+          >
+            KLIK HIER VOOR LOKALEN
+          </Button>
+        </div>
+      </div>
+
       {/* Main Content */}
 
       <div className="grid grid-cols-1 gap-4 sm:gap-6">

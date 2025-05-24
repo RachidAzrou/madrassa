@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, School, 
   Pencil, MoreVertical, Plus, GraduationCap, BookOpen, UsersRound,
-  CalendarIcon, Loader2, XCircle, Users2, X, AlertTriangle
+  CalendarIcon, Loader2, XCircle, Users2, X, AlertTriangle, Save
 } from 'lucide-react';
 import ManageStudentEnrollments from "@/components/student-groups/ManageStudentEnrollments";
 import { ClassEmptyState } from "@/components/ui/empty-states";
@@ -1166,6 +1166,9 @@ export default function StudentGroups() {
             >
               {(createStudentGroupMutation.isPending || updateStudentGroupMutation.isPending) && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              {!createStudentGroupMutation.isPending && !updateStudentGroupMutation.isPending && (
+                <Save className="mr-2 h-4 w-4" />
               )}
               {isEditDialogOpen ? "Opslaan" : "Klas Aanmaken"}
             </Button>

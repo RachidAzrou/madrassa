@@ -388,15 +388,6 @@ export default function Rooms() {
                 <p className="mt-1 text-sm text-gray-500">
                   Er zijn geen lokalen die voldoen aan de zoekcriteria.
                 </p>
-                <div className="mt-6">
-                  <Button 
-                    onClick={handleAddRoom}
-                    className="bg-[#1e3a8a] hover:bg-[#1e40af]"
-                  >
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Lokaal Toevoegen
-                  </Button>
-                </div>
               </div>
             ) : (
               <div className="overflow-x-auto">

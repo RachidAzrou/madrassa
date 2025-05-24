@@ -821,7 +821,37 @@ export default function StudentGroups() {
                       />
                       
                       <div className="mt-8">
-                        <div className="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                        <FormField
+                          control={form.control}
+                          name="curriculum"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs font-medium text-gray-700">Curriculum</FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="mt-1 h-9 text-sm bg-white border-gray-200">
+                                    <SelectValue placeholder="Selecteer curriculum" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="arabisch">Arabisch</SelectItem>
+                                  <SelectItem value="islamitisch">Islamitisch</SelectItem>
+                                  <SelectItem value="taal">Taal & Cultuur</SelectItem>
+                                  <SelectItem value="wiskunde">Wiskunde</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormDescription className="text-xs">
+                                Het curriculum dat deze klas volgt
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <div className="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300 mt-4">
                           <BookOpen className="mx-auto h-8 w-8 text-gray-400 mb-2" />
                           <p className="text-xs text-gray-500">Meerdere vakken kunnen worden toegewezen nadat de klas is aangemaakt.</p>
                         </div>

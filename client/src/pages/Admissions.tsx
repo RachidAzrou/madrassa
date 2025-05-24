@@ -479,11 +479,7 @@ export default function Admissions() {
 
           {/* Applicant List Table */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-200">
-              <div className="text-sm text-gray-500">
-                {isLoading ? 'Laden...' : `Tonen van ${applicants.length} van ${totalApplicants} aanmeldingen`}
-              </div>
-            </div>
+
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">

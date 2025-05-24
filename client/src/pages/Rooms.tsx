@@ -324,13 +324,13 @@ export default function Rooms() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'available':
-        return <Badge className="bg-green-500">Beschikbaar</Badge>;
+        return <Badge variant="outline" className="bg-[#e8f4ff] text-[#1e3a8a] border-[#bfdcff]">Beschikbaar</Badge>;
       case 'occupied':
-        return <Badge className="bg-red-500">Bezet</Badge>;
+        return <Badge variant="outline" className="bg-[#f5f5f5] text-[#64748b] border-[#e2e8f0]">Bezet</Badge>;
       case 'reserved':
-        return <Badge className="bg-yellow-500">Gereserveerd</Badge>;
+        return <Badge variant="outline" className="bg-[#eef2ff] text-[#4f46e5] border-[#c7d2fe]">Gereserveerd</Badge>;
       default:
-        return <Badge className="bg-gray-500">Onbekend</Badge>;
+        return <Badge variant="outline" className="bg-gray-100 text-gray-700 border-gray-200">Onbekend</Badge>;
     }
   };
 

@@ -57,6 +57,7 @@
     "electron": "^36.3.1",
     "electron-builder": "^26.0.12",
     "embla-carousel-react": "^8.6.0",
+    "expo-cli": "^6.3.12",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "framer-motion": "^11.13.1",

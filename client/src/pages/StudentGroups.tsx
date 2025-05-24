@@ -657,7 +657,7 @@ export default function StudentGroups() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="">Geen opleiding</SelectItem>
+                              <SelectItem value="none">Geen opleiding</SelectItem>
                               {programs.map((program: any) => (
                                 <SelectItem key={program.id} value={program.id.toString()}>
                                   {program.name}

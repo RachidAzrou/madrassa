@@ -309,14 +309,14 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   onClick={handleLinkClick}
                 />
                 <div 
-                  className="flex items-center py-2 px-3 rounded-md text-gray-700 hover:bg-[#1e3a8a]/10 cursor-pointer font-medium"
+                  className="flex items-center py-2 px-3 rounded-md text-gray-700 hover:bg-[#1e3a8a]/10 cursor-pointer font-medium ml-6"
                   onClick={() => {
                     window.location.href = "/rooms";
                     if (onClose) onClose();
                   }}
                 >
-                  <School className="h-5 w-5 mr-3 text-gray-500" />
-                  <span>Lokalen Beheer</span>
+                  <Building className="h-5 w-5 mr-3 text-gray-500" />
+                  <span>Lokalen</span>
                 </div>
                 <SidebarLink
                   href="/calendar"

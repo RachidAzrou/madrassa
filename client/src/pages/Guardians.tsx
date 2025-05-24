@@ -81,7 +81,6 @@ export default function Guardians() {
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<StudentType | null>(null);
-  const [guardianToDelete, setGuardianToDelete] = useState<GuardianType | null>(null);
   
   const initialNewGuardian = {
     firstName: '',
@@ -345,6 +344,7 @@ export default function Guardians() {
   const [selectedGuardians, setSelectedGuardians] = useState<number[]>([]);
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [guardianToDelete, setGuardianToDelete] = useState<GuardianType | null>(null);
   
   // Helper functions voor selectie
   const handleToggleAllGuardians = (checked: boolean) => {

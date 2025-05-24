@@ -353,14 +353,26 @@ export default function Rooms() {
         </div>
       </div>
 
-      <div className="mb-6 flex justify-end">
-        <Button
-          onClick={handleAddRoom}
-          className="bg-[#1e3a8a] hover:bg-[#1e40af]"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Lokaal Toevoegen
-        </Button>
+      <div className="mb-6">
+        <div className="w-full mb-4 relative">
+          <Search className="absolute left-2.5 top-3 h-4 w-4 text-gray-500" />
+          <Input
+            type="text"
+            placeholder="Zoek op naam, locatie..."
+            className="pl-8 w-full"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </div>
+        <div className="flex justify-end">
+          <Button
+            onClick={handleAddRoom}
+            className="bg-[#1e3a8a] hover:bg-[#1e40af]"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Lokaal Toevoegen
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-4">

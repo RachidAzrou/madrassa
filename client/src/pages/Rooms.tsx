@@ -664,15 +664,7 @@ export default function Rooms() {
                     </Select>
                   </div>
 
-                  <div>
-                    <Label htmlFor="currentUse">Huidig gebruik</Label>
-                    <Input
-                      id="currentUse"
-                      value={formData.currentUse || ""}
-                      onChange={(e) => handleFormChange('currentUse', e.target.value)}
-                      placeholder="Huidige bestemming"
-                    />
-                  </div>
+
                 </div>
               </div>
               

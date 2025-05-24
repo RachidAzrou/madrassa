@@ -374,47 +374,66 @@ export default function Programs() {
               <p className="text-sm font-medium">Geen vakken beschikbaar</p>
             </div>
             
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 p-4">
-              <div className="border rounded-md overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Checkbox</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vak</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duur</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klas</th>
-                      <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    <tr className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm text-gray-500">
-                        <Checkbox id="checkbox-1" />
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-500 font-medium">
-                        <div className="flex items-center">
-                          <span>Geen vakken toegevoegd</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-500">-</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">-</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">-</td>
-                      <td className="px-4 py-3 text-sm text-gray-500 text-right">
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            <div className="bg-white rounded-md border shadow-sm overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50">
+                  <tr className="border-b border-gray-200">
+                    <th className="py-3 px-2 w-10 font-medium text-xs uppercase text-gray-500 text-center">
+                      <Checkbox 
+                        className="translate-y-[2px]"
+                        onCheckedChange={(checked) => {
+                          // Hier later functionaliteit toevoegen voor 'selecteer alles'
+                        }}
+                      />
+                      <span className="sr-only">Selecteer Alles</span>
+                    </th>
+                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Vak</th>
+                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Code</th>
+                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Duur</th>
+                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Klas</th>
+                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right">
+                      <span className="sr-only">Acties</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
+                    <td className="py-3 px-2 text-center">
+                      <Checkbox 
+                        className="translate-y-[2px]"
+                        onCheckedChange={(checked) => {
+                          // Hier later functionaliteit toevoegen voor individuele selectie
+                        }}
+                      />
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="font-medium text-gray-900">Geen vakken toegevoegd</div>
+                      <div className="text-gray-500 text-xs">Voeg vakken toe aan het curriculum</div>
+                    </td>
+                    <td className="py-3 px-4 text-gray-700">-</td>
+                    <td className="py-3 px-4 text-gray-700">-</td>
+                    <td className="py-3 px-4 text-gray-700">-</td>
+                    <td className="py-3 px-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 p-0 text-slate-600"
+                        >
                           <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Bewerken</span>
                         </Button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div className="mt-2 flex justify-end">
-                <Button variant="outline" size="sm" className="text-xs flex items-center">
-                  <PlusCircle className="h-3 w-3 mr-1" />
-                  Module toevoegen
-                </Button>
-              </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-2 flex justify-end">
+              <Button variant="outline" size="sm" className="text-xs flex items-center">
+                <PlusCircle className="h-3 w-3 mr-1" />
+                Module toevoegen
+              </Button>
             </div>
           </div>
         ) : (

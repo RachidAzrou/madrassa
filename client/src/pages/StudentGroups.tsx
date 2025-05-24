@@ -884,68 +884,50 @@ export default function StudentGroups() {
                         />
                         
                         <div className="space-y-4 mt-4">
-                          <FormField
-                            control={form.control}
-                            name="instroomvereisten"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-xs font-medium text-gray-700">Instroomvereisten</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Beschrijf de vereiste kennis of vaardigheden voor deelname aan deze klas"
-                                    className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormDescription className="text-xs">
-                                  Wat moeten studenten weten of kunnen voordat ze aan deze klas beginnen?
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                          <div className="space-y-2">
+                            <Label htmlFor="entryRequirements" className="text-xs font-medium text-gray-700">Instroomvereisten</Label>
+                            <Textarea
+                              id="entryRequirements"
+                              placeholder="Beschrijf de vereiste kennis of vaardigheden voor deelname aan deze klas"
+                              className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
+                              value={form.watch('description') || ''}
+                              onChange={(e) => form.setValue('description', e.target.value)}
+                            />
+                            <p className="text-xs text-gray-500">
+                              Wat moeten studenten weten of kunnen voordat ze aan deze klas beginnen?
+                            </p>
+                          </div>
                           
-                          <FormField
-                            control={form.control}
-                            name="uitstroomvereisten"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-xs font-medium text-gray-700">Uitstroomvereisten</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Beschrijf wat studenten moeten beheersen na afronding van deze klas"
-                                    className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormDescription className="text-xs">
-                                  Welke competenties moeten studenten hebben verworven na afronding?
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                          <div className="space-y-2 mt-4">
+                            <Label htmlFor="exitRequirements" className="text-xs font-medium text-gray-700">Uitstroomvereisten</Label>
+                            <Textarea
+                              id="exitRequirements"
+                              placeholder="Beschrijf wat studenten moeten beheersen na afronding van deze klas"
+                              className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
+                              value={form.watch('maxCapacity') ? form.watch('maxCapacity').toString() : ''}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                form.setValue('maxCapacity', value ? parseInt(value) : null);
+                              }}
+                            />
+                            <p className="text-xs text-gray-500">
+                              Welke competenties moeten studenten hebben verworven na afronding?
+                            </p>
+                          </div>
                           
-                          <FormField
-                            control={form.control}
-                            name="leerplan"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-xs font-medium text-gray-700">Leerdoelen / Leerplan</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Beschrijf de leerdoelen en het leerplan voor deze klas"
-                                    className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormDescription className="text-xs">
-                                  Wat zijn de belangrijkste leerdoelen en onderdelen van het leerplan?
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                          <div className="space-y-2 mt-4">
+                            <Label htmlFor="learningPlan" className="text-xs font-medium text-gray-700">Leerdoelen / Leerplan</Label>
+                            <Textarea
+                              id="learningPlan"
+                              placeholder="Beschrijf de leerdoelen en het leerplan voor deze klas"
+                              className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
+                              value={form.watch('instructor') || ''}
+                              onChange={(e) => form.setValue('instructor', e.target.value)}
+                            />
+                            <p className="text-xs text-gray-500">
+                              Wat zijn de belangrijkste leerdoelen en onderdelen van het leerplan?
+                            </p>
+                          </div>
                           
                           <div className="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300 mt-4">
                             <BookOpen className="mx-auto h-8 w-8 text-gray-400 mb-2" />

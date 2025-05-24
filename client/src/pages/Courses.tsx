@@ -644,49 +644,69 @@ export default function Courses() {
               </DialogHeader>
               
               <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="md:col-span-2 space-y-6">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500 mb-1">Beschrijving</h3>
-                    <p className="text-gray-800 text-sm">
-                      {selectedCourse.description || 'Geen beschrijving beschikbaar'}
-                    </p>
-                  </div>
-                  
-                  {selectedCourse.learningObjectives && (
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 mb-1">Leerdoelen</h3>
-                      <p className="text-gray-800 text-sm">
-                        {selectedCourse.learningObjectives}
-                      </p>
-                    </div>
-                  )}
-                  
-                  {selectedCourse.competencies && (
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 mb-1">Competenties</h3>
-                      <p className="text-gray-800 text-sm">
-                        {selectedCourse.competencies}
-                      </p>
-                    </div>
-                  )}
-                  
-                  {selectedCourse.prerequisites && (
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 mb-1">Voorvereisten</h3>
-                      <p className="text-gray-800 text-sm">
-                        {selectedCourse.prerequisites}
-                      </p>
-                    </div>
-                  )}
-                  
-                  {selectedCourse.materials && (
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 mb-1">Studiemateriaal</h3>
-                      <p className="text-gray-800 text-sm">
-                        {selectedCourse.materials}
-                      </p>
-                    </div>
-                  )}
+                <div className="md:col-span-2">
+                  <Tabs defaultValue="info" className="w-full">
+                    <TabsList className="mb-4">
+                      <TabsTrigger value="info">Algemene info</TabsTrigger>
+                      <TabsTrigger value="requirements">Vereisten</TabsTrigger>
+                      <TabsTrigger value="curriculum">Leerplan</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="info" className="space-y-6">
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500 mb-1">Beschrijving</h3>
+                        <p className="text-gray-800 text-sm">
+                          {selectedCourse.description || 'Geen beschrijving beschikbaar'}
+                        </p>
+                      </div>
+                      
+                      {selectedCourse.materials && (
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500 mb-1">Studiemateriaal</h3>
+                          <p className="text-gray-800 text-sm">
+                            {selectedCourse.materials}
+                          </p>
+                        </div>
+                      )}
+                    </TabsContent>
+                    
+                    <TabsContent value="requirements" className="space-y-6">
+                      {selectedCourse.prerequisites && (
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500 mb-1">Instroomvereisten</h3>
+                          <div className="bg-gray-50 p-4 rounded border border-gray-100">
+                            <p className="text-gray-800 text-sm whitespace-pre-wrap">
+                              {selectedCourse.prerequisites}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {selectedCourse.competencies && (
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500 mb-1">Uitstroomvereisten</h3>
+                          <div className="bg-gray-50 p-4 rounded border border-gray-100">
+                            <p className="text-gray-800 text-sm whitespace-pre-wrap">
+                              {selectedCourse.competencies}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </TabsContent>
+                    
+                    <TabsContent value="curriculum" className="space-y-6">
+                      {selectedCourse.learningObjectives && (
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500 mb-1">Leerdoelen / Leerplan</h3>
+                          <div className="bg-gray-50 p-4 rounded border border-gray-100">
+                            <p className="text-gray-800 text-sm whitespace-pre-wrap">
+                              {selectedCourse.learningObjectives}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </TabsContent>
+                  </Tabs>
                 </div>
                 
                 <div className="space-y-6">

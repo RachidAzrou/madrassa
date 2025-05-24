@@ -594,14 +594,25 @@ export default function StudentGroups() {
           setIsDialogOpen(false);
         }
       }}>
-        <DialogContent className="sm:max-w-[95vw] md:max-w-[85vw] lg:max-w-[80vw] xl:max-w-[75vw] sm:h-[85vh] p-0 gap-0 bg-white overflow-hidden">
-          <DialogHeader className="p-6 border-b">
+        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
+          {/* Blauwe header */}
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ChalkBoard className="h-5 w-5 text-[#1e3a8a]" />
-                <DialogTitle className="text-xl">
-                  {isEditDialogOpen ? "Klas bewerken" : "Nieuwe klas aanmaken"}
-                </DialogTitle>
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  {isEditDialogOpen ? 
+                    <Pencil className="h-6 w-6 text-white" /> : 
+                    <ChalkBoard className="h-6 w-6 text-white" />
+                  }
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold">
+                    {isEditDialogOpen ? "Klas Bewerken" : "Nieuwe Klas Aanmaken"}
+                  </h2>
+                  <span className="text-sm text-blue-100 font-medium">
+                    Vul de onderstaande gegevens in om een {isEditDialogOpen ? "bestaande" : "nieuwe"} klas {isEditDialogOpen ? "bij te werken" : "aan te maken"}.
+                  </span>
+                </div>
               </div>
               <Button
                 variant="ghost"
@@ -611,103 +622,106 @@ export default function StudentGroups() {
                   setIsEditDialogOpen(false);
                   setIsDialogOpen(false);
                 }}
-                className="h-8 w-8 rounded-full p-0 text-gray-400 hover:text-gray-500"
+                className="h-8 w-8 rounded-full p-0 text-white hover:bg-white/20"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
                 <span className="sr-only">Sluiten</span>
               </Button>
             </div>
-            <DialogDescription className="text-gray-500 mt-2">
-              Vul de onderstaande gegevens in om een {isEditDialogOpen ? "bestaande" : "nieuwe"} klas {isEditDialogOpen ? "bij te werken" : "aan te maken"}.
-            </DialogDescription>
-          </DialogHeader>
+          </div>
           <div className="px-6 py-4 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 130px)' }}>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <Tabs defaultValue="algemeen" className="w-full">
-                  <TabsList className="grid grid-cols-5 w-full h-10 p-1 bg-blue-900/10">
-                    <TabsTrigger value="algemeen" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                  <TabsList className="grid grid-cols-5 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
+                    <TabsTrigger value="algemeen" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                       <ChalkBoard className="h-4 w-4" />
                       <span>Algemeen</span>
                     </TabsTrigger>
-                    <TabsTrigger value="studenten" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                    <TabsTrigger value="studenten" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                       <UsersRound className="h-4 w-4" />
                       <span>Studenten</span>
                     </TabsTrigger>
-                    <TabsTrigger value="docenten" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                    <TabsTrigger value="docenten" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                       <GraduationCap className="h-4 w-4" />
                       <span>Docenten</span>
                     </TabsTrigger>
-                    <TabsTrigger value="vakken" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                    <TabsTrigger value="vakken" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                       <BookOpen className="h-4 w-4" />
                       <span>Vakken</span>
                     </TabsTrigger>
-                    <TabsTrigger value="planning" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+                    <TabsTrigger value="planning" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                       <CalendarIcon className="h-4 w-4" />
                       <span>Planning</span>
                     </TabsTrigger>
                   </TabsList>
 
                   {/* Algemeen tabblad */}
-                  <TabsContent value="algemeen" className="pt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Klasnaam *</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Voer klasnaam in" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="academicYear"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Academisch Jaar *</FormLabel>
-                            <Select 
-                              onValueChange={field.onChange} 
-                              defaultValue={field.value}
-                            >
+                  <TabsContent value="algemeen" className="mt-0">
+                    <div className="p-4 bg-white rounded-lg min-h-[450px]">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs font-medium text-gray-700">Klasnaam <span className="text-primary">*</span></FormLabel>
                               <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecteer academisch jaar" />
-                                </SelectTrigger>
+                                <Input 
+                                  placeholder="Voer klasnaam in" 
+                                  {...field} 
+                                  className="mt-1 h-9 text-sm bg-white border-gray-200" 
+                                />
                               </FormControl>
-                              <SelectContent>
-                                <SelectItem value="2025-2026">2025-2026</SelectItem>
-                                <SelectItem value="2024-2025">2024-2025</SelectItem>
-                                <SelectItem value="2023-2024">2023-2024</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="maxCapacity"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Maximale Capaciteit</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                placeholder="30"
-                                {...field}
-                                onChange={(e) => {
-                                  const value = parseInt(e.target.value);
-                                  field.onChange(isNaN(value) ? undefined : value);
-                                }}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="academicYear"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs font-medium text-gray-700">Academisch Jaar <span className="text-primary">*</span></FormLabel>
+                              <Select 
+                                onValueChange={field.onChange} 
+                                defaultValue={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="mt-1 h-9 text-sm bg-white border-gray-200">
+                                    <SelectValue placeholder="Selecteer academisch jaar" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="2025-2026">2025-2026</SelectItem>
+                                  <SelectItem value="2024-2025">2024-2025</SelectItem>
+                                  <SelectItem value="2023-2024">2023-2024</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="maxCapacity"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs font-medium text-gray-700">Maximale Capaciteit</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  placeholder="30"
+                                  {...field}
+                                  className="mt-1 h-9 text-sm bg-white border-gray-200"
+                                  onChange={(e) => {
+                                    const value = parseInt(e.target.value);
+                                    field.onChange(isNaN(value) ? undefined : value);
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
                         )}
                       />
                       <FormField
@@ -847,7 +861,7 @@ export default function StudentGroups() {
               </form>
             </Form>
           </div>
-          <div className="px-6 py-4 border-t bg-gray-50 flex justify-between">
+          <div className="p-4 border-t flex justify-end gap-3 bg-gray-50">
             <Button
               type="button"
               variant="outline" 
@@ -855,6 +869,7 @@ export default function StudentGroups() {
                 isEditDialogOpen ? setIsEditDialogOpen(false) : setIsAddDialogOpen(false);
                 setIsDialogOpen(false);
               }}
+              className="border-gray-300"
             >
               Annuleren
             </Button>
@@ -867,7 +882,7 @@ export default function StudentGroups() {
               {(createStudentGroupMutation.isPending || updateStudentGroupMutation.isPending) && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              {isEditDialogOpen ? "Opslaan" : "Aanmaken"}
+              {isEditDialogOpen ? "Opslaan" : "Klas Aanmaken"}
             </Button>
           </div>
         </DialogContent>

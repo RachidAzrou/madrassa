@@ -497,15 +497,33 @@ export default function Rooms() {
           <div className="px-6 py-5 overflow-y-auto" style={{ height: "calc(85vh - 170px)" }}>
             <form onSubmit={handleFormSubmit} className="space-y-6">
               <div className="space-y-6">
-                <div>
-                  <Label htmlFor="name">Lokaalnaam <span className="text-red-500">*</span></Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => handleFormChange('name', e.target.value)}
-                    placeholder="Bijv. Lokaal A1-01"
-                    required
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">Lokaalnaam <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => handleFormChange('name', e.target.value)}
+                      placeholder="Bijv. Lokaal A1-01"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="status">Status</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value: 'available' | 'occupied') => handleFormChange('status', value)}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecteer status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="available">Beschikbaar</SelectItem>
+                        <SelectItem value="occupied">Bezet</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -543,22 +561,6 @@ export default function Rooms() {
                     placeholder="Bijzonderheden over dit lokaal"
                     rows={3}
                   />
-                </div>
-                
-                <div>
-                  <Label htmlFor="status">Status</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value: 'available' | 'occupied') => handleFormChange('status', value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecteer status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="available">Beschikbaar</SelectItem>
-                      <SelectItem value="occupied">Bezet</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </div>
               
@@ -607,15 +609,33 @@ export default function Rooms() {
           <div className="px-6 py-5 overflow-y-auto" style={{ height: "calc(85vh - 170px)" }}>
             <form onSubmit={handleFormSubmit} className="space-y-6">
               <div className="space-y-6">
-                <div>
-                  <Label htmlFor="name">Lokaalnaam <span className="text-red-500">*</span></Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => handleFormChange('name', e.target.value)}
-                    placeholder="Bijv. Lokaal A1-01"
-                    required
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">Lokaalnaam <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => handleFormChange('name', e.target.value)}
+                      placeholder="Bijv. Lokaal A1-01"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="status">Status</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value: 'available' | 'occupied') => handleFormChange('status', value)}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecteer status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="available">Beschikbaar</SelectItem>
+                        <SelectItem value="occupied">Bezet</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -653,22 +673,6 @@ export default function Rooms() {
                     placeholder="Bijzonderheden over dit lokaal"
                     rows={3}
                   />
-                </div>
-
-                <div>
-                  <Label htmlFor="status">Status</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value: 'available' | 'occupied') => handleFormChange('status', value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecteer status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="available">Beschikbaar</SelectItem>
-                      <SelectItem value="occupied">Bezet</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </div>
               

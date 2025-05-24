@@ -259,7 +259,7 @@ export default function Guardians() {
                         />
                         <label
                           htmlFor="isEmergencyContact"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#eb2626]"
                         >
                           Deze persoon is een noodcontact
                         </label>
@@ -398,7 +398,6 @@ export default function Guardians() {
           </div>
         </DialogContent>
       </Dialog>
-      
       {/* Delete bevestiging dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent className="sm:max-w-md p-0 gap-0 bg-white overflow-hidden [&>button[aria-label='Close']]:hidden">
@@ -453,7 +452,6 @@ export default function Guardians() {
           </div>
         </DialogContent>
       </Dialog>
-      
       {/* Page Title */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
@@ -468,7 +466,6 @@ export default function Guardians() {
           </div>
         </div>
       </div>
-      
       {/* Zoekbalk en acties */}
       <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
         <div className="relative w-full md:w-96">
@@ -490,7 +487,6 @@ export default function Guardians() {
           <span>Voogd Toevoegen</span>
         </Button>
       </div>
-      
       {/* Voogden lijst */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">

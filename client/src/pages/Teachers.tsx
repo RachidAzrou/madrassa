@@ -601,15 +601,12 @@ const Teachers = () => {
                 </div>
               </div>
               
-              <Button
-                type="button"
-                variant="ghost"
-                className="text-white hover:bg-blue-700 hover:text-white"
+              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white/20 cursor-pointer"
                 onClick={() => setIsViewDialogOpen(false)}
               >
-                <X className="h-4 w-4 mr-2" />
-                Sluiten
-              </Button>
+                <X className="h-4 w-4 text-white" />
+                <span className="sr-only">Sluiten</span>
+              </div>
             </div>
           </DialogHeader>
           
@@ -802,8 +799,12 @@ const Teachers = () => {
                   </DialogDescription>
                 </div>
               </div>
-              
-
+              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white/20 cursor-pointer"
+                onClick={() => setIsCreateDialogOpen(false)}
+              >
+                <X className="h-4 w-4 text-white" />
+                <span className="sr-only">Sluiten</span>
+              </div>
             </div>
           </DialogHeader>
           

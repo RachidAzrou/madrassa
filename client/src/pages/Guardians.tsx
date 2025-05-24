@@ -1500,19 +1500,15 @@ export default function Guardians() {
                   <AlertTriangle className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-1.5">Voogd verwijderen</h3>
-                  <p className="text-red-100 text-sm">
-                    Weet u zeker dat u deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-                  </p>
+                  <h3 className="text-xl font-bold text-white">Voogd verwijderen</h3>
                 </div>
               </div>
             </div>
             
             <div className="p-5">
-              <div className="flex items-center gap-2 mb-5 bg-red-50 p-3 rounded-md border border-red-200">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
-                <p className="text-sm text-red-600">Alle koppelingen met studenten worden ook verwijderd.</p>
-              </div>
+              <p className="text-gray-700 text-sm mb-5">
+                Weet u zeker dat u deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+              </p>
               
               <div className="flex items-center space-x-3 mb-2 bg-gray-50 p-4 rounded-md border border-gray-100">
                 <Avatar className="h-10 w-10">

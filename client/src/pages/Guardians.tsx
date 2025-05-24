@@ -1494,7 +1494,7 @@ export default function Guardians() {
       {isDeleteDialogOpen && guardianToDelete && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md overflow-hidden transform transition-all">
-            <div className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-6">
+            <div className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-6 relative">
               <div className="flex items-center gap-6">
                 <div className="bg-white/20 rounded-full p-3">
                   <AlertTriangle className="h-6 w-6 text-white" />
@@ -1503,6 +1503,12 @@ export default function Guardians() {
                   <h3 className="text-xl font-bold text-white">Voogd verwijderen</h3>
                 </div>
               </div>
+              <button 
+                className="absolute top-4 right-4 rounded-full p-1 hover:bg-white/20 transition-colors" 
+                onClick={cancelDelete}
+              >
+                <X className="h-5 w-5 text-white" />
+              </button>
             </div>
             
             <div className="p-5">

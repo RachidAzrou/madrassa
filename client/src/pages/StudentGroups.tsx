@@ -448,34 +448,34 @@ export default function StudentGroups() {
             </div>
           ) : (
             <>
-              <div className="rounded-md border overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-slate-50 text-slate-700">
-                    <tr>
-                      <th className="py-3 px-4 text-left font-medium text-sm">KLAS</th>
-                      <th className="py-3 px-4 text-left font-medium text-sm">TITULARIS</th>
-                      <th className="py-3 px-4 text-left font-medium text-sm">STATUS</th>
-                      <th className="py-3 px-4 text-right font-medium text-sm">
-                        <span className="sr-only">ACTIES</span>
+              <div className="bg-white rounded-md border shadow-sm overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50">
+                    <tr className="border-b border-gray-200">
+                      <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Klas</th>
+                      <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Titularis</th>
+                      <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Status</th>
+                      <th className="py-3 px-4 text-right">
+                        <span className="sr-only">Acties</span>
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
                     {studentGroups.map((group: any) => (
-                      <tr key={group.id} className="group hover:bg-slate-50">
-                        <td className="p-4 text-sm">
-                          <div className="font-medium text-slate-900">{group.name}</div>
-                          <div className="text-slate-500 text-xs">{group.academicYear} • {group.enrolledCount || 0} studenten</div>
+                      <tr key={group.id} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
+                        <td className="py-3 px-4">
+                          <div className="font-medium text-gray-900">{group.name}</div>
+                          <div className="text-gray-500 text-xs">{group.academicYear} • {group.enrolledCount || 0} studenten</div>
                         </td>
-                        <td className="p-4 text-sm text-slate-700">
+                        <td className="py-3 px-4 text-gray-700">
                           {group.instructor || "-"}
                         </td>
-                        <td className="p-4 text-sm">
+                        <td className="py-3 px-4">
                           <Badge variant={group.isActive ? "default" : "outline"} className={group.isActive ? "bg-green-100 text-green-800 hover:bg-green-100" : "text-gray-500"}>
                             {group.isActive ? "Actief" : "Inactief"}
                           </Badge>
                         </td>
-                        <td className="p-4 text-sm text-right">
+                        <td className="py-3 px-4 text-right">
                           <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Button 
                               variant="ghost" 

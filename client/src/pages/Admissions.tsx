@@ -461,13 +461,7 @@ export default function Admissions() {
       
       <div className="mb-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="p-1">
-              <TabsTrigger value="applications" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Aanmeldingen</TabsTrigger>
-              <TabsTrigger value="admission-programs" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Toelatingsprogramma's</TabsTrigger>
-              <TabsTrigger value="settings" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Instellingen</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="text-xl font-semibold text-gray-800">Aanmeldingen</div>
           
           <Button 
             onClick={handleAddApplicant} 

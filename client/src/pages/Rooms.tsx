@@ -382,15 +382,14 @@ export default function Rooms() {
                 <span className="loading loading-spinner loading-md"></span>
               </div>
             ) : rooms.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-2">
-                  <Building className="h-8 w-8 text-blue-600" />
+              <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                <div className="text-[#1e3a8a] mb-2">
+                  <Building className="h-10 w-10" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Geen lokalen gevonden</h3>
-                <p className="text-gray-500 mb-4 max-w-md mx-auto">
+                <p className="text-sm font-medium">
                   {searchTerm 
-                    ? `Er zijn geen lokalen gevonden die overeenkomen met "${searchTerm}". Probeer een andere zoekopdracht.` 
-                    : 'Er zijn nog geen lokalen aangemaakt.'}
+                    ? `Geen lokalen gevonden voor "${searchTerm}"` 
+                    : 'Geen lokalen gevonden'}
                 </p>
               </div>
             ) : (

@@ -407,43 +407,40 @@ export default function Admissions() {
         </div>
       </div>
       
-      {/* Dashboard Stats - met dezelfde stijl als in Dashboard.tsx */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <FileText className="h-20 w-20 text-sky-500" />
+      {/* Dashboard Stats - in dezelfde stijl als het dashboard */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+        <div className="bg-[#1e3a8a] text-white rounded-xl shadow-lg p-4 sm:p-6 relative overflow-hidden group hover:bg-[#1e3a8a]/90 transition-all">
+          <div className="absolute right-0 top-0 opacity-20 group-hover:opacity-25 transition-opacity">
+            <FileText className="h-24 sm:h-28 w-24 sm:w-28 text-white" />
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal Aanmeldingen</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.totalApplications}</p>
-
+          <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Totaal Aanmeldingen</h3>
+          <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.totalApplications}</p>
         </div>
         
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <Clock className="h-20 w-20 text-sky-500" />
+        <div className="bg-[#1e3a8a] text-white rounded-xl shadow-lg p-4 sm:p-6 relative overflow-hidden group hover:bg-[#1e3a8a]/90 transition-all">
+          <div className="absolute right-0 top-0 opacity-20 group-hover:opacity-25 transition-opacity">
+            <Clock className="h-24 sm:h-28 w-24 sm:w-28 text-white" />
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Wachtend op Beoordeling</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.pendingReview}</p>
-
+          <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Wachtend op Beoordeling</h3>
+          <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.pendingReview}</p>
         </div>
         
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <CheckCircle className="h-20 w-20 text-sky-500" />
+        <div className="bg-[#1e3a8a] text-white rounded-xl shadow-lg p-4 sm:p-6 relative overflow-hidden group hover:bg-[#1e3a8a]/90 transition-all">
+          <div className="absolute right-0 top-0 opacity-20 group-hover:opacity-25 transition-opacity">
+            <CheckCircle className="h-24 sm:h-28 w-24 sm:w-28 text-white" />
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Goedgekeurd</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.approved}</p>
-
+          <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Goedgekeurd</h3>
+          <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.approved}</p>
         </div>
         
-        <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10">
-            <School className="h-20 w-20 text-sky-500" />
+        <div className="bg-[#1e3a8a] text-white rounded-xl shadow-lg p-4 sm:p-6 relative overflow-hidden group hover:bg-[#1e3a8a]/90 transition-all">
+          <div className="absolute right-0 top-0 opacity-20 group-hover:opacity-25 transition-opacity">
+            <School className="h-24 sm:h-28 w-24 sm:w-28 text-white" />
           </div>
-          <h3 className="text-sm font-medium text-gray-600 mb-1">Inschrijvingsgraad</h3>
-          <p className="text-2xl font-bold text-sky-700">{stats.enrollmentRate}%</p>
+          <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Inschrijvingsgraad</h3>
+          <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.enrollmentRate}%</p>
           <div className="mt-2">
-            <Progress value={stats.enrollmentRate} className="h-1.5" />
+            <Progress value={stats.enrollmentRate} className="h-1.5 bg-blue-900" />
           </div>
         </div>
       </div>

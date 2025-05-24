@@ -455,12 +455,12 @@ export default function StudentGroups() {
                       <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Klas</th>
                       <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Titularis</th>
                       <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Status</th>
-                      <th className="py-3 px-4 text-right">
-                        <span className="sr-only">Acties</span>
+                      <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right">
+                        Acties
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
+                  <tbody>
                     {studentGroups.map((group: any) => (
                       <tr key={group.id} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
                         <td className="py-3 px-4">
@@ -476,7 +476,7 @@ export default function StudentGroups() {
                           </Badge>
                         </td>
                         <td className="py-3 px-4 text-right">
-                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex justify-end gap-2">
                             <Button 
                               variant="ghost" 
                               size="sm" 

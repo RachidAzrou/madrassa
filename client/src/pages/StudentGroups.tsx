@@ -648,8 +648,199 @@ export default function StudentGroups() {
                     </TabsTrigger>
                   </TabsList>
 
-                  {/* Content voor tabbladen hier - voor de leesbaarheid zijn deze weggelaten */}
-                  {/* Je kunt hier jouw tab content toevoegen */}
+                  {/* Algemeen tabblad */}
+                  <TabsContent value="algemeen" className="pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Klasnaam *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Voer klasnaam in" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="academicYear"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Academisch Jaar *</FormLabel>
+                            <Select 
+                              onValueChange={field.onChange} 
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecteer academisch jaar" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="2025-2026">2025-2026</SelectItem>
+                                <SelectItem value="2024-2025">2024-2025</SelectItem>
+                                <SelectItem value="2023-2024">2023-2024</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="maxCapacity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Maximale Capaciteit</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="30"
+                                {...field}
+                                onChange={(e) => {
+                                  const value = parseInt(e.target.value);
+                                  field.onChange(isNaN(value) ? undefined : value);
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="instructor"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Hoofddocent</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Naam van hoofddocent" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem className="col-span-2">
+                            <FormLabel>Beschrijving</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Geef een beschrijving van de klas en doelstellingen"
+                                className="min-h-24"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                            <div className="space-y-0.5">
+                              <FormLabel>Status Actief</FormLabel>
+                              <FormDescription>
+                                Als dit niet actief is, kan de klas niet worden gebruikt voor nieuwe inschrijvingen.
+                              </FormDescription>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </TabsContent>
+
+                  {/* Studenten tabblad */}
+                  <TabsContent value="studenten" className="pt-4">
+                    {isEditDialogOpen && selectedGroup ? (
+                      <ManageStudentEnrollments groupId={selectedGroup.id} />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center p-8 text-center">
+                        <p className="text-gray-500 mb-2">
+                          Sla de klas eerst op om studenten toe te kunnen wijzen.
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          Na het aanmaken kun je vanuit het bewerkscherm studenten toewijzen.
+                        </p>
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  {/* Docenten tabblad */}
+                  <TabsContent value="docenten" className="pt-4">
+                    <div className="flex flex-col items-center justify-center p-8 text-center">
+                      <p className="text-gray-500 mb-2">
+                        Sla de klas eerst op om docenten toe te kunnen wijzen.
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Na het aanmaken kun je vanuit het bewerkscherm docenten toewijzen.
+                      </p>
+                    </div>
+                  </TabsContent>
+
+                  {/* Vakken tabblad */}
+                  <TabsContent value="vakken" className="pt-4">
+                    <FormField
+                      control={form.control}
+                      name="courseId"
+                      render={({ field }) => (
+                        <FormItem className="mb-4">
+                          <FormLabel>Hoofdvak</FormLabel>
+                          <Select 
+                            onValueChange={(value) => field.onChange(Number(value))}
+                            value={field.value?.toString()}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecteer hoofdvak" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {courses.map((course) => (
+                                <SelectItem key={course.id} value={course.id.toString()}>
+                                  {course.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex flex-col items-center justify-center p-4 text-center">
+                      <p className="text-gray-500 mb-2">
+                        Sla de klas eerst op om meer vakken toe te kunnen wijzen.
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Na het aanmaken kun je vanuit het bewerkscherm meerdere vakken toewijzen.
+                      </p>
+                    </div>
+                  </TabsContent>
+
+                  {/* Planning tabblad */}
+                  <TabsContent value="planning" className="pt-4">
+                    <div className="flex flex-col items-center justify-center p-8 text-center">
+                      <p className="text-gray-500 mb-2">
+                        Sla de klas eerst op om planning toe te kunnen voegen.
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Na het aanmaken kun je vanuit het bewerkscherm planningen toevoegen.
+                      </p>
+                    </div>
+                  </TabsContent>
                 </Tabs>
 
                 <DialogFooter className="pt-6 flex justify-between">

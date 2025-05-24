@@ -563,10 +563,14 @@ export default function StudentGroups() {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <Tabs defaultValue="algemeen" className="w-full">
-                  <TabsList className="grid grid-cols-5 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
+                  <TabsList className="grid grid-cols-6 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
                     <TabsTrigger value="algemeen" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                       <ChalkBoard className="h-4 w-4" />
                       <span>Algemeen</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="curriculum" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
+                      <BookOpen className="h-4 w-4" />
+                      <span>Curriculum</span>
                     </TabsTrigger>
                     <TabsTrigger value="studenten" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
                       <UsersRound className="h-4 w-4" />
@@ -577,7 +581,7 @@ export default function StudentGroups() {
                       <span>Docenten</span>
                     </TabsTrigger>
                     <TabsTrigger value="vakken" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                      <BookOpen className="h-4 w-4" />
+                      <Book className="h-4 w-4" />
                       <span>Vakken</span>
                     </TabsTrigger>
                     <TabsTrigger value="planning" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
@@ -741,6 +745,113 @@ export default function StudentGroups() {
                     </div>
                   </TabsContent>
 
+                  {/* Curriculum tabblad */}
+                  <TabsContent value="curriculum" className="mt-0">
+                    <div className="p-4 bg-white rounded-lg">
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="selectCourse" className="text-xs font-medium text-gray-700">Selecteer een vak</Label>
+                            <Select
+                              onValueChange={(value) => {
+                                const selectedCourse = courses.find((c: any) => c.id.toString() === value);
+                                if (selectedCourse) {
+                                  form.setValue('courseId', selectedCourse.id);
+                                }
+                              }}
+                              value={form.watch('courseId')?.toString()}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Kies een vak" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {courses.length > 0 ? (
+                                  courses.map((course: any) => (
+                                    <SelectItem key={course.id} value={course.id.toString()}>
+                                      {course.name}
+                                    </SelectItem>
+                                  ))
+                                ) : (
+                                  <SelectItem value="none" disabled>Geen vakken beschikbaar</SelectItem>
+                                )}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4 border-t border-gray-200 pt-4 mt-4">
+                          <h3 className="text-md font-medium">Curriculum details</h3>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="instroomvereisten" className="text-xs font-medium text-gray-700">Instroomvereisten</Label>
+                            <Textarea
+                              id="instroomvereisten"
+                              placeholder="Beschrijf de vereiste kennis of vaardigheden voor deelname aan deze klas"
+                              className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
+                              value={form.watch('description') || ''}
+                              onChange={(e) => form.setValue('description', e.target.value)}
+                            />
+                            <p className="text-xs text-gray-500">
+                              Wat moeten studenten weten of kunnen voordat ze aan deze klas beginnen?
+                            </p>
+                          </div>
+                          
+                          <div className="space-y-2 mt-4">
+                            <Label htmlFor="uitstroomvereisten" className="text-xs font-medium text-gray-700">Uitstroomvereisten</Label>
+                            <Textarea
+                              id="uitstroomvereisten"
+                              placeholder="Beschrijf wat studenten moeten beheersen na afronding van deze klas"
+                              className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
+                              value={form.watch('instructor') || ''}
+                              onChange={(e) => form.setValue('instructor', e.target.value)}
+                            />
+                            <p className="text-xs text-gray-500">
+                              Welke competenties moeten studenten hebben verworven na afronding?
+                            </p>
+                          </div>
+                          
+                          <div className="space-y-2 mt-4">
+                            <Label htmlFor="leerplan" className="text-xs font-medium text-gray-700">Leerdoelen / Leerplan</Label>
+                            <Textarea
+                              id="leerplan"
+                              placeholder="Beschrijf de leerdoelen en het leerplan voor deze klas"
+                              className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
+                              value={form.watch('curriculum') || ''}
+                              onChange={(e) => form.setValue('curriculum', e.target.value)}
+                            />
+                            <p className="text-xs text-gray-500">
+                              Wat zijn de belangrijkste leerdoelen en onderdelen van het leerplan?
+                            </p>
+                          </div>
+                          
+                          <div className="space-y-2 mt-4">
+                            <Label htmlFor="studiemateriaal" className="text-xs font-medium text-gray-700">Studiemateriaal</Label>
+                            <Textarea
+                              id="studiemateriaal"
+                              placeholder="Beschrijf het benodigde studiemateriaal voor deze klas"
+                              className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
+                              value={form.watch('maxCapacity') ? form.watch('maxCapacity').toString() : ''}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (value) {
+                                  const numValue = parseInt(value);
+                                  if (!isNaN(numValue)) {
+                                    form.setValue('maxCapacity', numValue);
+                                  }
+                                } else {
+                                  form.setValue('maxCapacity', undefined);
+                                }
+                              }}
+                            />
+                            <p className="text-xs text-gray-500">
+                              Welke boeken, materialen en hulpmiddelen zijn nodig?
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+                  
                   {/* Studenten tabblad */}
                   <TabsContent value="studenten" className="mt-0">
                     <div className="p-4 bg-white rounded-lg min-h-[450px]">

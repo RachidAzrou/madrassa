@@ -790,151 +790,195 @@ export default function Courses() {
           </DialogHeader>
           
           <form onSubmit={isEditDialogOpen ? handleSubmitEditCourse : handleSubmitCourse} className="space-y-6 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Naam *</Label>
-                <Input
-                  id="name"
-                  value={courseFormData.name}
-                  onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="code">Code *</Label>
-                <Input
-                  id="code"
-                  value={courseFormData.code}
-                  onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="programId">Programma</Label>
+            {!isEditDialogOpen && (
+              <div className="space-y-2 mb-4">
+                <Label htmlFor="selectExistingCourse">Selecteer een bestaand vak</Label>
                 <Select
-                  value={courseFormData.programId?.toString() || ''}
-                  onValueChange={(value) => setCourseFormData({ ...courseFormData, programId: value ? parseInt(value) : null })}
+                  onValueChange={(value) => {
+                    const selectedCourse = courses.find((c) => c.id.toString() === value);
+                    if (selectedCourse) {
+                      setCourseFormData({
+                        ...selectedCourse,
+                        programId: selectedCourse.programId || undefined,
+                      });
+                    }
+                  }}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer een programma" />
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Of kies een bestaand vak om te bewerken" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Geen programma</SelectItem>
-                    {programs.map((program: ProgramType) => (
-                      <SelectItem key={program.id} value={program.id.toString()}>
-                        {program.name}
-                      </SelectItem>
-                    ))}
+                    {courses.length > 0 ? (
+                      courses.map((course) => (
+                        <SelectItem key={course.id} value={course.id.toString()}>
+                          {course.name} ({course.code})
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="none" disabled>Geen vakken beschikbaar</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
+            )}
+            
+            <div className="border-b border-gray-200 pb-4 mb-4">
+              <h3 className="text-md font-medium mb-4">Vak informatie</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Naam *</Label>
+                  <Input
+                    id="name"
+                    value={courseFormData.name}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, name: e.target.value })}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="code">Code *</Label>
+                  <Input
+                    id="code"
+                    value={courseFormData.code}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, code: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="programId">Programma</Label>
+                  <Select
+                    value={courseFormData.programId?.toString() || ''}
+                    onValueChange={(value) => setCourseFormData({ ...courseFormData, programId: value ? parseInt(value) : null })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer een programma" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Geen programma</SelectItem>
+                      {programs.map((program: ProgramType) => (
+                        <SelectItem key={program.id} value={program.id.toString()}>
+                          {program.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="credits">Studiepunten *</Label>
+                  <Input
+                    id="credits"
+                    type="number"
+                    min="0"
+                    value={courseFormData.credits?.toString() || '0'}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, credits: parseInt(e.target.value) })}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2 mt-4">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={courseFormData.isActive || false}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, isActive: e.target.checked })}
+                  className="rounded border-gray-300 focus:ring-primary h-4 w-4 text-primary"
+                />
+                <Label htmlFor="isActive" className="cursor-pointer">Actief</Label>
+              </div>
+            </div>
+            
+            <div className="border-b border-gray-200 pb-4 mb-4">
+              <h3 className="text-md font-medium mb-4">Curriculum details</h3>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="prerequisites">Instroomvereisten</Label>
+                  <Textarea
+                    id="prerequisites"
+                    value={courseFormData.prerequisites || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
+                    rows={3}
+                    placeholder="Welke kennis of vaardigheden moeten studenten bezitten voor aanvang?"
+                  />
+                  <p className="text-xs text-gray-500">Beschrijf wat studenten moeten weten of kunnen voordat ze aan dit curriculum beginnen</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="competencies">Uitstroomvereisten</Label>
+                  <Textarea
+                    id="competencies"
+                    value={courseFormData.competencies || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
+                    rows={3}
+                    placeholder="Welke kennis of vaardigheden moeten studenten beheersen na afronding?"
+                  />
+                  <p className="text-xs text-gray-500">Beschrijf welke competenties studenten moeten hebben na afronding</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="learningObjectives">Leerdoelen / Leerplan</Label>
+                  <Textarea
+                    id="learningObjectives"
+                    value={courseFormData.learningObjectives || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, learningObjectives: e.target.value })}
+                    rows={3}
+                    placeholder="Beschrijf de leerdoelen en het leerplan voor dit curriculum"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="materials">Studiemateriaal</Label>
+                  <Textarea
+                    id="materials"
+                    value={courseFormData.materials || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, materials: e.target.value })}
+                    rows={3}
+                    placeholder="Beschrijf het benodigde studiemateriaal voor dit vak"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h3 className="text-md font-medium mb-4">Overige informatie</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="instructor">Instructeur</Label>
+                  <Input
+                    id="instructor"
+                    value={courseFormData.instructor || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, instructor: e.target.value })}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="maxStudents">Maximum aantal studenten</Label>
+                  <Input
+                    id="maxStudents"
+                    type="number"
+                    min="0"
+                    value={courseFormData.maxStudents?.toString() || ''}
+                    onChange={(e) => setCourseFormData({ ...courseFormData, maxStudents: parseInt(e.target.value) })}
+                  />
+                  <p className="text-xs text-gray-500">Laat leeg voor onbeperkt</p>
+                </div>
+              </div>
               
               <div className="space-y-2">
-                <Label htmlFor="credits">Studiepunten *</Label>
-                <Input
-                  id="credits"
-                  type="number"
-                  min="0"
-                  value={courseFormData.credits?.toString() || '0'}
-                  onChange={(e) => setCourseFormData({ ...courseFormData, credits: parseInt(e.target.value) })}
-                  required
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="instructor">Instructeur</Label>
-                <Input
-                  id="instructor"
-                  value={courseFormData.instructor || ''}
-                  onChange={(e) => setCourseFormData({ ...courseFormData, instructor: e.target.value })}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="maxStudents">Maximum aantal studenten</Label>
-                <Input
-                  id="maxStudents"
-                  type="number"
-                  min="0"
-                  value={courseFormData.maxStudents?.toString() || ''}
-                  onChange={(e) => setCourseFormData({ ...courseFormData, maxStudents: parseInt(e.target.value) })}
-                />
-                <p className="text-xs text-gray-500">Laat leeg voor onbeperkt</p>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="description">Beschrijving</Label>
-              <Textarea
-                id="description"
-                value={courseFormData.description || ''}
-                onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
-                rows={3}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="learningObjectives">Leerdoelen / Leerplan</Label>
-              <Textarea
-                id="learningObjectives"
-                value={courseFormData.learningObjectives || ''}
-                onChange={(e) => setCourseFormData({ ...courseFormData, learningObjectives: e.target.value })}
-                rows={3}
-                placeholder="Beschrijf de leerdoelen en het leerplan voor dit curriculum"
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="prerequisites">Instroomvereisten</Label>
+                <Label htmlFor="description">Beschrijving</Label>
                 <Textarea
-                  id="prerequisites"
-                  value={courseFormData.prerequisites || ''}
-                  onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
+                  id="description"
+                  value={courseFormData.description || ''}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, description: e.target.value })}
                   rows={3}
-                  placeholder="Welke kennis of vaardigheden moeten studenten bezitten voor aanvang?"
                 />
-                <p className="text-xs text-gray-500">Beschrijf wat studenten moeten weten of kunnen voordat ze aan dit curriculum beginnen</p>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="competencies">Uitstroomvereisten</Label>
-                <Textarea
-                  id="competencies"
-                  value={courseFormData.competencies || ''}
-                  onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
-                  rows={3}
-                  placeholder="Welke kennis of vaardigheden moeten studenten beheersen na afronding?"
-                />
-                <p className="text-xs text-gray-500">Beschrijf welke competenties studenten moeten hebben na afronding</p>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="materials">Studiemateriaal</Label>
-              <Textarea
-                id="materials"
-                value={courseFormData.materials || ''}
-                onChange={(e) => setCourseFormData({ ...courseFormData, materials: e.target.value })}
-                rows={3}
-              />
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="isActive"
-                checked={courseFormData.isActive || false}
-                onChange={(e) => setCourseFormData({ ...courseFormData, isActive: e.target.checked })}
-                className="rounded border-gray-300 focus:ring-primary h-4 w-4 text-primary"
-              />
-              <Label htmlFor="isActive" className="cursor-pointer">Actief</Label>
             </div>
             
             <DialogFooter>

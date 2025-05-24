@@ -883,9 +883,74 @@ export default function StudentGroups() {
                           )}
                         />
                         
-                        <div className="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300 mt-4">
-                          <BookOpen className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                          <p className="text-xs text-gray-500">Meerdere vakken kunnen worden toegewezen nadat de klas is aangemaakt.</p>
+                        <div className="space-y-4 mt-4">
+                          <FormField
+                            control={form.control}
+                            name="instroomvereisten"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-xs font-medium text-gray-700">Instroomvereisten</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Beschrijf de vereiste kennis of vaardigheden voor deelname aan deze klas"
+                                    className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormDescription className="text-xs">
+                                  Wat moeten studenten weten of kunnen voordat ze aan deze klas beginnen?
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="uitstroomvereisten"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-xs font-medium text-gray-700">Uitstroomvereisten</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Beschrijf wat studenten moeten beheersen na afronding van deze klas"
+                                    className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormDescription className="text-xs">
+                                  Welke competenties moeten studenten hebben verworven na afronding?
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={form.control}
+                            name="leerplan"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-xs font-medium text-gray-700">Leerdoelen / Leerplan</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Beschrijf de leerdoelen en het leerplan voor deze klas"
+                                    className="resize-none text-sm bg-white border-gray-200 min-h-[80px]"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormDescription className="text-xs">
+                                  Wat zijn de belangrijkste leerdoelen en onderdelen van het leerplan?
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <div className="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300 mt-4">
+                            <BookOpen className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                            <p className="text-xs text-gray-500">Meerdere vakken kunnen worden toegewezen nadat de klas is aangemaakt.</p>
+                          </div>
                         </div>
                       </div>
                     </div>

@@ -860,34 +860,39 @@ export default function Courses() {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="learningObjectives">Leerdoelen</Label>
+              <Label htmlFor="learningObjectives">Leerdoelen / Leerplan</Label>
               <Textarea
                 id="learningObjectives"
                 value={courseFormData.learningObjectives || ''}
                 onChange={(e) => setCourseFormData({ ...courseFormData, learningObjectives: e.target.value })}
                 rows={3}
+                placeholder="Beschrijf de leerdoelen en het leerplan voor dit curriculum"
               />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="competencies">Competenties</Label>
-                <Textarea
-                  id="competencies"
-                  value={courseFormData.competencies || ''}
-                  onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
-                  rows={3}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="prerequisites">Voorvereisten</Label>
+                <Label htmlFor="prerequisites">Instroomvereisten</Label>
                 <Textarea
                   id="prerequisites"
                   value={courseFormData.prerequisites || ''}
                   onChange={(e) => setCourseFormData({ ...courseFormData, prerequisites: e.target.value })}
                   rows={3}
+                  placeholder="Welke kennis of vaardigheden moeten studenten bezitten voor aanvang?"
                 />
+                <p className="text-xs text-gray-500">Beschrijf wat studenten moeten weten of kunnen voordat ze aan dit curriculum beginnen</p>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="competencies">Uitstroomvereisten</Label>
+                <Textarea
+                  id="competencies"
+                  value={courseFormData.competencies || ''}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, competencies: e.target.value })}
+                  rows={3}
+                  placeholder="Welke kennis of vaardigheden moeten studenten beheersen na afronding?"
+                />
+                <p className="text-xs text-gray-500">Beschrijf welke competenties studenten moeten hebben na afronding</p>
               </div>
             </div>
             

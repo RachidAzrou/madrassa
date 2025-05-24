@@ -636,21 +636,10 @@ export default function Guardians() {
                 <tr>
                   <td colSpan={5}>
                     <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-                      <div className="mb-4 rounded-full w-12 h-12 bg-[#1e3a8a]/10 flex items-center justify-center">
-                        <UserCheck className="h-6 w-6 text-[#1e3a8a]" />
+                      <div className="text-[#1e3a8a] mb-2">
+                        <UserCheck className="h-12 w-12 mx-auto opacity-30" />
                       </div>
-                      <h3 className="text-base font-medium text-gray-900 mb-2">Geen voogden gevonden</h3>
-                      <p className="text-sm text-gray-500 max-w-md mx-auto mb-4">
-                        Er zijn nog geen voogden toegevoegd in het systeem.
-                      </p>
-                      <Button 
-                        className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white gap-2"
-                        onClick={() => setShowNewGuardianDialog(true)}
-                        size="sm"
-                      >
-                        <PlusCircle className="h-4 w-4" />
-                        Nieuwe Voogd
-                      </Button>
+                      <p className="text-sm font-medium">Geen voogden beschikbaar</p>
                     </div>
                   </td>
                 </tr>

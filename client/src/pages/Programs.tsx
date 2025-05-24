@@ -452,7 +452,7 @@ export default function Programs() {
 
       {/* Vak Toevoegen Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] h-auto overflow-y-auto p-0">
+        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
           {/* Blauwe header */}
           <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
             <div className="flex items-center justify-between">
@@ -641,7 +641,7 @@ export default function Programs() {
 
       {/* Vak bewerken dialoogvenster */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] h-auto overflow-y-auto p-0">
+        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
           {/* Blauwe header */}
           <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
             <div className="flex items-center justify-between">

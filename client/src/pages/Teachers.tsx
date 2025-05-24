@@ -1478,12 +1478,13 @@ const Teachers = () => {
                               id="klastitularis-1A"
                               checked={newTeacher.assignedClasses.find(c => c.name === "Klas 1A")?.isKlastitularis || false}
                               onCheckedChange={(checked) => {
+                                // Als deze klas wordt aangewezen als klastitularis, zet alle andere klassen op false
                                 setNewTeacher({
                                   ...newTeacher,
                                   assignedClasses: newTeacher.assignedClasses.map(cls => 
                                     cls.name === "Klas 1A" 
                                       ? { ...cls, isKlastitularis: checked === true } 
-                                      : cls
+                                      : { ...cls, isKlastitularis: false }
                                   )
                                 });
                               }}
@@ -1532,12 +1533,13 @@ const Teachers = () => {
                               id="klastitularis-2B"
                               checked={newTeacher.assignedClasses.find(c => c.name === "Klas 2B")?.isKlastitularis || false}
                               onCheckedChange={(checked) => {
+                                // Als deze klas wordt aangewezen als klastitularis, zet alle andere klassen op false
                                 setNewTeacher({
                                   ...newTeacher,
                                   assignedClasses: newTeacher.assignedClasses.map(cls => 
                                     cls.name === "Klas 2B" 
                                       ? { ...cls, isKlastitularis: checked === true } 
-                                      : cls
+                                      : { ...cls, isKlastitularis: false }
                                   )
                                 });
                               }}
@@ -1586,12 +1588,13 @@ const Teachers = () => {
                               id="klastitularis-3C"
                               checked={newTeacher.assignedClasses.find(c => c.name === "Klas 3C")?.isKlastitularis || false}
                               onCheckedChange={(checked) => {
+                                // Als deze klas wordt aangewezen als klastitularis, zet alle andere klassen op false
                                 setNewTeacher({
                                   ...newTeacher,
                                   assignedClasses: newTeacher.assignedClasses.map(cls => 
                                     cls.name === "Klas 3C" 
                                       ? { ...cls, isKlastitularis: checked === true } 
-                                      : cls
+                                      : { ...cls, isKlastitularis: false }
                                   )
                                 });
                               }}
@@ -1640,12 +1643,13 @@ const Teachers = () => {
                               id="klastitularis-4D"
                               checked={newTeacher.assignedClasses.find(c => c.name === "Klas 4D")?.isKlastitularis || false}
                               onCheckedChange={(checked) => {
+                                // Als deze klas wordt aangewezen als klastitularis, zet alle andere klassen op false
                                 setNewTeacher({
                                   ...newTeacher,
                                   assignedClasses: newTeacher.assignedClasses.map(cls => 
                                     cls.name === "Klas 4D" 
                                       ? { ...cls, isKlastitularis: checked === true } 
-                                      : cls
+                                      : { ...cls, isKlastitularis: false }
                                   )
                                 });
                               }}
@@ -1694,12 +1698,13 @@ const Teachers = () => {
                               id="klastitularis-5E"
                               checked={newTeacher.assignedClasses.find(c => c.name === "Klas 5E")?.isKlastitularis || false}
                               onCheckedChange={(checked) => {
+                                // Als deze klas wordt aangewezen als klastitularis, zet alle andere klassen op false
                                 setNewTeacher({
                                   ...newTeacher,
                                   assignedClasses: newTeacher.assignedClasses.map(cls => 
                                     cls.name === "Klas 5E" 
                                       ? { ...cls, isKlastitularis: checked === true } 
-                                      : cls
+                                      : { ...cls, isKlastitularis: false }
                                   )
                                 });
                               }}
@@ -1748,12 +1753,13 @@ const Teachers = () => {
                               id="klastitularis-6F"
                               checked={newTeacher.assignedClasses.find(c => c.name === "Klas 6F")?.isKlastitularis || false}
                               onCheckedChange={(checked) => {
+                                // Als deze klas wordt aangewezen als klastitularis, zet alle andere klassen op false
                                 setNewTeacher({
                                   ...newTeacher,
                                   assignedClasses: newTeacher.assignedClasses.map(cls => 
                                     cls.name === "Klas 6F" 
                                       ? { ...cls, isKlastitularis: checked === true } 
-                                      : cls
+                                      : { ...cls, isKlastitularis: false }
                                   )
                                 });
                               }}

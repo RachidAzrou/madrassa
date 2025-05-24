@@ -634,11 +634,23 @@ export default function Programs() {
       {/* Vak bewerken dialoogvenster */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Vak bewerken</DialogTitle>
-            <DialogDescription>
-              Vul de onderstaande velden in om dit vak bij te werken.
-            </DialogDescription>
+          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white p-6 flex items-center gap-2 rounded-t-lg">
+            <div className="bg-white/20 p-2 rounded-full">
+              <Edit className="h-6 w-6" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl">Vak bewerken</DialogTitle>
+              <DialogDescription className="text-white/80">
+                Vul de onderstaande velden in om dit vak bij te werken.
+              </DialogDescription>
+            </div>
+            <button 
+              onClick={() => setIsEditDialogOpen(false)} 
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            >
+              <XCircle className="h-6 w-6 text-white" />
+              <span className="sr-only">Close</span>
+            </button>
           </DialogHeader>
           <form onSubmit={handleSubmitEditProgram}>
             <div className="space-y-6 py-4">
@@ -799,11 +811,23 @@ export default function Programs() {
       {/* Vak verwijderen dialoogvenster */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Vak verwijderen</DialogTitle>
-            <DialogDescription>
-              Weet je zeker dat je dit vak wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-            </DialogDescription>
+          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white p-6 flex items-center gap-2 rounded-t-lg">
+            <div className="bg-white/20 p-2 rounded-full">
+              <Trash2 className="h-6 w-6" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl">Vak verwijderen</DialogTitle>
+              <DialogDescription className="text-white/80">
+                Weet je zeker dat je dit vak wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+              </DialogDescription>
+            </div>
+            <button 
+              onClick={() => setIsDeleteDialogOpen(false)} 
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            >
+              <XCircle className="h-6 w-6 text-white" />
+              <span className="sr-only">Close</span>
+            </button>
           </DialogHeader>
           
           {selectedProgram && (

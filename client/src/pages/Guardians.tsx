@@ -198,6 +198,28 @@ export default function Guardians() {
     }
   });
   
+  const deleteGuardianMutation = useMutation({
+    mutationFn: (guardianId: number) => 
+      apiRequest(`/api/guardians/${guardianId}`, {
+        method: 'DELETE'
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
+      toast({
+        title: "Voogd verwijderd",
+        description: "De voogd is succesvol verwijderd.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het verwijderen van de voogd: " + (error.message || error),
+        variant: "destructive",
+      });
+    }
+  });
+  
   // Filter guardians based on search query
   useEffect(() => {
     if (!Array.isArray(guardiansData)) {
@@ -372,10 +394,7 @@ export default function Guardians() {
   
   const confirmDelete = () => {
     if (selectedGuardian) {
-      toast({
-        title: "Voogd verwijderd",
-        description: `${selectedGuardian.firstName} ${selectedGuardian.lastName} is succesvol verwijderd.`,
-      });
+      deleteGuardianMutation.mutate(selectedGuardian.id);
       setIsDeleteDialogOpen(false);
       setSelectedGuardian(null);
     }
@@ -1479,6 +1498,46 @@ export default function Guardians() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+      {/* Verwijder bevestigingsdialoog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Voogd verwijderen</DialogTitle>
+            <DialogDescription>
+              Weet je zeker dat je deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {selectedGuardian && (
+              <p className="text-sm text-gray-700">
+                Je staat op het punt om <span className="font-semibold">{selectedGuardian.firstName} {selectedGuardian.lastName}</span> te verwijderen.
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDelete}
+              disabled={deleteGuardianMutation.isPending}
+            >
+              {deleteGuardianMutation.isPending ? (
+                <>
+                  <div className="h-4 w-4 border-2 border-t-transparent border-white rounded-full animate-spin mr-2"></div>
+                  Bezig...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Verwijderen
+                </>
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

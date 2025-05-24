@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, 
   FilePlus, GraduationCap, Palmtree, PartyPopper, Pencil, BookOpen, Timer,
-  MapPin, Clock, Search, XCircle
+  MapPin, Clock, Search, XCircle, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -875,13 +875,33 @@ export default function Calendar() {
 
       {/* Add Event Dialog */}
       <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
-        <DialogContent className="max-w-[95vw] w-[720px] max-h-[85vh] overflow-y-auto">
-          <DialogHeader className="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-4 rounded-t-lg">
-            <DialogTitle className="text-xl font-bold text-white">Evenement Toevoegen</DialogTitle>
-            <DialogDescription className="text-blue-100">
-              Voeg een nieuw evenement toe aan de academische kalender
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <CalendarIcon className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-semibold text-white">
+                    Evenement Toevoegen
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-blue-100 font-medium mt-0">
+                    Voeg een nieuw evenement toe aan de academische kalender
+                  </DialogDescription>
+                </div>
+              </div>
+              <div 
+                className="flex items-center justify-center h-8 w-8 rounded-full bg-white/20 cursor-pointer"
+                onClick={() => setIsAddEventDialogOpen(false)}
+              >
+                <X className="h-4 w-4 text-white" />
+                <span className="sr-only">Sluiten</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="px-6 py-4">
           
           <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value as 'exam' | 'class' | 'holiday' | 'event')}>
             <TabsList className="grid grid-cols-4 mt-2 p-1 bg-blue-900/10">

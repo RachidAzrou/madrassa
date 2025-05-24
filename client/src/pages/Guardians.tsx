@@ -527,38 +527,62 @@ export default function Guardians() {
 
       
       <div className="py-6">
-        {searchResults.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center bg-white border rounded-xl shadow-sm">
-            <div className="mb-6 rounded-full w-16 h-16 bg-[#1e3a8a]/10 flex items-center justify-center">
-              <UserCheck className="h-8 w-8 text-[#1e3a8a]" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Geen voogden gevonden</h3>
-            <p className="text-gray-500 max-w-md mx-auto mb-6">
-              {searchQuery.trim() !== '' 
-                ? 'Geen voogden gevonden die overeenkomen met je zoekopdracht. Probeer een andere zoekterm.' 
-                : 'Er zijn nog geen voogden toegevoegd in het systeem.'}
-            </p>
-            {searchQuery.trim() !== '' ? (
-              <Button 
-                variant="outline"
-                className="gap-2" 
-                onClick={() => setSearchQuery('')}
-              >
-                <XCircle className="h-4 w-4" />
-                Wis Zoekopdracht
-              </Button>
-            ) : (
-              <Button 
-                className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white gap-2"
-                onClick={handleAddNewGuardian}
-              >
-                <PlusCircle className="h-4 w-4" />
-                Nieuwe Voogd
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
+          <div className="hidden md:block overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                    <Checkbox 
+                      checked={selectedGuardians.length > 0 && selectedGuardians.length === searchResults.length}
+                      onCheckedChange={handleToggleAllGuardians}
+                    />
+                  </th>
+                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NAAM</th>
+                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">RELATIE</th>
+                  <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STUDENTEN</th>
+                  <th scope="col" className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]"></th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {searchResults.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="h-40 text-center">
+                      <div className="flex flex-col items-center justify-center py-8">
+                        <div className="mb-4 rounded-full w-12 h-12 bg-[#1e3a8a]/10 flex items-center justify-center">
+                          <UserCheck className="h-6 w-6 text-[#1e3a8a]" />
+                        </div>
+                        <h3 className="text-base font-medium text-gray-900 mb-2">Geen voogden gevonden</h3>
+                        <p className="text-sm text-gray-500 max-w-md mx-auto mb-4">
+                          {searchQuery.trim() !== '' 
+                            ? 'Geen voogden gevonden die overeenkomen met je zoekopdracht. Probeer een andere zoekterm.' 
+                            : 'Er zijn nog geen voogden toegevoegd in het systeem.'}
+                        </p>
+                        {searchQuery.trim() !== '' ? (
+                          <Button 
+                            variant="outline"
+                            className="gap-2" 
+                            onClick={() => setSearchQuery('')}
+                            size="sm"
+                          >
+                            <XCircle className="h-4 w-4" />
+                            Wis Zoekopdracht
+                          </Button>
+                        ) : (
+                          <Button 
+                            className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white gap-2"
+                            onClick={handleAddNewGuardian}
+                            size="sm"
+                          >
+                            <PlusCircle className="h-4 w-4" />
+                            Nieuwe Voogd
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  searchResults.map((guardian: GuardianType) => (
             <Table>
               <TableHeader className="bg-gray-50">
                 <TableRow className="border-b border-gray-200">

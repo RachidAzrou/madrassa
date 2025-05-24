@@ -132,11 +132,7 @@ export default function Guardians() {
   };
 
   const handleAddNewGuardian = () => {
-    toast({
-      title: "Voogd toevoegen",
-      description: "Deze functie wordt binnenkort beschikbaar.",
-    });
-    // Tijdelijke fix totdat de dialoog is geïmplementeerd
+    // Direct het dialoogvenster openen zonder toast-melding
     setShowNewGuardianDialog(true);
   };
 

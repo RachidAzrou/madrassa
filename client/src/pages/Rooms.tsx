@@ -395,93 +395,100 @@ export default function Rooms() {
 
       <div className="space-y-4">
         <div className="bg-white rounded-md border shadow-sm">
-          {isLoading ? (
-              <div className="flex justify-center py-8">
-                <span className="loading loading-spinner loading-md"></span>
-              </div>
-            ) : rooms.length === 0 ? (
-              <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-                <div className="text-[#1e3a8a] mb-2">
-                  <Building className="h-10 w-10 opacity-30" />
-                </div>
-                <p className="text-sm font-medium">
-                  {searchTerm 
-                    ? `Geen lokalen gevonden voor "${searchTerm}"` 
-                    : 'Geen lokalen gevonden'}
-                </p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader className="bg-gray-50 border-b">
-                    <TableRow className="border-b border-gray-200">
-                      <TableHead className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">
-                        <Checkbox 
-                          checked={selectedRooms.length === rooms.length && rooms.length > 0}
-                          onCheckedChange={handleSelectAllRooms}
-                          aria-label="Selecteer alle rijen"
-                        />
-                      </TableHead>
-                      <TableHead className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">LOKAALNAAM</TableHead>
-                      <TableHead className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">STATUS</TableHead>
-                      <TableHead className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">CAPACITEIT</TableHead>
-                      <TableHead className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rooms.map((room) => (
-                      <TableRow key={room.id} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
-                        <TableCell className="py-3 px-4">
-                          <Checkbox 
-                            checked={selectedRooms.includes(room.id)}
-                            onCheckedChange={() => handleSelectRoom(room.id)}
-                            aria-label={`Selecteer ${room.name}`}
-                          />
-                        </TableCell>
-                        <TableCell className="py-3 px-4 font-medium">{room.name}</TableCell>
-                        <TableCell className="py-3 px-4">{getStatusBadge(room.status)}</TableCell>
-                        <TableCell className="py-3 px-4">
-                          <div className="flex items-center">
-                            <Users className="h-4 w-4 mr-1 text-gray-500" />
-                            {room.capacity}
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-3 px-4 text-right">
-                          <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                              onClick={() => handleViewRoom(room)}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
-                              onClick={() => handleEditRoom(room)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
-                              onClick={() => handleDeleteRoom(room)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-            
-            {totalPages > 1 && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr className="border-b border-gray-200">
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">
+                    <Checkbox 
+                      checked={selectedRooms.length === rooms.length && rooms.length > 0}
+                      onCheckedChange={handleSelectAllRooms}
+                      aria-label="Selecteer alle rijen"
+                    />
+                  </th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">LOKAALNAAM</th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">STATUS</th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">CAPACITEIT</th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center">
+                      <div className="flex justify-center items-center">
+                        <div className="w-6 h-6 border-2 border-t-primary rounded-full animate-spin"></div>
+                      </div>
+                    </td>
+                  </tr>
+                ) : rooms.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="h-48 text-center">
+                      <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                        <div className="text-[#1e3a8a] mb-2">
+                          <Building className="h-10 w-10 opacity-30" />
+                        </div>
+                        <p className="text-sm font-medium">
+                          {searchTerm 
+                            ? `Geen lokalen gevonden voor "${searchTerm}"` 
+                            : 'Geen lokalen gevonden'}
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : rooms.map((room) => (
+                  <tr key={room.id} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
+                    <td className="py-3 px-4">
+                      <Checkbox 
+                        checked={selectedRooms.includes(room.id)}
+                        onCheckedChange={() => handleSelectRoom(room.id)}
+                        aria-label={`Selecteer ${room.name}`}
+                      />
+                    </td>
+                    <td className="py-3 px-4 font-medium">{room.name}</td>
+                    <td className="py-3 px-4">{getStatusBadge(room.status)}</td>
+                    <td className="py-3 px-4">
+                      <div className="flex items-center">
+                        <Users className="h-4 w-4 mr-1 text-gray-500" />
+                        {room.capacity}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                          onClick={() => handleViewRoom(room)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
+                          onClick={() => handleEditRoom(room)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
+                          onClick={() => handleDeleteRoom(room)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {totalPages > 1 && (
               <div className="flex items-center justify-center space-x-2 py-4 border-t">
                 {Array.from({ length: totalPages }, (_, i) => (
                   <Button

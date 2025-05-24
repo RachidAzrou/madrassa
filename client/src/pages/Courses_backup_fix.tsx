@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Eye, Pencil, Trash2, BookOpen, Users, XCircle, X } from 'lucide-react';
+import { Search, PlusCircle, Filter, Eye, Pencil, Trash2, BookOpen, Users, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -807,6 +807,7 @@ export default function Courses() {
           </DialogHeader>
           
           <div className="px-6 py-4 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 130px)' }}>
+            <form onSubmit={isEditDialogOpen ? handleSubmitEditCourse : handleSubmitCourse} className="space-y-6">
               <div className="space-y-2 mb-6">
                 <Label htmlFor="selectExistingCourse" className="text-[#1e3a8a] font-medium">Selecteer een bestaand vak</Label>
                 <Select
@@ -842,7 +843,7 @@ export default function Courses() {
                 <Label htmlFor="selectExistingGroup" className="text-[#1e3a8a] font-medium">Of selecteer een klas</Label>
                 <Select
                   onValueChange={(value) => {
-                    const selectedGroup = studentGroups.find((g) => g.id.toString() === value);
+                    const selectedGroup = studentGroups.find((g: any) => g.id.toString() === value);
                     if (selectedGroup) {
                       // Logic to load the class data into the form
                       // This is placeholder logic, actual implementation depends on your data structure
@@ -861,7 +862,7 @@ export default function Courses() {
                   </SelectTrigger>
                   <SelectContent>
                     {studentGroups.length > 0 ? (
-                      studentGroups.map((group) => (
+                      studentGroups.map((group: any) => (
                         <SelectItem key={group.id} value={group.id.toString()}>
                           {group.name}
                         </SelectItem>
@@ -932,6 +933,7 @@ export default function Courses() {
                   </div>
                 </div>
               </div>
+            </form>
           </div>
           
           <DialogFooter className="px-6 py-4 border-t bg-gray-50">

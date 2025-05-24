@@ -18,11 +18,10 @@ import { useToast } from '@/hooks/use-toast';
 
 interface ManageStudentEnrollmentsProps {
   groupId: number;
-  groupName?: string;
   onClose?: () => void;
 }
 
-export default function ManageStudentEnrollments({ groupId, groupName, onClose }: ManageStudentEnrollmentsProps) {
+export default function ManageStudentEnrollments({ groupId, onClose }: ManageStudentEnrollmentsProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -190,7 +189,7 @@ export default function ManageStudentEnrollments({ groupId, groupName, onClose }
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <div>
-          <h2 className="text-xl font-bold">{groupName || group.name}</h2>
+          <h2 className="text-xl font-bold">{group.name}</h2>
           <p className="text-gray-500">
             {group.academicYear} • {enrolledCount} student{enrolledCount !== 1 ? 'en' : ''}
             {group.maxCapacity ? ` / ${group.maxCapacity} plaatsen` : ''}

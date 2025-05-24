@@ -420,303 +420,219 @@ export default function Courses() {
               )}
             </tbody>
           </table>
-        </div>
-        
-        {/* Pagination */}
-        {!isLoading && !isError && totalPages > 1 && (
-          <div className="flex justify-center mt-8">
-            <div className="flex space-x-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-              >
-                Vorige
-              </Button>
-              
-              {[...Array(totalPages)].map((_, i) => (
+          
+          {/* Pagination UI */}
+          {!isLoading && !isError && totalPages > 1 && (
+            <div className="flex justify-between items-center bg-gray-50 px-4 py-3 border-t border-gray-200">
+              <div className="text-sm text-gray-500">
+                Pagina <span className="font-medium">{currentPage}</span> van <span className="font-medium">{totalPages}</span>
+                {totalCount > 0 && <span> ({totalCount} items)</span>}
+              </div>
+              <div className="flex gap-2">
                 <Button
-                  key={i}
-                  variant={currentPage === i + 1 ? "default" : "outline"}
+                  variant="outline"
                   size="sm"
-                  onClick={() => setCurrentPage(i + 1)}
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
                 >
-                  {i + 1}
+                  Vorige
                 </Button>
-              ))}
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-              >
-                Volgende
-              </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Volgende
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       
       {/* Add/Edit/View Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
-          {/* Blauwe header */}
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  {isEditingCourse ? 
-                    <Pencil className="h-6 w-6 text-white" /> : 
-                    <BookOpen className="h-6 w-6 text-white" />
-                  }
-                </div>
-                <div>
-                  <DialogTitle className="text-xl font-semibold text-white">
-                    {isEditingCourse ? "Vak Bewerken" : isAddingCourse ? "Nieuw Vak Toevoegen" : "Vak Details"}
-                  </DialogTitle>
-                  <DialogDescription className="text-sm text-blue-100 font-medium">
-                    {isEditingCourse 
-                      ? "Bewerk de onderstaande gegevens om dit vak bij te werken." 
-                      : isAddingCourse 
-                        ? "Vul de onderstaande gegevens in om een nieuw vak toe te voegen." 
-                        : "Details van het geselecteerde vak."}
-                  </DialogDescription>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  setIsDialogOpen(false);
-                  setIsAddingCourse(false);
-                  setIsEditingCourse(false);
-                  setIsViewingCourse(false);
-                }}
-                className="h-8 w-8 rounded-full p-0 text-white hover:bg-white/20"
-              >
-                <X className="h-5 w-5" />
-                <span className="sr-only">Sluiten</span>
-              </Button>
-            </div>
-          </div>
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {isEditingCourse ? "Vak Bewerken" : isAddingCourse ? "Nieuw Vak Toevoegen" : "Vak Details"}
+            </DialogTitle>
+            <DialogDescription>
+              {isEditingCourse 
+                ? "Bewerk de onderstaande gegevens om dit vak bij te werken." 
+                : isAddingCourse 
+                  ? "Vul de onderstaande gegevens in om een nieuw vak toe te voegen." 
+                  : "Details van het geselecteerde vak."}
+            </DialogDescription>
+          </DialogHeader>
           
-          <div className="px-6 py-4">
-            <form onSubmit={handleDialogSubmit} className="space-y-4">
-              <Tabs defaultValue="algemeen" className="w-full">
-                <TabsList className="grid grid-cols-6 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
-                  <TabsTrigger value="algemeen" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <BookOpen className="h-4 w-4" />
-                    <span>Algemeen</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="curriculum" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <BookOpen className="h-4 w-4" />
-                    <span>Curriculum</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="studenten" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <Users className="h-4 w-4" />
-                    <span>Studenten</span>
-                  </TabsTrigger>
-                </TabsList>
-
-                {/* Algemeen tabblad */}
-                <TabsContent value="algemeen" className="mt-0 bg-white rounded-lg min-h-[450px]">
-                  <div className="p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name" className="text-xs font-medium text-gray-700">Naam <span className="text-primary">*</span></Label>
-                        <Input 
-                          id="name" 
-                          name="name"
-                          placeholder="Naam van het vak" 
-                          disabled={isViewingCourse}
-                          className="h-9 text-sm bg-white border-gray-200"
-                          defaultValue={currentCourse?.name || ""}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="code" className="text-xs font-medium text-gray-700">Code <span className="text-primary">*</span></Label>
-                        <Input 
-                          id="code" 
-                          name="code"
-                          placeholder="Vakcode (bijv. MATH101)" 
-                          disabled={isViewingCourse}
-                          className="h-9 text-sm bg-white border-gray-200"
-                          defaultValue={currentCourse?.code || ""}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="credits" className="text-xs font-medium text-gray-700">Studiepunten</Label>
-                        <Input 
-                          id="credits" 
-                          name="credits"
-                          type="number" 
-                          placeholder="Aantal studiepunten"
-                          disabled={isViewingCourse}
-                          className="h-9 text-sm bg-white border-gray-200"
-                          defaultValue={currentCourse?.credits || ""}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="programId" className="text-xs font-medium text-gray-700">Programma</Label>
-                        <Select
-                          disabled={isViewingCourse}
-                          defaultValue={currentCourse?.programId?.toString() || ""}
-                        >
-                          <SelectTrigger className="h-9 text-sm bg-white border-gray-200">
-                            <SelectValue placeholder="Selecteer een programma" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {programs.map((program: ProgramType) => (
-                              <SelectItem key={program.id} value={program.id.toString()}>{program.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="instructor" className="text-xs font-medium text-gray-700">Docent</Label>
-                        <Input 
-                          id="instructor" 
-                          name="instructor"
-                          placeholder="Naam van de docent" 
-                          disabled={isViewingCourse}
-                          className="h-9 text-sm bg-white border-gray-200"
-                          defaultValue={currentCourse?.instructor || ""}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="maxStudents" className="text-xs font-medium text-gray-700">Max. studenten</Label>
-                        <Input 
-                          id="maxStudents" 
-                          name="maxStudents"
-                          type="number" 
-                          placeholder="Maximum aantal studenten"
-                          disabled={isViewingCourse}
-                          className="h-9 text-sm bg-white border-gray-200"
-                          defaultValue={currentCourse?.maxStudents || ""}
-                        />
-                      </div>
-                      <div className="col-span-1 md:col-span-2 space-y-2">
-                        <Label htmlFor="description" className="text-xs font-medium text-gray-700">Beschrijving</Label>
-                        <Textarea
-                          id="description"
-                          name="description"
-                          placeholder="Beschrijving van het vak"
-                          disabled={isViewingCourse}
-                          className="min-h-[100px] text-sm bg-white border-gray-200"
-                          defaultValue={currentCourse?.description || ""}
-                        />
-                      </div>
-                    </div>
+          <form onSubmit={handleDialogSubmit}>
+            <div className="space-y-6 py-4">
+              <div>
+                <h3 className="text-lg font-medium mb-4 border-b pb-2">Algemene Informatie</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-right">
+                      Naam van het vak <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      required
+                      defaultValue={currentCourse?.name || ""}
+                      className="mt-1"
+                      disabled={isViewingCourse}
+                    />
                   </div>
-                </TabsContent>
-
-                {/* Curriculum tabblad */}
-                <TabsContent value="curriculum" className="mt-0 bg-white rounded-lg min-h-[450px]">
-                  <div className="p-4 space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="prerequisites" className="text-xs font-medium text-gray-700">Instroomvereisten</Label>
-                      <Textarea
-                        id="prerequisites"
-                        name="prerequisites"
-                        placeholder="Vereiste voorkennis of vaardigheden voor dit vak"
-                        disabled={isViewingCourse}
-                        className="min-h-[80px] text-sm bg-white border-gray-200"
-                        defaultValue={currentCourse?.prerequisites || ""}
-                      />
-                      <p className="text-xs text-gray-500">
-                        Wat moeten studenten weten of kunnen voordat ze aan dit vak beginnen?
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="learningObjectives" className="text-xs font-medium text-gray-700">Leerdoelen / Leerplan</Label>
-                      <Textarea
-                        id="learningObjectives"
-                        name="learningObjectives"
-                        placeholder="Wat studenten zullen leren bij dit vak"
-                        disabled={isViewingCourse}
-                        className="min-h-[80px] text-sm bg-white border-gray-200"
-                        defaultValue={currentCourse?.learningObjectives || ""}
-                      />
-                      <p className="text-xs text-gray-500">
-                        Welke kennis en vaardigheden worden verwacht dat studenten verwerven?
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="competencies" className="text-xs font-medium text-gray-700">Uitstroomvereisten / Competenties</Label>
-                      <Textarea
-                        id="competencies"
-                        name="competencies"
-                        placeholder="Competenties die studenten ontwikkelen"
-                        disabled={isViewingCourse}
-                        className="min-h-[80px] text-sm bg-white border-gray-200"
-                        defaultValue={currentCourse?.competencies || ""}
-                      />
-                      <p className="text-xs text-gray-500">
-                        Welke competenties moeten studenten hebben verworven na afronding?
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="materials" className="text-xs font-medium text-gray-700">Leermateriaal</Label>
-                      <Textarea
-                        id="materials"
-                        name="materials"
-                        placeholder="Boeken, artikelen en andere leermaterialen"
-                        disabled={isViewingCourse}
-                        className="min-h-[80px] text-sm bg-white border-gray-200"
-                        defaultValue={currentCourse?.materials || ""}
-                      />
-                      <p className="text-xs text-gray-500">
-                        Welke materialen worden gebruikt voor dit vak?
-                      </p>
-                    </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="code" className="text-right">
+                      Vakcode <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="code"
+                      name="code"
+                      required
+                      defaultValue={currentCourse?.code || ""}
+                      className="mt-1"
+                      disabled={isViewingCourse}
+                    />
                   </div>
-                </TabsContent>
-
-                {/* Studenten tabblad */}
-                <TabsContent value="studenten" className="mt-0 bg-white rounded-lg min-h-[450px]">
-                  <div className="p-4">
-                    <div className="space-y-4">
-                      <div className="text-sm text-gray-500 italic">
-                        {isViewingCourse ? (
-                          currentCourse?.enrolledStudents ? (
-                            <p>Er zijn {currentCourse.enrolledStudents} studenten ingeschreven voor dit vak.</p>
-                          ) : (
-                            <p>Er zijn nog geen studenten ingeschreven voor dit vak.</p>
-                          )
-                        ) : (
-                          <p>
-                            Studenten kunnen worden toegewezen aan dit vak nadat het is aangemaakt.
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-              
-              {/* Dialog footer met knoppen */}
-              <div className="mt-6 border-t border-gray-200 pt-4 flex justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
-                >
-                  {isViewingCourse ? "Sluiten" : "Annuleren"}
-                </Button>
+                </div>
                 
-                {!isViewingCourse && (
-                  <Button type="submit">
-                    {isEditingCourse ? "Wijzigingen Opslaan" : "Vak Toevoegen"}
-                  </Button>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="credits" className="text-right">
+                      Studiepunten
+                    </Label>
+                    <Input
+                      id="credits"
+                      name="credits"
+                      type="number"
+                      defaultValue={currentCourse?.credits?.toString() || ""}
+                      className="mt-1"
+                      disabled={isViewingCourse}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="status" className="text-right">
+                      Status
+                    </Label>
+                    <Select
+                      defaultValue={currentCourse?.isActive ? "true" : "false"}
+                      disabled={isViewingCourse}
+                      name="isActive"
+                    >
+                      <SelectTrigger id="status" className="mt-1">
+                        <SelectValue placeholder="Selecteer status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="true">Actief</SelectItem>
+                        <SelectItem value="false">Inactief</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mt-4">
+                  <Label htmlFor="description" className="text-right">
+                    Beschrijving van het vak
+                  </Label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    className="w-full min-h-[100px] p-2 mt-1 border rounded-md"
+                    defaultValue={currentCourse?.description || ""}
+                    disabled={isViewingCourse}
+                    placeholder="Geef een korte beschrijving van de lesstof en leerdoelen van dit vak"
+                  />
+                </div>
               </div>
-            </form>
-          </div>
+              
+              <div>
+                <h3 className="text-lg font-medium mb-4 border-b pb-2">Curriculum</h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="prerequisites">Instroomvereisten</Label>
+                    <textarea
+                      id="prerequisites"
+                      name="prerequisites"
+                      className="w-full min-h-[80px] p-2 mt-1 border rounded-md"
+                      defaultValue={currentCourse?.prerequisites || ""}
+                      disabled={isViewingCourse}
+                      placeholder="Vereiste voorkennis of vaardigheden voor dit vak"
+                    />
+                    <p className="text-xs text-gray-500">
+                      Wat moeten studenten weten of kunnen voordat ze aan dit vak beginnen?
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="learningObjectives">Leerdoelen / Leerplan</Label>
+                    <textarea
+                      id="learningObjectives"
+                      name="learningObjectives"
+                      className="w-full min-h-[80px] p-2 mt-1 border rounded-md"
+                      defaultValue={currentCourse?.learningObjectives || ""}
+                      disabled={isViewingCourse}
+                      placeholder="Wat studenten zullen leren bij dit vak"
+                    />
+                    <p className="text-xs text-gray-500">
+                      Welke kennis en vaardigheden worden verwacht dat studenten verwerven?
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="competencies">Uitstroomvereisten / Competenties</Label>
+                    <textarea
+                      id="competencies"
+                      name="competencies"
+                      className="w-full min-h-[80px] p-2 mt-1 border rounded-md"
+                      defaultValue={currentCourse?.competencies || ""}
+                      disabled={isViewingCourse}
+                      placeholder="Competenties die studenten ontwikkelen"
+                    />
+                    <p className="text-xs text-gray-500">
+                      Welke competenties moeten studenten hebben verworven na afronding?
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="materials">Leermateriaal</Label>
+                    <textarea
+                      id="materials"
+                      name="materials"
+                      className="w-full min-h-[80px] p-2 mt-1 border rounded-md"
+                      defaultValue={currentCourse?.materials || ""}
+                      disabled={isViewingCourse}
+                      placeholder="Boeken, artikelen en andere leermaterialen"
+                    />
+                    <p className="text-xs text-gray-500">
+                      Welke materialen worden gebruikt voor dit vak?
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+              >
+                {isViewingCourse ? "Sluiten" : "Annuleren"}
+              </Button>
+              
+              {!isViewingCourse && (
+                <Button type="submit">
+                  {isEditingCourse ? "Wijzigingen Opslaan" : "Vak Toevoegen"}
+                </Button>
+              )}
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

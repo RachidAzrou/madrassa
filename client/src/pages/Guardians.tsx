@@ -384,8 +384,17 @@ export default function Guardians() {
   
   // Handle delete single guardian
   const handleDelete = (guardian: GuardianType) => {
-    setSelectedGuardian(guardian);
-    setIsDeleteDialogOpen(true);
+    // Eerst controleren of er geen andere dialoog open is
+    if (selectedGuardian !== null) {
+      setSelectedGuardian(null); // Sluit eerst de detailsdialoog
+      setTimeout(() => {
+        setSelectedGuardian(guardian);
+        setIsDeleteDialogOpen(true);
+      }, 100); // Korte vertraging om te zorgen dat de andere dialoog sluit
+    } else {
+      setSelectedGuardian(guardian);
+      setIsDeleteDialogOpen(true);
+    }
   };
   
   const handleShowStudentDetails = (student: StudentType) => {

@@ -238,7 +238,7 @@ export default function Courses() {
           
           <Button 
             onClick={handleAddCourse} 
-            className="flex items-center bg-primary hover:bg-primary/90"
+            className="flex items-center bg-primary hover:bg-primary/90 w-auto"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Curriculum Toevoegen</span>

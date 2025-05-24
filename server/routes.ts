@@ -31,6 +31,14 @@ import {
   type Teacher,
   type BehaviorAssessment
 } from "@shared/schema";
+import { 
+  getRooms, 
+  getLocations, 
+  getRoomById, 
+  createRoom, 
+  updateRoom, 
+  deleteRoom 
+} from "./handlers/rooms";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // prefix all routes with /api
@@ -3581,6 +3589,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Fout bij verwijderen notificatie" });
     }
   });
+  
+  // ****************
+  // Lokalen (Rooms)
+  // ****************
+  
+  // Haal alle lokalen op met filtering en paginering
+  apiRouter.get("/api/rooms", getRooms);
+  
+  // Haal unieke locaties op voor filtering
+  apiRouter.get("/api/rooms/locations", getLocations);
+  
+  // Haal een specifiek lokaal op
+  apiRouter.get("/api/rooms/:id", getRoomById);
+  
+  // Maak een nieuw lokaal aan
+  apiRouter.post("/api/rooms", ...createRoom);
+  
+  // Werk een lokaal bij
+  apiRouter.patch("/api/rooms/:id", ...updateRoom);
+  
+  // Verwijder een lokaal
+  apiRouter.delete("/api/rooms/:id", deleteRoom);
 
   // creëer HTTP server
   const server = createServer(app);

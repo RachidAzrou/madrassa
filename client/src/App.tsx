@@ -24,6 +24,7 @@ import MyAccount from "@/pages/MyAccount";
 import Login from "@/pages/Login";
 
 import Scheduling from "@/pages/Scheduling";
+import Rooms from "@/pages/Rooms";
 import Fees from "@/pages/Fees";
 import Settings from "@/pages/Settings";
 

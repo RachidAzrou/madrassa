@@ -545,23 +545,38 @@ export default function Courses() {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="name" className="text-xs font-medium text-gray-700">Vak <span className="text-primary">*</span></Label>
-                        <Input 
-                          id="name" 
-                          name="name"
-                          placeholder="Naam van het vak (bijv. Biologie)" 
+                        <Label htmlFor="courseId" className="text-xs font-medium text-gray-700">Vak <span className="text-primary">*</span></Label>
+                        <Select
                           disabled={isViewingCourse}
-                          className="h-9 text-sm bg-white border-gray-200"
-                          defaultValue={currentCourse?.name || ""}
-                        />
+                          defaultValue=""
+                          onValueChange={(value) => {
+                            // Wanneer een vak wordt geselecteerd, vind de bijbehorende vakcode
+                            const selectedCourse = courses.find(course => course.id.toString() === value);
+                            // Automatisch vakcode invullen
+                            if (selectedCourse) {
+                              // Hier zou je de code veld kunnen updaten
+                              // Dit vergt een kleine aanpassing in de state management
+                              console.log("Geselecteerd vak:", selectedCourse.name, "Code:", selectedCourse.code);
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="h-9 text-sm bg-white border-gray-200">
+                            <SelectValue placeholder="Selecteer een vak" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {courses.map((course: CourseType) => (
+                              <SelectItem key={course.id} value={course.id.toString()}>{course.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="code" className="text-xs font-medium text-gray-700">Code <span className="text-primary">*</span></Label>
                         <Input 
                           id="code" 
                           name="code"
-                          placeholder="Vakcode (bijv. BIO4)" 
-                          disabled={isViewingCourse}
+                          placeholder="Vakcode (automatisch ingevuld)" 
+                          disabled={true}
                           className="h-9 text-sm bg-white border-gray-200"
                           defaultValue={currentCourse?.code || ""}
                         />
@@ -589,18 +604,7 @@ export default function Courses() {
                           defaultValue={currentCourse?.instructor || ""}
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="maxStudents" className="text-xs font-medium text-gray-700">Max. studenten</Label>
-                        <Input 
-                          id="maxStudents" 
-                          name="maxStudents"
-                          type="number" 
-                          placeholder="Maximum aantal studenten"
-                          disabled={isViewingCourse}
-                          className="h-9 text-sm bg-white border-gray-200"
-                          defaultValue={currentCourse?.maxStudents || ""}
-                        />
-                      </div>
+
                       <div className="col-span-1 md:col-span-2 space-y-2">
                         <Label htmlFor="description" className="text-xs font-medium text-gray-700">Beschrijving</Label>
                         <Textarea

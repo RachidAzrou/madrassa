@@ -174,11 +174,11 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         )}
       </div>
 
-      {/* LOKALEN BEHEER SUPER BELANGRIJKE KNOP */}
+      {/* LOKALEN BEHEER PROMINENTE KNOP - nu nog opvallender! */}
       <div className="px-3 pt-4">
         <Link 
           href="/rooms"
-          className="bg-red-600 text-white font-bold rounded-md p-3 mb-4 flex items-center justify-center hover:bg-red-700 transition-colors"
+          className="bg-red-600 text-white font-bold rounded-md p-3 mb-4 flex items-center justify-center hover:bg-red-700 transition-colors border-2 border-black shadow-md"
           onClick={() => {
             if (onClose) onClose();
           }}

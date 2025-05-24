@@ -570,8 +570,7 @@ export default function Scheduling() {
           <div className="grid grid-cols-1 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>Lokalenbeheer
-</CardTitle>
+                <CardTitle className="text-2xl font-semibold leading-none tracking-tight text-[#0e40a1]">Lokalenbeheer</CardTitle>
 
               </CardHeader>
               <CardContent>
@@ -625,7 +624,7 @@ export default function Scheduling() {
           <div className="grid grid-cols-1 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>Docentenrooster</CardTitle>
+                <CardTitle className="text-2xl font-semibold leading-none tracking-tight text-[#0e40a1]">Docentenrooster</CardTitle>
                 <div className="flex flex-col gap-3">
                   <Tabs defaultValue="today" className="w-full">
                     <TabsList className="grid grid-cols-3 p-1 bg-[#1e3a8a]/10 rounded-md">

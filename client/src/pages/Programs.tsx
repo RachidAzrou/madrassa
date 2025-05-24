@@ -299,7 +299,6 @@ export default function Programs() {
           </p>
         </div>
       </div>
-      
       {/* Zoek en Voeg toe knoppen - onder de streep */}
       <div className="space-y-4">
         <div className="relative w-full">
@@ -331,7 +330,6 @@ export default function Programs() {
           </Button>
         </div>
       </div>
-
       {/* Programs list */}
       <div className="space-y-4">
         {isLoading ? (
@@ -450,7 +448,6 @@ export default function Programs() {
           ))
         )}
       </div>
-
       {/* Vak Toevoegen Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
@@ -493,8 +490,8 @@ export default function Programs() {
                     <span>Curriculum</span>
                   </TabsTrigger>
                   <TabsTrigger value="planning" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <Calendar className="h-4 w-4" />
-                    <span>Planning</span>
+                    <BookText className="h-4 w-4" />
+                    <span>Klas</span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -680,7 +677,6 @@ export default function Programs() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Vak bewerken dialoogvenster */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0">
@@ -804,7 +800,6 @@ export default function Programs() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Vak verwijderen dialoogvenster */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[450px]">

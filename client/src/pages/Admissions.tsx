@@ -483,19 +483,9 @@ export default function Admissions() {
 
           {/* Applicant List Table */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+            <div className="p-4 border-b border-gray-200">
               <div className="text-sm text-gray-500">
                 {isLoading ? 'Laden...' : `Tonen van ${applicants.length} van ${totalApplicants} aanmeldingen`}
-              </div>
-              <div className="flex space-x-2">
-                <Button variant="outline" size="sm">
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filteren
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Download className="mr-2 h-4 w-4" />
-                  Exporteren
-                </Button>
               </div>
             </div>
             <div className="overflow-x-auto">

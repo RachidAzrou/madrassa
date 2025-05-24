@@ -555,15 +555,6 @@ export default function Rooms() {
                     </Select>
                   </div>
 
-                  <div>
-                    <Label htmlFor="currentUse">Huidig gebruik</Label>
-                    <Input
-                      id="currentUse"
-                      value={formData.currentUse || ""}
-                      onChange={(e) => handleFormChange('currentUse', e.target.value)}
-                      placeholder="Huidige bestemming"
-                    />
-                  </div>
 
                   <div>
                     <Label htmlFor="notes">Notities</Label>
@@ -684,17 +675,6 @@ export default function Rooms() {
                       value={formData.currentUse || ""}
                       onChange={(e) => handleFormChange('currentUse', e.target.value)}
                       placeholder="Huidige bestemming"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="notes">Notities</Label>
-                    <Textarea
-                      id="notes"
-                      value={formData.notes || ""}
-                      onChange={(e) => handleFormChange('notes', e.target.value)}
-                      placeholder="Bijzonderheden over dit lokaal"
-                      rows={3}
                     />
                   </div>
                 </div>

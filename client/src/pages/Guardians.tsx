@@ -157,30 +157,44 @@ export default function Guardians() {
     <div className="container mx-auto px-4 py-8">
       {/* Delete bevestiging dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-xl">Voogd verwijderen</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="sm:max-w-md p-0 gap-0 bg-white overflow-hidden">
+          <div className="p-6 border-b">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-red-500" />
+                <DialogTitle className="text-xl m-0">Voogd verwijderen</DialogTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowDeleteDialog(false)}
+                className="h-8 w-8 rounded-full p-0 text-gray-400 hover:text-gray-500"
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Sluiten</span>
+              </Button>
+            </div>
+            <DialogDescription className="text-gray-500 mt-2">
               Weet je zeker dat je deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
             </DialogDescription>
-          </DialogHeader>
-          
-          {selectedGuardian && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4 my-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-red-100 p-2 rounded-full">
-                  <AlertTriangle className="h-5 w-5 text-red-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-red-800">
-                    Alle koppelingen met studenten worden ook verwijderd.
-                  </p>
+            
+            {selectedGuardian && (
+              <div className="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-red-100 p-2 rounded-full">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-red-800">
+                      Alle koppelingen met studenten worden ook verwijderd.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
           
-          <DialogFooter className="sm:justify-between">
+          <div className="p-4 border-t flex justify-end gap-3 bg-gray-50">
             <Button
               variant="outline"
               onClick={() => setShowDeleteDialog(false)}
@@ -195,7 +209,7 @@ export default function Guardians() {
               <Trash2 className="h-4 w-4" />
               Verwijderen
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
       

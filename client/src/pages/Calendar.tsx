@@ -875,23 +875,13 @@ export default function Calendar() {
 
       {/* Add Event Dialog */}
       <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
-        <DialogContent className="max-w-[95vw] w-[720px] max-h-[85vh] overflow-y-auto p-0">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
-                  <CalendarIcon className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white">Evenement Toevoegen</h2>
-                  <p className="text-sm text-blue-100">
-                    Voeg een nieuw evenement toe aan de academische kalender
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="p-6">
+        <DialogContent className="max-w-[95vw] w-[720px] max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Evenement Toevoegen</DialogTitle>
+            <DialogDescription>
+              Voeg een nieuw evenement toe aan de academische kalender
+            </DialogDescription>
+          </DialogHeader>
           
           <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value as 'exam' | 'class' | 'holiday' | 'event')}>
             <TabsList className="grid grid-cols-4 mt-2 p-1 bg-blue-900/10">

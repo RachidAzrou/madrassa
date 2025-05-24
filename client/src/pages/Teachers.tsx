@@ -576,7 +576,6 @@ const Teachers = () => {
           </div>
         )}
       </div>
-      
       {/* View Teacher Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="sm:max-w-[85vw] p-0">
@@ -780,7 +779,6 @@ const Teachers = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
       {/* Create Teacher Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[95vw] p-0">
@@ -1492,7 +1490,7 @@ const Teachers = () => {
                             />
                             <label 
                               htmlFor="klastitularis-1A" 
-                              className="text-xs font-medium text-gray-700 cursor-pointer"
+                              className="text-xs cursor-pointer text-[#1d3c95] font-bold"
                             >
                               Aanwijzen als klastitularis
                             </label>
@@ -1546,7 +1544,7 @@ const Teachers = () => {
                             />
                             <label 
                               htmlFor="klastitularis-2B" 
-                              className="text-xs font-medium text-gray-700 cursor-pointer"
+                              className="text-xs cursor-pointer text-[#1d3c95] font-bold"
                             >
                               Aanwijzen als klastitularis
                             </label>
@@ -1600,7 +1598,7 @@ const Teachers = () => {
                             />
                             <label 
                               htmlFor="klastitularis-3C" 
-                              className="text-xs font-medium text-gray-700 cursor-pointer"
+                              className="text-xs cursor-pointer text-[#1d3c95] font-bold"
                             >
                               Aanwijzen als klastitularis
                             </label>
@@ -1654,7 +1652,7 @@ const Teachers = () => {
                             />
                             <label 
                               htmlFor="klastitularis-4D" 
-                              className="text-xs font-medium text-gray-700 cursor-pointer"
+                              className="text-xs cursor-pointer text-[#1d3c95] font-bold"
                             >
                               Aanwijzen als klastitularis
                             </label>
@@ -1708,7 +1706,7 @@ const Teachers = () => {
                             />
                             <label 
                               htmlFor="klastitularis-5E" 
-                              className="text-xs font-medium text-gray-700 cursor-pointer"
+                              className="text-xs cursor-pointer text-[#1d3c95] font-bold"
                             >
                               Aanwijzen als klastitularis
                             </label>
@@ -1762,7 +1760,7 @@ const Teachers = () => {
                             />
                             <label 
                               htmlFor="klastitularis-6F" 
-                              className="text-xs font-medium text-gray-700 cursor-pointer"
+                              className="text-xs cursor-pointer text-[#1d3c95] font-bold"
                             >
                               Aanwijzen als klastitularis
                             </label>
@@ -1796,7 +1794,6 @@ const Teachers = () => {
           </div>
         </DialogContent>
       </Dialog>
-      
       {/* Verwijderbevestiging Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">

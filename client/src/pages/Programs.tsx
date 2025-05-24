@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen, Building, BookText, XCircle, GraduationCap } from 'lucide-react';
+import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen, Building, BookText, XCircle, GraduationCap, X, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { apiRequest, queryClient } from '@/lib/queryClient';
@@ -452,25 +452,33 @@ export default function Programs() {
 
       {/* Vak Toevoegen Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white p-6 flex items-center gap-2 rounded-t-lg">
-            <div className="bg-white/20 p-2 rounded-full">
-              <GraduationCap className="h-6 w-6" />
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] h-auto overflow-y-auto p-0">
+          {/* Blauwe header */}
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <GraduationCap className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-semibold text-white">
+                    Vak Toevoegen
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-blue-100 font-medium">
+                    Vul de onderstaande velden in om een nieuw vak toe te voegen.
+                  </DialogDescription>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsAddDialogOpen(false)}
+                className="h-8 w-8 rounded-full bg-white/20 p-0 text-white hover:bg-white/30"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
-            <div>
-              <DialogTitle className="text-xl">Vak Toevoegen</DialogTitle>
-              <DialogDescription className="text-white/80">
-                Vul de onderstaande velden in om een nieuw vak toe te voegen.
-              </DialogDescription>
-            </div>
-            <button 
-              onClick={() => setIsAddDialogOpen(false)} 
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-            >
-              <XCircle className="h-6 w-6 text-white" />
-              <span className="sr-only">Close</span>
-            </button>
-          </DialogHeader>
+          </div>
           <form onSubmit={handleSubmitProgram}>
             <div className="space-y-6 py-4">
               <div>
@@ -633,25 +641,33 @@ export default function Programs() {
 
       {/* Vak bewerken dialoogvenster */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white p-6 flex items-center gap-2 rounded-t-lg">
-            <div className="bg-white/20 p-2 rounded-full">
-              <Edit className="h-6 w-6" />
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] h-auto overflow-y-auto p-0">
+          {/* Blauwe header */}
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Pencil className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-semibold text-white">
+                    Vak Bewerken
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-blue-100 font-medium">
+                    Vul de onderstaande velden in om dit vak bij te werken.
+                  </DialogDescription>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsEditDialogOpen(false)}
+                className="h-8 w-8 rounded-full bg-white/20 p-0 text-white hover:bg-white/30"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
-            <div>
-              <DialogTitle className="text-xl">Vak bewerken</DialogTitle>
-              <DialogDescription className="text-white/80">
-                Vul de onderstaande velden in om dit vak bij te werken.
-              </DialogDescription>
-            </div>
-            <button 
-              onClick={() => setIsEditDialogOpen(false)} 
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-            >
-              <XCircle className="h-6 w-6 text-white" />
-              <span className="sr-only">Close</span>
-            </button>
-          </DialogHeader>
+          </div>
           <form onSubmit={handleSubmitEditProgram}>
             <div className="space-y-6 py-4">
               <div>
@@ -810,25 +826,33 @@ export default function Programs() {
 
       {/* Vak verwijderen dialoogvenster */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white p-6 flex items-center gap-2 rounded-t-lg">
-            <div className="bg-white/20 p-2 rounded-full">
-              <Trash2 className="h-6 w-6" />
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] h-auto overflow-y-auto p-0">
+          {/* Blauwe header */}
+          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Trash2 className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-semibold text-white">
+                    Vak Verwijderen
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-blue-100 font-medium">
+                    Weet je zeker dat je dit vak wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+                  </DialogDescription>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsDeleteDialogOpen(false)}
+                className="h-8 w-8 rounded-full bg-white/20 p-0 text-white hover:bg-white/30"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
-            <div>
-              <DialogTitle className="text-xl">Vak verwijderen</DialogTitle>
-              <DialogDescription className="text-white/80">
-                Weet je zeker dat je dit vak wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-              </DialogDescription>
-            </div>
-            <button 
-              onClick={() => setIsDeleteDialogOpen(false)} 
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-            >
-              <XCircle className="h-6 w-6 text-white" />
-              <span className="sr-only">Close</span>
-            </button>
-          </DialogHeader>
+          </div>
           
           {selectedProgram && (
             <div className="py-4 space-y-3">

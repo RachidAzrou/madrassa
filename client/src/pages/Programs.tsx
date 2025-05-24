@@ -486,11 +486,11 @@ export default function Programs() {
                     <span>Algemeen</span>
                   </TabsTrigger>
                   <TabsTrigger value="curriculum" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <GraduationCap className="h-4 w-4" />
+                    <BookOpen className="h-4 w-4" />
                     <span>Curriculum</span>
                   </TabsTrigger>
                   <TabsTrigger value="planning" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <BookText className="h-4 w-4" />
+                    <Users className="h-4 w-4" />
                     <span>Klas</span>
                   </TabsTrigger>
                 </TabsList>
@@ -669,9 +669,7 @@ export default function Programs() {
                 <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)} className="border-gray-300">
                   Annuleren
                 </Button>
-                <Button type="submit">
-                  Opslaan
-                </Button>
+                <Button type="submit">Vak toevoegen</Button>
               </div>
             </form>
           </div>

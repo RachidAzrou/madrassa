@@ -209,7 +209,7 @@ export default function Guardians() {
                   </TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="gegevens" className="space-y-4">
+                <TabsContent value="gegevens" className="space-y-4 min-h-[300px]">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">Voornaam</Label>
@@ -247,10 +247,33 @@ export default function Guardians() {
                         </SelectContent>
                       </Select>
                     </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center h-9 mb-1">
+                        <Label className="h-6 flex items-center">Noodcontact</Label>
+                      </div>
+                      <div className="flex items-center space-x-2 border rounded-md p-2 h-10">
+                        <Checkbox 
+                          id="isEmergencyContact" 
+                          checked={newGuardian.isEmergencyContact}
+                          onCheckedChange={(checked) => 
+                            setNewGuardian({
+                              ...newGuardian, 
+                              isEmergencyContact: checked === true
+                            })
+                          }
+                        />
+                        <label
+                          htmlFor="isEmergencyContact"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Deze persoon is een noodcontact
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </TabsContent>
                 
-                <TabsContent value="contact" className="space-y-4">
+                <TabsContent value="contact" className="space-y-4 min-h-[300px]">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">E-mailadres</Label>
@@ -271,33 +294,85 @@ export default function Guardians() {
                         onChange={(e) => setNewGuardian({...newGuardian, phone: e.target.value})}
                       />
                     </div>
+                    
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="address">Adres</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <div className="col-span-2">
+                          <Input 
+                            id="street" 
+                            placeholder="Straatnaam" 
+                            className="w-full"
+                          />
+                        </div>
+                        <div>
+                          <Input 
+                            id="houseNumber" 
+                            placeholder="Huisnummer" 
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="postalCode">Postcode</Label>
+                      <Input 
+                        id="postalCode" 
+                        placeholder="Postcode" 
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="city">Plaats</Label>
+                      <Input 
+                        id="city" 
+                        placeholder="Plaats" 
+                      />
+                    </div>
                   </div>
                 </TabsContent>
                 
-                <TabsContent value="noodcontact" className="space-y-4">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <Checkbox 
-                      id="isEmergencyContact" 
-                      checked={newGuardian.isEmergencyContact}
-                      onCheckedChange={(checked) => 
-                        setNewGuardian({
-                          ...newGuardian, 
-                          isEmergencyContact: checked === true
-                        })
-                      }
-                    />
-                    <label
-                      htmlFor="isEmergencyContact"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Deze persoon is een noodcontact
-                    </label>
+                <TabsContent value="noodcontact" className="space-y-4 min-h-[300px]">
+                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-4">
+                    <div className="flex gap-3">
+                      <AlertTriangle className="h-5 w-5 text-blue-600" />
+                      <p className="text-sm text-blue-800">
+                        De voogd aangemerkt als "noodcontact" is al toegevoegd op de eerste tab.
+                        Deze tab is bedoeld voor het toevoegen van andere noodcontacten voor deze voogd.
+                      </p>
+                    </div>
                   </div>
                   
-                  <div className="rounded-md border border-blue-100 bg-blue-50 p-4">
-                    <p className="text-sm text-blue-800">
-                      Noodcontacten worden gebeld in geval van een noodsituatie waarbij de primaire voogd niet bereikbaar is.
-                    </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="emergencyContactName">Naam noodcontact</Label>
+                      <Input 
+                        id="emergencyContactName" 
+                        placeholder="Naam" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="emergencyContactPhone">Telefoonnummer noodcontact</Label>
+                      <Input 
+                        id="emergencyContactPhone" 
+                        placeholder="Telefoonnummer" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="emergencyContactRelation">Relatie tot voogd</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecteer relatie" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="family">Familie</SelectItem>
+                          <SelectItem value="friend">Vriend(in)</SelectItem>
+                          <SelectItem value="neighbor">Buur</SelectItem>
+                          <SelectItem value="other">Anders</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </TabsContent>
               </Tabs>

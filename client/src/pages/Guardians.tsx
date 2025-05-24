@@ -290,16 +290,7 @@ export default function Guardians() {
                             <XCircle className="h-4 w-4" />
                             Wis Zoekopdracht
                           </Button>
-                        ) : (
-                          <Button 
-                            className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white gap-2"
-                            onClick={handleAddNewGuardian}
-                            size="sm"
-                          >
-                            <PlusCircle className="h-4 w-4" />
-                            Nieuwe Voogd
-                          </Button>
-                        )}
+                        ) : null}
                       />
                     </div>
                   </td>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, 
-  Building, MapPin, Users, Check, X
+  Building, MapPin, Users, Check, X, Save
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -574,6 +574,7 @@ export default function Rooms() {
                   Annuleren
                 </Button>
                 <Button type="submit">
+                  <Save className="mr-2 h-4 w-4" />
                   Lokaal Opslaan
                 </Button>
               </DialogFooter>

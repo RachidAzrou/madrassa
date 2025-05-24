@@ -89,13 +89,6 @@ export default function Guardians() {
   };
 
   // CRUD functies
-  const handleAddNewGuardian = () => {
-    setShowNewGuardianDialog(true);
-    toast({
-      title: "Voogd toevoegen",
-      description: "Het formulier om een nieuwe voogd toe te voegen wordt geopend.",
-    });
-  };
 
   const handleShowGuardianDetails = (guardian: GuardianType) => {
     setSelectedGuardian(guardian);
@@ -141,6 +134,10 @@ export default function Guardians() {
 
   const handleAddNewGuardian = () => {
     setShowNewGuardianDialog(true);
+    toast({
+      title: "Voogd toevoegen",
+      description: "Deze functie is nog in ontwikkeling.",
+    });
   };
 
   const handleDeleteSelectedGuardians = () => {

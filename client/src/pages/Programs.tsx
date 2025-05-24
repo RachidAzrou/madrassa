@@ -479,10 +479,7 @@ export default function Programs() {
               </Button>
             </div>
           </div>
-          <form onSubmit={handleSubmitProgram}>
-            <div className="space-y-6 py-4">
-              <div>
-                <h3 className="text-lg font-medium mb-4 border-b pb-2">Algemene Informatie</h3>
+          <form onSubmit={handleSubmitProgram} className="p-6 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-right">

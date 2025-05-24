@@ -658,33 +658,7 @@ export default function StudentGroups() {
                             </FormItem>
                           )}
                         />
-                        <FormField
-                          control={form.control}
-                          name="programId"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-xs font-medium text-gray-700">Opleiding</FormLabel>
-                              <Select
-                                onValueChange={(value) => field.onChange(parseInt(value))}
-                                value={field.value?.toString()}
-                              >
-                                <FormControl>
-                                  <SelectTrigger className="mt-1 h-9 text-sm bg-white border-gray-200">
-                                    <SelectValue placeholder="Selecteer opleiding" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {programs.map((program: any) => (
-                                    <SelectItem key={program.id} value={program.id.toString()}>
-                                      {program.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+
 
                         <FormField
                           control={form.control}

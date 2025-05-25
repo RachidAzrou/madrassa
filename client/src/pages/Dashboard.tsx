@@ -12,7 +12,7 @@ import {
   ArrowRight,
   ChevronRight
 } from 'lucide-react';
-import { PremiumHeader } from '@/components/layout/premium-header';
+import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { format, startOfWeek, endOfWeek, addDays, parseISO, isToday, isWithinInterval } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -165,13 +165,11 @@ export default function Dashboard() {
   return (
     <div className="bg-[#f7f9fc] min-h-screen">
       {/* Desktop application header bar - Professionele stijl - Premium variant */}
-      <PremiumHeader
+      <PageHeader
         title="Dashboard"
         icon={<LayoutDashboard className="h-5 w-5 text-white" />}
-        breadcrumbs={{
-          parent: "Beheer",
-          current: "Dashboard"
-        }}
+        parent="Beheer"
+        current="Dashboard"
       />
       
       {/* Main content area */}

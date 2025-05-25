@@ -10,7 +10,7 @@ import {
   FileUp, Upload, FilePlus2, FileSpreadsheet, Image, School, UserRound, Camera, CheckSquare, SquareSlash,
   UserCheck, CalendarDays, Hash, Save, Plus, Loader2
 } from 'lucide-react';
-import { PremiumHeader } from '@/components/layout/premium-header';
+import { PageHeader } from '@/components/layout/page-header';
 
 // Aangepast ChalkboardTeacher icoon
 const ChalkBoard = (props: any) => (

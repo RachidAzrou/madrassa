@@ -36,7 +36,8 @@ export default function Students() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [nextStudentId, setNextStudentId] = useState("STU-000001");
+  const currentYear = new Date().getFullYear();
+  const [nextStudentId, setNextStudentId] = useState(`ST${currentYear}001`);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -434,7 +435,9 @@ export default function Students() {
                         <Input
                           id="studentId"
                           name="studentId"
-                          value={formData.studentId || nextStudentId || "STU-000001"}
+                          value={formData.academicYear ? 
+                            `ST${formData.academicYear.split('-')[0]}001` : 
+                            nextStudentId}
                           disabled
                           className="mt-1 h-9 bg-gray-50 text-gray-500"
                         />

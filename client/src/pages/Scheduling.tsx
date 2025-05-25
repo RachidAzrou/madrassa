@@ -4,7 +4,7 @@ import {
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, 
   Calendar, Clock, Users, Repeat, Landmark, GraduationCap, 
   Building, BookOpen, ChevronRight, MapPin, Check, X,
-  AlertCircle, Calendar as CalendarIcon, XCircle
+  AlertCircle, Calendar as CalendarIcon, XCircle, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,9 +48,32 @@ interface TeacherSchedule {
   dayOfWeek: string;
   roomId: number;
   roomName: string;
-  isRecurring: boolean;
-  createdAt: string;
-  updatedAt: string;
+  type: 'regular' | 'once';
+  date?: string; // Voor eenmalige lessen
+  notes?: string;
+}
+
+interface Teacher {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  specialization: string;
+  courses: string[];
+}
+
+interface Course {
+  id: number;
+  name: string;
+  code: string;
+}
+
+interface ClassGroup {
+  id: number;
+  name: string;
+  academicYear: string;
+  programId: number;
+  programName: string;
 }
 
 interface Room {
@@ -58,1015 +81,968 @@ interface Room {
   name: string;
   capacity: number;
   location: string;
-  status: 'available' | 'occupied' | 'reserved';
-  currentUse?: string;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface Teacher {
-  id: number;
-  teacherId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  fullName: string;
-}
-
-interface Course {
-  id: number;
-  name: string;
-  code: string;
-  programId: number | null;
-}
-
-interface StudentGroup {
-  id: number;
-  name: string;
-  academicYear: string;
 }
 
 export default function Scheduling() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
-  const [course, setCourse] = useState('all');
-  const [instructor, setInstructor] = useState('all');
-  const [room, setRoom] = useState('all');
-  const [day, setDay] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState('instructor-schedule');
-  const [viewMode, setViewMode] = useState<'today' | 'week' | 'month'>('today');
-  
-  // Dialog state
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [dialogActiveTab, setDialogActiveTab] = useState('instructor-schedule');
+  const [selectedTeacher, setSelectedTeacher] = useState<string>('all');
+  const [selectedClass, setSelectedClass] = useState<string>('all');
+  const [selectedDay, setSelectedDay] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<string>('all');
+  const [showDialog, setShowDialog] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<TeacherSchedule | null>(null);
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-
-  // Form state
-  const [formData, setFormData] = useState({
-    // Docenten toewijzing
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
+  
+  const [formData, setFormData] = useState<Partial<TeacherSchedule>>({
     teacherId: '',
-    courseId: '',
-    classId: '',
-    selectedDays: {
-      monday: false,
-      tuesday: false,
-      wednesday: false,
-      thursday: false, 
-      friday: false,
-      saturday: false,
-      sunday: false
-    },
-    roomId: '',
+    courseId: 0,
+    classId: 0,
     startTime: '09:00',
     endTime: '10:30',
-    repeat: true,
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0],
-    
-    // Lokalen toewijzing
-    roomName: '',
-    capacity: 30,
-    location: '',
-    status: 'available' as 'available' | 'occupied' | 'reserved',
-    toewijzingsCategorie: 'vak',  // 'vak' of 'klas'
-    assignmentId: '',
-    description: '',
+    dayOfWeek: 'monday',
+    roomId: 0,
+    type: 'regular',
+    date: new Date().toISOString().split('T')[0],
     notes: ''
   });
-
-  // Fetch schedules with filters
-  const { data: schedulesData, isLoading, isError } = useQuery({
-    queryKey: ['/api/scheduling', { 
-      searchTerm, 
-      course, 
-      instructor, 
-      room, 
-      day, 
-      page: currentPage, 
-      type: activeTab,
-      viewMode 
-    }],
+  
+  // Data fetching
+  const { data: scheduleData = { schedules: [] }, isLoading: isLoadingSchedules } = useQuery({
+    queryKey: ['/api/schedules', { teacher: selectedTeacher, class: selectedClass, day: selectedDay }],
     queryFn: async () => {
       try {
-        const params = new URLSearchParams({
-          searchTerm,
-          page: currentPage.toString(),
-          type: activeTab,
-          viewMode
-        });
+        const params = new URLSearchParams();
+        if (selectedTeacher !== 'all') params.append('teacherId', selectedTeacher);
+        if (selectedClass !== 'all') params.append('classId', selectedClass);
+        if (selectedDay !== 'all') params.append('dayOfWeek', selectedDay);
         
-        if (course !== 'all') params.append('courseId', course);
-        if (instructor !== 'all') params.append('teacherId', instructor);
-        if (room !== 'all') params.append('roomId', room);
-        if (day !== 'all') params.append('day', day);
-        
-        const result = await apiRequest(`/api/scheduling?${params.toString()}`, {
-          method: 'GET'
-        });
-        return result;
-      } catch (error: any) {
-        console.error('Error fetching scheduling data:', error);
-        toast({
-          title: "Fout bij ophalen planning",
-          description: error?.message || "Er is een fout opgetreden bij het ophalen van de planningsgegevens.",
-          variant: "destructive",
-        });
-        return { schedules: [], totalCount: 0 };
+        const response = await apiRequest(`/api/schedules?${params.toString()}`);
+        return response;
+      } catch (error) {
+        console.error('Error fetching schedule data:', error);
+        return { schedules: [] };
       }
-    },
-    staleTime: 30000,
+    }
   });
 
-  // Fetch courses for filter
-  const { data: coursesData } = useQuery({
-    queryKey: ['/api/courses'],
-    queryFn: async () => {
-      try {
-        return await apiRequest('/api/courses', {
-          method: 'GET'
-        });
-      } catch (error: any) {
-        console.error('Error fetching courses:', error);
-        toast({
-          title: "Fout bij ophalen cursussen",
-          description: error?.message || "Er is een fout opgetreden bij het ophalen van de cursussen.",
-          variant: "destructive",
-        });
-        return { courses: [] };
-      }
-    },
-  });
-
-  // Fetch teachers for filter
-  const { data: teachersData } = useQuery({
+  const { data: teachersData = { teachers: [] } } = useQuery({
     queryKey: ['/api/teachers'],
     queryFn: async () => {
       try {
-        return await apiRequest('/api/teachers', {
-          method: 'GET'
-        });
-      } catch (error: any) {
+        const response = await apiRequest('/api/teachers');
+        return response;
+      } catch (error) {
         console.error('Error fetching teachers:', error);
-        toast({
-          title: "Fout bij ophalen docenten",
-          description: error?.message || "Er is een fout opgetreden bij het ophalen van de docenten.",
-          variant: "destructive",
-        });
         return { teachers: [] };
       }
-    },
+    }
   });
 
-  // Fetch student groups for filter
-  const { data: studentGroupsData } = useQuery({
+  const { data: coursesData = { courses: [] } } = useQuery({
+    queryKey: ['/api/courses'],
+    queryFn: async () => {
+      try {
+        const response = await apiRequest('/api/courses');
+        return response;
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+        return { courses: [] };
+      }
+    }
+  });
+
+  const { data: classGroupsData = { groups: [] } } = useQuery({
     queryKey: ['/api/student-groups'],
     queryFn: async () => {
       try {
-        return await apiRequest('/api/student-groups', {
-          method: 'GET'
-        });
-      } catch (error: any) {
-        console.error('Error fetching student groups:', error);
-        toast({
-          title: "Fout bij ophalen klassen",
-          description: error?.message || "Er is een fout opgetreden bij het ophalen van de klassen.",
-          variant: "destructive",
-        });
-        return [];
+        const response = await apiRequest('/api/student-groups');
+        return response;
+      } catch (error) {
+        console.error('Error fetching class groups:', error);
+        return { groups: [] };
       }
-    },
+    }
   });
 
-  // Fetch rooms for filter
-  const { data: roomsData } = useQuery({
+  const { data: roomsData = { rooms: [] } } = useQuery({
     queryKey: ['/api/rooms'],
     queryFn: async () => {
       try {
-        return await apiRequest('/api/rooms', {
-          method: 'GET'
-        });
-      } catch (error: any) {
+        const response = await apiRequest('/api/rooms');
+        return response;
+      } catch (error) {
         console.error('Error fetching rooms:', error);
-        toast({
-          title: "Fout bij ophalen lokalen",
-          description: error?.message || "Er is een fout opgetreden bij het ophalen van de lokalen.",
-          variant: "destructive",
-        });
         return { rooms: [] };
       }
-    },
+    }
   });
 
-  const schedules = schedulesData?.schedules || [];
-  const totalSchedules = schedulesData?.totalCount || 0;
-  const totalPages = Math.ceil(totalSchedules / 10);
-  
-  const courses = coursesData?.courses || [];
-  const teachers = teachersData?.teachers || [];
-  const studentGroups = studentGroupsData || [];
-  const rooms = roomsData?.rooms || [];
+  // Toon alleen de planning voor de geselecteerde docent/klas/dag
+  const filteredSchedules = scheduleData.schedules.filter((schedule: TeacherSchedule) => {
+    // Alleen filteren op zoekterm als die is ingevuld
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        schedule.instructorName.toLowerCase().includes(searchLower) ||
+        schedule.courseName.toLowerCase().includes(searchLower) ||
+        schedule.className.toLowerCase().includes(searchLower) ||
+        schedule.roomName.toLowerCase().includes(searchLower)
+      );
+    }
+    return true;
+  });
 
-  const handleAddSchedule = () => {
-    // Open the dialog
-    setIsDialogOpen(true);
-  };
+  // Groepeer lessen per dag voor weergave
+  const groupedSchedules = filteredSchedules.reduce((acc: any, schedule: TeacherSchedule) => {
+    const day = schedule.dayOfWeek;
+    if (!acc[day]) acc[day] = [];
+    acc[day].push(schedule);
+    return acc;
+  }, {});
   
-  // Mutation voor het toevoegen van een docentrooster
-  const createTeacherScheduleMutation = useMutation({
-    mutationFn: async (data: any) => {
-      try {
-        return await apiRequest('/api/scheduling/instructor', {
-          method: 'POST',
-          body: data
-        });
-      } catch (error: any) {
-        console.error('Error creating teacher schedule:', error);
-        throw new Error(error?.message || 'Fout bij het aanmaken van het docentrooster');
-      }
+  // Sorteer de lessen per tijdstip
+  Object.keys(groupedSchedules).forEach(day => {
+    groupedSchedules[day].sort((a: TeacherSchedule, b: TeacherSchedule) => 
+      a.startTime.localeCompare(b.startTime)
+    );
+  });
+
+  // Dagen van de week voor de tabs
+  const daysOfWeek = [
+    { value: 'all', label: 'Alle dagen' },
+    { value: 'monday', label: 'Maandag' },
+    { value: 'tuesday', label: 'Dinsdag' },
+    { value: 'wednesday', label: 'Woensdag' },
+    { value: 'thursday', label: 'Donderdag' },
+    { value: 'friday', label: 'Vrijdag' }
+  ];
+
+  // Mutations
+  const createScheduleMutation = useMutation({
+    mutationFn: async (scheduleData: Partial<TeacherSchedule>) => {
+      const response = await apiRequest('/api/schedules', {
+        method: 'POST',
+        body: scheduleData
+      });
+      return response;
     },
     onSuccess: () => {
       toast({
-        title: "Docentrooster toegevoegd",
-        description: "Het docentrooster is succesvol toegevoegd aan het systeem.",
-        variant: "default",
+        title: "Lesuur toegevoegd",
+        description: "Het lesuur is succesvol toegevoegd aan het rooster.",
       });
-      setIsDialogOpen(false);
-      resetFormData();
-      
-      queryClient.invalidateQueries({ queryKey: ['/api/scheduling'] });
+      setShowDialog(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/schedules'] });
     },
     onError: (error: any) => {
       toast({
         title: "Fout bij toevoegen",
-        description: error.message || "Er is een fout opgetreden bij het toevoegen van het docentrooster.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Mutation voor het toevoegen van een lokaal
-  const createRoomMutation = useMutation({
-    mutationFn: async (data: any) => {
-      try {
-        return await apiRequest('/api/rooms', {
-          method: 'POST',
-          body: data
-        });
-      } catch (error: any) {
-        console.error('Error creating room:', error);
-        throw new Error(error?.message || 'Fout bij het aanmaken van het lokaal');
-      }
-    },
-    onSuccess: () => {
-      toast({
-        title: "Lokaal toegevoegd",
-        description: "Het lokaal is succesvol toegevoegd aan het systeem.",
-        variant: "default",
-      });
-      setIsDialogOpen(false);
-      resetFormData();
-      
-      queryClient.invalidateQueries({ queryKey: ['/api/rooms'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/scheduling'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Fout bij toevoegen",
-        description: error.message || "Er is een fout opgetreden bij het toevoegen van het lokaal.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Reset form data
-  const resetFormData = () => {
-    setFormData({
-      teacherId: '',
-      courseId: '',
-      classId: '',
-      selectedDays: {
-        monday: false,
-        tuesday: false,
-        wednesday: false,
-        thursday: false, 
-        friday: false,
-        saturday: false,
-        sunday: false
-      },
-      roomId: '',
-      startTime: '09:00',
-      endTime: '10:30',
-      repeat: true,
-      startDate: new Date().toISOString().split('T')[0],
-      endDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0],
-      
-      // Lokalen toewijzing
-      roomName: '',
-      capacity: 30,
-      location: '',
-      status: 'available' as 'available' | 'occupied' | 'reserved',
-      toewijzingsCategorie: 'vak',
-      assignmentId: '',
-      description: '',
-      notes: ''
-    });
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      // Valideer formulier
-      if (dialogActiveTab === 'instructor-schedule') {
-        if (!formData.teacherId || !formData.courseId || !formData.classId || !formData.roomId) {
-          toast({
-            title: "Onvolledige gegevens",
-            description: "Vul alle verplichte velden in om een docentrooster toe te voegen.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        // Controleer of er minstens één dag is geselecteerd
-        const hasSelectedDay = Object.values(formData.selectedDays).some(day => day);
-        if (!hasSelectedDay) {
-          toast({
-            title: "Geen dagen geselecteerd",
-            description: "Selecteer ten minste één dag voor het rooster.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        // Valideer tijden
-        if (formData.startTime >= formData.endTime) {
-          toast({
-            title: "Ongeldige tijd",
-            description: "De eindtijd moet na de starttijd liggen.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        // Submit instructor schedule
-        const selectedTeacher = teachers.find(t => t.id.toString() === formData.teacherId);
-        const selectedCourse = courses.find(c => c.id.toString() === formData.courseId);
-        const selectedClass = studentGroups.find(g => g.id.toString() === formData.classId);
-        const selectedRoom = rooms.find(r => r.id.toString() === formData.roomId);
-        
-        const scheduleData = {
-          teacherId: formData.teacherId,
-          instructorName: selectedTeacher ? `${selectedTeacher.firstName} ${selectedTeacher.lastName}` : '',
-          courseId: formData.courseId,
-          courseName: selectedCourse?.name || '',
-          classId: formData.classId,
-          className: selectedClass?.name || '',
-          roomId: formData.roomId,
-          roomName: selectedRoom?.name || '',
-          selectedDays: formData.selectedDays,
-          startTime: formData.startTime,
-          endTime: formData.endTime,
-          startDate: formData.startDate,
-          endDate: formData.repeat ? formData.endDate : formData.startDate,
-          isRecurring: formData.repeat
-        };
-        
-        createTeacherScheduleMutation.mutate(scheduleData);
-        
-      } else {
-        // Valideer voor lokalen
-        if (!formData.roomName || !formData.capacity) {
-          toast({
-            title: "Onvolledige gegevens",
-            description: "Vul alle verplichte velden in om een lokaal toe te voegen.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        const roomData = {
-          name: formData.roomName,
-          capacity: formData.capacity,
-          location: formData.location,
-          status: formData.status,
-          notes: formData.notes
-        };
-        
-        createRoomMutation.mutate(roomData);
-      }
-    } catch (error: any) {
-      console.error('Error submitting form:', error);
-      toast({
-        title: "Fout bij verwerken",
-        description: error?.message || "Er is een fout opgetreden bij het verwerken van het formulier.",
+        description: error.message || "Er is een fout opgetreden bij het toevoegen van het lesuur.",
         variant: "destructive",
       });
     }
+  });
+
+  const updateScheduleMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number, data: Partial<TeacherSchedule> }) => {
+      const response = await apiRequest(`/api/schedules/${id}`, {
+        method: 'PATCH',
+        body: data
+      });
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Lesuur bijgewerkt",
+        description: "Het lesuur is succesvol bijgewerkt.",
+      });
+      setShowDialog(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/schedules'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij bijwerken",
+        description: error.message || "Er is een fout opgetreden bij het bijwerken van het lesuur.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const deleteScheduleMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest(`/api/schedules/${id}`, {
+        method: 'DELETE'
+      });
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Lesuur verwijderd",
+        description: "Het lesuur is succesvol verwijderd uit het rooster.",
+      });
+      setShowConfirmDialog(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/schedules'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van het lesuur.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Event handlers
+  const handleAddSchedule = () => {
+    setFormData({
+      teacherId: '',
+      courseId: 0,
+      classId: 0,
+      startTime: '09:00',
+      endTime: '10:30',
+      dayOfWeek: 'monday',
+      roomId: 0,
+      type: 'regular',
+      date: new Date().toISOString().split('T')[0],
+      notes: ''
+    });
+    setEditMode(false);
+    setShowDialog(true);
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when search changes
+  const handleEditSchedule = (schedule: TeacherSchedule) => {
+    setSelectedSchedule(schedule);
+    setFormData({
+      teacherId: schedule.teacherId,
+      courseId: schedule.courseId,
+      classId: schedule.classId,
+      startTime: schedule.startTime,
+      endTime: schedule.endTime,
+      dayOfWeek: schedule.dayOfWeek,
+      roomId: schedule.roomId,
+      type: schedule.type,
+      date: schedule.date,
+      notes: schedule.notes
+    });
+    setEditMode(true);
+    setShowDialog(true);
   };
 
-  const handleCourseChange = (value: string) => {
-    setCourse(value);
-    setCurrentPage(1);
+  const handleDeleteSchedule = (schedule: TeacherSchedule) => {
+    setSelectedSchedule(schedule);
+    setShowConfirmDialog(true);
   };
 
-  const handleInstructorChange = (value: string) => {
-    setInstructor(value);
-    setCurrentPage(1);
+  const confirmDeleteSchedule = () => {
+    if (selectedSchedule) {
+      deleteScheduleMutation.mutate(selectedSchedule.id);
+    }
   };
 
-  const handleRoomChange = (value: string) => {
-    setRoom(value);
-    setCurrentPage(1);
-  };
-
-  const handleDayChange = (value: string) => {
-    setDay(value);
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-  
-  const handleFormChange = (field: string, value: any) => {
+  const handleFormChange = (field: keyof TeacherSchedule, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validatie
+    if (!formData.teacherId || !formData.courseId || !formData.classId || !formData.roomId) {
+      toast({
+        title: "Vul alle verplichte velden in",
+        description: "Docent, vak, klas en lokaal zijn verplicht.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (editMode && selectedSchedule) {
+      updateScheduleMutation.mutate({ 
+        id: selectedSchedule.id, 
+        data: formData
+      });
+    } else {
+      createScheduleMutation.mutate(formData);
+    }
+  };
+
+  const getDayLabel = (day: string) => {
+    const dayMap: {[key: string]: string} = {
+      'monday': 'Maandag',
+      'tuesday': 'Dinsdag',
+      'wednesday': 'Woensdag',
+      'thursday': 'Donderdag',
+      'friday': 'Vrijdag'
+    };
+    return dayMap[day] || day;
+  };
+  
+  const getTeacherById = (id: string) => {
+    const t = teachersData.teachers.find((t: Teacher) => t.id === id);
+    const c = coursesData.courses.find((c: Course) => c.id === Number(formData.courseId));
+    const g = classGroupsData.groups.find((g: ClassGroup) => g.id === Number(formData.classId));
+    const r = roomsData.rooms.find((r: Room) => r.id === Number(formData.roomId));
+    
+    return {
+      teacherName: t ? `${t.firstName} ${t.lastName}` : 'Onbekend',
+      courseName: c?.name || 'Onbekend',
+      className: g?.name || 'Onbekend',
+      roomName: r?.name || 'Onbekend'
+    };
+  };
+
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* Page header */}
-      <div className="mb-8">
-        <div className="rounded-lg overflow-hidden shadow-sm">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] p-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <Clock className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white">Planning</h1>
-                <p className="text-base text-blue-100 mt-1">Beheer cursusroosters, lokalen en lesschema's</p>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Page header - Professionele desktop stijl */}
+      <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
+        <div className="flex flex-col">
+          <div className="px-6 py-4 flex justify-between items-center">
+            <div>
+              <h1 className="text-base font-medium text-gray-800 tracking-tight">Lesroosters</h1>
+            </div>
+            <div className="flex items-center">
+              <div className="text-xs text-gray-500 font-medium">
+                {new Date().toLocaleDateString('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})}
               </div>
             </div>
           </div>
+          <div className="px-6 py-2 bg-[#f9fafc] border-t border-[#e5e7eb] flex items-center">
+            <div className="text-xs text-gray-500">Planning &gt; Lesroosters</div>
+          </div>
         </div>
-      </div>
-      {/* Geen widgets op verzoek van gebruiker */}
-      <div className="mb-4">
-        <div className="flex flex-col gap-4 w-full mb-4">
-          <div className="relative w-full">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              placeholder="Zoek planning..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="pl-8 bg-white w-full"
-            />
-            {searchTerm && (
-              <XCircle
-                className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
-                onClick={() => setSearchTerm("")}
+      </header>
+
+      {/* Main content area */}
+      <div className="px-6 py-6 flex-1">
+        {/* Zoek- en actiebalk - Desktop style */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4">
+          <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            {/* Zoekbalk */}
+            <div className="relative w-full sm:max-w-md">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <Input
+                type="search"
+                placeholder="Zoek op docent, vak, klas of lokaal..."
+                className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
-            )}
+            </div>
+            
+            {/* Acties */}
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilterOptions(!showFilterOptions)}
+                className="h-7 text-xs rounded-sm border-[#e5e7eb]"
+              >
+                <Filter className="h-3.5 w-3.5 mr-1" />
+                Filters
+                {showFilterOptions ? 
+                  <ChevronUp className="h-3.5 w-3.5 ml-1" /> : 
+                  <ChevronDown className="h-3.5 w-3.5 ml-1" />
+                }
+              </Button>
+              
+              <Button
+                size="sm"
+                onClick={handleAddSchedule}
+                className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white"
+              >
+                <PlusCircle className="h-3.5 w-3.5 mr-1" />
+                Nieuw Lesuur
+              </Button>
+            </div>
           </div>
           
-          <div className="flex justify-end">
-            <Button 
-              onClick={handleAddSchedule} 
-              variant="default"
-              size="default"
-              className="hover:bg-primary/90 flex items-center bg-[#1e40af]"
-            >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              <span>Planning Toevoegen</span>
-            </Button>
-          </div>
-        </div>
-      </div>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-        </div>
-        
-        <TabsContent value="room-allocation">
-          <div className="grid grid-cols-1 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl font-semibold leading-none tracking-tight text-[#0e40a1]">Lokalenbeheer</CardTitle>
-
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-md border">
-                  <div className="grid grid-cols-5 bg-slate-50 p-3 text-xs font-medium">
-                    <div>Lokaal</div>
-                    <div>Capaciteit</div>
-                    <div>Status</div>
-                    <div>Huidig gebruik</div>
-                    <div className="text-right">Acties</div>
-                  </div>
-                  <div className="divide-y">
-                    {rooms && rooms.length > 0 ? (
-                      rooms.map((room: Room) => (
-                        <div key={room.id} className="grid grid-cols-5 items-center p-3">
-                          <div className="font-medium">{room.name}</div>
-                          <div>{room.capacity} personen</div>
-                          <div>
-                            <Badge className={
-                              room.status === 'available' ? "bg-green-100 text-green-800 hover:bg-green-100" :
-                              room.status === 'occupied' ? "bg-red-100 text-red-800 hover:bg-red-100" :
-                              "bg-amber-100 text-amber-800 hover:bg-amber-100"
-                            }>
-                              {room.status === 'available' ? 'Beschikbaar' : 
-                               room.status === 'occupied' ? 'Bezet' : 'Gereserveerd'}
-                            </Badge>
-                          </div>
-                          <div>{room.currentUse || '-'}</div>
-                          <div className="flex justify-end gap-2">
-                            <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
-                            <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-                        <div className="text-[#1e3a8a] mb-2">
-                          <Building className="h-12 w-12 mx-auto opacity-30" />
-                        </div>
-                        <p className="text-sm font-medium">Geen lokaalgegevens beschikbaar</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="instructor-schedule">
-          <div className="grid grid-cols-1 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl font-semibold leading-none tracking-tight text-[#1e3a8a]">Docentenrooster</CardTitle>
-                <div className="flex flex-col gap-3">
-                  <Tabs defaultValue="today" className="w-full">
-                    <TabsList className="grid grid-cols-3 p-1 bg-[#1e3a8a]/10 rounded-md">
-                      <TabsTrigger value="today" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                        <CalendarIcon className="h-4 w-4" />
-                        <span>Vandaag</span>
-                      </TabsTrigger>
-                      <TabsTrigger value="week" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                        <Repeat className="h-4 w-4" />
-                        <span>Deze week</span>
-                      </TabsTrigger>
-                      <TabsTrigger value="month" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                        <Calendar className="h-4 w-4" />
-                        <span>Deze maand</span>
-                      </TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-md border">
-                  <div className="grid grid-cols-6 bg-slate-50 p-3 text-xs font-medium">
-                    <div>Docent</div>
-                    <div>Vak</div>
-                    <div>Klas</div>
-                    <div>Tijd</div>
-                    <div>Lokaal</div>
-                    <div className="text-right">Acties</div>
-                  </div>
-                  <div className="divide-y">
-                    {schedules && schedules.length > 0 ? (
-                      schedules.map((schedule: TeacherSchedule) => (
-                        <div key={schedule.id} className="grid grid-cols-6 items-center p-3">
-                          <div className="font-medium">{schedule.instructorName}</div>
-                          <div>{schedule.courseName}</div>
-                          <div>{schedule.className}</div>
-                          <div>{schedule.startTime} - {schedule.endTime}</div>
-                          <div>{schedule.roomName}</div>
-                          <div className="flex justify-end gap-2">
-                            <Button variant="ghost" size="icon"><Eye className="h-4 w-4" /></Button>
-                            <Button variant="ghost" size="icon"><Edit className="h-4 w-4" /></Button>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-                        <div className="text-[#1e3a8a] mb-2">
-                          <Calendar className="h-12 w-12 mx-auto opacity-30" />
-                        </div>
-                        <p className="text-sm font-medium">Geen rooster gevonden</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
-      {/* Planning Toevoegen Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[85%] p-0 h-[85vh] max-h-[85vh]">
-          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <DialogTitle className="text-xl font-semibold text-white">
-                    Planning Toevoegen
-                  </DialogTitle>
-                  <DialogDescription className="text-sm text-blue-100 font-medium mt-1">
-                    Wijs docenten toe aan vakken of ken lokalen toe aan lessen.
-                  </DialogDescription>
-                </div>
+          {/* Filter opties */}
+          {showFilterOptions && (
+            <div className="px-4 py-3 border-t border-[#e5e7eb] flex flex-wrap gap-3 items-center">
+              <div className="flex items-center">
+                {(selectedTeacher !== 'all' || selectedClass !== 'all' || selectedDay !== 'all') && (
+                  <Button
+                    variant="link"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedTeacher('all');
+                      setSelectedClass('all');
+                      setSelectedDay('all');
+                    }}
+                    className="h-7 text-xs text-blue-600 p-0 mr-3"
+                  >
+                    Filters wissen
+                  </Button>
+                )}
               </div>
               
-              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white/20 cursor-pointer"
-                onClick={() => setIsDialogOpen(false)}
-              >
-                <X className="h-4 w-4 text-white" />
-                <span className="sr-only">Sluiten</span>
+              <div className="flex flex-wrap gap-3">
+                <Select 
+                  value={selectedTeacher} 
+                  onValueChange={setSelectedTeacher}
+                >
+                  <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
+                    <SelectValue placeholder="Docent" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle docenten</SelectItem>
+                    {teachersData?.teachers?.map((teacher: Teacher) => (
+                      <SelectItem key={teacher.id} value={teacher.id}>
+                        {teacher.firstName} {teacher.lastName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select 
+                  value={selectedClass} 
+                  onValueChange={setSelectedClass}
+                >
+                  <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
+                    <SelectValue placeholder="Klas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle klassen</SelectItem>
+                    {classGroupsData?.groups?.map((group: ClassGroup) => (
+                      <SelectItem key={group.id} value={group.id.toString()}>
+                        {group.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select 
+                  value={selectedDay} 
+                  onValueChange={setSelectedDay}
+                >
+                  <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
+                    <SelectValue placeholder="Dag" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {daysOfWeek.map(day => (
+                      <SelectItem key={day.value} value={day.value}>
+                        {day.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-          </DialogHeader>
-          
-          <div className="px-6 py-5 overflow-y-auto" style={{ height: "calc(85vh - 170px)" }}>
-            <form onSubmit={handleFormSubmit} className="space-y-6">
-              <Tabs 
-                value={dialogActiveTab} 
-                onValueChange={setDialogActiveTab} 
-                className="w-full"
-              >
-              
-              {/* Docenten Rooster Tab Content */}
-              <TabsContent value="instructor-schedule" className="space-y-4 mt-2">
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-md font-medium mb-4 border-b pb-2 text-gray-700">
-                      <div className="flex items-center">
-                        <GraduationCap className="mr-2 h-5 w-5 text-primary" />
-                        Docent Toewijzen
-                      </div>
-                    </h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="teacherId">Docent <span className="text-red-500">*</span></Label>
-                        <Select 
-                          value={formData.teacherId}
-                          onValueChange={(value) => handleFormChange('teacherId', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer een docent" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {teachers && teachers.length > 0 ? 
-                              teachers.map((teacher: Teacher) => (
-                                <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                                  {teacher.firstName} {teacher.lastName}
-                                </SelectItem>
-                              )) :
-                              <SelectItem value="no-teachers">Geen docenten beschikbaar</SelectItem>
-                            }
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="courseId">Vak <span className="text-red-500">*</span></Label>
-                        <Select 
-                          value={formData.courseId}
-                          onValueChange={(value) => handleFormChange('courseId', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer een vak" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {courses && courses.length > 0 ? 
-                              courses.map((course: Course) => (
-                                <SelectItem key={course.id} value={course.id.toString()}>
-                                  {course.name}
-                                </SelectItem>
-                              )) :
-                              <SelectItem value="no-courses">Geen vakken beschikbaar</SelectItem>
-                            }
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="classId">Klas <span className="text-red-500">*</span></Label>
-                        <Select 
-                          value={formData.classId}
-                          onValueChange={(value) => handleFormChange('classId', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer een klas" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {studentGroups && studentGroups.length > 0 ? 
-                              studentGroups.map((group: StudentGroup) => (
-                                <SelectItem key={group.id} value={group.id.toString()}>
-                                  {group.name}
-                                </SelectItem>
-                              )) :
-                              <SelectItem value="no-groups">Geen klassen beschikbaar</SelectItem>
-                            }
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="roomId">Lokaal <span className="text-red-500">*</span></Label>
-                        <Select 
-                          value={formData.roomId}
-                          onValueChange={(value) => handleFormChange('roomId', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer een lokaal" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {rooms && rooms.length > 0 ? 
-                              rooms.map((room: Room) => (
-                                <SelectItem key={room.id} value={room.id.toString()}>
-                                  {room.name} ({room.capacity} pers.)
-                                </SelectItem>
-                              )) :
-                              <SelectItem value="no-rooms">Geen lokalen beschikbaar</SelectItem>
-                            }
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="startTime">Starttijd <span className="text-red-500">*</span></Label>
-                        <Input
-                          id="startTime"
-                          type="time"
-                          value={formData.startTime}
-                          onChange={(e) => handleFormChange('startTime', e.target.value)}
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="endTime">Eindtijd <span className="text-red-500">*</span></Label>
-                        <Input
-                          id="endTime"
-                          type="time"
-                          value={formData.endTime}
-                          onChange={(e) => handleFormChange('endTime', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="mt-4 border-t pt-4">
-                      <h4 className="font-medium mb-3 text-gray-700 flex items-center">
-                        <Calendar className="mr-2 h-4 w-4 text-primary" />
-                        Lesdag(en) <span className="text-red-500 ml-1">*</span>
-                      </h4>
-                      
-                      <div className="grid grid-cols-2 md:grid-cols-7 gap-4">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="monday" 
-                            checked={formData.selectedDays.monday}
-                            onCheckedChange={(checked) => {
-                              const newSelectedDays = { ...formData.selectedDays, monday: !!checked };
-                              handleFormChange('selectedDays', newSelectedDays);
-                            }}
-                          />
-                          <Label htmlFor="monday">Maandag</Label>
+          )}
+        </div>
+        
+        {/* Dagtabs */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4">
+          <Tabs 
+            value={activeTab} 
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
+            <TabsList className="bg-[#f9fafc] border-b border-[#e5e7eb] w-full flex h-10 items-center justify-start overflow-x-auto rounded-none px-0 scrollbar-hide">
+              {daysOfWeek.map(day => (
+                <TabsTrigger 
+                  key={day.value} 
+                  value={day.value}
+                  className="flex h-10 border-b-2 border-transparent data-[state=active]:border-[#1e40af] rounded-none px-4 py-2 text-xs font-medium text-gray-500 data-[state=active]:text-[#1e40af] bg-transparent"
+                >
+                  {day.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            
+            {daysOfWeek.map(day => (
+              <TabsContent key={day.value} value={day.value} className="p-0">
+                {isLoadingSchedules ? (
+                  <div className="flex justify-center items-center py-12">
+                    <div className="w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
+                    <span className="ml-2 text-sm text-gray-500">Laden...</span>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-[#e5e7eb]">
+                    {day.value === 'all' ? (
+                      // Alle dagen weergeven
+                      Object.keys(groupedSchedules).length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+                          <Calendar className="h-12 w-12 text-gray-300 mb-2" />
+                          <h3 className="text-lg font-medium text-gray-900 mb-1">Geen lessen gepland</h3>
+                          <p className="text-sm text-center max-w-md mb-4">
+                            {searchTerm || selectedTeacher !== 'all' || selectedClass !== 'all' 
+                              ? 'Er zijn geen lesuren die voldoen aan de huidige filters.' 
+                              : 'Er zijn nog geen lesuren ingepland.'}
+                          </p>
+                          <Button
+                            size="sm"
+                            onClick={handleAddSchedule}
+                            className="h-8 text-xs rounded-sm bg-[#1e40af]"
+                          >
+                            <PlusCircle className="h-3.5 w-3.5 mr-1" />
+                            Lesuur toevoegen
+                          </Button>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="tuesday" 
-                            checked={formData.selectedDays.tuesday}
-                            onCheckedChange={(checked) => {
-                              const newSelectedDays = { ...formData.selectedDays, tuesday: !!checked };
-                              handleFormChange('selectedDays', newSelectedDays);
-                            }}
-                          />
-                          <Label htmlFor="tuesday">Dinsdag</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="wednesday" 
-                            checked={formData.selectedDays.wednesday}
-                            onCheckedChange={(checked) => {
-                              const newSelectedDays = { ...formData.selectedDays, wednesday: !!checked };
-                              handleFormChange('selectedDays', newSelectedDays);
-                            }}
-                          />
-                          <Label htmlFor="wednesday">Woensdag</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="thursday" 
-                            checked={formData.selectedDays.thursday}
-                            onCheckedChange={(checked) => {
-                              const newSelectedDays = { ...formData.selectedDays, thursday: !!checked };
-                              handleFormChange('selectedDays', newSelectedDays);
-                            }}
-                          />
-                          <Label htmlFor="thursday">Donderdag</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="friday" 
-                            checked={formData.selectedDays.friday}
-                            onCheckedChange={(checked) => {
-                              const newSelectedDays = { ...formData.selectedDays, friday: !!checked };
-                              handleFormChange('selectedDays', newSelectedDays);
-                            }}
-                          />
-                          <Label htmlFor="friday">Vrijdag</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="saturday" 
-                            checked={formData.selectedDays.saturday}
-                            onCheckedChange={(checked) => {
-                              const newSelectedDays = { ...formData.selectedDays, saturday: !!checked };
-                              handleFormChange('selectedDays', newSelectedDays);
-                            }}
-                          />
-                          <Label htmlFor="saturday">Zaterdag</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="sunday" 
-                            checked={formData.selectedDays.sunday}
-                            onCheckedChange={(checked) => {
-                              const newSelectedDays = { ...formData.selectedDays, sunday: !!checked };
-                              handleFormChange('selectedDays', newSelectedDays);
-                            }}
-                          />
-                          <Label htmlFor="sunday">Zondag</Label>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-4 border-t pt-4">
-                      <h4 className="font-medium mb-3 text-gray-700 flex items-center">
-                        <Repeat className="mr-2 h-4 w-4 text-primary" />
-                        Herhaling
-                      </h4>
-                      
-                      <div className="space-y-4">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="repeat" 
-                            checked={formData.repeat}
-                            onCheckedChange={(checked) => {
-                              handleFormChange('repeat', !!checked);
-                            }}
-                          />
-                          <Label htmlFor="repeat">Wekelijks herhalen</Label>
-                        </div>
-                        
-                        {formData.repeat && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-7">
-                            <div className="space-y-2">
-                              <Label htmlFor="startDate">Startdatum <span className="text-red-500">*</span></Label>
-                              <Input
-                                id="startDate"
-                                type="date"
-                                value={formData.startDate}
-                                onChange={(e) => handleFormChange('startDate', e.target.value)}
-                              />
-                            </div>
+                      ) : (
+                        Object.keys(groupedSchedules).map(dayKey => (
+                          <div key={dayKey} className="py-4">
+                            <h3 className="px-4 font-medium text-sm text-gray-700 mb-3">
+                              {getDayLabel(dayKey)}
+                            </h3>
                             
-                            <div className="space-y-2">
-                              <Label htmlFor="endDate">Einddatum <span className="text-red-500">*</span></Label>
-                              <Input
-                                id="endDate"
-                                type="date"
-                                value={formData.endDate}
-                                min={formData.startDate}
-                                onChange={(e) => handleFormChange('endDate', e.target.value)}
-                              />
+                            <div className="space-y-3 px-4">
+                              {groupedSchedules[dayKey].map((schedule: TeacherSchedule) => (
+                                <div 
+                                  key={schedule.id} 
+                                  className="border border-[#e5e7eb] rounded-sm hover:bg-gray-50"
+                                >
+                                  <div className="p-3 flex items-start justify-between">
+                                    <div className="flex items-start gap-3">
+                                      <div className="bg-[#f9fafc] border border-[#e5e7eb] rounded-sm p-1.5 text-center min-w-[60px]">
+                                        <div className="text-xs text-gray-700">{schedule.startTime}</div>
+                                        <div className="text-xs text-gray-500">{schedule.endTime}</div>
+                                      </div>
+                                      
+                                      <div>
+                                        <div className="font-medium text-sm">{schedule.courseName}</div>
+                                        <div className="text-xs text-gray-500 mt-1 space-y-1">
+                                          <div className="flex items-center">
+                                            <GraduationCap className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                                            <span>{schedule.instructorName}</span>
+                                          </div>
+                                          <div className="flex items-center">
+                                            <Users className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                                            <span>{schedule.className}</span>
+                                          </div>
+                                          <div className="flex items-center">
+                                            <MapPin className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                                            <span>{schedule.roomName}</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="flex items-start gap-1">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleEditSchedule(schedule)}
+                                        className="h-7 w-7 p-0 text-gray-500"
+                                      >
+                                        <Edit className="h-3.5 w-3.5" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleDeleteSchedule(schedule)}
+                                        className="h-7 w-7 p-0 text-gray-500"
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                  
+                                  {schedule.notes && (
+                                    <div className="px-3 py-2 border-t border-[#e5e7eb] text-xs text-gray-600 bg-gray-50">
+                                      <div className="flex items-start">
+                                        <AlertCircle className="h-3.5 w-3.5 mr-1.5 text-gray-400 mt-0.5" />
+                                        <span>{schedule.notes}</span>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
                             </div>
                           </div>
-                        )}
-                      </div>
-                    </div>
+                        ))
+                      )
+                    ) : (
+                      // Specifieke dag weergeven
+                      groupedSchedules[day.value] ? (
+                        <div className="py-4">
+                          <div className="space-y-3 px-4">
+                            {groupedSchedules[day.value].map((schedule: TeacherSchedule) => (
+                              <div 
+                                key={schedule.id} 
+                                className="border border-[#e5e7eb] rounded-sm hover:bg-gray-50"
+                              >
+                                <div className="p-3 flex items-start justify-between">
+                                  <div className="flex items-start gap-3">
+                                    <div className="bg-[#f9fafc] border border-[#e5e7eb] rounded-sm p-1.5 text-center min-w-[60px]">
+                                      <div className="text-xs text-gray-700">{schedule.startTime}</div>
+                                      <div className="text-xs text-gray-500">{schedule.endTime}</div>
+                                    </div>
+                                    
+                                    <div>
+                                      <div className="font-medium text-sm">{schedule.courseName}</div>
+                                      <div className="text-xs text-gray-500 mt-1 space-y-1">
+                                        <div className="flex items-center">
+                                          <GraduationCap className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                                          <span>{schedule.instructorName}</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                          <Users className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                                          <span>{schedule.className}</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                          <MapPin className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                                          <span>{schedule.roomName}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="flex items-start gap-1">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleEditSchedule(schedule)}
+                                      className="h-7 w-7 p-0 text-gray-500"
+                                    >
+                                      <Edit className="h-3.5 w-3.5" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleDeleteSchedule(schedule)}
+                                      className="h-7 w-7 p-0 text-gray-500"
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </div>
+                                </div>
+                                
+                                {schedule.notes && (
+                                  <div className="px-3 py-2 border-t border-[#e5e7eb] text-xs text-gray-600 bg-gray-50">
+                                    <div className="flex items-start">
+                                      <AlertCircle className="h-3.5 w-3.5 mr-1.5 text-gray-400 mt-0.5" />
+                                      <span>{schedule.notes}</span>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+                          <Calendar className="h-12 w-12 text-gray-300 mb-2" />
+                          <h3 className="text-lg font-medium text-gray-900 mb-1">Geen lessen gepland</h3>
+                          <p className="text-sm text-center max-w-md mb-4">
+                            {searchTerm || selectedTeacher !== 'all' || selectedClass !== 'all' 
+                              ? `Er zijn geen lesuren die voldoen aan de huidige filters voor ${day.label.toLowerCase()}.` 
+                              : `Er zijn nog geen lesuren ingepland voor ${day.label.toLowerCase()}.`}
+                          </p>
+                          <Button
+                            size="sm"
+                            onClick={handleAddSchedule}
+                            className="h-8 text-xs rounded-sm bg-[#1e40af]"
+                          >
+                            <PlusCircle className="h-3.5 w-3.5 mr-1" />
+                            Lesuur toevoegen
+                          </Button>
+                        </div>
+                      )
+                    )}
                   </div>
-                </div>
+                )}
               </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+      </div>
+
+      {/* Dialogen */}
+      
+      {/* Lesuur toevoegen/bewerken dialoog */}
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>{editMode ? "Lesuur bewerken" : "Lesuur toevoegen"}</DialogTitle>
+            <DialogDescription>
+              {editMode 
+                ? "Werk de details van dit lesuur bij." 
+                : "Vul de gegevens in om een nieuw lesuur toe te voegen aan het rooster."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleFormSubmit} className="space-y-4 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="teacherId" className="text-xs">Docent</Label>
+                <Select 
+                  value={formData.teacherId?.toString() || ""} 
+                  onValueChange={(value) => handleFormChange('teacherId', value)}
+                >
+                  <SelectTrigger id="teacherId" className="h-8 text-xs">
+                    <SelectValue placeholder="Selecteer docent" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teachersData.teachers.map((teacher: Teacher) => (
+                      <SelectItem key={teacher.id} value={teacher.id}>
+                        {teacher.firstName} {teacher.lastName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               
-              {/* Lokalen Tab Content */}
-              <TabsContent value="room-allocation" className="space-y-4 mt-2">
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-md font-medium mb-4 border-b pb-2 text-gray-700">
-                      <div className="flex items-center">
-                        <Building className="mr-2 h-5 w-5 text-primary" />
-                        Lokaal Toevoegen
-                      </div>
-                    </h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="roomName">Lokaal naam <span className="text-red-500">*</span></Label>
-                        <Input
-                          id="roomName"
-                          value={formData.roomName}
-                          onChange={(e) => handleFormChange('roomName', e.target.value)}
-                          placeholder="Bijv. Lokaal 1.01"
-                          required
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="capacity">Capaciteit <span className="text-red-500">*</span></Label>
-                        <Input
-                          id="capacity"
-                          type="number"
-                          min="1"
-                          value={formData.capacity}
-                          onChange={(e) => handleFormChange('capacity', parseInt(e.target.value) || 1)}
-                          placeholder="Aantal personen"
-                          required
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="location">Locatie</Label>
-                        <Input
-                          id="location"
-                          value={formData.location}
-                          onChange={(e) => handleFormChange('location', e.target.value)}
-                          placeholder="Bijv. 1e verdieping, noordvleugel"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="status">Status</Label>
-                        <Select 
-                          value={formData.status}
-                          onValueChange={(value: 'available' | 'occupied' | 'reserved') => handleFormChange('status', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="available">Beschikbaar</SelectItem>
-                            <SelectItem value="occupied">Bezet</SelectItem>
-                            <SelectItem value="reserved">Gereserveerd</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-4">
-                      <Label htmlFor="notes">Notities</Label>
-                      <Textarea
-                        id="notes"
-                        value={formData.notes}
-                        onChange={(e) => handleFormChange('notes', e.target.value)}
-                        placeholder="Bijzonderheden over dit lokaal"
-                        rows={3}
-                      />
-                    </div>
+              <div className="space-y-2">
+                <Label htmlFor="courseId" className="text-xs">Vak</Label>
+                <Select 
+                  value={formData.courseId?.toString() || ""} 
+                  onValueChange={(value) => handleFormChange('courseId', parseInt(value))}
+                >
+                  <SelectTrigger id="courseId" className="h-8 text-xs">
+                    <SelectValue placeholder="Selecteer vak" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {coursesData.courses.map((course: Course) => (
+                      <SelectItem key={course.id} value={course.id.toString()}>
+                        {course.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="classId" className="text-xs">Klas</Label>
+                <Select 
+                  value={formData.classId?.toString() || ""} 
+                  onValueChange={(value) => handleFormChange('classId', parseInt(value))}
+                >
+                  <SelectTrigger id="classId" className="h-8 text-xs">
+                    <SelectValue placeholder="Selecteer klas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {classGroupsData.groups.map((group: ClassGroup) => (
+                      <SelectItem key={group.id} value={group.id.toString()}>
+                        {group.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="roomId" className="text-xs">Lokaal</Label>
+                <Select 
+                  value={formData.roomId?.toString() || ""} 
+                  onValueChange={(value) => handleFormChange('roomId', parseInt(value))}
+                >
+                  <SelectTrigger id="roomId" className="h-8 text-xs">
+                    <SelectValue placeholder="Selecteer lokaal" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roomsData.rooms.map((room: Room) => (
+                      <SelectItem key={room.id} value={room.id.toString()}>
+                        {room.name} ({room.location})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="dayOfWeek" className="text-xs">Dag</Label>
+                <Select 
+                  value={formData.dayOfWeek || "monday"} 
+                  onValueChange={(value) => handleFormChange('dayOfWeek', value)}
+                >
+                  <SelectTrigger id="dayOfWeek" className="h-8 text-xs">
+                    <SelectValue placeholder="Selecteer dag" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="monday">Maandag</SelectItem>
+                    <SelectItem value="tuesday">Dinsdag</SelectItem>
+                    <SelectItem value="wednesday">Woensdag</SelectItem>
+                    <SelectItem value="thursday">Donderdag</SelectItem>
+                    <SelectItem value="friday">Vrijdag</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="type" className="text-xs">Type</Label>
+                <Select 
+                  value={formData.type || "regular"} 
+                  onValueChange={(value) => handleFormChange('type', value as 'regular' | 'once')}
+                >
+                  <SelectTrigger id="type" className="h-8 text-xs">
+                    <SelectValue placeholder="Selecteer type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="regular">Regulier (wekelijks)</SelectItem>
+                    <SelectItem value="once">Eenmalig</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="startTime" className="text-xs">Starttijd</Label>
+                <Input 
+                  id="startTime"
+                  type="time"
+                  value={formData.startTime || '09:00'}
+                  onChange={(e) => handleFormChange('startTime', e.target.value)}
+                  className="h-8 text-xs"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="endTime" className="text-xs">Eindtijd</Label>
+                <Input 
+                  id="endTime"
+                  type="time"
+                  value={formData.endTime || '10:30'}
+                  onChange={(e) => handleFormChange('endTime', e.target.value)}
+                  className="h-8 text-xs"
+                />
+              </div>
+              
+              {formData.type === 'once' && (
+                <div className="space-y-2">
+                  <Label htmlFor="date" className="text-xs">Datum (eenmalig)</Label>
+                  <Input 
+                    id="date"
+                    type="date"
+                    value={formData.date || ''}
+                    onChange={(e) => handleFormChange('date', e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </div>
+              )}
+              
+              <div className="space-y-2 col-span-2">
+                <Label htmlFor="notes" className="text-xs">Notities</Label>
+                <Textarea 
+                  id="notes"
+                  value={formData.notes || ''}
+                  onChange={(e) => handleFormChange('notes', e.target.value)}
+                  placeholder="Eventuele opmerkingen over deze les..."
+                  className="min-h-[80px] text-xs"
+                />
+              </div>
+              
+              {formData.teacherId && formData.courseId && formData.classId && formData.roomId && (
+                <div className="col-span-2 p-3 bg-[#f9fafc] border border-[#e5e7eb] rounded-sm">
+                  <div className="text-xs font-medium text-gray-700 mb-2">Samenvatting:</div>
+                  <div className="text-xs text-gray-600">
+                    {(() => {
+                      const info = getTeacherById(formData.teacherId);
+                      return (
+                        <div className="space-y-1">
+                          <div className="flex items-center">
+                            <GraduationCap className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                            <span>{info.teacherName}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <BookOpen className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                            <span>{info.courseName}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <Users className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                            <span>{info.className}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <MapPin className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                            <span>{info.roomName}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <Calendar className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                            <span>
+                              {formData.type === 'once' 
+                                ? `Eenmalig op ${formData.date ? new Date(formData.date).toLocaleDateString('nl-NL') : '...'}`
+                                : `Wekelijks op ${getDayLabel(formData.dayOfWeek || 'monday')}`}
+                            </span>
+                          </div>
+                          <div className="flex items-center">
+                            <Clock className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                            <span>{formData.startTime} - {formData.endTime}</span>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
-              </TabsContent>
-            </Tabs>
+              )}
+            </div>
             
-            <DialogFooter className="flex items-center justify-end space-x-2 pt-4 border-t">
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowDialog(false)}
+                className="h-8 text-xs rounded-sm"
+              >
                 Annuleren
               </Button>
-              <Button type="submit" className="hover:bg-[#1e40af]/90 bg-[#1e40af]">
-                {dialogActiveTab === 'instructor-schedule' 
-                  ? 'Docentrooster Opslaan' 
-                  : 'Lokaal Opslaan'}
+              <Button 
+                type="submit"
+                className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
+              >
+                {editMode ? "Bijwerken" : "Toevoegen"}
               </Button>
             </DialogFooter>
           </form>
-          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bevestiging dialoog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Lesuur verwijderen</DialogTitle>
+            <DialogDescription>
+              Weet je zeker dat je dit lesuur wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedSchedule && (
+            <div className="py-4">
+              <div className="bg-[#f9fafc] border rounded-sm p-4">
+                <div className="mb-2 font-medium text-sm">{selectedSchedule.courseName}</div>
+                <div className="text-xs text-gray-600 space-y-1">
+                  <div className="flex items-center">
+                    <GraduationCap className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                    <span>{selectedSchedule.instructorName}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Users className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                    <span>{selectedSchedule.className}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                    <span>{getDayLabel(selectedSchedule.dayOfWeek)}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Clock className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                    <span>{selectedSchedule.startTime} - {selectedSchedule.endTime}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmDialog(false)}
+              className="h-8 text-xs rounded-sm"
+            >
+              Annuleren
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteSchedule}
+              className="h-8 text-xs rounded-sm"
+            >
+              Verwijderen
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

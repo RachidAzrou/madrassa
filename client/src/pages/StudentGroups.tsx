@@ -351,7 +351,7 @@ export default function StudentGroups() {
             )}
           </div>
           
-          <Button onClick={handleAddStudentGroup} className="flex items-center bg-primary hover:bg-primary/90">
+          <Button onClick={handleAddStudentGroup} className="flex items-center bg-[#1e40af] hover:bg-[#1e40af]/90">
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Klas Aanmaken</span>
           </Button>
@@ -387,7 +387,10 @@ export default function StudentGroups() {
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Fout bij laden</h3>
               <p className="text-gray-500 mb-4">Er is een fout opgetreden bij het laden van de klassen. Probeer de pagina te vernieuwen.</p>
-              <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] })}>
+              <Button 
+                onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] })}
+                className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+              >
                 Opnieuw proberen
               </Button>
             </div>
@@ -1122,7 +1125,7 @@ export default function StudentGroups() {
             <Button 
               type="button"
               onClick={form.handleSubmit(onSubmit)}
-              className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white"
+              className="bg-[#1e40af] hover:bg-[#1e40af]/90 text-white"
               disabled={createStudentGroupMutation.isPending || updateStudentGroupMutation.isPending}
             >
               {(createStudentGroupMutation.isPending || updateStudentGroupMutation.isPending) && (

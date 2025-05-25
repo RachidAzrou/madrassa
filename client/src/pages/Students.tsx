@@ -77,7 +77,7 @@ export default function Students() {
     postalCode: "",
     city: "",
     programId: "",
-    enrollmentDate: "",
+    enrollmentDate: new Date().toISOString().split('T')[0], // Huidige datum als standaard
     status: "enrolled",
     notes: "",
     studentGroupId: "",
@@ -683,9 +683,9 @@ export default function Students() {
                         className="h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
                       />
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-xs font-medium text-center">{student.studentId}</TableCell>
-                    <TableCell className="px-4 py-3 text-center">
-                      <div className="flex items-center justify-center">
+                    <TableCell className="px-4 py-3 text-xs font-medium">{student.studentId}</TableCell>
+                    <TableCell className="px-4 py-3">
+                      <div className="flex items-center">
                         <Avatar className="h-7 w-7 mr-3">
                           {student.photoUrl ? (
                             <AvatarImage src={student.photoUrl} alt={`${student.firstName} ${student.lastName}`} />
@@ -700,13 +700,13 @@ export default function Students() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-xs text-gray-600 text-center">
+                    <TableCell className="px-4 py-3 text-xs text-gray-600">
                       {student.studentGroupName || '-'}
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-xs text-gray-600 text-center">
+                    <TableCell className="px-4 py-3 text-xs text-gray-600">
                       {student.academicYear || '-'}
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-center">
+                    <TableCell className="px-4 py-3">
                       <Badge 
                         variant="outline" 
                         className={`text-xs rounded-sm ${

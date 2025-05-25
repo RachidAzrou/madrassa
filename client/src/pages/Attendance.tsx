@@ -412,29 +412,32 @@ export default function Attendance() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="mb-8">
-        <div className="rounded-lg overflow-hidden shadow-sm">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] p-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <ClipboardCheck className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white">Aanwezigheid</h1>
-                <p className="text-base text-blue-100 mt-1">Registreer en beheer aanwezigheid van studenten en docenten</p>
-              </div>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e40af] text-white">
+              <ClipboardCheck className="h-7 w-7" />
             </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Aanwezigheid</h1>
+              <p className="text-base text-gray-500 mt-1">Registreer en beheer aanwezigheid van studenten en docenten</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 mt-4 md:mt-0 md:ml-auto">
+            <span className="text-sm text-gray-500 font-medium">
+              {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
           </div>
         </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Datum selectie paneel */}
-        <Card className="overflow-hidden border-0 shadow-md">
-          <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-            <CardTitle className="text-blue-900 flex items-center text-lg">
-              <div className="mr-3 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                <Clock className="h-4 w-4 text-blue-800" />
+        <Card className="border border-gray-200 shadow-sm">
+          <CardHeader className="pb-2 border-b bg-white">
+            <CardTitle className="text-gray-900 flex items-center text-lg">
+              <div className="mr-3 p-2 bg-[#1e40af] text-white rounded-md">
+                <Clock className="h-4 w-4" />
               </div>
               Datum
             </CardTitle>
@@ -448,7 +451,7 @@ export default function Attendance() {
                   variant="outline" 
                   size="sm" 
                   onClick={() => handleDateChange(-1)} 
-                  className="flex-1 border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800"
+                  className="flex-1 border-gray-200 text-[#1e40af] hover:bg-gray-50"
                 >
                   <ArrowLeft className="h-4 w-4 mr-1" /> 
                   <span>Vorige dag</span>
@@ -457,24 +460,24 @@ export default function Attendance() {
                   variant="outline" 
                   size="sm" 
                   onClick={() => handleDateChange(1)} 
-                  className="flex-1 border-blue-200 text-blue-700 hover:bg-blue-50 hover:text-blue-800"
+                  className="flex-1 border-gray-200 text-[#1e40af] hover:bg-gray-50"
                 >
                   <span>Volgende dag</span> <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               </div>
-              <div className="mt-3 text-center p-3 bg-blue-50 border border-blue-100 rounded-md shadow-sm">
-                <span className="text-blue-900 font-medium">{formatDate(selectedDate)}</span>
+              <div className="mt-3 text-center p-3 bg-gray-50 border border-gray-200 rounded-md">
+                <span className="text-gray-900 font-medium">{formatDate(selectedDate)}</span>
               </div>
             </div>
           </CardContent>
         </Card>
         
         {/* Filters */}
-        <Card className="overflow-hidden border-0 shadow-md">
-          <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
-            <CardTitle className="text-blue-900 flex items-center text-lg">
-              <div className="mr-3 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                <Filter className="h-4 w-4 text-blue-800" />
+        <Card className="border border-gray-200 shadow-sm">
+          <CardHeader className="pb-2 border-b bg-white">
+            <CardTitle className="text-gray-900 flex items-center text-lg">
+              <div className="mr-3 p-2 bg-[#1e40af] text-white rounded-md">
+                <Filter className="h-4 w-4" />
               </div>
               Filters
             </CardTitle>
@@ -482,9 +485,9 @@ export default function Attendance() {
           </CardHeader>
           <CardContent className="p-4 bg-white">
             <Tabs defaultValue="vak" onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
-              <TabsList className="w-full mb-4 bg-blue-900/10 rounded-md">
-                <TabsTrigger value="vak" className="data-[state=active]:bg-white data-[state=active]:text-blue-900 data-[state=active]:shadow-sm">Vak</TabsTrigger>
-                <TabsTrigger value="klas" className="data-[state=active]:bg-white data-[state=active]:text-blue-900 data-[state=active]:shadow-sm">Klas</TabsTrigger>
+              <TabsList className="w-full mb-4 bg-blue-900/10 p-1">
+                <TabsTrigger value="vak" className="data-[state=active]:bg-white data-[state=active]:text-[#1e40af] data-[state=active]:shadow-md">Vak</TabsTrigger>
+                <TabsTrigger value="klas" className="data-[state=active]:bg-white data-[state=active]:text-[#1e40af] data-[state=active]:shadow-md">Klas</TabsTrigger>
               </TabsList>
               
               <TabsContent value="vak">

@@ -1332,7 +1332,12 @@ export default function Students() {
                       "default" : "secondary"
                     }
                   >
-                    {selectedStudent.status}
+                    {selectedStudent.status === 'active' ? 'Ingeschreven' : 
+                     selectedStudent.status === 'inactive' ? 'Uitgeschreven' : 
+                     selectedStudent.status === 'enrolled' ? 'Ingeschreven' :
+                     selectedStudent.status === 'graduated' ? 'Afgestudeerd' :
+                     selectedStudent.status === 'suspended' ? 'Geschorst' :
+                     selectedStudent.status}
                   </Badge>
                 </div>
               </div>

@@ -98,7 +98,7 @@ export function Topbar() {
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
-              <MessageSquare className="h-5 w-5 text-gray-600" />
+              <Mail className="h-5 w-5 text-gray-600" />
               <Badge 
                 className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af]"
                 variant="default"

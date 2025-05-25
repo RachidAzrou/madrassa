@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, GraduationCap, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, BookOpen, Users, ChalkBoard } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, GraduationCap, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, BookOpen, Users } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,6 @@ import EmptyState from '@/components/ui/empty-state';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { 
   CustomDialog, 
-  DialogHeaderWithIcon, 
   DialogFormContainer, 
   SectionContainer, 
   DialogFooterContainer 
@@ -407,7 +406,7 @@ export default function Teachers() {
                     variant="outline"
                     size="sm"
                     onClick={handleExportSelectedTeachers}
-                    className="h-7 text-xs rounded-sm border-[#e5e7eb]"
+                    className="h-7 text-xs rounded-sm border-[#e5e7eb] w-full sm:w-auto"
                   >
                     <FileDown className="h-3.5 w-3.5 mr-1" />
                     Exporteren
@@ -624,13 +623,26 @@ export default function Teachers() {
       <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
         <DialogContent className="sm:max-w-[85vw] p-0">
           {/* Dialog Header */}
-          <DialogHeaderWithIcon
-            title="Docent gegevens"
-            icon={GraduationCap}
-            bgColor="bg-blue-600"
-            textColor="text-white"
-            onClose={() => setShowViewDialog(false)}
-          />
+          <div className="bg-blue-600 py-4 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Docent gegevens</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Details van de geselecteerde docent.
+                </DialogDescription>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              className="h-8 w-8 p-0 text-white/70 hover:text-white"
+              onClick={() => setShowViewDialog(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
           
           {selectedTeacher && (
             <div className="p-6">
@@ -787,13 +799,26 @@ export default function Teachers() {
       <Dialog open={showNewTeacherDialog} onOpenChange={setShowNewTeacherDialog}>
         <DialogContent className="sm:max-w-[85vw] p-0">
           {/* Dialog Header */}
-          <DialogHeaderWithIcon
-            title="Nieuwe docent toevoegen"
-            icon={GraduationCap}
-            bgColor="bg-blue-600"
-            textColor="text-white"
-            onClose={() => setShowNewTeacherDialog(false)}
-          />
+          <div className="bg-blue-600 py-4 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Nieuwe docent toevoegen</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Vul de gegevens in om een nieuwe docent toe te voegen.
+                </DialogDescription>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              className="h-8 w-8 p-0 text-white/70 hover:text-white"
+              onClick={() => setShowNewTeacherDialog(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
           
           {/* Tabs met formulier secties */}
           <DialogFormContainer>

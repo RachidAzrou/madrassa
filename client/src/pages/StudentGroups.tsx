@@ -351,7 +351,7 @@ export default function StudentGroups() {
             )}
           </div>
           
-          <Button onClick={handleAddStudentGroup} className="flex items-center bg-[#1e40af] hover:bg-[#1e40af]/90">
+          <Button onClick={handleAddStudentGroup} className="flex items-center hover:bg-[#1e40af]/90 bg-[#1e40af]">
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Klas Aanmaken</span>
           </Button>
@@ -389,7 +389,7 @@ export default function StudentGroups() {
               <p className="text-gray-500 mb-4">Er is een fout opgetreden bij het laden van de klassen. Probeer de pagina te vernieuwen.</p>
               <Button 
                 onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] })}
-                className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+                className="hover:bg-[#1e40af]/90 bg-[#1e40af]"
               >
                 Opnieuw proberen
               </Button>

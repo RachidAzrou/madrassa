@@ -363,7 +363,7 @@ export default function Rooms() {
       <PremiumHeader 
         title="Lokalen" 
         path="Beheer > Lokalen" 
-        icon={School} 
+        icon={Building} 
       />
 
       {/* Main content area */}

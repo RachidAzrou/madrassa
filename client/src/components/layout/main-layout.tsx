@@ -73,9 +73,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
         {/* Sidebar for both mobile and desktop */}
         <div 
-          className={`fixed md:static inset-y-auto top-16 left-0 transform ${
+          className={`fixed md:static inset-y-auto top-12 left-0 transform ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 z-30 transition duration-200 ease-in-out h-[calc(100vh-4rem)] flex-shrink-0`}
+          } md:translate-x-0 z-30 transition duration-200 ease-in-out h-[calc(100vh-3rem)] flex-shrink-0`}
         >
           <Sidebar 
             isMobile={isMobile} 

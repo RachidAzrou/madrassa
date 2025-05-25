@@ -954,11 +954,10 @@ export default function Students() {
                       </div>
                       
                       <div>
-                        <Label htmlFor="studentGroupId" className="text-xs font-medium text-gray-700">Klas *</Label>
+                        <Label htmlFor="studentGroupId" className="text-xs font-medium text-gray-700">Klas</Label>
                         <Select 
                           value={formData.studentGroupId} 
                           onValueChange={(value) => handleSelectChange('studentGroupId', value)}
-                          required
                         >
                           <SelectTrigger id="studentGroupId" className="mt-1 h-9 w-full border-[#e5e7eb] bg-white">
                             <SelectValue placeholder="Selecteer klas" />

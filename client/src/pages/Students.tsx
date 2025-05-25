@@ -1176,7 +1176,7 @@ export default function Students() {
           <Button 
             variant="default" 
             size="default" 
-            className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+            className="hover:bg-[#1e40af]/90 bg-[#1e40af]"
             onClick={() => {
               resetForm();
               setIsCreateDialogOpen(true);
@@ -1283,7 +1283,7 @@ export default function Students() {
                 setPage(1);
                 setShowFilterOptions(false);
               }}
-              className="text-xs h-7 bg-[#1e3a8a]"
+              className="text-xs h-7 bg-[#1e40af]"
             >
               Toepassen
             </Button>

@@ -6,6 +6,7 @@ import {
   Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, ChevronRight
 } from 'lucide-react';
 import { Topbar } from '@/components/layout/topbar';
+import { PremiumHeader } from '@/components/layout/premium-header';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -363,24 +364,16 @@ export default function Students() {
   return (
     <div className="bg-[#f7f9fc] min-h-screen">
       {/* Top navigation bar */}
-      <Topbar />
-      
-      {/* Professionele header */}
-      <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
-        <div className="flex flex-col">
-          <div className="bg-[#1e40af] px-6 py-3.5 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Users className="h-5 w-5 text-white" />
-              <h1 className="text-base font-medium text-white tracking-tight">Studenten</h1>
-            </div>
-            <div className="text-xs text-white opacity-70 flex items-center">
-              <span className="mr-1">Beheer</span>
-              <ChevronRight className="h-3 w-3 mx-0.5" />
-              <span>Studenten</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Professionele header component */}
+      <PremiumHeader 
+        title="Studenten" 
+        description="Bekijk en beheer alle studentgegevens"
+        icon={Users}
+        breadcrumbs={{
+          parent: "Beheer",
+          current: "Studenten"
+        }}
+      />
       
       <div className="container mx-auto p-4 max-w-7xl">
         <div className="flex justify-end mb-6">

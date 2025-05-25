@@ -4,13 +4,14 @@ import { createElement } from "react";
 interface PremiumHeaderProps {
   title: string;
   icon: LucideIcon;
+  description?: string;
   breadcrumbs?: {
     parent?: string;
     current: string;
   };
 }
 
-export function PremiumHeader({ title, icon, breadcrumbs }: PremiumHeaderProps) {
+export function PremiumHeader({ title, icon, description, breadcrumbs }: PremiumHeaderProps) {
   // We gebruiken createElement om het Lucide icoon correct te instantiëren
   const IconComponent = createElement(icon, {
     className: "h-5 w-5 text-white"
@@ -36,6 +37,11 @@ export function PremiumHeader({ title, icon, breadcrumbs }: PremiumHeaderProps) 
             </div>
           )}
         </div>
+        {description && (
+          <div className="bg-white px-6 py-2 text-gray-600 text-sm">
+            {description}
+          </div>
+        )}
       </div>
     </header>
   );

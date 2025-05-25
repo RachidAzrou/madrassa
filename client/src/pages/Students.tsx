@@ -36,6 +36,7 @@ export default function Students() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [nextStudentId, setNextStudentId] = useState("STU-000001");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -48,11 +49,13 @@ export default function Students() {
     city: "",
     programId: "",
     enrollmentDate: "",
-    status: "active",
+    status: "enrolled",
     notes: "",
     studentGroupId: "",
     gender: "man",
-    photoUrl: ""
+    photoUrl: "",
+    studentId: "",
+    academicYear: ""
   });
   
   const { toast } = useToast();
@@ -431,7 +434,7 @@ export default function Students() {
                         <Input
                           id="studentId"
                           name="studentId"
-                          value="Automatisch gegenereerd"
+                          value={formData.studentId || nextStudentId || "STU-000001"}
                           disabled
                           className="mt-1 h-9 bg-gray-50 text-gray-500"
                         />
@@ -584,33 +587,32 @@ export default function Students() {
                     </h3>
                     <div className="space-y-3">
                       <div>
-                        <Label htmlFor="programId" className="text-xs font-medium text-gray-700">Programma *</Label>
+                        <Label htmlFor="academicYear" className="text-xs font-medium text-gray-700">Schooljaar *</Label>
                         <Select 
-                          value={formData.programId} 
-                          onValueChange={(value) => handleSelectChange('programId', value)}
+                          value={formData.academicYear || ''} 
+                          onValueChange={(value) => handleSelectChange('academicYear', value)}
                           required
                         >
                           <SelectTrigger className="mt-1 h-9">
-                            <SelectValue placeholder="Selecteer programma" />
+                            <SelectValue placeholder="Selecteer schooljaar" />
                           </SelectTrigger>
                           <SelectContent>
-                            {programs.map((program) => (
-                              <SelectItem key={program.id} value={program.id.toString()}>
-                                {program.name}
-                              </SelectItem>
-                            ))}
+                            <SelectItem value="2024-2025">2024-2025</SelectItem>
+                            <SelectItem value="2025-2026">2025-2026</SelectItem>
+                            <SelectItem value="2026-2027">2026-2027</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       
                       <div>
-                        <Label htmlFor="studentGroupId" className="text-xs font-medium text-gray-700">Klassengroep</Label>
+                        <Label htmlFor="studentGroupId" className="text-xs font-medium text-gray-700">Klas *</Label>
                         <Select 
                           value={formData.studentGroupId} 
                           onValueChange={(value) => handleSelectChange('studentGroupId', value)}
+                          required
                         >
                           <SelectTrigger className="mt-1 h-9">
-                            <SelectValue placeholder="Selecteer klassengroep" />
+                            <SelectValue placeholder="Selecteer klas" />
                           </SelectTrigger>
                           <SelectContent>
                             {studentGroups.map((group) => (
@@ -623,12 +625,12 @@ export default function Students() {
                       </div>
                       
                       <div>
-                        <Label htmlFor="enrollmentDate" className="text-xs font-medium text-gray-700">Inschrijvingsdatum</Label>
+                        <Label htmlFor="enrollmentDate" className="text-xs font-medium text-gray-700">Inschrijfdatum</Label>
                         <Input
                           id="enrollmentDate"
                           name="enrollmentDate"
                           type="date"
-                          value={formData.enrollmentDate || ''}
+                          value={formData.enrollmentDate || new Date().toISOString().split('T')[0]}
                           onChange={handleInputChange}
                           className="mt-1 h-9"
                         />
@@ -645,29 +647,29 @@ export default function Students() {
                             <SelectValue placeholder="Selecteer status" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="active">Actief</SelectItem>
-                            <SelectItem value="inactive">Inactief</SelectItem>
+                            <SelectItem value="enrolled">Ingeschreven</SelectItem>
+                            <SelectItem value="unenrolled">Uitgeschreven</SelectItem>
+                            <SelectItem value="suspended">Geschorst</SelectItem>
                             <SelectItem value="graduated">Afgestudeerd</SelectItem>
-                            <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md h-full flex flex-col">
                     <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
                       <NotebookText className="h-4 w-4 mr-2" />
                       Aantekeningen
                     </h3>
-                    <div>
+                    <div className="flex-grow flex flex-col">
                       <Textarea
                         id="notes"
                         name="notes"
                         value={formData.notes}
                         onChange={handleInputChange}
-                        rows={5}
-                        className="resize-none"
+                        rows={8}
+                        className="resize-none flex-grow"
                         placeholder="Voeg hier eventuele opmerkingen of aantekeningen toe..."
                       />
                     </div>

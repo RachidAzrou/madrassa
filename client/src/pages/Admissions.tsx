@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, CheckCircle, XCircle, FileText, Clock, School, User, Phone, Mail, Calendar, BookOpen, Building, Clipboard, Info, ChevronDown, ChevronUp, UserPlus } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, CheckCircle, XCircle, FileText, Clock, School, User, Phone, Mail, Calendar, BookOpen, Building, Clipboard, Info, ChevronDown, ChevronUp, UserPlus, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -321,7 +321,7 @@ export default function Admissions() {
       <PremiumHeader 
         title="Aanmeldingen" 
         path="Beheer > Aanmeldingen" 
-        icon={UserPlus} 
+        icon={ClipboardList} 
       />
 
       {/* Main content area */}

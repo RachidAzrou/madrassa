@@ -40,6 +40,8 @@ export default function Students() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [filterProgram, setFilterProgram] = useState("all");
+  const [filterAcademicYear, setFilterAcademicYear] = useState("all");
+  const [filterStudentGroup, setFilterStudentGroup] = useState("all");
   const [showFilterOptions, setShowFilterOptions] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
@@ -355,13 +357,15 @@ export default function Students() {
         {showFilterOptions && (
           <div className="px-4 py-3 border-t border-[#e5e7eb] flex flex-wrap gap-3 items-center">
             <div className="flex items-center">
-              {(statusFilter !== 'all' || filterProgram !== 'all') && (
+              {(statusFilter !== 'all' || filterProgram !== 'all' || filterAcademicYear !== 'all' || filterStudentGroup !== 'all') && (
                 <Button
                   variant="link"
                   size="sm"
                   onClick={() => {
                     setStatusFilter('all');
                     setFilterProgram('all');
+                    setFilterAcademicYear('all');
+                    setFilterStudentGroup('all');
                   }}
                   className="h-7 text-xs text-blue-600 p-0 mr-3"
                 >
@@ -399,6 +403,38 @@ export default function Students() {
                   {programs.map((program) => (
                     <SelectItem key={program.id} value={program.id.toString()}>
                       {program.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select 
+                value={filterAcademicYear} 
+                onValueChange={setFilterAcademicYear}
+              >
+                <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
+                  <SelectValue placeholder="Schooljaar" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle schooljaren</SelectItem>
+                  <SelectItem value="2024-2025">2024-2025</SelectItem>
+                  <SelectItem value="2023-2024">2023-2024</SelectItem>
+                  <SelectItem value="2022-2023">2022-2023</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select 
+                value={filterStudentGroup} 
+                onValueChange={setFilterStudentGroup}
+              >
+                <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
+                  <SelectValue placeholder="Klas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle klassen</SelectItem>
+                  {studentGroups.map((group) => (
+                    <SelectItem key={group.id} value={group.id.toString()}>
+                      {group.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

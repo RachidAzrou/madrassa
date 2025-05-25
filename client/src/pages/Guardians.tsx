@@ -349,6 +349,7 @@ export default function Guardians() {
                       <div className="py-6">
                         <EmptyState
                           icon={<UserCheck className="h-12 w-12 mx-auto text-gray-300" />}
+                          title="Geen voogden gevonden"
                           description={searchQuery.trim() !== '' 
                             ? 'Geen voogden gevonden die overeenkomen met je zoekopdracht. Probeer een andere zoekterm.' 
                             : 'Er zijn nog geen voogden toegevoegd in het systeem.'}

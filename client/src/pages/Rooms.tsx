@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, 
-  Building, MapPin, Users, Check, X, Save
+  Building, MapPin, Users, Check, X, Save, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -57,6 +57,7 @@ export default function Rooms() {
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
   
   // Dialog state
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -75,7 +76,7 @@ export default function Rooms() {
   });
 
   // Fetch rooms with filters
-  const { data: roomsData, isLoading, isError } = useQuery({
+  const { data: roomsData = { rooms: [], totalCount: 0 }, isLoading, isError } = useQuery({
     queryKey: ['/api/rooms', { 
       searchTerm, 
       status: statusFilter, 
@@ -114,7 +115,7 @@ export default function Rooms() {
   const totalPages = Math.ceil(totalRooms / 10);
 
   // Fetch unique locations for filter
-  const { data: locationsData } = useQuery({
+  const { data: locationsData = { locations: [] } } = useQuery({
     queryKey: ['/api/rooms/locations'],
     queryFn: async () => {
       try {
@@ -311,7 +312,6 @@ export default function Rooms() {
       capacity: room.capacity,
       location: room.location,
       status: room.status,
-
       notes: room.notes || ''
     });
     setIsEditDialogOpen(true);
@@ -356,495 +356,500 @@ export default function Rooms() {
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* Page header */}
-      <div className="mb-8">
-        <div className="rounded-lg overflow-hidden shadow-sm">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] p-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <Building className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white">Lokalen</h1>
-                <p className="text-base text-blue-100 mt-1">Beheer alle lokalen in het schoolgebouw</p>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Page header - Professionele desktop stijl */}
+      <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
+        <div className="flex flex-col">
+          <div className="px-6 py-4 flex justify-between items-center">
+            <div>
+              <h1 className="text-base font-medium text-gray-800 tracking-tight">Lokalen</h1>
+            </div>
+            <div className="flex items-center">
+              <div className="text-xs text-gray-500 font-medium">
+                {new Date().toLocaleDateString('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})}
               </div>
             </div>
           </div>
+          <div className="px-6 py-2 bg-[#f9fafc] border-t border-[#e5e7eb] flex items-center">
+            <div className="text-xs text-gray-500">Beheer &gt; Lokalen</div>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div className="mb-6">
-        <div className="w-full mb-4 relative">
-          <Search className="absolute left-2.5 top-3 h-4 w-4 text-gray-500" />
-          <Input
-            type="text"
-            placeholder="Zoek op naam, locatie..."
-            className="pl-8 w-full"
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
+      {/* Main content area */}
+      <div className="px-6 py-6 flex-1">
+        {/* Zoek- en actiebalk - Desktop style */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4">
+          <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            {/* Zoekbalk */}
+            <div className="relative w-full sm:max-w-md">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <Input
+                type="search"
+                placeholder="Zoek op naam of locatie..."
+                className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+            
+            {/* Acties */}
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilterOptions(!showFilterOptions)}
+                className="h-7 text-xs rounded-sm border-[#e5e7eb]"
+              >
+                <Filter className="h-3.5 w-3.5 mr-1" />
+                Filters
+                {showFilterOptions ? 
+                  <ChevronUp className="h-3.5 w-3.5 ml-1" /> : 
+                  <ChevronDown className="h-3.5 w-3.5 ml-1" />
+                }
+              </Button>
+              
+              <Button
+                size="sm"
+                onClick={handleAddRoom}
+                className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white"
+              >
+                <PlusCircle className="h-3.5 w-3.5 mr-1" />
+                Nieuw Lokaal
+              </Button>
+            </div>
+          </div>
+          
+          {/* Filter opties */}
+          {showFilterOptions && (
+            <div className="px-4 py-3 border-t border-[#e5e7eb] flex flex-wrap gap-3 items-center">
+              <div className="flex items-center">
+                {(statusFilter !== 'all' || locationFilter !== 'all') && (
+                  <Button
+                    variant="link"
+                    size="sm"
+                    onClick={() => {
+                      setStatusFilter('all');
+                      setLocationFilter('all');
+                    }}
+                    className="h-7 text-xs text-blue-600 p-0 mr-3"
+                  >
+                    Filters wissen
+                  </Button>
+                )}
+              </div>
+              
+              <div className="flex flex-wrap gap-3">
+                <Select 
+                  value={statusFilter} 
+                  onValueChange={handleStatusChange}
+                >
+                  <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle statussen</SelectItem>
+                    <SelectItem value="available">Beschikbaar</SelectItem>
+                    <SelectItem value="occupied">Bezet</SelectItem>
+                    <SelectItem value="reserved">Gereserveerd</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select 
+                  value={locationFilter} 
+                  onValueChange={handleLocationChange}
+                >
+                  <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
+                    <SelectValue placeholder="Locatie" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle locaties</SelectItem>
+                    {locations.map((loc: string) => (
+                      <SelectItem key={loc} value={loc}>
+                        {loc}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="flex justify-end">
-          <Button
-            onClick={handleAddRoom}
-            className="bg-[#1e3a8a] hover:bg-[#1e40af]"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Lokaal Toevoegen
-          </Button>
-        </div>
-      </div>
 
-      <div className="space-y-4">
-        <div className="bg-white rounded-md border shadow-sm">
+        {/* Tabel van lokalen - Desktop style */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50">
-                <tr className="border-b border-gray-200">
-                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">
+            <table className="min-w-full divide-y divide-[#e5e7eb]">
+              <thead className="bg-[#f9fafc]">
+                <tr>
+                  <th scope="col" className="px-4 py-3 text-left w-10">
                     <Checkbox 
-                      checked={selectedRooms.length === rooms.length && rooms.length > 0}
+                      checked={selectedRooms.length > 0 && selectedRooms.length === rooms.length && rooms.length > 0}
                       onCheckedChange={handleSelectAllRooms}
-                      aria-label="Selecteer alle rijen"
+                      className="h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
                     />
                   </th>
-                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">LOKAALNAAM</th>
-                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">STATUS</th>
-                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">CAPACITEIT</th>
-                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right"></th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Naam</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Locatie</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Status</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Capaciteit</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-right w-[120px]">
+                    <span className="text-xs font-medium text-gray-700">Acties</span>
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody className="bg-white divide-y divide-[#e5e7eb]">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center">
+                    <td colSpan={6} className="px-6 py-4 text-center">
                       <div className="flex justify-center items-center">
-                        <div className="w-6 h-6 border-2 border-t-primary rounded-full animate-spin"></div>
+                        <div className="w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
+                        <span className="ml-2 text-sm text-gray-500">Laden...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : isError ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center">
+                      <div className="flex flex-col items-center justify-center py-6">
+                        <X className="h-8 w-8 text-red-500 mb-2" />
+                        <p className="text-sm text-red-500">Fout bij het laden van lokalen.</p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/rooms'] })}
+                          className="mt-2 h-7 text-xs rounded-sm"
+                        >
+                          Opnieuw proberen
+                        </Button>
                       </div>
                     </td>
                   </tr>
                 ) : rooms.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="h-48 text-center">
-                      <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                        <div className="text-[#1e3a8a] mb-2">
-                          <Building className="h-10 w-10 opacity-30" />
+                    <td colSpan={6} className="px-6 py-4 text-center">
+                      <div className="py-6">
+                        <div className="flex flex-col items-center justify-center">
+                          <Building className="h-12 w-12 text-gray-300 mb-2" />
+                          <h3 className="text-lg font-medium text-gray-900 mb-1">Geen lokalen gevonden</h3>
+                          <p className="text-sm text-gray-500 max-w-md text-center mb-4">
+                            {searchTerm || statusFilter !== 'all' || locationFilter !== 'all' 
+                              ? 'Er zijn geen lokalen die voldoen aan de huidige filters.' 
+                              : 'Er zijn nog geen lokalen toegevoegd in het systeem.'}
+                          </p>
+                          {(searchTerm || statusFilter !== 'all' || locationFilter !== 'all') && (
+                            <Button 
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSearchTerm('');
+                                setStatusFilter('all');
+                                setLocationFilter('all');
+                              }}
+                              className="h-8 text-xs rounded-sm"
+                            >
+                              Filters wissen
+                            </Button>
+                          )}
                         </div>
-                        <p className="text-sm font-medium">
-                          {searchTerm 
-                            ? `Geen lokalen gevonden voor "${searchTerm}"` 
-                            : 'Geen lokalen gevonden'}
-                        </p>
                       </div>
                     </td>
                   </tr>
-                ) : rooms.map((room) => (
-                  <tr key={room.id} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
-                    <td className="py-3 px-4">
-                      <Checkbox 
-                        checked={selectedRooms.includes(room.id)}
-                        onCheckedChange={() => handleSelectRoom(room.id)}
-                        aria-label={`Selecteer ${room.name}`}
-                      />
-                    </td>
-                    <td className="py-3 px-4 font-medium">{room.name}</td>
-                    <td className="py-3 px-4">{getStatusBadge(room.status)}</td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center">
-                        <Users className="h-4 w-4 mr-1 text-gray-500" />
-                        {room.capacity}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                          onClick={() => handleViewRoom(room)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
-                          onClick={() => handleEditRoom(room)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
-                          onClick={() => handleDeleteRoom(room)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                ) : (
+                  rooms.map((room) => (
+                    <tr key={room.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <Checkbox
+                          checked={selectedRooms.includes(room.id)}
+                          onCheckedChange={() => handleSelectRoom(room.id)}
+                          className="h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-xs font-medium text-gray-900">{room.name}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center">
+                          <MapPin className="h-3.5 w-3.5 text-gray-500 mr-1" />
+                          <span className="text-xs text-gray-500">{room.location}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">{getStatusBadge(room.status)}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center">
+                          <Users className="h-3.5 w-3.5 text-gray-500 mr-1" />
+                          <span className="text-xs">{room.capacity}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleViewRoom(room)}
+                            className="h-7 w-7 p-0 text-gray-500"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditRoom(room)}
+                            className="h-7 w-7 p-0 text-gray-500"
+                          >
+                            <Edit className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteRoom(room)}
+                            className="h-7 w-7 p-0 text-gray-500"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
+          
+          {/* Paginering */}
+          {rooms.length > 0 && (
+            <div className="px-4 py-3 border-t border-[#e5e7eb] flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500">
+              <div>
+                Resultaten {(currentPage - 1) * 10 + 1}-{Math.min(currentPage * 10, totalRooms)} van {totalRooms}
+              </div>
+              <div className="flex items-center space-x-2 mt-2 sm:mt-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs rounded-sm"
+                  disabled={currentPage <= 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
+                  Vorige
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs rounded-sm"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  Volgende
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
-
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center space-x-2 py-4 border-t">
-            {Array.from({ length: totalPages }, (_, i) => (
-              <Button
-                key={i}
-                variant={currentPage === i + 1 ? "default" : "outline"}
-                size="sm"
-                onClick={() => handlePageChange(i + 1)}
-                className={currentPage === i + 1 ? "bg-[#1e3a8a]" : ""}
-              >
-                {i + 1}
-              </Button>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* Lokaal Toevoegen Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[85%] p-0 h-[85vh] max-h-[85vh]">
-          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Building className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <DialogTitle className="text-xl font-semibold text-white">
-                    Lokaal Toevoegen
-                  </DialogTitle>
-                  <DialogDescription className="text-sm text-blue-100 font-medium mt-1">
-                    Voeg een nieuw lokaal toe aan het systeem
-                  </DialogDescription>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white/20 cursor-pointer"
-                onClick={() => setIsDialogOpen(false)}
-              >
-                <X className="h-4 w-4 text-white" />
-                <span className="sr-only">Sluiten</span>
-              </div>
-            </div>
-          </DialogHeader>
-          
-          <div className="px-6 py-5 overflow-y-auto" style={{ height: "calc(85vh - 170px)" }}>
-            <form onSubmit={handleFormSubmit} className="space-y-6">
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name">Lokaalnaam <span className="text-red-500">*</span></Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => handleFormChange('name', e.target.value)}
-                      placeholder="Bijv. Lokaal A1-01"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="status">Status</Label>
-                    <Select
-                      value={formData.status}
-                      onValueChange={(value: 'available' | 'occupied') => handleFormChange('status', value)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecteer status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="available">Beschikbaar</SelectItem>
-                        <SelectItem value="occupied">Bezet</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="capacity">Capaciteit <span className="text-red-500">*</span></Label>
-                    <Input
-                      type="number"
-                      id="capacity"
-                      min={1}
-                      value={formData.capacity || ""}
-                      onChange={(e) => handleFormChange('capacity', parseInt(e.target.value))}
-                      placeholder="Aantal studenten"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="location">Locatie <span className="text-red-500">*</span></Label>
-                    <Input
-                      id="location"
-                      value={formData.location}
-                      onChange={(e) => handleFormChange('location', e.target.value)}
-                      placeholder="Bijv. Gebouw A, 1e verdieping"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="notes">Notities</Label>
-                  <Textarea
-                    id="notes"
-                    value={formData.notes || ""}
-                    onChange={(e) => handleFormChange('notes', e.target.value)}
-                    placeholder="Bijzonderheden over dit lokaal"
-                    rows={3}
-                  />
-                </div>
-              </div>
-              
-              <DialogFooter className="flex items-center justify-end space-x-2 pt-4 border-t">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Annuleren
-                </Button>
-                <Button type="submit">
-                  <Save className="mr-2 h-4 w-4" />
-                  Lokaal Opslaan
-                </Button>
-              </DialogFooter>
-            </form>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Dialogen */}
       
-      {/* Lokaal Bewerken Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[85%] p-0 h-[85vh] max-h-[85vh]">
-          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Building className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <DialogTitle className="text-xl font-semibold text-white">
-                    Lokaal Bewerken
-                  </DialogTitle>
-                  <DialogDescription className="text-sm text-blue-100 font-medium mt-1">
-                    Wijzig de gegevens van het lokaal
-                  </DialogDescription>
-                </div>
+      {/* Nieuw/bewerk lokaal dialoog */}
+      <Dialog open={isDialogOpen || isEditDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          isDialogOpen ? setIsDialogOpen(false) : setIsEditDialogOpen(false);
+          resetFormData();
+        }
+      }}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{isEditDialogOpen ? 'Lokaal bewerken' : 'Nieuw lokaal toevoegen'}</DialogTitle>
+            <DialogDescription>
+              {isEditDialogOpen
+                ? 'Bewerk de gegevens van dit lokaal.'
+                : 'Vul de details in om een nieuw lokaal toe te voegen.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleFormSubmit} className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Naam lokaal</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => handleFormChange('name', e.target.value)}
+                  placeholder="Bijv. Lokaal A101"
+                  className="h-8 text-sm"
+                  required
+                />
               </div>
               
-              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white/20 cursor-pointer"
-                onClick={() => setIsEditDialogOpen(false)}
-              >
-                <X className="h-4 w-4 text-white" />
-                <span className="sr-only">Sluiten</span>
+              <div className="space-y-2">
+                <Label htmlFor="capacity">Capaciteit</Label>
+                <Input
+                  id="capacity"
+                  type="number"
+                  value={formData.capacity}
+                  onChange={(e) => handleFormChange('capacity', parseInt(e.target.value) || 0)}
+                  placeholder="30"
+                  className="h-8 text-sm"
+                  min="1"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="location">Locatie</Label>
+                <Input
+                  id="location"
+                  value={formData.location}
+                  onChange={(e) => handleFormChange('location', e.target.value)}
+                  placeholder="Bijv. Gebouw A, 1e verdieping"
+                  className="h-8 text-sm"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => handleFormChange('status', value)}
+                >
+                  <SelectTrigger id="status" className="h-8 text-sm">
+                    <SelectValue placeholder="Selecteer status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="available">Beschikbaar</SelectItem>
+                    <SelectItem value="occupied">Bezet</SelectItem>
+                    <SelectItem value="reserved">Gereserveerd</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-          </DialogHeader>
-          
-          <div className="px-6 py-5 overflow-y-auto" style={{ height: "calc(85vh - 170px)" }}>
-            <form onSubmit={handleFormSubmit} className="space-y-6">
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name">Lokaalnaam <span className="text-red-500">*</span></Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => handleFormChange('name', e.target.value)}
-                      placeholder="Bijv. Lokaal A1-01"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="status">Status</Label>
-                    <Select
-                      value={formData.status}
-                      onValueChange={(value: 'available' | 'occupied') => handleFormChange('status', value)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecteer status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="available">Beschikbaar</SelectItem>
-                        <SelectItem value="occupied">Bezet</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="capacity">Capaciteit <span className="text-red-500">*</span></Label>
-                    <Input
-                      type="number"
-                      id="capacity"
-                      min={1}
-                      value={formData.capacity || ""}
-                      onChange={(e) => handleFormChange('capacity', parseInt(e.target.value))}
-                      placeholder="Aantal studenten"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="location">Locatie <span className="text-red-500">*</span></Label>
-                    <Input
-                      id="location"
-                      value={formData.location}
-                      onChange={(e) => handleFormChange('location', e.target.value)}
-                      placeholder="Bijv. Gebouw A, 1e verdieping"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="notes">Notities</Label>
-                  <Textarea
-                    id="notes"
-                    value={formData.notes || ""}
-                    onChange={(e) => handleFormChange('notes', e.target.value)}
-                    placeholder="Bijzonderheden over dit lokaal"
-                    rows={3}
-                  />
-                </div>
-              </div>
-              
-              <DialogFooter className="flex items-center justify-end space-x-2 pt-4 border-t">
-                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                  Annuleren
-                </Button>
-                <Button type="submit">
-                  Wijzigingen Opslaan
-                </Button>
-              </DialogFooter>
-            </form>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Lokaal Bekijken Dialog */}
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-[85%] p-0 max-h-[85vh]">
-          <DialogHeader className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Building className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <DialogTitle className="text-xl font-semibold text-white">
-                    Lokaal Details
-                  </DialogTitle>
-                  <DialogDescription className="text-sm text-blue-100 font-medium mt-1">
-                    {selectedRoom?.name}
-                  </DialogDescription>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white/20 cursor-pointer"
-                onClick={() => setIsViewDialogOpen(false)}
-              >
-                <X className="h-4 w-4 text-white" />
-                <span className="sr-only">Sluiten</span>
-              </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="notes">Notities</Label>
+              <Textarea
+                id="notes"
+                value={formData.notes}
+                onChange={(e) => handleFormChange('notes', e.target.value)}
+                placeholder="Optionele details over het lokaal..."
+                className="min-h-[80px] text-sm"
+              />
             </div>
-          </DialogHeader>
-          
-          <div className="px-6 py-5">
-            {selectedRoom && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <div className="bg-white rounded-lg shadow-lg p-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Basis Informatie</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <span className="text-sm font-medium text-gray-500">Naam:</span>
-                        <p className="text-gray-900">{selectedRoom.name}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-500">Capaciteit:</span>
-                        <p className="text-gray-900 flex items-center gap-1">
-                          <Users className="h-4 w-4" /> {selectedRoom.capacity} personen
-                        </p>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-500">Locatie:</span>
-                        <p className="text-gray-900 flex items-center gap-1">
-                          <MapPin className="h-4 w-4" /> {selectedRoom.location}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-500">Status:</span>
-                        <p className="mt-1">{getStatusBadge(selectedRoom.status)}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="bg-white rounded-lg shadow-lg p-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Extra Informatie</h3>
-                    <div className="space-y-3">
 
-                      <div>
-                        <span className="text-sm font-medium text-gray-500">Notities:</span>
-                        <p className="text-gray-900 whitespace-pre-line">{selectedRoom.notes || "-"}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-500">Aangemaakt op:</span>
-                        <p className="text-gray-900">
-                          {new Date(selectedRoom.createdAt).toLocaleDateString('nl-NL', { 
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-500">Laatst bijgewerkt:</span>
-                        <p className="text-gray-900">
-                          {new Date(selectedRoom.updatedAt).toLocaleDateString('nl-NL', { 
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <DialogFooter className="px-6 py-4 border-t">
-            <div className="flex items-center justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={() => setIsViewDialogOpen(false)}>
-                Sluiten
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => isDialogOpen ? setIsDialogOpen(false) : setIsEditDialogOpen(false)}
+                className="h-8 text-xs rounded-sm"
+              >
+                Annuleren
               </Button>
-              {selectedRoom && (
-                <Button onClick={() => {
-                  setIsViewDialogOpen(false);
-                  handleEditRoom(selectedRoom);
-                }}>
-                  <Edit className="mr-2 h-4 w-4" />
+              <Button 
+                type="submit"
+                className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
+              >
+                <Save className="h-3.5 w-3.5 mr-1" />
+                {isEditDialogOpen ? 'Bijwerken' : 'Toevoegen'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Details dialoog */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Lokaal details</DialogTitle>
+            <DialogDescription>
+              Details van het geselecteerde lokaal.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedRoom && (
+            <div className="py-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500 mb-3">Algemene informatie</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                        <span className="text-xs text-gray-500">Naam</span>
+                        <span className="text-sm font-medium">{selectedRoom.name}</span>
+                      </div>
+                      <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                        <span className="text-xs text-gray-500">Locatie</span>
+                        <span className="text-sm">{selectedRoom.location}</span>
+                      </div>
+                      <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                        <span className="text-xs text-gray-500">Capaciteit</span>
+                        <span className="text-sm">{selectedRoom.capacity} personen</span>
+                      </div>
+                      <div className="flex items-center justify-between pb-2">
+                        <span className="text-xs text-gray-500">Status</span>
+                        <span>{getStatusBadge(selectedRoom.status)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500 mb-3">Notities</h4>
+                    <p className="text-sm border rounded-sm p-3 bg-gray-50 min-h-[100px]">
+                      {selectedRoom.notes || "Geen notities beschikbaar"}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500 mb-3">Aangemaakt/bijgewerkt</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                        <span className="text-xs text-gray-500">Aangemaakt</span>
+                        <span className="text-sm">{new Date(selectedRoom.createdAt).toLocaleDateString('nl-NL')}</span>
+                      </div>
+                      <div className="flex items-center justify-between pb-2">
+                        <span className="text-xs text-gray-500">Laatst bijgewerkt</span>
+                        <span className="text-sm">{new Date(selectedRoom.updatedAt).toLocaleDateString('nl-NL')}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsViewDialogOpen(false)}
+              className="h-8 text-xs rounded-sm"
+            >
+              Sluiten
+            </Button>
+            {selectedRoom && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsViewDialogOpen(false);
+                    handleEditRoom(selectedRoom);
+                  }}
+                  className="h-8 text-xs rounded-sm"
+                >
+                  <Edit className="h-3.5 w-3.5 mr-1" />
                   Bewerken
                 </Button>
-              )}
-            </div>
+              </>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

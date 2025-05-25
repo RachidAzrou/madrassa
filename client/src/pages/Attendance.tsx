@@ -411,20 +411,15 @@ export default function Attendance() {
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* Page header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
-          <div className="flex items-center gap-4 mb-2 md:mb-0">
-            <div className="p-3 rounded-md bg-[#1e40af] text-white">
-              <ClipboardCheck className="h-7 w-7" />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Aanwezigheid</h1>
-              <p className="text-base text-gray-500 mt-1">Registreer en beheer aanwezigheid van studenten en docenten</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 mt-4 md:mt-0 md:ml-auto">
+    <div className="space-y-6">
+      <PremiumHeader
+        title="Aanwezigheid"
+        path="Onderwijs > Aanwezigheid"
+        icon={CalendarCheck}
+      />
+      <div className="p-4 md:p-6">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-2 ml-auto">
             <span className="text-sm text-gray-500 font-medium">
               {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </span>

@@ -3,8 +3,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, DollarSign, CreditCard, CheckCircle, 
   Users, Settings, Percent, AlertCircle, ChevronDown, FileText, UserPlus, Euro, Coins, 
-  Mail, Phone, Home, CalendarIcon, Plus, User, X, MapPin, School, XCircle
+  Mail, Phone, Home, CalendarIcon, Plus, User, X, MapPin, School, XCircle, Receipt
 } from 'lucide-react';
+import { PremiumHeader } from '@/components/layout/premium-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -387,20 +388,15 @@ export default function Fees() {
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* Page header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
-          <div className="flex items-center gap-4 mb-2 md:mb-0">
-            <div className="p-3 rounded-md bg-[#1e40af] text-white">
-              <Coins className="h-7 w-7" />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Betalingsbeheer</h1>
-              <p className="text-base text-gray-500 mt-1">Beheer van collegegelden, betalingen, kortingen en schulden</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 mt-4 md:mt-0 md:ml-auto">
+    <div className="space-y-6">
+      <PremiumHeader
+        title="Betalingsbeheer"
+        path="Administratie > Betalingsbeheer"
+        icon={Receipt}
+      />
+      <div className="p-4 md:p-6">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-2 ml-auto">
             <span className="text-sm text-gray-500 font-medium">
               {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </span>

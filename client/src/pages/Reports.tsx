@@ -21,8 +21,10 @@ import {
   BarChart3,
   BookMarked,
   Plus,
-  Trash2
+  Trash2,
+  FileBarChart
 } from 'lucide-react';
+import { PremiumHeader } from '@/components/layout/premium-header';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -464,20 +466,15 @@ export default function Reports() {
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* Page header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
-          <div className="flex items-center gap-4 mb-2 md:mb-0">
-            <div className="p-3 rounded-md bg-[#1e40af] text-white">
-              <BookMarked className="h-7 w-7" />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Rapport</h1>
-              <p className="text-base text-gray-500 mt-1">Beheer en genereer rapporten voor studenten en klassen</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 mt-4 md:mt-0 md:ml-auto">
+    <div className="space-y-6">
+      <PremiumHeader
+        title="Rapport"
+        path="Onderwijs > Rapport"
+        icon={FileBarChart}
+      />
+      <div className="p-4 md:p-6">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-2 ml-auto">
             <span className="text-sm text-gray-500 font-medium">
               {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </span>

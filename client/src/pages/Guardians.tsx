@@ -205,10 +205,21 @@ export default function Guardians() {
 
   // Valideren van het nieuwe voogd formulier
   const validateNewGuardian = () => {
-    if (!newGuardian.firstName || !newGuardian.lastName || !newGuardian.email) {
+    // Controleren of verplichte velden zijn ingevuld: voornaam, achternaam, telefoonnummer en relatie
+    if (!newGuardian.firstName || !newGuardian.lastName || !newGuardian.phone || !newGuardian.relationship) {
+      // Extra validatie voor het "anders" relatietype
+      if (newGuardian.relationship === 'other' && !newGuardian.relationshipOther) {
+        toast({
+          title: "Ontbrekende velden",
+          description: "Specificeer de relatie tot de student.",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
       toast({
         title: "Ontbrekende velden",
-        description: "Vul alle verplichte velden in.",
+        description: "Vul alle verplichte velden in (voornaam, achternaam, telefoonnummer en relatie tot student).",
         variant: "destructive",
       });
       return false;
@@ -597,32 +608,67 @@ export default function Guardians() {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">Voornaam</Label>
+                      <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">
+                        Voornaam <span className="text-red-500">*</span>
+                      </Label>
                       <Input 
                         id="firstName" 
                         placeholder="Voornaam" 
-                        className="h-8 text-sm"
+                        className={`h-8 text-sm ${!newGuardian.firstName ? 'border-red-300' : ''}`}
                         value={newGuardian.firstName}
                         onChange={(e) => setNewGuardian({...newGuardian, firstName: e.target.value})}
+                        required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">Achternaam</Label>
+                      <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">
+                        Achternaam <span className="text-red-500">*</span>
+                      </Label>
                       <Input 
                         id="lastName" 
                         placeholder="Achternaam" 
-                        className="h-8 text-sm"
+                        className={`h-8 text-sm ${!newGuardian.lastName ? 'border-red-300' : ''}`}
                         value={newGuardian.lastName}
                         onChange={(e) => setNewGuardian({...newGuardian, lastName: e.target.value})}
+                        required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="relationship" className="text-xs font-medium text-gray-700">Relatie tot Student</Label>
+                      <Label htmlFor="phone" className="text-xs font-medium text-gray-700">
+                        Telefoonnummer <span className="text-red-500">*</span>
+                      </Label>
+                      <Input 
+                        id="phone" 
+                        placeholder="Telefoonnummer" 
+                        className={`h-8 text-sm ${!newGuardian.phone ? 'border-red-300' : ''}`}
+                        value={newGuardian.phone || ''}
+                        onChange={(e) => setNewGuardian({...newGuardian, phone: e.target.value})}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-xs font-medium text-gray-700">
+                        E-mailadres
+                      </Label>
+                      <Input 
+                        id="email" 
+                        type="email"
+                        placeholder="E-mailadres" 
+                        className="h-8 text-sm"
+                        value={newGuardian.email || ''}
+                        onChange={(e) => setNewGuardian({...newGuardian, email: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="relationship" className="text-xs font-medium text-gray-700">
+                        Relatie tot Student <span className="text-red-500">*</span>
+                      </Label>
                       <Select 
                         value={newGuardian.relationship} 
                         onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
+                        required
                       >
-                        <SelectTrigger id="relationship" className="h-8 text-sm border-gray-300">
+                        <SelectTrigger id="relationship" className={`h-8 text-sm border-gray-300 ${!newGuardian.relationship ? 'border-red-300' : ''}`}>
                           <SelectValue placeholder="Selecteer relatie" />
                         </SelectTrigger>
                         <SelectContent className="bg-white">
@@ -637,13 +683,16 @@ export default function Guardians() {
                     
                     {newGuardian.relationship === 'other' && (
                       <div className="space-y-2">
-                        <Label htmlFor="relationshipOther">Specificeer relatie</Label>
+                        <Label htmlFor="relationshipOther">
+                          Specificeer relatie <span className="text-red-500">*</span>
+                        </Label>
                         <Input 
                           id="relationshipOther" 
                           placeholder="Beschrijf de relatie" 
-                          className="h-8 text-sm"
+                          className={`h-8 text-sm ${newGuardian.relationship === 'other' && !newGuardian.relationshipOther ? 'border-red-300' : ''}`}
                           value={newGuardian.relationshipOther || ''}
                           onChange={(e) => setNewGuardian({...newGuardian, relationshipOther: e.target.value})}
+                          required
                         />
                       </div>
                     )}

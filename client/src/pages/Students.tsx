@@ -333,9 +333,9 @@ export default function Students() {
             </Select>
             
             <Select value={filterProgram} onValueChange={setFilterProgram}>
-              <SelectTrigger className="h-7 text-xs rounded-sm">
+              <Button variant="outline" className="h-7 text-xs rounded-sm flex items-center justify-between">
                 <SelectValue placeholder="Programma" />
-              </SelectTrigger>
+              </Button>
               <SelectContent>
                 <SelectItem value="all">Alle programma's</SelectItem>
                 {programs.map((program) => (
@@ -591,9 +591,9 @@ export default function Students() {
                           onValueChange={(value) => handleSelectChange('gender', value)}
                           required
                         >
-                          <SelectTrigger className="mt-1 h-9">
+                          <Button variant="outline" className="mt-1 h-9 w-full flex items-center justify-between">
                             <SelectValue placeholder="Selecteer geslacht" />
-                          </SelectTrigger>
+                          </Button>
                           <SelectContent>
                             <SelectItem value="man">Man</SelectItem>
                             <SelectItem value="vrouw">Vrouw</SelectItem>
@@ -737,9 +737,9 @@ export default function Students() {
                           onValueChange={(value) => handleSelectChange('academicYear', value)}
                           required
                         >
-                          <SelectTrigger className="mt-1 h-9">
+                          <Button variant="outline" className="mt-1 h-9 w-full flex items-center justify-between">
                             <SelectValue placeholder="Selecteer schooljaar" />
-                          </SelectTrigger>
+                          </Button>
                           <SelectContent>
                             <SelectItem value="2024-2025">2024-2025</SelectItem>
                             <SelectItem value="2025-2026">2025-2026</SelectItem>
@@ -755,9 +755,9 @@ export default function Students() {
                           onValueChange={(value) => handleSelectChange('studentGroupId', value)}
                           required
                         >
-                          <SelectTrigger className="mt-1 h-9">
+                          <Button variant="outline" className="mt-1 h-9 w-full flex items-center justify-between">
                             <SelectValue placeholder="Selecteer klas" />
-                          </SelectTrigger>
+                          </Button>
                           <SelectContent>
                             {studentGroups.map((group) => (
                               <SelectItem key={group.id} value={group.id.toString()}>
@@ -787,9 +787,9 @@ export default function Students() {
                           onValueChange={(value) => handleSelectChange('status', value)}
                           required
                         >
-                          <SelectTrigger className="mt-1 h-9">
+                          <Button variant="outline" className="mt-1 h-9 w-full flex items-center justify-between">
                             <SelectValue placeholder="Selecteer status" />
-                          </SelectTrigger>
+                          </Button>
                           <SelectContent>
                             <SelectItem value="enrolled">Ingeschreven</SelectItem>
                             <SelectItem value="unenrolled">Uitgeschreven</SelectItem>

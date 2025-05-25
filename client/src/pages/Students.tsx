@@ -21,6 +21,7 @@ import {
   DataTableContainer, 
   SearchActionBar, 
   TableContainer,
+  DataTableHeader,
   TableLoadingState,
   EmptyTableState
 } from "@/components/ui/data-table-container";
@@ -359,7 +360,7 @@ export default function Students() {
         {/* Student Table */}
         <TableContainer>
           <Table>
-            <TableHeader>
+            <DataTableHeader>
               <TableRow>
                 <ShadcnTableHead className="px-4 py-3 text-left w-[100px]">
                   <span className="text-xs font-medium text-gray-700">ID</span>
@@ -380,7 +381,7 @@ export default function Students() {
                   <span className="text-xs font-medium text-gray-700">Acties</span>
                 </ShadcnTableHead>
               </TableRow>
-            </TableHeader>
+            </DataTableHeader>
             <TableBody>
               {studentsLoading ? (
                 <TableLoadingState />

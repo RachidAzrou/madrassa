@@ -53,7 +53,7 @@ export function TableContainer({ children, className = "" }: TableContainerProps
   );
 }
 
-interface TableHeadProps {
+interface DataTableHeaderProps {
   children: ReactNode;
   className?: string;
 }
@@ -61,7 +61,7 @@ interface TableHeadProps {
 /**
  * A reusable table header with consistent styling
  */
-export function TableHead({ children, className = "" }: TableHeadProps) {
+export function DataTableHeader({ children, className = "" }: DataTableHeaderProps) {
   return (
     <thead className={`bg-[#f9fafc] ${className}`}>
       {children}

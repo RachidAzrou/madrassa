@@ -13,10 +13,21 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
       preload: path.join(__dirname, 'preload.js'),
+      webSecurity: false // Tijdelijk uitschakelen voor ontwikkeling
     },
+  });
+
+  // CSP-instellingen configureren
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': ["default-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* ws://localhost:* data: blob:"]
+      }
+    });
   });
 
   // Laad de juiste URL afhankelijk van development of productie omgeving

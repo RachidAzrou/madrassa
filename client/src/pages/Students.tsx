@@ -383,11 +383,11 @@ export default function Students() {
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#e5e7eb]">
-                  <SelectItem value="all" className="focus:bg-blue-100 hover:bg-blue-50">Alle statussen</SelectItem>
-                  <SelectItem value="active" className="focus:bg-blue-100 hover:bg-blue-50">Actief</SelectItem>
-                  <SelectItem value="inactive" className="focus:bg-blue-100 hover:bg-blue-50">Inactief</SelectItem>
-                  <SelectItem value="graduated" className="focus:bg-blue-100 hover:bg-blue-50">Afgestudeerd</SelectItem>
-                  <SelectItem value="withdrawn" className="focus:bg-blue-100 hover:bg-blue-50">Teruggetrokken</SelectItem>
+                  <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle statussen</SelectItem>
+                  <SelectItem value="active" className="focus:bg-blue-200 hover:bg-blue-100">Actief</SelectItem>
+                  <SelectItem value="inactive" className="focus:bg-blue-200 hover:bg-blue-100">Inactief</SelectItem>
+                  <SelectItem value="graduated" className="focus:bg-blue-200 hover:bg-blue-100">Afgestudeerd</SelectItem>
+                  <SelectItem value="withdrawn" className="focus:bg-blue-200 hover:bg-blue-100">Teruggetrokken</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -399,9 +399,9 @@ export default function Students() {
                   <SelectValue placeholder="Programma" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#e5e7eb]">
-                  <SelectItem value="all" className="focus:bg-blue-100 hover:bg-blue-50">Alle programma's</SelectItem>
+                  <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle programma's</SelectItem>
                   {programs.map((program) => (
-                    <SelectItem key={program.id} value={program.id.toString()} className="focus:bg-blue-100 hover:bg-blue-50">
+                    <SelectItem key={program.id} value={program.id.toString()} className="focus:bg-blue-200 hover:bg-blue-100">
                       {program.name}
                     </SelectItem>
                   ))}
@@ -416,10 +416,10 @@ export default function Students() {
                   <SelectValue placeholder="Schooljaar" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#e5e7eb]">
-                  <SelectItem value="all" className="focus:bg-blue-100 hover:bg-blue-50">Alle schooljaren</SelectItem>
-                  <SelectItem value="2024-2025" className="focus:bg-blue-100 hover:bg-blue-50">2024-2025</SelectItem>
-                  <SelectItem value="2023-2024" className="focus:bg-blue-100 hover:bg-blue-50">2023-2024</SelectItem>
-                  <SelectItem value="2022-2023" className="focus:bg-blue-100 hover:bg-blue-50">2022-2023</SelectItem>
+                  <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle schooljaren</SelectItem>
+                  <SelectItem value="2024-2025" className="focus:bg-blue-200 hover:bg-blue-100">2024-2025</SelectItem>
+                  <SelectItem value="2023-2024" className="focus:bg-blue-200 hover:bg-blue-100">2023-2024</SelectItem>
+                  <SelectItem value="2022-2023" className="focus:bg-blue-200 hover:bg-blue-100">2022-2023</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -431,9 +431,9 @@ export default function Students() {
                   <SelectValue placeholder="Klas" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#e5e7eb]">
-                  <SelectItem value="all" className="focus:bg-blue-100 hover:bg-blue-50">Alle klassen</SelectItem>
+                  <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle klassen</SelectItem>
                   {studentGroups.map((group) => (
-                    <SelectItem key={group.id} value={group.id.toString()} className="focus:bg-blue-100 hover:bg-blue-50">
+                    <SelectItem key={group.id} value={group.id.toString()} className="focus:bg-blue-200 hover:bg-blue-100">
                       {group.name}
                     </SelectItem>
                   ))}

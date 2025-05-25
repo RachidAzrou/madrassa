@@ -2305,6 +2305,7 @@ export default function Students() {
                                   className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
                                   onClick={() => {
                                     setNewStudentGuardians([...newStudentGuardians, guardian]);
+                                    setSelectedGuardians([...selectedGuardians, guardian]);
                                     toast({
                                       title: "Voogd gekoppeld",
                                       description: "De voogd is toegevoegd aan de student"

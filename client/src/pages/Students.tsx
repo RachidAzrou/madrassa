@@ -1325,12 +1325,15 @@ export default function Students() {
                 <div>
                   <h2 className="text-xl font-semibold">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
                   <p className="text-sm text-gray-500">{selectedStudent.studentId}</p>
-                  <Badge className="mt-2" 
-                    variant={
-                      selectedStudent.status === "active" || 
-                      selectedStudent.status === "ingeschreven" ? 
-                      "default" : "secondary"
-                    }
+                  <Badge 
+                    variant="outline" 
+                    className={`text-xs rounded-sm ${
+                      selectedStudent.status === 'active' || selectedStudent.status === 'ingeschreven' ? "bg-green-50 text-green-700 border-green-200" : 
+                      selectedStudent.status === 'inactive' || selectedStudent.status === 'uitgeschreven' ? "bg-gray-50 text-gray-700 border-gray-200" : 
+                      selectedStudent.status === 'afgestudeerd' ? "bg-blue-50 text-blue-700 border-blue-200" :
+                      selectedStudent.status === 'geschorst' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
+                      "bg-yellow-50 text-yellow-700 border-yellow-200"
+                    }`}
                   >
                     {selectedStudent.status === 'active' ? 'Ingeschreven' : 
                      selectedStudent.status === 'inactive' ? 'Uitgeschreven' : 
@@ -1395,11 +1398,16 @@ export default function Students() {
                   <div>
                     <CustomFormLabel>Status</CustomFormLabel>
                     <div className="text-sm mt-1">
-                      <Badge variant={
-                        selectedStudent.status === "active" || 
-                        selectedStudent.status === "ingeschreven" ? 
-                        "default" : "secondary"
-                      }>
+                      <Badge 
+                        variant="outline" 
+                        className={`text-xs rounded-sm ${
+                          selectedStudent.status === 'active' || selectedStudent.status === 'ingeschreven' ? "bg-green-50 text-green-700 border-green-200" : 
+                          selectedStudent.status === 'inactive' || selectedStudent.status === 'uitgeschreven' ? "bg-gray-50 text-gray-700 border-gray-200" : 
+                          selectedStudent.status === 'afgestudeerd' ? "bg-blue-50 text-blue-700 border-blue-200" :
+                          selectedStudent.status === 'geschorst' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
+                          "bg-yellow-50 text-yellow-700 border-yellow-200"
+                        }`}
+                      >
                         {selectedStudent.status === 'active' ? 'Ingeschreven' : 
                          selectedStudent.status === 'inactive' ? 'Uitgeschreven' : 
                          selectedStudent.status === 'enrolled' ? 'Ingeschreven' :

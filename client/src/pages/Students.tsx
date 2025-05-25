@@ -8,7 +8,7 @@ import {
   ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
   Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, CreditCard, AlertCircle,
   FileUp, Upload, FilePlus2, FileSpreadsheet, Image, School, UserRound, Camera, CheckSquare, SquareSlash,
-  UserCheck, CalendarDays, Hash, Save
+  UserCheck, CalendarDays, Hash, Save, Plus, Loader2
 } from 'lucide-react';
 
 // Aangepast ChalkboardTeacher icoon
@@ -163,12 +163,12 @@ export default function Students() {
   ];
 
   // Ophalen programma's voor dropdown
-  const { data: programsData = {} } = useQuery({
+  const { data: programsData = [] } = useQuery({
     queryKey: ['/api/programs'],
   });
 
   // Ophalen studentengroepen voor dropdown
-  const { data: studentGroupsData = {} } = useQuery({
+  const { data: studentGroupsData = [] } = useQuery({
     queryKey: ['/api/student-groups'],
   });
   
@@ -206,7 +206,7 @@ export default function Students() {
   }, [isCreateDialogOpen]);
   
   // Ophalen studenten met paginering en filters
-  const { data: studentsData = {}, isLoading, isError } = useQuery({
+  const { data: studentsData = { students: [], totalCount: 0 }, isLoading, isError } = useQuery({
     queryKey: [
       '/api/students', 
       { 
@@ -1837,7 +1837,7 @@ export default function Students() {
                     disabled={!studentFormData.programId}
                     className="h-8 text-xs"
                   >
-                    <Plus className="h-3.5 w-3.5 mr-1" />
+                    <PlusCircle className="h-3.5 w-3.5 mr-1" />
                     Toevoegen
                   </Button>
                 </div>
@@ -2295,7 +2295,7 @@ export default function Students() {
                     disabled={!studentFormData.programId}
                     className="h-8 text-xs"
                   >
-                    <Plus className="h-3.5 w-3.5 mr-1" />
+                    <PlusCircle className="h-3.5 w-3.5 mr-1" />
                     Toevoegen
                   </Button>
                 </div>

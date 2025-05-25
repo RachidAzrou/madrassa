@@ -5,7 +5,7 @@ import {
   Search, PlusCircle, Filter, Download, Users, User, Camera,
   Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
   GraduationCap, NotebookText, MapPin, FileEdit, Upload, FileDown,
-  ArrowDownToLine, ArrowUpToLine
+  ArrowDownToLine, ArrowUpToLine, Info
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -1580,7 +1580,7 @@ export default function Students() {
                 </div>
               </div>
               <p className="text-xs text-gray-600 mt-3">
-                <InfoIcon className="h-3 w-3 inline-block mr-1" />
+                <Info className="h-3 w-3 inline-block mr-1" />
                 Het CSV- of Excel-bestand moet kolommen bevatten met bovenstaande veldnamen.
               </p>
             </div>

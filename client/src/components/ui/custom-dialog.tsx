@@ -29,7 +29,7 @@ export function CustomDialog({
 }: CustomDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`sm:max-w-[${maxWidth}] p-0 overflow-hidden max-h-[90vh] ${className}`}>
+      <DialogContent className={`p-0 overflow-hidden max-h-[90vh] w-[95vw] sm:max-w-[${maxWidth}] ${className}`}>
         {children}
       </DialogContent>
     </Dialog>

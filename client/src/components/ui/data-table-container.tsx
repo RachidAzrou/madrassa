@@ -116,8 +116,8 @@ interface SearchActionBarProps {
  */
 export function SearchActionBar({ children, className = "" }: SearchActionBarProps) {
   return (
-    <div className={`bg-white border border-[#e5e7eb] rounded-sm mb-4 ${className}`}>
-      <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+    <div className={`bg-white border border-[#e5e7eb] rounded-sm mb-4 shadow-sm ${className}`}>
+      <div className="px-3 sm:px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         {children}
       </div>
     </div>
@@ -134,8 +134,8 @@ interface TableContainerProps {
  */
 export function TableContainer({ children, className = "" }: TableContainerProps) {
   return (
-    <div className={`bg-white border border-[#e5e7eb] rounded-sm overflow-hidden ${className}`}>
-      <div className="overflow-x-auto">
+    <div className={`bg-white border border-[#e5e7eb] rounded-sm overflow-hidden shadow-sm ${className}`}>
+      <div className="overflow-x-auto md:overflow-x-visible">
         {children}
       </div>
     </div>

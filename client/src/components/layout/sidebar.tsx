@@ -138,12 +138,25 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
     <aside
       className={cn(
         "h-screen bg-white border-r border-gray-200",
-        "w-56 flex flex-col", /* Original width */
+        "w-64 flex flex-col", /* Slightly increased width */
+        isMobile ? "shadow-xl" : "", /* Add shadow on mobile */
         className
       )}
     >
-
-
+      {/* Mobile header with close button */}
+      {isMobile && (
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+          <div className="flex items-center">
+            <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8" />
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-gray-100"
+          >
+            <X className="h-5 w-5 text-gray-500" />
+          </button>
+        </div>
+      )}
 
       
       {/* Dashboard link */}

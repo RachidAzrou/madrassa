@@ -39,22 +39,44 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const isMobile = useMobile();
   const pageTitle = getPageTitle(location);
 
-  // Always keep sidebar open regardless of device or location
+  // Toggle sidebar based on mobile or desktop
   useEffect(() => {
-    setSidebarOpen(true);
-  }, []);
+    setSidebarOpen(!isMobile);
+  }, [isMobile]);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   return (
     <div className="flex flex-col h-full min-h-screen">
       {/* Topbar - volledig boven alles */}
       <div className="w-full z-40">
-        <Topbar />
+        <Topbar onMenuClick={toggleSidebar} />
       </div>
       
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - always visible, non-collapsible */}
-        <div className="static z-30 h-[calc(100vh-3rem)] flex-shrink-0">
-          <Sidebar className="h-full" />
+        {/* Mobile sidebar overlay */}
+        {isMobile && sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Sidebar - conditionally visible on mobile */}
+        <div className={`${
+          isMobile 
+            ? `fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out ${
+                sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+              }`
+            : 'static z-30 h-[calc(100vh-3rem)] flex-shrink-0'
+        }`}>
+          <Sidebar 
+            className="h-full" 
+            isMobile={isMobile} 
+            onClose={() => setSidebarOpen(false)} 
+          />
         </div>
 
         {/* Main content */}

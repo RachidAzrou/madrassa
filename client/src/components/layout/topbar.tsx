@@ -9,6 +9,7 @@ import {
   LogOut,
   ChevronDown,
   Mail,
+  Menu,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { 
@@ -27,6 +28,7 @@ import {
   PopoverContent, 
   PopoverTrigger 
 } from '@/components/ui/popover';
+import { useMobile } from "@/hooks/use-mobile";
 
 // Import logo
 import myMadrassaLogo from '@/assets/mymadrassa_logo.png';
@@ -41,7 +43,12 @@ type Notification = {
   type: 'info' | 'warning' | 'success' | 'error';
 };
 
-export function Topbar() {
+interface TopbarProps {
+  onMenuClick?: () => void;
+}
+
+export function Topbar({ onMenuClick }: TopbarProps = {}) {
+  const isMobile = useMobile();
   // Haal de notificaties op
   const { data: notificationsData } = useQuery({
     queryKey: ['/api/notifications/user/1'],
@@ -63,6 +70,18 @@ export function Topbar() {
 
   return (
     <div className="w-full h-12 border-b border-gray-200 bg-white px-4 flex items-center justify-between">
+      {/* Menu voor mobiel (links) */}
+      {isMobile && (
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="mr-2"
+          onClick={onMenuClick}
+        >
+          <Menu className="h-5 w-5 text-gray-600" />
+        </Button>
+      )}
+      
       {/* Logo sectie - links */}
       <div className="flex items-center h-full">
         <Link href="/dashboard" className="flex items-center">

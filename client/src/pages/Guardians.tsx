@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, UserCheck, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, UserPlus } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, UserCheck, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, UserPlus, HeartPulse, AlertCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -523,7 +523,7 @@ export default function Guardians() {
                   <span>Persoonlijke gegevens</span>
                 </TabsTrigger>
                 <TabsTrigger value="contact" className="flex items-center gap-2">
-                  <AlertTriangle className="h-3.5 w-3.5" />
+                  <HeartPulse className="h-3.5 w-3.5" />
                   <span>Noodcontact</span>
                 </TabsTrigger>
               </TabsList>
@@ -532,7 +532,10 @@ export default function Guardians() {
                 <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">Voornaam</Label>
+                      <Label htmlFor="firstName" className="flex items-center gap-2">
+                        <UserCheck className="h-3.5 w-3.5 text-[#1e40af]" />
+                        <span>Voornaam</span>
+                      </Label>
                       <Input 
                         id="firstName" 
                         placeholder="Voornaam" 
@@ -542,7 +545,10 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Achternaam</Label>
+                      <Label htmlFor="lastName" className="flex items-center gap-2">
+                        <UserCheck className="h-3.5 w-3.5 text-[#1e40af]" />
+                        <span>Achternaam</span>
+                      </Label>
                       <Input 
                         id="lastName" 
                         placeholder="Achternaam" 
@@ -552,7 +558,10 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="relationship">Relatie tot Student</Label>
+                      <Label htmlFor="relationship" className="flex items-center gap-2">
+                        <UserCheck className="h-3.5 w-3.5 text-[#1e40af]" />
+                        <span>Relatie tot Student</span>
+                      </Label>
                       <Select 
                         value={newGuardian.relationship} 
                         onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
@@ -583,25 +592,30 @@ export default function Guardians() {
                       </div>
                     )}
                     <div className="space-y-2">
-                      <Label htmlFor="isEmergencyContact">Noodcontact</Label>
-                      <div className="flex items-center h-8 border rounded-sm px-3">
-                        <Checkbox 
-                          id="isEmergencyContact" 
-                          checked={newGuardian.isEmergencyContact}
-                          onCheckedChange={(checked) => 
-                            setNewGuardian({
-                              ...newGuardian, 
-                              isEmergencyContact: checked === true
-                            })
-                          }
-                          className="mr-2 h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
-                        />
-                        <label
-                          htmlFor="isEmergencyContact"
-                          className="text-xs leading-none"
-                        >
-                          Deze persoon is een noodcontact
-                        </label>
+                      <Label htmlFor="isEmergencyContact" className="flex items-center gap-2">
+                        <HeartPulse className="h-3.5 w-3.5 text-red-500" />
+                        <span>Noodcontact</span>
+                      </Label>
+                      <div className="flex items-center gap-2 h-8 py-0.5">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="isEmergencyContact" 
+                            checked={newGuardian.isEmergencyContact}
+                            onCheckedChange={(checked) => 
+                              setNewGuardian({
+                                ...newGuardian, 
+                                isEmergencyContact: checked === true
+                              })
+                            }
+                            className="h-4 w-4 rounded-sm border-[#e5e7eb] data-[state=checked]:bg-[#1e40af]"
+                          />
+                          <label
+                            htmlFor="isEmergencyContact"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            Deze persoon is een primair noodcontact
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -621,7 +635,10 @@ export default function Guardians() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email">E-mailadres</Label>
+                      <Label htmlFor="email" className="flex items-center gap-2">
+                        <Mail className="h-3.5 w-3.5 text-[#1e40af]" />
+                        <span>E-mailadres</span>
+                      </Label>
                       <Input 
                         id="email" 
                         type="email" 
@@ -632,7 +649,10 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Telefoonnummer</Label>
+                      <Label htmlFor="phone" className="flex items-center gap-2">
+                        <Phone className="h-3.5 w-3.5 text-[#1e40af]" />
+                        <span>Telefoonnummer</span>
+                      </Label>
                       <Input 
                         id="phone" 
                         placeholder="Telefoonnummer" 
@@ -643,13 +663,17 @@ export default function Guardians() {
                     </div>
                     
                     <div className="col-span-2 border-t border-gray-200 mt-2 pt-4">
-                      <h3 className="font-medium text-sm mb-3">
+                      <h3 className="font-medium text-sm mb-3 flex items-center gap-2 text-[#1e40af]">
+                        <AlertCircle className="h-4 w-4 text-red-500" />
                         {newGuardian.isEmergencyContact ? "Secundair noodcontact" : "Noodcontact"}
                       </h3>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="emergencyContactFirstName">Voornaam</Label>
+                      <Label htmlFor="emergencyContactFirstName" className="flex items-center gap-2">
+                        <UserCheck className="h-3.5 w-3.5 text-[#1e40af]" />
+                        <span>Voornaam</span>
+                      </Label>
                       <Input 
                         id="emergencyContactFirstName" 
                         placeholder="Voornaam" 
@@ -659,7 +683,10 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="emergencyContactLastName">Achternaam</Label>
+                      <Label htmlFor="emergencyContactLastName" className="flex items-center gap-2">
+                        <UserCheck className="h-3.5 w-3.5 text-[#1e40af]" />
+                        <span>Achternaam</span>
+                      </Label>
                       <Input 
                         id="emergencyContactLastName" 
                         placeholder="Achternaam" 
@@ -669,7 +696,10 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="emergencyContactPhone">Telefoonnummer</Label>
+                      <Label htmlFor="emergencyContactPhone" className="flex items-center gap-2">
+                        <Phone className="h-3.5 w-3.5 text-[#1e40af]" />
+                        <span>Telefoonnummer</span>
+                      </Label>
                       <Input 
                         id="emergencyContactPhone" 
                         placeholder="Telefoonnummer" 
@@ -679,7 +709,10 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="emergencyContactRelationship">Relatie tot student</Label>
+                      <Label htmlFor="emergencyContactRelationship" className="flex items-center gap-2">
+                        <UserCheck className="h-3.5 w-3.5 text-[#1e40af]" />
+                        <span>Relatie tot student</span>
+                      </Label>
                       <Select 
                         value={newGuardian.emergencyContactRelationship || ''} 
                         onValueChange={(value) => setNewGuardian({...newGuardian, emergencyContactRelationship: value})}

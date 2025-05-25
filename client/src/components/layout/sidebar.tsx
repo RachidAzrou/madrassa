@@ -137,7 +137,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
     <aside
       className={cn(
         "h-screen bg-white border-r border-gray-200",
-        "w-52 flex flex-col", /* Reduced width from w-64 to w-52 */
+        "w-56 flex flex-col", /* Original width */
         className
       )}
     >

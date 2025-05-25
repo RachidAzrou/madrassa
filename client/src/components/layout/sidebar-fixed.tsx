@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 
 // Aangepast ChalkboardTeacher icoon
-const ChalkBoard = (props: any) => (
+export const ChalkBoard = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg" 
     width="20" 

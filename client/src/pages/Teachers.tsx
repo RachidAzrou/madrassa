@@ -433,7 +433,7 @@ const Teachers = () => {
       {/* Main content area */}
       <div className="px-6 py-6">
         {/* Zoek- en actiebalk - Desktop style */}
-        <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4">
+        <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4 shadow-sm">
           <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             {/* Zoekbalk */}
             <div className="relative w-full sm:max-w-md">
@@ -533,6 +533,7 @@ const Teachers = () => {
             </div>
           </div>
         </div>
+          </div>
 
         {/* Tabel - Desktop style */}
         <div className="bg-white border border-[#e5e7eb] rounded-sm overflow-hidden">

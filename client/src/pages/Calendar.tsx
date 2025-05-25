@@ -407,28 +407,32 @@ export default function Calendar() {
       <div className="flex flex-col gap-4 mb-4">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <Tabs value={view} onValueChange={(value) => setView(value as 'month' | 'week' | 'day')}>
-              <TabsList className="p-1 bg-blue-900/10">
-                <TabsTrigger 
-                  value="month" 
-                  className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
-                >
-                  Maand
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="week" 
-                  className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
-                >
-                  Week
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="day" 
-                  className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md"
-                >
-                  Dag
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="flex border rounded-md overflow-hidden">
+              <button 
+                onClick={() => setView('month')}
+                className={`px-4 py-2 text-sm font-medium ${view === 'month' 
+                  ? 'bg-[#1e40af] text-white' 
+                  : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+              >
+                Maand
+              </button>
+              <button 
+                onClick={() => setView('week')}
+                className={`px-4 py-2 text-sm font-medium ${view === 'week' 
+                  ? 'bg-[#1e40af] text-white' 
+                  : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+              >
+                Week
+              </button>
+              <button 
+                onClick={() => setView('day')}
+                className={`px-4 py-2 text-sm font-medium ${view === 'day' 
+                  ? 'bg-[#1e40af] text-white' 
+                  : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+              >
+                Dag
+              </button>
+            </div>
           </div>
           <div className="flex items-center space-x-3 flex-wrap gap-3">
             <Select value={filter} onValueChange={handleFilterChange}>

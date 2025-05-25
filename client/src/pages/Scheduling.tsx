@@ -547,7 +547,7 @@ export default function Scheduling() {
               onClick={handleAddSchedule} 
               variant="default"
               size="default"
-              className="bg-primary hover:bg-primary/90 flex items-center"
+              className="hover:bg-primary/90 flex items-center bg-[#1e40af]"
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               <span>Planning Toevoegen</span>
@@ -1059,7 +1059,7 @@ export default function Scheduling() {
               <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Annuleren
               </Button>
-              <Button type="submit">
+              <Button type="submit" className="hover:bg-[#1e40af]/90 bg-[#1e40af]">
                 {dialogActiveTab === 'instructor-schedule' 
                   ? 'Docentrooster Opslaan' 
                   : 'Lokaal Opslaan'}

@@ -448,7 +448,7 @@ export default function Calendar() {
               onClick={handleAddEvent}
               variant="default"
               size="default"
-              className="bg-primary hover:bg-primary/90 flex items-center"
+              className="hover:bg-primary/90 flex items-center bg-[#1e40af]"
             >
               <Plus className="mr-2 h-4 w-4" />
               <span>Evenement Toevoegen</span>
@@ -1157,7 +1157,7 @@ export default function Calendar() {
                   <Button 
                     type="submit"
                     disabled={createEventMutation.isPending}
-                    className="bg-primary hover:bg-primary/90"
+                    className="hover:bg-primary/90 bg-[#1e40af]"
                   >
                     {createEventMutation.isPending ? 'Bezig met toevoegen...' : 'Evenement toevoegen'}
                   </Button>

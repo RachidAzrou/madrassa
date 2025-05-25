@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { Link, useLocation } from 'wouter';
+import { useToast } from "@/hooks/use-toast";
 import { 
   Search, PlusCircle, Filter, Download, Users, User, Camera,
   Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
@@ -18,7 +19,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { 
@@ -1166,6 +1166,58 @@ export default function Students() {
                   
                   <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                     <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <Users className="h-4 w-4 mr-2" />
+                      Familie
+                    </h3>
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700 mb-2 block">Voogden</Label>
+                        <div className="p-3 bg-gray-50 rounded-md text-center">
+                          <p className="text-sm text-gray-500 mb-2">Voogden kunnen worden toegevoegd nadat de student is aangemaakt</p>
+                          <Button 
+                            type="button"
+                            variant="outline" 
+                            size="sm"
+                            className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
+                            onClick={() => {
+                              toast({
+                                title: "Info",
+                                description: "U kunt voogden toevoegen na het aanmaken van de student."
+                              });
+                            }}
+                          >
+                            <UserPlus className="h-3.5 w-3.5 mr-1" />
+                            Voogd toevoegen
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700 mb-2 block">Broers/Zussen</Label>
+                        <div className="p-3 bg-gray-50 rounded-md text-center">
+                          <p className="text-sm text-gray-500 mb-2">Koppel bestaande studenten als broer/zus</p>
+                          <Button 
+                            type="button"
+                            variant="outline" 
+                            size="sm"
+                            className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
+                            onClick={() => {
+                              toast({
+                                title: "Info",
+                                description: "U kunt broers/zussen koppelen na het aanmaken van de student."
+                              });
+                            }}
+                          >
+                            <Users className="h-3.5 w-3.5 mr-1" />
+                            Broer/Zus koppelen
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
                       <NotebookText className="h-4 w-4 mr-2" />
                       Aantekeningen
                     </h3>
@@ -1646,6 +1698,121 @@ export default function Students() {
                       onChange={(e) => setFormData({ ...formData, enrollmentDate: e.target.value })}
                       className="h-9"
                     />
+                  </div>
+                </div>
+              </SectionContainer>
+              
+              <SectionContainer title="Familie" icon={<Users className="h-4 w-4" />}>
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700 mb-2 block">Voogden</Label>
+                    {formData.guardians && formData.guardians.length > 0 ? (
+                      <div className="space-y-2">
+                        {formData.guardians.map((guardian, index) => (
+                          <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                                {guardian.firstName?.charAt(0)}{guardian.lastName?.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="text-sm font-medium">{guardian.firstName} {guardian.lastName}</p>
+                              <p className="text-xs text-gray-500">{guardian.relationship}</p>
+                            </div>
+                            <div className="ml-auto">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 w-7 p-0 hover:bg-red-50"
+                                onClick={() => {
+                                  toast({
+                                    title: "Info",
+                                    description: "Verwijderfunctie nog niet beschikbaar."
+                                  });
+                                }}
+                              >
+                                <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-gray-50 rounded-md text-center">
+                        <p className="text-sm text-gray-500 mb-2">Geen voogden gevonden</p>
+                        <Button 
+                          type="button"
+                          variant="outline" 
+                          size="sm"
+                          className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
+                          onClick={() => {
+                            setIsEditDialogOpen(false);
+                            setLocation(`/guardians?studentId=${selectedStudent.id}`);
+                          }}
+                        >
+                          <UserPlus className="h-3.5 w-3.5 mr-1" />
+                          Voogd toevoegen
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700 mb-2 block">Broers/Zussen</Label>
+                    {formData.relatedStudents && formData.relatedStudents.length > 0 ? (
+                      <div className="space-y-2">
+                        {formData.relatedStudents.map((relatedStudent, index) => (
+                          <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
+                            <Avatar className="h-8 w-8">
+                              {relatedStudent.photoUrl ? (
+                                <AvatarImage src={relatedStudent.photoUrl} alt={`${relatedStudent.firstName} ${relatedStudent.lastName}`} />
+                              ) : (
+                                <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                                  {relatedStudent.firstName?.charAt(0)}{relatedStudent.lastName?.charAt(0)}
+                                </AvatarFallback>
+                              )}
+                            </Avatar>
+                            <div>
+                              <p className="text-sm">{relatedStudent.firstName} {relatedStudent.lastName}</p>
+                            </div>
+                            <div className="ml-auto">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 w-7 p-0 hover:bg-red-50"
+                                onClick={() => {
+                                  toast({
+                                    title: "Info",
+                                    description: "Verwijderfunctie nog niet beschikbaar."
+                                  });
+                                }}
+                              >
+                                <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-gray-50 rounded-md text-center">
+                        <p className="text-sm text-gray-500 mb-2">Koppel bestaande studenten als broer/zus</p>
+                        <Button 
+                          type="button"
+                          variant="outline" 
+                          size="sm"
+                          className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
+                          onClick={() => {
+                            toast({
+                              title: "Info",
+                              description: "Functie nog niet beschikbaar."
+                            });
+                          }}
+                        >
+                          <Users className="h-3.5 w-3.5 mr-1" />
+                          Broer/Zus koppelen
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </SectionContainer>

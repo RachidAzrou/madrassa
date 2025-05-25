@@ -6,10 +6,7 @@ import {
   GraduationCap, 
   Calendar,
   LayoutDashboard,
-  Building,
-  PieChart,
-  Clock,
-  ArrowRight
+  Building
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format, startOfWeek, endOfWeek, addDays, parseISO, isToday, isWithinInterval } from 'date-fns';

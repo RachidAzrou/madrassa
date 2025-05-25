@@ -37,7 +37,7 @@ import {
 export default function Students() {
   // State hooks
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [filterProgram, setFilterProgram] = useState("all");
   const [showFilterOptions, setShowFilterOptions] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -370,8 +370,8 @@ export default function Students() {
             
             <div className="flex flex-wrap gap-3">
               <Select 
-                value={filterStatus} 
-                onValueChange={setFilterStatus}
+                value={statusFilter} 
+                onValueChange={setStatusFilter}
               >
                 <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
                   <SelectValue placeholder="Status" />
@@ -416,16 +416,16 @@ export default function Students() {
                 <ShadcnTableHead className="px-4 py-3 text-left">
                   <span className="text-xs font-medium text-gray-700">Naam</span>
                 </ShadcnTableHead>
-                <ShadcnTableHead className="px-4 py-3 text-left hidden md:table-cell">
-                  <span className="text-xs font-medium text-gray-700">Email</span>
+                <ShadcnTableHead className="px-4 py-3 text-left">
+                  <span className="text-xs font-medium text-gray-700">Klas</span>
                 </ShadcnTableHead>
-                <ShadcnTableHead className="px-4 py-3 text-left hidden md:table-cell">
-                  <span className="text-xs font-medium text-gray-700">Programma</span>
+                <ShadcnTableHead className="px-4 py-3 text-left">
+                  <span className="text-xs font-medium text-gray-700">Schooljaar</span>
                 </ShadcnTableHead>
-                <ShadcnTableHead className="px-4 py-3 text-left hidden md:table-cell">
+                <ShadcnTableHead className="px-4 py-3 text-left">
                   <span className="text-xs font-medium text-gray-700">Status</span>
                 </ShadcnTableHead>
-                <ShadcnTableHead className="px-4 py-3 text-right w-[120px]">
+                <ShadcnTableHead className="px-4 py-3 text-right w-[100px]">
                   <span className="text-xs font-medium text-gray-700">Acties</span>
                 </ShadcnTableHead>
               </TableRow>
@@ -437,18 +437,18 @@ export default function Students() {
                 <EmptyTableState 
                   icon={<User className="h-12 w-12 mx-auto text-gray-300" />}
                   title="Geen studenten gevonden"
-                  description={searchTerm.trim() !== '' || filterStatus !== 'all' || filterProgram !== 'all' 
+                  description={searchTerm.trim() !== '' || statusFilter !== 'all' || filterProgram !== 'all' 
                     ? 'Probeer andere zoek- of filtercriteria te gebruiken.' 
                     : 'Er zijn nog geen studenten toegevoegd in het systeem.'}
                   action={
-                    (searchTerm.trim() !== '' || filterStatus !== 'all' || filterProgram !== 'all') && (
+                    (searchTerm.trim() !== '' || statusFilter !== 'all' || filterProgram !== 'all') && (
                       <Button 
                         variant="outline"
                         className="mt-4 h-7 text-xs rounded-sm" 
                         size="sm"
                         onClick={() => {
                           setSearchTerm('');
-                          setFilterStatus('all');
+                          setStatusFilter('all');
                           setFilterProgram('all');
                         }}
                       >
@@ -460,7 +460,7 @@ export default function Students() {
                 />
               ) : (
                 students.map((student) => (
-                  <TableRow key={student.id} className="hover:bg-gray-50">
+                  <TableRow key={student.id} className="hover:bg-gray-50 group">
                     <TableCell className="px-4 py-3 text-xs font-medium">{student.studentId}</TableCell>
                     <TableCell className="px-4 py-3">
                       <div className="flex items-center">
@@ -478,9 +478,13 @@ export default function Students() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-xs text-gray-500 hidden md:table-cell">{student.email}</TableCell>
-                    <TableCell className="px-4 py-3 text-xs text-gray-500 hidden md:table-cell">{student.programName}</TableCell>
-                    <TableCell className="px-4 py-3 hidden md:table-cell">
+                    <TableCell className="px-4 py-3 text-xs text-gray-600">
+                      {studentGroupsData.find(g => g.id && student.studentGroupId && g.id.toString() === student.studentGroupId.toString())?.name || '-'}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-xs text-gray-600">
+                      {student.academicYear || '-'}
+                    </TableCell>
+                    <TableCell className="px-4 py-3">
                       <Badge 
                         variant="outline" 
                         className={`text-xs rounded-sm ${
@@ -497,7 +501,7 @@ export default function Students() {
                       </Badge>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-right">
-                      <div className="flex justify-end gap-1">
+                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
                           size="sm"

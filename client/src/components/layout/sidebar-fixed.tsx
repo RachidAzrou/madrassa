@@ -69,16 +69,31 @@ const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps)
       <div
         onClick={onClick}
         className={cn(
-          "flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer",
+          "flex items-center gap-3 px-4 py-2.5 text-sm rounded-lg transition-all duration-200 cursor-pointer relative overflow-hidden",
           isActive
-            ? "bg-primary text-white font-medium"
-            : "text-gray-600 hover:text-primary hover:bg-gray-100"
+            ? "bg-primary/10 text-primary font-medium shadow-sm" 
+            : "text-gray-700 hover:text-primary hover:bg-gray-50"
         )}
+        style={{
+          transform: isActive ? "scale(1.02)" : "scale(1)",
+        }}
       >
-        <div className="flex-shrink-0">
+        <div className={cn(
+          "flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full",
+          isActive ? "bg-primary/15 text-primary" : "text-gray-600"
+        )}>
           {icon}
         </div>
         <span className="truncate whitespace-nowrap">{label}</span>
+        
+        {/* Flutter-style indicator */}
+        {isActive && (
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" 
+               style={{ 
+                 boxShadow: "0 0 8px rgba(124, 58, 237, 0.5)" 
+               }}
+          />
+        )}
       </div>
     </Link>
   );

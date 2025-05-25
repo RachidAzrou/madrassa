@@ -2,10 +2,12 @@ import {
   users, type User, type InsertUser, 
   feeDiscounts, type FeeDiscount, type InsertFeeDiscount,
   feeSettings, type FeeSettings, type InsertFeeSettings,
-  fees, type Fee, type InsertFee
+  fees, type Fee, type InsertFee,
+  messages, type Message, type InsertMessage,
+  students, teachers, guardians, studentGuardians
 } from "@shared/schema";
 import { db } from "./db";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql, count } from "drizzle-orm";
 
 // Interface voor storage operaties
 export interface IStorage {
@@ -48,6 +50,18 @@ export interface IStorage {
   createFeeDiscount(discount: InsertFeeDiscount): Promise<FeeDiscount>;
   updateFeeDiscount(id: number, discount: Partial<FeeDiscount>): Promise<FeeDiscount | undefined>;
   deleteFeeDiscount(id: number): Promise<boolean>;
+  
+  // Message operations
+  getMessages(): Promise<Message[]>;
+  getMessage(id: number): Promise<Message | undefined>;
+  getMessagesBySender(senderId: number, senderRole: string): Promise<Message[]>;
+  getMessagesByReceiver(receiverId: number, receiverRole: string): Promise<Message[]>;
+  getMessageThread(parentMessageId: number): Promise<Message[]>;
+  getUnreadMessagesCount(userId: number, userRole: string): Promise<number>;
+  createMessage(message: InsertMessage): Promise<Message>;
+  markMessageAsRead(id: number): Promise<Message | undefined>;
+  deleteMessage(id: number): Promise<boolean>;
+  getAuthorizedReceivers(senderId: number, senderRole: string): Promise<{id: number, role: string, name: string}[]>;
 }
 
 // DatabaseStorage implementatie die gebruik maakt van de database
@@ -206,6 +220,174 @@ export class DatabaseStorage implements IStorage {
   async deleteFeeDiscount(id: number): Promise<boolean> {
     const result = await db.delete(feeDiscounts).where(eq(feeDiscounts.id, id));
     return result.rowCount > 0;
+  }
+
+  // Message operations
+  async getMessages(): Promise<Message[]> {
+    return await db.select().from(messages);
+  }
+
+  async getMessage(id: number): Promise<Message | undefined> {
+    const [message] = await db.select().from(messages).where(eq(messages.id, id));
+    return message;
+  }
+
+  async getMessagesBySender(senderId: number, senderRole: string): Promise<Message[]> {
+    return await db.select()
+      .from(messages)
+      .where(and(
+        eq(messages.senderId, senderId),
+        eq(messages.senderRole, senderRole)
+      ));
+  }
+
+  async getMessagesByReceiver(receiverId: number, receiverRole: string): Promise<Message[]> {
+    return await db.select()
+      .from(messages)
+      .where(and(
+        eq(messages.receiverId, receiverId),
+        eq(messages.receiverRole, receiverRole)
+      ));
+  }
+
+  async getMessageThread(parentMessageId: number): Promise<Message[]> {
+    return await db.select()
+      .from(messages)
+      .where(eq(messages.parentMessageId, parentMessageId));
+  }
+
+  async getUnreadMessagesCount(userId: number, userRole: string): Promise<number> {
+    const result = await db.select({ count: count() })
+      .from(messages)
+      .where(and(
+        eq(messages.receiverId, userId),
+        eq(messages.receiverRole, userRole),
+        eq(messages.isRead, false)
+      ));
+    
+    return result[0]?.count || 0;
+  }
+
+  async createMessage(message: InsertMessage): Promise<Message> {
+    const [createdMessage] = await db.insert(messages).values(message).returning();
+    return createdMessage;
+  }
+
+  async markMessageAsRead(id: number): Promise<Message | undefined> {
+    const [updatedMessage] = await db
+      .update(messages)
+      .set({ isRead: true })
+      .where(eq(messages.id, id))
+      .returning();
+    
+    return updatedMessage;
+  }
+
+  async deleteMessage(id: number): Promise<boolean> {
+    const result = await db.delete(messages).where(eq(messages.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getAuthorizedReceivers(senderId: number, senderRole: string): Promise<{ id: number; role: string; name: string; }[]> {
+    // Implementeer rolgebaseerde beperkingen voor berichten
+    // Bijvoorbeeld: Docenten kunnen berichten sturen naar studenten en voogden, maar studenten kunnen alleen berichten sturen naar docenten
+    
+    let receivers: { id: number; role: string; name: string; }[] = [];
+    
+    // Implementeer de regels voor wie berichten kan ontvangen op basis van de rol van de afzender
+    switch (senderRole) {
+      case 'admin':
+        // Admin kan berichten sturen naar iedereen
+        const adminToTeachers = await db.select({
+          id: teachers.id,
+          role: sql`'teacher'`.as('role'),
+          name: sql`CONCAT(${teachers.firstName}, ' ', ${teachers.lastName})`.as('name')
+        }).from(teachers);
+        
+        const adminToStudents = await db.select({
+          id: students.id,
+          role: sql`'student'`.as('role'),
+          name: sql`CONCAT(${students.firstName}, ' ', ${students.lastName})`.as('name')
+        }).from(students);
+        
+        const adminToGuardians = await db.select({
+          id: guardians.id,
+          role: sql`'guardian'`.as('role'),
+          name: sql`CONCAT(${guardians.firstName}, ' ', ${guardians.lastName})`.as('name')
+        }).from(guardians);
+        
+        receivers = [...adminToTeachers, ...adminToStudents, ...adminToGuardians];
+        break;
+        
+      case 'teacher':
+        // Docenten kunnen berichten sturen naar studenten, voogden en admins
+        const teacherToStudents = await db.select({
+          id: students.id,
+          role: sql`'student'`.as('role'),
+          name: sql`CONCAT(${students.firstName}, ' ', ${students.lastName})`.as('name')
+        }).from(students);
+        
+        const teacherToGuardians = await db.select({
+          id: guardians.id,
+          role: sql`'guardian'`.as('role'),
+          name: sql`CONCAT(${guardians.firstName}, ' ', ${guardians.lastName})`.as('name')
+        }).from(guardians);
+        
+        const teacherToAdmins = await db.select({
+          id: users.id,
+          role: users.role,
+          name: sql`CONCAT(${users.firstName}, ' ', ${users.lastName})`.as('name')
+        }).from(users).where(eq(users.role, 'admin'));
+        
+        receivers = [...teacherToStudents, ...teacherToGuardians, ...teacherToAdmins];
+        break;
+        
+      case 'student':
+        // Studenten kunnen alleen berichten sturen naar docenten en admins
+        const studentToTeachers = await db.select({
+          id: teachers.id,
+          role: sql`'teacher'`.as('role'),
+          name: sql`CONCAT(${teachers.firstName}, ' ', ${teachers.lastName})`.as('name')
+        }).from(teachers);
+        
+        const studentToAdmins = await db.select({
+          id: users.id,
+          role: users.role,
+          name: sql`CONCAT(${users.firstName}, ' ', ${users.lastName})`.as('name')
+        }).from(users).where(eq(users.role, 'admin'));
+        
+        receivers = [...studentToTeachers, ...studentToAdmins];
+        break;
+        
+      case 'guardian':
+        // Voogden kunnen berichten sturen naar docenten, admins en hun eigen studenten
+        const guardianToTeachers = await db.select({
+          id: teachers.id,
+          role: sql`'teacher'`.as('role'),
+          name: sql`CONCAT(${teachers.firstName}, ' ', ${teachers.lastName})`.as('name')
+        }).from(teachers);
+        
+        const guardianToAdmins = await db.select({
+          id: users.id,
+          role: users.role,
+          name: sql`CONCAT(${users.firstName}, ' ', ${users.lastName})`.as('name')
+        }).from(users).where(eq(users.role, 'admin'));
+        
+        // Voeg alleen de studenten toe die aan deze voogd zijn gekoppeld
+        const guardianStudents = await db.select({
+          id: students.id,
+          role: sql`'student'`.as('role'),
+          name: sql`CONCAT(${students.firstName}, ' ', ${students.lastName})`.as('name')
+        })
+        .from(students)
+        .innerJoin(studentGuardians, eq(students.id, studentGuardians.studentId))
+        .where(eq(studentGuardians.guardianId, senderId));
+        
+        receivers = [...guardianToTeachers, ...guardianToAdmins, ...guardianStudents];
+        break;
+    }
+    
+    return receivers;
   }
 }
 

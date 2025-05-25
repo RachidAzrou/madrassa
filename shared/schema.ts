@@ -563,6 +563,49 @@ export const studentGuardiansRelations = relations(studentGuardians, ({ one }) =
 // Guardian relations
 export const guardiansRelations = relations(guardians, ({ many }) => ({
   studentGuardians: many(studentGuardians),
+  messages: many(messages, { relationName: "guardian_messages" }),
+}));
+
+// Messages
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  senderId: integer("sender_id").notNull(),
+  senderRole: text("sender_role").notNull(), // student, teacher, guardian, admin
+  receiverId: integer("receiver_id").notNull(),
+  receiverRole: text("receiver_role").notNull(), // student, teacher, guardian, admin
+  title: text("title"),
+  content: text("content").notNull(),
+  sentAt: timestamp("sent_at").defaultNow().notNull(),
+  isRead: boolean("is_read").default(false),
+  attachmentUrl: text("attachment_url"),
+  parentMessageId: integer("parent_message_id"), // Voor antwoorden/threads
+});
+
+export const insertMessageSchema = createInsertSchema(messages).omit({
+  id: true,
+  sentAt: true
+});
+
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type Message = typeof messages.$inferSelect;
+
+// Messages relations
+export const messagesRelations = relations(messages, ({ one }) => ({
+  sender: one(users, {
+    fields: [messages.senderId],
+    references: [users.id],
+    relationName: "message_sender"
+  }),
+  receiver: one(users, {
+    fields: [messages.receiverId],
+    references: [users.id],
+    relationName: "message_receiver"
+  }),
+  parentMessage: one(messages, {
+    fields: [messages.parentMessageId],
+    references: [messages.id],
+    relationName: "parent_message"
+  })
 }));
 
 // Teachers

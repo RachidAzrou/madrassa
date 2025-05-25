@@ -434,7 +434,7 @@ export default function Students() {
       <PremiumHeader 
         title="Studenten" 
         description="Beheer de studenten van je madrassa"
-        icon={<Users className="h-5 w-5 text-[#1e40af]" />}
+        icon={Users}
       />
       
       <DataTableContainer>

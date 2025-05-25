@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Users, User, Camera,
-  Fingerprint, ChevronRight, Edit, Trash2, Eye
+  Fingerprint, ChevronRight, Edit, Trash2, Eye, Home,
+  GraduationCap, NotebookText, MapPin
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -350,11 +351,11 @@ export default function Students() {
 
       {/* Create Student Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden">
-          <div className="bg-[#1e40af] py-5 px-6 flex items-center justify-between">
+        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden max-h-[90vh]">
+          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-2 rounded-full">
-                <User className="h-6 w-6 text-white" />
+                <User className="h-5 w-5 text-white" />
               </div>
               <div>
                 <DialogTitle className="text-white text-lg font-semibold m-0">Student Toevoegen</DialogTitle>
@@ -365,9 +366,9 @@ export default function Students() {
             </div>
           </div>
           
-          <form onSubmit={handleCreateStudent}>
-            <div className="px-6 py-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <form onSubmit={handleCreateStudent} className="overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
+            <div className="px-6 py-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-4 md:col-span-2">
                   <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                     <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
@@ -390,20 +391,17 @@ export default function Students() {
                         <div className="flex flex-col gap-2 justify-center items-end">
                           <button 
                             type="button" 
-                            className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors bg-[#8CD3AF] text-sm"
+                            className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors text-sm"
                           >
-                            <div className="bg-[#8CD3AF] rounded-sm px-1 text-white font-bold">
-                              <span className="text-black text-xs">be</span>
-                              <span className="text-white text-xs">ID</span>
-                            </div>
-                            <span className="text-xs font-medium text-gray-700">Identificeer met eID</span>
+                            <img src="/images/beid-logo.png" alt="eID" className="h-5" />
+                            <span className="text-xs font-medium text-gray-700">eID</span>
                           </button>
                           <button 
                             type="button" 
-                            className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-[#FF4D27] text-white hover:bg-[#e04423] transition-colors text-sm"
+                            className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
                           >
-                            <Fingerprint className="h-3 w-3" />
-                            <span className="text-xs font-medium">Identificeer met itsme</span>
+                            <img src="/images/itsme-logo.jpeg" alt="itsme" className="h-5" />
+                            <span className="text-xs font-medium">itsme</span>
                           </button>
                         </div>
                         <input
@@ -427,7 +425,7 @@ export default function Students() {
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
                         <Label htmlFor="studentId" className="text-xs font-medium text-gray-700">Student ID</Label>
                         <Input
@@ -523,10 +521,10 @@ export default function Students() {
                   
                   <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                     <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                      <ChevronRight className="h-4 w-4 mr-2" />
+                      <MapPin className="h-4 w-4 mr-2" />
                       Adresgegevens
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div className="md:col-span-2">
                         <Label htmlFor="street" className="text-xs font-medium text-gray-700">Straat</Label>
                         <Input
@@ -581,10 +579,10 @@ export default function Students() {
                 <div className="space-y-4">
                   <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                     <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                      <ChevronRight className="h-4 w-4 mr-2" />
+                      <GraduationCap className="h-4 w-4 mr-2" />
                       Onderwijsgegevens
                     </h3>
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <div>
                         <Label htmlFor="programId" className="text-xs font-medium text-gray-700">Programma *</Label>
                         <Select 
@@ -659,7 +657,7 @@ export default function Students() {
                   
                   <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                     <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                      <ChevronRight className="h-4 w-4 mr-2" />
+                      <NotebookText className="h-4 w-4 mr-2" />
                       Aantekeningen
                     </h3>
                     <div>
@@ -668,7 +666,7 @@ export default function Students() {
                         name="notes"
                         value={formData.notes}
                         onChange={handleInputChange}
-                        rows={6}
+                        rows={5}
                         className="resize-none"
                         placeholder="Voeg hier eventuele opmerkingen of aantekeningen toe..."
                       />
@@ -678,7 +676,7 @@ export default function Students() {
               </div>
             </div>
             
-            <div className="bg-gray-50 px-6 py-4 flex justify-end gap-2 border-t">
+            <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
               <Button 
                 type="button" 
                 variant="outline"

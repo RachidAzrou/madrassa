@@ -173,11 +173,7 @@ export default function Dashboard() {
               <h1 className="text-base font-medium text-gray-800 tracking-tight">Dashboard</h1>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-xs text-gray-500 font-medium flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-              Systeem actief
-            </div>
+          <div className="flex items-center">
             <div className="text-xs text-gray-500 font-medium">
               {format(new Date(), 'd MMMM yyyy', { locale: nl })}
             </div>

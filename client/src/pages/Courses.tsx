@@ -608,7 +608,7 @@ export default function Courses() {
                         <SelectValue placeholder="Selecteer programma" />
                       </SelectTrigger>
                       <SelectContent>
-                        {programsData.programs.map((program: ProgramType) => (
+                        {programsData?.programs?.map((program: ProgramType) => (
                           <SelectItem key={program.id} value={program.id.toString()} className="text-xs">
                             {program.name}
                           </SelectItem>

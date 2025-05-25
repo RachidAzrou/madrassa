@@ -164,53 +164,23 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         )}
       </div>
 
-      {/* LOKALEN BEHEER PROMINENTE KNOP - nu nog opvallender! */}
-      <div className="px-3 pt-4">
-        <Link 
-          href="/rooms"
-          className="bg-red-600 text-white font-bold rounded-md p-3 mb-4 flex items-center justify-center hover:bg-red-700 transition-colors border-2 border-black shadow-md"
-          onClick={() => {
-            if (onClose) onClose();
-          }}
-        >
-          <Building className="h-5 w-5 mr-2" />
-          <span>LOKALEN BEHEER</span>
-        </Link>
-      </div>
+
       
-      {/* Ingelogde gebruiker informatie - vast bovenaan */}
-      <div className="px-3 pb-2 border-b border-gray-100">
-        <div 
-          className="bg-blue-50 rounded-md p-3 mb-2 cursor-pointer hover:bg-blue-100 transition-colors"
-          onClick={() => {
-            window.location.href = "/mijn-account";
-            if (onClose) onClose();
-          }}
-        >
-          <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
-              <span className="font-semibold">{userData?.firstName?.[0] || ""}{userData?.lastName?.[0] || ""}</span>
-            </div>
-            <div>
-              <div className="font-medium">{userData?.firstName || ""} {userData?.lastName || ""}</div>
-              <div className="text-xs text-gray-500">{userData?.role || "Gebruiker"}</div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="mt-2 bg-gray-50 rounded-md overflow-hidden">
+      {/* Dashboard link */}
+      <div className="px-3 pt-3 pb-2 border-b border-gray-100">
+        <div className="bg-gray-50 rounded-md overflow-hidden">
           <Link href="/">
             <div
               onClick={handleLinkClick}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 text-sm transition-colors cursor-pointer",
+                "flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer",
                 location === "/"
                   ? "bg-primary/10 text-primary font-medium"
                   : "text-gray-700 hover:text-primary hover:bg-gray-100"
               )}
             >
               <div className="flex-shrink-0">
-                <LayoutDashboard className="h-5 w-5" />
+                <LayoutDashboard className="h-4 w-4" />
               </div>
               <span className="truncate whitespace-nowrap">Dashboard</span>
             </div>

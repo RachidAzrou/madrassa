@@ -2639,8 +2639,8 @@ export default function Students() {
                     (student.firstName?.toLowerCase().includes(siblingSearchTerm.toLowerCase()) || 
                      student.lastName?.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
                      student.studentId?.toLowerCase().includes(siblingSearchTerm.toLowerCase())) && 
-                    // Exclude already linked siblings
-                    !newStudentSiblings.some(s => s.id === student.id)
+                    // Exclude siblings that are currently selected in the form
+                    !selectedSiblings.some(s => s.id === student.id)
                   )
                   .map((student, index) => (
                     <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50">

@@ -426,7 +426,6 @@ export default function Students() {
                   <span className="text-xs font-medium text-gray-700">Status</span>
                 </ShadcnTableHead>
                 <ShadcnTableHead className="px-4 py-3 text-right w-[100px]">
-                  <span className="text-xs font-medium text-gray-700">Acties</span>
                 </ShadcnTableHead>
               </TableRow>
             </DataTableHeader>

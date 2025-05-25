@@ -362,8 +362,11 @@ export default function Rooms() {
       {/* Premium header component */}
       <PremiumHeader 
         title="Lokalen" 
-        path="Beheer > Lokalen" 
         icon={Building} 
+        breadcrumbs={{
+          parent: "Beheer",
+          current: "Lokalen"
+        }}
       />
 
       {/* Main content area */}

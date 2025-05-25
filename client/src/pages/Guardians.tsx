@@ -205,8 +205,11 @@ export default function Guardians() {
       {/* Premium header component */}
       <PremiumHeader 
         title="Voogden" 
-        path="Beheer > Voogden" 
-        icon={UserCheck} 
+        icon={UserCheck}
+        breadcrumbs={{
+          parent: "Beheer",
+          current: "Voogden"
+        }}
       />
 
       {/* Main content area */}

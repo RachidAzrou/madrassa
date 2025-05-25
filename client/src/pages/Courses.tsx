@@ -301,8 +301,11 @@ export default function Courses() {
       {/* Premium header component */}
       <PremiumHeader 
         title="Curriculum" 
-        path="Onderwijs > Curriculum" 
-        icon={BookOpen} 
+        icon={BookOpen}
+        breadcrumbs={{
+          parent: "Onderwijs",
+          current: "Curriculum"
+        }}
       />
 
       {/* Main content area */}

@@ -158,55 +158,103 @@ export default function Dashboard() {
   const navigateToGroups = () => setLocation('/student-groups');
 
   return (
-    <div className="p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
+    <div className="p-3 sm:p-5 md:p-6 space-y-5 sm:space-y-7">
       {/* Page Title */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
-          <div className="flex items-center gap-4 mb-2 md:mb-0">
-            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+      <div className="mb-6">
+        <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] rounded-lg shadow-md p-6 text-white">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
               <LayoutDashboard className="h-7 w-7" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-base text-gray-500 mt-1">Overzicht van de belangrijkste statistieken en activiteiten</p>
+              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Dashboard</h1>
+              <p className="text-blue-100 mt-1 font-medium">Overzicht van de belangrijkste statistieken en activiteiten</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
-        <div className="bg-[#1e3a8a] text-white rounded-xl shadow-lg p-4 sm:p-6 relative overflow-hidden group hover:bg-[#1e3a8a]/90 transition-all">
-          <div className="absolute right-0 top-0 opacity-20 group-hover:opacity-25 transition-opacity">
-            <Users className="h-24 sm:h-28 w-24 sm:w-28 text-white" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-7">
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-5 relative overflow-hidden group hover:border-[#1e40af]/30 hover:shadow-lg transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-500">Studenten</h3>
+            <div className="h-9 w-9 rounded-md bg-[#1e40af]/10 flex items-center justify-center">
+              <Users className="h-5 w-5 text-[#1e40af]" />
+            </div>
           </div>
-          <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Studenten</h3>
-          <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.totalStudents}</p>
+          <p className="text-3xl font-semibold tracking-tight text-gray-900">{stats.totalStudents}</p>
+          <div className="mt-2">
+            <Button 
+              variant="link" 
+              size="sm" 
+              className="text-xs text-[#1e40af] p-0 h-auto font-medium" 
+              onClick={navigateToStudents}
+            >
+              Details bekijken
+            </Button>
+          </div>
         </div>
         
-        <div className="bg-[#1e3a8a] text-white rounded-xl shadow-lg p-4 sm:p-6 relative overflow-hidden group hover:bg-[#1e3a8a]/90 transition-all">
-          <div className="absolute right-0 top-0 opacity-20 group-hover:opacity-25 transition-opacity">
-            <ChalkBoard className="h-24 sm:h-28 w-24 sm:w-28 text-white" />
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-5 relative overflow-hidden group hover:border-[#1e40af]/30 hover:shadow-lg transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-500">Klassen</h3>
+            <div className="h-9 w-9 rounded-md bg-[#1e40af]/10 flex items-center justify-center">
+              <ChalkBoard className="h-5 w-5 text-[#1e40af]" />
+            </div>
           </div>
-          <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Klassen</h3>
-          <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.studentGroups}</p>
+          <p className="text-3xl font-semibold tracking-tight text-gray-900">{stats.studentGroups}</p>
+          <div className="mt-2">
+            <Button 
+              variant="link" 
+              size="sm" 
+              className="text-xs text-[#1e40af] p-0 h-auto font-medium" 
+              onClick={navigateToGroups}
+            >
+              Details bekijken
+            </Button>
+          </div>
         </div>
         
-        <div className="bg-[#1e3a8a] text-white rounded-xl shadow-lg p-4 sm:p-6 relative overflow-hidden group hover:bg-[#1e3a8a]/90 transition-all">
-          <div className="absolute right-0 top-0 opacity-20 group-hover:opacity-25 transition-opacity">
-            <GraduationCap className="h-24 sm:h-28 w-24 sm:w-28 text-white" />
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-5 relative overflow-hidden group hover:border-[#1e40af]/30 hover:shadow-lg transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-500">Docenten</h3>
+            <div className="h-9 w-9 rounded-md bg-[#1e40af]/10 flex items-center justify-center">
+              <GraduationCap className="h-5 w-5 text-[#1e40af]" />
+            </div>
           </div>
-          <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Docenten</h3>
-          <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.totalTeachers}</p>
+          <p className="text-3xl font-semibold tracking-tight text-gray-900">{stats.totalTeachers}</p>
+          <div className="mt-2">
+            <Button 
+              variant="link" 
+              size="sm" 
+              className="text-xs text-[#1e40af] p-0 h-auto font-medium" 
+              onClick={navigateToTeachers}
+            >
+              Details bekijken
+            </Button>
+          </div>
         </div>
         
         {/* Vakken widget */}
-        <div className="bg-[#1e3a8a] text-white rounded-xl shadow-lg p-4 sm:p-6 relative overflow-hidden group hover:bg-[#1e3a8a]/90 transition-all">
-          <div className="absolute right-0 top-0 opacity-20 group-hover:opacity-25 transition-opacity">
-            <BookOpen className="h-24 sm:h-28 w-24 sm:w-28 text-white" />
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-5 relative overflow-hidden group hover:border-[#1e40af]/30 hover:shadow-lg transition-all">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-500">Vakken</h3>
+            <div className="h-9 w-9 rounded-md bg-[#1e40af]/10 flex items-center justify-center">
+              <BookOpen className="h-5 w-5 text-[#1e40af]" />
+            </div>
           </div>
-          <h3 className="text-sm sm:text-base font-medium text-white/80 mb-2">Vakken</h3>
-          <p className="text-3xl sm:text-4xl font-bold tracking-tight">{stats.activeCourses}</p>
+          <p className="text-3xl font-semibold tracking-tight text-gray-900">{stats.activeCourses}</p>
+          <div className="mt-2">
+            <Button 
+              variant="link" 
+              size="sm" 
+              className="text-xs text-[#1e40af] p-0 h-auto font-medium" 
+              onClick={navigateToCourses}
+            >
+              Details bekijken
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -216,38 +264,56 @@ export default function Dashboard() {
 
       {/* Main Content */}
 
-      <div className="grid grid-cols-1 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Studenten per klas grafiek */}
-        <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 gap-2">
-            <div className="flex items-center gap-2">
-              <ChalkBoard className="h-4 w-4 sm:h-5 sm:w-5 text-[#1e3a8a]" />
-              <h3 className="text-base sm:text-lg font-semibold text-gray-800">Studenten per klas</h3>
+        <div className="bg-white rounded-lg shadow-md border border-gray-200">
+          <div className="flex items-center justify-between p-5 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-md bg-[#1e40af]/10 flex items-center justify-center">
+                <ChalkBoard className="h-4 w-4 text-[#1e40af]" />
+              </div>
+              <h3 className="text-base font-semibold text-gray-800">Studenten per klas</h3>
             </div>
           </div>
           
           {/* Studentengroepen data visualisatie - Horizontale staafdiagram */}
           {isGroupsLoading || isEnrollmentsLoading || isStatsLoading ? (
-            <div className="h-48 flex items-center justify-center">
-              <div className="w-6 h-6 sm:w-8 sm:h-8 border-3 sm:border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div className="h-64 flex items-center justify-center">
+              <div className="w-8 h-8 border-3 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : stats.totalStudents === 0 ? (
-            <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-              <div className="text-[#1e3a8a] mb-2">
-                <Users className="h-12 w-12 mx-auto opacity-30" />
+            <div className="h-64 flex flex-col items-center justify-center p-6">
+              <div className="p-4 rounded-full bg-gray-50 text-[#1e40af] mb-3">
+                <Users className="h-10 w-10 opacity-60" />
               </div>
-              <p className="text-sm font-medium">Geen studenten beschikbaar</p>
+              <p className="text-sm font-medium text-gray-500">Geen studenten beschikbaar</p>
+              <Button 
+                variant="link" 
+                size="sm" 
+                className="text-xs text-[#1e40af] mt-2 font-medium" 
+                onClick={navigateToStudents}
+              >
+                Voeg studenten toe
+              </Button>
             </div>
           ) : (studentGroupsData as any[]).length === 0 ? (
-            <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-              <div className="text-[#1e3a8a] mb-2">
-                <ChalkBoard className="h-12 w-12 mx-auto opacity-30" />
+            <div className="h-64 flex flex-col items-center justify-center p-6">
+              <div className="p-4 rounded-full bg-gray-50 text-[#1e40af] mb-3">
+                <ChalkBoard className="h-10 w-10 opacity-60" />
               </div>
-              <p className="text-sm font-medium">Geen klassen beschikbaar</p>
+              <p className="text-sm font-medium text-gray-500">Geen klassen beschikbaar</p>
+              <Button 
+                variant="link" 
+                size="sm" 
+                className="text-xs text-[#1e40af] mt-2 font-medium" 
+                onClick={navigateToGroups}
+              >
+                Maak een klas aan
+              </Button>
             </div>
           ) : (
-            <div className="p-4">
-              <div className="grid grid-cols-12 mb-2">
+            <div className="p-5">
+              <div className="grid grid-cols-12 mb-3 px-1">
                 <div className="col-span-3 text-xs text-gray-500 font-medium">Klas</div>
                 <div className="col-span-7 text-xs text-gray-500 font-medium">Bezetting</div>
                 <div className="col-span-2 text-xs text-gray-500 font-medium text-right">Aantal</div>
@@ -255,18 +321,18 @@ export default function Dashboard() {
 
               <div className="space-y-4">
                 {chartData.map((item, index) => {
-                  // Kies kleur op basis van vulgraad - gebruik de app kleuren
+                  // Gebruik de huisstijl kleuren
                   const barColor = item.percentageFilled < 0.5 
-                    ? 'bg-sky-400' // lichtblauw voor weinig bezette klassen
+                    ? 'bg-blue-400' 
                     : item.percentageFilled < 0.75 
-                      ? 'bg-sky-500' // medium blauw voor gemiddeld bezette klassen 
-                      : 'bg-blue-700'; // donkerblauw voor volle klassen
+                      ? 'bg-[#1e3a8a]' 
+                      : 'bg-[#1e40af]';
                       
                   const textColor = item.percentageFilled < 0.5 
-                    ? 'text-sky-500' // lichtblauw
+                    ? 'text-blue-500'
                     : item.percentageFilled < 0.75 
-                      ? 'text-sky-600' // medium blauw
-                      : 'text-blue-800'; // donkerblauw
+                      ? 'text-[#1e3a8a]'
+                      : 'text-[#1e40af]';
                   
                   // Bereken breedte voor de balk
                   const barWidth = `${Math.max(5, Math.min(100, item.percentageFilled * 100))}%`;
@@ -280,10 +346,10 @@ export default function Dashboard() {
                         </div>
                         
                         {/* Staafdiagram */}
-                        <div className="col-span-7 h-8 bg-gray-100 rounded-lg relative overflow-hidden">
+                        <div className="col-span-7 h-8 bg-gray-100 rounded-md relative overflow-hidden">
                           {/* Voortgangsbalk */}
                           <div 
-                            className={`h-full ${barColor} transition-all duration-1000 ease-out shadow-sm rounded-l-lg flex items-center justify-end px-2`}
+                            className={`h-full ${barColor} transition-all duration-700 ease-out shadow-sm rounded-l-md flex items-center justify-end px-2`}
                             style={{ width: barWidth }}
                           >
                             {item.percentageFilled > 0.25 && (
@@ -294,7 +360,7 @@ export default function Dashboard() {
                           </div>
 
                           {/* Info popup on hover */}
-                          <div className="opacity-0 group-hover:opacity-100 absolute -top-9 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap transition-opacity z-10">
+                          <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap transition-opacity z-10">
                             {item.count} van {item.maxCapacity} plekken bezet
                           </div>
                         </div>
@@ -310,17 +376,17 @@ export default function Dashboard() {
               </div>
               
               {/* Legenda */}
-              <div className="flex justify-end mt-4 text-xs text-gray-500 gap-3">
+              <div className="flex justify-end mt-5 text-xs text-gray-500 gap-3 border-t border-gray-100 pt-3">
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-sky-400 rounded-sm mr-1"></div>
+                  <div className="w-3 h-3 bg-blue-400 rounded-sm mr-1"></div>
                   <span>&lt;50%</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-sky-500 rounded-sm mr-1"></div>
+                  <div className="w-3 h-3 bg-[#1e3a8a] rounded-sm mr-1"></div>
                   <span>50-75%</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-3 h-3 bg-blue-700 rounded-sm mr-1"></div>
+                  <div className="w-3 h-3 bg-[#1e40af] rounded-sm mr-1"></div>
                   <span>&gt;75%</span>
                 </div>
               </div>
@@ -329,52 +395,66 @@ export default function Dashboard() {
         </div>
         
         {/* Lesrooster voor deze week */}
-        <div className="bg-gradient-to-br from-white to-sky-50/30 rounded-xl shadow-md border border-sky-200 p-3 sm:p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-[#1e3a8a]" />
-              <h3 className="text-base sm:text-lg font-semibold text-gray-800">Lesrooster deze week</h3>
+        <div className="bg-white rounded-lg shadow-md border border-gray-200">
+          <div className="flex items-center justify-between p-5 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-md bg-[#1e40af]/10 flex items-center justify-center">
+                <Calendar className="h-4 w-4 text-[#1e40af]" />
+              </div>
+              <h3 className="text-base font-semibold text-gray-800">Lesrooster deze week</h3>
             </div>
             <Button 
               variant="outline" 
               size="sm" 
-              className="text-xs sm:text-sm text-[#1e3a8a] hover:text-blue-700"
+              className="text-xs text-gray-700 hover:text-[#1e40af] hover:border-[#1e40af]"
               onClick={navigateToCalendar}
             >
-              Volledig rooster bekijken
+              Volledig rooster
             </Button>
           </div>
           
           {isLessonsLoading ? (
-            <div className="h-32 sm:h-48 flex items-center justify-center">
-              <div className="w-6 h-6 sm:w-8 sm:h-8 border-3 sm:border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div className="h-64 flex items-center justify-center">
+              <div className="w-8 h-8 border-3 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
+            <div>
               {currentWeekLessons.length === 0 ? (
-                <div className="h-32 flex flex-col items-center justify-center text-gray-500">
-                  <div className="text-[#1e3a8a] mb-2">
-                    <Calendar className="h-12 w-12 mx-auto opacity-30" />
+                <div className="h-64 flex flex-col items-center justify-center p-6">
+                  <div className="p-4 rounded-full bg-gray-50 text-[#1e40af] mb-3">
+                    <Calendar className="h-10 w-10 opacity-60" />
                   </div>
-                  <p className="text-sm font-medium">Geen lessen gepland voor deze week</p>
+                  <p className="text-sm font-medium text-gray-500">Geen lessen gepland voor deze week</p>
+                  <Button 
+                    variant="link" 
+                    size="sm" 
+                    className="text-xs text-[#1e40af] mt-2 font-medium" 
+                    onClick={navigateToCalendar}
+                  >
+                    Ga naar roosterplanning
+                  </Button>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="divide-y divide-gray-100">
                   {currentWeekLessons.slice(0, 5).map((lesson, index) => (
                     <div 
                       key={index} 
-                      className="p-3 sm:p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-200 transition-colors"
+                      className="p-4 hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <h4 className="font-medium text-gray-700">{lesson.title}</h4>
-                          <p className="text-xs sm:text-sm text-gray-500 mt-1">{lesson.courseName}</p>
+                          <h4 className="font-medium text-gray-800">{lesson.title}</h4>
+                          <p className="text-sm text-gray-500 mt-1">{lesson.courseName}</p>
                         </div>
                         <div className="text-right">
-                          <div className="text-xs sm:text-sm font-medium text-gray-700">
+                          <div className="text-sm font-medium text-[#1e40af]">
                             {lesson.date && format(parseISO(lesson.date), 'EEEE d MMMM', { locale: nl })}
                           </div>
-                          <div className="text-xs text-gray-500 mt-0.5">
+                          <div className="text-xs text-gray-500 mt-0.5 flex items-center justify-end gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="10" />
+                              <polyline points="12 6 12 12 16 14" />
+                            </svg>
                             {lesson.startTime} - {lesson.endTime}
                           </div>
                         </div>
@@ -383,10 +463,10 @@ export default function Dashboard() {
                   ))}
                   
                   {currentWeekLessons.length > 5 && (
-                    <div className="text-center mt-2">
+                    <div className="p-3 text-center">
                       <Button 
                         variant="link" 
-                        className="text-xs sm:text-sm text-[#1e3a8a]"
+                        className="text-xs text-[#1e40af] font-medium"
                         onClick={navigateToCalendar}
                       >
                         {currentWeekLessons.length - 5} meer lessen bekijken

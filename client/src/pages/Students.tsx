@@ -502,6 +502,7 @@ export default function Students() {
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#e5e7eb]">
                   <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle schooljaren</SelectItem>
+                  <SelectItem value="2025-2026" className="focus:bg-blue-200 hover:bg-blue-100">2025-2026</SelectItem>
                   <SelectItem value="2024-2025" className="focus:bg-blue-200 hover:bg-blue-100">2024-2025</SelectItem>
                   <SelectItem value="2023-2024" className="focus:bg-blue-200 hover:bg-blue-100">2023-2024</SelectItem>
                   <SelectItem value="2022-2023" className="focus:bg-blue-200 hover:bg-blue-100">2022-2023</SelectItem>
@@ -852,13 +853,14 @@ export default function Students() {
                       </div>
                       
                       <div>
-                        <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">Geboortedatum</Label>
+                        <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">Geboortedatum *</Label>
                         <Input
                           id="dateOfBirth"
                           name="dateOfBirth"
                           type="date"
                           value={formData.dateOfBirth || ''}
                           onChange={handleInputChange}
+                          required
                           className="mt-1 h-9"
                         />
                       </div>
@@ -872,48 +874,52 @@ export default function Students() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div className="md:col-span-2">
-                        <Label htmlFor="street" className="text-xs font-medium text-gray-700">Straat</Label>
+                        <Label htmlFor="street" className="text-xs font-medium text-gray-700">Straat *</Label>
                         <Input
                           id="street"
                           name="street"
                           value={formData.street}
                           onChange={handleInputChange}
+                          required
                           className="mt-1 h-9"
                           placeholder="Straat"
                         />
                       </div>
                       
                       <div>
-                        <Label htmlFor="houseNumber" className="text-xs font-medium text-gray-700">Huisnummer</Label>
+                        <Label htmlFor="houseNumber" className="text-xs font-medium text-gray-700">Huisnummer *</Label>
                         <Input
                           id="houseNumber"
                           name="houseNumber"
                           value={formData.houseNumber}
                           onChange={handleInputChange}
+                          required
                           className="mt-1 h-9"
                           placeholder="Nr."
                         />
                       </div>
                       
                       <div>
-                        <Label htmlFor="postalCode" className="text-xs font-medium text-gray-700">Postcode</Label>
+                        <Label htmlFor="postalCode" className="text-xs font-medium text-gray-700">Postcode *</Label>
                         <Input
                           id="postalCode"
                           name="postalCode"
                           value={formData.postalCode}
                           onChange={handleInputChange}
+                          required
                           className="mt-1 h-9"
                           placeholder="Postcode"
                         />
                       </div>
                       
                       <div className="md:col-span-2">
-                        <Label htmlFor="city" className="text-xs font-medium text-gray-700">Plaats</Label>
+                        <Label htmlFor="city" className="text-xs font-medium text-gray-700">Plaats *</Label>
                         <Input
                           id="city"
                           name="city"
                           value={formData.city}
                           onChange={handleInputChange}
+                          required
                           className="mt-1 h-9"
                           placeholder="Plaats"
                         />

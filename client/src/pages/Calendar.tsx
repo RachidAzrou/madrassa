@@ -421,17 +421,26 @@ export default function Calendar() {
             
             {/* View toggles and actions */}
             <div className="flex items-center gap-2">
-              <Tabs 
-                value={viewMode} 
-                onValueChange={(value) => setViewMode(value as 'month' | 'day' | 'list')}
-                className="h-7"
-              >
-                <TabsList className="h-7 bg-[#f9fafc] p-0.5">
-                  <TabsTrigger value="month" className="text-xs h-6 px-3 data-[state=active]:bg-white">Maand</TabsTrigger>
-                  <TabsTrigger value="day" className="text-xs h-6 px-3 data-[state=active]:bg-white">Dag</TabsTrigger>
-                  <TabsTrigger value="list" className="text-xs h-6 px-3 data-[state=active]:bg-white">Lijst</TabsTrigger>
-                </TabsList>
-              </Tabs>
+              <div className="h-7 bg-[#f9fafc] p-0.5 rounded-md flex items-center">
+                <button 
+                  onClick={() => setViewMode('month')}
+                  className={`text-xs h-6 px-3 rounded-sm ${viewMode === 'month' ? 'bg-white' : ''}`}
+                >
+                  Maand
+                </button>
+                <button 
+                  onClick={() => setViewMode('day')}
+                  className={`text-xs h-6 px-3 rounded-sm ${viewMode === 'day' ? 'bg-white' : ''}`}
+                >
+                  Dag
+                </button>
+                <button 
+                  onClick={() => setViewMode('list')}
+                  className={`text-xs h-6 px-3 rounded-sm ${viewMode === 'list' ? 'bg-white' : ''}`}
+                >
+                  Lijst
+                </button>
+              </div>
               
               <Button
                 variant="outline"

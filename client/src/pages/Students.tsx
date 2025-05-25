@@ -436,7 +436,7 @@ export default function Students() {
                           id="studentId"
                           name="studentId"
                           value={formData.academicYear ? 
-                            `ST${formData.academicYear.split('-')[0]}001` : 
+                            `ST${formData.academicYear.substring(2, 4)}001` : 
                             nextStudentId}
                           disabled
                           className="mt-1 h-9 bg-gray-50 text-gray-500"

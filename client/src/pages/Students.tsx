@@ -313,43 +313,14 @@ export default function Students() {
     }, 2000);
   };
 
-  // Dummy data for testing
-  const students = [
-    {
-      id: 1,
-      studentId: "STU-001",
-      firstName: "Sarah",
-      lastName: "Johnson",
-      email: "sarah.j@example.com",
-      phone: "0123456789",
-      programId: 1,
-      programName: "Computer Science",
-      status: "active",
-      photoUrl: ""
-    },
-    {
-      id: 2,
-      studentId: "STU-002",
-      firstName: "Michael",
-      lastName: "Brown",
-      email: "michael.b@example.com",
-      phone: "0123456789",
-      programId: 2,
-      programName: "Business Administration",
-      status: "active",
-      photoUrl: ""
-    }
-  ];
+  // Gebruik echte data van de API
+  const students = studentsData;
 
-  const programs = [
-    { id: 1, name: "Computer Science" },
-    { id: 2, name: "Business Administration" }
-  ];
+  // Gebruik echte programma's data van de API
+  const programs = programsData || [];
 
-  const studentGroups = [
-    { id: 1, name: "Group A" },
-    { id: 2, name: "Group B" }
-  ];
+  // Gebruik echte studentgroepen data van de API
+  const studentGroups = studentGroupsData || [];
 
   return (
     <div className="bg-[#f7f9fc] min-h-screen">

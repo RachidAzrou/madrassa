@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
 import { Switch } from "@/components/ui/switch";
+import { PremiumHeader } from '@/components/layout/premium-header';
 import { 
   Card, 
   CardContent, 
@@ -365,251 +366,226 @@ export default function Calendar() {
   const calendarDays = generateCalendarDays();
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* Page header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
-          <div className="flex items-center gap-4 mb-2 md:mb-0">
-            <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
-              <CalendarIcon className="h-7 w-7" />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Kalender</h1>
-              <p className="text-base text-gray-500 mt-1">Beheer academische evenementen en schoolactiviteiten</p>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Premium header component */}
+      <PremiumHeader 
+        title="Kalender" 
+        path="Onderwijs > Kalender" 
+        icon={CalendarIcon} 
+      />
       
-      {/* Zoekbalk - onder de paginatitel geplaatst */}
-      <div className="mb-4">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            type="search"
-            placeholder="Zoek evenementen..."
-            className="pl-8 bg-white"
-            value={searchTerm || ""}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          {searchTerm && (
-            <XCircle
-              className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
-              onClick={() => setSearchTerm("")}
+      <div className="px-6 py-6 flex-1 space-y-6">
+        {/* Zoekbalk - onder de paginatitel geplaatst */}
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="search"
+              placeholder="Zoek evenementen..."
+              className="pl-8 bg-white"
+              value={searchTerm || ""}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-          )}
+            {searchTerm && (
+              <XCircle
+                className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
+                onClick={() => setSearchTerm("")}
+              />
+            )}
+          </div>
         </div>
-      </div>
-      
-      {/* Controls and filters - onder de zoekbalk */}
-      <div className="flex flex-col gap-4 mb-4">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <div className="flex border rounded-md overflow-hidden">
-              <button 
-                onClick={() => setView('month')}
-                className={`px-4 py-2 text-sm font-medium ${view === 'month' 
-                  ? 'bg-[#1e40af] text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+        
+        {/* Controls and filters - onder de zoekbalk */}
+        <div className="flex flex-col gap-4 mb-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <div className="flex border rounded-md overflow-hidden">
+                <button 
+                  onClick={() => setView('month')}
+                  className={`px-4 py-2 text-sm font-medium ${view === 'month' 
+                    ? 'bg-[#1e40af] text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                >
+                  Maand
+                </button>
+                <button 
+                  onClick={() => setView('week')}
+                  className={`px-4 py-2 text-sm font-medium ${view === 'week' 
+                    ? 'bg-[#1e40af] text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                >
+                  Week
+                </button>
+                <button 
+                  onClick={() => setView('day')}
+                  className={`px-4 py-2 text-sm font-medium ${view === 'day' 
+                    ? 'bg-[#1e40af] text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                >
+                  Dag
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3 flex-wrap gap-3">
+              <Select value={filter} onValueChange={handleFilterChange}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Filter Evenementen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle Evenementen</SelectItem>
+                  <SelectItem value="exam">Examens</SelectItem>
+                  <SelectItem value="class">Lessen</SelectItem>
+                  <SelectItem value="holiday">Vakanties</SelectItem>
+                  <SelectItem value="event">Activiteiten</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button 
+                onClick={handleAddEvent}
+                variant="default"
+                size="default"
+                className="bg-[#1e40af] hover:bg-[#1e40af]/90 flex items-center"
               >
-                Maand
-              </button>
-              <button 
-                onClick={() => setView('week')}
-                className={`px-4 py-2 text-sm font-medium ${view === 'week' 
-                  ? 'bg-[#1e40af] text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-50'}`}
-              >
-                Week
-              </button>
-              <button 
-                onClick={() => setView('day')}
-                className={`px-4 py-2 text-sm font-medium ${view === 'day' 
-                  ? 'bg-[#1e40af] text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-50'}`}
-              >
-                Dag
-              </button>
+                <Plus className="mr-2 h-4 w-4" />
+                <span>Evenement Toevoegen</span>
+              </Button>
             </div>
           </div>
-          <div className="flex items-center space-x-3 flex-wrap gap-3">
-            <Select value={filter} onValueChange={handleFilterChange}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Filter Evenementen" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Evenementen</SelectItem>
-                <SelectItem value="exam">Examens</SelectItem>
-                <SelectItem value="class">Lessen</SelectItem>
-                <SelectItem value="holiday">Vakanties</SelectItem>
-                <SelectItem value="event">Activiteiten</SelectItem>
-              </SelectContent>
-            </Select>
+         
+          {/* Calendar navigation header */}
+          <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md border border-gray-200">
             <Button 
-              onClick={handleAddEvent}
-              variant="default"
-              size="default"
-              className="bg-[#1e40af] hover:bg-[#1e40af]/90 flex items-center"
+              variant="outline" 
+              size="sm" 
+              onClick={navigatePrevious}
+              className="border-0 bg-white shadow-sm"
             >
-              <Plus className="mr-2 h-4 w-4" />
-              <span>Evenement Toevoegen</span>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <h2 className="text-base font-medium text-gray-800">
+              {view === 'month' 
+                ? `${month} ${year}` 
+                : view === 'week'
+                  ? `Week van ${formatDate(currentDate)} - ${formatDate(new Date(currentDate.getTime() + 6 * 24 * 60 * 60 * 1000))}`
+                  : formatDayDate(currentDate)
+              }
+            </h2>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={navigateNext}
+              className="border-0 bg-white shadow-sm"
+            >
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
-       
-        {/* Calendar navigation header */}
-        <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md border border-gray-200">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={navigatePrevious}
-            className="border-0 bg-white shadow-sm"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            <span className="ml-1">Vorige</span>
-          </Button>
-          
-          <h2 className="text-lg font-semibold">
-            {view === 'month' ? `${month} ${year}` : 
-             view === 'week' ? `Week van ${formatDate(currentDate)}` : 
-             formatDayDate(currentDate)}
-          </h2>
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={navigateNext}
-            className="border-0 bg-white shadow-sm"
-          >
-            <span className="mr-1">Volgende</span>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-      
-      {/* Calendar body - conditionally render based on view */}
-      {view === 'month' && (
-        <div className="rounded-lg overflow-hidden border border-gray-200">
-          {/* Day labels */}
-          <div className="grid grid-cols-7 bg-gray-100">
-            {["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"].map((day, i) => (
-              <div key={i} className="py-2 px-3 text-sm font-medium text-gray-700 text-center">
-                {day}
-              </div>
-            ))}
-          </div>
-          
-          {/* Calendar days grid */}
-          <div className="grid grid-cols-7 auto-rows-fr bg-white">
-            {calendarDays.map((day, index) => (
-              <div 
-                key={index} 
-                className={`
-                  min-h-[100px] p-1 border-t border-l
-                  ${day.isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'} 
-                  ${day.isToday ? 'ring-2 ring-inset ring-[#1e40af]' : ''}
-                  ${index % 7 === 6 ? 'border-r' : ''}
-                  ${index >= calendarDays.length - 7 ? 'border-b' : ''}
-                `}
-              >
-                <div className="flex flex-col h-full">
-                  <div className="flex justify-between items-center">
-                    <span className={`text-sm font-medium p-1 ${day.isToday ? 'bg-[#1e40af] text-white rounded-full w-6 h-6 flex items-center justify-center' : ''}`}>
-                      {day.day}
-                    </span>
+        
+        {/* Calendar view */}
+        <div className="bg-white rounded-sm shadow-sm border border-gray-200">
+          {/* Month View */}
+          {view === 'month' && (
+            <div className="grid grid-cols-7 divide-x divide-y divide-gray-200">
+              {/* Weekdays header */}
+              {['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag'].map((day, index) => (
+                <div key={index} className="py-2 text-center font-medium text-xs text-gray-500 bg-gray-50">
+                  {day}
+                </div>
+              ))}
+              
+              {/* Calendar days */}
+              {calendarDays.map((day, index) => (
+                <div 
+                  key={index} 
+                  className={`p-2 h-32 sm:h-40 overflow-y-auto ${
+                    day.isCurrentMonth ? 'bg-white' : 'bg-gray-50'
+                  } ${day.isToday ? 'border-t-2 border-[#1e40af]' : ''}`}
+                >
+                  <div className="text-xs text-gray-500 mb-1">
+                    {day.day}
                   </div>
                   
                   {/* Events for this day */}
-                  <div className="flex-grow overflow-y-auto space-y-1 mt-1">
-                    {day.events.slice(0, 3).map((event, idx) => {
+                  <div className="space-y-1">
+                    {day.events.map((event, idx) => {
                       const colors = getEventColors(event.type);
                       return (
                         <div 
                           key={idx} 
-                          className="text-xs rounded px-1 py-0.5 truncate"
+                          className="px-1.5 py-0.5 text-xs font-medium truncate rounded-sm flex items-center"
                           style={{ 
                             backgroundColor: colors.bgColor,
                             borderLeft: `2px solid ${colors.borderColor}`
                           }}
                         >
-                          {event.title}
+                          <span className="truncate">{event.title}</span>
                         </div>
                       );
                     })}
-                    
-                    {/* If there are more events than we can display */}
-                    {day.events.length > 3 && (
-                      <div className="text-xs text-gray-500 pl-1">
-                        +{day.events.length - 3} meer
-                      </div>
-                    )}
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {view === 'week' && (
-        <div className="rounded-lg overflow-hidden border border-gray-200">
-          <div className="grid grid-cols-8 bg-white">
-            {/* Time slots column */}
-            <div className="border-r">
-              <div className="h-12 border-b"></div>
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="h-16 border-b relative">
-                  <span className="absolute -top-3 left-2 text-xs text-gray-500">
-                    {`${i + 8}:00`}
-                  </span>
                 </div>
               ))}
             </div>
-            
-            {/* Days columns */}
-            {Array.from({ length: 7 }).map((_, dayIndex) => {
-              const dayDate = new Date(currentDate);
-              dayDate.setDate(currentDate.getDate() - currentDate.getDay() + dayIndex + 1);
-              const dayEvents = events.filter(event => 
-                event.date.startsWith(dayDate.toISOString().split('T')[0])
-              );
-              
-              const isToday = new Date().toDateString() === dayDate.toDateString();
-              
-              return (
-                <div key={dayIndex} className="border-r last:border-r-0">
-                  {/* Day header */}
-                  <div className={`h-12 p-2 border-b text-center ${isToday ? 'bg-blue-50' : ''}`}>
-                    <div className="text-sm font-medium">
-                      {dayDate.toLocaleDateString('nl-NL', { weekday: 'short' })}
+          )}
+          
+          {/* Week View */}
+          {view === 'week' && (
+            <div className="divide-y divide-gray-200">
+              {/* Time slots for each day */}
+              <div className="grid grid-cols-8 divide-x divide-gray-200">
+                {/* Empty header for time column */}
+                <div className="py-2 text-center font-medium text-xs text-gray-500 bg-gray-50">
+                  Uur
+                </div>
+                
+                {/* Headers for days of the week */}
+                {Array.from({ length: 7 }, (_, i) => {
+                  const day = new Date(currentDate);
+                  day.setDate(day.getDate() + i);
+                  return (
+                    <div key={i} className="py-2 text-center font-medium text-xs text-gray-500 bg-gray-50">
+                      {day.toLocaleDateString('nl-NL', { weekday: 'short' })} {day.getDate()}
                     </div>
-                    <div className={`text-sm ${isToday ? 'text-[#1e40af] font-semibold' : ''}`}>
-                      {dayDate.getDate()}
-                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Time slots */}
+              {Array.from({ length: 14 }, (_, i) => i + 8).map(hour => (
+                <div key={hour} className="grid grid-cols-8 divide-x divide-gray-200">
+                  {/* Time column */}
+                  <div className="py-2 text-center text-xs text-gray-500 bg-gray-50">
+                    {hour}:00
                   </div>
                   
-                  {/* Time slots */}
-                  {Array.from({ length: 12 }).map((_, timeIndex) => {
-                    const hourEvents = dayEvents.filter(event => {
-                      const eventHour = parseInt(event.startTime.split(':')[0]);
-                      return eventHour === timeIndex + 8;
+                  {/* Event cells for each day at this hour */}
+                  {Array.from({ length: 7 }, (_, i) => {
+                    const day = new Date(currentDate);
+                    day.setDate(day.getDate() + i);
+                    const dateStr = day.toISOString().split('T')[0];
+                    const hourEvents = events.filter(event => {
+                      return event.date === dateStr && 
+                             parseInt(event.startTime.split(':')[0]) <= hour && 
+                             parseInt(event.endTime.split(':')[0]) > hour;
                     });
                     
                     return (
-                      <div key={timeIndex} className="h-16 border-b relative p-1">
+                      <div key={i} className="min-h-[3rem] relative">
                         {hourEvents.map((event, idx) => {
                           const colors = getEventColors(event.type);
                           return (
                             <div 
                               key={idx} 
-                              className="text-xs rounded p-1 truncate mb-1 text-gray-800"
+                              className="absolute top-0 left-0 right-0 mx-1 my-0.5 px-1 py-0.5 text-xs font-medium rounded-sm overflow-hidden"
                               style={{ 
                                 backgroundColor: colors.bgColor,
-                                borderLeft: `2px solid ${colors.borderColor}`
+                                borderLeft: `2px solid ${colors.borderColor}`,
+                                zIndex: idx + 1
                               }}
                             >
-                              <div className="font-medium">{event.title}</div>
-                              <div className="text-xs opacity-75">{event.startTime} - {event.endTime}</div>
+                              <div className="truncate">{event.title}</div>
+                              <div className="truncate text-[10px] text-gray-600">
+                                {event.startTime} - {event.endTime}
+                              </div>
                             </div>
                           );
                         })}
@@ -617,204 +593,227 @@ export default function Calendar() {
                     );
                   })}
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-      
-      {view === 'day' && (
-        <div className="rounded-lg overflow-hidden border border-gray-200">
-          <div className="p-4 bg-gray-50 border-b text-center">
-            <h3 className="text-lg font-semibold">{formatDayDate(currentDate)}</h3>
-          </div>
+              ))}
+            </div>
+          )}
           
-          <div className="grid grid-cols-[80px_1fr] bg-white">
-            {/* Time slots */}
-            {Array.from({ length: 14 }).map((_, i) => {
-              const hour = i + 7; // Start at 7 AM
-              const hourStr = `${hour}:00`;
+          {/* Day View */}
+          {view === 'day' && (
+            <div className="divide-y divide-gray-200">
+              <div className="py-2 text-center font-medium text-sm text-gray-700 bg-gray-50">
+                {formatDayDate(currentDate)}
+              </div>
               
-              // Find events that start during this hour
-              const hourEvents = events.filter(event => {
-                const eventDate = event.date;
-                const eventHour = parseInt(event.startTime.split(':')[0]);
-                return eventDate.startsWith(currentDate.toISOString().split('T')[0]) && eventHour === hour;
-              });
-              
-              return (
-                <React.Fragment key={i}>
-                  <div className="p-2 border-b border-r text-xs text-gray-500 text-right">
-                    {hourStr}
-                  </div>
-                  <div className="p-1 border-b relative">
-                    {hourEvents.map((event, idx) => {
-                      const colors = getEventColors(event.type);
-                      return (
-                        <div 
-                          key={idx} 
-                          className="text-sm rounded-sm p-2 mb-1"
-                          style={{ 
-                            backgroundColor: colors.bgColor,
-                            borderLeft: `3px solid ${colors.borderColor}`
-                          }}
-                        >
-                          <div className="font-medium">{event.title}</div>
-                          <div className="text-xs flex items-center mt-1">
-                            <Clock className="h-3 w-3 mr-1" /> 
-                            {event.startTime} - {event.endTime}
-                          </div>
-                          {event.location && (
-                            <div className="text-xs flex items-center mt-1">
-                              <MapPin className="h-3 w-3 mr-1" /> 
-                              {event.location}
+              {/* Time slots */}
+              {Array.from({ length: 14 }, (_, i) => i + 8).map(hour => {
+                const dateStr = currentDate.toISOString().split('T')[0];
+                const hourEvents = events.filter(event => {
+                  return event.date === dateStr && 
+                         parseInt(event.startTime.split(':')[0]) <= hour && 
+                         parseInt(event.endTime.split(':')[0]) > hour;
+                });
+                
+                return (
+                  <div key={hour} className="grid grid-cols-8 divide-x divide-gray-200">
+                    {/* Time column */}
+                    <div className="py-2 px-3 text-right text-xs text-gray-500 bg-gray-50">
+                      {hour}:00
+                    </div>
+                    
+                    {/* Events for this hour */}
+                    <div className="col-span-7 min-h-[5rem] relative p-1">
+                      {hourEvents.map((event, idx) => {
+                        const colors = getEventColors(event.type);
+                        return (
+                          <div 
+                            key={idx} 
+                            className="p-2 mb-1 text-sm rounded-sm"
+                            style={{ 
+                              backgroundColor: colors.bgColor,
+                              borderLeft: `3px solid ${colors.borderColor}`,
+                            }}
+                          >
+                            <div className="font-medium">{event.title}</div>
+                            <div className="text-xs text-gray-600 mt-1">
+                              {event.startTime} - {event.endTime} • {event.location}
                             </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                            {event.description && (
+                              <div className="text-xs mt-1 text-gray-700">
+                                {event.description}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </React.Fragment>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
-      )}
+      </div>
       
       {/* Add Event Dialog */}
       <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Evenement Toevoegen</DialogTitle>
+            <DialogTitle>Evenement Toevoegen</DialogTitle>
             <DialogDescription>
-              Voeg een nieuw evenement toe aan de academische kalender
+              Voeg een nieuw evenement toe aan de kalender.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="mt-4">
-            <div className="grid grid-cols-4 gap-1">
-              <button 
-                onClick={() => handleTabChange('exam')}
-                className={`px-3 py-2 text-sm font-medium rounded-sm flex items-center justify-center gap-2 ${activeTab === 'exam' 
-                  ? 'bg-[#1e40af] text-white' 
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}`}
-              >
-                <FilePlus className="h-4 w-4" />
-                <span>Examen</span>
-              </button>
-              <button 
-                onClick={() => handleTabChange('class')}
-                className={`px-3 py-2 text-sm font-medium rounded-sm flex items-center justify-center gap-2 ${activeTab === 'class' 
-                  ? 'bg-[#1e40af] text-white' 
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}`}
-              >
-                <BookOpen className="h-4 w-4" />
-                <span>Les</span>
-              </button>
-              <button 
-                onClick={() => handleTabChange('holiday')}
-                className={`px-3 py-2 text-sm font-medium rounded-sm flex items-center justify-center gap-2 ${activeTab === 'holiday' 
-                  ? 'bg-[#1e40af] text-white' 
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}`}
-              >
-                <Palmtree className="h-4 w-4" />
-                <span>Vakantie</span>
-              </button>
-              <button 
-                onClick={() => handleTabChange('event')}
-                className={`px-3 py-2 text-sm font-medium rounded-sm flex items-center justify-center gap-2 ${activeTab === 'event' 
-                  ? 'bg-[#1e40af] text-white' 
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}`}
-              >
-                <PartyPopper className="h-4 w-4" />
-                <span>Evenement</span>
-              </button>
-            </div>
+          <div className="flex border-b mb-4">
+            <button
+              className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                activeTab === 'event' ? 'border-[#1e40af] text-[#1e40af]' : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => handleTabChange('event')}
+            >
+              <div className="flex items-center">
+                <PartyPopper className="mr-2 h-4 w-4" />
+                Activiteit
+              </div>
+            </button>
+            <button
+              className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                activeTab === 'class' ? 'border-[#1e40af] text-[#1e40af]' : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => handleTabChange('class')}
+            >
+              <div className="flex items-center">
+                <BookOpen className="mr-2 h-4 w-4" />
+                Les
+              </div>
+            </button>
+            <button
+              className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                activeTab === 'exam' ? 'border-[#1e40af] text-[#1e40af]' : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => handleTabChange('exam')}
+            >
+              <div className="flex items-center">
+                <FilePlus className="mr-2 h-4 w-4" />
+                Examen
+              </div>
+            </button>
+            <button
+              className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                activeTab === 'holiday' ? 'border-[#1e40af] text-[#1e40af]' : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => handleTabChange('holiday')}
+            >
+              <div className="flex items-center">
+                <Palmtree className="mr-2 h-4 w-4" />
+                Vakantie
+              </div>
+            </button>
           </div>
           
           <form onSubmit={handleSubmitEvent}>
-            {/* Common fields for all event types */}
-            <div className="space-y-4 pt-4 border-t mt-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Titel</Label>
-                  <Input
-                    id="title"
-                    value={newEvent.title}
-                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                    placeholder="Titel van het evenement"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="date">Datum</Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={newEvent.date}
-                    onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
-                  />
-                </div>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="title" className="text-right">
+                  Titel
+                </Label>
+                <Input
+                  id="title"
+                  value={newEvent.title}
+                  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                  className="col-span-3"
+                />
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="startTime">Starttijd</Label>
-                  <Input
-                    id="startTime"
-                    type="time"
-                    value={newEvent.startTime}
-                    onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="endTime">Eindtijd</Label>
-                  <Input
-                    id="endTime"
-                    type="time"
-                    value={newEvent.endTime}
-                    onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
-                  />
-                </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="date" className="text-right">
+                  Datum
+                </Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={newEvent.date}
+                  onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                  className="col-span-3"
+                />
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="location">Locatie</Label>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="startTime" className="text-right">
+                  Starttijd
+                </Label>
+                <Input
+                  id="startTime"
+                  type="time"
+                  value={newEvent.startTime}
+                  onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="endTime" className="text-right">
+                  Eindtijd
+                </Label>
+                <Input
+                  id="endTime"
+                  type="time"
+                  value={newEvent.endTime}
+                  onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="location" className="text-right">
+                  Locatie
+                </Label>
                 <Input
                   id="location"
                   value={newEvent.location}
                   onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-                  placeholder="Locatie"
+                  className="col-span-3"
                 />
               </div>
-            </div>
-            
-            {/* Conditional fields based on event type */}
-            {activeTab === 'exam' && (
-              <div className="space-y-4 pt-4 border-t mt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="courseId">Vak</Label>
-                    <Select
-                      value={newEvent.courseId}
-                      onValueChange={(value) => setNewEvent({ ...newEvent, courseId: value })}
+              
+              {(activeTab === 'class' || activeTab === 'exam') && (
+                <>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="courseId" className="text-right">
+                      Vak
+                    </Label>
+                    <Select 
+                      value={newEvent.courseId} 
+                      onValueChange={(value) => setNewEvent({ 
+                        ...newEvent, 
+                        courseId: value,
+                        courseName: "Vak Naam" // Normaal zou je dit ophalen uit je data
+                      })}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="col-span-3">
                         <SelectValue placeholder="Selecteer een vak" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="1">Arabisch</SelectItem>
-                        <SelectItem value="2">Islamitische Studies</SelectItem>
-                        <SelectItem value="3">Koranrecitatie</SelectItem>
+                        <SelectItem value="2">Islamitische Geschiedenis</SelectItem>
+                        <SelectItem value="3">Koran Memorisatie</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="classId">Klas</Label>
-                    <Select
-                      value={newEvent.classId}
-                      onValueChange={(value) => setNewEvent({ ...newEvent, classId: value })}
+                  
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="classId" className="text-right">
+                      Klas
+                    </Label>
+                    <Select 
+                      value={newEvent.classId} 
+                      onValueChange={(value) => setNewEvent({ 
+                        ...newEvent, 
+                        classId: value,
+                        className: "Klas Naam" // Normaal zou je dit ophalen uit je data
+                      })}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="col-span-3">
                         <SelectValue placeholder="Selecteer een klas" />
                       </SelectTrigger>
                       <SelectContent>
@@ -824,132 +823,98 @@ export default function Calendar() {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="examDescription">Beschrijving</Label>
-                  <Textarea
-                    id="examDescription"
-                    value={newEvent.description}
-                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                    placeholder="Extra informatie over het examen"
-                    rows={3}
-                  />
-                </div>
+                </>
+              )}
+              
+              <div className="grid grid-cols-4 items-start gap-4">
+                <Label htmlFor="description" className="text-right pt-2">
+                  Beschrijving
+                </Label>
+                <Textarea
+                  id="description"
+                  value={newEvent.description}
+                  onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                  className="col-span-3"
+                  placeholder="Optionele beschrijving"
+                />
               </div>
-            )}
-            
-            {activeTab === 'class' && (
-              <div className="space-y-4 pt-4 border-t mt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="courseId">Vak</Label>
-                    <Select
-                      value={newEvent.courseId}
-                      onValueChange={(value) => setNewEvent({ ...newEvent, courseId: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecteer een vak" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">Arabisch</SelectItem>
-                        <SelectItem value="2">Islamitische Studies</SelectItem>
-                        <SelectItem value="3">Koranrecitatie</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="classId">Klas</Label>
-                    <Select
-                      value={newEvent.classId}
-                      onValueChange={(value) => setNewEvent({ ...newEvent, classId: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecteer een klas" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">Klas 1A</SelectItem>
-                        <SelectItem value="2">Klas 2B</SelectItem>
-                        <SelectItem value="3">Klas 3C</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="classDescription">Beschrijving</Label>
-                  <Textarea
-                    id="classDescription"
-                    value={newEvent.description}
-                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                    placeholder="Extra informatie over de les"
-                    rows={3}
-                  />
-                </div>
-                
-                <div className="flex items-center space-x-2">
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="recurring" className="text-right">
+                  Herhalend
+                </Label>
+                <div className="flex items-center space-x-2 col-span-3">
                   <Switch
                     id="recurring"
                     checked={newEvent.isRecurring}
                     onCheckedChange={(checked) => setNewEvent({ ...newEvent, isRecurring: checked })}
                   />
-                  <Label htmlFor="recurring">Wekelijks herhalen</Label>
+                  <Label htmlFor="recurring">Evenement herhalen</Label>
                 </div>
-                
-                {newEvent.isRecurring && (
-                  <div className="space-y-2">
-                    <Label htmlFor="recurrenceEndDate">Tot datum</Label>
+              </div>
+              
+              {newEvent.isRecurring && (
+                <>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="recurrencePattern" className="text-right">
+                      Herhalingspatroon
+                    </Label>
+                    <Select 
+                      value={newEvent.recurrencePattern} 
+                      onValueChange={(value) => setNewEvent({ 
+                        ...newEvent, 
+                        recurrencePattern: value as any
+                      })}
+                    >
+                      <SelectTrigger className="col-span-3">
+                        <SelectValue placeholder="Kies een patroon" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Dagelijks</SelectItem>
+                        <SelectItem value="weekly">Wekelijks</SelectItem>
+                        <SelectItem value="monthly">Maandelijks</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="recurrenceEndDate" className="text-right">
+                      Einddatum
+                    </Label>
                     <Input
                       id="recurrenceEndDate"
                       type="date"
                       value={newEvent.recurrenceEndDate}
                       onChange={(e) => setNewEvent({ ...newEvent, recurrenceEndDate: e.target.value })}
+                      className="col-span-3"
                     />
                   </div>
-                )}
-              </div>
-            )}
+                </>
+              )}
+            </div>
             
-            {activeTab === 'holiday' && (
-              <div className="space-y-4 pt-4 border-t mt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="holidayDescription">Beschrijving</Label>
-                  <Textarea
-                    id="holidayDescription"
-                    value={newEvent.description}
-                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                    placeholder="Beschrijving van de vakantie"
-                    rows={3}
-                  />
-                </div>
-              </div>
-            )}
-            
-            {activeTab === 'event' && (
-              <div className="space-y-4 pt-4 border-t mt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="eventDescription">Beschrijving</Label>
-                  <Textarea
-                    id="eventDescription"
-                    value={newEvent.description}
-                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                    placeholder="Beschrijving van het evenement"
-                    rows={3}
-                  />
-                </div>
-              </div>
-            )}
-          
-            <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={() => setIsAddEventDialogOpen(false)}>
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsAddEventDialogOpen(false)}
+              >
                 Annuleren
               </Button>
               <Button 
                 type="submit" 
-                className="bg-[#1e40af] text-white hover:bg-[#1e40af]/90"
+                variant="default"
+                className="bg-[#1e40af] hover:bg-[#1e40af]/90"
                 disabled={createEventMutation.isPending}
               >
-                {createEventMutation.isPending ? "Bezig met toevoegen..." : "Toevoegen"}
+                {createEventMutation.isPending ? (
+                  <>
+                    <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                    Toevoegen...
+                  </>
+                ) : (
+                  'Toevoegen'
+                )}
               </Button>
             </DialogFooter>
           </form>

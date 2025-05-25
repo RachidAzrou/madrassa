@@ -128,6 +128,9 @@ export default function Students() {
   const [isAddGuardianDialogOpen, setIsAddGuardianDialogOpen] = useState(false);
   const [newStudentId, setNewStudentId] = useState(null);
 
+  // State om ontbrekende velden bij te houden
+  const [missingRequiredFields, setMissingRequiredFields] = useState([]);
+  
   const handleCreateStudent = async (e) => {
     e.preventDefault();
     
@@ -146,6 +149,9 @@ export default function Students() {
     ];
     
     const missingFields = requiredFields.filter(field => !formData[field.name]);
+    
+    // Update state met ontbrekende velden
+    setMissingRequiredFields(missingFields.map(f => f.name));
     
     if (missingFields.length > 0) {
       toast({
@@ -865,7 +871,7 @@ export default function Students() {
                           value={formData.firstName}
                           onChange={handleInputChange}
                           required
-                          className="mt-1 h-9"
+                          className={`mt-1 h-9 ${missingRequiredFields.includes('firstName') ? 'border-red-500 bg-red-50' : ''}`}
                           placeholder="Voornaam"
                         />
                       </div>
@@ -878,7 +884,7 @@ export default function Students() {
                           value={formData.lastName}
                           onChange={handleInputChange}
                           required
-                          className="mt-1 h-9"
+                          className={`mt-1 h-9 ${missingRequiredFields.includes('lastName') ? 'border-red-500 bg-red-50' : ''}`}
                           placeholder="Achternaam"
                         />
                       </div>
@@ -917,7 +923,7 @@ export default function Students() {
                           value={formData.dateOfBirth || ''}
                           onChange={handleInputChange}
                           required
-                          className="mt-1 h-9"
+                          className={`mt-1 h-9 ${missingRequiredFields.includes('dateOfBirth') ? 'border-red-500 bg-red-50' : ''}`}
                         />
                       </div>
                     </div>
@@ -937,7 +943,7 @@ export default function Students() {
                           value={formData.street}
                           onChange={handleInputChange}
                           required
-                          className="mt-1 h-9"
+                          className={`mt-1 h-9 ${missingRequiredFields.includes('street') ? 'border-red-500 bg-red-50' : ''}`}
                           placeholder="Straat"
                         />
                       </div>

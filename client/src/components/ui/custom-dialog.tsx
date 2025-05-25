@@ -8,6 +8,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CustomDialogProps {
   open: boolean;
@@ -30,6 +33,82 @@ export function CustomDialog({
         {children}
       </DialogContent>
     </Dialog>
+  );
+}
+
+/**
+ * Styled form label with consistent styling
+ */
+export function FormLabel({ children, htmlFor, className = "" }: { children: ReactNode; htmlFor?: string; className?: string }) {
+  return (
+    <Label htmlFor={htmlFor} className={`text-xs font-medium text-gray-700 ${className}`}>
+      {children}
+    </Label>
+  );
+}
+
+/**
+ * Styled select with consistent styling matching the filter dropdowns
+ */
+export function StyledSelect({ 
+  value, 
+  onValueChange, 
+  placeholder = "Selecteer...", 
+  children, 
+  className = "",
+  triggerClassName = ""
+}: { 
+  value: string; 
+  onValueChange: (value: string) => void; 
+  placeholder?: string;
+  children: ReactNode;
+  className?: string;
+  triggerClassName?: string;
+}) {
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger id="relationship" className={`h-8 text-sm border-gray-300 ${triggerClassName}`}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent className={`bg-white ${className}`}>
+        {children}
+      </SelectContent>
+    </Select>
+  );
+}
+
+/**
+ * Styled select item with consistent styling
+ */
+export function StyledSelectItem({ value, children, className = "" }: { value: string; children: ReactNode; className?: string }) {
+  return (
+    <SelectItem value={value} className={`text-black hover:bg-blue-100 focus:bg-blue-200 ${className}`}>
+      {children}
+    </SelectItem>
+  );
+}
+
+/**
+ * Styled checkbox with consistent styling
+ */
+export function StyledCheckbox({
+  id,
+  checked,
+  onCheckedChange,
+  className = ""
+}: {
+  id?: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  className?: string;
+}) {
+  return (
+    <Checkbox
+      id={id}
+      checked={checked}
+      onCheckedChange={onCheckedChange}
+      className={`peer shrink-0 border ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:text-primary-foreground h-4 w-4 rounded-sm border-gray-300 data-[state=checked]:bg-[#1e40af] bg-[#fff] ${className}`}
+    />
   );
 }
 

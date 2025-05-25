@@ -1,4 +1,6 @@
 import { ReactNode } from "react";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface DataTableContainerProps {
   children: ReactNode;
@@ -14,6 +16,58 @@ export function DataTableContainer({ children, className = "" }: DataTableContai
     <div className={`px-6 py-6 flex-1 ${className}`}>
       {children}
     </div>
+  );
+}
+
+/**
+ * Styled form label with consistent styling for use in tables and filters
+ */
+export function FilterLabel({ children, htmlFor, className = "" }: { children: ReactNode; htmlFor?: string; className?: string }) {
+  return (
+    <Label htmlFor={htmlFor} className={`text-xs font-medium text-gray-700 ${className}`}>
+      {children}
+    </Label>
+  );
+}
+
+/**
+ * Styled select with consistent styling for use in tables and filters
+ */
+export function FilterSelect({ 
+  value, 
+  onValueChange, 
+  placeholder = "Selecteer...", 
+  children, 
+  className = "",
+  triggerClassName = ""
+}: { 
+  value: string; 
+  onValueChange: (value: string) => void; 
+  placeholder?: string;
+  children: ReactNode;
+  className?: string;
+  triggerClassName?: string;
+}) {
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className={`h-8 text-sm border-gray-300 ${triggerClassName}`}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent className={`bg-white ${className}`}>
+        {children}
+      </SelectContent>
+    </Select>
+  );
+}
+
+/**
+ * Styled select item with consistent styling for use in tables and filters
+ */
+export function FilterSelectItem({ value, children, className = "" }: { value: string; children: ReactNode; className?: string }) {
+  return (
+    <SelectItem value={value} className={`text-black hover:bg-blue-100 focus:bg-blue-200 ${className}`}>
+      {children}
+    </SelectItem>
   );
 }
 

@@ -681,10 +681,7 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="emergencyContactPhone" className="flex items-center gap-2">
-                        <Phone className="h-3.5 w-3.5 text-[#1e40af]" />
-                        <span>Telefoonnummer</span>
-                      </Label>
+                      <Label htmlFor="emergencyContactPhone" className="text-xs font-medium text-gray-700">Telefoonnummer</Label>
                       <Input 
                         id="emergencyContactPhone" 
                         placeholder="Telefoonnummer" 

@@ -146,17 +146,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
   return (
     <div className={cn("h-screen", className)}>
       <div className="flex flex-col h-full bg-white border-r border-gray-200 shadow-sm">
-        {/* Alleen mobiele sluiten knop */}
-        <div className="flex items-center justify-end px-4 py-2 border-b border-gray-200 bg-secondary/20">
-          {isMobile && (
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded text-gray-500 hover:bg-gray-100"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          )}
-        </div>
+
         
         {/* Verwijderd gebruiker informatie sectie uit sidebar - nu in topbar */}
         

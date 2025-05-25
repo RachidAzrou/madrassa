@@ -146,17 +146,8 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
   return (
     <div className={cn("h-screen", className)}>
       <div className="flex flex-col h-full bg-white border-r border-gray-200 shadow-sm">
-        {/* Header met logo en mobiele sluiten knop */}
-        <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 bg-secondary/20">
-          <Link href="/">
-            <div className="flex items-center cursor-pointer">
-              <img
-                src={myMadrassaLogo}
-                alt="myMadrassa Logo"
-                className="h-10 w-auto object-contain"
-              />
-            </div>
-          </Link>
+        {/* Alleen mobiele sluiten knop */}
+        <div className="flex items-center justify-end px-4 py-2 border-b border-gray-200 bg-secondary/20">
           {isMobile && (
             <button
               onClick={onClose}

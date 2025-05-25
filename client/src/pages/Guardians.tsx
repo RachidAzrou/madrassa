@@ -484,7 +484,7 @@ export default function Guardians() {
         
         <Button 
           onClick={handleAddNewGuardian} 
-          className="bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white gap-2"
+          className="hover:bg-[#1e3a8a]/90 text-white gap-2 bg-[#1e40af]"
         >
           <PlusCircle className="h-4 w-4" />
           <span>Voogd Toevoegen</span>

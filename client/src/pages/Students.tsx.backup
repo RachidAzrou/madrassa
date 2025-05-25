@@ -2,393 +2,371 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle,
-  ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
-  Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash
+  ChevronUp, ChevronDown, FileText, FileDown, Mail, Home as HomeIcon, BookOpen, Phone,
+  Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, ChevronRight,
+  UserPlus, ClipboardEdit, CreditCard, Smartphone, NotebookText, CheckCircle2, Loader2,
+  ScanLine, Fingerprint, AlertCircle, Home, Camera
 } from 'lucide-react';
-import { PageHeader } from '@/components/layout/page-header';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Topbar } from '@/components/layout/topbar';
+import { PremiumHeader } from '@/components/layout/premium-header';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Textarea } from "@/components/ui/textarea";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { jsPDF } from "jspdf";
-import autoTable from 'jspdf-autotable';
-import { apiRequest } from '@/lib/queryClient';
-import { formatDateToDisplayFormat } from '@/lib/utils';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
+import { format, parseISO } from 'date-fns';
+import { nl } from 'date-fns/locale';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
+// Begin pagina component
 export default function Students() {
-  const queryClient = useQueryClient();
-  const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProgramFilter, setSelectedProgramFilter] = useState('all');
-  const [selectedYearLevelFilter, setSelectedYearLevelFilter] = useState('all');
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState('all');
-  const [selectedStudentGroupFilter, setSelectedStudentGroupFilter] = useState('all');
-  const [showFilterOptions, setShowFilterOptions] = useState(false);
-  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  // State hooks
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterProgram, setFilterProgram] = useState("all");
+  const [filterStudentGroup, setFilterStudentGroup] = useState("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isStudentDetailDialogOpen, setIsStudentDetailDialogOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  
-  // State voor het studentformulier
-  const [studentFormData, setStudentFormData] = useState({
-    studentId: '',
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    dateOfBirth: null as string | null,
-    address: '',
-    street: '',
-    houseNumber: '',
-    postalCode: '',
-    city: '',
-    programId: null as number | null,
-    yearLevel: '',
-    schoolYear: '' as string | null,
-    studentGroupId: null as number | null,
-    enrollmentDate: '',
-    status: 'active' as string,
-    notes: '',
-    gender: '' as string,
+  const [isCreateGuardianDialogOpen, setIsCreateGuardianDialogOpen] = useState(false);
+  const [isLinkGuardianDialogOpen, setIsLinkGuardianDialogOpen] = useState(false);
+  const [selectedGuardianId, setSelectedGuardianId] = useState("");
+  const [guardianRelationType, setGuardianRelationType] = useState("parent");
+  const [isEmergencyContact, setIsEmergencyContact] = useState(false);
+  const [viewTab, setViewTab] = useState("info");
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [formData, setFormData] = useState({
+    studentId: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: null,
+    address: "",
+    street: "",
+    houseNumber: "",
+    postalCode: "",
+    city: "",
+    programId: "",
+    yearLevel: "",
+    enrollmentDate: "",
+    status: "active",
+    notes: "",
+    schoolYear: "",
+    studentGroupId: "",
+    gender: "man",
+    photoUrl: ""
   });
   
-  // State voor meerdere programma's
-  const [selectedPrograms, setSelectedPrograms] = useState<{
-    programId: number;
-    yearLevel: string;
-  }[]>([]);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
-  // Statusopties voor dropdown
-  const statusOptions = [
-    { value: 'active', label: 'Actief' },
-    { value: 'pending', label: 'In Afwachting' },
-    { value: 'inactive', label: 'Inactief' },
-    { value: 'graduated', label: 'Afgestudeerd' }
-  ];
-
-  // Geslacht opties voor dropdown
-  const genderOptions = [
-    { value: 'man', label: 'Man' },
-    { value: 'vrouw', label: 'Vrouw' },
-    { value: 'ander', label: 'Ander' }
-  ];
-
-  // Ophalen programma's voor dropdown
+  // Data fetching
+  const { data: studentsData = {}, isLoading: studentsLoading } = useQuery({
+    queryKey: ['/api/students'],
+  });
+  
   const { data: programsData = {} } = useQuery({
     queryKey: ['/api/programs'],
   });
-
-  // Ophalen studentengroepen voor dropdown
+  
   const { data: studentGroupsData = {} } = useQuery({
     queryKey: ['/api/student-groups'],
   });
-
-  // Ophalen studenten
-  const { data: studentsData = {}, isLoading } = useQuery({
-    queryKey: ['/api/students', { 
-      page, 
-      search: searchTerm, 
-      programId: selectedProgramFilter !== 'all' ? selectedProgramFilter : undefined, 
-      yearLevel: selectedYearLevelFilter !== 'all' ? selectedYearLevelFilter : undefined, 
-      status: selectedStatusFilter !== 'all' ? selectedStatusFilter : undefined, 
-      studentGroupId: selectedStudentGroupFilter !== 'all' ? selectedStudentGroupFilter : undefined 
-    }]
+  
+  const { data: guardianData = {} } = useQuery({
+    queryKey: ['/api/guardians'],
   });
 
-  // Ophalen student details
-  const getStudentDetails = (studentId: string) => {
-    return apiRequest(`/api/students/${studentId}`);
+  // Formulier reset functie
+  const resetForm = () => {
+    setFormData({
+      studentId: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      dateOfBirth: null,
+      address: "",
+      street: "",
+      houseNumber: "",
+      postalCode: "",
+      city: "",
+      programId: "",
+      yearLevel: "",
+      enrollmentDate: "",
+      status: "active",
+      notes: "",
+      schoolYear: "",
+      studentGroupId: "",
+      gender: "man",
+      photoUrl: ""
+    });
+  };
+
+  // Form change handler
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Select change handlers
+  const handleSelectChange = (name, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   // Create student mutation
   const createStudentMutation = useMutation({
-    mutationFn: (data: any) => {
-      return apiRequest('/api/students', {
+    mutationFn: (data) => {
+      return fetch('/api/students', {
         method: 'POST',
-        body: data
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(res => {
+        if (!res.ok) throw new Error('Er is een fout opgetreden bij het aanmaken van de student');
+        return res.json();
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
-      resetForm();
       setIsCreateDialogOpen(false);
+      resetForm();
+      toast({
+        title: "Student aangemaakt",
+        description: "De student is succesvol aangemaakt."
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Fout",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   });
 
   // Update student mutation
   const updateStudentMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => {
-      return apiRequest(`/api/students/${id}`, {
-        method: 'PATCH',
-        body: data
+    mutationFn: (data) => {
+      return fetch(`/api/students/${selectedStudent.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(res => {
+        if (!res.ok) throw new Error('Er is een fout opgetreden bij het bijwerken van de student');
+        return res.json();
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
-      resetForm();
       setIsEditDialogOpen(false);
+      toast({
+        title: "Student bijgewerkt",
+        description: "De student is succesvol bijgewerkt."
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Fout",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   });
 
   // Delete student mutation
   const deleteStudentMutation = useMutation({
-    mutationFn: (id: string) => {
-      return apiRequest(`/api/students/${id}`, {
+    mutationFn: () => {
+      return fetch(`/api/students/${selectedStudent.id}`, {
         method: 'DELETE'
+      }).then(res => {
+        if (!res.ok) throw new Error('Er is een fout opgetreden bij het verwijderen van de student');
+        return res.json();
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
       setIsDeleteDialogOpen(false);
+      toast({
+        title: "Student verwijderd",
+        description: "De student is succesvol verwijderd."
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Fout",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   });
 
-  // Delete multiple students mutation
-  const deleteMultipleStudentsMutation = useMutation({
-    mutationFn: (ids: string[]) => {
-      return apiRequest('/api/students/batch', {
-        method: 'DELETE',
-        body: { ids }
+  // Link guardian mutation
+  const linkGuardianMutation = useMutation({
+    mutationFn: (data) => {
+      return fetch('/api/student-guardians', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(res => {
+        if (!res.ok) throw new Error('Er is een fout opgetreden bij het koppelen van de voogd');
+        return res.json();
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
-      setSelectedStudents([]);
+      setIsLinkGuardianDialogOpen(false);
+      toast({
+        title: "Voogd gekoppeld",
+        description: "De voogd is succesvol gekoppeld aan de student."
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Fout",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   });
 
-  // Function to reset form
-  const resetForm = () => {
-    setStudentFormData({
-      studentId: '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      dateOfBirth: null,
-      address: '',
-      street: '',
-      houseNumber: '',
-      postalCode: '',
-      city: '',
-      programId: null,
-      yearLevel: '',
-      schoolYear: '',
-      studentGroupId: null,
-      enrollmentDate: '',
-      status: 'active',
-      notes: '',
-      gender: '',
-    });
-    setSelectedPrograms([]);
+  // Event handlers
+  const handleCreateStudent = (e) => {
+    e.preventDefault();
+    createStudentMutation.mutate(formData);
   };
 
-  // Function to handle student creation
-  const handleCreateStudent = () => {
-    // Validatie
-    if (!studentFormData.firstName || !studentFormData.lastName) {
-      alert('Vul alstublieft voornaam en achternaam in');
+  const handleUpdateStudent = (e) => {
+    e.preventDefault();
+    updateStudentMutation.mutate(formData);
+  };
+
+  const handleDeleteStudent = () => {
+    deleteStudentMutation.mutate();
+  };
+
+  const handleLinkGuardian = (e) => {
+    e.preventDefault();
+    if (!selectedGuardianId) {
+      toast({
+        title: "Fout",
+        description: "Selecteer een voogd om te koppelen",
+        variant: "destructive"
+      });
       return;
     }
 
-    // Maak een kopie van de data om te versturen
-    const dataToSubmit = {
-      ...studentFormData,
-      programs: selectedPrograms.length > 0 ? selectedPrograms : 
-        (studentFormData.programId ? [{ 
-          programId: studentFormData.programId, 
-          yearLevel: studentFormData.yearLevel 
-        }] : [])
-    };
-
-    createStudentMutation.mutate(dataToSubmit);
-  };
-
-  // Function to handle student update
-  const handleUpdateStudent = () => {
-    if (!selectedStudent) return;
-
-    // Maak een kopie van de data om te versturen
-    const dataToSubmit = {
-      ...studentFormData,
-      programs: selectedPrograms.length > 0 ? selectedPrograms : 
-        (studentFormData.programId ? [{ 
-          programId: studentFormData.programId, 
-          yearLevel: studentFormData.yearLevel 
-        }] : [])
-    };
-
-    updateStudentMutation.mutate({
-      id: selectedStudent.id,
-      data: dataToSubmit
+    linkGuardianMutation.mutate({
+      studentId: selectedStudent.id,
+      guardianId: selectedGuardianId,
+      relationshipType: guardianRelationType,
+      isEmergencyContact: isEmergencyContact
     });
   };
 
-  // Function to handle student deletion
-  const handleDeleteStudent = () => {
-    if (!selectedStudent) return;
-    deleteStudentMutation.mutate(selectedStudent.id);
+  const handleViewStudent = (student) => {
+    // Make sure photoUrl is included in the student object
+    const studentWithPhoto = {
+      ...student,
+      photoUrl: student.photoUrl || ""
+    };
+    setSelectedStudent(studentWithPhoto);
+    setViewTab("info");
+    setIsViewDialogOpen(true);
   };
 
-  // Function to delete multiple students
-  const handleDeleteMultipleStudents = () => {
-    if (selectedStudents.length === 0) return;
-    deleteMultipleStudentsMutation.mutate(selectedStudents);
-  };
-
-  // Function to view student details
-  const handleViewStudentDetails = async (student: any) => {
-    const details = await getStudentDetails(student.id);
-    setSelectedStudent(details);
-    setIsStudentDetailDialogOpen(true);
-  };
-
-  // Function to edit student
-  const handleEditStudent = async (student: any) => {
-    const details = await getStudentDetails(student.id);
-    setSelectedStudent(details);
-    
-    // Set form data
-    setStudentFormData({
-      studentId: details.studentId || '',
-      firstName: details.firstName || '',
-      lastName: details.lastName || '',
-      email: details.email || '',
-      phone: details.phone || '',
-      dateOfBirth: details.dateOfBirth || null,
-      address: details.address || '',
-      street: details.street || '',
-      houseNumber: details.houseNumber || '',
-      postalCode: details.postalCode || '',
-      city: details.city || '',
-      programId: details.programs && details.programs[0] ? details.programs[0].programId : null,
-      yearLevel: details.programs && details.programs[0] ? details.programs[0].yearLevel : '',
-      schoolYear: details.schoolYear || '',
-      studentGroupId: details.studentGroupId || null,
-      enrollmentDate: details.enrollmentDate || '',
-      status: details.status || 'active',
-      notes: details.notes || '',
-      gender: details.gender || '',
+  const handleEditStudent = (student) => {
+    setSelectedStudent(student);
+    setFormData({
+      studentId: student.studentId,
+      firstName: student.firstName,
+      lastName: student.lastName,
+      email: student.email || "",
+      phone: student.phone || "",
+      dateOfBirth: student.dateOfBirth || null,
+      address: student.address || "",
+      street: student.street || "",
+      houseNumber: student.houseNumber || "",
+      postalCode: student.postalCode || "",
+      city: student.city || "",
+      programId: student.programId?.toString() || "",
+      yearLevel: student.yearLevel?.toString() || "",
+      enrollmentDate: student.enrollmentDate || "",
+      status: student.status || "active",
+      notes: student.notes || "",
+      schoolYear: student.schoolYear || "",
+      studentGroupId: student.studentGroupId?.toString() || "",
+      gender: student.gender || "man",
+      photoUrl: student.photoUrl || ""
     });
-    
-    // Set selected programs
-    if (details.programs && details.programs.length > 0) {
-      setSelectedPrograms(details.programs.map((p: any) => ({
-        programId: p.programId,
-        yearLevel: p.yearLevel
-      })));
-    } else {
-      setSelectedPrograms([]);
-    }
-    
     setIsEditDialogOpen(true);
   };
 
-  // Function to export student data as PDF
-  const exportStudentsAsPDF = () => {
-    const doc = new jsPDF();
+  const handleDeleteStudentClick = (student) => {
+    setSelectedStudent(student);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const formatDateToDisplayFormat = (dateString) => {
+    if (!dateString) return "";
+    try {
+      return format(parseISO(dateString), 'P', { locale: nl });
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  // Get available guardians (those not already linked to the student)
+  const getAvailableGuardians = () => {
+    if (!selectedStudent || !guardianData.guardians) return [];
     
-    // Title
-    doc.setFontSize(18);
-    doc.text('Studentenlijst', 14, 22);
+    const linkedGuardianIds = (selectedStudent.guardians || []).map(g => g.id);
+    return guardianData.guardians.filter(g => !linkedGuardianIds.includes(g.id));
+  };
+
+  // Filtering logic
+  const filteredStudents = () => {
+    if (!studentsData.students) return [];
     
-    // Subtitle with date
-    doc.setFontSize(11);
-    doc.setTextColor(100);
-    doc.text(`Geëxporteerd op ${new Date().toLocaleDateString('nl-NL')}`, 14, 30);
-    
-    const students = studentsData.students || [];
-    
-    // Filter columns to include in PDF
-    const tableColumn = ["ID", "Naam", "Email", "Telefoon", "Status"];
-    
-    // Map the data to match the columns
-    const tableRows = students.map((student: any) => [
-      student.studentId,
-      `${student.firstName} ${student.lastName}`,
-      student.email,
-      student.phone,
-      student.status === 'active' ? 'Actief' : 
-      student.status === 'pending' ? 'In Afwachting' : 
-      student.status === 'inactive' ? 'Inactief' : 'Afgestudeerd'
-    ]);
-    
-    // Generate the PDF
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 40,
-      styles: {
-        fontSize: 10,
-        cellPadding: 3,
-        lineColor: [200, 200, 200]
-      },
-      headStyles: {
-        fillColor: [59, 89, 152],
-        textColor: 255,
-        fontStyle: 'bold'
-      },
-      alternateRowStyles: {
-        fillColor: [240, 240, 240]
-      }
+    return studentsData.students.filter(student => {
+      const matchesSearch = 
+        student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (student.email && student.email.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesStatus = filterStatus === "all" || student.status === filterStatus;
+      
+      const matchesProgram = filterProgram === "all" || 
+        (student.programId && student.programId.toString() === filterProgram);
+      
+      const matchesStudentGroup = filterStudentGroup === "all" || 
+        (student.studentGroupId && student.studentGroupId.toString() === filterStudentGroup);
+      
+      return matchesSearch && matchesStatus && matchesProgram && matchesStudentGroup;
     });
-    
-    doc.save('studentenlijst.pdf');
-  };
-
-  // Filter unique year levels for dropdown
-  const yearLevels = Array.from(
-    new Set(
-      (studentsData.students || []).map((s: any) => 
-        s.programs && s.programs[0] ? s.programs[0].yearLevel : null
-      ).filter(Boolean)
-    )
-  );
-
-  // Handle checkbox selection
-  const handleSelectStudent = (studentId: string) => {
-    if (selectedStudents.includes(studentId)) {
-      setSelectedStudents(selectedStudents.filter(id => id !== studentId));
-    } else {
-      setSelectedStudents([...selectedStudents, studentId]);
-    }
-  };
-
-  // Handle select all
-  const handleSelectAll = () => {
-    if (selectedStudents.length === (studentsData.students || []).length) {
-      setSelectedStudents([]);
-    } else {
-      setSelectedStudents((studentsData.students || []).map((s: any) => s.id));
-    }
-  };
-
-  // Function to render status badge
-  const renderStatusBadge = (status: string) => {
-    switch (status) {
-      case 'active':
-        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">Actief</Badge>;
-      case 'pending':
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">In Afwachting</Badge>;
-      case 'inactive':
-        return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">Inactief</Badge>;
-      case 'graduated':
-        return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">Afgestudeerd</Badge>;
-      default:
-        return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">{status}</Badge>;
-    }
   };
 
   // Programs and student groups arrays
@@ -396,13 +374,19 @@ export default function Students() {
   const studentGroups = studentGroupsData.studentGroups || [];
 
   return (
-    <div>
-      <PageHeader 
+    <div className="bg-[#f7f9fc] min-h-screen">
+      {/* Top navigation bar */}
+      {/* Professionele header component */}
+      <PremiumHeader 
         title="Studenten" 
-        icon={<Users className="h-5 w-5 text-white" />}
-        parent="Beheer" 
-        current="Studenten" 
+        description="Bekijk en beheer alle studentgegevens"
+        icon={Users}
+        breadcrumbs={{
+          parent: "Beheer",
+          current: "Studenten"
+        }}
       />
+      
       <div className="container mx-auto p-4 max-w-7xl">
         <div className="flex justify-end mb-6">
           <Button 
@@ -418,1588 +402,1184 @@ export default function Students() {
           </Button>
         </div>
 
-      <div className="mb-6 flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            type="search"
-            placeholder="Zoek studenten..."
-            className="pl-8 bg-white"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="default"
-            className="border-gray-300 text-gray-700"
-            onClick={() => setShowFilterOptions(!showFilterOptions)}
-          >
-            <Filter className="mr-2 h-4 w-4" /> Filteren
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="default"
-            className="border-gray-300 text-gray-700"
-            onClick={exportStudentsAsPDF}
-          >
-            <Download className="mr-2 h-4 w-4" /> Exporteren
-          </Button>
-        </div>
-      </div>
-
-      {/* Filter opties */}
-      {showFilterOptions && (
-        <div className="mb-6 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
-          <h3 className="text-lg font-medium mb-4">Filter Opties</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <Label htmlFor="program-filter">Programma</Label>
-              <Select 
-                value={selectedProgramFilter} 
-                onValueChange={setSelectedProgramFilter}
-              >
-                <SelectTrigger id="program-filter" className="bg-white">
-                  <SelectValue placeholder="Alle programma's" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle programma's</SelectItem>
-                  {programs.map((program: any) => (
-                    <SelectItem key={program.id} value={program.id.toString()}>
-                      {program.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        <div className="mb-6 flex flex-col md:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="text"
+              placeholder="Zoek op naam, ID of email..."
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="flex-initial w-full md:w-auto flex flex-wrap gap-2">
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-full md:w-[150px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle statussen</SelectItem>
+                <SelectItem value="active">Actief</SelectItem>
+                <SelectItem value="inactive">Inactief</SelectItem>
+                <SelectItem value="graduated">Afgestudeerd</SelectItem>
+                <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
+              </SelectContent>
+            </Select>
             
-            <div>
-              <Label htmlFor="year-filter">Leerjaar</Label>
-              <Select 
-                value={selectedYearLevelFilter} 
-                onValueChange={setSelectedYearLevelFilter}
-              >
-                <SelectTrigger id="year-filter" className="bg-white">
-                  <SelectValue placeholder="Alle leerjaren" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle leerjaren</SelectItem>
-                  {yearLevels.map((year: any) => (
-                    <SelectItem key={year} value={year}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={filterProgram} onValueChange={setFilterProgram}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Programma" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle programma's</SelectItem>
+                {programs.map((program) => (
+                  <SelectItem key={program.id} value={program.id.toString()}>
+                    {program.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             
-            <div>
-              <Label htmlFor="status-filter">Status</Label>
-              <Select 
-                value={selectedStatusFilter} 
-                onValueChange={setSelectedStatusFilter}
-              >
-                <SelectTrigger id="status-filter" className="bg-white">
-                  <SelectValue placeholder="Alle statussen" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle statussen</SelectItem>
-                  {statusOptions.map(status => (
-                    <SelectItem key={status.value} value={status.value}>
-                      {status.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="group-filter">Klas</Label>
-              <Select 
-                value={selectedStudentGroupFilter} 
-                onValueChange={setSelectedStudentGroupFilter}
-              >
-                <SelectTrigger id="group-filter" className="bg-white">
-                  <SelectValue placeholder="Alle klassen" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle klassen</SelectItem>
-                  {studentGroups.map((group: any) => (
-                    <SelectItem key={group.id} value={group.id.toString()}>
-                      {group.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={filterStudentGroup} onValueChange={setFilterStudentGroup}>
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Klassengroep" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle klassengroepen</SelectItem>
+                {studentGroups.map((group) => (
+                  <SelectItem key={group.id} value={group.id.toString()}>
+                    {group.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
-      )}
 
-      {/* Studenten tabel */}
-      <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Student Table */}
+        <div className="bg-white rounded-md border shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">
-                  <Checkbox 
-                    checked={
-                      selectedStudents.length > 0 && 
-                      selectedStudents.length === (studentsData.students || []).length
-                    }
-                    onCheckedChange={handleSelectAll}
-                    aria-label="Select all"
-                  />
-                </TableHead>
-                <TableHead>Student ID</TableHead>
+              <TableRow className="bg-gray-50">
+                <TableHead className="w-[100px]">ID</TableHead>
                 <TableHead>Naam</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Programma</TableHead>
-                <TableHead>Leerjaar</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="hidden md:table-cell">Email</TableHead>
+                <TableHead className="hidden md:table-cell">Programma</TableHead>
+                <TableHead className="hidden md:table-cell">Status</TableHead>
                 <TableHead className="text-right">Acties</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading ? (
+              {studentsLoading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
-                    <div className="flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                      <span className="ml-2">Laden...</span>
-                    </div>
+                  <TableCell colSpan={6} className="text-center py-4">
+                    Studenten laden...
                   </TableCell>
                 </TableRow>
-              ) : (studentsData.students || []).length === 0 ? (
+              ) : filteredStudents().length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                  <TableCell colSpan={6} className="text-center py-4">
                     Geen studenten gevonden
                   </TableCell>
                 </TableRow>
               ) : (
-                (studentsData.students || []).map((student: any) => (
-                  <TableRow key={student.id}>
-                    <TableCell>
-                      <Checkbox 
-                        checked={selectedStudents.includes(student.id)}
-                        onCheckedChange={() => handleSelectStudent(student.id)}
-                        aria-label={`Select ${student.firstName}`}
-                      />
-                    </TableCell>
-                    <TableCell className="font-medium">{student.studentId}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <Avatar className="h-8 w-8 mr-2">
-                          <AvatarFallback className="bg-primary/10 text-primary">
-                            {student.firstName[0]}{student.lastName[0]}
-                          </AvatarFallback>
-                        </Avatar>
-                        {student.firstName} {student.lastName}
-                      </div>
-                    </TableCell>
-                    <TableCell>{student.email}</TableCell>
-                    <TableCell>
-                      {student.programs && student.programs[0] 
-                        ? programs.find((p: any) => p.id === student.programs[0].programId)?.name 
-                        : '-'}
-                    </TableCell>
-                    <TableCell>
-                      {student.programs && student.programs[0] 
-                        ? student.programs[0].yearLevel 
-                        : '-'}
-                    </TableCell>
-                    <TableCell>
-                      {renderStatusBadge(student.status)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleViewStudentDetails(student)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleEditStudent(student)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => {
-                            setSelectedStudent(student);
-                            setIsDeleteDialogOpen(true);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                filteredStudents().map((student) => {
+                  const program = programs.find(p => p.id === student.programId);
+                  return (
+                    <TableRow key={student.id}>
+                      <TableCell className="font-medium">{student.studentId}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <Avatar className="h-8 w-8 mr-2">
+                            <AvatarFallback className="bg-[#1e40af] text-white">
+                              {student.firstName[0]}{student.lastName[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            {student.firstName} {student.lastName}
+                            {student.guardians && student.guardians.length > 0 && (
+                              <div className="text-xs text-gray-500">
+                                {student.guardians.length} voogd(en)
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {student.email || "-"}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {program ? program.name : "-"}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Badge variant={
+                          student.status === 'active' ? 'default' : 
+                          student.status === 'inactive' ? 'secondary' :
+                          student.status === 'graduated' ? 'success' : 'destructive'
+                        }>
+                          {student.status === 'active' ? 'Actief' : 
+                           student.status === 'inactive' ? 'Inactief' :
+                           student.status === 'graduated' ? 'Afgestudeerd' : 'Teruggetrokken'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleViewStudent(student)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditStudent(student)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteStudentClick(student)}
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
         </div>
-
-        {/* Batch acties */}
-        {selectedStudents.length > 0 && (
-          <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
-            <div className="text-sm">
-              {selectedStudents.length} student(en) geselecteerd
-            </div>
-            <Button 
-              variant="destructive" 
-              size="sm"
-              onClick={handleDeleteMultipleStudents}
-            >
-              <Trash2 className="mr-2 h-4 w-4" /> Verwijder geselecteerde
-            </Button>
-          </div>
-        )}
-
-        {/* Paginering */}
-        {(studentsData.students || []).length > 0 && (
-          <div className="p-4 border-t border-gray-200">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious 
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (page > 1) setPage(page - 1);
-                    }}
-                  />
-                </PaginationItem>
-                
-                {/* Toon paginanummers */}
-                {Array.from({ length: Math.ceil((studentsData.totalCount || 0) / 10) }, (_, i) => (
-                  <PaginationItem key={i}>
-                    <PaginationLink 
-                      href="#"
-                      isActive={page === i + 1}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setPage(i + 1);
-                      }}
-                    >
-                      {i + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                
-                <PaginationItem>
-                  <PaginationNext 
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (page < Math.ceil((studentsData.totalCount || 0) / 10)) {
-                        setPage(page + 1);
-                      }
-                    }}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-        )}
       </div>
 
       {/* Create Student Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
-            <DialogDescription>
-              Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="py-4">
-            <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-5 mb-4">
-                <TabsTrigger value="personal">
-                  <User className="mr-2 h-4 w-4" />
-                  Persoonlijk
-                </TabsTrigger>
-                <TabsTrigger value="contact">
-                  <Phone className="mr-2 h-4 w-4" />
-                  Contact
-                </TabsTrigger>
-                <TabsTrigger value="address">
-                  <MapPin className="mr-2 h-4 w-4" />
-                  Adres
-                </TabsTrigger>
-                <TabsTrigger value="class">
-                  <Users className="mr-2 h-4 w-4" />
-                  Klas
-                </TabsTrigger>
-                <TabsTrigger value="subjects">
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Vakken
-                </TabsTrigger>
-              </TabsList>
-              
-              {/* Persoonlijke informatie tab */}
-              <TabsContent value="personal" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="studentId" className="text-sm font-medium text-gray-700">
-                        Studentnummer <span className="text-primary">*</span>
-                      </Label>
-                      <Input
-                        id="studentId"
-                        value={studentFormData.studentId}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, studentId: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Bijv. S12345"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="status" className="text-sm font-medium text-gray-700">
-                        Status <span className="text-primary">*</span>
-                      </Label>
-                      <Select
-                        value={studentFormData.status}
-                        onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
-                      >
-                        <SelectTrigger id="status" className="mt-1 bg-white">
-                          <SelectValue placeholder="Selecteer status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {statusOptions.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
-                        Voornaam <span className="text-primary">*</span>
-                      </Label>
-                      <Input
-                        id="firstName"
-                        value={studentFormData.firstName}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, firstName: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Voornaam"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
-                        Achternaam <span className="text-primary">*</span>
-                      </Label>
-                      <Input
-                        id="lastName"
-                        value={studentFormData.lastName}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Achternaam"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
-                        Geslacht
-                      </Label>
-                      <Select
-                        value={studentFormData.gender}
-                        onValueChange={(value) => setStudentFormData({ ...studentFormData, gender: value })}
-                      >
-                        <SelectTrigger id="gender" className="mt-1 bg-white">
-                          <SelectValue placeholder="Selecteer geslacht" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {genderOptions.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700">
-                        Geboortedatum
-                      </Label>
-                      <Input
-                        id="dateOfBirth"
-                        type="date"
-                        value={studentFormData.dateOfBirth || ''}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
-                        className="mt-1 bg-white"
-                      />
-                    </div>
-                    
-                    <div className="md:col-span-2">
-                      <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
-                        Notities
-                      </Label>
-                      <Textarea
-                        id="notes"
-                        value={studentFormData.notes}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, notes: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Voeg hier aanvullende informatie toe..."
-                        rows={4}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              {/* Contact informatie tab */}
-              <TabsContent value="contact" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                        Email
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={studentFormData.email}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="student@mymadrassa.nl"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
-                        Telefoonnummer
-                      </Label>
-                      <Input
-                        id="phone"
-                        value={studentFormData.phone}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="06 1234 5678"
-                      />
-                    </div>
-                    
-                    <div className="md:col-span-2">
-                      <Label htmlFor="enrollmentDate" className="text-sm font-medium text-gray-700">
-                        Inschrijvingsdatum
-                      </Label>
-                      <Input
-                        id="enrollmentDate"
-                        type="date"
-                        value={studentFormData.enrollmentDate}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, enrollmentDate: e.target.value })}
-                        className="mt-1 bg-white"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              {/* Adres informatie tab */}
-              <TabsContent value="address" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="street" className="text-sm font-medium text-gray-700">
-                        Straat
-                      </Label>
-                      <Input
-                        id="street"
-                        value={studentFormData.street}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, street: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Straatnaam"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="houseNumber" className="text-sm font-medium text-gray-700">
-                        Huisnummer
-                      </Label>
-                      <Input
-                        id="houseNumber"
-                        value={studentFormData.houseNumber}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, houseNumber: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="123"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
-                        Postcode
-                      </Label>
-                      <Input
-                        id="postalCode"
-                        value={studentFormData.postalCode}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="1234 AB"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="city" className="text-sm font-medium text-gray-700">
-                        Stad
-                      </Label>
-                      <Input
-                        id="city"
-                        value={studentFormData.city}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Amsterdam"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              {/* Klas toewijzing tab */}
-              <TabsContent value="class" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-primary">Klas Toewijzing</h3>
-                    {studentFormData.studentGroupId && (
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
-                        Klas toegewezen
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="space-y-6">
-                    <p className="text-sm text-gray-500">
-                      Wijs de student toe aan een klas. Een student kan maar in één klas zitten.
-                    </p>
-                    
-                    <div className="grid grid-cols-1 gap-6">
-                      <div>
-                        <Label htmlFor="schoolYear" className="text-sm font-medium text-gray-700">
-                          Schooljaar <span className="text-primary">*</span>
-                        </Label>
-                        <div className="mt-2">
-                          <Select
-                            value={studentFormData.schoolYear || ''}
-                            onValueChange={(value) => setStudentFormData({ 
-                              ...studentFormData, 
-                              schoolYear: value
-                            })}
-                          >
-                            <SelectTrigger className="border-gray-200 bg-white">
-                              <SelectValue placeholder="Selecteer schooljaar" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="">Selecteer schooljaar</SelectItem>
-                              <SelectItem value="2024-2025">2024-2025</SelectItem>
-                              <SelectItem value="2025-2026">2025-2026</SelectItem>
-                              <SelectItem value="2026-2027">2026-2027</SelectItem>
-                              <SelectItem value="2027-2028">2027-2028</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="studentGroupId" className="text-sm font-medium text-gray-700">
-                          Selecteer klas
-                        </Label>
-                        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <Select
-                              value={studentFormData.studentGroupId?.toString() || 'none'}
-                              onValueChange={(value) => setStudentFormData({ 
-                                ...studentFormData, 
-                                studentGroupId: value === 'none' ? null : parseInt(value) 
-                              })}
-                            >
-                              <SelectTrigger className="border-gray-200 bg-white">
-                                <SelectValue placeholder="Selecteer klas" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="none">Geen klas</SelectItem>
-                                {studentGroups.map((group: any) => (
-                                  <SelectItem key={group.id} value={group.id.toString()}>
-                                    {group.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {studentFormData.studentGroupId && (
-                      <div className="flex items-center p-4 mt-4 rounded-md bg-blue-50 border border-blue-100">
-                        <div className="mr-4 p-2 bg-primary rounded-full">
-                          <Users className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-primary">
-                            {studentGroups.find((g: any) => g.id === studentFormData.studentGroupId)?.name}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            De student wordt toegewezen aan deze klas
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </TabsContent>
-              
-              {/* Vakken toewijzing tab */}
-              <TabsContent value="subjects" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-primary">Vakken Toewijzing</h3>
-                    {selectedPrograms.length > 0 && (
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
-                        {selectedPrograms.length} vakken toegewezen
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <p className="text-sm text-gray-500">
-                      Wijs de student toe aan vakken. Dit is optioneel voor studenten die individuele vakken willen volgen.
-                    </p>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <Label htmlFor="programId" className="text-sm font-medium text-gray-700">
-                          Programma
-                        </Label>
-                        <Select
-                          value={studentFormData.programId?.toString() || ''}
-                          onValueChange={(value) => setStudentFormData({ 
-                            ...studentFormData, 
-                            programId: value ? parseInt(value) : null 
-                          })}
-                        >
-                          <SelectTrigger id="programId" className="mt-1 bg-white">
-                            <SelectValue placeholder="Selecteer programma" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="">Selecteer programma</SelectItem>
-                            {programs.map((program: any) => (
-                              <SelectItem key={program.id} value={program.id.toString()}>
-                                {program.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="yearLevel" className="text-sm font-medium text-gray-700">
-                          Leerjaar
-                        </Label>
-                        <Input
-                          id="yearLevel"
-                          value={studentFormData.yearLevel}
-                          onChange={(e) => setStudentFormData({ ...studentFormData, yearLevel: e.target.value })}
-                          className="mt-1 bg-white"
-                          placeholder="Bijv. Jaar 1"
-                        />
-                      </div>
-                    </div>
-                    
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="mt-2"
-                      onClick={() => {
-                        if (studentFormData.programId) {
-                          // Check if program already exists
-                          const programExists = selectedPrograms.some(
-                            p => p.programId === studentFormData.programId
-                          );
-                          
-                          if (!programExists) {
-                            setSelectedPrograms([
-                              ...selectedPrograms,
-                              {
-                                programId: studentFormData.programId,
-                                yearLevel: studentFormData.yearLevel
-                              }
-                            ]);
-                          }
-                        }
-                      }}
-                    >
-                      <PlusCircle className="mr-2 h-4 w-4" /> Voeg programma toe
-                    </Button>
-                    
-                    {/* Geselecteerde programma's */}
-                    {selectedPrograms.length > 0 && (
-                      <div className="mt-6">
-                        <h4 className="font-medium mb-2">Geselecteerde programma's:</h4>
-                        <div className="space-y-2">
-                          {selectedPrograms.map((program, index) => (
-                            <div 
-                              key={index}
-                              className="flex justify-between items-center p-3 bg-gray-50 rounded-md border border-gray-200"
-                            >
-                              <div>
-                                <span className="font-medium">
-                                  {programs.find((p: any) => p.id === program.programId)?.name}
-                                </span>
-                                <span className="text-sm text-gray-600 ml-2">
-                                  ({program.yearLevel})
-                                </span>
-                              </div>
-                              <Button 
-                                variant="ghost" 
-                                size="icon"
-                                onClick={() => {
-                                  setSelectedPrograms(
-                                    selectedPrograms.filter((_, i) => i !== index)
-                                  );
-                                }}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => {
-              resetForm();
-              setIsCreateDialogOpen(false);
-            }}>
-              Annuleren
-            </Button>
-            <Button 
-              type="submit" 
-              onClick={handleCreateStudent}
-              disabled={createStudentMutation.isPending}
-            >
-              {createStudentMutation.isPending && (
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></div>
-              )}
-              Student toevoegen
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Student Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Student Bewerken</DialogTitle>
-            <DialogDescription>
-              Werk de gegevens bij voor student: {studentFormData.firstName} {studentFormData.lastName}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="py-4">
-            <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-5 mb-4">
-                <TabsTrigger value="personal">
-                  <User className="mr-2 h-4 w-4" />
-                  Persoonlijk
-                </TabsTrigger>
-                <TabsTrigger value="contact">
-                  <Phone className="mr-2 h-4 w-4" />
-                  Contact
-                </TabsTrigger>
-                <TabsTrigger value="address">
-                  <MapPin className="mr-2 h-4 w-4" />
-                  Adres
-                </TabsTrigger>
-                <TabsTrigger value="class">
-                  <Users className="mr-2 h-4 w-4" />
-                  Klas
-                </TabsTrigger>
-                <TabsTrigger value="subjects">
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Vakken
-                </TabsTrigger>
-              </TabsList>
-              
-              {/* Same tabs as create student dialog */}
-              {/* Persoonlijke informatie tab */}
-              <TabsContent value="personal" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="edit-studentId" className="text-sm font-medium text-gray-700">
-                        Studentnummer <span className="text-primary">*</span>
-                      </Label>
-                      <Input
-                        id="edit-studentId"
-                        value={studentFormData.studentId}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, studentId: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Bijv. S12345"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="edit-status" className="text-sm font-medium text-gray-700">
-                        Status <span className="text-primary">*</span>
-                      </Label>
-                      <Select
-                        value={studentFormData.status}
-                        onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
-                      >
-                        <SelectTrigger id="edit-status" className="mt-1 bg-white">
-                          <SelectValue placeholder="Selecteer status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {statusOptions.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="edit-firstName" className="text-sm font-medium text-gray-700">
-                        Voornaam <span className="text-primary">*</span>
-                      </Label>
-                      <Input
-                        id="edit-firstName"
-                        value={studentFormData.firstName}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, firstName: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Voornaam"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="edit-lastName" className="text-sm font-medium text-gray-700">
-                        Achternaam <span className="text-primary">*</span>
-                      </Label>
-                      <Input
-                        id="edit-lastName"
-                        value={studentFormData.lastName}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Achternaam"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="edit-gender" className="text-sm font-medium text-gray-700">
-                        Geslacht
-                      </Label>
-                      <Select
-                        value={studentFormData.gender}
-                        onValueChange={(value) => setStudentFormData({ ...studentFormData, gender: value })}
-                      >
-                        <SelectTrigger id="edit-gender" className="mt-1 bg-white">
-                          <SelectValue placeholder="Selecteer geslacht" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {genderOptions.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="edit-dateOfBirth" className="text-sm font-medium text-gray-700">
-                        Geboortedatum
-                      </Label>
-                      <Input
-                        id="edit-dateOfBirth"
-                        type="date"
-                        value={studentFormData.dateOfBirth || ''}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
-                        className="mt-1 bg-white"
-                      />
-                    </div>
-                    
-                    <div className="md:col-span-2">
-                      <Label htmlFor="edit-notes" className="text-sm font-medium text-gray-700">
-                        Notities
-                      </Label>
-                      <Textarea
-                        id="edit-notes"
-                        value={studentFormData.notes}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, notes: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Voeg hier aanvullende informatie toe..."
-                        rows={4}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              {/* Contact informatie tab */}
-              <TabsContent value="contact" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="edit-email" className="text-sm font-medium text-gray-700">
-                        Email
-                      </Label>
-                      <Input
-                        id="edit-email"
-                        type="email"
-                        value={studentFormData.email}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="student@mymadrassa.nl"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="edit-phone" className="text-sm font-medium text-gray-700">
-                        Telefoonnummer
-                      </Label>
-                      <Input
-                        id="edit-phone"
-                        value={studentFormData.phone}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="06 1234 5678"
-                      />
-                    </div>
-                    
-                    <div className="md:col-span-2">
-                      <Label htmlFor="edit-enrollmentDate" className="text-sm font-medium text-gray-700">
-                        Inschrijvingsdatum
-                      </Label>
-                      <Input
-                        id="edit-enrollmentDate"
-                        type="date"
-                        value={studentFormData.enrollmentDate}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, enrollmentDate: e.target.value })}
-                        className="mt-1 bg-white"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              {/* Adres informatie tab */}
-              <TabsContent value="address" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="edit-street" className="text-sm font-medium text-gray-700">
-                        Straat
-                      </Label>
-                      <Input
-                        id="edit-street"
-                        value={studentFormData.street}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, street: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Straatnaam"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="edit-houseNumber" className="text-sm font-medium text-gray-700">
-                        Huisnummer
-                      </Label>
-                      <Input
-                        id="edit-houseNumber"
-                        value={studentFormData.houseNumber}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, houseNumber: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="123"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="edit-postalCode" className="text-sm font-medium text-gray-700">
-                        Postcode
-                      </Label>
-                      <Input
-                        id="edit-postalCode"
-                        value={studentFormData.postalCode}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="1234 AB"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="edit-city" className="text-sm font-medium text-gray-700">
-                        Stad
-                      </Label>
-                      <Input
-                        id="edit-city"
-                        value={studentFormData.city}
-                        onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
-                        className="mt-1 bg-white"
-                        placeholder="Amsterdam"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              {/* Klas toewijzing tab */}
-              <TabsContent value="class" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-primary">Klas Toewijzing</h3>
-                    {studentFormData.studentGroupId && (
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
-                        Klas toegewezen
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="space-y-6">
-                    <p className="text-sm text-gray-500">
-                      Wijs de student toe aan een klas. Een student kan maar in één klas zitten.
-                    </p>
-                    
-                    <div className="grid grid-cols-1 gap-6">
-                      <div>
-                        <Label htmlFor="edit-schoolYear" className="text-sm font-medium text-gray-700">
-                          Schooljaar <span className="text-primary">*</span>
-                        </Label>
-                        <div className="mt-2">
-                          <Select
-                            value={studentFormData.schoolYear || ''}
-                            onValueChange={(value) => setStudentFormData({ 
-                              ...studentFormData, 
-                              schoolYear: value
-                            })}
-                          >
-                            <SelectTrigger className="border-gray-200 bg-white">
-                              <SelectValue placeholder="Selecteer schooljaar" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="">Selecteer schooljaar</SelectItem>
-                              <SelectItem value="2024-2025">2024-2025</SelectItem>
-                              <SelectItem value="2025-2026">2025-2026</SelectItem>
-                              <SelectItem value="2026-2027">2026-2027</SelectItem>
-                              <SelectItem value="2027-2028">2027-2028</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="edit-studentGroupId" className="text-sm font-medium text-gray-700">
-                          Selecteer klas
-                        </Label>
-                        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <Select
-                              value={studentFormData.studentGroupId?.toString() || 'none'}
-                              onValueChange={(value) => setStudentFormData({ 
-                                ...studentFormData, 
-                                studentGroupId: value === 'none' ? null : parseInt(value) 
-                              })}
-                            >
-                              <SelectTrigger className="border-gray-200 bg-white">
-                                <SelectValue placeholder="Selecteer klas" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="none">Geen klas</SelectItem>
-                                {studentGroups.map((group: any) => (
-                                  <SelectItem key={group.id} value={group.id.toString()}>
-                                    {group.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {studentFormData.studentGroupId && (
-                      <div className="flex items-center p-4 mt-4 rounded-md bg-blue-50 border border-blue-100">
-                        <div className="mr-4 p-2 bg-primary rounded-full">
-                          <Users className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-primary">
-                            {studentGroups.find((g: any) => g.id === studentFormData.studentGroupId)?.name}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            De student wordt toegewezen aan deze klas
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </TabsContent>
-              
-              {/* Vakken toewijzing tab */}
-              <TabsContent value="subjects" className="space-y-6">
-                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-primary">Vakken Toewijzing</h3>
-                    {selectedPrograms.length > 0 && (
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
-                        {selectedPrograms.length} vakken toegewezen
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <p className="text-sm text-gray-500">
-                      Wijs de student toe aan vakken. Dit is optioneel voor studenten die individuele vakken willen volgen.
-                    </p>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <Label htmlFor="edit-programId" className="text-sm font-medium text-gray-700">
-                          Programma
-                        </Label>
-                        <Select
-                          value={studentFormData.programId?.toString() || ''}
-                          onValueChange={(value) => setStudentFormData({ 
-                            ...studentFormData, 
-                            programId: value ? parseInt(value) : null 
-                          })}
-                        >
-                          <SelectTrigger id="edit-programId" className="mt-1 bg-white">
-                            <SelectValue placeholder="Selecteer programma" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="">Selecteer programma</SelectItem>
-                            {programs.map((program: any) => (
-                              <SelectItem key={program.id} value={program.id.toString()}>
-                                {program.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="edit-yearLevel" className="text-sm font-medium text-gray-700">
-                          Leerjaar
-                        </Label>
-                        <Input
-                          id="edit-yearLevel"
-                          value={studentFormData.yearLevel}
-                          onChange={(e) => setStudentFormData({ ...studentFormData, yearLevel: e.target.value })}
-                          className="mt-1 bg-white"
-                          placeholder="Bijv. Jaar 1"
-                        />
-                      </div>
-                    </div>
-                    
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="mt-2"
-                      onClick={() => {
-                        if (studentFormData.programId) {
-                          // Check if program already exists
-                          const programExists = selectedPrograms.some(
-                            p => p.programId === studentFormData.programId
-                          );
-                          
-                          if (!programExists) {
-                            setSelectedPrograms([
-                              ...selectedPrograms,
-                              {
-                                programId: studentFormData.programId,
-                                yearLevel: studentFormData.yearLevel
-                              }
-                            ]);
-                          }
-                        }
-                      }}
-                    >
-                      <PlusCircle className="mr-2 h-4 w-4" /> Voeg programma toe
-                    </Button>
-                    
-                    {/* Geselecteerde programma's */}
-                    {selectedPrograms.length > 0 && (
-                      <div className="mt-6">
-                        <h4 className="font-medium mb-2">Geselecteerde programma's:</h4>
-                        <div className="space-y-2">
-                          {selectedPrograms.map((program, index) => (
-                            <div 
-                              key={index}
-                              className="flex justify-between items-center p-3 bg-gray-50 rounded-md border border-gray-200"
-                            >
-                              <div>
-                                <span className="font-medium">
-                                  {programs.find((p: any) => p.id === program.programId)?.name}
-                                </span>
-                                <span className="text-sm text-gray-600 ml-2">
-                                  ({program.yearLevel})
-                                </span>
-                              </div>
-                              <Button 
-                                variant="ghost" 
-                                size="icon"
-                                onClick={() => {
-                                  setSelectedPrograms(
-                                    selectedPrograms.filter((_, i) => i !== index)
-                                  );
-                                }}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => {
-              resetForm();
-              setIsEditDialogOpen(false);
-            }}>
-              Annuleren
-            </Button>
-            <Button 
-              type="submit" 
-              onClick={handleUpdateStudent}
-              disabled={updateStudentMutation.isPending}
-            >
-              {updateStudentMutation.isPending && (
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></div>
-              )}
-              Wijzigingen opslaan
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Student Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[450px]">
-          <DialogHeader>
-            <DialogTitle>Student verwijderen</DialogTitle>
-            <DialogDescription>
-              Weet je zeker dat je de student <span className="font-semibold">
-                {selectedStudent?.firstName} {selectedStudent?.lastName}
-              </span> wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <DialogFooter className="mt-6">
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Annuleren
-            </Button>
-            <Button 
-              variant="destructive" 
-              onClick={handleDeleteStudent}
-              disabled={deleteStudentMutation.isPending}
-            >
-              {deleteStudentMutation.isPending && (
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></div>
-              )}
-              Verwijderen
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Student Detail Dialog */}
-      <Dialog open={isStudentDetailDialogOpen} onOpenChange={setIsStudentDetailDialogOpen}>
-        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Student Details</DialogTitle>
-            <DialogDescription>
-              Gedetailleerde informatie over {selectedStudent?.firstName} {selectedStudent?.lastName}
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedStudent && (
-            <div className="py-4">
-              <Tabs defaultValue="personal" className="w-full">
-                <TabsList className="grid grid-cols-5 mb-4">
-                  <TabsTrigger value="personal">
-                    <User className="mr-2 h-4 w-4" />
-                    Persoonlijk
-                  </TabsTrigger>
-                  <TabsTrigger value="contact">
-                    <Phone className="mr-2 h-4 w-4" />
-                    Contact
-                  </TabsTrigger>
-                  <TabsTrigger value="address">
-                    <MapPin className="mr-2 h-4 w-4" />
-                    Adres
-                  </TabsTrigger>
-                  <TabsTrigger value="class">
-                    <Users className="mr-2 h-4 w-4" />
-                    Klas
-                  </TabsTrigger>
-                  <TabsTrigger value="subjects">
-                    <BookOpen className="mr-2 h-4 w-4" />
-                    Vakken
-                  </TabsTrigger>
-                </TabsList>
-                
-                {/* Persoonlijke informatie tab */}
-                <TabsContent value="personal" className="pt-2">
-                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                      <div className="md:col-span-2 flex">
-                        <div className="mr-4">
-                          <Avatar className="h-16 w-16">
-                            <AvatarFallback className="bg-primary/10 text-primary text-xl">
-                              {selectedStudent.firstName[0]}{selectedStudent.lastName[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                        </div>
-                        <div>
-                          <h2 className="text-xl font-semibold mb-1">
-                            {selectedStudent.firstName} {selectedStudent.lastName}
-                          </h2>
-                          <p className="text-gray-600">{selectedStudent.studentId}</p>
-                          <div className="mt-2">
-                            {renderStatusBadge(selectedStudent.status)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                      <div className="md:col-span-1">
-                        <p className="text-sm font-medium text-gray-700">Geboortedatum</p>
-                        <p className="mt-1">{selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "Niet ingevuld"}</p>
-                      </div>
-                      <div className="md:col-span-1">
-                        <p className="text-sm font-medium text-gray-700">Geslacht</p>
-                        <p className="mt-1">
-                          {selectedStudent.gender === 'man' ? 'Man' : 
-                           selectedStudent.gender === 'vrouw' ? 'Vrouw' : 'Niet ingevuld'}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Notities</p>
-                        <p className="mt-1 whitespace-pre-wrap">{selectedStudent.notes || "Geen notities"}</p>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                {/* Contact tab */}
-                <TabsContent value="contact" className="pt-2">
-                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
-                    
-                    <div className="grid grid-cols-1 gap-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Email</p>
-                          <p className="mt-1 flex items-center">
-                            <Mail className="h-4 w-4 mr-2 text-gray-500" />
-                            {selectedStudent.email || "Niet ingevuld"}
-                          </p>
-                        </div>
-                        
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Telefoonnummer</p>
-                          <p className="mt-1 flex items-center">
-                            <Phone className="h-4 w-4 mr-2 text-gray-500" />
-                            {selectedStudent.phone || "Niet ingevuld"}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Inschrijvingsdatum</p>
-                        <p className="mt-1">
-                          {selectedStudent.enrollmentDate 
-                            ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) 
-                            : "Niet ingevuld"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                {/* Adres tab */}
-                <TabsContent value="address" className="pt-2">
-                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
-                    
-                    <div className="grid grid-cols-1 gap-6">
-                      <div className="flex items-start">
-                        <MapPin className="h-5 w-5 mr-2 mt-0.5 text-gray-500" />
-                        <div>
-                          <p className="font-medium">
-                            {selectedStudent.street} {selectedStudent.houseNumber}
-                          </p>
-                          <p className="text-gray-600">
-                            {selectedStudent.postalCode} {selectedStudent.city}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Straat</p>
-                          <p className="mt-1">{selectedStudent.street || "Niet ingevuld"}</p>
-                        </div>
-                        
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Huisnummer</p>
-                          <p className="mt-1">{selectedStudent.houseNumber || "Niet ingevuld"}</p>
-                        </div>
-                        
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Postcode</p>
-                          <p className="mt-1">{selectedStudent.postalCode || "Niet ingevuld"}</p>
-                        </div>
-                        
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Stad</p>
-                          <p className="mt-1">{selectedStudent.city || "Niet ingevuld"}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                {/* Klas tab */}
-                <TabsContent value="class" className="pt-2">
-                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Klas Informatie</h3>
-                    
-                    <div className="grid grid-cols-1 gap-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Schooljaar</p>
-                          <p className="mt-1">{selectedStudent.schoolYear || "Niet toegewezen"}</p>
-                        </div>
-                        
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Klas</p>
-                          <p className="mt-1">
-                            {selectedStudent.studentGroupId 
-                              ? studentGroups.find((g: any) => g.id === selectedStudent.studentGroupId)?.name
-                              : "Niet toegewezen"}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      {selectedStudent.studentGroupId && (
-                        <div className="flex items-center p-4 mt-2 rounded-md bg-blue-50 border border-blue-100">
-                          <div className="mr-4 p-2 bg-primary rounded-full">
-                            <Users className="h-5 w-5 text-white" />
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-primary">
-                              {studentGroups.find((g: any) => g.id === selectedStudent.studentGroupId)?.name}
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              De student is toegewezen aan deze klas
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                {/* Vakken tab */}
-                <TabsContent value="subjects" className="pt-2">
-                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-                    <h3 className="text-lg font-semibold text-primary mb-4">Vakken Informatie</h3>
-                    
-                    {(!selectedStudent.programs || selectedStudent.programs.length === 0) ? (
-                      <div className="p-4 bg-gray-50 rounded-md border border-gray-200 text-center">
-                        <GraduationCap className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                        <p className="text-gray-600">
-                          Deze student volgt geen vakken
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {selectedStudent.programs.map((program: any, index: number) => (
-                          <div 
-                            key={index}
-                            className="flex justify-between items-center p-4 bg-gray-50 rounded-md border border-gray-200"
-                          >
-                            <div>
-                              <h4 className="font-medium">
-                                {programs.find((p: any) => p.id === program.programId)?.name || "Onbekend programma"}
-                              </h4>
-                              <p className="text-sm text-gray-600 mt-1">
-                                Leerjaar: {program.yearLevel || "Niet gespecificeerd"}
-                              </p>
-                            </div>
-                            <div>
-                              <BookOpen className="h-5 w-5 text-primary" />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </TabsContent>
-              </Tabs>
-              
-              <div className="flex justify-end gap-2 mt-6">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setIsStudentDetailDialogOpen(false)}
-                >
-                  Sluiten
-                </Button>
-                <Button 
-                  variant="default" 
-                  onClick={() => {
-                    setIsStudentDetailDialogOpen(false);
-                    handleEditStudent(selectedStudent);
-                  }}
-                >
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Bewerken
-                </Button>
+        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden">
+          <div className="bg-[#1e40af] py-5 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <UserPlus className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Student Toevoegen</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Voeg een nieuwe student toe aan het systeem.
+                </DialogDescription>
               </div>
             </div>
-          )}
+          </div>
+          
+          <form onSubmit={handleCreateStudent}>
+                <div className="px-6 py-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div className="space-y-4 md:col-span-2">
+                      <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                        <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                          <User className="h-4 w-4 mr-2" />
+                          Persoonlijke Informatie
+                        </h3>
+                        <div className="mb-4">
+                          <p className="text-sm font-medium text-gray-700 mb-1">Foto</p>
+                          <div className="flex gap-4 justify-between">
+                            <div 
+                              className="w-32 h-32 rounded-md border border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:bg-gray-100 transition-colors"
+                              onClick={() => document.getElementById('photo-upload').click()}
+                            >
+                              {formData.photoUrl ? (
+                                <img src={formData.photoUrl} alt="Student foto" className="w-full h-full object-cover" />
+                              ) : (
+                                <Camera className="h-12 w-12 text-gray-400" />
+                              )}
+                            </div>
+                            <div className="flex flex-col gap-2 justify-center items-end">
+                              <button 
+                                type="button" 
+                                className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors bg-[#8CD3AF] text-sm"
+                              >
+                                <div className="bg-[#8CD3AF] rounded-sm px-1 text-white font-bold">
+                                  <span className="text-black text-xs">be</span>
+                                  <span className="text-white text-xs">ID</span>
+                                </div>
+                                <span className="text-xs font-medium text-gray-700">Identificeer met eID</span>
+                              </button>
+                              <button 
+                                type="button" 
+                                className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-[#FF4D27] text-white hover:bg-[#e04423] transition-colors text-sm"
+                              >
+                                <Fingerprint className="h-3 w-3" />
+                                <span className="text-xs font-medium">Identificeer met itsme</span>
+                              </button>
+                            </div>
+                            <input
+                              id="photo-upload"
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => {
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      photoUrl: reader.result as string
+                                    }));
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="studentId" className="text-xs font-medium text-gray-700">Student ID *</Label>
+                            <Input
+                              id="studentId"
+                              name="studentId"
+                              value={formData.studentId}
+                              onChange={handleInputChange}
+                              required
+                              className="mt-1 h-9"
+                              placeholder="Bijv. STU-001"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="gender" className="text-xs font-medium text-gray-700">Geslacht *</Label>
+                            <Select 
+                              value={formData.gender} 
+                              onValueChange={(value) => handleSelectChange('gender', value)}
+                              required
+                            >
+                              <SelectTrigger className="mt-1 h-9">
+                                <SelectValue placeholder="Selecteer geslacht" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="man">Man</SelectItem>
+                                <SelectItem value="vrouw">Vrouw</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">Voornaam *</Label>
+                            <Input
+                              id="firstName"
+                              name="firstName"
+                              value={formData.firstName}
+                              onChange={handleInputChange}
+                              required
+                              className="mt-1 h-9"
+                              placeholder="Voornaam"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">Achternaam *</Label>
+                            <Input
+                              id="lastName"
+                              name="lastName"
+                              value={formData.lastName}
+                              onChange={handleInputChange}
+                              required
+                              className="mt-1 h-9"
+                              placeholder="Achternaam"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="email" className="text-xs font-medium text-gray-700">Email</Label>
+                            <Input
+                              id="email"
+                              name="email"
+                              type="email"
+                              value={formData.email}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="email@voorbeeld.com"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="phone" className="text-xs font-medium text-gray-700">Telefoon</Label>
+                            <Input
+                              id="phone"
+                              name="phone"
+                              value={formData.phone}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="+32 123 456 789"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">Geboortedatum</Label>
+                            <Input
+                              id="dateOfBirth"
+                              name="dateOfBirth"
+                              type="date"
+                              value={formData.dateOfBirth || ""}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                        <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                          <HomeIcon className="h-4 w-4 mr-2" />
+                          Adresgegevens
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                          <div className="md:col-span-4">
+                            <Label htmlFor="street" className="text-xs font-medium text-gray-700">Straat</Label>
+                            <Input
+                              id="street"
+                              name="street"
+                              value={formData.street}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="Straatnaam"
+                            />
+                          </div>
+                          
+                          <div className="md:col-span-2">
+                            <Label htmlFor="houseNumber" className="text-xs font-medium text-gray-700">Huisnummer</Label>
+                            <Input
+                              id="houseNumber"
+                              name="houseNumber"
+                              value={formData.houseNumber}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="123"
+                            />
+                          </div>
+                          
+                          <div className="md:col-span-2">
+                            <Label htmlFor="postalCode" className="text-xs font-medium text-gray-700">Postcode</Label>
+                            <Input
+                              id="postalCode"
+                              name="postalCode"
+                              value={formData.postalCode}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="1000"
+                            />
+                          </div>
+                          
+                          <div className="md:col-span-4">
+                            <Label htmlFor="city" className="text-xs font-medium text-gray-700">Stad</Label>
+                            <Input
+                              id="city"
+                              name="city"
+                              value={formData.city}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="Brussel"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                        <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                          <GraduationCap className="h-4 w-4 mr-2" />
+                          Onderwijsgegevens
+                        </h3>
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="schoolYear" className="text-xs font-medium text-gray-700">Schooljaar</Label>
+                            <Input
+                              id="schoolYear"
+                              name="schoolYear"
+                              value={formData.schoolYear}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="Bijv. 2023-2024"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="studentGroupId" className="text-xs font-medium text-gray-700">Klas</Label>
+                            <Select 
+                              value={formData.studentGroupId} 
+                              onValueChange={(value) => handleSelectChange('studentGroupId', value)}
+                            >
+                              <SelectTrigger className="mt-1 h-9">
+                                <SelectValue placeholder="Selecteer klas" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {studentGroups.map((group) => (
+                                  <SelectItem key={group.id} value={group.id}>
+                                    {group.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="enrollmentDate" className="text-xs font-medium text-gray-700">Inschrijvingsdatum</Label>
+                            <Input
+                              id="enrollmentDate"
+                              name="enrollmentDate"
+                              type="date"
+                              value={formData.enrollmentDate || ""}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="status" className="text-xs font-medium text-gray-700">Status</Label>
+                            <Select 
+                              value={formData.status} 
+                              onValueChange={(value) => handleSelectChange('status', value)}
+                            >
+                              <SelectTrigger className="mt-1 h-9">
+                                <SelectValue placeholder="Selecteer status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="active">Ingeschreven</SelectItem>
+                                <SelectItem value="inactive">Uitgeschreven</SelectItem>
+                                <SelectItem value="suspended">Geschorst</SelectItem>
+                                <SelectItem value="graduated">Afgestudeerd</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                        <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                          <NotebookText className="h-4 w-4 mr-2" />
+                          Notities
+                        </h3>
+                        <div>
+                          <Textarea
+                            id="notes"
+                            name="notes"
+                            value={formData.notes}
+                            onChange={handleInputChange}
+                            rows={6}
+                            className="resize-none h-full"
+                            placeholder="Eventuele opmerkingen of bijzonderheden over deze student"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="eid" className="p-0 mt-0">
+                <div className="p-6">
+                  <div className="bg-[#f8fafc] p-6 rounded-lg border border-[#e2e8f0] max-w-md mx-auto text-center">
+                    <div className="w-16 h-16 bg-[#77CC9A] rounded-full flex items-center justify-center text-white mx-auto mb-4">
+                      <CreditCard className="h-8 w-8" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Identificatie via e-ID kaart</h3>
+                    <p className="text-sm text-gray-500 mb-6">
+                      Sluit uw kaartlezer aan en plaats uw e-ID kaart om automatisch gegevens in te lezen.
+                    </p>
+                    
+                    <div className="flex flex-col items-center">
+                      <div className="w-64 h-36 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-6 bg-white">
+                        <div className="text-center text-gray-400">
+                          <User className="w-12 h-12 mx-auto text-gray-300" />
+                          <p className="text-xs mt-1">e-ID kaart hier plaatsen</p>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        className="bg-[#1e40af] hover:bg-[#1e40af]/90 mb-2"
+                        disabled
+                      >
+                        <ScanLine className="h-4 w-4 mr-2" />
+                        Gegevens Inlezen
+                      </Button>
+                      <p className="text-xs text-gray-500 flex items-center gap-1 justify-center">
+                        <AlertCircle className="h-3 w-3" />
+                        Kaartlezer niet gedetecteerd
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="itsme" className="p-0 mt-0">
+                <div className="p-6">
+                  <div className="bg-[#f8fafc] p-6 rounded-lg border border-[#e2e8f0] max-w-md mx-auto text-center">
+                    <div className="w-16 h-16 bg-[#FF4D27] rounded-full flex items-center justify-center text-white mx-auto mb-4">
+                      <Fingerprint className="h-8 w-8" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Identificatie via itsme®</h3>
+                    <p className="text-sm text-gray-500 mb-6">
+                      Gebruik de itsme® app op uw smartphone om snel en veilig te identificeren.
+                    </p>
+                    
+                    <div className="max-w-sm mx-auto space-y-6">
+                      <div className="bg-white rounded-lg p-5 border border-gray-200">
+                        <ol className="list-decimal list-inside text-sm text-gray-600 space-y-3">
+                          <li>Open de itsme® app op uw smartphone</li>
+                          <li>Klik op de knop hieronder om de identificatie te starten</li>
+                          <li>Scan de QR-code die verschijnt met uw itsme® app</li>
+                          <li>Bevestig uw identiteit in de app</li>
+                        </ol>
+                      </div>
+                      
+                      <Button className="bg-[#FF4D27] hover:bg-[#FF4D27]/90 w-full">
+                        <Smartphone className="h-4 w-4 mr-2" />
+                        Identificeren met itsme®
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+            
+            <div className="border-t border-gray-200 px-6 py-4 flex justify-end gap-2 bg-[#f8fafc]">
+              <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                Annuleren
+              </Button>
+              <Button type="submit" className="bg-[#1e40af] hover:bg-[#1e40af]/90">
+                {createStudentMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Bezig met opslaan...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                    Student Toevoegen
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
+
+      {/* View Student Dialog */}
+      {selectedStudent && (
+        <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+          <DialogContent className="sm:max-w-[700px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Avatar className="h-8 w-8">
+                  {selectedStudent.photoUrl ? (
+                    <AvatarImage src={selectedStudent.photoUrl} alt={`${selectedStudent.firstName} ${selectedStudent.lastName}`} />
+                  ) : (
+                    <AvatarFallback className="bg-[#1e40af] text-white">
+                      {selectedStudent.firstName[0]}{selectedStudent.lastName[0]}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                {selectedStudent.firstName} {selectedStudent.lastName}
+              </DialogTitle>
+              <DialogDescription>
+                Student ID: {selectedStudent.studentId}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <Tabs value={viewTab} onValueChange={setViewTab} className="mt-2">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="info">Informatie</TabsTrigger>
+                <TabsTrigger value="guardians">Voogden</TabsTrigger>
+                <TabsTrigger value="enrollments">Inschrijvingen</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="info" className="mt-4">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-32 h-32 rounded-md overflow-hidden border border-gray-200">
+                    {selectedStudent.photoUrl ? (
+                      <img 
+                        src={selectedStudent.photoUrl} 
+                        alt={`${selectedStudent.firstName} ${selectedStudent.lastName}`} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                        <UserCircle className="h-16 w-16 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-lg">{selectedStudent.firstName} {selectedStudent.lastName}</h3>
+                    <p className="text-sm text-gray-500">ID: {selectedStudent.studentId}</p>
+                    {selectedStudent.status && (
+                      <Badge variant={
+                        selectedStudent.status === 'active' ? 'default' : 
+                        selectedStudent.status === 'inactive' ? 'secondary' :
+                        selectedStudent.status === 'graduated' ? 'success' : 'destructive'
+                      } className="mt-2">
+                        {selectedStudent.status === 'active' ? 'Ingeschreven' : 
+                        selectedStudent.status === 'inactive' ? 'Uitgeschreven' :
+                        selectedStudent.status === 'suspended' ? 'Geschorst' :
+                        selectedStudent.status === 'graduated' ? 'Afgestudeerd' : 'Niet ingevuld'}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="md:col-span-1">
+                    <p className="text-sm font-medium text-gray-700">Email</p>
+                    <p className="mt-1">{selectedStudent.email || "Niet ingevuld"}</p>
+                  </div>
+                  
+                  <div className="md:col-span-1">
+                    <p className="text-sm font-medium text-gray-700">Telefoon</p>
+                    <p className="mt-1">{selectedStudent.phone || "Niet ingevuld"}</p>
+                  </div>
+                  
+                  <div className="md:col-span-1">
+                    <p className="text-sm font-medium text-gray-700">Geboortedatum</p>
+                    <p className="mt-1">{selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "Niet ingevuld"}</p>
+                  </div>
+                  
+                  <div className="md:col-span-1">
+                    <p className="text-sm font-medium text-gray-700">Geslacht</p>
+                    <p className="mt-1">
+                      {selectedStudent.gender === 'man' ? 'Man' : 
+                       selectedStudent.gender === 'vrouw' ? 'Vrouw' : 'Niet ingevuld'}
+                    </p>
+                  </div>
+                  
+                  <div className="md:col-span-2">
+                    <p className="text-sm font-medium text-gray-700">Adres</p>
+                    <p className="mt-1">
+                      {selectedStudent.street ? `${selectedStudent.street} ${selectedStudent.houseNumber || ''}, ${selectedStudent.postalCode || ''} ${selectedStudent.city || ''}` : "Niet ingevuld"}
+                    </p>
+                  </div>
+                  
+                  <div className="md:col-span-1">
+                    <p className="text-sm font-medium text-gray-700">Programma</p>
+                    <p className="mt-1">
+                      {programs.find(p => p.id === selectedStudent.programId)?.name || "Niet ingevuld"}
+                    </p>
+                  </div>
+                  
+                  <div className="md:col-span-1">
+                    <p className="text-sm font-medium text-gray-700">Jaar Niveau</p>
+                    <p className="mt-1">{selectedStudent.yearLevel ? `Jaar ${selectedStudent.yearLevel}` : "Niet ingevuld"}</p>
+                  </div>
+                  
+                  <div className="md:col-span-1">
+                    <p className="text-sm font-medium text-gray-700">Klassengroep</p>
+                    <p className="mt-1">
+                      {studentGroups.find(g => g.id === selectedStudent.studentGroupId)?.name || "Niet ingevuld"}
+                    </p>
+                  </div>
+                  
+                  <div className="md:col-span-1">
+                    <p className="text-sm font-medium text-gray-700">Inschrijvingsdatum</p>
+                    <p className="mt-1">{selectedStudent.enrollmentDate ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) : "Niet ingevuld"}</p>
+                  </div>
+                  
+                  <div className="md:col-span-1">
+                    <p className="text-sm font-medium text-gray-700">Status</p>
+                    <p className="mt-1">
+                      <Badge variant={
+                        selectedStudent.status === 'active' ? 'default' : 
+                        selectedStudent.status === 'inactive' ? 'secondary' :
+                        selectedStudent.status === 'graduated' ? 'success' : 'destructive'
+                      }>
+                        {selectedStudent.status === 'active' ? 'Actief' : 
+                         selectedStudent.status === 'inactive' ? 'Inactief' :
+                         selectedStudent.status === 'graduated' ? 'Afgestudeerd' : 'Teruggetrokken'}
+                      </Badge>
+                    </p>
+                  </div>
+                  
+                  <div className="md:col-span-3">
+                    <p className="text-sm font-medium text-gray-700">Notities</p>
+                    <p className="mt-1 text-sm text-gray-600 whitespace-pre-line">
+                      {selectedStudent.notes || "Geen notities"}
+                    </p>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="guardians" className="mt-4">
+                <div className="flex justify-end mb-4 gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setIsLinkGuardianDialogOpen(true);
+                    }}
+                  >
+                    <PlusCircle className="mr-2 h-4 w-4" /> Bestaande Voogd Koppelen
+                  </Button>
+                  
+                  <Button 
+                    className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+                    size="sm"
+                    onClick={() => {
+                      setIsCreateGuardianDialogOpen(true);
+                    }}
+                  >
+                    <PlusCircle className="mr-2 h-4 w-4" /> Nieuwe Voogd Toevoegen
+                  </Button>
+                </div>
+                
+                {selectedStudent.guardians && selectedStudent.guardians.length > 0 ? (
+                  <div className="space-y-4">
+                    {selectedStudent.guardians.map((guardian) => (
+                      <div key={guardian.id} className="bg-gray-50 p-4 rounded-md border">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-medium">{guardian.firstName} {guardian.lastName}</h3>
+                            <p className="text-sm text-gray-600">{guardian.relationshipType || "Niet gespecificeerd"}</p>
+                            
+                            <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1">
+                              <div className="flex items-center gap-1 text-sm text-gray-600">
+                                <Mail className="h-3.5 w-3.5 text-gray-500" />
+                                <span>{guardian.email || "Geen email"}</span>
+                              </div>
+                              
+                              <div className="flex items-center gap-1 text-sm text-gray-600">
+                                <Phone className="h-3.5 w-3.5 text-gray-500" />
+                                <span>{guardian.phone || "Geen telefoon"}</span>
+                              </div>
+                              
+                              {guardian.address && (
+                                <div className="flex items-center gap-1 text-sm text-gray-600 md:col-span-2">
+                                  <HomeIcon className="h-3.5 w-3.5 text-gray-500" />
+                                  <span>{guardian.address}</span>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {guardian.isEmergencyContact && (
+                              <Badge variant="outline" className="mt-2 bg-amber-50 text-amber-700 border-amber-200">
+                                Noodcontact
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              // Hier zou je een functie kunnen toevoegen om de voogd te bewerken
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              // Hier zou je een functie kunnen toevoegen om de voogd te ontkoppelen
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <UserCircle className="mx-auto h-12 w-12 text-gray-300" />
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">Geen voogden</h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Deze student heeft nog geen gekoppelde voogden.
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="enrollments" className="mt-4">
+                {/* Je zou hier inschrijvingsgegevens kunnen tonen */}
+                <div className="text-center py-8">
+                  <BookOpen className="mx-auto h-12 w-12 text-gray-300" />
+                  <h3 className="mt-2 text-sm font-medium text-gray-900">Inschrijvingsgegevens</h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Hier komen de details van de inschrijvingen.
+                  </p>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Edit Student Dialog */}
+      {selectedStudent && (
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Student Bewerken</DialogTitle>
+              <DialogDescription>
+                Bewerk de gegevens van {selectedStudent.firstName} {selectedStudent.lastName}.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <form onSubmit={handleUpdateStudent}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="studentId">Student ID</Label>
+                  <Input
+                    id="studentId"
+                    name="studentId"
+                    value={formData.studentId}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="gender">Geslacht</Label>
+                  <Select 
+                    value={formData.gender} 
+                    onValueChange={(value) => handleSelectChange('gender', value)}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer geslacht" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="man">Man</SelectItem>
+                      <SelectItem value="vrouw">Vrouw</SelectItem>
+                      <SelectItem value="anders">Anders</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">Voornaam</Label>
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Achternaam</Label>
+                  <Input
+                    id="lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Telefoon</Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="dateOfBirth">Geboortedatum</Label>
+                  <Input
+                    id="dateOfBirth"
+                    name="dateOfBirth"
+                    type="date"
+                    value={formData.dateOfBirth || ""}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="programId">Programma</Label>
+                  <Select 
+                    value={formData.programId} 
+                    onValueChange={(value) => handleSelectChange('programId', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer programma" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {programs.map((program) => (
+                        <SelectItem key={program.id} value={program.id.toString()}>
+                          {program.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="yearLevel">Jaar Niveau</Label>
+                  <Select 
+                    value={formData.yearLevel} 
+                    onValueChange={(value) => handleSelectChange('yearLevel', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer niveau" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Jaar 1</SelectItem>
+                      <SelectItem value="2">Jaar 2</SelectItem>
+                      <SelectItem value="3">Jaar 3</SelectItem>
+                      <SelectItem value="4">Jaar 4</SelectItem>
+                      <SelectItem value="5">Jaar 5</SelectItem>
+                      <SelectItem value="6">Jaar 6</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="studentGroupId">Klassengroep</Label>
+                  <Select 
+                    value={formData.studentGroupId} 
+                    onValueChange={(value) => handleSelectChange('studentGroupId', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer klassengroep" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {studentGroups.map((group) => (
+                        <SelectItem key={group.id} value={group.id.toString()}>
+                          {group.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="enrollmentDate">Inschrijvingsdatum</Label>
+                  <Input
+                    id="enrollmentDate"
+                    name="enrollmentDate"
+                    type="date"
+                    value={formData.enrollmentDate || ""}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select 
+                    value={formData.status} 
+                    onValueChange={(value) => handleSelectChange('status', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Actief</SelectItem>
+                      <SelectItem value="inactive">Inactief</SelectItem>
+                      <SelectItem value="graduated">Afgestudeerd</SelectItem>
+                      <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="col-span-1 md:col-span-2 space-y-2">
+                  <Label htmlFor="street">Straat</Label>
+                  <Input
+                    id="street"
+                    name="street"
+                    value={formData.street}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="houseNumber">Huisnummer</Label>
+                  <Input
+                    id="houseNumber"
+                    name="houseNumber"
+                    value={formData.houseNumber}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="postalCode">Postcode</Label>
+                  <Input
+                    id="postalCode"
+                    name="postalCode"
+                    value={formData.postalCode}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="city">Stad</Label>
+                  <Input
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="col-span-1 md:col-span-2 space-y-2">
+                  <Label htmlFor="notes">Notities</Label>
+                  <Textarea
+                    id="notes"
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleInputChange}
+                    rows={3}
+                  />
+                </div>
+              </div>
+              
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                  Annuleren
+                </Button>
+                <Button type="submit" className="bg-[#1e40af] hover:bg-[#1e40af]/90">
+                  {updateStudentMutation.isPending ? "Bezig met opslaan..." : "Wijzigingen Opslaan"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Delete Student Dialog */}
+      {selectedStudent && (
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Student Verwijderen</DialogTitle>
+              <DialogDescription>
+                Weet je zeker dat je {selectedStudent.firstName} {selectedStudent.lastName} wilt verwijderen? 
+                Deze actie kan niet ongedaan worden gemaakt.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                Annuleren
+              </Button>
+              <Button 
+                type="button" 
+                variant="destructive"
+                onClick={handleDeleteStudent}
+              >
+                {deleteStudentMutation.isPending ? "Bezig met verwijderen..." : "Student Verwijderen"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Link Guardian Dialog */}
+      {selectedStudent && (
+        <Dialog open={isLinkGuardianDialogOpen} onOpenChange={setIsLinkGuardianDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Voogd Koppelen aan {selectedStudent.firstName} {selectedStudent.lastName}</DialogTitle>
+              <DialogDescription>
+                Koppel een bestaande voogd aan deze student.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <form onSubmit={handleLinkGuardian}>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="guardianId">Voogd</Label>
+                  <Select 
+                    value={selectedGuardianId} 
+                    onValueChange={setSelectedGuardianId}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer een voogd" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getAvailableGuardians().map((guardian) => (
+                        <SelectItem key={guardian.id} value={guardian.id.toString()}>
+                          {guardian.firstName} {guardian.lastName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="relationshipType">Relatie</Label>
+                  <Select 
+                    value={guardianRelationType} 
+                    onValueChange={setGuardianRelationType}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer relatietype" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="parent">Ouder</SelectItem>
+                      <SelectItem value="guardian">Voogd</SelectItem>
+                      <SelectItem value="family">Familie</SelectItem>
+                      <SelectItem value="other">Anders</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isEmergencyContact"
+                    checked={isEmergencyContact}
+                    onChange={(e) => setIsEmergencyContact(e.target.checked)}
+                    className="rounded border-gray-300 text-[#1e40af] focus:ring-[#1e40af]"
+                  />
+                  <Label htmlFor="isEmergencyContact" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Noodcontact
+                  </Label>
+                </div>
+              </div>
+              
+              <DialogFooter className="gap-2">
+                <Button type="button" variant="outline" onClick={() => setIsLinkGuardianDialogOpen(false)}>
+                  Annuleren
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={() => {
+                    setIsLinkGuardianDialogOpen(false);
+                    setIsCreateGuardianDialogOpen(true);
+                  }}
+                >
+                  Nieuwe Voogd
+                </Button>
+                <Button type="submit" className="bg-[#1e40af] hover:bg-[#1e40af]/90">
+                  Voogd Koppelen
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Create Guardian Dialog zou hier kunnen worden toegevoegd */}
     </div>
   );
 }

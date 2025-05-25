@@ -575,34 +575,6 @@ export default function Students() {
           </div>
           
           <form onSubmit={handleCreateStudent}>
-            <Tabs defaultValue="handmatig" className="mt-0">
-              <div className="bg-[#f8fafc] px-6 py-3 border-b">
-                <TabsList className="grid w-full grid-cols-3 bg-[#e2e8f0]">
-                  <TabsTrigger 
-                    value="handmatig" 
-                    className="data-[state=active]:bg-white data-[state=active]:text-[#1e40af] data-[state=active]:shadow"
-                  >
-                    <ClipboardEdit className="h-4 w-4 mr-2" />
-                    Handmatig
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="eid" 
-                    className="data-[state=active]:bg-white data-[state=active]:text-[#1e40af] data-[state=active]:shadow"
-                  >
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    e-ID Kaart
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="itsme" 
-                    className="data-[state=active]:bg-white data-[state=active]:text-[#1e40af] data-[state=active]:shadow"
-                  >
-                    <Smartphone className="h-4 w-4 mr-2" />
-                    itsme®
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-              
-              <TabsContent value="handmatig" className="p-0 mt-0">
                 <div className="px-6 py-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div className="space-y-4 md:col-span-2">
@@ -613,7 +585,7 @@ export default function Students() {
                         </h3>
                         <div className="mb-4">
                           <p className="text-sm font-medium text-gray-700 mb-1">Foto</p>
-                          <div className="flex gap-4">
+                          <div className="flex gap-4 justify-between">
                             <div 
                               className="w-32 h-32 rounded-md border border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:bg-gray-100 transition-colors"
                               onClick={() => document.getElementById('photo-upload').click()}
@@ -624,10 +596,10 @@ export default function Students() {
                                 <Camera className="h-12 w-12 text-gray-400" />
                               )}
                             </div>
-                            <div className="flex flex-col gap-3 justify-center">
+                            <div className="flex flex-col gap-2 justify-center items-end">
                               <button 
                                 type="button" 
-                                className="flex items-center justify-center gap-2 border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-50 transition-colors bg-[#8CD3AF]"
+                                className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors bg-[#8CD3AF] text-sm"
                               >
                                 <div className="bg-[#8CD3AF] rounded-sm px-1 text-white font-bold">
                                   <span className="text-black text-xs">be</span>
@@ -637,9 +609,9 @@ export default function Students() {
                               </button>
                               <button 
                                 type="button" 
-                                className="flex items-center justify-center gap-2 border border-gray-300 rounded-md px-3 py-2 bg-[#FF4D27] text-white hover:bg-[#e04423] transition-colors"
+                                className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-[#FF4D27] text-white hover:bg-[#e04423] transition-colors text-sm"
                               >
-                                <Fingerprint className="h-4 w-4" />
+                                <Fingerprint className="h-3 w-3" />
                                 <span className="text-xs font-medium">Identificeer met itsme</span>
                               </button>
                             </div>

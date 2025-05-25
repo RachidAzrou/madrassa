@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import ManageStudentEnrollments from "@/components/student-groups/ManageStudentEnrollments";
 import { ClassEmptyState } from "@/components/ui/empty-states";
+import { PremiumHeader } from "@/components/layout/premium-header";
 // Aangepast ChalkboardTeacher icoon
 const ChalkBoard = (props: any) => (
   <svg
@@ -286,24 +287,11 @@ export default function StudentGroups() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Page header - Professionele desktop stijl (conform Dashboard) */}
-      <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
-        <div className="flex flex-col">
-          <div className="px-6 py-4 flex justify-between items-center">
-            <div className="flex items-center">
-              <UsersRound className="h-5 w-5 text-[#1e40af] mr-2" />
-              <h1 className="text-base font-medium text-gray-800 tracking-tight">Klassen</h1>
-            </div>
-            <div className="flex items-center">
-              <div className="text-xs text-gray-500 font-medium">
-                {new Date().toLocaleDateString('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})}
-              </div>
-            </div>
-          </div>
-          <div className="px-6 py-2 bg-[#f9fafc] border-t border-[#e5e7eb] flex items-center">
-            <div className="text-xs text-gray-500">Beheer &gt; Klassen</div>
-          </div>
-        </div>
-      </header>
+      <PremiumHeader 
+        title="Klassen" 
+        path="Beheer > Klassen" 
+        icon={UsersRound} 
+      />
 
       {/* Main content area */}
       <div className="px-6 py-6 flex-1">

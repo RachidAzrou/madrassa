@@ -371,24 +371,12 @@ const Teachers = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Page header - Professionele desktop stijl */}
-        <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
-          <div className="flex flex-col">
-            <div className="px-6 py-4 flex justify-between items-center">
-              <div>
-                <h1 className="text-base font-medium text-gray-800 tracking-tight">Docenten</h1>
-              </div>
-              <div className="flex items-center">
-                <div className="text-xs text-gray-500 font-medium">
-                  {new Date().toLocaleDateString('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})}
-                </div>
-              </div>
-            </div>
-            <div className="px-6 py-2 bg-[#f9fafc] border-t border-[#e5e7eb] flex items-center">
-              <div className="text-xs text-gray-500">Beheer &gt; Docenten</div>
-            </div>
-          </div>
-        </header>
+        {/* Premium header component */}
+        <PremiumHeader 
+          title="Docenten" 
+          path="Beheer > Docenten" 
+          icon={GraduationCap} 
+        />
 
         {/* Main content area */}
         <div className="flex-1 p-6 flex flex-col">
@@ -406,24 +394,12 @@ const Teachers = () => {
   if (isError) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Page header - Professionele desktop stijl */}
-        <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
-          <div className="flex flex-col">
-            <div className="px-6 py-4 flex justify-between items-center">
-              <div>
-                <h1 className="text-base font-medium text-gray-800 tracking-tight">Docenten</h1>
-              </div>
-              <div className="flex items-center">
-                <div className="text-xs text-gray-500 font-medium">
-                  {new Date().toLocaleDateString('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})}
-                </div>
-              </div>
-            </div>
-            <div className="px-6 py-2 bg-[#f9fafc] border-t border-[#e5e7eb] flex items-center">
-              <div className="text-xs text-gray-500">Beheer &gt; Docenten</div>
-            </div>
-          </div>
-        </header>
+        {/* Premium header component */}
+        <PremiumHeader 
+          title="Docenten" 
+          path="Beheer > Docenten" 
+          icon={GraduationCap} 
+        />
 
         {/* Main content area */}
         <div className="flex-1 p-6 flex flex-col">
@@ -446,25 +422,12 @@ const Teachers = () => {
   
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Page header - Professionele desktop stijl (conform Dashboard) */}
-      <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
-        <div className="flex flex-col">
-          <div className="px-6 py-4 flex justify-between items-center">
-            <div className="flex items-center">
-              <GraduationCap className="h-5 w-5 text-[#1e40af] mr-2" />
-              <h1 className="text-base font-medium text-gray-800 tracking-tight">Docenten</h1>
-            </div>
-            <div className="flex items-center">
-              <div className="text-xs text-gray-500 font-medium">
-                {new Date().toLocaleDateString('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})}
-              </div>
-            </div>
-          </div>
-          <div className="px-6 py-2 bg-[#f9fafc] border-t border-[#e5e7eb] flex items-center">
-            <div className="text-xs text-gray-500">Beheer &gt; Docenten</div>
-          </div>
-        </div>
-      </header>
+      {/* Premium header component */}
+      <PremiumHeader 
+        title="Docenten" 
+        path="Beheer > Docenten" 
+        icon={GraduationCap} 
+      />
 
       {/* Main content area */}
       <div className="px-6 py-6">

@@ -666,21 +666,21 @@ export default function Attendance() {
                           {studentsData.map((student: Student) => {
                             const status = studentAttendance[student.id]?.status;
                             const statusBadge = status === 'present' 
-                              ? <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 border border-green-200 shadow-sm"><CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Aanwezig</span>
+                              ? <span className="inline-flex items-center px-2.5 py-1 rounded-sm text-xs font-medium bg-green-50 text-green-700 border border-green-100"><CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Aanwezig</span>
                               : status === 'late'
-                                ? <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200 shadow-sm"><Clock className="h-3.5 w-3.5 mr-1.5" /> Te laat</span>
+                                ? <span className="inline-flex items-center px-2.5 py-1 rounded-sm text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100"><Clock className="h-3.5 w-3.5 mr-1.5" /> Te laat</span>
                                 : status === 'absent'
-                                  ? <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800 border border-red-200 shadow-sm"><XCircle className="h-3.5 w-3.5 mr-1.5" /> Afwezig</span>
-                                  : <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 shadow-sm">Niet ingevuld</span>;
+                                  ? <span className="inline-flex items-center px-2.5 py-1 rounded-sm text-xs font-medium bg-red-50 text-red-700 border border-red-100"><XCircle className="h-3.5 w-3.5 mr-1.5" /> Afwezig</span>
+                                  : <span className="inline-flex items-center px-2.5 py-1 rounded-sm text-xs font-medium bg-gray-50 text-gray-600 border border-gray-100">Niet ingevuld</span>;
                             
                             return (
-                              <div key={student.id} className="grid grid-cols-12 items-center p-4 hover:bg-blue-50/30 transition-colors">
+                              <div key={student.id} className="grid grid-cols-12 items-center p-4 hover:bg-gray-50 transition-colors">
                                 <div className="col-span-4 sm:col-span-4 font-medium flex items-center">
-                                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 flex items-center justify-center text-xs font-medium mr-3 border border-blue-200 shadow-sm">
+                                  <div className="h-10 w-10 rounded-md bg-gray-100 text-[#1e40af] flex items-center justify-center text-xs font-medium mr-3 border border-gray-200">
                                     {student.firstName.charAt(0)}{student.lastName.charAt(0)}
                                   </div>
                                   <div>
-                                    <div className="font-medium text-blue-900">{student.firstName} {student.lastName}</div>
+                                    <div className="font-medium text-gray-800">{student.firstName} {student.lastName}</div>
                                     <div className="text-xs text-gray-500 sm:hidden mt-0.5">{student.studentId}</div>
                                   </div>
                                 </div>
@@ -701,7 +701,7 @@ export default function Attendance() {
                                     size="sm" 
                                     {...getStudentButtonStyle(student.id, 'present')}
                                     onClick={() => markStudentPresent(student.id)}
-                                    className="flex-1 sm:flex-initial max-w-[90px] shadow-sm rounded-md"
+                                    className="flex-1 sm:flex-initial max-w-[90px] border-gray-200 rounded-sm hover:bg-gray-50 hover:text-[#1e40af]"
                                   >
                                     <CheckCircle className="h-4 w-4 sm:mr-1.5" />
                                     <span className="hidden sm:inline font-medium">Aanwezig</span>
@@ -711,7 +711,7 @@ export default function Attendance() {
                                     size="sm" 
                                     {...getStudentButtonStyle(student.id, 'late')}
                                     onClick={() => markStudentLate(student.id)}
-                                    className="flex-1 sm:flex-initial max-w-[90px] shadow-sm rounded-md"
+                                    className="flex-1 sm:flex-initial max-w-[90px] border-gray-200 rounded-sm hover:bg-gray-50 hover:text-[#1e40af]"
                                   >
                                     <Clock className="h-4 w-4 sm:mr-1.5" />
                                     <span className="hidden sm:inline font-medium">Te laat</span>

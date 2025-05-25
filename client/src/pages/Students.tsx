@@ -287,7 +287,7 @@ export default function Students() {
     <div className="bg-[#f7f9fc] min-h-screen">
       <PremiumHeader 
         title="Studenten" 
-        description="Bekijk en beheer alle studentgegevens"
+        description="Bekijk en beheer alle studentgegevens, inclusief persoonlijke informatie en inschrijvingsdetails"
         icon={Users}
         breadcrumbs={{
           parent: "Beheer",

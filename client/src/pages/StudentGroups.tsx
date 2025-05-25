@@ -290,7 +290,8 @@ export default function StudentGroups() {
       <PremiumHeader 
         title="Klassen" 
         path="Beheer > Klassen" 
-        icon={ChalkBoard} 
+        icon={ChalkBoard}
+        description="Beheer klasgroepen, bekijk studentenlijsten en wijs docenten toe aan klassen"
       />
 
       {/* Main content area */}

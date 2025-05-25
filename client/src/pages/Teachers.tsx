@@ -426,7 +426,8 @@ const Teachers = () => {
       <PremiumHeader 
         title="Docenten" 
         path="Beheer > Docenten" 
-        icon={GraduationCap} 
+        icon={GraduationCap}
+        description="Beheer alle docenten en hun gegevens, cursussen en beschikbaarheid"
       />
 
       {/* Main content area */}

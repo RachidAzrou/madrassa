@@ -1142,6 +1142,48 @@ export default function Students() {
           <div className="px-6 py-4">
             <div className="space-y-4">
               <SectionContainer title="Persoonlijke Informatie" icon={<User className="h-4 w-4" />}>
+                <div className="mb-4 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="relative inline-block">
+                      <Avatar className="h-24 w-24 border-2 border-gray-200 mb-2">
+                        {formData.photoUrl ? (
+                          <AvatarImage src={formData.photoUrl} alt={`${formData.firstName} ${formData.lastName}`} />
+                        ) : (
+                          <AvatarFallback className="bg-[#1e40af] text-white text-xl">
+                            {formData.firstName?.charAt(0)}{formData.lastName?.charAt(0)}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div 
+                        className="absolute bottom-0 right-0 bg-gray-100 rounded-full p-1 border border-gray-300 cursor-pointer hover:bg-gray-200 transition-colors"
+                        onClick={() => document.getElementById('photo-upload-edit').click()}
+                      >
+                        <Camera className="h-4 w-4 text-gray-700" />
+                      </div>
+                    </div>
+                    <input
+                      id="photo-upload-edit"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setFormData(prev => ({
+                              ...prev,
+                              photoUrl: reader.result as string
+                            }));
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Klik op het camera-icoon om de foto te wijzigen</p>
+                  </div>
+                </div>
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <CustomFormLabel htmlFor="firstName">Voornaam</CustomFormLabel>

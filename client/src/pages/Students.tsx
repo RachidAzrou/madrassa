@@ -2210,34 +2210,59 @@ export default function Students() {
                           !newStudentGuardians.some(g => g.id === guardian.id)
                         )
                         .map((guardian, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50">
-                            <div className="flex items-center gap-3">
-                              <Avatar className="h-8 w-8">
-                                <AvatarFallback className="bg-[#1e40af] text-white text-xs">
-                                  {guardian.firstName?.charAt(0)}{guardian.lastName?.charAt(0)}
-                                </AvatarFallback>
-                              </Avatar>
+                          <div key={index} className="p-3 hover:bg-gray-50">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-3">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                                    {guardian.firstName?.charAt(0)}{guardian.lastName?.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="text-sm font-medium">{guardian.firstName} {guardian.lastName}</p>
+                                  <p className="text-xs text-gray-500">{guardian.relationship || 'Voogd'}</p>
+                                </div>
+                              </div>
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
+                                onClick={() => {
+                                  setNewStudentGuardians([...newStudentGuardians, guardian]);
+                                  toast({
+                                    title: "Voogd gekoppeld",
+                                    description: "De voogd is toegevoegd aan de student"
+                                  });
+                                  setIsAddGuardianDialogOpen(false);
+                                }}
+                              >
+                                Koppelen
+                              </Button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 text-xs">
                               <div>
-                                <p className="text-sm font-medium">{guardian.firstName} {guardian.lastName}</p>
-                                <p className="text-xs text-gray-500">{guardian.relationship || 'Voogd'}</p>
+                                <p className="text-gray-500">Email:</p>
+                                <p className="font-medium">{guardian.email || '-'}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500">Telefoon:</p>
+                                <p className="font-medium">{guardian.phone || '-'}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500">Adres:</p>
+                                <p className="font-medium">{guardian.address || '-'}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500">Beroep:</p>
+                                <p className="font-medium">{guardian.occupation || '-'}</p>
+                              </div>
+                              <div className="col-span-2">
+                                <p className="text-gray-500">Noodcontact:</p>
+                                <p className="font-medium">{guardian.isEmergencyContact ? 'Ja' : 'Nee'}</p>
                               </div>
                             </div>
-                            <Button 
-                              type="button" 
-                              variant="outline" 
-                              size="sm" 
-                              className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
-                              onClick={() => {
-                                setNewStudentGuardians([...newStudentGuardians, guardian]);
-                                toast({
-                                  title: "Voogd gekoppeld",
-                                  description: "De voogd is toegevoegd aan de student"
-                                });
-                                setIsAddGuardianDialogOpen(false);
-                              }}
-                            >
-                              Koppelen
-                            </Button>
                           </div>
                         ))
                       }

@@ -141,28 +141,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         className
       )}
     >
-      {/* Logo and header */}
-      <div className="flex items-center justify-center px-2 py-4 border-b border-gray-200">
-        <Link href="/">
-          <div className="w-full flex items-center justify-center">
-            <img 
-              src={myMadrassaLogo} 
-              alt="myMadrassa Logo" 
-              className="w-full object-contain" 
-              style={{ maxHeight: "60px" }}
-            />
-            <span className="sr-only">myMadrassa</span>
-          </div>
-        </Link>
-        {isMobile && (
-          <button 
-            onClick={onClose} 
-            className="p-1 rounded-full text-gray-500 hover:bg-gray-100"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        )}
-      </div>
+
 
 
       
@@ -199,7 +178,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               <div className="space-y-1.5">
                 <SidebarLink
                   href="/students"
-                  icon={<Users className="h-5 w-5" />}
+                  icon={<Users className="h-4 w-4" />}
                   label="Studenten"
                   isActive={location.startsWith("/students")}
                   onClick={handleLinkClick}

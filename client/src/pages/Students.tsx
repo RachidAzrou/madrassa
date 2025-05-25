@@ -610,49 +610,41 @@ export default function Students() {
                           <User className="h-4 w-4 mr-2" />
                           Persoonlijke Informatie
                         </h3>
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="w-24 h-24 rounded-md border border-gray-300 flex items-center justify-center bg-gray-50 overflow-hidden relative">
+                        <div className="mb-4">
+                          <p className="text-sm font-medium text-gray-700 mb-1">Foto</p>
+                          <div 
+                            className="w-32 h-32 rounded-md border border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:bg-gray-100 transition-colors"
+                            onClick={() => document.getElementById('photo-upload').click()}
+                          >
                             {formData.photoUrl ? (
                               <img src={formData.photoUrl} alt="Student foto" className="w-full h-full object-cover" />
                             ) : (
-                              <UserCircle className="h-12 w-12 text-gray-400" />
+                              <>
+                                <UserCircle className="h-12 w-12 text-gray-400 mb-2" />
+                                <p className="text-xs text-gray-500 text-center px-2">Klik om foto handmatig te uploaden</p>
+                                <p className="text-xs text-gray-400 text-center px-2 mt-1">Foto wordt automatisch geladen via eID of itsme</p>
+                              </>
                             )}
                           </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-700 mb-1">Foto</p>
-                            <p className="text-xs text-gray-500 mb-2">Foto wordt automatisch geladen via eID of itsme</p>
-                            <div>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="text-xs"
-                                onClick={() => document.getElementById('photo-upload').click()}
-                              >
-                                <ScanLine className="h-3 w-3 mr-1" />
-                                Handmatig uploaden
-                              </Button>
-                              <input
-                                id="photo-upload"
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    const reader = new FileReader();
-                                    reader.onloadend = () => {
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        photoUrl: reader.result as string
-                                      }));
-                                    };
-                                    reader.readAsDataURL(file);
-                                  }
-                                }}
-                              />
-                            </div>
-                          </div>
+                          <input
+                            id="photo-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    photoUrl: reader.result as string
+                                  }));
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>

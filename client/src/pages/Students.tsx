@@ -942,13 +942,13 @@ export default function Students() {
                           onValueChange={(value) => handleSelectChange('academicYear', value)}
                           required
                         >
-                          <Button variant="outline" className="mt-1 h-9 w-full flex items-center justify-between">
+                          <SelectTrigger id="academicYear" className="mt-1 h-9 w-full border-[#e5e7eb] bg-white">
                             <SelectValue placeholder="Selecteer schooljaar" />
-                          </Button>
-                          <SelectContent>
-                            <SelectItem value="2024-2025">2024-2025</SelectItem>
-                            <SelectItem value="2025-2026">2025-2026</SelectItem>
-                            <SelectItem value="2026-2027">2026-2027</SelectItem>
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border-[#e5e7eb]">
+                            <SelectItem value="2024-2025" className="focus:bg-blue-200 hover:bg-blue-100">2024-2025</SelectItem>
+                            <SelectItem value="2025-2026" className="focus:bg-blue-200 hover:bg-blue-100">2025-2026</SelectItem>
+                            <SelectItem value="2026-2027" className="focus:bg-blue-200 hover:bg-blue-100">2026-2027</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -960,12 +960,12 @@ export default function Students() {
                           onValueChange={(value) => handleSelectChange('studentGroupId', value)}
                           required
                         >
-                          <Button variant="outline" className="mt-1 h-9 w-full flex items-center justify-between">
+                          <SelectTrigger id="studentGroupId" className="mt-1 h-9 w-full border-[#e5e7eb] bg-white">
                             <SelectValue placeholder="Selecteer klas" />
-                          </Button>
-                          <SelectContent>
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border-[#e5e7eb]">
                             {studentGroups.map((group) => (
-                              <SelectItem key={group.id} value={group.id.toString()}>
+                              <SelectItem key={group.id} value={group.id.toString()} className="focus:bg-blue-200 hover:bg-blue-100">
                                 {group.name}
                               </SelectItem>
                             ))}
@@ -992,14 +992,14 @@ export default function Students() {
                           onValueChange={(value) => handleSelectChange('status', value)}
                           required
                         >
-                          <Button variant="outline" className="mt-1 h-9 w-full flex items-center justify-between">
+                          <SelectTrigger id="status" className="mt-1 h-9 w-full border-[#e5e7eb] bg-white">
                             <SelectValue placeholder="Selecteer status" />
-                          </Button>
-                          <SelectContent>
-                            <SelectItem value="enrolled">Ingeschreven</SelectItem>
-                            <SelectItem value="unenrolled">Uitgeschreven</SelectItem>
-                            <SelectItem value="suspended">Geschorst</SelectItem>
-                            <SelectItem value="graduated">Afgestudeerd</SelectItem>
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border-[#e5e7eb]">
+                            <SelectItem value="enrolled" className="focus:bg-blue-200 hover:bg-blue-100">Ingeschreven</SelectItem>
+                            <SelectItem value="unenrolled" className="focus:bg-blue-200 hover:bg-blue-100">Uitgeschreven</SelectItem>
+                            <SelectItem value="suspended" className="focus:bg-blue-200 hover:bg-blue-100">Geschorst</SelectItem>
+                            <SelectItem value="graduated" className="focus:bg-blue-200 hover:bg-blue-100">Afgestudeerd</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

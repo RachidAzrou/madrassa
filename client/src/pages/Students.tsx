@@ -137,6 +137,14 @@ export default function Students() {
   // State om ontbrekende velden bij te houden
   const [missingRequiredFields, setMissingRequiredFields] = useState([]);
   
+  // Effect om studenten te synchroniseren met localStorage wanneer ze veranderen
+  useEffect(() => {
+    if (students.length > 0) {
+      localStorage.setItem('students', JSON.stringify(students));
+      console.log('Studenten opgeslagen in localStorage:', students.length);
+    }
+  }, [students]);
+  
   const handleCreateStudent = async (e) => {
     e.preventDefault();
     

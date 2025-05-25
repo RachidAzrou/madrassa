@@ -88,6 +88,7 @@ export default function Students() {
   };
   
   const [formData, setFormData] = useState(emptyFormData);
+  const [students, setStudents] = useState([]);
   
   const { toast } = useToast();
 
@@ -133,7 +134,15 @@ export default function Students() {
       // Student would be created here
       console.log('Creating student:', formData);
       
-      // Creëer nieuwe student en voeg toe aan lijst
+      // In een echte applicatie zou hier een API-aanroep zijn:
+      // const response = await fetch('/api/students', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(formData)
+      // });
+      // const data = await response.json();
+      
+      // Voor demo-doeleinden: direct toevoegen aan de lokale state
       const newStudent = {
         ...formData,
         id: Date.now().toString(), // Tijdelijk ID voor demo
@@ -143,7 +152,7 @@ export default function Students() {
       };
       
       // Update studenten lijst met nieuwe student
-      setStudents([newStudent, ...students]);
+      setStudents(prevStudents => [newStudent, ...prevStudents]);
       
       // Sla nieuw student ID op voor eventuele voogdkoppeling
       const newId = formData.studentId || nextStudentId;
@@ -161,9 +170,8 @@ export default function Students() {
       // Open het dialoogvenster om een voogd toe te voegen
       setIsAddGuardianDialogOpen(true);
       
-      // Vernieuw de lijst direct met de toegevoegde student
-      // De cache wordt automatisch bijgewerkt bij de volgende pagina-refresh
     } catch (error) {
+      console.error("Fout bij toevoegen student:", error);
       toast({
         title: "Fout",
         description: "Er is een fout opgetreden bij het toevoegen van de student.",

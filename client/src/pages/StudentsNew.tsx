@@ -240,6 +240,14 @@ export default function Students() {
     try {
       await deleteStudentMutation.mutateAsync(selectedStudent.id);
       setIsDeleteDialogOpen(false);
+      setSelectedStudent(null);
+      
+      // Extra melding om te bevestigen dat de verwijdering succesvol was
+      toast({
+        title: "Student verwijderd",
+        description: "De student is succesvol verwijderd uit het systeem.",
+        variant: "success"
+      });
     } catch (error) {
       console.error("Fout bij het verwijderen van de student:", error);
       toast({
@@ -381,36 +389,8 @@ export default function Students() {
     });
   };
   
-  // Dummy data for testing (kan worden verwijderd als de echte API werkt)
-  const students = [
-    {
-      id: 1,
-      studentId: "STU-001",
-      firstName: "Sarah",
-      lastName: "Johnson",
-      email: "sarah.j@example.com",
-      phone: "0123456789",
-      programId: 1,
-      programName: "Computer Science",
-      status: "active",
-      photoUrl: ""
-    },
-    {
-      id: 2,
-      studentId: "STU-002",
-      firstName: "Michael",
-      lastName: "Brown",
-      email: "michael.b@example.com",
-      phone: "0123456789",
-      programId: 2,
-      programName: "Business Administration",
-      status: "active",
-      photoUrl: ""
-    }
-  ];
-  
   // Filter de studenten op basis van zoekopdracht en filters
-  const filteredStudents = students.filter(student => {
+  const filteredStudents = (studentsData as any[] || []).filter(student => {
     const matchesSearch = 
       searchTerm === "" || 
       student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -756,10 +736,10 @@ export default function Students() {
       
       {/* Import Dialog */}
       <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" aria-describedby="import-students-description">
           <DialogHeader>
             <DialogTitle>Importeer Studenten</DialogTitle>
-            <DialogDescription>
+            <DialogDescription id="import-students-description">
               Upload een CSV bestand om meerdere studenten in één keer te importeren.
             </DialogDescription>
           </DialogHeader>
@@ -807,9 +787,12 @@ export default function Students() {
       
       {/* View Student Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg" aria-describedby="view-student-description">
           <DialogHeader>
             <DialogTitle>Student Details</DialogTitle>
+            <DialogDescription id="view-student-description" className="sr-only">
+              Bekijk de details van de geselecteerde student
+            </DialogDescription>
           </DialogHeader>
           {selectedStudent && (
             <div className="grid gap-6 py-4">
@@ -892,10 +875,10 @@ export default function Students() {
         if (isEditDialogOpen) setIsEditDialogOpen(open);
         if (!open) setFormData(emptyFormData);
       }}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg" aria-describedby="create-edit-student-description">
           <DialogHeader>
             <DialogTitle>{isEditDialogOpen ? "Student Bewerken" : "Nieuwe Student"}</DialogTitle>
-            <DialogDescription>
+            <DialogDescription id="create-edit-student-description">
               {isEditDialogOpen 
                 ? "Bewerk de gegevens van deze student." 
                 : "Voeg een nieuwe student toe aan je madrassa."}
@@ -1052,10 +1035,10 @@ export default function Students() {
       
       {/* Delete Student Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" aria-describedby="delete-student-description">
           <DialogHeader>
             <DialogTitle>Student Verwijderen</DialogTitle>
-            <DialogDescription>
+            <DialogDescription id="delete-student-description">
               Weet je zeker dat je deze student wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
             </DialogDescription>
           </DialogHeader>

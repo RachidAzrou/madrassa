@@ -853,7 +853,10 @@ export default function Students() {
                           onValueChange={(value) => handleSelectChange('gender', value)}
                           required
                         >
-                          <SelectTrigger id="gender" className="mt-1 h-9 w-full border-[#e5e7eb] bg-white">
+                          <SelectTrigger 
+                            id="gender" 
+                            className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('gender') ? 'border-red-500 bg-red-50' : ''}`}
+                          >
                             <SelectValue placeholder="Man of Vrouw" />
                           </SelectTrigger>
                           <SelectContent className="bg-white border-[#e5e7eb]">
@@ -956,7 +959,7 @@ export default function Students() {
                           value={formData.houseNumber}
                           onChange={handleInputChange}
                           required
-                          className="mt-1 h-9"
+                          className={`mt-1 h-9 ${missingRequiredFields.includes('houseNumber') ? 'border-red-500 bg-red-50' : ''}`}
                           placeholder="Nr."
                         />
                       </div>
@@ -969,7 +972,7 @@ export default function Students() {
                           value={formData.postalCode}
                           onChange={handleInputChange}
                           required
-                          className="mt-1 h-9"
+                          className={`mt-1 h-9 ${missingRequiredFields.includes('postalCode') ? 'border-red-500 bg-red-50' : ''}`}
                           placeholder="Postcode"
                         />
                       </div>
@@ -982,7 +985,7 @@ export default function Students() {
                           value={formData.city}
                           onChange={handleInputChange}
                           required
-                          className="mt-1 h-9"
+                          className={`mt-1 h-9 ${missingRequiredFields.includes('city') ? 'border-red-500 bg-red-50' : ''}`}
                           placeholder="Plaats"
                         />
                       </div>
@@ -1004,7 +1007,10 @@ export default function Students() {
                           onValueChange={(value) => handleSelectChange('academicYear', value)}
                           required
                         >
-                          <SelectTrigger id="academicYear" className="mt-1 h-9 w-full border-[#e5e7eb] bg-white">
+                          <SelectTrigger 
+                            id="academicYear"
+                            className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('academicYear') ? 'border-red-500 bg-red-50' : ''}`}
+                          >
                             <SelectValue placeholder="Selecteer schooljaar" />
                           </SelectTrigger>
                           <SelectContent className="bg-white border-[#e5e7eb]">
@@ -1053,7 +1059,10 @@ export default function Students() {
                           onValueChange={(value) => handleSelectChange('status', value)}
                           required
                         >
-                          <SelectTrigger id="status" className="mt-1 h-9 w-full border-[#e5e7eb] bg-white">
+                          <SelectTrigger 
+                            id="status" 
+                            className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('status') ? 'border-red-500 bg-red-50' : ''}`}
+                          >
                             <SelectValue placeholder="Selecteer status" />
                           </SelectTrigger>
                           <SelectContent className="bg-white border-[#e5e7eb]">
@@ -1448,7 +1457,10 @@ export default function Students() {
                       value={formData.status} 
                       onValueChange={(value) => setFormData({ ...formData, status: value })}
                     >
-                      <SelectTrigger id="status" className="h-9">
+                      <SelectTrigger 
+                        id="status" 
+                        className={`h-9 ${missingRequiredFields.includes('status') ? 'border-red-500 bg-red-50' : ''}`}
+                      >
                         <SelectValue placeholder="Selecteer status" />
                       </SelectTrigger>
                       <SelectContent>

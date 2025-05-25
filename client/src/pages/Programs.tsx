@@ -350,7 +350,7 @@ export default function Programs() {
             onClick={handleAddProgram} 
             variant="default"
             size="default"
-            className="bg-primary hover:bg-primary/90 flex items-center"
+            className="hover:bg-primary/90 flex items-center bg-[#1e40af]"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
             <span>Vak Toevoegen</span>
@@ -720,7 +720,7 @@ export default function Programs() {
                 <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)} className="border-gray-300">
                   Annuleren
                 </Button>
-                <Button type="submit">Vak toevoegen</Button>
+                <Button type="submit" className="hover:bg-[#1e40af]/90 bg-[#1e40af]">Vak toevoegen</Button>
               </div>
             </form>
           </div>
@@ -841,7 +841,7 @@ export default function Programs() {
                 <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)} className="border-gray-300">
                   Annuleren
                 </Button>
-                <Button type="submit">
+                <Button type="submit" className="hover:bg-[#1e40af]/90 bg-[#1e40af]">
                   Opslaan
                 </Button>
               </div>

@@ -166,18 +166,13 @@ export default function Dashboard() {
       <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
         <div className="flex flex-col">
           <div className="bg-gradient-to-r from-[#0f2b76] to-[#1e4baf] px-6 py-4">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 flex items-center justify-center bg-white rounded-sm shadow-md overflow-hidden">
-                  <div className="bg-gradient-to-b from-[#1e4baf] to-[#0f2b76] h-7 w-7 flex items-center justify-center m-1">
-                    <LayoutDashboard className="h-4 w-4 text-white" />
-                  </div>
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 flex items-center justify-center bg-white rounded-sm shadow-md overflow-hidden">
+                <div className="bg-gradient-to-b from-[#1e4baf] to-[#0f2b76] h-7 w-7 flex items-center justify-center m-1">
+                  <LayoutDashboard className="h-4 w-4 text-white" />
                 </div>
-                <h1 className="text-base font-medium text-white tracking-tight">Dashboard</h1>
               </div>
-              <div className="text-xs text-white font-medium">
-                {format(new Date(), 'd MMMM yyyy', { locale: nl })}
-              </div>
+              <h1 className="text-base font-medium text-white tracking-tight">Dashboard</h1>
             </div>
           </div>
           <div className="px-6 py-2 bg-[#f9fafc] border-t border-[#e5e7eb] flex items-center">

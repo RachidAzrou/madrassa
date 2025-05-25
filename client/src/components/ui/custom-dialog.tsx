@@ -160,7 +160,7 @@ export function DialogFormContainer({
   return (
     <form 
       onSubmit={onSubmit} 
-      className={`overflow-y-auto ${className}`} 
+      className={`overflow-y-auto px-4 sm:px-6 py-4 ${className}`} 
       style={{ maxHeight: 'calc(90vh - 150px)' }}
     >
       {children}
@@ -216,7 +216,7 @@ export function DialogFooterContainer({
   className = "",
 }: DialogFooterContainerProps) {
   return (
-    <div className={`bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t ${className}`}>
+    <div className={`bg-gray-50 px-4 sm:px-6 py-3 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t ${className}`}>
       {children ? (
         children
       ) : (
@@ -226,6 +226,7 @@ export function DialogFooterContainer({
               type="button" 
               variant="outline"
               onClick={onCancel}
+              className="w-full sm:w-auto mt-2 sm:mt-0"
             >
               {cancelText}
             </Button>
@@ -233,7 +234,7 @@ export function DialogFooterContainer({
           {showSubmitButton && (
             <Button 
               type={onSubmit ? "button" : "submit"}
-              className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+              className="bg-[#1e40af] hover:bg-[#1e40af]/90 w-full sm:w-auto"
               onClick={onSubmit}
             >
               {submitText}
@@ -280,8 +281,8 @@ export function ConfirmationDialog({
 }: ConfirmationDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`sm:max-w-[${maxWidth}] p-0 overflow-hidden`}>
-        <div className="p-6">
+      <DialogContent className={`w-[95vw] sm:max-w-[${maxWidth}] p-0 overflow-hidden`}>
+        <div className="p-4 sm:p-6">
           <div className="flex flex-col items-center gap-2 mb-4">
             {icon && (
               <div className={`h-12 w-12 rounded-full ${iconBackground} flex items-center justify-center mb-2`}>
@@ -295,12 +296,12 @@ export function ConfirmationDialog({
           </div>
           
           {content && (
-            <div className="bg-gray-50 rounded-md p-4 mb-6">
+            <div className="bg-gray-50 rounded-md p-3 sm:p-4 mb-6">
               {content}
             </div>
           )}
           
-          <div className="flex justify-end gap-2">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
             {onCancel && (
               <Button 
                 type="button" 
@@ -309,6 +310,7 @@ export function ConfirmationDialog({
                   onCancel();
                   onOpenChange(false);
                 }}
+                className="w-full sm:w-auto mt-2 sm:mt-0"
               >
                 {cancelText}
               </Button>
@@ -320,6 +322,7 @@ export function ConfirmationDialog({
                 onConfirm();
                 onOpenChange(false);
               }}
+              className="w-full sm:w-auto"
             >
               {confirmText}
             </Button>

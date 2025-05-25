@@ -159,6 +159,7 @@ export default function Students() {
       { name: 'postalCode', label: 'Postcode' },
       { name: 'city', label: 'Plaats' },
       { name: 'academicYear', label: 'Schooljaar' },
+      { name: 'enrollmentDate', label: 'Inschrijfdatum' },
       { name: 'status', label: 'Status' }
     ];
     
@@ -716,7 +717,12 @@ export default function Students() {
                           "bg-yellow-50 text-yellow-700 border-yellow-200"
                         }`}
                       >
-                        {student.status}
+                        {student.status === 'active' ? 'Ingeschreven' : 
+                         student.status === 'inactive' ? 'Uitgeschreven' : 
+                         student.status === 'enrolled' ? 'Ingeschreven' :
+                         student.status === 'graduated' ? 'Afgestudeerd' :
+                         student.status === 'suspended' ? 'Geschorst' :
+                         student.status}
                       </Badge>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-right">
@@ -1050,14 +1056,15 @@ export default function Students() {
                       </div>
                       
                       <div>
-                        <Label htmlFor="enrollmentDate" className="text-xs font-medium text-gray-700">Inschrijfdatum</Label>
+                        <Label htmlFor="enrollmentDate" className="text-xs font-medium text-gray-700">Inschrijfdatum *</Label>
                         <Input
                           id="enrollmentDate"
                           name="enrollmentDate"
                           type="date"
                           value={formData.enrollmentDate || new Date().toISOString().split('T')[0]}
                           onChange={handleInputChange}
-                          className="mt-1 h-9"
+                          required
+                          className={`mt-1 h-9 ${missingRequiredFields.includes('enrollmentDate') ? 'border-red-500 bg-red-50' : ''}`}
                         />
                       </div>
                       
@@ -1215,10 +1222,6 @@ export default function Students() {
               <SectionContainer title="Onderwijsgegevens" icon={<GraduationCap className="h-4 w-4" />}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <CustomFormLabel>Opleiding</CustomFormLabel>
-                    <p className="text-sm mt-1">{selectedStudent.programName || "-"}</p>
-                  </div>
-                  <div>
                     <CustomFormLabel>Status</CustomFormLabel>
                     <div className="text-sm mt-1">
                       <Badge variant={
@@ -1226,7 +1229,12 @@ export default function Students() {
                         selectedStudent.status === "ingeschreven" ? 
                         "default" : "secondary"
                       }>
-                        {selectedStudent.status}
+                        {selectedStudent.status === 'active' ? 'Ingeschreven' : 
+                         selectedStudent.status === 'inactive' ? 'Uitgeschreven' : 
+                         selectedStudent.status === 'enrolled' ? 'Ingeschreven' :
+                         selectedStudent.status === 'graduated' ? 'Afgestudeerd' :
+                         selectedStudent.status === 'suspended' ? 'Geschorst' :
+                         selectedStudent.status}
                       </Badge>
                     </div>
                   </div>

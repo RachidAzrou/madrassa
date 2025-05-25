@@ -82,6 +82,8 @@ export default function Students() {
   const [isAddingNewGuardian, setIsAddingNewGuardian] = useState(true);
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('');
   const [siblingSearchTerm, setSiblingSearchTerm] = useState('');
+  const [selectedGuardians, setSelectedGuardians] = useState<any[]>([]);
+  const [selectedSiblings, setSelectedSiblings] = useState<any[]>([]);
   const currentYear = new Date().getFullYear();
   const [nextStudentId, setNextStudentId] = useState(`ST${currentYear.toString().substring(2, 4)}001`);
   const [importFile, setImportFile] = useState<File | null>(null);
@@ -1194,6 +1196,33 @@ export default function Students() {
                     <div className="space-y-3">
                       <div>
                         <Label className="text-xs font-medium text-gray-700 mb-2 block">Voogden</Label>
+                        {selectedGuardians.length > 0 ? (
+                          <div className="space-y-2 mb-2">
+                            {selectedGuardians.map((guardian, index) => (
+                              <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                                    {guardian.firstName?.charAt(0)}{guardian.lastName?.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="text-sm font-medium">{guardian.firstName} {guardian.lastName}</p>
+                                  <p className="text-xs text-gray-500">{guardian.relationship}</p>
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-7 w-7 p-0 ml-auto"
+                                  onClick={() => {
+                                    setSelectedGuardians(selectedGuardians.filter((_, i) => i !== index));
+                                  }}
+                                >
+                                  <X className="h-3.5 w-3.5 text-gray-500" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
                         <div className="p-3 bg-gray-50 rounded-md text-center">
                           <Button 
                             type="button"
@@ -1212,6 +1241,37 @@ export default function Students() {
                       
                       <div>
                         <Label className="text-xs font-medium text-gray-700 mb-2 block">Broers/Zussen</Label>
+                        {selectedSiblings.length > 0 ? (
+                          <div className="space-y-2 mb-2">
+                            {selectedSiblings.map((sibling, index) => (
+                              <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
+                                <Avatar className="h-8 w-8">
+                                  {sibling.photoUrl ? (
+                                    <AvatarImage src={sibling.photoUrl} alt={`${sibling.firstName} ${sibling.lastName}`} />
+                                  ) : (
+                                    <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                                      {sibling.firstName?.charAt(0)}{sibling.lastName?.charAt(0)}
+                                    </AvatarFallback>
+                                  )}
+                                </Avatar>
+                                <div>
+                                  <p className="text-sm">{sibling.firstName} {sibling.lastName}</p>
+                                  <p className="text-xs text-gray-500">{sibling.studentId}</p>
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-7 w-7 p-0 ml-auto"
+                                  onClick={() => {
+                                    setSelectedSiblings(selectedSiblings.filter((_, i) => i !== index));
+                                  }}
+                                >
+                                  <X className="h-3.5 w-3.5 text-gray-500" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
                         <div className="p-3 bg-gray-50 rounded-md text-center">
                           <Button 
                             type="button"

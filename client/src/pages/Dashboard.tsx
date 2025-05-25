@@ -200,19 +200,9 @@ export default function Dashboard() {
               <Users className="h-5 w-5 text-[#1e40af]" />
             </div>
             <div className="flex-1 p-3">
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col">
-                  <h3 className="text-xs font-medium text-gray-500">Studenten</h3>
-                  <p className="text-lg font-medium text-gray-800 mt-1">{stats.totalStudents}</p>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-7 w-7 p-0 rounded-sm"
-                  onClick={navigateToStudents}
-                >
-                  <ArrowRight className="h-3.5 w-3.5 text-gray-500" />
-                </Button>
+              <div className="flex flex-col">
+                <h3 className="text-xs font-medium text-gray-500">Studenten</h3>
+                <p className="text-lg font-medium text-gray-800 mt-1">{stats.totalStudents}</p>
               </div>
             </div>
           </div>
@@ -225,19 +215,9 @@ export default function Dashboard() {
               <ChalkBoard className="h-5 w-5 text-[#1e40af]" />
             </div>
             <div className="flex-1 p-3">
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col">
-                  <h3 className="text-xs font-medium text-gray-500">Klassen</h3>
-                  <p className="text-lg font-medium text-gray-800 mt-1">{stats.studentGroups}</p>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-7 w-7 p-0 rounded-sm"
-                  onClick={navigateToGroups}
-                >
-                  <ArrowRight className="h-3.5 w-3.5 text-gray-500" />
-                </Button>
+              <div className="flex flex-col">
+                <h3 className="text-xs font-medium text-gray-500">Klassen</h3>
+                <p className="text-lg font-medium text-gray-800 mt-1">{stats.studentGroups}</p>
               </div>
             </div>
           </div>
@@ -250,19 +230,9 @@ export default function Dashboard() {
               <GraduationCap className="h-5 w-5 text-[#1e40af]" />
             </div>
             <div className="flex-1 p-3">
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col">
-                  <h3 className="text-xs font-medium text-gray-500">Docenten</h3>
-                  <p className="text-lg font-medium text-gray-800 mt-1">{stats.totalTeachers}</p>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-7 w-7 p-0 rounded-sm"
-                  onClick={navigateToTeachers}
-                >
-                  <ArrowRight className="h-3.5 w-3.5 text-gray-500" />
-                </Button>
+              <div className="flex flex-col">
+                <h3 className="text-xs font-medium text-gray-500">Docenten</h3>
+                <p className="text-lg font-medium text-gray-800 mt-1">{stats.totalTeachers}</p>
               </div>
             </div>
           </div>
@@ -275,19 +245,9 @@ export default function Dashboard() {
               <BookOpen className="h-5 w-5 text-[#1e40af]" />
             </div>
             <div className="flex-1 p-3">
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col">
-                  <h3 className="text-xs font-medium text-gray-500">Vakken</h3>
-                  <p className="text-lg font-medium text-gray-800 mt-1">{stats.activeCourses}</p>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-7 w-7 p-0 rounded-sm"
-                  onClick={navigateToCourses}
-                >
-                  <ArrowRight className="h-3.5 w-3.5 text-gray-500" />
-                </Button>
+              <div className="flex flex-col">
+                <h3 className="text-xs font-medium text-gray-500">Vakken</h3>
+                <p className="text-lg font-medium text-gray-800 mt-1">{stats.activeCourses}</p>
               </div>
             </div>
           </div>

@@ -245,7 +245,6 @@ export function EmptyTableState({
             {icon}
           </div>
           <p className="text-sm font-medium">{title}</p>
-          <p className="text-sm">{description}</p>
           {action && <div className="mt-4">{action}</div>}
         </div>
       </td>

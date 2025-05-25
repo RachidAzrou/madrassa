@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { PremiumHeader } from "@/components/layout/premium-header";
 import { formatDateToDisplayFormat } from "@/lib/utils";
 
 const ChalkBoard = (props: any) => (

@@ -28,7 +28,6 @@ import {
   Clock,
   Coins,
   BookMarked,
-  Building,
 } from "lucide-react";
 
 // Aangepast ChalkboardTeacher icoon
@@ -70,7 +69,7 @@ const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps)
       <div
         onClick={onClick}
         className={cn(
-          "flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer",
+          "flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer",
           isActive
             ? "bg-primary text-white font-medium"
             : "text-gray-600 hover:text-primary hover:bg-gray-100"
@@ -122,19 +121,10 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
     }
   }, []);
 
-  // Adjust sidebar on window resize
+  // Sidebar is always expanded, no need to adjust on resize
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setExpanded(true);
-      } else if (isMobile) {
-        setExpanded(false);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [isMobile]);
+    setExpanded(true); // Always keep the sidebar expanded
+  }, []);
 
   // Handle click on mobile
   const handleLinkClick = () => {
@@ -147,7 +137,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
     <aside
       className={cn(
         "h-screen bg-white border-r border-gray-200",
-        "w-64 flex flex-col",
+        "w-52 flex flex-col", /* Reduced width from w-64 to w-52 */
         className
       )}
     >

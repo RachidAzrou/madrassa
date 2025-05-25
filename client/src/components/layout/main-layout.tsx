@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
-import Sidebar from "./sidebar-collapsible";
+import Sidebar from "./sidebar";
 import Header from "./header";
 import TestBanner from "./test-banner";
 import { Topbar } from "./topbar";
@@ -39,21 +39,10 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const isMobile = useMobile();
   const pageTitle = getPageTitle(location);
 
-  // Close sidebar on location change for mobile
+  // Always keep sidebar open regardless of device or location
   useEffect(() => {
-    if (isMobile) {
-      setSidebarOpen(false);
-    }
-  }, [location, isMobile]);
-
-  // Open sidebar by default on desktop
-  useEffect(() => {
-    setSidebarOpen(!isMobile);
-  }, [isMobile]);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+    setSidebarOpen(true);
+  }, []);
 
   return (
     <div className="flex flex-col h-full min-h-screen">
@@ -63,24 +52,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       </div>
       
       <div className="flex flex-1 overflow-hidden">
-        {/* Mobile sidebar backdrop */}
-        {isMobile && sidebarOpen && (
-          <div
-            className="fixed inset-0 z-20 bg-black bg-opacity-50"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-
-        {/* Sidebar for both mobile and desktop */}
-        <div 
-          className={`fixed md:static inset-y-auto top-12 left-0 transform ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 z-30 transition duration-200 ease-in-out h-[calc(100vh-3rem)] flex-shrink-0`}
-        >
-          <Sidebar 
-            isMobile={isMobile} 
-            onClose={() => setSidebarOpen(false)} 
-            className="h-full" />
+        {/* Sidebar - always visible, non-collapsible */}
+        <div className="static z-30 h-[calc(100vh-3rem)] flex-shrink-0">
+          <Sidebar className="h-full" />
         </div>
 
         {/* Main content */}

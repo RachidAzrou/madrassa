@@ -2423,6 +2423,15 @@ export default function Students() {
                           // Reset validatiestatus
                           setHasValidationAttempt(false);
                           
+                          // Zorg ervoor dat de voogd wordt toegevoegd aan zowel newStudentGuardians als selectedGuardians
+                          const fullGuardian = {
+                            ...guardianFormData,
+                            id: `temp-${Date.now()}`,
+                          };
+                          
+                          setNewStudentGuardians([...newStudentGuardians, fullGuardian]);
+                          setSelectedGuardians([...selectedGuardians, fullGuardian]);
+                          
                           setIsAddGuardianDialogOpen(false);
                           toast({
                             title: "Voogd toegevoegd",

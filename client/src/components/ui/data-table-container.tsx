@@ -239,11 +239,13 @@ export function EmptyTableState({
 }: EmptyTableStateProps) {
   return (
     <tr>
-      <td colSpan={99} className="px-6 py-12 text-center">
-        <div className="flex flex-col items-center justify-center max-w-md mx-auto">
-          {icon && <div className="mb-4 bg-gray-100 rounded-full p-3">{icon}</div>}
-          <h3 className="text-base font-semibold text-gray-900">{title}</h3>
-          <p className="mt-2 text-sm text-gray-500 max-w-xs mx-auto">{description}</p>
+      <td colSpan={99} className="px-6 py-4 text-center">
+        <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+          <div className="text-[#1e3a8a] mb-2">
+            {icon}
+          </div>
+          <p className="text-sm font-medium">{title}</p>
+          <p className="text-sm">{description}</p>
           {action && <div className="mt-4">{action}</div>}
         </div>
       </td>

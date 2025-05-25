@@ -111,9 +111,12 @@ export function Topbar() {
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="font-medium text-sm">Berichten</h3>
-                <Link href="/messages">
-                  <a className="text-xs text-[#1e40af] hover:underline">Alle berichten</a>
-                </Link>
+                <button 
+                  className="text-xs text-[#1e40af] hover:underline"
+                  onClick={() => window.location.href = "/messages"}
+                >
+                  Alle berichten
+                </button>
               </div>
             </div>
             <div className="max-h-72 overflow-y-auto">
@@ -147,11 +150,12 @@ export function Topbar() {
               </div>
             </div>
             <div className="p-3 border-t border-gray-200 bg-gray-50">
-              <Link href="/messages">
-                <Button className="w-full bg-[#1e40af] hover:bg-[#1e40af]/90 text-white text-xs h-8">
-                  <Mail className="h-4 w-4 mr-2" /> Naar Berichten
-                </Button>
-              </Link>
+              <Button 
+                className="w-full bg-[#1e40af] hover:bg-[#1e40af]/90 text-white text-xs h-8"
+                onClick={() => window.location.href = "/messages"}
+              >
+                <Mail className="h-4 w-4 mr-2" /> Naar Berichten
+              </Button>
             </div>
           </PopoverContent>
         </Popover>

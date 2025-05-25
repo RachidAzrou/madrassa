@@ -362,6 +362,13 @@ export default function Students() {
       // Vernieuw de studentenlijst na het verwijderen
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
       
+      // Update lokale state
+      const updatedStudents = students.filter(student => student.id !== selectedStudent.id);
+      setStudents(updatedStudents);
+      
+      // Update localStorage
+      localStorage.setItem('students', JSON.stringify(updatedStudents));
+      
       toast({
         title: "Succes",
         description: `Student ${selectedStudent.firstName} ${selectedStudent.lastName} is succesvol verwijderd.`,

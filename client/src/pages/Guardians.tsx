@@ -29,9 +29,14 @@ type GuardianType = {
   firstName: string;
   lastName: string;
   relationship: string;
+  relationshipOther?: string;
   email: string;
   phone?: string;
   isEmergencyContact: boolean;
+  emergencyContactFirstName?: string;
+  emergencyContactLastName?: string;
+  emergencyContactPhone?: string;
+  emergencyContactRelationship?: string;
 };
 
 export default function Guardians() {
@@ -46,9 +51,14 @@ export default function Guardians() {
     firstName: '',
     lastName: '',
     relationship: 'parent',
+    relationshipOther: '',
     email: '',
     phone: '',
-    isEmergencyContact: false
+    isEmergencyContact: false,
+    emergencyContactFirstName: '',
+    emergencyContactLastName: '',
+    emergencyContactPhone: '',
+    emergencyContactRelationship: ''
   });
   
   // Data ophalen
@@ -494,7 +504,7 @@ export default function Guardians() {
           <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-2 rounded-full">
-                <UserPlus className="h-5 w-5 text-white" />
+                <UserCheck className="h-5 w-5 text-white" />
               </div>
               <div>
                 <DialogTitle className="text-white text-lg font-semibold m-0">Nieuwe Voogd Toevoegen</DialogTitle>
@@ -559,6 +569,19 @@ export default function Guardians() {
                         </SelectContent>
                       </Select>
                     </div>
+                    
+                    {newGuardian.relationship === 'other' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="relationshipOther">Specificeer relatie</Label>
+                        <Input 
+                          id="relationshipOther" 
+                          placeholder="Beschrijf de relatie" 
+                          className="h-8 text-sm"
+                          value={newGuardian.relationshipOther || ''}
+                          onChange={(e) => setNewGuardian({...newGuardian, relationshipOther: e.target.value})}
+                        />
+                      </div>
+                    )}
                     <div className="space-y-2">
                       <Label htmlFor="isEmergencyContact">Noodcontact</Label>
                       <div className="flex items-center h-8 border rounded-sm px-3">
@@ -587,6 +610,15 @@ export default function Guardians() {
               
               <TabsContent value="contact" className="space-y-4 min-h-[300px]">
                 <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  {newGuardian.isEmergencyContact ? (
+                    <div className="mb-4 px-3 py-2 bg-amber-50 border border-amber-200 rounded-md">
+                      <p className="text-sm text-amber-700">
+                        Deze persoon is al ingesteld als primair noodcontact. 
+                        Hieronder kunt u een secundair noodcontact toevoegen.
+                      </p>
+                    </div>
+                  ) : null}
+                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">E-mailadres</Label>
@@ -608,6 +640,61 @@ export default function Guardians() {
                         value={newGuardian.phone || ''}
                         onChange={(e) => setNewGuardian({...newGuardian, phone: e.target.value})}
                       />
+                    </div>
+                    
+                    <div className="col-span-2 border-t border-gray-200 mt-2 pt-4">
+                      <h3 className="font-medium text-sm mb-3">
+                        {newGuardian.isEmergencyContact ? "Secundair noodcontact" : "Noodcontact"}
+                      </h3>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="emergencyContactFirstName">Voornaam</Label>
+                      <Input 
+                        id="emergencyContactFirstName" 
+                        placeholder="Voornaam" 
+                        className="h-8 text-sm"
+                        value={newGuardian.emergencyContactFirstName || ''}
+                        onChange={(e) => setNewGuardian({...newGuardian, emergencyContactFirstName: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="emergencyContactLastName">Achternaam</Label>
+                      <Input 
+                        id="emergencyContactLastName" 
+                        placeholder="Achternaam" 
+                        className="h-8 text-sm"
+                        value={newGuardian.emergencyContactLastName || ''}
+                        onChange={(e) => setNewGuardian({...newGuardian, emergencyContactLastName: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="emergencyContactPhone">Telefoonnummer</Label>
+                      <Input 
+                        id="emergencyContactPhone" 
+                        placeholder="Telefoonnummer" 
+                        className="h-8 text-sm"
+                        value={newGuardian.emergencyContactPhone || ''}
+                        onChange={(e) => setNewGuardian({...newGuardian, emergencyContactPhone: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="emergencyContactRelationship">Relatie tot student</Label>
+                      <Select 
+                        value={newGuardian.emergencyContactRelationship || ''} 
+                        onValueChange={(value) => setNewGuardian({...newGuardian, emergencyContactRelationship: value})}
+                      >
+                        <SelectTrigger id="emergencyContactRelationship" className="h-8 text-sm">
+                          <SelectValue placeholder="Selecteer relatie" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="parent">Ouder</SelectItem>
+                          <SelectItem value="guardian">Voogd</SelectItem>
+                          <SelectItem value="grandparent">Grootouder</SelectItem>
+                          <SelectItem value="sibling">Broer/Zus</SelectItem>
+                          <SelectItem value="other">Anders</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </div>

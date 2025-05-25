@@ -1421,7 +1421,10 @@ export default function Students() {
                       value={formData.programId} 
                       onValueChange={(value) => setFormData({ ...formData, programId: value })}
                     >
-                      <SelectTrigger id="programId" className="h-9">
+                      <SelectTrigger 
+                        id="programId" 
+                        className={`h-9 ${missingRequiredFields.includes('programId') ? 'border-red-500 bg-red-50' : ''}`}
+                      >
                         <SelectValue placeholder="Selecteer programma" />
                       </SelectTrigger>
                       <SelectContent>

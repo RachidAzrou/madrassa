@@ -206,6 +206,7 @@ export default function Guardians() {
       <PremiumHeader 
         title="Voogden" 
         icon={UserCheck}
+        description="Beheer ouders en voogden van studenten, inclusief contactgegevens en noodcontacten"
         breadcrumbs={{
           parent: "Beheer",
           current: "Voogden"

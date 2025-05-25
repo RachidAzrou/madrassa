@@ -408,8 +408,9 @@ export default function Scheduling() {
       {/* Premium header component */}
       <PremiumHeader 
         title="Planning" 
-        path="Onderwijs > Planning" 
-        icon={Clock} 
+        path="Evaluatie > Planning" 
+        icon={Clock}
+        description="Beheer lesroosters, plan lessen voor klassen en docenten, en voorkom planningsconflicten"
       />
 
       {/* Main content area */}

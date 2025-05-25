@@ -393,6 +393,7 @@ export default function Fees() {
         title="Betalingsbeheer"
         path="Administratie > Betalingsbeheer"
         icon={Receipt}
+        description="Beheer schoolgelden, volg betalingen en openstaande facturen, en genereer financiële overzichten"
       />
       <div className="p-4 md:p-6">
         <div className="flex items-center justify-between mb-8">

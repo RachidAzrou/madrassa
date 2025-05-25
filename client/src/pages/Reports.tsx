@@ -469,8 +469,9 @@ export default function Reports() {
     <div className="space-y-6">
       <PremiumHeader
         title="Rapport"
-        path="Onderwijs > Rapport"
+        path="Evaluatie > Rapport"
         icon={FileBarChart}
+        description="Genereer en beheer rapporten voor studenten, inclusief cijfers, feedback en voortgangsanalyses"
       />
       <div className="p-4 md:p-6">
         <div className="flex items-center justify-between mb-8">

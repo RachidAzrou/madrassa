@@ -414,8 +414,9 @@ export default function Attendance() {
     <div className="space-y-6">
       <PremiumHeader
         title="Aanwezigheid"
-        path="Onderwijs > Aanwezigheid"
+        path="Evaluatie > Aanwezigheid"
         icon={CalendarCheck}
+        description="Registreer en beheer aanwezigheid van studenten, bekijk absentiegeschiedenis en identificeer trends"
       />
       <div className="p-4 md:p-6">
         <div className="flex items-center justify-between mb-8">

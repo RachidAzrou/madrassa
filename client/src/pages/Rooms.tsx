@@ -362,7 +362,8 @@ export default function Rooms() {
       {/* Premium header component */}
       <PremiumHeader 
         title="Lokalen" 
-        icon={Building} 
+        icon={Building}
+        description="Beheer alle beschikbare lokalen en ruimtes, inclusief capaciteit en beschikbaarheid voor lessen"
         breadcrumbs={{
           parent: "Beheer",
           current: "Lokalen"

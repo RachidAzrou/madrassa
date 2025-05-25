@@ -370,8 +370,9 @@ export default function Calendar() {
       {/* Premium header component */}
       <PremiumHeader 
         title="Kalender" 
-        path="Onderwijs > Kalender" 
-        icon={CalendarIcon} 
+        path="Evaluatie > Kalender" 
+        icon={CalendarIcon}
+        description="Beheer schoolevenementen, bekijk lessen en belangrijke data in een overzichtelijke kalenderweergave"
       />
       
       <div className="px-6 py-6 flex-1 space-y-6">

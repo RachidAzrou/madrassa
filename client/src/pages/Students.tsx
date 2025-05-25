@@ -1514,17 +1514,15 @@ export default function Students() {
       }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader variant="premium">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 flex items-center justify-center bg-white rounded-sm shadow-md overflow-hidden">
-                <div className="bg-gradient-to-b from-[#1e4baf] to-[#0f2b76] h-6 w-6 flex items-center justify-center m-1">
-                  <User className="h-3.5 w-3.5 text-white" />
-                </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <User className="h-5 w-5 text-white" />
+                <DialogTitle className="text-white">
+                  {isEditDialogOpen ? 'Student bewerken' : 'Student toevoegen'}
+                </DialogTitle>
               </div>
-              <DialogTitle className="text-white">
-                {isEditDialogOpen ? 'Student bewerken' : 'Student toevoegen'}
-              </DialogTitle>
             </div>
-            <DialogDescription className="text-gray-100 opacity-90">
+            <DialogDescription className="text-white opacity-70 mt-1">
               {isEditDialogOpen 
                 ? 'Bewerk de gegevens van de student hieronder.'
                 : 'Vul de gegevens van de nieuwe student in.'
@@ -1903,11 +1901,7 @@ export default function Students() {
           <DialogHeader variant="premium">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 flex items-center justify-center bg-white rounded-sm shadow-md overflow-hidden">
-                  <div className="bg-gradient-to-b from-[#1e4baf] to-[#0f2b76] h-6 w-6 flex items-center justify-center m-1">
-                    <User className="h-3.5 w-3.5 text-white" />
-                  </div>
-                </div>
+                <User className="h-5 w-5 text-white" />
                 <DialogTitle className="text-white flex items-center">
                   <span>Student details</span>
                   <Badge className={`${getStatusBadgeClass(selectedStudent?.status || 'active')} border rounded-sm px-2 py-0.5 text-xs font-medium ml-2`}>
@@ -1917,7 +1911,7 @@ export default function Students() {
                 </DialogTitle>
               </div>
             </div>
-            <DialogDescription className="text-gray-100 opacity-90">
+            <DialogDescription className="text-white opacity-70 mt-1">
               Details en informatie over de geselecteerde student.
             </DialogDescription>
           </DialogHeader>
@@ -2307,17 +2301,15 @@ export default function Students() {
       <Dialog open={isImportDialogOpen} onOpenChange={handleCloseImportDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader variant="premium">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 flex items-center justify-center bg-white rounded-sm shadow-md overflow-hidden">
-                <div className="bg-gradient-to-b from-[#1e4baf] to-[#0f2b76] h-6 w-6 flex items-center justify-center m-1">
-                  <FileUp className="h-3.5 w-3.5 text-white" />
-                </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <FileUp className="h-5 w-5 text-white" />
+                <DialogTitle className="text-white">
+                  Studenten importeren
+                </DialogTitle>
               </div>
-              <DialogTitle className="text-white">
-                Studenten importeren
-              </DialogTitle>
             </div>
-            <DialogDescription className="text-gray-100 opacity-90">
+            <DialogDescription className="text-white opacity-70 mt-1">
               Importeer studenten vanuit een CSV of Excel bestand.
             </DialogDescription>
           </DialogHeader>

@@ -87,7 +87,7 @@ const DialogHeader = ({
     default: "bg-background border-b border-border p-4",
     branded: "bg-gradient-to-r from-primary/90 to-primary text-white p-4",
     subtle: "bg-secondary/50 border-b border-border p-4",
-    premium: "bg-gradient-to-r from-[#0f2b76] to-[#1e4baf] text-white p-4"
+    premium: "bg-[#1e40af] text-white p-4"
   };
   
   return (

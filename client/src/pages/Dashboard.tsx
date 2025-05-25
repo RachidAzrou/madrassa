@@ -162,19 +162,19 @@ export default function Dashboard() {
 
   return (
     <div className="bg-[#f7f9fc] min-h-screen">
-      {/* Desktop application header bar */}
-      <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
-        <div className="px-6 py-3 flex items-center justify-between bg-[#1e40af] text-white">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 flex items-center justify-center rounded-sm bg-[#1e40af] text-white">
-              <LayoutDashboard className="h-4 w-4" />
+      {/* Desktop application header bar - Professionele stijl */}
+      <header className="bg-[#1e40af] border-b border-[#1d3a8a] shadow-md">
+        <div className="px-6 py-4 flex items-center justify-between text-white">
+          <div className="flex items-center gap-4">
+            <div className="h-9 w-9 flex items-center justify-center rounded-sm bg-white text-[#1e40af] shadow-sm">
+              <LayoutDashboard className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-base font-medium text-gray-800 tracking-tight">Dashboard</h1>
+              <h1 className="text-lg font-medium text-white tracking-tight">Dashboard</h1>
             </div>
           </div>
           <div className="flex items-center">
-            <div className="text-xs text-gray-500 font-medium">
+            <div className="text-sm text-white font-medium">
               {format(new Date(), 'd MMMM yyyy', { locale: nl })}
             </div>
           </div>

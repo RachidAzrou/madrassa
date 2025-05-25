@@ -286,7 +286,10 @@ export function ConfirmationDialog({
 }: ConfirmationDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`sm:max-w-[${maxWidth}] p-0 overflow-hidden`}>
+      <DialogContent 
+        className={`sm:max-w-[${maxWidth}] p-0 overflow-hidden`}
+        aria-describedby="confirmation-dialog-description"
+      >
         <div className="p-6">
           <div className="flex flex-col items-center gap-2 mb-4">
             {icon && (
@@ -295,7 +298,7 @@ export function ConfirmationDialog({
               </div>
             )}
             <DialogTitle className="text-center">{title}</DialogTitle>
-            <DialogDescription className="text-center">
+            <DialogDescription id="confirmation-dialog-description" className="text-center">
               {description}
             </DialogDescription>
           </div>

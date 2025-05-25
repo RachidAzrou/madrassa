@@ -419,6 +419,78 @@ export default function Students() {
       
       <DataTableContainer>
         <SearchActionBar>
+          {/* Import/Export knoppen linksboven */}
+          <div className="flex items-center gap-2">
+            {/* Exporteren knop */}
+            <DropdownMenu open={isExportMenuOpen} onOpenChange={setIsExportMenuOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs rounded-sm border-[#e5e7eb]"
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="14" 
+                    height="14" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    className="mr-1"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  Exporteren
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="min-w-[180px] bg-white">
+                <DropdownMenuItem className="text-xs py-2 cursor-pointer" onClick={exportToExcel}>
+                  <FileSpreadsheet className="h-3.5 w-3.5 mr-2" />
+                  Exporteren als Excel
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-xs py-2 cursor-pointer" onClick={exportToPDF}>
+                  <FileText className="h-3.5 w-3.5 mr-2" />
+                  Exporteren als PDF
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-xs py-2 cursor-pointer" onClick={exportToCSV}>
+                  <FileText className="h-3.5 w-3.5 mr-2" />
+                  Exporteren als CSV
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            {/* Importeren knop */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs rounded-sm border-[#e5e7eb]"
+              onClick={() => setIsImportDialogOpen(true)}
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="14" 
+                height="14" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className="mr-1"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Importeren
+            </Button>
+          </div>
+          
           {/* Zoekbalk */}
           <div className="relative w-full sm:max-w-md">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
@@ -450,45 +522,6 @@ export default function Students() {
                   <path d="M3.13523 8.84197C3.3241 9.04343 3.64052 9.05363 3.84197 8.86477L7.5 5.43536L11.158 8.86477C11.3595 9.05363 11.6759 9.04343 11.8648 8.84197C12.0536 8.64051 12.0434 8.32409 11.842 8.13523L7.84197 4.38523C7.64964 4.20492 7.35036 4.20492 7.15803 4.38523L3.15803 8.13523C2.95657 8.32409 2.94637 8.64051 3.13523 8.84197Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
                 </svg>
               }
-            </Button>
-            
-            {/* Exporteren knop */}
-            <DropdownMenu open={isExportMenuOpen} onOpenChange={setIsExportMenuOpen}>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs rounded-sm border-[#e5e7eb]"
-                >
-                  <Download className="h-3.5 w-3.5 mr-1" />
-                  Exporteren
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="min-w-[180px] bg-white">
-                <DropdownMenuItem className="text-xs py-2 cursor-pointer" onClick={exportToExcel}>
-                  <FileSpreadsheet className="h-3.5 w-3.5 mr-2" />
-                  Exporteren als Excel
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-xs py-2 cursor-pointer" onClick={exportToPDF}>
-                  <FileText className="h-3.5 w-3.5 mr-2" />
-                  Exporteren als PDF
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-xs py-2 cursor-pointer" onClick={exportToCSV}>
-                  <FileText className="h-3.5 w-3.5 mr-2" />
-                  Exporteren als CSV
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            {/* Importeren knop */}
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-7 text-xs rounded-sm border-[#e5e7eb]"
-              onClick={() => setIsImportDialogOpen(true)}
-            >
-              <Upload className="h-3.5 w-3.5 mr-1" />
-              Importeren
             </Button>
             
             {/* Nieuwe student toevoegen knop */}

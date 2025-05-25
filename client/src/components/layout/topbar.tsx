@@ -147,9 +147,11 @@ export function Topbar() {
               </div>
             </div>
             <div className="p-3 border-t border-gray-200 bg-gray-50">
-              <Button className="w-full bg-[#1e40af] hover:bg-[#1e40af]/90 text-white text-xs h-8">
-                <Mail className="h-4 w-4 mr-2" /> Nieuw bericht
-              </Button>
+              <Link href="/berichten">
+                <Button className="w-full bg-[#1e40af] hover:bg-[#1e40af]/90 text-white text-xs h-8">
+                  <Mail className="h-4 w-4 mr-2" /> Naar Berichten
+                </Button>
+              </Link>
             </div>
           </PopoverContent>
         </Popover>

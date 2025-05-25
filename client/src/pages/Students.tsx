@@ -754,7 +754,7 @@ export default function Students() {
                           {student.photoUrl ? (
                             <AvatarImage src={student.photoUrl} alt={`${student.firstName} ${student.lastName}`} />
                           ) : (
-                            <AvatarFallback className="text-xs bg-[#1e40af] text-white">
+                            <AvatarFallback className="text-xs bg-[#1e40af] text-white" style={{ backgroundColor: "#1e40af" }}>
                               {student.firstName.charAt(0)}{student.lastName.charAt(0)}
                             </AvatarFallback>
                           )}

@@ -357,11 +357,12 @@ export default function Rooms() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Page header - Professionele desktop stijl */}
+      {/* Page header - Professionele desktop stijl (conform Dashboard) */}
       <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
         <div className="flex flex-col">
           <div className="px-6 py-4 flex justify-between items-center">
-            <div>
+            <div className="flex items-center">
+              <Building className="h-5 w-5 text-[#1e40af] mr-2" />
               <h1 className="text-base font-medium text-gray-800 tracking-tight">Lokalen</h1>
             </div>
             <div className="flex items-center">

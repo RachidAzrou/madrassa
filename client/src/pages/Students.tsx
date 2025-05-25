@@ -694,21 +694,14 @@ export default function Students() {
                       <Badge 
                         variant="outline" 
                         className={`text-xs rounded-sm ${
-                          student.status === 'active' || student.status === 'enrolled' ? "bg-green-50 text-green-700 border-green-200" : 
-                          student.status === 'inactive' || student.status === 'unenrolled' ? "bg-gray-50 text-gray-700 border-gray-200" : 
-                          student.status === 'graduated' ? "bg-blue-50 text-blue-700 border-blue-200" :
-                          student.status === 'suspended' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
+                          student.status === 'active' || student.status === 'ingeschreven' ? "bg-green-50 text-green-700 border-green-200" : 
+                          student.status === 'inactive' || student.status === 'uitgeschreven' ? "bg-gray-50 text-gray-700 border-gray-200" : 
+                          student.status === 'afgestudeerd' ? "bg-blue-50 text-blue-700 border-blue-200" :
+                          student.status === 'geschorst' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
                           "bg-yellow-50 text-yellow-700 border-yellow-200"
                         }`}
                       >
-                        {student.status === 'active' ? 'Actief' : 
-                         student.status === 'inactive' ? 'Inactief' : 
-                         student.status === 'graduated' ? 'Afgestudeerd' : 
-                         student.status === 'withdrawn' ? 'Teruggetrokken' :
-                         student.status === 'enrolled' ? 'Ingeschreven' :
-                         student.status === 'unenrolled' ? 'Uitgeschreven' :
-                         student.status === 'suspended' ? 'Geschorst' :
-                         student.status}
+                        {student.status}
                       </Badge>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-right">
@@ -1058,10 +1051,10 @@ export default function Students() {
                             <SelectValue placeholder="Selecteer status" />
                           </SelectTrigger>
                           <SelectContent className="bg-white border-[#e5e7eb]">
-                            <SelectItem value="enrolled" className="focus:bg-blue-200 hover:bg-blue-100">Ingeschreven</SelectItem>
-                            <SelectItem value="unenrolled" className="focus:bg-blue-200 hover:bg-blue-100">Uitgeschreven</SelectItem>
-                            <SelectItem value="suspended" className="focus:bg-blue-200 hover:bg-blue-100">Geschorst</SelectItem>
-                            <SelectItem value="graduated" className="focus:bg-blue-200 hover:bg-blue-100">Afgestudeerd</SelectItem>
+                            <SelectItem value="ingeschreven" className="focus:bg-blue-200 hover:bg-blue-100">Ingeschreven</SelectItem>
+                            <SelectItem value="uitgeschreven" className="focus:bg-blue-200 hover:bg-blue-100">Uitgeschreven</SelectItem>
+                            <SelectItem value="geschorst" className="focus:bg-blue-200 hover:bg-blue-100">Geschorst</SelectItem>
+                            <SelectItem value="afgestudeerd" className="focus:bg-blue-200 hover:bg-blue-100">Afgestudeerd</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -1138,18 +1131,11 @@ export default function Students() {
                   <Badge className="mt-2" 
                     variant={
                       selectedStudent.status === "active" || 
-                      selectedStudent.status === "enrolled" ? 
+                      selectedStudent.status === "ingeschreven" ? 
                       "default" : "secondary"
                     }
                   >
-                    {selectedStudent.status === 'active' ? 'Actief' : 
-                     selectedStudent.status === 'inactive' ? 'Inactief' : 
-                     selectedStudent.status === 'graduated' ? 'Afgestudeerd' : 
-                     selectedStudent.status === 'withdrawn' ? 'Teruggetrokken' :
-                     selectedStudent.status === 'enrolled' ? 'Ingeschreven' :
-                     selectedStudent.status === 'unenrolled' ? 'Uitgeschreven' :
-                     selectedStudent.status === 'suspended' ? 'Geschorst' :
-                     selectedStudent.status}
+                    {selectedStudent.status}
                   </Badge>
                 </div>
               </div>
@@ -1205,18 +1191,18 @@ export default function Students() {
               <SectionContainer title="Onderwijsgegevens" icon={<GraduationCap className="h-4 w-4" />}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <CustomFormLabel>Programma</CustomFormLabel>
+                    <CustomFormLabel>Opleiding</CustomFormLabel>
                     <p className="text-sm mt-1">{selectedStudent.programName || "-"}</p>
                   </div>
                   <div>
                     <CustomFormLabel>Status</CustomFormLabel>
                     <div className="text-sm mt-1">
-                      <Badge variant={selectedStudent.status === "active" ? "default" : "secondary"}>
-                        {selectedStudent.status === "active" ? "Actief" : 
-                         selectedStudent.status === "graduated" ? "Afgestudeerd" : 
-                         selectedStudent.status === "suspended" ? "Geschorst" : 
-                         selectedStudent.status === "withdrawn" ? "Teruggetrokken" : 
-                         selectedStudent.status}
+                      <Badge variant={
+                        selectedStudent.status === "active" || 
+                        selectedStudent.status === "ingeschreven" ? 
+                        "default" : "secondary"
+                      }>
+                        {selectedStudent.status}
                       </Badge>
                     </div>
                   </div>
@@ -1460,10 +1446,10 @@ export default function Students() {
                         <SelectValue placeholder="Selecteer status" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="active">Actief</SelectItem>
-                        <SelectItem value="graduated">Afgestudeerd</SelectItem>
-                        <SelectItem value="suspended">Geschorst</SelectItem>
-                        <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
+                        <SelectItem value="ingeschreven">Ingeschreven</SelectItem>
+                        <SelectItem value="afgestudeerd">Afgestudeerd</SelectItem>
+                        <SelectItem value="geschorst">Geschorst</SelectItem>
+                        <SelectItem value="uitgeschreven">Uitgeschreven</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

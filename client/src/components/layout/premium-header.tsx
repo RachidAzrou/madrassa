@@ -15,10 +15,7 @@ export function PremiumHeader({ title, path, icon: Icon }: PremiumHeaderProps) {
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 flex items-center justify-center bg-white rounded-sm shadow-md overflow-hidden">
               <div className="bg-gradient-to-b from-[#1e4baf] to-[#0f2b76] h-7 w-7 flex items-center justify-center m-1">
-                {typeof Icon === 'function' && !('render' in Icon) 
-                  ? React.createElement(Icon, { className: "h-4 w-4 text-white" })
-                  : <Icon className="h-4 w-4 text-white" />
-                }
+                <Icon className="h-4 w-4 text-white" />
               </div>
             </div>
             <h1 className="text-base font-medium text-white tracking-tight">{title}</h1>

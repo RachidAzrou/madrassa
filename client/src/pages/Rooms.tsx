@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, 
   Building, MapPin, Users, Check, X, Save, ChevronDown, ChevronUp,
-  LayoutGrid
+  LayoutGrid, School
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { PremiumHeader } from "@/components/layout/premium-header";
-import ChalkboardIcon from "@/components/ui/chalkboard-icon";
 import {
   Dialog,
   DialogContent,
@@ -364,7 +363,7 @@ export default function Rooms() {
       <PremiumHeader 
         title="Lokalen" 
         path="Beheer > Lokalen" 
-        icon={ChalkboardIcon} 
+        icon={School} 
       />
 
       {/* Main content area */}

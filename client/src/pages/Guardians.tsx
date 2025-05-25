@@ -536,10 +536,7 @@ export default function Guardians() {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName" className="flex items-center gap-2">
-                        <UserCheck className="h-3.5 w-3.5 text-[#1e40af]" />
-                        <span>Voornaam</span>
-                      </Label>
+                      <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">Voornaam</Label>
                       <Input 
                         id="firstName" 
                         placeholder="Voornaam" 
@@ -549,10 +546,7 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName" className="flex items-center gap-2">
-                        <UserCheck className="h-3.5 w-3.5 text-[#1e40af]" />
-                        <span>Achternaam</span>
-                      </Label>
+                      <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">Achternaam</Label>
                       <Input 
                         id="lastName" 
                         placeholder="Achternaam" 
@@ -562,10 +556,7 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="relationship" className="flex items-center gap-2">
-                        <UserCheck className="h-3.5 w-3.5 text-[#1e40af]" />
-                        <span>Relatie tot Student</span>
-                      </Label>
+                      <Label htmlFor="relationship" className="text-xs font-medium text-gray-700">Relatie tot Student</Label>
                       <Select 
                         value={newGuardian.relationship} 
                         onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
@@ -596,10 +587,7 @@ export default function Guardians() {
                       </div>
                     )}
                     <div className="space-y-2">
-                      <Label htmlFor="isEmergencyContact" className="flex items-center gap-2">
-                        <HeartPulse className="h-3.5 w-3.5 text-red-500" />
-                        <span>Noodcontact</span>
-                      </Label>
+                      <Label htmlFor="isEmergencyContact" className="text-xs font-medium text-gray-700">Noodcontact</Label>
                       <div className="flex items-center gap-2 h-8 py-0.5">
                         <div className="flex items-center space-x-2">
                           <Checkbox 
@@ -644,10 +632,7 @@ export default function Guardians() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="flex items-center gap-2">
-                        <Mail className="h-3.5 w-3.5 text-[#1e40af]" />
-                        <span>E-mailadres</span>
-                      </Label>
+                      <Label htmlFor="email" className="text-xs font-medium text-gray-700">E-mailadres</Label>
                       <Input 
                         id="email" 
                         type="email" 
@@ -658,10 +643,7 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone" className="flex items-center gap-2">
-                        <Phone className="h-3.5 w-3.5 text-[#1e40af]" />
-                        <span>Telefoonnummer</span>
-                      </Label>
+                      <Label htmlFor="phone" className="text-xs font-medium text-gray-700">Telefoonnummer</Label>
                       <Input 
                         id="phone" 
                         placeholder="Telefoonnummer" 
@@ -679,10 +661,7 @@ export default function Guardians() {
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="emergencyContactFirstName" className="flex items-center gap-2">
-                        <UserCheck className="h-3.5 w-3.5 text-[#1e40af]" />
-                        <span>Voornaam</span>
-                      </Label>
+                      <Label htmlFor="emergencyContactFirstName" className="text-xs font-medium text-gray-700">Voornaam</Label>
                       <Input 
                         id="emergencyContactFirstName" 
                         placeholder="Voornaam" 
@@ -692,10 +671,7 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="emergencyContactLastName" className="flex items-center gap-2">
-                        <UserCheck className="h-3.5 w-3.5 text-[#1e40af]" />
-                        <span>Achternaam</span>
-                      </Label>
+                      <Label htmlFor="emergencyContactLastName" className="text-xs font-medium text-gray-700">Achternaam</Label>
                       <Input 
                         id="emergencyContactLastName" 
                         placeholder="Achternaam" 

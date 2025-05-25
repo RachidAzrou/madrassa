@@ -1513,11 +1513,18 @@ export default function Students() {
         }
       }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {isEditDialogOpen ? 'Student bewerken' : 'Student toevoegen'}
-            </DialogTitle>
-            <DialogDescription>
+          <DialogHeader variant="premium">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 flex items-center justify-center bg-white rounded-sm shadow-md overflow-hidden">
+                <div className="bg-gradient-to-b from-[#1e4baf] to-[#0f2b76] h-6 w-6 flex items-center justify-center m-1">
+                  <User className="h-3.5 w-3.5 text-white" />
+                </div>
+              </div>
+              <DialogTitle className="text-white">
+                {isEditDialogOpen ? 'Student bewerken' : 'Student toevoegen'}
+              </DialogTitle>
+            </div>
+            <DialogDescription className="text-gray-100 opacity-90">
               {isEditDialogOpen 
                 ? 'Bewerk de gegevens van de student hieronder.'
                 : 'Vul de gegevens van de nieuwe student in.'
@@ -1893,15 +1900,24 @@ export default function Students() {
         if (!open) setIsViewDialogOpen(false);
       }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center space-x-2">
-              <span>Student details</span>
-              <Badge className={`${getStatusBadgeClass(selectedStudent?.status || 'active')} border rounded-sm px-2 py-0.5 text-xs font-medium ml-2`}>
-                {getStatusIcon(selectedStudent?.status || 'active')}
-                {getStatusLabel(selectedStudent?.status || 'active')}
-              </Badge>
-            </DialogTitle>
-            <DialogDescription>
+          <DialogHeader variant="premium">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 flex items-center justify-center bg-white rounded-sm shadow-md overflow-hidden">
+                  <div className="bg-gradient-to-b from-[#1e4baf] to-[#0f2b76] h-6 w-6 flex items-center justify-center m-1">
+                    <User className="h-3.5 w-3.5 text-white" />
+                  </div>
+                </div>
+                <DialogTitle className="text-white flex items-center">
+                  <span>Student details</span>
+                  <Badge className={`${getStatusBadgeClass(selectedStudent?.status || 'active')} border rounded-sm px-2 py-0.5 text-xs font-medium ml-2`}>
+                    {getStatusIcon(selectedStudent?.status || 'active')}
+                    {getStatusLabel(selectedStudent?.status || 'active')}
+                  </Badge>
+                </DialogTitle>
+              </div>
+            </div>
+            <DialogDescription className="text-gray-100 opacity-90">
               Details en informatie over de geselecteerde student.
             </DialogDescription>
           </DialogHeader>

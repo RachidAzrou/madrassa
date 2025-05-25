@@ -56,9 +56,9 @@ const DialogContent = React.forwardRef<
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          "fixed left-[50%] z-50 w-full translate-x-[-50%] gap-0 border border-border bg-background shadow-lg duration-200",
+          "fixed left-[50%] z-50 w-full translate-x-[-50%] gap-0 border border-gray-200 bg-background shadow-lg duration-200",
           "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-98 data-[state=open]:zoom-in-98",
-          "rounded overflow-hidden flex flex-col",
+          "rounded-sm overflow-hidden flex flex-col",
           noPadding ? "p-0" : "p-0",
           sizeClasses[size],
           positionClasses[position],
@@ -80,20 +80,21 @@ DialogContent.displayName = DialogPrimitive.Content.displayName
 const DialogHeader = ({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & { variant?: "default" | "branded" | "subtle" }) => {
+}: React.HTMLAttributes<HTMLDivElement> & { variant?: "default" | "branded" | "subtle" | "premium" }) => {
   const { variant = "default", ...rest } = props;
   
   const variantClasses = {
     default: "bg-background border-b border-border p-4",
     branded: "bg-gradient-to-r from-primary/90 to-primary text-white p-4",
-    subtle: "bg-secondary/50 border-b border-border p-4"
+    subtle: "bg-secondary/50 border-b border-border p-4",
+    premium: "bg-gradient-to-r from-[#0f2b76] to-[#1e4baf] text-white p-4"
   };
   
   return (
     <div
       className={cn(
         "flex flex-col space-y-1 mb-0",
-        variantClasses[variant as "default" | "branded" | "subtle"],
+        variantClasses[variant as "default" | "branded" | "subtle" | "premium"],
         className
       )}
       {...rest}

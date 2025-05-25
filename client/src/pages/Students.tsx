@@ -477,33 +477,17 @@ export default function Students() {
             
             <div className="flex flex-wrap gap-3">
               <Select 
-                value={statusFilter} 
-                onValueChange={setStatusFilter}
+                value={filterStudentGroup} 
+                onValueChange={setFilterStudentGroup}
               >
                 <SelectTrigger className="w-40 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white">
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder="Klas" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#e5e7eb]">
-                  <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle statussen</SelectItem>
-                  <SelectItem value="active" className="focus:bg-blue-200 hover:bg-blue-100">Actief</SelectItem>
-                  <SelectItem value="inactive" className="focus:bg-blue-200 hover:bg-blue-100">Inactief</SelectItem>
-                  <SelectItem value="graduated" className="focus:bg-blue-200 hover:bg-blue-100">Afgestudeerd</SelectItem>
-                  <SelectItem value="withdrawn" className="focus:bg-blue-200 hover:bg-blue-100">Teruggetrokken</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Select 
-                value={filterProgram} 
-                onValueChange={setFilterProgram}
-              >
-                <SelectTrigger className="w-40 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white">
-                  <SelectValue placeholder="Programma" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-[#e5e7eb]">
-                  <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle programma's</SelectItem>
-                  {programs.map((program) => (
-                    <SelectItem key={program.id} value={program.id.toString()} className="focus:bg-blue-200 hover:bg-blue-100">
-                      {program.name}
+                  <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle klassen</SelectItem>
+                  {studentGroups.map((group) => (
+                    <SelectItem key={group.id} value={group.id.toString()} className="focus:bg-blue-200 hover:bg-blue-100">
+                      {group.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -525,19 +509,18 @@ export default function Students() {
               </Select>
               
               <Select 
-                value={filterStudentGroup} 
-                onValueChange={setFilterStudentGroup}
+                value={statusFilter} 
+                onValueChange={setStatusFilter}
               >
                 <SelectTrigger className="w-40 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white">
-                  <SelectValue placeholder="Klas" />
+                  <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#e5e7eb]">
-                  <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle klassen</SelectItem>
-                  {studentGroups.map((group) => (
-                    <SelectItem key={group.id} value={group.id.toString()} className="focus:bg-blue-200 hover:bg-blue-100">
-                      {group.name}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle statussen</SelectItem>
+                  <SelectItem value="active" className="focus:bg-blue-200 hover:bg-blue-100">Actief</SelectItem>
+                  <SelectItem value="inactive" className="focus:bg-blue-200 hover:bg-blue-100">Inactief</SelectItem>
+                  <SelectItem value="graduated" className="focus:bg-blue-200 hover:bg-blue-100">Afgestudeerd</SelectItem>
+                  <SelectItem value="withdrawn" className="focus:bg-blue-200 hover:bg-blue-100">Teruggetrokken</SelectItem>
                 </SelectContent>
               </Select>
             </div>

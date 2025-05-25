@@ -321,7 +321,8 @@ export default function Admissions() {
       <PremiumHeader 
         title="Aanmeldingen" 
         path="Beheer > Aanmeldingen" 
-        icon={ClipboardList} 
+        icon={ClipboardList}
+        description="Beheer nieuwe aanvragen, beoordeel en verwerk inschrijvingen, en volg de status van alle kandidaten"
       />
 
       {/* Main content area */}

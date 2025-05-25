@@ -596,7 +596,7 @@ export default function StudentGroups() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Geen programma</SelectItem>
+                          <SelectItem value="none_program">Geen programma</SelectItem>
                           {programsData?.map((prog: any) => (
                             <SelectItem key={prog.id} value={prog.id.toString()}>{prog.name}</SelectItem>
                           ))}
@@ -623,7 +623,7 @@ export default function StudentGroups() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Geen vak</SelectItem>
+                          <SelectItem value="none_course">Geen vak</SelectItem>
                           {coursesData?.map((course: any) => (
                             <SelectItem key={course.id} value={course.id.toString()}>{course.name}</SelectItem>
                           ))}
@@ -708,7 +708,7 @@ export default function StudentGroups() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Geen dag</SelectItem>
+                          <SelectItem value="none_day">Geen dag</SelectItem>
                           <SelectItem value="Maandag">Maandag</SelectItem>
                           <SelectItem value="Dinsdag">Dinsdag</SelectItem>
                           <SelectItem value="Woensdag">Woensdag</SelectItem>
@@ -894,7 +894,7 @@ export default function StudentGroups() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Geen programma</SelectItem>
+                          <SelectItem value="none_program">Geen programma</SelectItem>
                           {programsData?.map((prog: any) => (
                             <SelectItem key={prog.id} value={prog.id.toString()}>{prog.name}</SelectItem>
                           ))}

@@ -210,11 +210,19 @@ export default function Messages() {
 
   return (
     <div className="container mx-auto py-6">
-      <PremiumHeader
-        title="Berichten"
-        description="Beheer communicatie met studenten, docenten en voogden"
-        icon={MessageCircle}
-      />
+      <header className="bg-white border-b border-[#e5e7eb] shadow-sm mb-6">
+        <div className="flex flex-col">
+          <div className="bg-[#1e40af] px-6 py-3.5 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <MessageCircle className="h-5 w-5 text-white" />
+              <h1 className="text-base font-medium text-white tracking-tight">Berichten</h1>
+            </div>
+          </div>
+          <div className="bg-white px-6 py-2 text-gray-600 text-sm">
+            Beheer communicatie met studenten, docenten en voogden
+          </div>
+        </div>
+      </header>
 
       <DataTableContainer>
         {/* Zoek- en actiesbalk */}

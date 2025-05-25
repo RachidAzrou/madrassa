@@ -48,6 +48,7 @@ export default function Guardians() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGuardians, setSelectedGuardians] = useState<number[]>([]);
+  const [linkedStudentId, setLinkedStudentId] = useState<string | null>(null);
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showNewGuardianDialog, setShowNewGuardianDialog] = useState(false);
@@ -74,6 +75,37 @@ export default function Guardians() {
     }
   });
 
+  // URL parameters controleren bij het laden van de pagina
+  useEffect(() => {
+    // URL parameters uitlezen
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    const studentId = urlParams.get('studentId');
+    
+    // Controleer ook op gegevens in localStorage (als backup)
+    const pendingStudentId = localStorage.getItem('pendingStudentForGuardian');
+    
+    if ((action === 'add' && studentId) || pendingStudentId) {
+      // Sla de student ID op voor later gebruik bij het koppelen
+      setLinkedStudentId(studentId || pendingStudentId);
+      
+      // Open automatisch het dialoogvenster voor het toevoegen van een voogd
+      setShowNewGuardianDialog(true);
+      
+      // Toon een melding aan de gebruiker
+      toast({
+        title: "Voogd toevoegen",
+        description: `Je bent bezig met het toevoegen van een voogd voor student ${studentId || pendingStudentId}`,
+      });
+      
+      // Verwijder de student ID uit localStorage om te voorkomen dat het dialoogvenster opnieuw wordt geopend
+      localStorage.removeItem('pendingStudentForGuardian');
+      
+      // Verwijder de parameters uit de URL zonder de pagina te verversen
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [toast]);
+  
   // Gefilterde resultaten
   const searchResults = guardians.filter((guardian: GuardianType) => 
     guardian.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -189,15 +221,45 @@ export default function Guardians() {
     if (!validateNewGuardian()) return;
     
     try {
-      const response = await apiRequest('/api/guardians', {
+      // Stap 1: Maak eerst de nieuwe voogd aan
+      const guardianResponse = await apiRequest('/api/guardians', {
         method: 'POST',
         body: newGuardian
       });
       
-      toast({
-        title: "Voogd toegevoegd",
-        description: "De nieuwe voogd is succesvol toegevoegd.",
-      });
+      // Stap 2: Als er een student ID is meegegeven, koppel de voogd aan deze student
+      if (linkedStudentId) {
+        try {
+          // Koppel de voogd aan de student via de student-guardians relatie
+          await apiRequest('/api/student-guardians', {
+            method: 'POST',
+            body: {
+              studentId: linkedStudentId,
+              guardianId: guardianResponse.id
+            }
+          });
+          
+          toast({
+            title: "Voogd toegevoegd",
+            description: `De nieuwe voogd is succesvol toegevoegd en gekoppeld aan student ${linkedStudentId}.`,
+          });
+          
+          // Reset de gekoppelde student ID
+          setLinkedStudentId(null);
+        } catch (linkError) {
+          console.error('Fout bij koppelen van voogd aan student:', linkError);
+          toast({
+            title: "Voogd toegevoegd, maar niet gekoppeld",
+            description: "De voogd is aangemaakt maar kon niet worden gekoppeld aan de student. Probeer de koppeling handmatig te maken.",
+            variant: "warning"
+          });
+        }
+      } else {
+        toast({
+          title: "Voogd toegevoegd",
+          description: "De nieuwe voogd is succesvol toegevoegd.",
+        });
+      }
       
       // Reset formulier en sluit dialoog
       setNewGuardian({
@@ -210,8 +272,9 @@ export default function Guardians() {
       });
       setShowNewGuardianDialog(false);
       
-      // Vernieuw de lijst
+      // Vernieuw de lijsten
       queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-guardians'] });
     } catch (error) {
       toast({
         title: "Fout bij toevoegen",

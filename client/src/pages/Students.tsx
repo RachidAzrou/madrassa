@@ -1614,9 +1614,12 @@ export default function Students() {
             <Button 
               onClick={() => {
                 console.log('Navigating to add guardian for student:', newStudentId);
-                // Hier zou je naar het voogd formulier navigeren met de student ID
+                // Sla de student ID op in localStorage om deze beschikbaar te maken op de voogd pagina
+                localStorage.setItem('pendingStudentForGuardian', newStudentId);
+                // Sluit het huidige dialoogvenster
                 setIsAddGuardianDialogOpen(false);
-                // Voorbeeld navigatie (in een echte implementatie zou je naar de voogd pagina navigeren)
+                // Navigeer naar de voogden pagina met een link-parameter
+                window.location.href = '/guardians?action=add&studentId=' + encodeURIComponent(newStudentId);
                 toast({
                   title: "Voogd toevoegen",
                   description: "Je wordt doorgestuurd naar het voogd formulier.",

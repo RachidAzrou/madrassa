@@ -61,8 +61,23 @@ export default function Students() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [isAddGuardianDialogOpen, setIsAddGuardianDialogOpen] = useState(false);
+  const [isLinkSiblingDialogOpen, setIsLinkSiblingDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
+  const [newStudentGuardians, setNewStudentGuardians] = useState<any[]>([]);
+  const [newStudentSiblings, setNewStudentSiblings] = useState<any[]>([]);
+  const [guardianFormData, setGuardianFormData] = useState({
+    firstName: '',
+    lastName: '',
+    relationship: 'ouder',
+    email: '',
+    phone: '',
+    address: '',
+    occupation: '',
+    isEmergencyContact: true,
+  });
+  const [siblingSearchTerm, setSiblingSearchTerm] = useState('');
   const currentYear = new Date().getFullYear();
   const [nextStudentId, setNextStudentId] = useState(`ST${currentYear.toString().substring(2, 4)}001`);
   const [importFile, setImportFile] = useState<File | null>(null);
@@ -133,7 +148,6 @@ export default function Students() {
     setFormData(emptyFormData);
   };
 
-  const [isAddGuardianDialogOpen, setIsAddGuardianDialogOpen] = useState(false);
   const [newStudentId, setNewStudentId] = useState(null);
 
   // State om ontbrekende velden bij te houden
@@ -1164,53 +1178,53 @@ export default function Students() {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                      <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                        <Users className="h-4 w-4 mr-2" />
-                        Familie
-                      </h3>
-                      <div className="space-y-3">
-                        <div>
-                          <Label className="text-xs font-medium text-gray-700 mb-2 block">Voogden</Label>
-                          <div className="p-3 bg-gray-50 rounded-md text-center">
-                            <Button 
-                              type="button"
-                              variant="outline" 
-                              size="sm"
-                              className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50 w-full"
-                              onClick={() => {
-                                toast({
-                                  title: "Info",
-                                  description: "U kunt voogden toevoegen na het aanmaken van de student."
-                                });
-                              }}
-                            >
-                              <UserPlus className="h-3.5 w-3.5 mr-1" />
-                              Voogd toevoegen
-                            </Button>
-                          </div>
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md w-full">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <Users className="h-4 w-4 mr-2" />
+                      Familie
+                    </h3>
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700 mb-2 block">Voogden</Label>
+                        <div className="p-3 bg-gray-50 rounded-md text-center">
+                          <Button 
+                            type="button"
+                            variant="outline" 
+                            size="sm"
+                            className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50 w-full"
+                            onClick={() => {
+                              // Implementatie voogd toevoegen komt hier
+                              toast({
+                                title: "Voogd toevoegen",
+                                description: "Deze functionaliteit wordt binnenkort geïmplementeerd."
+                              });
+                            }}
+                          >
+                            <UserPlus className="h-3.5 w-3.5 mr-1" />
+                            Voogd toevoegen
+                          </Button>
                         </div>
-                        
-                        <div>
-                          <Label className="text-xs font-medium text-gray-700 mb-2 block">Broers/Zussen</Label>
-                          <div className="p-3 bg-gray-50 rounded-md text-center">
-                            <Button 
-                              type="button"
-                              variant="outline" 
-                              size="sm"
-                              className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50 w-full"
-                              onClick={() => {
-                                toast({
-                                  title: "Info",
-                                  description: "U kunt broers/zussen koppelen na het aanmaken van de student."
-                                });
-                              }}
-                            >
-                              <Users className="h-3.5 w-3.5 mr-1" />
-                              Broer/Zus koppelen
-                            </Button>
-                          </div>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-xs font-medium text-gray-700 mb-2 block">Broers/Zussen</Label>
+                        <div className="p-3 bg-gray-50 rounded-md text-center">
+                          <Button 
+                            type="button"
+                            variant="outline" 
+                            size="sm"
+                            className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50 w-full"
+                            onClick={() => {
+                              // Implementatie broer/zus koppelen komt hier
+                              toast({
+                                title: "Broer/Zus koppelen",
+                                description: "Deze functionaliteit wordt binnenkort geïmplementeerd."
+                              });
+                            }}
+                          >
+                            <Users className="h-3.5 w-3.5 mr-1" />
+                            Broer/Zus koppelen
+                          </Button>
                         </div>
                       </div>
                     </div>

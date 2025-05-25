@@ -491,16 +491,16 @@ export default function Attendance() {
               </TabsList>
               
               <TabsContent value="vak">
-                <div className="bg-white rounded-md p-4 border border-blue-100 shadow-sm">
-                  <label className="block text-sm font-medium text-blue-800 mb-2">Vak</label>
+                <div className="bg-white rounded-md p-4 border border-gray-200">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Vak</label>
                   <Select value={selectedCourse} onValueChange={handleCourseChange}>
-                    <SelectTrigger className="w-full border-blue-200 focus:ring-blue-500">
+                    <SelectTrigger className="w-full border-gray-300 focus:ring-[#1e40af]">
                       <SelectValue placeholder="Selecteer vak" />
                     </SelectTrigger>
                     <SelectContent>
                       {isLoadingCourses ? (
                         <div className="flex items-center justify-center p-2">
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600" />
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin text-[#1e40af]" />
                           <SelectItem value="loading" disabled>Vakken laden...</SelectItem>
                         </div>
                       ) : coursesData && Array.isArray(coursesData) ? (
@@ -518,16 +518,16 @@ export default function Attendance() {
               </TabsContent>
               
               <TabsContent value="klas">
-                <div className="bg-white rounded-md p-4 border border-blue-100 shadow-sm">
-                  <label className="block text-sm font-medium text-blue-800 mb-2">Klas</label>
+                <div className="bg-white rounded-md p-4 border border-gray-200">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Klas</label>
                   <Select value={selectedClass} onValueChange={handleClassChange}>
-                    <SelectTrigger className="w-full border-blue-200 focus:ring-blue-500">
+                    <SelectTrigger className="w-full border-gray-300 focus:ring-[#1e40af]">
                       <SelectValue placeholder="Selecteer klas" />
                     </SelectTrigger>
                     <SelectContent>
                       {isLoadingClasses ? (
                         <div className="flex items-center justify-center p-2">
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600" />
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin text-[#1e40af]" />
                           <SelectItem value="loading" disabled>Klassen laden...</SelectItem>
                         </div>
                       ) : classesData && Array.isArray(classesData) ? (
@@ -593,22 +593,22 @@ export default function Attendance() {
 
                 <TabsContent value="students">
                   <div className="space-y-4 mt-6">
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-lg border border-blue-100 shadow-sm mb-6">
+                    <div className="bg-white p-5 rounded-md border border-gray-200 mb-6">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                          <div className="p-2 bg-blue-100 rounded-md">
-                            <Users2 className="h-5 w-5 text-blue-700" />
+                          <div className="p-2 bg-[#1e40af] rounded-md">
+                            <Users2 className="h-5 w-5 text-white" />
                           </div>
-                          <div className="text-base font-medium text-blue-800 mb-1 sm:mb-0">Groepsacties</div>
+                          <div className="text-base font-medium text-gray-800 mb-1 sm:mb-0">Groepsacties</div>
                         </div>
                         
                         <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
-                          <div className="text-xs px-3 py-1.5 bg-white text-blue-800 rounded-md border border-blue-200 shadow-sm font-medium">
+                          <div className="text-xs px-3 py-1.5 bg-white text-gray-800 rounded-sm border border-gray-200 font-medium">
                             {selectedType === 'vak' 
                               ? `Vak: ${coursesData?.find((c: any) => c.id.toString() === selectedCourse)?.name || ''}` 
                               : `Klas: ${classesData?.find((c: any) => c.id.toString() === selectedClass)?.name || ''}`}
                           </div>
-                          <div className="text-xs px-3 py-1.5 bg-white text-blue-800 rounded-md border border-blue-200 shadow-sm font-medium">
+                          <div className="text-xs px-3 py-1.5 bg-white text-gray-800 rounded-sm border border-gray-200 font-medium">
                             Datum: {formatDate(selectedDate)}
                           </div>
                         </div>

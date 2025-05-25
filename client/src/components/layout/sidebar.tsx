@@ -185,35 +185,35 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                 />
                 <SidebarLink
                   href="/guardians"
-                  icon={<UserCheck className="h-5 w-5" />}
+                  icon={<UserCheck className="h-4 w-4" />}
                   label="Voogden"
                   isActive={location.startsWith("/guardians")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/teachers"
-                  icon={<GraduationCap className="h-5 w-5" />}
+                  icon={<GraduationCap className="h-4 w-4" />}
                   label="Docenten"
                   isActive={location.startsWith("/teachers")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/admissions"
-                  icon={<FileText className="h-5 w-5" />}
+                  icon={<FileText className="h-4 w-4" />}
                   label="Aanmeldingen"
                   isActive={location.startsWith("/admissions")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/student-groups"
-                  icon={<ChalkBoard className="h-5 w-5" />}
+                  icon={<ChalkBoard className="h-4 w-4" />}
                   label="Klassen"
                   isActive={location.startsWith("/student-groups")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/rooms"
-                  icon={<Building className="h-5 w-5" />}
+                  icon={<Building className="h-4 w-4" />}
                   label="Lokalen Beheer"
                   isActive={location.startsWith("/rooms")}
                   onClick={handleLinkClick}
@@ -228,38 +228,28 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               <div className="space-y-1.5">
                 <SidebarLink
                   href="/courses"
-                  icon={<BookOpen className="h-5 w-5" />}
+                  icon={<BookOpen className="h-4 w-4" />}
                   label="Curriculum"
                   isActive={location.startsWith("/courses")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/programs"
-                  icon={<BookText className="h-5 w-5" />}
+                  icon={<BookText className="h-4 w-4" />}
                   label="Vakken"
                   isActive={location.startsWith("/programs")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/scheduling"
-                  icon={<Clock className="h-5 w-5" />}
-                  label="Klassen"
+                  icon={<Clock className="h-4 w-4" />}
+                  label="Rooster"
                   isActive={location.startsWith("/scheduling")}
                   onClick={handleLinkClick}
                 />
-                <div 
-                  className="flex items-center py-2 px-3 rounded-md text-gray-700 hover:bg-[#1e3a8a]/10 cursor-pointer font-medium ml-6"
-                  onClick={() => {
-                    window.location.href = "/rooms";
-                    if (onClose) onClose();
-                  }}
-                >
-                  <Building className="h-5 w-5 mr-3 text-gray-500" />
-                  <span>Lokalen</span>
-                </div>
                 <SidebarLink
                   href="/calendar"
-                  icon={<Calendar className="h-5 w-5" />}
+                  icon={<Calendar className="h-4 w-4" />}
                   label="Kalender"
                   isActive={location.startsWith("/calendar")}
                   onClick={handleLinkClick}
@@ -274,28 +264,28 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               <div className="space-y-1.5">
                 <SidebarLink
                   href="/attendance"
-                  icon={<ClipboardCheck className="h-5 w-5" />}
+                  icon={<ClipboardCheck className="h-4 w-4" />}
                   label="Aanwezigheid"
                   isActive={location.startsWith("/attendance")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/grading"
-                  icon={<Percent className="h-5 w-5" />}
+                  icon={<Percent className="h-4 w-4" />}
                   label="Cijfers"
                   isActive={location.startsWith("/grading")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/reports"
-                  icon={<BookMarked className="h-5 w-5" />}
+                  icon={<BookMarked className="h-4 w-4" />}
                   label="Rapport"
                   isActive={location.startsWith("/reports")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/fees"
-                  icon={<Coins className="h-5 w-5" />}
+                  icon={<Coins className="h-4 w-4" />}
                   label="Betalingsbeheer"
                   isActive={location.startsWith("/fees")}
                   onClick={handleLinkClick}
@@ -316,10 +306,10 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               window.location.href = "/login";
               if (onClose) onClose();
             }}
-            className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50"
+            className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50"
           >
             <div className="flex-shrink-0">
-              <LogOut className="h-5 w-5" />
+              <LogOut className="h-4 w-4" />
             </div>
             <span className="truncate whitespace-nowrap font-medium">Afmelden</span>
           </div>

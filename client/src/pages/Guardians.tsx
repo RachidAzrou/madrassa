@@ -381,7 +381,7 @@ export default function Guardians() {
                   </tr>
                 ) : (
                   searchResults.map((guardian: GuardianType) => (
-                    <tr key={guardian.id} className="hover:bg-gray-50">
+                    <tr key={guardian.id} className="group hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <Checkbox
                           checked={selectedGuardians.includes(guardian.id)}

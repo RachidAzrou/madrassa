@@ -24,7 +24,6 @@ import Notifications from "@/pages/Notifications";
 import MyAccount from "@/pages/MyAccount";
 import Login from "@/pages/Login";
 import Messages from "@/pages/Messages";
-import ResponsiveTableExample from "@/pages/ResponsiveTableExample";
 
 import Scheduling from "@/pages/Scheduling";
 import Fees from "@/pages/Fees";
@@ -69,7 +68,6 @@ function AuthenticatedRouter() {
         <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
         <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
         <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
-        <Route path="/responsive-table-example" component={() => <AuthenticatedRoute component={ResponsiveTableExample} />} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>

@@ -13,7 +13,7 @@ interface DataTableContainerProps {
  */
 export function DataTableContainer({ children, className = "" }: DataTableContainerProps) {
   return (
-    <div className={`px-3 sm:px-4 md:px-6 py-4 md:py-6 flex-1 ${className}`}>
+    <div className={`px-6 py-6 flex-1 ${className}`}>
       {children}
     </div>
   );
@@ -50,7 +50,7 @@ export function FilterSelect({
 }) {
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger className={`h-8 sm:h-9 text-sm border-gray-300 w-full ${triggerClassName}`}>
+      <SelectTrigger className={`h-8 text-sm border-gray-300 ${triggerClassName}`}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent className={`bg-white ${className}`}>
@@ -100,7 +100,7 @@ export function EmptyActionHeader({
   width?: string;
 }) {
   return (
-    <th scope="col" className={`px-3 sm:px-4 py-3 text-right w-[80px] sm:w-[120px] ${className}`}>
+    <th scope="col" className={`px-4 py-3 text-right w-[120px] ${className}`}>
       <span className="text-xs font-medium text-gray-700"></span>
     </th>
   );
@@ -117,7 +117,7 @@ interface SearchActionBarProps {
 export function SearchActionBar({ children, className = "" }: SearchActionBarProps) {
   return (
     <div className={`bg-white border border-[#e5e7eb] rounded-sm mb-4 shadow-sm ${className}`}>
-      <div className="px-3 sm:px-4 py-3 sm:py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+      <div className="px-3 sm:px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         {children}
       </div>
     </div>
@@ -135,7 +135,7 @@ interface TableContainerProps {
 export function TableContainer({ children, className = "" }: TableContainerProps) {
   return (
     <div className={`bg-white border border-[#e5e7eb] rounded-sm overflow-hidden shadow-sm ${className}`}>
-      <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+      <div className="overflow-x-auto md:overflow-x-visible">
         {children}
       </div>
     </div>
@@ -164,10 +164,10 @@ export function DataTableHeader({ children, className = "" }: DataTableHeaderPro
 export function TableLoadingState() {
   return (
     <tr>
-      <td colSpan={99} className="px-3 sm:px-6 py-3 sm:py-4 text-center">
+      <td colSpan={99} className="px-6 py-4 text-center">
         <div className="flex justify-center items-center">
-          <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
-          <span className="ml-2 text-xs sm:text-sm text-gray-500">Laden...</span>
+          <div className="w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
+          <span className="ml-2 text-sm text-gray-500">Laden...</span>
         </div>
       </td>
     </tr>
@@ -188,8 +188,8 @@ export function TableErrorState({
 }: TableErrorStateProps) {
   return (
     <tr>
-      <td colSpan={99} className="px-3 sm:px-6 py-3 sm:py-4 text-center">
-        <div className="flex flex-col items-center justify-center py-4 sm:py-6">
+      <td colSpan={99} className="px-6 py-4 text-center">
+        <div className="flex flex-col items-center justify-center py-6">
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
             width="24" 
@@ -200,13 +200,13 @@ export function TableErrorState({
             strokeWidth="2" 
             strokeLinecap="round" 
             strokeLinejoin="round" 
-            className="h-6 w-6 sm:h-8 sm:w-8 text-red-500 mb-2"
+            className="h-8 w-8 text-red-500 mb-2"
           >
             <circle cx="12" cy="12" r="10" />
             <line x1="15" y1="9" x2="9" y2="15" />
             <line x1="9" y1="9" x2="15" y2="15" />
           </svg>
-          <p className="text-xs sm:text-sm text-red-500">{message}</p>
+          <p className="text-sm text-red-500">{message}</p>
           {onRetry && (
             <button 
               onClick={onRetry}
@@ -239,13 +239,13 @@ export function EmptyTableState({
 }: EmptyTableStateProps) {
   return (
     <tr>
-      <td colSpan={99} className="px-3 sm:px-6 py-3 sm:py-4 text-center">
-        <div className="h-36 sm:h-48 flex flex-col items-center justify-center text-gray-500">
+      <td colSpan={99} className="px-6 py-4 text-center">
+        <div className="h-48 flex flex-col items-center justify-center text-gray-500">
           <div className="text-[#1e3a8a] mb-2">
             {icon}
           </div>
-          <p className="text-xs sm:text-sm font-medium">{title}</p>
-          {action && <div className="mt-3 sm:mt-4">{action}</div>}
+          <p className="text-sm font-medium">{title}</p>
+          {action && <div className="mt-4">{action}</div>}
         </div>
       </td>
     </tr>

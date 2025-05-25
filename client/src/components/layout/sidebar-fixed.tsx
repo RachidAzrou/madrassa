@@ -145,7 +145,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
 
   return (
     <div className={cn("h-screen", className)}>
-      <div className="flex flex-col h-full bg-slate-50 border-r border-gray-200 shadow-md">
+      <div className="flex flex-col h-full bg-white border-r border-gray-200 shadow-md">
 
         
         {/* Verwijderd gebruiker informatie sectie uit sidebar - nu in topbar */}

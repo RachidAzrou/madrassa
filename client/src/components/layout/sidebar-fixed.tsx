@@ -70,10 +70,10 @@ const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps)
       <div
         onClick={onClick}
         className={cn(
-          "flex items-center gap-2.5 px-3 py-2 text-sm transition-colors cursor-pointer border-l-2",
+          "flex items-center gap-2.5 px-3 py-2 text-sm transition-colors cursor-pointer rounded-sm",
           isActive
-            ? "border-l-primary bg-primary/5 text-primary font-medium"
-            : "border-l-transparent text-gray-700 hover:text-primary hover:border-l-primary/30 hover:bg-primary/5"
+            ? "bg-blue-50 text-blue-800 font-medium"
+            : "text-gray-700 hover:text-blue-700 hover:bg-blue-50/50"
         )}
       >
         <div className="flex-shrink-0">
@@ -145,23 +145,23 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
 
   return (
     <div className={cn("h-screen", className)}>
-      <div className="flex flex-col h-full bg-white border-r border-gray-200 shadow-sm">
+      <div className="flex flex-col h-full bg-white border-r border-gray-200 shadow-md">
 
         
         {/* Verwijderd gebruiker informatie sectie uit sidebar - nu in topbar */}
         
         {/* Navigation links - scrollable section */}
-        <div className="flex-1 overflow-auto py-1 px-3">
+        <div className="flex-1 overflow-auto py-2 px-3">
           <div className="space-y-3">
             <div className="pt-1">
               <Link href="/">
                 <div
                   onClick={handleLinkClick}
                   className={cn(
-                    "flex items-center gap-2.5 px-2.5 py-2 text-sm transition-colors cursor-pointer border-l-2 mb-3",
+                    "flex items-center gap-2.5 px-2.5 py-2 text-sm transition-colors cursor-pointer mb-3",
                     location === "/"
-                      ? "border-l-primary bg-primary/5 text-primary font-medium"
-                      : "border-l-transparent text-gray-700 hover:text-primary hover:border-l-primary/30 hover:bg-primary/5"
+                      ? "bg-blue-50 text-blue-800 font-medium rounded-sm"
+                      : "text-gray-700 hover:text-blue-700 hover:bg-blue-50/50 rounded-sm"
                   )}
                 >
                   <div className="flex-shrink-0">
@@ -171,11 +171,11 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                 </div>
               </Link>
               <div className="flex items-center mb-1 px-2">
-                <div className="h-px bg-gray-200 flex-grow mr-2"></div>
-                <p className="text-xs font-medium text-gray-500">
+                <div className="h-px bg-gray-300 flex-grow mr-2"></div>
+                <p className="text-xs font-medium text-gray-600 tracking-wide uppercase">
                   Beheer
                 </p>
-                <div className="h-px bg-gray-200 flex-grow ml-2"></div>
+                <div className="h-px bg-gray-300 flex-grow ml-2"></div>
               </div>
               <div className="space-y-0.5">
                 <SidebarLink
@@ -225,11 +225,11 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
 
             <div className="pt-1">
               <div className="flex items-center mb-1 px-2">
-                <div className="h-px bg-gray-200 flex-grow mr-2"></div>
-                <p className="text-xs font-medium text-gray-500">
+                <div className="h-px bg-gray-300 flex-grow mr-2"></div>
+                <p className="text-xs font-medium text-gray-600 tracking-wide uppercase">
                   Onderwijs
                 </p>
-                <div className="h-px bg-gray-200 flex-grow ml-2"></div>
+                <div className="h-px bg-gray-300 flex-grow ml-2"></div>
               </div>
               <div className="space-y-0.5">
                 <SidebarLink
@@ -265,11 +265,11 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
 
             <div className="pt-1">
               <div className="flex items-center mb-1 px-2">
-                <div className="h-px bg-gray-200 flex-grow mr-2"></div>
-                <p className="text-xs font-medium text-gray-500">
+                <div className="h-px bg-gray-300 flex-grow mr-2"></div>
+                <p className="text-xs font-medium text-gray-600 tracking-wide uppercase">
                   Evaluatie
                 </p>
-                <div className="h-px bg-gray-200 flex-grow ml-2"></div>
+                <div className="h-px bg-gray-300 flex-grow ml-2"></div>
               </div>
               <div className="space-y-0.5">
                 <SidebarLink
@@ -306,7 +306,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
         
         {/* Afmelden knop aan einde van de sidebar - fixed */}
-        <div className="px-3 border-t border-gray-200 py-3 bg-secondary/10">
+        <div className="px-3 border-t border-gray-300 py-3 bg-gray-50">
           <div
             onClick={() => {
               // Verwijder authenticatie gegevens

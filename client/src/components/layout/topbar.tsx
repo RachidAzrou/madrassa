@@ -62,11 +62,11 @@ export function Topbar() {
   const unreadCount = notifications.filter((n: Notification) => !n.isRead).length;
 
   return (
-    <div className="w-full h-12 border-b border-gray-200 bg-white px-4 flex items-center justify-between">
+    <div className="w-full h-16 border-b border-gray-200 bg-white px-4 flex items-center justify-between">
       {/* Logo sectie - links */}
       <div className="flex items-center h-full">
         <Link href="/dashboard" className="flex items-center">
-          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8" />
+          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-10" />
         </Link>
       </div>
 

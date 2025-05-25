@@ -303,24 +303,7 @@ export default function Dashboard() {
               <PieChart className="h-3.5 w-3.5 text-[#1e40af]" />
               <h3 className="text-xs font-medium text-gray-700 tracking-tight">Klasbezetting</h3>
             </div>
-            <div className="flex gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="h-6 px-2 text-[10px] rounded-none hover:bg-gray-100 text-gray-500"
-                onClick={navigateToGroups}
-              >
-                Vernieuwen
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 px-2 text-[10px] rounded-none hover:bg-gray-100 text-gray-500"
-                onClick={navigateToGroups}
-              >
-                Exporteren
-              </Button>
-            </div>
+
           </div>
           
           {/* Studentengroepen data visualisatie - Tabel met voortgangsbalken */}
@@ -436,24 +419,7 @@ export default function Dashboard() {
               <Calendar className="h-3.5 w-3.5 text-[#1e40af]" />
               <h3 className="text-xs font-medium text-gray-700 tracking-tight">Weekplanning</h3>
             </div>
-            <div className="flex gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="h-6 px-2 text-[10px] rounded-none hover:bg-gray-100 text-gray-500"
-                onClick={navigateToCalendar}
-              >
-                Vernieuwen
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 px-2 text-[10px] rounded-none hover:bg-gray-100 text-gray-500"
-                onClick={navigateToCalendar}
-              >
-                Volledige agenda
-              </Button>
-            </div>
+
           </div>
           
           {/* Week view - Desktop app stijl weekkalender */}

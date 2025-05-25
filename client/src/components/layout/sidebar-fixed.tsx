@@ -316,7 +316,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               window.location.href = "/login";
               if (onClose) onClose();
             }}
-            className="flex items-center gap-2.5 px-2.5 py-2 text-sm transition-colors cursor-pointer text-gray-700 hover:text-red-600 border-l-2 border-l-transparent hover:border-l-red-600 hover:bg-red-50/50"
+            className="flex items-center gap-2.5 px-2.5 py-2 text-sm transition-colors cursor-pointer rounded-sm text-gray-700 hover:text-red-600 hover:bg-red-50/50"
           >
             <div className="flex-shrink-0">
               <LogOut className="h-4.5 w-4.5" />

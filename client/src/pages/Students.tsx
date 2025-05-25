@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Users, User, Camera,
   Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
-  GraduationCap, NotebookText, MapPin
+  GraduationCap, NotebookText, MapPin, FileEdit
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

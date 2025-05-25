@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Users, User, Camera,
-  Fingerprint, ChevronRight, Edit, Trash2, Eye, Home,
+  Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
   GraduationCap, NotebookText, MapPin
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
@@ -17,11 +17,18 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from 'date-fns';
 import { nl } from 'date-fns/locale';
+import { 
+  DataTableContainer, 
+  SearchActionBar, 
+  TableContainer,
+  TableLoadingState,
+  EmptyTableState
+} from "@/components/ui/data-table-container";
 import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
+  TableHead as ShadcnTableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
@@ -295,32 +302,24 @@ export default function Students() {
         }}
       />
       
-      <div className="container mx-auto p-4 max-w-7xl">
-        <div className="flex justify-end mb-6">
-          <Button 
-            variant="default" 
-            size="default" 
-            className="bg-[#1e40af] hover:bg-[#1e40af]/90"
-            onClick={() => setIsCreateDialogOpen(true)}
-          >
-            <PlusCircle className="mr-2 h-4 w-4" /> Student Toevoegen
-          </Button>
-        </div>
-
-        <div className="mb-6 flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
+      <DataTableContainer>
+        <SearchActionBar>
+          {/* Zoekbalk */}
+          <div className="relative w-full sm:max-w-md">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
             <Input
               type="text"
               placeholder="Zoek op naam, ID of email..."
-              className="pl-9"
+              className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="flex-initial w-full md:w-auto flex flex-wrap gap-2">
+          
+          {/* Acties */}
+          <div className="flex flex-wrap items-center gap-2">
             <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-full md:w-[150px]">
+              <SelectTrigger className="h-7 text-xs rounded-sm">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -333,7 +332,7 @@ export default function Students() {
             </Select>
             
             <Select value={filterProgram} onValueChange={setFilterProgram}>
-              <SelectTrigger className="w-full md:w-[180px]">
+              <SelectTrigger className="h-7 text-xs rounded-sm">
                 <SelectValue placeholder="Programma" />
               </SelectTrigger>
               <SelectContent>
@@ -345,65 +344,102 @@ export default function Students() {
                 ))}
               </SelectContent>
             </Select>
+            
+            <Button
+              size="sm"
+              onClick={() => setIsCreateDialogOpen(true)}
+              className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white ml-auto"
+            >
+              <PlusCircle className="h-3.5 w-3.5 mr-1" />
+              Nieuwe Student
+            </Button>
           </div>
-        </div>
+        </SearchActionBar>
 
         {/* Student Table */}
-        <div className="bg-white rounded-md border shadow-sm overflow-hidden">
+        <TableContainer>
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50">
-                <TableHead className="w-[100px]">ID</TableHead>
-                <TableHead>Naam</TableHead>
-                <TableHead className="hidden md:table-cell">Email</TableHead>
-                <TableHead className="hidden md:table-cell">Programma</TableHead>
-                <TableHead className="hidden md:table-cell">Status</TableHead>
-                <TableHead className="text-right">Acties</TableHead>
+              <TableRow>
+                <ShadcnTableHead className="px-4 py-3 text-left w-[100px]">
+                  <span className="text-xs font-medium text-gray-700">ID</span>
+                </ShadcnTableHead>
+                <ShadcnTableHead className="px-4 py-3 text-left">
+                  <span className="text-xs font-medium text-gray-700">Naam</span>
+                </ShadcnTableHead>
+                <ShadcnTableHead className="px-4 py-3 text-left hidden md:table-cell">
+                  <span className="text-xs font-medium text-gray-700">Email</span>
+                </ShadcnTableHead>
+                <ShadcnTableHead className="px-4 py-3 text-left hidden md:table-cell">
+                  <span className="text-xs font-medium text-gray-700">Programma</span>
+                </ShadcnTableHead>
+                <ShadcnTableHead className="px-4 py-3 text-left hidden md:table-cell">
+                  <span className="text-xs font-medium text-gray-700">Status</span>
+                </ShadcnTableHead>
+                <ShadcnTableHead className="px-4 py-3 text-right w-[120px]">
+                  <span className="text-xs font-medium text-gray-700">Acties</span>
+                </ShadcnTableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {studentsLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-4">
-                    Studenten laden...
-                  </TableCell>
-                </TableRow>
+                <TableLoadingState />
               ) : students.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-4">
-                    Geen studenten gevonden.
-                  </TableCell>
-                </TableRow>
+                <EmptyTableState 
+                  icon={<User className="h-12 w-12 mx-auto text-gray-300" />}
+                  title="Geen studenten gevonden"
+                  description={searchTerm.trim() !== '' || filterStatus !== 'all' || filterProgram !== 'all' 
+                    ? 'Probeer andere zoek- of filtercriteria te gebruiken.' 
+                    : 'Er zijn nog geen studenten toegevoegd in het systeem.'}
+                  action={
+                    (searchTerm.trim() !== '' || filterStatus !== 'all' || filterProgram !== 'all') && (
+                      <Button 
+                        variant="outline"
+                        className="mt-4 h-7 text-xs rounded-sm" 
+                        size="sm"
+                        onClick={() => {
+                          setSearchTerm('');
+                          setFilterStatus('all');
+                          setFilterProgram('all');
+                        }}
+                      >
+                        <X className="h-3.5 w-3.5 mr-1" />
+                        Wis Filters
+                      </Button>
+                    )
+                  }
+                />
               ) : (
                 students.map((student) => (
-                  <TableRow key={student.id}>
-                    <TableCell className="font-medium">{student.studentId}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-8 w-8">
+                  <TableRow key={student.id} className="hover:bg-gray-50">
+                    <TableCell className="px-4 py-3 text-xs font-medium">{student.studentId}</TableCell>
+                    <TableCell className="px-4 py-3">
+                      <div className="flex items-center">
+                        <Avatar className="h-7 w-7 mr-3">
                           {student.photoUrl ? (
                             <AvatarImage src={student.photoUrl} alt={`${student.firstName} ${student.lastName}`} />
                           ) : (
-                            <AvatarFallback className="bg-[#1e40af] text-white">
+                            <AvatarFallback className="text-xs bg-[#1e40af] text-white">
                               {student.firstName.charAt(0)}{student.lastName.charAt(0)}
                             </AvatarFallback>
                           )}
                         </Avatar>
-                        <span>{student.firstName} {student.lastName}</span>
+                        <div>
+                          <p className="text-xs font-medium text-gray-900">{student.firstName} {student.lastName}</p>
+                        </div>
                       </div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">{student.email}</TableCell>
-                    <TableCell className="hidden md:table-cell">{student.programName}</TableCell>
-                    <TableCell className="hidden md:table-cell">
+                    <TableCell className="px-4 py-3 text-xs text-gray-500 hidden md:table-cell">{student.email}</TableCell>
+                    <TableCell className="px-4 py-3 text-xs text-gray-500 hidden md:table-cell">{student.programName}</TableCell>
+                    <TableCell className="px-4 py-3 hidden md:table-cell">
                       <Badge 
-                        variant={student.status === 'active' ? 'default' : 
-                               student.status === 'inactive' ? 'secondary' : 
-                               student.status === 'graduated' ? 'success' : 'outline'
-                        }
-                        className={student.status === 'active' ? 'bg-green-100 text-green-800 hover:bg-green-100' : 
-                                 student.status === 'inactive' ? 'bg-gray-100 text-gray-800 hover:bg-gray-100' : 
-                                 student.status === 'graduated' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' : ''
-                        }
+                        variant="outline" 
+                        className={`text-xs rounded-sm ${
+                          student.status === 'active' ? "bg-green-50 text-green-700 border-green-200" : 
+                          student.status === 'inactive' ? "bg-gray-50 text-gray-700 border-gray-200" : 
+                          student.status === 'graduated' ? "bg-blue-50 text-blue-700 border-blue-200" :
+                          "bg-yellow-50 text-yellow-700 border-yellow-200"
+                        }`}
                       >
                         {student.status === 'active' ? 'Actief' : 
                          student.status === 'inactive' ? 'Inactief' : 
@@ -411,31 +447,31 @@ export default function Students() {
                          student.status === 'withdrawn' ? 'Teruggetrokken' : student.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-8 w-8"
+                    <TableCell className="px-4 py-3 text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleViewStudent(student)}
+                          className="h-7 w-7 p-0 text-gray-500"
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-3.5 w-3.5" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-8 w-8"
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleEditStudent(student)}
+                          className="h-7 w-7 p-0 text-gray-500"
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="h-3.5 w-3.5" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleDeleteStudentClick(student)}
+                          className="h-7 w-7 p-0 text-gray-500"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </div>
                     </TableCell>
@@ -444,8 +480,8 @@ export default function Students() {
               )}
             </TableBody>
           </Table>
-        </div>
-      </div>
+        </TableContainer>
+      </DataTableContainer>
 
       {/* Create Student Dialog */}
       <Dialog 

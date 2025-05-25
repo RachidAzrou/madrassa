@@ -69,31 +69,16 @@ const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps)
       <div
         onClick={onClick}
         className={cn(
-          "flex items-center gap-3 px-4 py-3 text-sm rounded-lg transition-all duration-200 cursor-pointer relative overflow-hidden",
+          "flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer",
           isActive
-            ? "bg-primary/10 text-primary font-medium shadow-sm" 
-            : "text-gray-700 hover:text-primary hover:bg-gray-50"
+            ? "bg-primary text-white font-medium"
+            : "text-gray-600 hover:text-primary hover:bg-gray-100"
         )}
-        style={{
-          transform: isActive ? "scale(1.02)" : "scale(1)",
-        }}
       >
-        <div className={cn(
-          "flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full",
-          isActive ? "bg-primary/15 text-primary" : "text-gray-500"
-        )}>
+        <div className="flex-shrink-0">
           {icon}
         </div>
-        <span className="truncate whitespace-nowrap font-medium">{label}</span>
-        
-        {/* Flutter-style indicator */}
-        {isActive && (
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary rounded-r-full" 
-               style={{ 
-                 boxShadow: "0 0 8px rgba(0, 123, 255, 0.5)" 
-               }}
-          />
-        )}
+        <span className="truncate whitespace-nowrap">{label}</span>
       </div>
     </Link>
   );
@@ -223,12 +208,12 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         
         {/* Navigation links - scrollable section */}
         <div className="flex-1 overflow-auto py-2 px-3">
-          <div className="space-y-1">
+          <div className="space-y-4">
             <div className="pt-2">
-              <p className="mb-2 px-3 text-xs font-semibold text-blue-600 uppercase tracking-wider">
+              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Beheer
               </p>
-              <div className="space-y-0.5 flutter-list-item">
+              <div className="space-y-1.5">
                 <SidebarLink
                   href="/students"
                   icon={<Users className="h-5 w-5" />}
@@ -275,10 +260,10 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
             </div>
 
             <div className="pt-2">
-              <p className="mb-2 px-3 text-xs font-semibold text-blue-600 uppercase tracking-wider">
+              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Onderwijs
               </p>
-              <div className="space-y-0.5 flutter-list-item">
+              <div className="space-y-1.5">
                 <SidebarLink
                   href="/courses"
                   icon={<BookOpen className="h-5 w-5" />}
@@ -311,10 +296,10 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
             </div>
 
             <div className="pt-2">
-              <p className="mb-2 px-3 text-xs font-semibold text-blue-600 uppercase tracking-wider">
+              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Evaluatie
               </p>
-              <div className="space-y-0.5 flutter-list-item">
+              <div className="space-y-1.5">
                 <SidebarLink
                   href="/attendance"
                   icon={<ClipboardCheck className="h-5 w-5" />}

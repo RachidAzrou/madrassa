@@ -601,6 +601,82 @@ export default function Students() {
                           <User className="h-4 w-4 mr-2" />
                           Persoonlijke Informatie
                         </h3>
+                        <div className="mb-4">
+                          <div className="flex flex-col items-center">
+                            <div className="mb-2 w-32 h-32 rounded-md border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 overflow-hidden relative">
+                              {formData.photoUrl ? (
+                                <img src={formData.photoUrl} alt="Student foto" className="w-full h-full object-cover" />
+                              ) : (
+                                <UserCircle className="h-16 w-16 text-gray-400" />
+                              )}
+                            </div>
+                            <div className="flex flex-wrap gap-2 mt-2 justify-center">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="text-xs"
+                                onClick={() => document.getElementById('photo-upload').click()}
+                              >
+                                <ScanLine className="h-3 w-3 mr-1" />
+                                Uploaden
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="text-xs"
+                                onClick={() => {
+                                  // Placeholder for eID integration
+                                  toast({
+                                    title: "eID Integratie",
+                                    description: "eID functionaliteit wordt binnenkort geïmplementeerd.",
+                                    variant: "default"
+                                  });
+                                }}
+                              >
+                                <Fingerprint className="h-3 w-3 mr-1" />
+                                eID
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="text-xs"
+                                onClick={() => {
+                                  // Placeholder for itsme integration
+                                  toast({
+                                    title: "itsme® Integratie",
+                                    description: "itsme® functionaliteit wordt binnenkort geïmplementeerd.",
+                                    variant: "default"
+                                  });
+                                }}
+                              >
+                                <AlertCircle className="h-3 w-3 mr-1" />
+                                itsme®
+                              </Button>
+                              <input
+                                id="photo-upload"
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        photoUrl: reader.result as string
+                                      }));
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <Label htmlFor="studentId" className="text-xs font-medium text-gray-700">Student ID *</Label>

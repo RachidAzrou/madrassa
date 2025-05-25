@@ -23,6 +23,7 @@ export const students = pgTable("students", {
   enrollmentDate: timestamp("enrollment_date").defaultNow(),
   notes: text("notes"), // Notities over de student
   gender: text("gender"), // man of vrouw
+  photoUrl: text("photo_url"), // URL naar de foto van de student
 });
 
 // Maak een standaard schema maar omit ID (wordt gegenereerd door database)

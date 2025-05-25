@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -45,6 +46,7 @@ export default function Students() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
   const currentYear = new Date().getFullYear();
   const [nextStudentId, setNextStudentId] = useState(`ST${currentYear.toString().substring(2, 4)}001`);
   
@@ -410,19 +412,31 @@ export default function Students() {
           <Table>
             <DataTableHeader>
               <TableRow>
-                <ShadcnTableHead className="px-4 py-3 text-left w-[100px]">
+                <ShadcnTableHead className="px-4 py-3 w-[40px] text-center">
+                  <Checkbox 
+                    checked={students.length > 0 && selectedStudents.length === students.length}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedStudents(students.map(s => s.id));
+                      } else {
+                        setSelectedStudents([]);
+                      }
+                    }}
+                  />
+                </ShadcnTableHead>
+                <ShadcnTableHead className="px-4 py-3 text-center w-[100px]">
                   <span className="text-xs font-medium text-gray-700">ID</span>
                 </ShadcnTableHead>
-                <ShadcnTableHead className="px-4 py-3 text-left">
+                <ShadcnTableHead className="px-4 py-3 text-center">
                   <span className="text-xs font-medium text-gray-700">Naam</span>
                 </ShadcnTableHead>
-                <ShadcnTableHead className="px-4 py-3 text-left">
+                <ShadcnTableHead className="px-4 py-3 text-center">
                   <span className="text-xs font-medium text-gray-700">Klas</span>
                 </ShadcnTableHead>
-                <ShadcnTableHead className="px-4 py-3 text-left">
+                <ShadcnTableHead className="px-4 py-3 text-center">
                   <span className="text-xs font-medium text-gray-700">Schooljaar</span>
                 </ShadcnTableHead>
-                <ShadcnTableHead className="px-4 py-3 text-left">
+                <ShadcnTableHead className="px-4 py-3 text-center">
                   <span className="text-xs font-medium text-gray-700">Status</span>
                 </ShadcnTableHead>
                 <ShadcnTableHead className="px-4 py-3 text-right w-[100px]">
@@ -460,9 +474,21 @@ export default function Students() {
               ) : (
                 students.map((student) => (
                   <TableRow key={student.id} className="hover:bg-gray-50 group">
-                    <TableCell className="px-4 py-3 text-xs font-medium">{student.studentId}</TableCell>
-                    <TableCell className="px-4 py-3">
-                      <div className="flex items-center">
+                    <TableCell className="px-4 py-3 text-center">
+                      <Checkbox 
+                        checked={selectedStudents.includes(student.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedStudents(prev => [...prev, student.id]);
+                          } else {
+                            setSelectedStudents(prev => prev.filter(id => id !== student.id));
+                          }
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-xs font-medium text-center">{student.studentId}</TableCell>
+                    <TableCell className="px-4 py-3 text-center">
+                      <div className="flex items-center justify-center">
                         <Avatar className="h-7 w-7 mr-3">
                           {student.photoUrl ? (
                             <AvatarImage src={student.photoUrl} alt={`${student.firstName} ${student.lastName}`} />
@@ -477,13 +503,13 @@ export default function Students() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-xs text-gray-600">
-                      {studentGroupsData.find(g => g.id && student.studentGroupId && g.id.toString() === student.studentGroupId.toString())?.name || '-'}
+                    <TableCell className="px-4 py-3 text-xs text-gray-600 text-center">
+                      {student.studentGroupName || '-'}
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-xs text-gray-600">
+                    <TableCell className="px-4 py-3 text-xs text-gray-600 text-center">
                       {student.academicYear || '-'}
                     </TableCell>
-                    <TableCell className="px-4 py-3">
+                    <TableCell className="px-4 py-3 text-center">
                       <Badge 
                         variant="outline" 
                         className={`text-xs rounded-sm ${

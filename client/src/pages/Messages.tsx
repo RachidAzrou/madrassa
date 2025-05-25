@@ -241,17 +241,17 @@ export default function Messages() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="h-9 px-2.5"
+                className="h-7 text-xs rounded-sm border-[#e5e7eb] bg-white hover:bg-blue-50"
               >
-                <Filter className="h-3.5 w-3.5 mr-1" />
+                <Filter className="h-3.5 w-3.5 mr-1 text-gray-500" />
                 <span>Filter</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="h-9 px-2.5"
+                className="h-7 text-xs rounded-sm border-[#e5e7eb] bg-white hover:bg-blue-50"
               >
-                <Download className="h-3.5 w-3.5 mr-1" />
+                <Download className="h-3.5 w-3.5 mr-1 text-gray-500" />
                 <span>Exporteren</span>
               </Button>
             </div>
@@ -259,7 +259,7 @@ export default function Messages() {
           <div className="flex items-center justify-end">
             <Button
               size="sm"
-              className="h-9"
+              className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
               onClick={() => {
                 setSelectedMessage(null);
                 setNewMessage({

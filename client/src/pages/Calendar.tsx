@@ -715,7 +715,7 @@ export default function Calendar() {
                           {formatDayDate(new Date(date))}
                         </h3>
                         <div className="space-y-2 ml-4">
-                          {dayEvents
+                          {dayEvents && Array.isArray(dayEvents) && dayEvents
                             .sort((a: CalendarEvent, b: CalendarEvent) => a.startTime.localeCompare(b.startTime))
                             .map((event: CalendarEvent) => (
                               <div 

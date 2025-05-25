@@ -181,7 +181,7 @@ export default function Scheduling() {
   });
 
   // Toon alleen de planning voor de geselecteerde docent/klas/dag
-  const filteredSchedules = scheduleData.schedules.filter((schedule: TeacherSchedule) => {
+  const filteredSchedules = scheduleData?.schedules?.filter((schedule: TeacherSchedule) => {
     // Alleen filteren op zoekterm als die is ingevuld
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
@@ -193,22 +193,27 @@ export default function Scheduling() {
       );
     }
     return true;
-  });
+  }) || [];
 
   // Groepeer lessen per dag voor weergave
-  const groupedSchedules = filteredSchedules.reduce((acc: any, schedule: TeacherSchedule) => {
-    const day = schedule.dayOfWeek;
-    if (!acc[day]) acc[day] = [];
-    acc[day].push(schedule);
-    return acc;
-  }, {});
+  const groupedSchedules = filteredSchedules && filteredSchedules.length > 0 ? 
+    filteredSchedules.reduce((acc: any, schedule: TeacherSchedule) => {
+      const day = schedule.dayOfWeek;
+      if (!acc[day]) acc[day] = [];
+      acc[day].push(schedule);
+      return acc;
+    }, {}) : {};
   
   // Sorteer de lessen per tijdstip
-  Object.keys(groupedSchedules).forEach(day => {
-    groupedSchedules[day].sort((a: TeacherSchedule, b: TeacherSchedule) => 
-      a.startTime.localeCompare(b.startTime)
-    );
-  });
+  if (Object.keys(groupedSchedules).length > 0) {
+    Object.keys(groupedSchedules).forEach(day => {
+      if (groupedSchedules[day] && Array.isArray(groupedSchedules[day])) {
+        groupedSchedules[day].sort((a: TeacherSchedule, b: TeacherSchedule) => 
+          a.startTime.localeCompare(b.startTime)
+        );
+      }
+    });
+  }
 
   // Dagen van de week voor de tabs
   const daysOfWeek = [

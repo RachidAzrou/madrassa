@@ -530,6 +530,10 @@ export default function Guardians() {
               
               <TabsContent value="gegevens" className="space-y-4 min-h-[300px]">
                 <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <UserCheck className="h-4 w-4 mr-2" />
+                    Persoonlijke Informatie
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName" className="flex items-center gap-2">
@@ -624,6 +628,11 @@ export default function Guardians() {
               
               <TabsContent value="contact" className="space-y-4 min-h-[300px]">
                 <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <Mail className="h-4 w-4 mr-2" />
+                    Contact Informatie
+                  </h3>
+                  
                   {newGuardian.isEmergencyContact ? (
                     <div className="mb-4 px-3 py-2 bg-amber-50 border border-amber-200 rounded-md">
                       <p className="text-sm text-amber-700">
@@ -663,8 +672,8 @@ export default function Guardians() {
                     </div>
                     
                     <div className="col-span-2 border-t border-gray-200 mt-2 pt-4">
-                      <h3 className="font-medium text-sm mb-3 flex items-center gap-2 text-[#1e40af]">
-                        <AlertCircle className="h-4 w-4 text-red-500" />
+                      <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                        <AlertCircle className="h-4 w-4 mr-2 text-red-500" />
                         {newGuardian.isEmergencyContact ? "Secundair noodcontact" : "Noodcontact"}
                       </h3>
                     </div>

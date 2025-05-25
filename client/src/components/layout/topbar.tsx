@@ -111,7 +111,7 @@ export function Topbar() {
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="font-medium text-sm">Berichten</h3>
-                <Link href="/berichten">
+                <Link href="/messages">
                   <a className="text-xs text-[#1e40af] hover:underline">Alle berichten</a>
                 </Link>
               </div>
@@ -147,7 +147,7 @@ export function Topbar() {
               </div>
             </div>
             <div className="p-3 border-t border-gray-200 bg-gray-50">
-              <Link href="/berichten">
+              <Link href="/messages">
                 <Button className="w-full bg-[#1e40af] hover:bg-[#1e40af]/90 text-white text-xs h-8">
                   <Mail className="h-4 w-4 mr-2" /> Naar Berichten
                 </Button>

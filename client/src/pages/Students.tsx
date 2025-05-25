@@ -10,7 +10,7 @@ import {
 import { Topbar } from '@/components/layout/topbar';
 import { PremiumHeader } from '@/components/layout/premium-header';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { format, parseISO } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import {
@@ -68,7 +69,8 @@ export default function Students() {
     notes: "",
     schoolYear: "",
     studentGroupId: "",
-    gender: "man"
+    gender: "man",
+    photoUrl: ""
   });
   
   const queryClient = useQueryClient();
@@ -112,7 +114,8 @@ export default function Students() {
       notes: "",
       schoolYear: "",
       studentGroupId: "",
-      gender: "man"
+      gender: "man",
+      photoUrl: ""
     });
   };
 
@@ -1045,9 +1048,13 @@ export default function Students() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-[#1e40af] text-white">
-                    {selectedStudent.firstName[0]}{selectedStudent.lastName[0]}
-                  </AvatarFallback>
+                  {selectedStudent.photoUrl ? (
+                    <AvatarImage src={selectedStudent.photoUrl} alt={`${selectedStudent.firstName} ${selectedStudent.lastName}`} />
+                  ) : (
+                    <AvatarFallback className="bg-[#1e40af] text-white">
+                      {selectedStudent.firstName[0]}{selectedStudent.lastName[0]}
+                    </AvatarFallback>
+                  )}
                 </Avatar>
                 {selectedStudent.firstName} {selectedStudent.lastName}
               </DialogTitle>

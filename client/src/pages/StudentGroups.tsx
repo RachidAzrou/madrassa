@@ -290,7 +290,7 @@ export default function StudentGroups() {
       <PremiumHeader 
         title="Klassen" 
         path="Beheer > Klassen" 
-        icon={UsersRound} 
+        icon={ChalkBoard} 
       />
 
       {/* Main content area */}

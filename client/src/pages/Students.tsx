@@ -1193,11 +1193,7 @@ export default function Students() {
                             size="sm"
                             className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50 w-full"
                             onClick={() => {
-                              // Implementatie voogd toevoegen komt hier
-                              toast({
-                                title: "Voogd toevoegen",
-                                description: "Deze functionaliteit wordt binnenkort geïmplementeerd."
-                              });
+                              setIsAddGuardianDialogOpen(true);
                             }}
                           >
                             <UserPlus className="h-3.5 w-3.5 mr-1" />
@@ -1215,11 +1211,7 @@ export default function Students() {
                             size="sm"
                             className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50 w-full"
                             onClick={() => {
-                              // Implementatie broer/zus koppelen komt hier
-                              toast({
-                                title: "Broer/Zus koppelen",
-                                description: "Deze functionaliteit wordt binnenkort geïmplementeerd."
-                              });
+                              setIsLinkSiblingDialogOpen(true);
                             }}
                           >
                             <Users className="h-3.5 w-3.5 mr-1" />
@@ -2144,6 +2136,237 @@ export default function Students() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Voogd toevoegen Dialog */}
+      <CustomDialog open={isAddGuardianDialogOpen} onOpenChange={setIsAddGuardianDialogOpen}>
+        <DialogHeaderWithIcon 
+          title="Voogd Toevoegen" 
+          description="Voeg een nieuwe voogd toe voor deze student"
+          icon={<UserPlus className="h-5 w-5 text-white" />}
+        />
+        
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          
+          // Voeg de nieuwe voogd toe aan de lijst
+          setNewStudentGuardians([...newStudentGuardians, guardianFormData]);
+          
+          // Reset het formulier en sluit de dialoog
+          setGuardianFormData({
+            firstName: '',
+            lastName: '',
+            relationship: 'ouder',
+            email: '',
+            phone: '',
+            address: '',
+            occupation: '',
+            isEmergencyContact: true,
+          });
+          
+          setIsAddGuardianDialogOpen(false);
+          toast({
+            title: "Voogd toegevoegd",
+            description: "De voogd is toegevoegd aan de student"
+          });
+        }}>
+          <div className="px-6 py-4 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <CustomFormLabel htmlFor="firstName">Voornaam</CustomFormLabel>
+                <Input
+                  id="firstName"
+                  value={guardianFormData.firstName}
+                  onChange={(e) => setGuardianFormData({ ...guardianFormData, firstName: e.target.value })}
+                  className="h-9"
+                  required
+                />
+              </div>
+              <div>
+                <CustomFormLabel htmlFor="lastName">Achternaam</CustomFormLabel>
+                <Input
+                  id="lastName"
+                  value={guardianFormData.lastName}
+                  onChange={(e) => setGuardianFormData({ ...guardianFormData, lastName: e.target.value })}
+                  className="h-9"
+                  required
+                />
+              </div>
+              <div>
+                <CustomFormLabel htmlFor="relationship">Relatie</CustomFormLabel>
+                <Select 
+                  value={guardianFormData.relationship} 
+                  onValueChange={(value) => setGuardianFormData({ ...guardianFormData, relationship: value })}
+                >
+                  <SelectTrigger id="relationship" className="h-9">
+                    <SelectValue placeholder="Selecteer relatie" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ouder">Ouder</SelectItem>
+                    <SelectItem value="voogd">Voogd</SelectItem>
+                    <SelectItem value="grootouder">Grootouder</SelectItem>
+                    <SelectItem value="andere">Andere</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <CustomFormLabel htmlFor="email">Email</CustomFormLabel>
+                <Input
+                  id="email"
+                  type="email"
+                  value={guardianFormData.email}
+                  onChange={(e) => setGuardianFormData({ ...guardianFormData, email: e.target.value })}
+                  className="h-9"
+                />
+              </div>
+              <div>
+                <CustomFormLabel htmlFor="phone">Telefoon</CustomFormLabel>
+                <Input
+                  id="phone"
+                  value={guardianFormData.phone}
+                  onChange={(e) => setGuardianFormData({ ...guardianFormData, phone: e.target.value })}
+                  className="h-9"
+                />
+              </div>
+              <div>
+                <CustomFormLabel htmlFor="occupation">Beroep</CustomFormLabel>
+                <Input
+                  id="occupation"
+                  value={guardianFormData.occupation}
+                  onChange={(e) => setGuardianFormData({ ...guardianFormData, occupation: e.target.value })}
+                  className="h-9"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <CustomFormLabel htmlFor="address">Adres</CustomFormLabel>
+                <Input
+                  id="address"
+                  value={guardianFormData.address}
+                  onChange={(e) => setGuardianFormData({ ...guardianFormData, address: e.target.value })}
+                  className="h-9"
+                />
+              </div>
+              <div className="md:col-span-2 flex items-center space-x-2">
+                <Checkbox 
+                  id="isEmergencyContact" 
+                  checked={guardianFormData.isEmergencyContact}
+                  onCheckedChange={(checked) => 
+                    setGuardianFormData({ ...guardianFormData, isEmergencyContact: checked as boolean })
+                  }
+                />
+                <label
+                  htmlFor="isEmergencyContact"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Noodcontact
+                </label>
+              </div>
+            </div>
+          </div>
+          <DialogFooterContainer
+            cancelText="Annuleren"
+            submitText="Voogd Toevoegen"
+            onCancel={() => setIsAddGuardianDialogOpen(false)}
+          />
+        </form>
+      </CustomDialog>
+      
+      {/* Broer/Zus koppelen Dialog */}
+      <CustomDialog open={isLinkSiblingDialogOpen} onOpenChange={setIsLinkSiblingDialogOpen}>
+        <DialogHeaderWithIcon 
+          title="Broer/Zus Koppelen" 
+          description="Zoek en koppel een bestaande student als broer of zus"
+          icon={<Users className="h-5 w-5 text-white" />}
+        />
+        
+        <div className="px-6 py-4 space-y-4">
+          <div className="flex gap-2 mb-4">
+            <Input
+              placeholder="Zoek op naam of studentnummer..."
+              value={siblingSearchTerm}
+              onChange={(e) => setSiblingSearchTerm(e.target.value)}
+              className="flex-1"
+            />
+            <Button 
+              type="button" 
+              variant="outline"
+              onClick={() => setSiblingSearchTerm('')}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="max-h-[300px] overflow-y-auto border rounded-md">
+            {students.length > 0 ? (
+              <div className="divide-y">
+                {students
+                  .filter(student => 
+                    (student.firstName?.toLowerCase().includes(siblingSearchTerm.toLowerCase()) || 
+                     student.lastName?.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
+                     student.studentId?.toLowerCase().includes(siblingSearchTerm.toLowerCase())) && 
+                    // Exclude already linked siblings
+                    !newStudentSiblings.some(s => s.id === student.id)
+                  )
+                  .map((student, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                          {student.photoUrl ? (
+                            <AvatarImage src={student.photoUrl} alt={`${student.firstName} ${student.lastName}`} />
+                          ) : (
+                            <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                              {student.firstName?.charAt(0)}{student.lastName?.charAt(0)}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                        <div>
+                          <p className="text-sm font-medium">{student.firstName} {student.lastName}</p>
+                          <p className="text-xs text-gray-500">{student.studentId}</p>
+                        </div>
+                      </div>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
+                        onClick={() => {
+                          setNewStudentSiblings([...newStudentSiblings, student]);
+                          toast({
+                            title: "Broer/Zus gekoppeld",
+                            description: "De student is toegevoegd als broer/zus"
+                          });
+                          setIsLinkSiblingDialogOpen(false);
+                        }}
+                      >
+                        Koppelen
+                      </Button>
+                    </div>
+                  ))
+                }
+                {students.filter(student => 
+                  (student.firstName?.toLowerCase().includes(siblingSearchTerm.toLowerCase()) || 
+                   student.lastName?.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
+                   student.studentId?.toLowerCase().includes(siblingSearchTerm.toLowerCase())) && 
+                  !newStudentSiblings.some(s => s.id === student.id)
+                ).length === 0 && (
+                  <div className="p-4 text-center text-gray-500">
+                    Geen resultaten gevonden
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-4 text-center text-gray-500">
+                Geen studenten beschikbaar om te koppelen
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <DialogFooterContainer
+          showSubmitButton={false}
+          cancelText="Sluiten"
+          onCancel={() => setIsLinkSiblingDialogOpen(false)}
+        />
+      </CustomDialog>
     </div>
   );
 }

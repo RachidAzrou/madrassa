@@ -1553,24 +1553,22 @@ export default function Students() {
             <div className="bg-[#f1f5f9] p-4 rounded-md">
               <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
                 <FileEdit className="h-4 w-4 mr-2" />
-                Vereiste velden
+                Velden voor importeren
               </h3>
               <div className="grid grid-cols-2 gap-2">
                 <div className="text-xs text-gray-600">
-                  <p className="font-medium mb-1 text-[#1e40af]">Verplichte velden:</p>
                   <ul className="space-y-1">
-                    <li>• <span className="font-medium">firstName</span> (Voornaam)</li>
-                    <li>• <span className="font-medium">lastName</span> (Achternaam)</li>
-                    <li>• <span className="font-medium">gender</span> (Geslacht)</li>
-                    <li>• <span className="font-medium">academicYear</span> (Schooljaar)</li>
-                    <li>• <span className="font-medium">studentGroupId</span> (Klas ID)</li>
-                    <li>• <span className="font-medium">status</span> (Status)</li>
+                    <li>• firstName (Voornaam)</li>
+                    <li>• lastName (Achternaam)</li>
+                    <li>• gender (Geslacht)</li>
+                    <li>• academicYear (Schooljaar)</li>
+                    <li>• studentGroupId (Klas ID)</li>
+                    <li>• status (Status)</li>
+                    <li>• email (E-mail)</li>
                   </ul>
                 </div>
                 <div className="text-xs text-gray-600">
-                  <p className="font-medium mb-1 text-[#1e40af]">Optionele velden:</p>
                   <ul className="space-y-1">
-                    <li>• email (E-mail)</li>
                     <li>• phone (Telefoon)</li>
                     <li>• dateOfBirth (Geboortedatum)</li>
                     <li>• street (Straat)</li>
@@ -1581,6 +1579,10 @@ export default function Students() {
                   </ul>
                 </div>
               </div>
+              <p className="text-xs text-gray-600 mt-3">
+                <InfoIcon className="h-3 w-3 inline-block mr-1" />
+                Het CSV- of Excel-bestand moet kolommen bevatten met bovenstaande veldnamen.
+              </p>
             </div>
             
             <div className="border-2 border-dashed border-gray-300 rounded-md px-6 py-8 bg-white">

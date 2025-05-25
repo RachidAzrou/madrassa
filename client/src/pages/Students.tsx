@@ -77,6 +77,8 @@ export default function Students() {
     occupation: '',
     isEmergencyContact: true,
   });
+  const [isAddingNewGuardian, setIsAddingNewGuardian] = useState(true);
+  const [guardianSearchTerm, setGuardianSearchTerm] = useState('');
   const [siblingSearchTerm, setSiblingSearchTerm] = useState('');
   const currentYear = new Date().getFullYear();
   const [nextStudentId, setNextStudentId] = useState(`ST${currentYear.toString().substring(2, 4)}001`);
@@ -126,6 +128,10 @@ export default function Students() {
   
   const { data: studentGroupsData = [] } = useQuery({
     queryKey: ['/api/student-groups'],
+  });
+  
+  const { data: guardians = [] } = useQuery({
+    queryKey: ['/api/guardians'],
   });
 
   // Form handlers
@@ -2141,133 +2147,265 @@ export default function Students() {
       <CustomDialog open={isAddGuardianDialogOpen} onOpenChange={setIsAddGuardianDialogOpen}>
         <DialogHeaderWithIcon 
           title="Voogd Toevoegen" 
-          description="Voeg een nieuwe voogd toe voor deze student"
+          description="Selecteer een bestaande voogd of voeg een nieuwe voogd toe"
           icon={<UserPlus className="h-5 w-5 text-white" />}
         />
         
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          
-          // Voeg de nieuwe voogd toe aan de lijst
-          setNewStudentGuardians([...newStudentGuardians, guardianFormData]);
-          
-          // Reset het formulier en sluit de dialoog
-          setGuardianFormData({
-            firstName: '',
-            lastName: '',
-            relationship: 'ouder',
-            email: '',
-            phone: '',
-            address: '',
-            occupation: '',
-            isEmergencyContact: true,
-          });
-          
-          setIsAddGuardianDialogOpen(false);
-          toast({
-            title: "Voogd toegevoegd",
-            description: "De voogd is toegevoegd aan de student"
-          });
-        }}>
-          <div className="px-6 py-4 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <CustomFormLabel htmlFor="firstName">Voornaam</CustomFormLabel>
-                <Input
-                  id="firstName"
-                  value={guardianFormData.firstName}
-                  onChange={(e) => setGuardianFormData({ ...guardianFormData, firstName: e.target.value })}
-                  className="h-9"
-                  required
-                />
-              </div>
-              <div>
-                <CustomFormLabel htmlFor="lastName">Achternaam</CustomFormLabel>
-                <Input
-                  id="lastName"
-                  value={guardianFormData.lastName}
-                  onChange={(e) => setGuardianFormData({ ...guardianFormData, lastName: e.target.value })}
-                  className="h-9"
-                  required
-                />
-              </div>
-              <div>
-                <CustomFormLabel htmlFor="relationship">Relatie</CustomFormLabel>
-                <Select 
-                  value={guardianFormData.relationship} 
-                  onValueChange={(value) => setGuardianFormData({ ...guardianFormData, relationship: value })}
+        <div className="px-6 py-4">
+          <div className="space-y-6">
+            {/* Tabs voor bestaande of nieuwe voogd */}
+            <div className="border-b border-gray-200">
+              <div className="flex -mb-px space-x-8">
+                <button
+                  onClick={() => setIsAddingNewGuardian(false)}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    !isAddingNewGuardian 
+                      ? 'border-[#1e40af] text-[#1e40af]' 
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
                 >
-                  <SelectTrigger id="relationship" className="h-9">
-                    <SelectValue placeholder="Selecteer relatie" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ouder">Ouder</SelectItem>
-                    <SelectItem value="voogd">Voogd</SelectItem>
-                    <SelectItem value="grootouder">Grootouder</SelectItem>
-                    <SelectItem value="andere">Andere</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <CustomFormLabel htmlFor="email">Email</CustomFormLabel>
-                <Input
-                  id="email"
-                  type="email"
-                  value={guardianFormData.email}
-                  onChange={(e) => setGuardianFormData({ ...guardianFormData, email: e.target.value })}
-                  className="h-9"
-                />
-              </div>
-              <div>
-                <CustomFormLabel htmlFor="phone">Telefoon</CustomFormLabel>
-                <Input
-                  id="phone"
-                  value={guardianFormData.phone}
-                  onChange={(e) => setGuardianFormData({ ...guardianFormData, phone: e.target.value })}
-                  className="h-9"
-                />
-              </div>
-              <div>
-                <CustomFormLabel htmlFor="occupation">Beroep</CustomFormLabel>
-                <Input
-                  id="occupation"
-                  value={guardianFormData.occupation}
-                  onChange={(e) => setGuardianFormData({ ...guardianFormData, occupation: e.target.value })}
-                  className="h-9"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <CustomFormLabel htmlFor="address">Adres</CustomFormLabel>
-                <Input
-                  id="address"
-                  value={guardianFormData.address}
-                  onChange={(e) => setGuardianFormData({ ...guardianFormData, address: e.target.value })}
-                  className="h-9"
-                />
-              </div>
-              <div className="md:col-span-2 flex items-center space-x-2">
-                <Checkbox 
-                  id="isEmergencyContact" 
-                  checked={guardianFormData.isEmergencyContact}
-                  onCheckedChange={(checked) => 
-                    setGuardianFormData({ ...guardianFormData, isEmergencyContact: checked as boolean })
-                  }
-                />
-                <label
-                  htmlFor="isEmergencyContact"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  Bestaande Voogd
+                </button>
+                <button
+                  onClick={() => setIsAddingNewGuardian(true)}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                    isAddingNewGuardian 
+                      ? 'border-[#1e40af] text-[#1e40af]' 
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
                 >
-                  Noodcontact
-                </label>
+                  Nieuwe Voogd
+                </button>
               </div>
             </div>
+            
+            {/* Bestaande voogd selecteren */}
+            {!isAddingNewGuardian && (
+              <div className="space-y-4">
+                <div className="flex gap-2 mb-4">
+                  <Input
+                    placeholder="Zoek op naam of email..."
+                    value={guardianSearchTerm}
+                    onChange={(e) => setGuardianSearchTerm(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => setGuardianSearchTerm('')}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <div className="max-h-[300px] overflow-y-auto border rounded-md">
+                  {guardians.length > 0 ? (
+                    <div className="divide-y">
+                      {guardians
+                        .filter(guardian => 
+                          (guardian.firstName?.toLowerCase().includes(guardianSearchTerm.toLowerCase()) || 
+                           guardian.lastName?.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
+                           guardian.email?.toLowerCase().includes(guardianSearchTerm.toLowerCase())) && 
+                          // Exclude already linked guardians
+                          !newStudentGuardians.some(g => g.id === guardian.id)
+                        )
+                        .map((guardian, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 hover:bg-gray-50">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                                  {guardian.firstName?.charAt(0)}{guardian.lastName?.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="text-sm font-medium">{guardian.firstName} {guardian.lastName}</p>
+                                <p className="text-xs text-gray-500">{guardian.relationship || 'Voogd'}</p>
+                              </div>
+                            </div>
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="sm" 
+                              className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
+                              onClick={() => {
+                                setNewStudentGuardians([...newStudentGuardians, guardian]);
+                                toast({
+                                  title: "Voogd gekoppeld",
+                                  description: "De voogd is toegevoegd aan de student"
+                                });
+                                setIsAddGuardianDialogOpen(false);
+                              }}
+                            >
+                              Koppelen
+                            </Button>
+                          </div>
+                        ))
+                      }
+                      {guardians.filter(guardian => 
+                        (guardian.firstName?.toLowerCase().includes(guardianSearchTerm.toLowerCase()) || 
+                         guardian.lastName?.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
+                         guardian.email?.toLowerCase().includes(guardianSearchTerm.toLowerCase())) && 
+                        !newStudentGuardians.some(g => g.id === guardian.id)
+                      ).length === 0 && (
+                        <div className="p-4 text-center text-gray-500">
+                          Geen resultaten gevonden
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="p-4 text-center text-gray-500">
+                      Geen voogden beschikbaar
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Nieuwe voogd toevoegen */}
+            {isAddingNewGuardian && (
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                
+                // Genereer een tijdelijk ID voor de nieuwe voogd
+                const newGuardian = {
+                  ...guardianFormData,
+                  id: `temp-${Date.now()}`,
+                };
+                
+                // Voeg de nieuwe voogd toe aan de lijst
+                setNewStudentGuardians([...newStudentGuardians, newGuardian]);
+                
+                // Reset het formulier en sluit de dialoog
+                setGuardianFormData({
+                  firstName: '',
+                  lastName: '',
+                  relationship: 'ouder',
+                  email: '',
+                  phone: '',
+                  address: '',
+                  occupation: '',
+                  isEmergencyContact: true,
+                });
+                
+                setIsAddGuardianDialogOpen(false);
+                toast({
+                  title: "Voogd toegevoegd",
+                  description: "De voogd is toegevoegd aan de student"
+                });
+              }}>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <CustomFormLabel htmlFor="firstName">Voornaam</CustomFormLabel>
+                      <Input
+                        id="firstName"
+                        value={guardianFormData.firstName}
+                        onChange={(e) => setGuardianFormData({ ...guardianFormData, firstName: e.target.value })}
+                        className="h-9"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <CustomFormLabel htmlFor="lastName">Achternaam</CustomFormLabel>
+                      <Input
+                        id="lastName"
+                        value={guardianFormData.lastName}
+                        onChange={(e) => setGuardianFormData({ ...guardianFormData, lastName: e.target.value })}
+                        className="h-9"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <CustomFormLabel htmlFor="relationship">Relatie</CustomFormLabel>
+                      <Select 
+                        value={guardianFormData.relationship} 
+                        onValueChange={(value) => setGuardianFormData({ ...guardianFormData, relationship: value })}
+                      >
+                        <SelectTrigger id="relationship" className="h-9">
+                          <SelectValue placeholder="Selecteer relatie" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ouder">Ouder</SelectItem>
+                          <SelectItem value="voogd">Voogd</SelectItem>
+                          <SelectItem value="grootouder">Grootouder</SelectItem>
+                          <SelectItem value="andere">Andere</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <CustomFormLabel htmlFor="email">Email</CustomFormLabel>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={guardianFormData.email}
+                        onChange={(e) => setGuardianFormData({ ...guardianFormData, email: e.target.value })}
+                        className="h-9"
+                      />
+                    </div>
+                    <div>
+                      <CustomFormLabel htmlFor="phone">Telefoon</CustomFormLabel>
+                      <Input
+                        id="phone"
+                        value={guardianFormData.phone}
+                        onChange={(e) => setGuardianFormData({ ...guardianFormData, phone: e.target.value })}
+                        className="h-9"
+                      />
+                    </div>
+                    <div>
+                      <CustomFormLabel htmlFor="occupation">Beroep</CustomFormLabel>
+                      <Input
+                        id="occupation"
+                        value={guardianFormData.occupation}
+                        onChange={(e) => setGuardianFormData({ ...guardianFormData, occupation: e.target.value })}
+                        className="h-9"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <CustomFormLabel htmlFor="address">Adres</CustomFormLabel>
+                      <Input
+                        id="address"
+                        value={guardianFormData.address}
+                        onChange={(e) => setGuardianFormData({ ...guardianFormData, address: e.target.value })}
+                        className="h-9"
+                      />
+                    </div>
+                    <div className="md:col-span-2 flex items-center space-x-2">
+                      <Checkbox 
+                        id="isEmergencyContact" 
+                        checked={guardianFormData.isEmergencyContact}
+                        onCheckedChange={(checked) => 
+                          setGuardianFormData({ ...guardianFormData, isEmergencyContact: checked as boolean })
+                        }
+                      />
+                      <label
+                        htmlFor="isEmergencyContact"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Noodcontact
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 flex justify-end gap-2">
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      onClick={() => setIsAddGuardianDialogOpen(false)}
+                    >
+                      Annuleren
+                    </Button>
+                    <Button 
+                      type="submit"
+                      className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+                    >
+                      Voogd Toevoegen
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            )}
           </div>
-          <DialogFooterContainer
-            cancelText="Annuleren"
-            submitText="Voogd Toevoegen"
-            onCancel={() => setIsAddGuardianDialogOpen(false)}
-          />
-        </form>
+        </div>
       </CustomDialog>
       
       {/* Broer/Zus koppelen Dialog */}

@@ -69,10 +69,10 @@ const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps)
       <div
         onClick={onClick}
         className={cn(
-          "flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors cursor-pointer",
+          "flex items-center gap-2.5 px-3 py-2 text-sm transition-colors cursor-pointer border-l-2",
           isActive
-            ? "bg-primary text-white font-medium"
-            : "text-gray-600 hover:text-primary hover:bg-gray-100"
+            ? "border-l-primary bg-primary/5 text-primary font-medium"
+            : "border-l-transparent text-gray-700 hover:text-primary hover:border-l-primary/30 hover:bg-primary/5"
         )}
       >
         <div className="flex-shrink-0">

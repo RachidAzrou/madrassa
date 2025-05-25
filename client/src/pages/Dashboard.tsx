@@ -165,9 +165,6 @@ export default function Dashboard() {
 
   return (
     <div className="bg-[#f7f9fc] min-h-screen">
-      {/* Top navigation bar */}
-      <Topbar />
-      
       {/* Desktop application header bar - Professionele stijl - Premium variant */}
       <PageHeader
         title="Dashboard"

@@ -158,26 +158,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
           )}
         </div>
         
-        {/* Ingelogde gebruiker informatie - fixed top */}
-        <div className="px-3 py-3 border-b border-gray-200 bg-gradient-to-b from-gray-50 to-white">
-          <div 
-            className="flex items-center cursor-pointer p-2 hover:bg-gray-50 transition-colors rounded"
-            onClick={() => {
-              window.location.href = "/mijn-account";
-              if (onClose) onClose();
-            }}
-          >
-            <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center text-primary mr-2.5">
-              <span className="font-medium text-sm">{userData?.firstName?.[0] || ""}{userData?.lastName?.[0] || ""}</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="font-medium text-sm truncate">{userData?.firstName || ""} {userData?.lastName || ""}</div>
-              <div className="text-xs text-gray-500 truncate">{userData?.role || "Gebruiker"}</div>
-            </div>
-          </div>
-          
-          <div className="mt-2"></div>
-        </div>
+        {/* Verwijderd gebruiker informatie sectie uit sidebar - nu in topbar */}
         
         {/* Navigation links - scrollable section */}
         <div className="flex-1 overflow-auto py-1 px-3">

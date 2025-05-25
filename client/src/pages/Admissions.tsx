@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, CheckCircle, XCircle, FileText, Clock, School, User, Phone, Mail, Calendar, BookOpen, Building, Clipboard, Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, CheckCircle, XCircle, FileText, Clock, School, User, Phone, Mail, Calendar, BookOpen, Building, Clipboard, Info, ChevronDown, ChevronUp, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -17,6 +17,7 @@ import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { PremiumHeader } from "@/components/layout/premium-header";
 
 interface Applicant {
   id: string;
@@ -316,25 +317,12 @@ export default function Admissions() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Page header - Professionele desktop stijl (conform Dashboard) */}
-      <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
-        <div className="flex flex-col">
-          <div className="px-6 py-4 flex justify-between items-center">
-            <div className="flex items-center">
-              <Clipboard className="h-5 w-5 text-[#1e40af] mr-2" />
-              <h1 className="text-base font-medium text-gray-800 tracking-tight">Aanmeldingen</h1>
-            </div>
-            <div className="flex items-center">
-              <div className="text-xs text-gray-500 font-medium">
-                {new Date().toLocaleDateString('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})}
-              </div>
-            </div>
-          </div>
-          <div className="px-6 py-2 bg-[#f9fafc] border-t border-[#e5e7eb] flex items-center">
-            <div className="text-xs text-gray-500">Beheer &gt; Aanmeldingen</div>
-          </div>
-        </div>
-      </header>
+      {/* Premium header component */}
+      <PremiumHeader 
+        title="Aanmeldingen" 
+        path="Beheer > Aanmeldingen" 
+        icon={UserPlus} 
+      />
 
       {/* Main content area */}
       <div className="px-6 py-6 flex-1">

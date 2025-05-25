@@ -631,31 +631,9 @@ export default function Guardians() {
                   ) : null}
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-xs font-medium text-gray-700">E-mailadres</Label>
-                      <Input 
-                        id="email" 
-                        type="email" 
-                        placeholder="E-mailadres" 
-                        className="h-8 text-sm"
-                        value={newGuardian.email || ''}
-                        onChange={(e) => setNewGuardian({...newGuardian, email: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone" className="text-xs font-medium text-gray-700">Telefoonnummer</Label>
-                      <Input 
-                        id="phone" 
-                        placeholder="Telefoonnummer" 
-                        className="h-8 text-sm"
-                        value={newGuardian.phone || ''}
-                        onChange={(e) => setNewGuardian({...newGuardian, phone: e.target.value})}
-                      />
-                    </div>
                     
-                    <div className="col-span-2 border-t border-gray-200 mt-2 pt-4">
-                      <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                        <AlertCircle className="h-4 w-4 mr-2 text-red-500" />
+                    <div className="col-span-2 mt-2">
+                      <h3 className="text-sm font-medium text-gray-700 mb-3">
                         {newGuardian.isEmergencyContact ? "Secundair noodcontact" : "Noodcontact"}
                       </h3>
                     </div>
@@ -691,10 +669,7 @@ export default function Guardians() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="emergencyContactRelationship" className="flex items-center gap-2">
-                        <UserCheck className="h-3.5 w-3.5 text-[#1e40af]" />
-                        <span>Relatie tot student</span>
-                      </Label>
+                      <Label htmlFor="emergencyContactRelationship" className="text-xs font-medium text-gray-700">Relatie tot student</Label>
                       <Select 
                         value={newGuardian.emergencyContactRelationship || ''} 
                         onValueChange={(value) => setNewGuardian({...newGuardian, emergencyContactRelationship: value})}

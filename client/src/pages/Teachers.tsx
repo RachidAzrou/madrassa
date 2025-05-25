@@ -421,33 +421,33 @@ const Teachers = () => {
   }
   
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Premium header component */}
-      <PremiumHeader 
-        title="Docenten" 
-        path="Beheer > Docenten" 
-        icon={GraduationCap}
-        description="Beheer alle docenten en hun gegevens, cursussen en beschikbaarheid"
-      />
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        {/* Premium header component */}
+        <PremiumHeader 
+          title="Docenten" 
+          path="Beheer > Docenten" 
+          icon={GraduationCap}
+          description="Beheer alle docenten en hun gegevens, cursussen en beschikbaarheid"
+        />
 
-      {/* Main content area */}
-      <div className="px-6 py-6">
-        {/* Zoek- en actiebalk - Desktop style */}
-        <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4 shadow-sm">
-          <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-            {/* Zoekbalk */}
-            <div className="relative w-full sm:max-w-md">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-              <Input
-                type="search"
-                placeholder="Zoek op naam of docent ID..."
-                className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            {/* Filters en knoppen */}
+        {/* Main content area */}
+        <div className="px-6 py-6">
+          {/* Zoek- en actiebalk - Desktop style */}
+          <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4 shadow-sm">
+            <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+              {/* Zoekbalk */}
+              <div className="relative w-full sm:max-w-md">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                <Input
+                  type="search"
+                  placeholder="Zoek op naam of docent ID..."
+                  className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              
+              {/* Filters en knoppen */}
             <div className="flex flex-wrap items-center gap-2">
               {selectedTeachers.length > 0 ? (
                 <>

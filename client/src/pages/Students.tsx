@@ -37,8 +37,10 @@ export default function Students() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const currentYear = new Date().getFullYear();
-  const [nextStudentId, setNextStudentId] = useState(`ST${currentYear}001`);
-  const [formData, setFormData] = useState({
+  const [nextStudentId, setNextStudentId] = useState(`ST${currentYear.toString().substring(2, 4)}001`);
+  
+  // Lege formulierdata template
+  const emptyFormData = {
     firstName: "",
     lastName: "",
     email: "",
@@ -57,7 +59,9 @@ export default function Students() {
     photoUrl: "",
     studentId: "",
     academicYear: ""
-  });
+  };
+  
+  const [formData, setFormData] = useState(emptyFormData);
   
   const { toast } = useToast();
 
@@ -90,16 +94,29 @@ export default function Students() {
     }));
   };
 
+  const [isAddGuardianDialogOpen, setIsAddGuardianDialogOpen] = useState(false);
+  const [newStudentId, setNewStudentId] = useState(null);
+
   const handleCreateStudent = async (e) => {
     e.preventDefault();
     try {
       // Student would be created here
       console.log('Creating student:', formData);
+      
+      // Sla nieuw student ID op voor eventuele voogdkoppeling
+      const newId = formData.studentId || nextStudentId;
+      setNewStudentId(newId);
+      
+      // Sluit het huidige dialoogvenster
       setIsCreateDialogOpen(false);
+      
       toast({
         title: "Student toegevoegd",
         description: "De student is succesvol toegevoegd."
       });
+      
+      // Open het dialoogvenster om een voogd toe te voegen
+      setIsAddGuardianDialogOpen(true);
     } catch (error) {
       toast({
         title: "Fout",
@@ -431,7 +448,15 @@ export default function Students() {
       </div>
 
       {/* Create Student Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+      <Dialog 
+        open={isCreateDialogOpen} 
+        onOpenChange={(open) => {
+          setIsCreateDialogOpen(open);
+          if (!open) {
+            // Reset het formulier wanneer het dialoogvenster sluit
+            setFormData(emptyFormData);
+          }
+        }}>
         <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden max-h-[90vh]">
           <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -834,6 +859,53 @@ export default function Students() {
                 }}
               >
                 Verwijderen
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialoogvenster voor voogd toevoegen */}
+      <Dialog open={isAddGuardianDialogOpen} onOpenChange={setIsAddGuardianDialogOpen}>
+        <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden">
+          <div className="p-6">
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+              <DialogTitle className="text-center">Voogd toevoegen</DialogTitle>
+              <DialogDescription className="text-center">
+                Wil je een voogd toevoegen en koppelen aan deze student?
+              </DialogDescription>
+            </div>
+            
+            <div className="bg-gray-50 rounded-md p-4 mb-6">
+              <p className="text-gray-700">De student is succesvol toegevoegd. Wil je nu direct een voogd toevoegen en koppelen aan deze student?</p>
+              <p className="mt-2 text-gray-700">Student ID: <span className="font-semibold">{newStudentId}</span></p>
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={() => setIsAddGuardianDialogOpen(false)}
+              >
+                Later toevoegen
+              </Button>
+              <Button 
+                type="button"
+                onClick={() => {
+                  console.log('Navigating to add guardian for student:', newStudentId);
+                  // Hier zou je naar het voogd formulier navigeren met de student ID
+                  setIsAddGuardianDialogOpen(false);
+                  // Voorbeeld navigatie (in een echte implementatie zou je naar de voogd pagina navigeren)
+                  toast({
+                    title: "Voogd toevoegen",
+                    description: "Je wordt doorgestuurd naar het voogd formulier.",
+                  });
+                }}
+              >
+                Voogd toevoegen
               </Button>
             </div>
           </div>

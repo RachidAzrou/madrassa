@@ -27,6 +27,14 @@ import {
   EmptyTableState
 } from "@/components/ui/data-table-container";
 import {
+  CustomDialog,
+  DialogHeaderWithIcon,
+  DialogFormContainer,
+  SectionContainer,
+  DialogFooterContainer,
+  FormLabel as CustomFormLabel
+} from "@/components/ui/custom-dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -953,6 +961,133 @@ export default function Students() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* View Student Dialog */}
+      <CustomDialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogHeaderWithIcon 
+          title="Student Details" 
+          description="Gedetailleerde informatie over de student"
+          icon={<User className="h-5 w-5 text-white" />}
+        />
+        
+        <div className="px-6 py-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
+          {selectedStudent && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 mb-6">
+                <Avatar className="h-16 w-16 border-2 border-gray-200">
+                  {selectedStudent.photoUrl ? (
+                    <AvatarImage src={selectedStudent.photoUrl} alt={`${selectedStudent.firstName} ${selectedStudent.lastName}`} />
+                  ) : (
+                    <AvatarFallback className="bg-[#1e40af] text-white text-lg">
+                      {selectedStudent.firstName?.charAt(0)}{selectedStudent.lastName?.charAt(0)}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <div>
+                  <h2 className="text-xl font-semibold">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
+                  <p className="text-sm text-gray-500">{selectedStudent.studentId}</p>
+                  <Badge className="mt-2" variant={selectedStudent.status === "active" ? "default" : "secondary"}>
+                    {selectedStudent.status === "active" ? "Actief" : selectedStudent.status}
+                  </Badge>
+                </div>
+              </div>
+              
+              <SectionContainer title="Persoonlijke Informatie" icon={<User className="h-4 w-4" />}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <CustomFormLabel>Student ID</CustomFormLabel>
+                    <p className="text-sm mt-1">{selectedStudent.studentId}</p>
+                  </div>
+                  <div>
+                    <CustomFormLabel>Naam</CustomFormLabel>
+                    <p className="text-sm mt-1">{selectedStudent.firstName} {selectedStudent.lastName}</p>
+                  </div>
+                  <div>
+                    <CustomFormLabel>Email</CustomFormLabel>
+                    <p className="text-sm mt-1">{selectedStudent.email || "-"}</p>
+                  </div>
+                  <div>
+                    <CustomFormLabel>Telefoon</CustomFormLabel>
+                    <p className="text-sm mt-1">{selectedStudent.phone || "-"}</p>
+                  </div>
+                  <div>
+                    <CustomFormLabel>Geboortedatum</CustomFormLabel>
+                    <p className="text-sm mt-1">{selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "-"}</p>
+                  </div>
+                  <div>
+                    <CustomFormLabel>Geslacht</CustomFormLabel>
+                    <p className="text-sm mt-1">{selectedStudent.gender === "man" ? "Man" : "Vrouw"}</p>
+                  </div>
+                </div>
+              </SectionContainer>
+              
+              <SectionContainer title="Adresgegevens" icon={<MapPin className="h-4 w-4" />}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <CustomFormLabel>Adres</CustomFormLabel>
+                    <p className="text-sm mt-1">
+                      {selectedStudent.street ? `${selectedStudent.street} ${selectedStudent.houseNumber || ""}` : "-"}
+                    </p>
+                  </div>
+                  <div>
+                    <CustomFormLabel>Postcode</CustomFormLabel>
+                    <p className="text-sm mt-1">{selectedStudent.postalCode || "-"}</p>
+                  </div>
+                  <div>
+                    <CustomFormLabel>Plaats</CustomFormLabel>
+                    <p className="text-sm mt-1">{selectedStudent.city || "-"}</p>
+                  </div>
+                </div>
+              </SectionContainer>
+              
+              <SectionContainer title="Onderwijsgegevens" icon={<GraduationCap className="h-4 w-4" />}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <CustomFormLabel>Programma</CustomFormLabel>
+                    <p className="text-sm mt-1">{selectedStudent.programName || "-"}</p>
+                  </div>
+                  <div>
+                    <CustomFormLabel>Status</CustomFormLabel>
+                    <p className="text-sm mt-1">
+                      <Badge variant={selectedStudent.status === "active" ? "default" : "secondary"}>
+                        {selectedStudent.status === "active" ? "Actief" : 
+                         selectedStudent.status === "graduated" ? "Afgestudeerd" : 
+                         selectedStudent.status === "suspended" ? "Geschorst" : 
+                         selectedStudent.status === "withdrawn" ? "Teruggetrokken" : 
+                         selectedStudent.status}
+                      </Badge>
+                    </p>
+                  </div>
+                  <div>
+                    <CustomFormLabel>Klas</CustomFormLabel>
+                    <p className="text-sm mt-1">{selectedStudent.studentGroupName || "-"}</p>
+                  </div>
+                  <div>
+                    <CustomFormLabel>Schooljaar</CustomFormLabel>
+                    <p className="text-sm mt-1">{selectedStudent.academicYear || "-"}</p>
+                  </div>
+                  <div>
+                    <CustomFormLabel>Inschrijfdatum</CustomFormLabel>
+                    <p className="text-sm mt-1">{selectedStudent.enrollmentDate ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) : "-"}</p>
+                  </div>
+                </div>
+              </SectionContainer>
+              
+              {selectedStudent.notes && (
+                <SectionContainer title="Aantekeningen" icon={<NotebookText className="h-4 w-4" />}>
+                  <p className="text-sm whitespace-pre-wrap">{selectedStudent.notes}</p>
+                </SectionContainer>
+              )}
+            </div>
+          )}
+        </div>
+        
+        <DialogFooterContainer
+          showSubmitButton={false}
+          cancelText="Sluiten"
+          onCancel={() => setIsViewDialogOpen(false)}
+        />
+      </CustomDialog>
 
       {/* Delete Student Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

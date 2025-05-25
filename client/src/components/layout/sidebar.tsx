@@ -146,23 +146,42 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
 
 
       
-      {/* Dashboard link */}
+      {/* Dashboard en Berichten links */}
       <div className="px-3 pt-3 pb-2 border-b border-gray-100">
-        <div className="bg-gray-50 rounded-md overflow-hidden">
-          <Link href="/">
+        <div className="space-y-1.5">
+          <div className="bg-gray-50 rounded-md overflow-hidden">
+            <Link href="/">
+              <div
+                onClick={handleLinkClick}
+                className={cn(
+                  "flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer",
+                  location === "/"
+                    ? "bg-primary/10 text-primary font-medium"
+                    : "text-gray-700 hover:text-primary hover:bg-gray-100"
+                )}
+              >
+                <div className="flex-shrink-0">
+                  <LayoutDashboard className="h-4 w-4" />
+                </div>
+                <span className="truncate whitespace-nowrap">Dashboard</span>
+              </div>
+            </Link>
+          </div>
+
+          <Link href="/messages">
             <div
               onClick={handleLinkClick}
               className={cn(
                 "flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer",
-                location === "/"
+                location.startsWith("/messages")
                   ? "bg-primary/10 text-primary font-medium"
                   : "text-gray-700 hover:text-primary hover:bg-gray-100"
               )}
             >
               <div className="flex-shrink-0">
-                <LayoutDashboard className="h-4 w-4" />
+                <MessageSquare className="h-4 w-4" />
               </div>
-              <span className="truncate whitespace-nowrap">Dashboard</span>
+              <span className="truncate whitespace-nowrap">Berichten</span>
             </div>
           </Link>
         </div>
@@ -198,13 +217,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   isActive={location.startsWith("/teachers")}
                   onClick={handleLinkClick}
                 />
-                <SidebarLink
-                  href="/messages"
-                  icon={<MessageSquare className="h-4 w-4" />}
-                  label="Berichten"
-                  isActive={location.startsWith("/messages")}
-                  onClick={handleLinkClick}
-                />
+
                 <SidebarLink
                   href="/admissions"
                   icon={<FileText className="h-4 w-4" />}

@@ -1,51 +1,6 @@
-import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import * as XLSX from 'xlsx';
-import { Pencil, Trash2, Search, Plus, PlusCircle, Eye, User, Phone, MapPin, Briefcase, BookOpen, GraduationCap, Book, X, UserCircle, Users, Upload, Image, BookText, XCircle, LucideIcon, School, Download } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+import React from "react";
+import { GraduationCap } from "lucide-react";
 import { PremiumHeader } from "@/components/layout/premium-header";
-import { formatDateToDisplayFormat } from "@/lib/utils";
-
-const ChalkBoard = (props: any) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg" 
-    width="20" 
-    height="20" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round"
-    {...props}
-  >
-    <rect x="2" y="2" width="20" height="14" rx="2" />
-    <line x1="2" y1="12" x2="22" y2="12" />
-    <line x1="6" y1="12" x2="6" y2="20" />
-    <line x1="18" y1="12" x2="18" y2="20" />
-    <ellipse cx="12" cy="18" rx="3" ry="2" />
-    <path d="M10 4h4" />
-    <path d="M8 8h8" />
-  </svg>
-);
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import EmptyState from "@/components/ui/empty-state";
 
 const Teachers = () => {
   const { toast } = useToast();
@@ -421,33 +376,33 @@ const Teachers = () => {
   }
   
   return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Premium header component */}
-        <PremiumHeader 
-          title="Docenten" 
-          path="Beheer > Docenten" 
-          icon={GraduationCap}
-          description="Beheer alle docenten en hun gegevens, cursussen en beschikbaarheid"
-        />
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Premium header component */}
+      <PremiumHeader 
+        title="Docenten" 
+        path="Beheer > Docenten" 
+        icon={GraduationCap}
+        description="Beheer alle docenten en hun gegevens, cursussen en beschikbaarheid"
+      />
 
-        {/* Main content area */}
-        <div className="px-6 py-6">
-          {/* Zoek- en actiebalk - Desktop style */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4 shadow-sm">
-            <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-              {/* Zoekbalk */}
-              <div className="relative w-full sm:max-w-md">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                <Input
-                  type="search"
-                  placeholder="Zoek op naam of docent ID..."
-                  className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              
-              {/* Filters en knoppen */}
+      {/* Main content area */}
+      <div className="px-6 py-6">
+        {/* Zoek- en actiebalk - Desktop style */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4 shadow-sm">
+          <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            {/* Zoekbalk */}
+            <div className="relative w-full sm:max-w-md">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <Input
+                type="search"
+                placeholder="Zoek op naam of docent ID..."
+                className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            {/* Filters en knoppen */}
             <div className="flex flex-wrap items-center gap-2">
               {selectedTeachers.length > 0 ? (
                 <>
@@ -708,7 +663,6 @@ const Teachers = () => {
           )}
         </div>
       </div>
-      
       {/* Weergave van docentgegevens Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="sm:max-w-[85vw] p-0">

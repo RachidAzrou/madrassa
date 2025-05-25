@@ -4,7 +4,8 @@ import { queryClient } from '@/lib/queryClient';
 import { 
   Search, PlusCircle, Filter, Download, Users, User, Camera,
   Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
-  GraduationCap, NotebookText, MapPin, FileEdit, Upload, FileDown
+  GraduationCap, NotebookText, MapPin, FileEdit, Upload, FileDown,
+  ArrowDownToLine, ArrowUpToLine
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -429,7 +430,7 @@ export default function Students() {
               className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
               title="Importeer studenten"
             >
-              <Upload className="h-3.5 w-3.5" />
+              <Download className="h-3.5 w-3.5" />
             </Button>
             
             <Button
@@ -439,7 +440,7 @@ export default function Students() {
               className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
               title="Exporteer studenten"
             >
-              <FileDown className="h-3.5 w-3.5" />
+              <Upload className="h-3.5 w-3.5" />
             </Button>
 
             <Button
@@ -1533,19 +1534,29 @@ export default function Students() {
       
       {/* Importeer dialoog */}
       <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-        <DialogContent className="sm:max-w-[525px]">
-          <DialogHeader>
-            <DialogTitle>Studenten importeren</DialogTitle>
-            <DialogDescription>
-              Upload een CSV of Excel bestand met studentgegevens. Zorg ervoor dat het bestand de juiste kolomnamen heeft.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[525px] p-0 overflow-hidden">
+          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <Download className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Studenten Importeren</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Upload een CSV of Excel bestand met studentgegevens
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
           
-          <div className="space-y-4 py-4">
-            <div className="bg-gray-50 p-4 rounded-md">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Vereiste velden</h3>
+          <div className="p-6 space-y-5">
+            <div className="bg-[#f1f5f9] p-4 rounded-md">
+              <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                <FileEdit className="h-4 w-4 mr-2" />
+                Vereiste velden
+              </h3>
               <div className="grid grid-cols-2 gap-2">
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-600">
                   <ul className="space-y-1">
                     <li>• firstName (Voornaam)</li>
                     <li>• lastName (Achternaam)</li>
@@ -1555,7 +1566,7 @@ export default function Students() {
                     <li>• gender (Geslacht)</li>
                   </ul>
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-600">
                   <ul className="space-y-1">
                     <li>• street (Straat)</li>
                     <li>• houseNumber (Huisnummer)</li>
@@ -1568,9 +1579,9 @@ export default function Students() {
               </div>
             </div>
             
-            <div className="border-2 border-dashed border-gray-300 rounded-md px-6 py-8">
+            <div className="border-2 border-dashed border-gray-300 rounded-md px-6 py-8 bg-white">
               <div className="flex flex-col items-center text-center">
-                <Upload className="h-10 w-10 text-gray-400 mb-3" />
+                <Upload className="h-10 w-10 text-[#1e40af] mb-3" />
                 <h3 className="text-sm font-medium text-gray-900">
                   {importFile ? importFile.name : "Sleep bestand hierheen of klik om te uploaden"}
                 </h3>
@@ -1586,7 +1597,7 @@ export default function Students() {
                   />
                   <Button 
                     variant="outline" 
-                    className="h-8 text-xs rounded-sm"
+                    className="h-8 text-xs rounded-sm border-[#e5e7eb] hover:bg-[#f1f5f9] hover:text-[#1e40af]"
                     asChild
                   >
                     <span>Bestand selecteren</span>
@@ -1594,16 +1605,23 @@ export default function Students() {
                 </label>
               </div>
             </div>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+              <p className="text-xs text-blue-800 flex items-start">
+                <Fingerprint className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
+                <span>Alle gegevens zullen worden gevalideerd voordat ze worden toegevoegd. Ongeldige rijen worden overgeslagen.</span>
+              </p>
+            </div>
           </div>
           
-          <DialogFooter>
+          <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-2">
             <Button 
               variant="outline" 
               onClick={() => {
                 setIsImportDialogOpen(false);
                 setImportFile(null);
               }}
-              className="h-8 text-xs rounded-sm"
+              className="h-8 text-xs rounded-sm border-[#e5e7eb]"
             >
               Annuleren
             </Button>
@@ -1614,27 +1632,37 @@ export default function Students() {
             >
               Importeren
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
       
       {/* Exporteer dialoog */}
       <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Studenten exporteren</DialogTitle>
-            <DialogDescription>
-              Kies een formaat om de studenten te exporteren.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden">
+          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <Upload className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Studenten Exporteren</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Kies een formaat om de studenten te exporteren
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
           
-          <div className="py-4 space-y-4">
-            <div className="flex flex-col space-y-2">
-              <h3 className="text-sm font-medium text-gray-700">Selecteer exportformaat</h3>
-              <div className="grid grid-cols-2 gap-3 pt-2">
+          <div className="p-6 space-y-5">
+            <div className="bg-[#f1f5f9] p-4 rounded-md">
+              <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                <FileDown className="h-4 w-4 mr-2" />
+                Selecteer exportformaat
+              </h3>
+              <div className="grid grid-cols-2 gap-3 pt-1">
                 <Button 
                   variant="outline"
-                  className="h-24 rounded-md border-gray-300 flex flex-col items-center justify-center gap-2"
+                  className="h-24 rounded-md border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-blue-300 hover:bg-blue-50"
                   onClick={() => handleExportStudents('excel')}
                 >
                   <FileDown className="h-8 w-8 text-green-600" />
@@ -1642,7 +1670,7 @@ export default function Students() {
                 </Button>
                 <Button 
                   variant="outline"
-                  className="h-24 rounded-md border-gray-300 flex flex-col items-center justify-center gap-2"
+                  className="h-24 rounded-md border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-blue-300 hover:bg-blue-50"
                   onClick={() => handleExportStudents('pdf')}
                 >
                   <FileDown className="h-8 w-8 text-red-600" />
@@ -1652,23 +1680,26 @@ export default function Students() {
             </div>
             
             <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
-              <p className="text-xs text-amber-800">
-                {selectedStudents.length > 0
-                  ? `Je hebt ${selectedStudents.length} student(en) geselecteerd om te exporteren.`
-                  : "Je hebt geen studenten geselecteerd. Alle studenten worden geëxporteerd."}
+              <p className="text-xs text-amber-800 flex items-start">
+                <GraduationCap className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
+                <span>
+                  {selectedStudents.length > 0
+                    ? `Je hebt ${selectedStudents.length} student(en) geselecteerd om te exporteren.`
+                    : "Je hebt geen studenten geselecteerd. Alle studenten worden geëxporteerd."}
+                </span>
               </p>
             </div>
           </div>
           
-          <DialogFooter>
+          <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-2">
             <Button 
               variant="outline" 
               onClick={() => setIsExportDialogOpen(false)}
-              className="h-8 text-xs rounded-sm"
+              className="h-8 text-xs rounded-sm border-[#e5e7eb]"
             >
               Annuleren
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

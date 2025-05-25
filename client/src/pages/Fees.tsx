@@ -746,47 +746,57 @@ export default function Fees() {
         <TabsContent value="fee-records" className="space-y-6">
           {/* Statistieken */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-              <div className="absolute right-0 top-0 opacity-10">
-                <CheckCircle className="h-20 w-20 text-sky-500" />
+            <div className="bg-white rounded-md shadow-sm border border-gray-200 p-5">
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center space-x-2">
+                  <div className="p-2 bg-[#1e40af] rounded-md">
+                    <CheckCircle className="h-5 w-5 text-white" />
+                  </div>
+                  <h3 className="font-medium text-gray-700">Totaal Geïnd</h3>
+                </div>
+                <p className="text-2xl font-bold text-gray-900">
+                  {statsData?.stats?.totalCollected 
+                    ? formatCurrency(statsData.stats.totalCollected) 
+                    : "€0,00"}
+                </p>
               </div>
-              <h3 className="text-sm font-medium text-gray-600 mb-1">Totaal Geïnd</h3>
-              <p className="text-2xl font-bold text-sky-700">
-                {statsData?.stats?.totalCollected 
-                  ? formatCurrency(statsData.stats.totalCollected) 
-                  : "€0,00"}
-              </p>
-
             </div>
 
-            <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-              <div className="absolute right-0 top-0 opacity-10">
-                <AlertCircle className="h-20 w-20 text-sky-500" />
+            <div className="bg-white rounded-md shadow-sm border border-gray-200 p-5">
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center space-x-2">
+                  <div className="p-2 bg-amber-500 rounded-md">
+                    <AlertCircle className="h-5 w-5 text-white" />
+                  </div>
+                  <h3 className="font-medium text-gray-700">Openstaand Bedrag</h3>
+                </div>
+                <p className="text-2xl font-bold text-gray-900">
+                  {statsData?.stats?.pendingAmount 
+                    ? formatCurrency(statsData.stats.pendingAmount) 
+                    : "€0,00"}
+                </p>
               </div>
-              <h3 className="text-sm font-medium text-gray-600 mb-1">Openstaand Bedrag</h3>
-              <p className="text-2xl font-bold text-sky-700">
-                {statsData?.stats?.pendingAmount 
-                  ? formatCurrency(statsData.stats.pendingAmount) 
-                  : "€0,00"}
-              </p>
-
             </div>
 
-            <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl shadow-md border border-sky-200 p-5 relative overflow-hidden">
-              <div className="absolute right-0 top-0 opacity-10">
-                <Percent className="h-20 w-20 text-sky-500" />
-              </div>
-              <h3 className="text-sm font-medium text-gray-600 mb-1">Betalingsgraad</h3>
-              <p className="text-2xl font-bold text-sky-700">
-                {statsData?.stats?.completionRate 
-                  ? `${statsData.stats.completionRate}%` 
-                  : "0%"}
-              </p>
-              <div className="mt-2">
-                <Progress 
-                  className="h-2 w-full" 
-                  value={statsData?.stats?.completionRate || 0} 
-                />
+            <div className="bg-white rounded-md shadow-sm border border-gray-200 p-5">
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center space-x-2">
+                  <div className="p-2 bg-green-600 rounded-md">
+                    <Percent className="h-5 w-5 text-white" />
+                  </div>
+                  <h3 className="font-medium text-gray-700">Betalingsgraad</h3>
+                </div>
+                <p className="text-2xl font-bold text-gray-900">
+                  {statsData?.stats?.completionRate 
+                    ? `${statsData.stats.completionRate}%` 
+                    : "0%"}
+                </p>
+                <div className="mt-2">
+                  <Progress 
+                    className="h-2 w-full" 
+                    value={statsData?.stats?.completionRate || 0} 
+                  />
+                </div>
               </div>
             </div>
           </div>

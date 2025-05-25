@@ -19,7 +19,9 @@ import {
   Save,
   Search,
   BarChart3,
-  BookMarked
+  BookMarked,
+  Plus,
+  Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

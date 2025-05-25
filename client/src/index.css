@@ -1,9 +1,10 @@
+@import url('./components/animations/flutter-animations.css');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-      /* Flutter-style colors - Material Design inspired */
+      /* Flutter-style colors - Material Design inspired with Blue primary */
       --background: 0 0% 100%;
       --foreground: 220 10% 20%;
       --muted: 210 20% 98%;
@@ -14,11 +15,11 @@
       --card-foreground: 220 10% 20%;
       --border: 220 13% 91%;
       --input: 220 13% 91%;
-      --primary: 262 83% 58%; /* Flutter Primary Color */
+      --primary: 210 100% 50%; /* Flutter Blue Primary Color */
       --primary-foreground: 0 0% 100%;
-      --secondary: 191 97% 77%; /* Flutter Secondary Color */
+      --secondary: 199 89% 48%; /* Flutter Blue Secondary Color */
       --secondary-foreground: 220 10% 20%;
-      --accent: 262 83% 58%;
+      --accent: 210 100% 50%;
       --accent-foreground: 0 0% 100%;
       --destructive: 0 84% 60%;
       --destructive-foreground: 0 0% 100%;
@@ -50,11 +51,11 @@
       --card-foreground: 213 31% 91%;
       --border: 216 34% 17%;
       --input: 216 34% 17%;
-      --primary: 262 83% 58%;
+      --primary: 210 100% 50%;
       --primary-foreground: 210 40% 98%;
       --secondary: 199 89% 48%;
       --secondary-foreground: 222 47% 11%;
-      --accent: 262 83% 58%;
+      --accent: 210 100% 50%;
       --accent-foreground: 210 40% 98%;
       --destructive: 0 63% 31%;
       --destructive-foreground: 210 40% 98%;

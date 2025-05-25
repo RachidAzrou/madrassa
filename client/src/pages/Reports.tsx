@@ -547,7 +547,7 @@ export default function Reports() {
                         <SelectValue placeholder="Alle studenten" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Alle studenten</SelectItem>
+                        <SelectItem value="all">Alle studenten</SelectItem>
                         {classes.map((cls: any) => (
                           <SelectItem key={cls.id} value={cls.id.toString()}>
                             {cls.name}

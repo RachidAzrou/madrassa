@@ -28,6 +28,7 @@ import {
   Clock,
   Coins,
   BookMarked,
+  MessageSquare,
 } from "lucide-react";
 
 // Aangepast ChalkboardTeacher icoon
@@ -195,6 +196,13 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   icon={<GraduationCap className="h-4 w-4" />}
                   label="Docenten"
                   isActive={location.startsWith("/teachers")}
+                  onClick={handleLinkClick}
+                />
+                <SidebarLink
+                  href="/messages"
+                  icon={<MessageSquare className="h-4 w-4" />}
+                  label="Berichten"
+                  isActive={location.startsWith("/messages")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink

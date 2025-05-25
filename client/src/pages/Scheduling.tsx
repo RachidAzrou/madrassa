@@ -818,7 +818,7 @@ export default function Scheduling() {
                     <SelectValue placeholder="Selecteer klas" />
                   </SelectTrigger>
                   <SelectContent>
-                    {classGroupsData.groups.map((group: ClassGroup) => (
+                    {classGroupsData?.groups?.map((group: ClassGroup) => (
                       <SelectItem key={group.id} value={group.id.toString()}>
                         {group.name}
                       </SelectItem>

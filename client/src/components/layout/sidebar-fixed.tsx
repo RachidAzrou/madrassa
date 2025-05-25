@@ -184,30 +184,29 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
             </div>
           </div>
           
-          <div className="mt-2">
-            <Link href="/">
-              <div
-                onClick={handleLinkClick}
-                className={cn(
-                  "flex items-center gap-2.5 px-2.5 py-2 text-sm transition-colors cursor-pointer border-l-2",
-                  location === "/"
-                    ? "border-l-primary bg-primary/5 text-primary font-medium"
-                    : "border-l-transparent text-gray-700 hover:text-primary hover:border-l-primary/30 hover:bg-primary/5"
-                )}
-              >
-                <div className="flex-shrink-0">
-                  <LayoutDashboard className="h-5 w-5" />
-                </div>
-                <span className="truncate whitespace-nowrap">Dashboard</span>
-              </div>
-            </Link>
-          </div>
+          <div className="mt-2"></div>
         </div>
         
         {/* Navigation links - scrollable section */}
         <div className="flex-1 overflow-auto py-1 px-3">
           <div className="space-y-3">
             <div className="pt-1">
+              <Link href="/">
+                <div
+                  onClick={handleLinkClick}
+                  className={cn(
+                    "flex items-center gap-2.5 px-2.5 py-2 text-sm transition-colors cursor-pointer border-l-2 mb-3",
+                    location === "/"
+                      ? "border-l-primary bg-primary/5 text-primary font-medium"
+                      : "border-l-transparent text-gray-700 hover:text-primary hover:border-l-primary/30 hover:bg-primary/5"
+                  )}
+                >
+                  <div className="flex-shrink-0">
+                    <LayoutDashboard className="h-5 w-5" />
+                  </div>
+                  <span className="truncate whitespace-nowrap">Dashboard</span>
+                </div>
+              </Link>
               <div className="flex items-center mb-1 px-2">
                 <div className="h-px bg-gray-200 flex-grow mr-2"></div>
                 <p className="text-xs font-medium text-gray-500">

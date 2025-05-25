@@ -673,7 +673,7 @@ export default function Guardians() {
                         required
                       >
                         <SelectTrigger id="relationship" className={`h-8 text-sm border-gray-300 ${hasValidationAttempt && !newGuardian.relationship ? 'border-red-300' : ''}`}>
-                          <SelectValue placeholder="Selecteer relatie" />
+                          <SelectValue placeholder="Selecteer een relatie" />
                         </SelectTrigger>
                         <SelectContent className="bg-white">
                           <SelectItem value="parent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Ouder</SelectItem>
@@ -784,7 +784,7 @@ export default function Guardians() {
                         onValueChange={(value) => setNewGuardian({...newGuardian, emergencyContactRelationship: value})}
                       >
                         <SelectTrigger id="emergencyContactRelationship" className="h-8 text-sm border-gray-300">
-                          <SelectValue placeholder="Selecteer relatie" />
+                          <SelectValue placeholder="Selecteer een relatie" />
                         </SelectTrigger>
                         <SelectContent className="bg-white">
                           <SelectItem value="parent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Ouder</SelectItem>

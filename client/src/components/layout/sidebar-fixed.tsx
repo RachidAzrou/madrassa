@@ -29,6 +29,8 @@ import {
   Clock,
   Coins,
   BookMarked,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 // Aangepast ChalkboardTeacher icoon
@@ -62,9 +64,10 @@ type SidebarLinkProps = {
   label: string;
   isActive: boolean;
   onClick?: () => void;
+  collapsed?: boolean;
 };
 
-const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps) => {
+const SidebarLink = ({ href, icon, label, isActive, onClick, collapsed = false }: SidebarLinkProps) => {
   return (
     <Link href={href}>
       <div
@@ -75,11 +78,14 @@ const SidebarLink = ({ href, icon, label, isActive, onClick }: SidebarLinkProps)
             ? "bg-blue-50 text-blue-800 font-medium"
             : "text-gray-700 hover:text-blue-700 hover:bg-blue-50/50"
         )}
+        title={collapsed ? label : undefined}
       >
         <div className="flex-shrink-0">
           {icon}
         </div>
-        <span className="truncate whitespace-nowrap">{label}</span>
+        {!collapsed && (
+          <span className="truncate whitespace-nowrap">{label}</span>
+        )}
       </div>
     </Link>
   );
@@ -89,11 +95,12 @@ type SidebarProps = {
   isMobile?: boolean;
   onClose?: () => void;
   className?: string;
+  defaultCollapsed?: boolean;
 };
 
-const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) => {
+const Sidebar = ({ isMobile = false, onClose, className = "", defaultCollapsed = false }: SidebarProps) => {
   const [location] = useLocation();
-  const [expanded, setExpanded] = useState(!isMobile);
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [userData, setUserData] = useState<any>(null);
   
   // Gebruiker data uit localStorage ophalen of standaard data gebruiken
@@ -122,19 +129,35 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
     }
   }, []);
 
+  // Controleer of eerder ingestelde sidebar status is opgeslagen
+  useEffect(() => {
+    const storedCollapsed = localStorage.getItem('sidebarCollapsed');
+    if (storedCollapsed !== null) {
+      setCollapsed(storedCollapsed === 'true');
+    }
+  }, []);
+
+  // Update localStorage wanneer sidebar status verandert
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', String(collapsed));
+  }, [collapsed]);
+
   // Adjust sidebar on window resize
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setExpanded(true);
-      } else if (isMobile) {
-        setExpanded(false);
+      if (window.innerWidth < 768) {
+        setCollapsed(true);
       }
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [isMobile]);
+  }, []);
+
+  // Toggle sidebar collapse state
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed);
+  };
 
   // Handle click on mobile
   const handleLinkClick = () => {
@@ -145,13 +168,28 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
 
   return (
     <div className={cn("h-screen", className)}>
-      <div className="flex flex-col h-full bg-white border-r border-gray-200 shadow-md">
+      <div className={cn(
+        "flex flex-col h-full bg-white border-r border-gray-200 shadow-md transition-all duration-200",
+        collapsed ? "w-[60px]" : "w-[240px]"
+      )}>
 
-        
-        {/* Verwijderd gebruiker informatie sectie uit sidebar - nu in topbar */}
+        {/* Toggle button for collapsing/expanding sidebar */}
+        <div className="flex justify-end items-center h-12 px-2 border-b border-gray-200">
+          <button 
+            onClick={toggleSidebar}
+            className="p-1.5 rounded-md text-gray-500 hover:bg-gray-100 transition-colors"
+            title={collapsed ? "Uitvouwen" : "Invouwen"}
+          >
+            {collapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </button>
+        </div>
         
         {/* Navigation links - scrollable section */}
-        <div className="flex-1 overflow-auto py-2 px-3">
+        <div className="flex-1 overflow-auto py-2 px-2">
           <div className="space-y-3">
             <div className="pt-1">
               <Link href="/">
@@ -163,18 +201,23 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                       ? "bg-blue-50 text-blue-800 font-medium rounded-sm"
                       : "text-gray-700 hover:text-blue-700 hover:bg-blue-50/50 rounded-sm"
                   )}
+                  title={collapsed ? "Dashboard" : undefined}
                 >
                   <div className="flex-shrink-0">
                     <LayoutDashboard className="h-5 w-5" />
                   </div>
-                  <span className="truncate whitespace-nowrap">Dashboard</span>
+                  {!collapsed && (
+                    <span className="truncate whitespace-nowrap">Dashboard</span>
+                  )}
                 </div>
               </Link>
               <div className="flex items-center mb-1 px-2">
                 <div className="h-px bg-gray-300 flex-grow mr-2"></div>
-                <p className="text-xs font-medium text-gray-600 tracking-wide uppercase">
-                  Beheer
-                </p>
+                {!collapsed ? (
+                  <p className="text-xs font-medium text-gray-600 tracking-wide uppercase">
+                    Beheer
+                  </p>
+                ) : null}
                 <div className="h-px bg-gray-300 flex-grow ml-2"></div>
               </div>
               <div className="space-y-0.5">
@@ -184,6 +227,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   label="Studenten"
                   isActive={location.startsWith("/students")}
                   onClick={handleLinkClick}
+                  collapsed={collapsed}
                 />
                 <SidebarLink
                   href="/guardians"
@@ -191,6 +235,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   label="Voogden"
                   isActive={location.startsWith("/guardians")}
                   onClick={handleLinkClick}
+                  collapsed={collapsed}
                 />
                 <SidebarLink
                   href="/teachers"
@@ -198,6 +243,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   label="Docenten"
                   isActive={location.startsWith("/teachers")}
                   onClick={handleLinkClick}
+                  collapsed={collapsed}
                 />
                 <SidebarLink
                   href="/admissions"
@@ -205,6 +251,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   label="Aanmeldingen"
                   isActive={location.startsWith("/admissions")}
                   onClick={handleLinkClick}
+                  collapsed={collapsed}
                 />
                 <SidebarLink
                   href="/student-groups"
@@ -212,6 +259,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   label="Klassen"
                   isActive={location.startsWith("/student-groups")}
                   onClick={handleLinkClick}
+                  collapsed={collapsed}
                 />
                 <SidebarLink
                   href="/rooms"
@@ -219,6 +267,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   label="Lokalen"
                   isActive={location.startsWith("/rooms")}
                   onClick={handleLinkClick}
+                  collapsed={collapsed}
                 />
               </div>
             </div>

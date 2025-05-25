@@ -1384,20 +1384,19 @@ export default function Students() {
       <CustomDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogHeaderWithIcon 
           title="Student Verwijderen" 
-          description="Weet je zeker dat je deze student wilt verwijderen? Dit kan niet ongedaan worden gemaakt."
+          description="Weet je zeker dat je deze student wilt verwijderen?"
           icon={<Trash2 className="h-5 w-5 text-white" />}
-          className="bg-red-600"
         />
         
         <div className="px-6 py-4">
           {selectedStudent && (
-            <div className="bg-gray-50 rounded-md p-4 mb-6">
+            <div className="mb-6">
               <div className="flex items-center gap-3">
-                <Avatar className="h-12 w-12 border-2 border-gray-200">
+                <Avatar className="h-10 w-10 border border-gray-200">
                   {selectedStudent.photoUrl ? (
                     <AvatarImage src={selectedStudent.photoUrl} alt={`${selectedStudent.firstName} ${selectedStudent.lastName}`} />
                   ) : (
-                    <AvatarFallback className="bg-[#1e40af] text-white text-lg">
+                    <AvatarFallback className="bg-[#1e40af] text-white">
                       {selectedStudent.firstName?.charAt(0)}{selectedStudent.lastName?.charAt(0)}
                     </AvatarFallback>
                   )}
@@ -1405,21 +1404,12 @@ export default function Students() {
                 <div>
                   <p className="font-medium">{selectedStudent.firstName} {selectedStudent.lastName}</p>
                   <p className="text-xs text-gray-500">Student ID: {selectedStudent.studentId}</p>
-                  <p className="text-xs text-gray-500">Email: {selectedStudent.email}</p>
                 </div>
               </div>
             </div>
           )}
           
-          <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mb-6">
-            <div className="flex gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500 h-5 w-5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
-              <div>
-                <p className="text-sm text-amber-800 font-medium">Waarschuwing</p>
-                <p className="text-xs text-amber-700">Deze actie kan niet ongedaan worden gemaakt. Alle gegevens van deze student worden permanent verwijderd uit het systeem.</p>
-              </div>
-            </div>
-          </div>
+          <p className="text-sm text-gray-600 mb-6">Deze actie kan niet ongedaan worden gemaakt. De student wordt permanent verwijderd uit het systeem.</p>
           
           <DialogFooterContainer>
             <Button 
@@ -1434,9 +1424,8 @@ export default function Students() {
               type="button"
               variant="destructive"
               onClick={handleDeleteStudent}
-              className="bg-red-600 hover:bg-red-700"
             >
-              Student Verwijderen
+              Verwijderen
             </Button>
           </DialogFooterContainer>
         </div>

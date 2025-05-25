@@ -406,10 +406,10 @@ export default function Teachers() {
                     variant="outline"
                     size="sm"
                     onClick={handleExportSelectedTeachers}
-                    className="h-7 text-xs rounded-sm border-[#e5e7eb] w-full sm:w-auto"
+                    className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
+                    title="Exporteer docenten"
                   >
-                    <FileDown className="h-3.5 w-3.5 mr-1" />
-                    Exporteren
+                    <Upload className="h-3.5 w-3.5" />
                   </Button>
                   <Button
                     size="sm"

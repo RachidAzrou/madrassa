@@ -484,6 +484,7 @@ export default function Students() {
                         setSelectedStudents([]);
                       }
                     }}
+                    className="h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
                   />
                 </ShadcnTableHead>
                 <ShadcnTableHead className="px-4 py-3 text-center w-[100px]">
@@ -546,6 +547,7 @@ export default function Students() {
                             setSelectedStudents(prev => prev.filter(id => id !== student.id));
                           }
                         }}
+                        className="h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
                       />
                     </TableCell>
                     <TableCell className="px-4 py-3 text-xs font-medium text-center">{student.studentId}</TableCell>

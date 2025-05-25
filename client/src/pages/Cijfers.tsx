@@ -454,8 +454,9 @@ export default function Cijfers() {
       {/* Premium header component */}
       <PremiumHeader 
         title="Cijfers" 
-        path="Onderwijs > Cijfers" 
-        icon={Percent} 
+        path="Evaluatie > Cijfers" 
+        icon={Percent}
+        description="Voer cijfers in voor studenten, beheer beoordelingen en volg studievoortgang per klas"
       />
       
       <div className="px-6 py-6 flex-1 space-y-6">

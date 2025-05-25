@@ -314,8 +314,9 @@ export default function Programs() {
       {/* Premium header component */}
       <PremiumHeader 
         title="Vakken" 
-        path="Onderwijs > Vakken" 
-        icon={BookText} 
+        path="Evaluatie > Vakken" 
+        icon={BookText}
+        description="Beheer alle vakken binnen het curriculum, inclusief toewijzing aan docenten en klassen"
       />
       
       {/* Main content area */}

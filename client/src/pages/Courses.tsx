@@ -302,8 +302,9 @@ export default function Courses() {
       <PremiumHeader 
         title="Curriculum" 
         icon={BookOpen}
+        description="Beheer alle vakken, leerdoelen en lesmateriaal voor de verschillende programma's"
         breadcrumbs={{
-          parent: "Onderwijs",
+          parent: "Evaluatie",
           current: "Curriculum"
         }}
       />

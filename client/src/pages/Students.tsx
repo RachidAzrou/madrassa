@@ -5,7 +5,7 @@ import {
   ChevronUp, ChevronDown, FileText, FileDown, Mail, Home as HomeIcon, BookOpen, Phone,
   Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, ChevronRight,
   UserPlus, ClipboardEdit, CreditCard, Smartphone, NotebookText, CheckCircle2, Loader2,
-  ScanLine, Fingerprint, AlertCircle, Home
+  ScanLine, Fingerprint, AlertCircle, Home, Camera
 } from 'lucide-react';
 import { Topbar } from '@/components/layout/topbar';
 import { PremiumHeader } from '@/components/layout/premium-header';
@@ -612,38 +612,55 @@ export default function Students() {
                         </h3>
                         <div className="mb-4">
                           <p className="text-sm font-medium text-gray-700 mb-1">Foto</p>
-                          <div 
-                            className="w-32 h-32 rounded-md border border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:bg-gray-100 transition-colors"
-                            onClick={() => document.getElementById('photo-upload').click()}
-                          >
-                            {formData.photoUrl ? (
-                              <img src={formData.photoUrl} alt="Student foto" className="w-full h-full object-cover" />
-                            ) : (
-                              <>
-                                <UserCircle className="h-12 w-12 text-gray-400 mb-2" />
-                                <p className="text-xs text-gray-400 text-center px-2">Foto wordt automatisch geladen via eID of itsme</p>
-                              </>
-                            )}
+                          <div className="flex flex-col gap-2">
+                            <div 
+                              className="w-32 h-32 rounded-md border border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:bg-gray-100 transition-colors"
+                              onClick={() => document.getElementById('photo-upload').click()}
+                            >
+                              {formData.photoUrl ? (
+                                <img src={formData.photoUrl} alt="Student foto" className="w-full h-full object-cover" />
+                              ) : (
+                                <Camera className="h-12 w-12 text-gray-400" />
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-xs"
+                              >
+                                eID
+                              </Button>
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-xs"
+                              >
+                                itsme
+                              </Button>
+                            </div>
+                            <input
+                              id="photo-upload"
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => {
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      photoUrl: reader.result as string
+                                    }));
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
                           </div>
-                          <input
-                            id="photo-upload"
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    photoUrl: reader.result as string
-                                  }));
-                                };
-                                reader.readAsDataURL(file);
-                              }
-                            }}
-                          />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
@@ -879,8 +896,8 @@ export default function Students() {
                             name="notes"
                             value={formData.notes}
                             onChange={handleInputChange}
-                            rows={3}
-                            className="resize-none"
+                            rows={6}
+                            className="resize-none h-full"
                             placeholder="Eventuele opmerkingen of bijzonderheden over deze student"
                           />
                         </div>

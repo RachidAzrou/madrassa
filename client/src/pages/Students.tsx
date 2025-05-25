@@ -404,8 +404,12 @@ export default function Students() {
     }, 2000);
   };
 
-  // Gebruik echte data van de API
-  const students = studentsData;
+  // Update studenten wanneer data wordt geladen
+  useEffect(() => {
+    if (studentsData && studentsData.length > 0) {
+      setStudents(studentsData);
+    }
+  }, [studentsData]);
 
   // Gebruik echte programma's data van de API
   const programs = programsData || [];

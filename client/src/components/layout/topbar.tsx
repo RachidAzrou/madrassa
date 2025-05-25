@@ -78,14 +78,14 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
           className="mr-2"
           onClick={onMenuClick}
         >
-          <Menu className="h-5 w-5 text-gray-600" />
+          <Menu className="h-6 w-6 text-gray-600" />
         </Button>
       )}
       
       {/* Logo sectie - links */}
       <div className="flex items-center h-full">
         <Link href="/dashboard" className="flex items-center">
-          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-11" />
+          <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-10 sm:h-11" />
         </Link>
       </div>
 

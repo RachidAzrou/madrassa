@@ -147,7 +147,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
       {isMobile && (
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center">
-            <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-8" />
+            <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-12" />
           </div>
           <button 
             onClick={onClose}

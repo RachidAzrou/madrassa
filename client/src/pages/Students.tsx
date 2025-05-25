@@ -1354,7 +1354,7 @@ export default function Students() {
                         <Button 
                           variant="link" 
                           className="mt-2 text-[#1e40af]"
-                          onClick={() => navigate(`/guardians?studentId=${selectedStudent.id}`)}
+                          onClick={() => setLocation(`/guardians?studentId=${selectedStudent.id}`)}
                         >
                           <UserPlus className="h-3.5 w-3.5 mr-1" />
                           Voogd toevoegen

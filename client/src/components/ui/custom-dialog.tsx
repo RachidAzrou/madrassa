@@ -29,8 +29,14 @@ export function CustomDialog({
 }: CustomDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`sm:max-w-[${maxWidth}] p-0 overflow-hidden max-h-[90vh] ${className}`}>
+      <DialogContent 
+        className={`sm:max-w-[${maxWidth}] p-0 overflow-hidden max-h-[90vh] ${className}`}
+        aria-describedby="dialog-description"
+      >
         {children}
+        <div id="dialog-description" className="sr-only">
+          Dialoogvenster met informatie of interactieve opties
+        </div>
       </DialogContent>
     </Dialog>
   );

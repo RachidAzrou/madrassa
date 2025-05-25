@@ -241,7 +241,7 @@ export default function Courses() {
           <div className="flex justify-end">
             <Button 
               onClick={handleAddCourse} 
-              className="flex items-center bg-primary hover:bg-primary/90"
+              className="flex items-center hover:bg-primary/90 bg-[#1e40af]"
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               <span>Curriculum Toevoegen</span>
@@ -727,7 +727,7 @@ export default function Courses() {
                 </Button>
                 
                 {!isViewingCourse && (
-                  <Button type="submit" className="flex items-center gap-1">
+                  <Button type="submit" className="flex items-center gap-1 hover:bg-[#1e40af]/90 bg-[#1e40af]">
                     <Save className="h-4 w-4 mr-1" />
                     {isEditingCourse ? "Wijzigingen Opslaan" : "Vak Toevoegen"}
                   </Button>

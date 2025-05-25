@@ -2306,9 +2306,18 @@ export default function Students() {
       {/* Student importeren dialog */}
       <Dialog open={isImportDialogOpen} onOpenChange={handleCloseImportDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Studenten importeren</DialogTitle>
-            <DialogDescription>
+          <DialogHeader variant="premium">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 flex items-center justify-center bg-white rounded-sm shadow-md overflow-hidden">
+                <div className="bg-gradient-to-b from-[#1e4baf] to-[#0f2b76] h-6 w-6 flex items-center justify-center m-1">
+                  <FileUp className="h-3.5 w-3.5 text-white" />
+                </div>
+              </div>
+              <DialogTitle className="text-white">
+                Studenten importeren
+              </DialogTitle>
+            </div>
+            <DialogDescription className="text-gray-100 opacity-90">
               Importeer studenten vanuit een CSV of Excel bestand.
             </DialogDescription>
           </DialogHeader>

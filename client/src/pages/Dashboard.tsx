@@ -294,365 +294,242 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Main dashboard content - 2 columns op desktop */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Linker kolom - 2/3 breedte */}
-        <div className="lg:col-span-2 space-y-4">
-          
-          {/* Studenten per klas grafiek - Desktop application styling */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-[#e5e7eb] bg-[#f9fafc]">
-              <div className="flex items-center gap-2">
-                <PieChart className="h-3.5 w-3.5 text-[#1e40af]" />
-                <h3 className="text-xs font-medium text-gray-700 tracking-tight">Klasbezetting</h3>
-              </div>
-              <div className="flex gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="h-6 px-2 text-[10px] rounded-none hover:bg-gray-100 text-gray-500"
-                  onClick={navigateToGroups}
-                >
-                  Vernieuwen
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-6 px-2 text-[10px] rounded-none hover:bg-gray-100 text-gray-500"
-                  onClick={navigateToGroups}
-                >
-                  Exporteren
-                </Button>
-              </div>
+      {/* Main dashboard content - fullwidth design */}
+      <div className="space-y-4">
+        {/* Studenten per klas grafiek - Desktop application styling */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="flex items-center justify-between px-4 py-2 border-b border-[#e5e7eb] bg-[#f9fafc]">
+            <div className="flex items-center gap-2">
+              <PieChart className="h-3.5 w-3.5 text-[#1e40af]" />
+              <h3 className="text-xs font-medium text-gray-700 tracking-tight">Klasbezetting</h3>
             </div>
-            
-            {/* Studentengroepen data visualisatie - Tabel met voortgangsbalken */}
-            {isGroupsLoading || isEnrollmentsLoading || isStatsLoading ? (
-              <div className="h-48 flex items-center justify-center">
-                <div className="w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            ) : stats.totalStudents === 0 ? (
-              <div className="h-48 flex flex-col items-center justify-center p-4">
-                <div className="p-2 bg-[#f7f9fc] text-[#1e40af] mb-3 border border-[#e5e7eb] rounded-sm">
-                  <Users className="h-6 w-6 opacity-60" />
-                </div>
-                <p className="text-xs text-gray-500">Geen studenten beschikbaar</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="mt-2 text-[10px] h-6 border-[#e5e7eb] text-gray-600 hover:bg-gray-50 rounded-sm" 
-                  onClick={navigateToStudents}
-                >
-                  Voeg studenten toe
-                </Button>
-              </div>
-            ) : (studentGroupsData as any[]).length === 0 ? (
-              <div className="h-48 flex flex-col items-center justify-center p-4">
-                <div className="p-2 bg-[#f7f9fc] text-[#1e40af] mb-3 border border-[#e5e7eb] rounded-sm">
-                  <ChalkBoard className="h-6 w-6 opacity-60" />
-                </div>
-                <p className="text-xs text-gray-500">Geen klassen beschikbaar</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="mt-2 text-[10px] h-6 border-[#e5e7eb] text-gray-600 hover:bg-gray-50 rounded-sm" 
-                  onClick={navigateToGroups}
-                >
-                  Maak een klas aan
-                </Button>
-              </div>
-            ) : (
-              <div className="p-0">
-                <table className="w-full text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-[#f7f9fc] border-t border-b border-[#e5e7eb]">
-                      <th className="py-1.5 px-4 text-left font-medium text-gray-500 w-1/5">Klas</th>
-                      <th className="py-1.5 px-4 text-left font-medium text-gray-500 w-3/5">Bezetting</th>
-                      <th className="py-1.5 px-4 text-right font-medium text-gray-500 w-1/5">Aantal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {chartData.map((item, index) => {
-                      // Gebruik de huisstijl kleuren
-                      const barColor = item.percentageFilled < 0.5 
-                        ? 'bg-blue-400' 
-                        : item.percentageFilled < 0.75 
-                          ? 'bg-[#1e3a8a]' 
-                          : 'bg-[#1e40af]';
-                      
-                      // Bereken breedte voor de balk
-                      const barWidth = `${Math.max(3, Math.min(100, item.percentageFilled * 100))}%`;
-                      
-                      return (
-                        <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#f9fafc]'} hover:bg-gray-50`}>
-                          <td className="py-1.5 px-4 text-left font-medium text-gray-700">{item.name}</td>
-                          <td className="py-1.5 px-4">
-                            <div className="flex items-center gap-2">
-                              <div className="flex-1 h-5 bg-[#f0f0f0] rounded-none overflow-hidden relative">
-                                <div 
-                                  className={`absolute top-0 left-0 h-full ${barColor}`} 
-                                  style={{ width: barWidth }}>
-                                </div>
-                              </div>
-                              <span className="text-[10px] text-gray-500 w-8 text-right">
-                                {Math.round(item.percentageFilled * 100)}%
-                              </span>
-                            </div>
-                          </td>
-                          <td className="py-1.5 px-4 text-right text-gray-700 font-medium">
-                            {item.count}/{item.maxCapacity}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-                
-                {/* Totalen en legenda (footer) */}
-                <div className="flex items-center justify-between px-4 py-2 border-t border-[#e5e7eb] bg-[#f9fafc] text-[10px] text-gray-500">
-                  <div>
-                    Totaal: {stats.totalStudents} studenten verdeeld over {stats.studentGroups} klassen
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-blue-400 mr-1"></div>
-                      <span>&lt;50%</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-[#1e3a8a] mr-1"></div>
-                      <span>50-75%</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-2 h-2 bg-[#1e40af] mr-1"></div>
-                      <span>&gt;75%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {/* Weekkalender - Desktop application styling */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-[#e5e7eb] bg-[#f9fafc]">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-3.5 w-3.5 text-[#1e40af]" />
-                <h3 className="text-xs font-medium text-gray-700 tracking-tight">Weekplanning</h3>
-              </div>
-              <div className="flex gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="h-6 px-2 text-[10px] rounded-none hover:bg-gray-100 text-gray-500"
-                  onClick={navigateToCalendar}
-                >
-                  Vernieuwen
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-6 px-2 text-[10px] rounded-none hover:bg-gray-100 text-gray-500"
-                  onClick={navigateToCalendar}
-                >
-                  Volledige agenda
-                </Button>
-              </div>
-            </div>
-            
-            {/* Week view - Desktop app stijl weekkalender */}
-            <div className="px-0 py-0">
-              <div className="grid grid-cols-7 border-b border-[#e5e7eb]">
-                {weekdays.map((day, index) => (
-                  <div 
-                    key={index}
-                    className={`text-center py-2 ${index < 6 ? 'border-r' : ''} border-[#e5e7eb] ${day.isToday ? 'bg-[#f0f4ff]' : ''}`}
-                  >
-                    <div className="text-[10px] uppercase font-medium mb-1 text-gray-500">{day.dayShort}</div>
-                    <div className={`${day.isToday ? 'text-[#1e40af] font-semibold' : 'text-gray-700'} text-sm`}>
-                      {day.dayNumber}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              {/* Lessons for this week - Desktop app stijl lesrooster */}
-              <div>
-                {isLessonsLoading ? (
-                  <div className="h-24 flex items-center justify-center">
-                    <div className="w-5 h-5 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                ) : currentWeekLessons.length === 0 ? (
-                  <div className="h-24 flex flex-col items-center justify-center py-3">
-                    <div className="p-1.5 bg-[#f7f9fc] text-[#1e40af] mb-2 border border-[#e5e7eb] rounded-sm">
-                      <Calendar className="h-4 w-4 opacity-70" />
-                    </div>
-                    <p className="text-xs text-gray-500">Geen lessen gepland deze week</p>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="mt-2 text-[10px] h-6 border-[#e5e7eb] text-gray-600 hover:bg-gray-50 rounded-sm" 
-                      onClick={navigateToCalendar}
-                    >
-                      Les plannen
-                    </Button>
-                  </div>
-                ) : (
-                  <div>
-                    <table className="w-full text-xs border-collapse">
-                      <tbody>
-                        {currentWeekLessons.slice(0, 5).map((lesson, index) => (
-                          <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#f9fafc]'} hover:bg-gray-50 border-b border-[#e5e7eb] last:border-b-0`}>
-                            <td className="py-2 px-3 text-left">
-                              <div className="flex items-center">
-                                <Clock className="h-3 w-3 text-[#1e40af] mr-2 flex-shrink-0" />
-                                <span className="font-medium text-gray-700">{lesson.title || lesson.courseName}</span>
-                              </div>
-                            </td>
-                            <td className="py-2 px-3 text-left text-gray-500">
-                              {format(parseISO(lesson.date), 'EEE d MMM', { locale: nl })}
-                            </td>
-                            <td className="py-2 px-3 text-right whitespace-nowrap text-gray-500">
-                              {lesson.startTime} - {lesson.endTime}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    
-                    {currentWeekLessons.length > 5 && (
-                      <div className="px-3 py-2 text-right bg-[#f9fafc] border-t border-[#e5e7eb]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="text-[10px] h-6 px-2 rounded-sm text-gray-500 hover:bg-gray-100"
-                          onClick={navigateToCalendar}
-                        >
-                          {currentWeekLessons.length - 5} meer lessen
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+            <div className="flex gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="h-6 px-2 text-[10px] rounded-none hover:bg-gray-100 text-gray-500"
+                onClick={navigateToGroups}
+              >
+                Vernieuwen
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 px-2 text-[10px] rounded-none hover:bg-gray-100 text-gray-500"
+                onClick={navigateToGroups}
+              >
+                Exporteren
+              </Button>
             </div>
           </div>
-        </div>
-        
-        {/* Rechter kolom - 1/3 breedte */}
-        <div className="space-y-4">
-          {/* Snelle acties - Desktop application styling */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-[#e5e7eb] bg-[#f9fafc]">
-              <div className="flex items-center gap-2">
-                <h3 className="text-xs font-medium text-gray-700 tracking-tight">Snelle acties</h3>
-              </div>
+          
+          {/* Studentengroepen data visualisatie - Tabel met voortgangsbalken */}
+          {isGroupsLoading || isEnrollmentsLoading || isStatsLoading ? (
+            <div className="h-48 flex items-center justify-center">
+              <div className="w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
             </div>
+          ) : stats.totalStudents === 0 ? (
+            <div className="h-48 flex flex-col items-center justify-center p-4">
+              <div className="p-2 bg-[#f7f9fc] text-[#1e40af] mb-3 border border-[#e5e7eb] rounded-sm">
+                <Users className="h-6 w-6 opacity-60" />
+              </div>
+              <p className="text-xs text-gray-500">Geen studenten beschikbaar</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-2 text-[10px] h-6 border-[#e5e7eb] text-gray-600 hover:bg-gray-50 rounded-sm" 
+                onClick={navigateToStudents}
+              >
+                Voeg studenten toe
+              </Button>
+            </div>
+          ) : (studentGroupsData as any[]).length === 0 ? (
+            <div className="h-48 flex flex-col items-center justify-center p-4">
+              <div className="p-2 bg-[#f7f9fc] text-[#1e40af] mb-3 border border-[#e5e7eb] rounded-sm">
+                <ChalkBoard className="h-6 w-6 opacity-60" />
+              </div>
+              <p className="text-xs text-gray-500">Geen klassen beschikbaar</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-2 text-[10px] h-6 border-[#e5e7eb] text-gray-600 hover:bg-gray-50 rounded-sm" 
+                onClick={navigateToGroups}
+              >
+                Maak een klas aan
+              </Button>
+            </div>
+          ) : (
             <div className="p-0">
-              <div className="divide-y divide-[#e5e7eb]">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full justify-start rounded-none text-left text-xs py-2 h-8 hover:bg-gray-50 text-gray-700"
-                  onClick={navigateToStudents}
-                >
-                  <Users className="h-3.5 w-3.5 mr-2 text-[#1e40af]" />
-                  Student toevoegen
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full justify-start rounded-none text-left text-xs py-2 h-8 hover:bg-gray-50 text-gray-700"
-                  onClick={navigateToTeachers}
-                >
-                  <GraduationCap className="h-3.5 w-3.5 mr-2 text-[#1e40af]" />
-                  Docent toevoegen
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full justify-start rounded-none text-left text-xs py-2 h-8 hover:bg-gray-50 text-gray-700"
-                  onClick={navigateToGroups}
-                >
-                  <ChalkBoard className="h-3.5 w-3.5 mr-2 text-[#1e40af]" />
-                  Klas aanmaken
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full justify-start rounded-none text-left text-xs py-2 h-8 hover:bg-gray-50 text-gray-700"
-                  onClick={navigateToCourses}
-                >
-                  <BookOpen className="h-3.5 w-3.5 mr-2 text-[#1e40af]" />
-                  Vak toevoegen
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full justify-start rounded-none text-left text-xs py-2 h-8 hover:bg-gray-50 text-gray-700"
-                  onClick={navigateToCalendar}
-                >
-                  <Calendar className="h-3.5 w-3.5 mr-2 text-[#1e40af]" />
-                  Les plannen
-                </Button>
-              </div>
-            </div>
-          </div>
-          
-          {/* Systeem status - Desktop application styling */}
-          <div className="bg-white border border-[#e5e7eb] rounded-sm">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-[#e5e7eb] bg-[#f9fafc]">
-              <div className="flex items-center gap-2">
-                <h3 className="text-xs font-medium text-gray-700 tracking-tight">Systeem status</h3>
-              </div>
-            </div>
-            <div className="p-0">
-              <table className="w-full text-xs">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="bg-[#f7f9fc] border-t border-b border-[#e5e7eb]">
+                    <th className="py-1.5 px-4 text-left font-medium text-gray-500 w-1/5">Klas</th>
+                    <th className="py-1.5 px-4 text-left font-medium text-gray-500 w-3/5">Bezetting</th>
+                    <th className="py-1.5 px-4 text-right font-medium text-gray-500 w-1/5">Aantal</th>
+                  </tr>
+                </thead>
                 <tbody>
-                  <tr className="border-b border-[#e5e7eb]">
-                    <td className="py-1.5 px-4">
-                      <div className="flex items-center">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></div>
-                        <span className="text-gray-600">Database</span>
-                      </div>
-                    </td>
-                    <td className="py-1.5 px-4 text-right text-green-600 font-medium">Actief</td>
-                  </tr>
-                  <tr className="border-b border-[#e5e7eb] bg-[#f9fafc]">
-                    <td className="py-1.5 px-4">
-                      <div className="flex items-center">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></div>
-                        <span className="text-gray-600">API services</span>
-                      </div>
-                    </td>
-                    <td className="py-1.5 px-4 text-right text-green-600 font-medium">Operationeel</td>
-                  </tr>
-                  <tr className="border-b border-[#e5e7eb]">
-                    <td className="py-1.5 px-4">
-                      <div className="flex items-center">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></div>
-                        <span className="text-gray-600">Opslagruimte</span>
-                      </div>
-                    </td>
-                    <td className="py-1.5 px-4 text-right text-green-600 font-medium">64% beschikbaar</td>
-                  </tr>
-                  <tr className="border-b border-[#e5e7eb] bg-[#f9fafc]">
-                    <td className="py-1.5 px-4">
-                      <div className="flex items-center">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2"></div>
-                        <span className="text-gray-600">Laatste backup</span>
-                      </div>
-                    </td>
-                    <td className="py-1.5 px-4 text-right text-green-600 font-medium">Vandaag 03:00</td>
-                  </tr>
+                  {chartData.map((item, index) => {
+                    // Gebruik de huisstijl kleuren
+                    const barColor = item.percentageFilled < 0.5 
+                      ? 'bg-blue-400' 
+                      : item.percentageFilled < 0.75 
+                        ? 'bg-[#1e3a8a]' 
+                        : 'bg-[#1e40af]';
+                    
+                    // Bereken breedte voor de balk
+                    const barWidth = `${Math.max(3, Math.min(100, item.percentageFilled * 100))}%`;
+                    
+                    return (
+                      <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#f9fafc]'} hover:bg-gray-50`}>
+                        <td className="py-1.5 px-4 text-left font-medium text-gray-700">{item.name}</td>
+                        <td className="py-1.5 px-4">
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-5 bg-[#f0f0f0] rounded-none overflow-hidden relative">
+                              <div 
+                                className={`absolute top-0 left-0 h-full ${barColor}`} 
+                                style={{ width: barWidth }}>
+                              </div>
+                            </div>
+                            <span className="text-[10px] text-gray-500 w-8 text-right">
+                              {Math.round(item.percentageFilled * 100)}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-1.5 px-4 text-right text-gray-700 font-medium">
+                          {item.count}/{item.maxCapacity}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
               
-              <div className="px-4 py-2 bg-[#f9fafc] border-t border-[#e5e7eb] text-[10px] text-gray-500">
-                <div className="flex items-center justify-between">
-                  <span>Systeem versie: <span className="font-medium">v2.4.1</span></span>
-                  <span>{format(new Date(), 'd MMM yyyy', { locale: nl })}</span>
+              {/* Totalen en legenda (footer) */}
+              <div className="flex items-center justify-between px-4 py-2 border-t border-[#e5e7eb] bg-[#f9fafc] text-[10px] text-gray-500">
+                <div>
+                  Totaal: {stats.totalStudents} studenten verdeeld over {stats.studentGroups} klassen
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-blue-400 mr-1"></div>
+                    <span>&lt;50%</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-[#1e3a8a] mr-1"></div>
+                    <span>50-75%</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-[#1e40af] mr-1"></div>
+                    <span>&gt;75%</span>
+                  </div>
                 </div>
               </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Weekkalender - Desktop application styling */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="flex items-center justify-between px-4 py-2 border-b border-[#e5e7eb] bg-[#f9fafc]">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-3.5 w-3.5 text-[#1e40af]" />
+              <h3 className="text-xs font-medium text-gray-700 tracking-tight">Weekplanning</h3>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="h-6 px-2 text-[10px] rounded-none hover:bg-gray-100 text-gray-500"
+                onClick={navigateToCalendar}
+              >
+                Vernieuwen
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 px-2 text-[10px] rounded-none hover:bg-gray-100 text-gray-500"
+                onClick={navigateToCalendar}
+              >
+                Volledige agenda
+              </Button>
+            </div>
+          </div>
+          
+          {/* Week view - Desktop app stijl weekkalender */}
+          <div className="px-0 py-0">
+            <div className="grid grid-cols-7 border-b border-[#e5e7eb]">
+              {weekdays.map((day, index) => (
+                <div 
+                  key={index}
+                  className={`text-center py-2 ${index < 6 ? 'border-r' : ''} border-[#e5e7eb] ${day.isToday ? 'bg-[#f0f4ff]' : ''}`}
+                >
+                  <div className="text-[10px] uppercase font-medium mb-1 text-gray-500">{day.dayShort}</div>
+                  <div className={`${day.isToday ? 'text-[#1e40af] font-semibold' : 'text-gray-700'} text-sm`}>
+                    {day.dayNumber}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Lessons for this week - Desktop app stijl lesrooster */}
+            <div>
+              {isLessonsLoading ? (
+                <div className="h-24 flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : currentWeekLessons.length === 0 ? (
+                <div className="h-24 flex flex-col items-center justify-center py-3">
+                  <div className="p-1.5 bg-[#f7f9fc] text-[#1e40af] mb-2 border border-[#e5e7eb] rounded-sm">
+                    <Calendar className="h-4 w-4 opacity-70" />
+                  </div>
+                  <p className="text-xs text-gray-500">Geen lessen gepland deze week</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2 text-[10px] h-6 border-[#e5e7eb] text-gray-600 hover:bg-gray-50 rounded-sm" 
+                    onClick={navigateToCalendar}
+                  >
+                    Les plannen
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <table className="w-full text-xs border-collapse">
+                    <tbody>
+                      {currentWeekLessons.slice(0, 5).map((lesson, index) => (
+                        <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#f9fafc]'} hover:bg-gray-50 border-b border-[#e5e7eb] last:border-b-0`}>
+                          <td className="py-2 px-3 text-left">
+                            <div className="flex items-center">
+                              <Clock className="h-3 w-3 text-[#1e40af] mr-2 flex-shrink-0" />
+                              <span className="font-medium text-gray-700">{lesson.title || lesson.courseName}</span>
+                            </div>
+                          </td>
+                          <td className="py-2 px-3 text-left text-gray-500">
+                            {format(parseISO(lesson.date), 'EEE d MMM', { locale: nl })}
+                          </td>
+                          <td className="py-2 px-3 text-right whitespace-nowrap text-gray-500">
+                            {lesson.startTime} - {lesson.endTime}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  
+                  {currentWeekLessons.length > 5 && (
+                    <div className="px-3 py-2 text-right bg-[#f9fafc] border-t border-[#e5e7eb]">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-[10px] h-6 px-2 rounded-sm text-gray-500 hover:bg-gray-100"
+                        onClick={navigateToCalendar}
+                      >
+                        {currentWeekLessons.length - 5} meer lessen
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

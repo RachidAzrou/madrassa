@@ -144,22 +144,22 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
 
   return (
     <div className={cn("h-screen", className)}>
-      <div className="flex flex-col h-full bg-white border-r border-gray-200">
+      <div className="flex flex-col h-full bg-white border-r border-gray-200 shadow-sm">
         {/* Header met logo en mobiele sluiten knop */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+        <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 bg-secondary/20">
           <Link href="/">
             <div className="flex items-center cursor-pointer">
               <img
                 src={myMadrassaLogo}
                 alt="myMadrassa Logo"
-                className="h-12 w-auto object-contain"
+                className="h-10 w-auto object-contain"
               />
             </div>
           </Link>
           {isMobile && (
             <button
               onClick={onClose}
-              className="p-2 rounded-md text-gray-500 hover:bg-gray-100"
+              className="p-1.5 rounded text-gray-500 hover:bg-gray-100"
             >
               <X className="h-5 w-5" />
             </button>
@@ -167,34 +167,32 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
         
         {/* Ingelogde gebruiker informatie - fixed top */}
-        <div className="px-3 py-3 border-b border-gray-200">
+        <div className="px-3 py-3 border-b border-gray-200 bg-gradient-to-b from-gray-50 to-white">
           <div 
-            className="bg-blue-50 rounded-md p-3 cursor-pointer hover:bg-blue-100 transition-colors"
+            className="flex items-center cursor-pointer p-2 hover:bg-gray-50 transition-colors rounded"
             onClick={() => {
               window.location.href = "/mijn-account";
               if (onClose) onClose();
             }}
           >
-            <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
-                <span className="font-semibold">{userData?.firstName?.[0] || ""}{userData?.lastName?.[0] || ""}</span>
-              </div>
-              <div>
-                <div className="font-medium">{userData?.firstName || ""} {userData?.lastName || ""}</div>
-                <div className="text-xs text-gray-500">{userData?.role || "Gebruiker"}</div>
-              </div>
+            <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center text-primary mr-2.5">
+              <span className="font-medium text-sm">{userData?.firstName?.[0] || ""}{userData?.lastName?.[0] || ""}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm truncate">{userData?.firstName || ""} {userData?.lastName || ""}</div>
+              <div className="text-xs text-gray-500 truncate">{userData?.role || "Gebruiker"}</div>
             </div>
           </div>
           
-          <div className="mt-2 bg-gray-50 rounded-md overflow-hidden">
+          <div className="mt-2">
             <Link href="/">
               <div
                 onClick={handleLinkClick}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 text-sm transition-colors cursor-pointer",
+                  "flex items-center gap-2.5 px-2.5 py-2 text-sm transition-colors cursor-pointer border-l-2",
                   location === "/"
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-gray-700 hover:text-primary hover:bg-gray-100"
+                    ? "border-l-primary bg-primary/5 text-primary font-medium"
+                    : "border-l-transparent text-gray-700 hover:text-primary hover:border-l-primary/30 hover:bg-primary/5"
                 )}
               >
                 <div className="flex-shrink-0">
@@ -207,51 +205,55 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
         
         {/* Navigation links - scrollable section */}
-        <div className="flex-1 overflow-auto py-2 px-3">
-          <div className="space-y-4">
-            <div className="pt-2">
-              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Beheer
-              </p>
-              <div className="space-y-1.5">
+        <div className="flex-1 overflow-auto py-1 px-3">
+          <div className="space-y-3">
+            <div className="pt-1">
+              <div className="flex items-center mb-1 px-2">
+                <div className="h-px bg-gray-200 flex-grow mr-2"></div>
+                <p className="text-xs font-medium text-gray-500">
+                  Beheer
+                </p>
+                <div className="h-px bg-gray-200 flex-grow ml-2"></div>
+              </div>
+              <div className="space-y-0.5">
                 <SidebarLink
                   href="/students"
-                  icon={<Users className="h-5 w-5" />}
+                  icon={<Users className="h-4.5 w-4.5" />}
                   label="Studenten"
                   isActive={location.startsWith("/students")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/guardians"
-                  icon={<UserCheck className="h-5 w-5" />}
+                  icon={<UserCheck className="h-4.5 w-4.5" />}
                   label="Voogden"
                   isActive={location.startsWith("/guardians")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/teachers"
-                  icon={<GraduationCap className="h-5 w-5" />}
+                  icon={<GraduationCap className="h-4.5 w-4.5" />}
                   label="Docenten"
                   isActive={location.startsWith("/teachers")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/admissions"
-                  icon={<FileText className="h-5 w-5" />}
+                  icon={<FileText className="h-4.5 w-4.5" />}
                   label="Aanmeldingen"
                   isActive={location.startsWith("/admissions")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/student-groups"
-                  icon={<ChalkBoard className="h-5 w-5" />}
+                  icon={<ChalkBoard className="h-4.5 w-4.5" />}
                   label="Klassen"
                   isActive={location.startsWith("/student-groups")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/rooms"
-                  icon={<Building className="h-5 w-5" />}
+                  icon={<Building className="h-4.5 w-4.5" />}
                   label="Lokalen"
                   isActive={location.startsWith("/rooms")}
                   onClick={handleLinkClick}
@@ -259,35 +261,39 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               </div>
             </div>
 
-            <div className="pt-2">
-              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Onderwijs
-              </p>
-              <div className="space-y-1.5">
+            <div className="pt-1">
+              <div className="flex items-center mb-1 px-2">
+                <div className="h-px bg-gray-200 flex-grow mr-2"></div>
+                <p className="text-xs font-medium text-gray-500">
+                  Onderwijs
+                </p>
+                <div className="h-px bg-gray-200 flex-grow ml-2"></div>
+              </div>
+              <div className="space-y-0.5">
                 <SidebarLink
                   href="/courses"
-                  icon={<BookOpen className="h-5 w-5" />}
+                  icon={<BookOpen className="h-4.5 w-4.5" />}
                   label="Curriculum"
                   isActive={location.startsWith("/courses")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/programs"
-                  icon={<BookText className="h-5 w-5" />}
+                  icon={<BookText className="h-4.5 w-4.5" />}
                   label="Vakken"
                   isActive={location.startsWith("/programs")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/scheduling"
-                  icon={<Clock className="h-5 w-5" />}
+                  icon={<Clock className="h-4.5 w-4.5" />}
                   label="Planning"
                   isActive={location.startsWith("/scheduling")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/calendar"
-                  icon={<Calendar className="h-5 w-5" />}
+                  icon={<Calendar className="h-4.5 w-4.5" />}
                   label="Kalender"
                   isActive={location.startsWith("/calendar")}
                   onClick={handleLinkClick}
@@ -295,35 +301,39 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               </div>
             </div>
 
-            <div className="pt-2">
-              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Evaluatie
-              </p>
-              <div className="space-y-1.5">
+            <div className="pt-1">
+              <div className="flex items-center mb-1 px-2">
+                <div className="h-px bg-gray-200 flex-grow mr-2"></div>
+                <p className="text-xs font-medium text-gray-500">
+                  Evaluatie
+                </p>
+                <div className="h-px bg-gray-200 flex-grow ml-2"></div>
+              </div>
+              <div className="space-y-0.5">
                 <SidebarLink
                   href="/attendance"
-                  icon={<ClipboardCheck className="h-5 w-5" />}
+                  icon={<ClipboardCheck className="h-4.5 w-4.5" />}
                   label="Aanwezigheid"
                   isActive={location.startsWith("/attendance")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/grading"
-                  icon={<Percent className="h-5 w-5" />}
+                  icon={<Percent className="h-4.5 w-4.5" />}
                   label="Cijfers"
                   isActive={location.startsWith("/grading")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/reports"
-                  icon={<BookMarked className="h-5 w-5" />}
+                  icon={<BookMarked className="h-4.5 w-4.5" />}
                   label="Rapport"
                   isActive={location.startsWith("/reports")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink
                   href="/fees"
-                  icon={<Coins className="h-5 w-5" />}
+                  icon={<Coins className="h-4.5 w-4.5" />}
                   label="Betalingsbeheer"
                   isActive={location.startsWith("/fees")}
                   onClick={handleLinkClick}
@@ -334,7 +344,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
         
         {/* Afmelden knop aan einde van de sidebar - fixed */}
-        <div className="px-3 border-t border-gray-200 py-4 bg-white">
+        <div className="px-3 border-t border-gray-200 py-3 bg-secondary/10">
           <div
             onClick={() => {
               // Verwijder authenticatie gegevens
@@ -344,12 +354,12 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               window.location.href = "/login";
               if (onClose) onClose();
             }}
-            className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors cursor-pointer text-gray-600 hover:text-red-600 hover:bg-red-50"
+            className="flex items-center gap-2.5 px-2.5 py-2 text-sm transition-colors cursor-pointer text-gray-700 hover:text-red-600 border-l-2 border-l-transparent hover:border-l-red-600 hover:bg-red-50/50"
           >
             <div className="flex-shrink-0">
-              <LogOut className="h-5 w-5" />
+              <LogOut className="h-4.5 w-4.5" />
             </div>
-            <span className="truncate whitespace-nowrap font-medium">Afmelden</span>
+            <span className="truncate whitespace-nowrap">Afmelden</span>
           </div>
         </div>
       </div>

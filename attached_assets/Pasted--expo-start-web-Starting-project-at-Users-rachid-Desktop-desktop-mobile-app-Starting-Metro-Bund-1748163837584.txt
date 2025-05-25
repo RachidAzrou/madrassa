@@ -1,0 +1,96 @@
+> expo start --web
+
+Starting project at /Users/rachid/Desktop/desktop-mobile-app
+Starting Metro Bundler
+Starting Webpack on port 19006 in development mode.
+(node:60373) [DEP_WEBPACK_DEV_SERVER_CONSTRUCTOR] DeprecationWarning: Using 'compiler' as the first argument is deprecated. Please use 'options' as the first argument and 'compiler' as the second argument.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:60373) [DEP_WEBPACK_DEV_SERVER_LISTEN] DeprecationWarning: 'listen' is deprecated. Please use the async 'start' or 'startCallback' method.
+▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+█ ▄▄▄▄▄ █▀▀ ████  █ ▄▄▄▄▄ █
+█ █   █ █▄▀██▀█▄  █ █   █ █
+█ █▄▄▄█ █ ▄ █  █ ██ █▄▄▄█ █
+█▄▄▄▄▄▄▄█ █ ▀▄█▄█▄█▄▄▄▄▄▄▄█
+█  █ █▀▄▄▀▀█  ▄▀▄▄▀  ▄▀▄▄▀█
+█ ▀▀▄██▄ ▀▀▀  ▀ ▀█▄▀ ▀▀█▄▄█
+██ ▄ ▄█▄ ██▄ █  █▀█ ▄█ ██▀█
+█▄▀ ▄▄ ▄█▄█▄ █▀██ ▄▄ ▀▀██▄█
+█▄▄██▄▄▄▄▀ ▄█ ▀▄  ▄▄▄ █ ▄ █
+█ ▄▄▄▄▄ █▄▄ ▄ █▄  █▄█  ▀ ▄█
+█ █   █ █▀ ▄▀▄▄▀▀▄ ▄▄ █▀▄██
+█ █▄▄▄█ █▀▄███  █  █▄  ▄█▄█
+█▄▄▄▄▄▄▄█▄████▄▄█▄███▄▄█▄▄█
+
+› Metro waiting on exp://192.168.0.214:8081
+› Scan the QR code above with Expo Go (Android) or the Camera app (iOS)
+
+› Web is waiting on http://localhost:19006
+
+› Using Expo Go
+› Press s │ switch to development build
+
+› Press a │ open Android
+› Press i │ open iOS simulator
+› Press w │ open web
+
+› Press j │ open debugger
+› Press r │ reload app
+› Press m │ toggle menu
+› Press o │ open project code in your editor
+
+› Press ? │ show all commands
+
+Logs for your project will appear below. Press Ctrl+C to exit.
+ERROR in ./electron/main.js:2:13
+Module not found: Can't resolve 'path'
+  1 | const { app, BrowserWindow, ipcMain } = require('electron');
+> 2 | const path = require('path');
+    |             ^
+  3 | const isDev = require('electron-is-dev');
+  4 | const serve = require('electron-serve');
+  5 |
+
+ERROR in ./node_modules/electron-serve/index.js:2
+Module not found: Can't resolve 'fs'
+  1 | 'use strict';
+> 2 | const fs = require('fs');
+  3 | const path = require('path');
+  4 | const {promisify} = require('util');
+  5 | const electron = require('electron');
+
+ERROR in ./node_modules/electron-serve/index.js:3
+Module not found: Can't resolve 'path'
+  1 | 'use strict';
+  2 | const fs = require('fs');
+> 3 | const path = require('path');
+  4 | const {promisify} = require('util');
+  5 | const electron = require('electron');
+  6 |
+
+ERROR in ./node_modules/electron-serve/index.js:4:18
+Module not found: Can't resolve 'util'
+  2 | const fs = require('fs');
+  3 | const path = require('path');
+> 4 | const {promisify} = require('util');
+    |                  ^
+  5 | const electron = require('electron');
+  6 |
+  7 | const stat = promisify(fs.stat);
+
+ERROR in ./node_modules/electron/index.js:1
+Module not found: Can't resolve 'fs'
+> 1 | const fs = require('fs');
+  2 | const path = require('path');
+  3 |
+  4 | const pathFile = path.join(__dirname, 'path.txt');
+
+ERROR in ./node_modules/electron/index.js:2
+Module not found: Can't resolve 'path'
+  1 | const fs = require('fs');
+> 2 | const path = require('path');
+  3 |
+  4 | const pathFile = path.join(__dirname, 'path.txt');
+  5 |
+
+web compiled with 6 errors
+

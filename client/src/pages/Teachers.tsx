@@ -511,7 +511,7 @@ const Teachers = () => {
                   <Button 
                     variant="default" 
                     size="default" 
-                    className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+                    className="hover:bg-[#1e40af]/90 bg-[#1e40af]"
                     onClick={() => setIsCreateDialogOpen(true)}
                   >
                     <PlusCircle className="h-4 w-4 mr-2" />
@@ -865,7 +865,7 @@ const Teachers = () => {
                 setIsViewDialogOpen(false);
                 handleEditTeacher(selectedTeacher);
               }}
-              className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+              className="hover:bg-[#1e40af]/90 bg-[#1e40af]"
             >
               <Pencil className="mr-2 h-4 w-4" />
               Bewerken

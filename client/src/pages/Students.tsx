@@ -791,12 +791,12 @@ export default function Students() {
                           onValueChange={(value) => handleSelectChange('gender', value)}
                           required
                         >
-                          <Button variant="outline" className="mt-1 h-9 w-full flex items-center justify-between">
-                            <SelectValue placeholder="Selecteer geslacht" />
-                          </Button>
-                          <SelectContent>
-                            <SelectItem value="man">Man</SelectItem>
-                            <SelectItem value="vrouw">Vrouw</SelectItem>
+                          <SelectTrigger id="gender" className="mt-1 h-9 w-full border-[#e5e7eb] bg-white">
+                            <SelectValue placeholder="Man of Vrouw" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border-[#e5e7eb]">
+                            <SelectItem value="man" className="focus:bg-blue-200 hover:bg-blue-100">Man</SelectItem>
+                            <SelectItem value="vrouw" className="focus:bg-blue-200 hover:bg-blue-100">Vrouw</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -1271,12 +1271,12 @@ export default function Students() {
                       value={formData.gender} 
                       onValueChange={(value) => setFormData({ ...formData, gender: value })}
                     >
-                      <SelectTrigger id="gender" className="h-9">
-                        <SelectValue placeholder="Selecteer geslacht" />
+                      <SelectTrigger id="gender" className="h-9 border-[#e5e7eb] bg-white">
+                        <SelectValue placeholder="Man of Vrouw" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="man">Man</SelectItem>
-                        <SelectItem value="vrouw">Vrouw</SelectItem>
+                      <SelectContent className="bg-white border-[#e5e7eb]">
+                        <SelectItem value="man" className="focus:bg-blue-200 hover:bg-blue-100">Man</SelectItem>
+                        <SelectItem value="vrouw" className="focus:bg-blue-200 hover:bg-blue-100">Vrouw</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

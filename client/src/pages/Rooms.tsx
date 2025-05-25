@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { PremiumHeader } from "@/components/layout/premium-header";
+import { ChalkBoard } from "@/components/layout/sidebar-fixed";
 import {
   Dialog,
   DialogContent,
@@ -363,7 +364,7 @@ export default function Rooms() {
       <PremiumHeader 
         title="Lokalen" 
         path="Beheer > Lokalen" 
-        icon={LayoutGrid} 
+        icon={ChalkBoard} 
       />
 
       {/* Main content area */}

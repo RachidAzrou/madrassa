@@ -420,3 +420,97 @@ div[role="dialog"] footer {
 [role="dialog"] > button[aria-label="Close"] {
   display: none !important;
 }
+
+/* Flutter-style Tables */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--elevation-1);
+  background-color: white;
+}
+
+table th, table td {
+  padding: 14px 16px;
+  text-align: left;
+}
+
+table th {
+  background-color: hsl(var(--primary)/0.08);
+  color: hsl(var(--primary));
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+table tbody tr {
+  border-bottom: 1px solid hsl(var(--border));
+  transition: all 0.15s var(--animate-timing);
+}
+
+table tbody tr:last-child {
+  border-bottom: none;
+}
+
+table tbody tr:hover {
+  background-color: hsl(var(--primary)/0.04);
+}
+
+/* Zebra striping for better readability */
+table tbody tr:nth-child(even) {
+  background-color: hsl(var(--muted)/0.5);
+}
+
+/* Flutter-style actions column */
+table td:last-child {
+  white-space: nowrap;
+  width: 1%;
+}
+
+/* Add card-like container for tables */
+.table-container {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--elevation-1);
+  background-color: white;
+  transition: all 0.2s var(--animate-timing);
+}
+
+.table-container:hover {
+  box-shadow: var(--elevation-2);
+}
+
+/* Table pagination styling */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+.pagination-item {
+  min-width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s var(--animate-timing);
+  font-weight: 500;
+}
+
+.pagination-item:hover {
+  background-color: hsl(var(--primary)/0.1);
+  color: hsl(var(--primary));
+}
+
+.pagination-item.active {
+  background-color: hsl(var(--primary));
+  color: white;
+}

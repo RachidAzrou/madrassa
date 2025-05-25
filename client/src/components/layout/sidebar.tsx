@@ -146,12 +146,12 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
       {/* Mobile header with close button */}
       {isMobile && (
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-          <div className="flex items-center">
-            <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-12" />
+          <div className="flex-1 flex justify-center">
+            <img src={myMadrassaLogo} alt="myMadrassa Logo" className="h-10" />
           </div>
           <button 
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-100"
+            className="p-1 rounded-full hover:bg-gray-100 absolute right-4"
           >
             <X className="h-5 w-5 text-gray-500" />
           </button>

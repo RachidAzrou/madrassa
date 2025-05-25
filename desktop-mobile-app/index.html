@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyMadrassa Test Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+    }
+    .container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 40px;
+      text-align: center;
+      max-width: 600px;
+    }
+    h1 {
+      color: #1e3a8a;
+      margin-bottom: 20px;
+    }
+    p {
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #1e3a8a;
+      color: white;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+      margin: 10px;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-secondary {
+      background-color: #e5e7eb;
+      color: #1f2937;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>MyMadrassa Desktop App</h1>
+    <p>Welkom bij de MyMadrassa desktop applicatie testpagina. Deze pagina is een eenvoudige test om te controleren of Electron correct werkt.</p>
+    
+    <button class="btn" id="test-btn">Test Electron Functie</button>
+    <button class="btn btn-secondary" id="info-btn">Toon App Info</button>
+    
+    <div id="result" style="margin-top: 20px;"></div>
+  </div>
+
+  <script>
+    document.getElementById('test-btn').addEventListener('click', function() {
+      const resultDiv = document.getElementById('result');
+      
+      // Controleren of we in Electron draaien
+      if (window.electronAPI) {
+        resultDiv.innerHTML = '<p style="color: green;">Electron is beschikbaar! De app draait correct.</p>';
+        
+        // Probeer een Electron API te gebruiken als die beschikbaar is
+        try {
+          window.electronAPI.getAppPath().then(path => {
+            resultDiv.innerHTML += `<p>App pad: ${path}</p>`;
+          }).catch(err => {
+            resultDiv.innerHTML += `<p style="color: orange;">Kon app pad niet ophalen: ${err.message}</p>`;
+          });
+        } catch (error) {
+          resultDiv.innerHTML += `<p style="color: red;">Electron API fout: ${error.message}</p>`;
+        }
+      } else {
+        resultDiv.innerHTML = '<p style="color: orange;">Electron API niet beschikbaar. Dit draait waarschijnlijk in een gewone browser.</p>';
+      }
+    });
+    
+    document.getElementById('info-btn').addEventListener('click', function() {
+      const resultDiv = document.getElementById('result');
+      const info = {
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight
+      };
+      
+      resultDiv.innerHTML = '<h3>App Informatie:</h3>';
+      resultDiv.innerHTML += `<p>User Agent: ${info.userAgent}</p>`;
+      resultDiv.innerHTML += `<p>Platform: ${info.platform}</p>`;
+      resultDiv.innerHTML += `<p>Schermafmetingen: ${info.screenWidth} x ${info.screenHeight}</p>`;
+    });
+  </script>
+</body>
+</html>

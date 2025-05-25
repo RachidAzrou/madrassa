@@ -4,6 +4,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigation/AppNavigator';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+// Electron API type definitie voor TypeScript
+declare global {
+  interface Window {
+    electronAPI?: any;
+  }
+}
+
 // Detecteer of we in een Electron/web-omgeving zijn
 const isElectron = () => {
   return Platform.OS === 'web' && 

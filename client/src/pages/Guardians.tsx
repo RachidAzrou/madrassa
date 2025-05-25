@@ -88,7 +88,6 @@ export default function Guardians() {
   };
 
   // CRUD functies
-
   const handleShowGuardianDetails = (guardian: GuardianType) => {
     setSelectedGuardian(guardian);
   };
@@ -101,22 +100,22 @@ export default function Guardians() {
     });
   };
 
-  const openDeleteConfirmation = (guardian: GuardianType) => {
+  const handleDeleteGuardian = (guardian: GuardianType) => {
     setSelectedGuardian(guardian);
     setShowDeleteDialog(true);
   };
 
-  const handleDeleteGuardian = async () => {
+  const confirmDeleteGuardian = async () => {
     if (!selectedGuardian) return;
     
     try {
-      await apiRequest(`/api/guardians/${selectedGuardian.id}`, { 
-        method: 'DELETE' 
+      await apiRequest(`/api/guardians/${selectedGuardian.id}`, {
+        method: 'DELETE'
       });
       
       toast({
         title: "Voogd verwijderd",
-        description: `${selectedGuardian.firstName} ${selectedGuardian.lastName} is succesvol verwijderd.`,
+        description: "De voogd is succesvol verwijderd.",
       });
       
       queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
@@ -150,498 +149,567 @@ export default function Guardians() {
     });
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+  // Valideren van het nieuwe voogd formulier
+  const validateNewGuardian = () => {
+    if (!newGuardian.firstName || !newGuardian.lastName || !newGuardian.email) {
+      toast({
+        title: "Ontbrekende velden",
+        description: "Vul alle verplichte velden in.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  // Opslaan van nieuwe voogd
+  const handleSaveGuardian = async () => {
+    if (!validateNewGuardian()) return;
+    
+    try {
+      const response = await apiRequest('/api/guardians', {
+        method: 'POST',
+        body: newGuardian
+      });
+      
+      toast({
+        title: "Voogd toegevoegd",
+        description: "De nieuwe voogd is succesvol toegevoegd.",
+      });
+      
+      // Reset formulier en sluit dialoog
+      setNewGuardian({
+        firstName: '',
+        lastName: '',
+        relationship: 'parent',
+        email: '',
+        phone: '',
+        isEmergencyContact: false
+      });
+      setShowNewGuardianDialog(false);
+      
+      // Vernieuw de lijst
+      queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+    } catch (error) {
+      toast({
+        title: "Fout bij toevoegen",
+        description: "Er is een probleem opgetreden bij het toevoegen van de voogd.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Voogd toevoegen/bewerken dialog */}
-      <Dialog open={showNewGuardianDialog} onOpenChange={setShowNewGuardianDialog}>
-        <DialogContent className="sm:max-w-[85%] max-h-[90vh] h-auto overflow-y-auto p-0 [&>button[aria-label='Close']]:hidden">
-          {/* Blauwe header */}
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] text-white px-6 py-5 rounded-t-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <UserCheck className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <DialogTitle className="text-xl font-semibold text-white">
-                    Nieuwe Voogd Toevoegen
-                  </DialogTitle>
-                  <DialogDescription className="text-sm text-blue-100 font-medium">
-                    Vul de gegevens in van de nieuwe voogd of contactpersoon
-                  </DialogDescription>
-                </div>
-              </div>
-              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-white/20 cursor-pointer"
-                onClick={() => setShowNewGuardianDialog(false)}
-              >
-                <X className="h-4 w-4 text-white" />
-                <span className="sr-only">Sluiten</span>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Page header - Professionele desktop stijl */}
+      <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
+        <div className="flex flex-col">
+          <div className="px-6 py-4 flex justify-between items-center">
+            <div>
+              <h1 className="text-base font-medium text-gray-800 tracking-tight">Voogden</h1>
+            </div>
+            <div className="flex items-center">
+              <div className="text-xs text-gray-500 font-medium">
+                {new Date().toLocaleDateString('nl-NL', {day: 'numeric', month: 'long', year: 'numeric'})}
               </div>
             </div>
           </div>
-          
-          <div className="px-6 py-4">
-            <form className="space-y-4">
-              <Tabs defaultValue="gegevens" className="w-full">
-                <TabsList className="grid grid-cols-3 mb-4 p-1 bg-[#1e3a8a]/10 rounded-md">
-                  <TabsTrigger value="gegevens" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <UserCheck className="h-4 w-4" />
-                    <span>Persoonlijke Gegevens</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="contact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <Phone className="h-4 w-4" />
-                    <span>Contactgegevens</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="noodcontact" className="flex items-center gap-1 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm px-3">
-                    <AlertTriangle className="h-4 w-4" />
-                    <span>Noodcontact</span>
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="gegevens" className="space-y-4 min-h-[300px]">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">Voornaam</Label>
-                      <Input 
-                        id="firstName" 
-                        placeholder="Voornaam" 
-                        value={newGuardian.firstName}
-                        onChange={(e) => setNewGuardian({...newGuardian, firstName: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Achternaam</Label>
-                      <Input 
-                        id="lastName" 
-                        placeholder="Achternaam" 
-                        value={newGuardian.lastName}
-                        onChange={(e) => setNewGuardian({...newGuardian, lastName: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center h-9 mb-1">
-                        <Label className="h-6 flex items-center" htmlFor="relationship">Relatie tot Student</Label>
-                      </div>
-                      <Select 
-                        value={newGuardian.relationship} 
-                        onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
-                      >
-                        <SelectTrigger className="h-10">
-                          <SelectValue placeholder="Selecteer relatie" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="parent">Ouder</SelectItem>
-                          <SelectItem value="guardian">Voogd</SelectItem>
-                          <SelectItem value="grandparent">Grootouder</SelectItem>
-                          <SelectItem value="sibling">Broer/Zus</SelectItem>
-                          <SelectItem value="other">Anders</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center h-9 mb-1">
-                        <Label className="h-6 flex items-center">Noodcontact</Label>
-                      </div>
-                      <div className="flex items-center space-x-2 border rounded-md p-2 h-10">
-                        <Checkbox 
-                          id="isEmergencyContact" 
-                          checked={newGuardian.isEmergencyContact}
-                          onCheckedChange={(checked) => 
-                            setNewGuardian({
-                              ...newGuardian, 
-                              isEmergencyContact: checked === true
-                            })
-                          }
-                        />
-                        <label
-                          htmlFor="isEmergencyContact"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#eb2626]"
-                        >
-                          Deze persoon is een noodcontact
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="contact" className="space-y-4 min-h-[300px]">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">E-mailadres</Label>
-                      <Input 
-                        id="email" 
-                        type="email" 
-                        placeholder="E-mailadres" 
-                        value={newGuardian.email || ''}
-                        onChange={(e) => setNewGuardian({...newGuardian, email: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Telefoonnummer</Label>
-                      <Input 
-                        id="phone" 
-                        placeholder="Telefoonnummer" 
-                        value={newGuardian.phone || ''}
-                        onChange={(e) => setNewGuardian({...newGuardian, phone: e.target.value})}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2 md:col-span-2">
-                      <Label htmlFor="address">Adres</Label>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <div className="col-span-2">
-                          <Input 
-                            id="street" 
-                            placeholder="Straatnaam" 
-                            className="w-full"
-                          />
-                        </div>
-                        <div>
-                          <Input 
-                            id="houseNumber" 
-                            placeholder="Huisnummer" 
-                            className="w-full"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="postalCode">Postcode</Label>
-                      <Input 
-                        id="postalCode" 
-                        placeholder="Postcode" 
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="city">Plaats</Label>
-                      <Input 
-                        id="city" 
-                        placeholder="Plaats" 
-                      />
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="noodcontact" className="space-y-4 min-h-[300px]">
-                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-4">
-                    <div className="flex gap-3">
-                      <AlertTriangle className="h-5 w-5 text-blue-600" />
-                      <p className="text-sm text-blue-800">
-                        De voogd aangemerkt als "noodcontact" is al toegevoegd op de eerste tab.
-                        Deze tab is bedoeld voor het toevoegen van andere noodcontacten voor deze voogd.
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="emergencyContactName">Naam noodcontact</Label>
-                      <Input 
-                        id="emergencyContactName" 
-                        placeholder="Naam" 
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="emergencyContactPhone">Telefoonnummer noodcontact</Label>
-                      <Input 
-                        id="emergencyContactPhone" 
-                        placeholder="Telefoonnummer" 
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="emergencyContactRelation">Relatie tot voogd</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer relatie" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="family">Familie</SelectItem>
-                          <SelectItem value="friend">Vriend(in)</SelectItem>
-                          <SelectItem value="neighbor">Buur</SelectItem>
-                          <SelectItem value="other">Anders</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-              
-              <div className="pt-4 border-t flex justify-end gap-2">
-                <Button 
-                  variant="outline" 
-                  type="button" 
-                  onClick={() => setShowNewGuardianDialog(false)}
-                >
-                  Annuleren
-                </Button>
-                <Button 
-                  type="submit"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    toast({
-                      title: "Voogd opslaan",
-                      description: "Deze functie wordt binnenkort geïmplementeerd.",
-                    });
-                    setShowNewGuardianDialog(false);
-                  }}
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  Voogd Opslaan
-                </Button>
-              </div>
-            </form>
+          <div className="px-6 py-2 bg-[#f9fafc] border-t border-[#e5e7eb] flex items-center">
+            <div className="text-xs text-gray-500">Beheer &gt; Voogden</div>
           </div>
-        </DialogContent>
-      </Dialog>
-      {/* Delete bevestiging dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="sm:max-w-md p-0 gap-0 bg-white overflow-hidden [&>button[aria-label='Close']]:hidden">
-          <div className="p-6 border-b">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
-                <DialogTitle className="text-xl m-0">Voogd verwijderen</DialogTitle>
-              </div>
-              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 cursor-pointer"
-                onClick={() => setShowDeleteDialog(false)}
-              >
-                <X className="h-4 w-4 text-gray-600" />
-                <span className="sr-only">Sluiten</span>
-              </div>
+        </div>
+      </header>
+
+      {/* Main content area */}
+      <div className="px-6 py-6 flex-1">
+        {/* Zoek- en actiebalk - Desktop style */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4">
+          <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            {/* Zoekbalk */}
+            <div className="relative w-full sm:max-w-md">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <Input
+                type="search"
+                placeholder="Zoek op naam of email..."
+                className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            <DialogDescription className="text-gray-500 mt-2">
-              Weet je zeker dat je deze voogd wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-            </DialogDescription>
             
-            {selectedGuardian && (
-              <div className="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
-                <div className="flex items-center gap-3">
-                  <div className="bg-red-100 p-2 rounded-full">
-                    <AlertTriangle className="h-5 w-5 text-red-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-red-800">
-                      Alle koppelingen met studenten worden ook verwijderd.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Acties */}
+            <div className="flex flex-wrap items-center gap-2">
+              {selectedGuardians.length > 0 ? (
+                <>
+                  <span className="text-xs text-gray-500">{selectedGuardians.length} geselecteerd</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedGuardians([])}
+                    className="h-7 text-xs rounded-sm"
+                  >
+                    <X className="h-3.5 w-3.5 mr-1" />
+                    Wissen
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDeleteSelectedGuardians}
+                    className="h-7 text-xs rounded-sm border-red-300 text-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-3.5 w-3.5 mr-1" />
+                    Verwijderen
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleExportSelectedGuardians}
+                    className="h-7 text-xs rounded-sm border-[#e5e7eb]"
+                  >
+                    <FileDown className="h-3.5 w-3.5 mr-1" />
+                    Exporteren
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleAddNewGuardian}
+                    className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white"
+                  >
+                    <PlusCircle className="h-3.5 w-3.5 mr-1" />
+                    Nieuwe Voogd
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
+        </div>
+
+        {/* Tabel van voogden - Desktop style */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-[#e5e7eb]">
+              <thead className="bg-[#f9fafc]">
+                <tr>
+                  <th scope="col" className="px-4 py-3 text-left w-10">
+                    <Checkbox 
+                      checked={selectedGuardians.length > 0 && selectedGuardians.length === searchResults.length}
+                      onCheckedChange={handleToggleAllGuardians}
+                      className="h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
+                    />
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Naam</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Relatie</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">E-mail</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Telefoon</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-right w-[120px]">
+                    <span className="text-xs font-medium text-gray-700">Acties</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-[#e5e7eb]">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center">
+                      <div className="flex justify-center items-center">
+                        <div className="w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
+                        <span className="ml-2 text-sm text-gray-500">Laden...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : isError ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center">
+                      <div className="flex flex-col items-center justify-center py-6">
+                        <XCircle className="h-8 w-8 text-red-500 mb-2" />
+                        <p className="text-sm text-red-500">Fout bij het laden van voogden.</p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/guardians'] })}
+                          className="mt-2 h-7 text-xs rounded-sm"
+                        >
+                          Opnieuw proberen
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : searchResults.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center">
+                      <div className="py-6">
+                        <EmptyState
+                          icon={<UserCheck className="h-12 w-12 mx-auto text-gray-300" />}
+                          description={searchQuery.trim() !== '' 
+                            ? 'Geen voogden gevonden die overeenkomen met je zoekopdracht. Probeer een andere zoekterm.' 
+                            : 'Er zijn nog geen voogden toegevoegd in het systeem.'}
+                        />
+                        {searchQuery.trim() !== '' && (
+                          <Button 
+                            variant="outline"
+                            className="mt-4 h-7 text-xs rounded-sm" 
+                            onClick={() => setSearchQuery('')}
+                            size="sm"
+                          >
+                            <XCircle className="h-3.5 w-3.5 mr-1" />
+                            Wis Zoekopdracht
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  searchResults.map((guardian: GuardianType) => (
+                    <tr key={guardian.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <Checkbox
+                          checked={selectedGuardians.includes(guardian.id)}
+                          onCheckedChange={() => toggleGuardianSelection(guardian.id)}
+                          className="h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center">
+                          <Avatar className="h-7 w-7 mr-3">
+                            <AvatarFallback className="text-xs bg-[#e5e7eb] text-gray-600">
+                              {guardian.firstName.charAt(0)}{guardian.lastName.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="text-xs font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs rounded-sm ${guardian.isEmergencyContact 
+                            ? "bg-red-50 text-red-700 border-red-200" 
+                            : "bg-blue-50 text-blue-700 border-blue-200"}`}
+                        >
+                          {getRelationshipLabel(guardian.relationship)}
+                          {guardian.isEmergencyContact && " (Nood)"}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-500">{guardian.email}</td>
+                      <td className="px-4 py-3 text-xs text-gray-500">{guardian.phone || "-"}</td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleShowGuardianDetails(guardian)}
+                            className="h-7 w-7 p-0 text-gray-500"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditGuardian(guardian)}
+                            className="h-7 w-7 p-0 text-gray-500"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteGuardian(guardian)}
+                            className="h-7 w-7 p-0 text-gray-500"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Dialogen */}
+      
+      {/* Verwijder dialoog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Voogd verwijderen</DialogTitle>
+            <DialogDescription>
+              Weet je zeker dat je deze voogd wilt verwijderen? Dit kan niet ongedaan worden gemaakt.
+            </DialogDescription>
+          </DialogHeader>
           
-          <div className="p-4 border-t flex justify-end gap-3 bg-gray-50">
+          {selectedGuardian && (
+            <div className="flex items-center space-x-4 py-4">
+              <Avatar className="h-10 w-10">
+                <AvatarFallback className="bg-[#e5e7eb] text-gray-600">
+                  {selectedGuardian.firstName.charAt(0)}{selectedGuardian.lastName.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium">{selectedGuardian.firstName} {selectedGuardian.lastName}</p>
+                <p className="text-sm text-gray-500">{selectedGuardian.email}</p>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setShowDeleteDialog(false)}
+              className="h-8 text-xs rounded-sm"
             >
               Annuleren
             </Button>
             <Button
               variant="destructive"
-              onClick={handleDeleteGuardian}
-              className="gap-1"
+              onClick={confirmDeleteGuardian}
+              className="h-8 text-xs rounded-sm"
             >
-              <Trash2 className="h-4 w-4" />
               Verwijderen
             </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* Page header */}
-      <div className="mb-8">
-        <div className="rounded-lg overflow-hidden shadow-sm">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] p-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <UserCheck className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white">Voogden</h1>
-                <p className="text-base text-blue-100 mt-1">Beheer voogden en hun relaties met studenten</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Zoekbalk en acties */}
-      <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-          <Input
-            type="search"
-            placeholder="Zoek voogden..."
-            className="pl-8 bg-white"
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
-        </div>
-        
-        <Button 
-          onClick={handleAddNewGuardian} 
-          className="hover:bg-[#1e3a8a]/90 text-white gap-2 bg-[#1e40af]"
-        >
-          <PlusCircle className="h-4 w-4" />
-          <span>Voogd Toevoegen</span>
-        </Button>
-      </div>
-      {/* Voogden lijst */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
-                  <Checkbox 
-                    checked={selectedGuardians.length > 0 && selectedGuardians.length === searchResults.length}
-                    onCheckedChange={handleToggleAllGuardians}
+      
+      {/* Nieuwe voogd dialoog */}
+      <Dialog open={showNewGuardianDialog} onOpenChange={setShowNewGuardianDialog}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Nieuwe Voogd Toevoegen</DialogTitle>
+            <DialogDescription>
+              Vul de gegevens in om een nieuwe voogd toe te voegen.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Tabs defaultValue="gegevens" className="mt-4">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="gegevens" className="flex items-center gap-2">
+                <UserCheck className="h-3.5 w-3.5" />
+                <span>Persoonlijke gegevens</span>
+              </TabsTrigger>
+              <TabsTrigger value="contact" className="flex items-center gap-2">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                <span>Noodcontact</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="gegevens" className="space-y-4 min-h-[300px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">Voornaam</Label>
+                  <Input 
+                    id="firstName" 
+                    placeholder="Voornaam" 
+                    className="h-8 text-sm"
+                    value={newGuardian.firstName}
+                    onChange={(e) => setNewGuardian({...newGuardian, firstName: e.target.value})}
                   />
-                </th>
-                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NAAM</th>
-                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">RELATIE</th>
-                <th scope="col" className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">E-MAIL</th>
-                <th scope="col" className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">ACTIES</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center">
-                    <div className="flex justify-center items-center">
-                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      <span className="ml-2">Laden...</span>
-                    </div>
-                  </td>
-                </tr>
-              ) : isError ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-red-500">
-                    Fout bij het laden van voogden. Probeer het opnieuw.
-                  </td>
-                </tr>
-              ) : searchResults.length === 0 ? (
-                <tr>
-                  <td colSpan={5}>
-                    <div className="py-6">
-                      <EmptyState
-                        icon={<UserCheck className="h-12 w-12 mx-auto opacity-30" />}
-                        title="Geen voogden gevonden"
-                        description={searchQuery.trim() !== '' 
-                          ? 'Geen voogden gevonden die overeenkomen met je zoekopdracht. Probeer een andere zoekterm.' 
-                          : 'Er zijn nog geen voogden toegevoegd in het systeem.'}
-                        action={searchQuery.trim() !== '' ? (
-                          <Button 
-                            variant="outline"
-                            className="gap-2" 
-                            onClick={() => setSearchQuery('')}
-                            size="sm"
-                          >
-                            <XCircle className="h-4 w-4" />
-                            Wis Zoekopdracht
-                          </Button>
-                        ) : null}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                searchResults.map((guardian: GuardianType) => (
-                  <tr key={guardian.id} className="group hover:bg-gray-50">
-                    <td className="px-3 py-4 whitespace-nowrap">
-                      <Checkbox
-                        checked={selectedGuardians.includes(guardian.id)}
-                        onCheckedChange={() => toggleGuardianSelection(guardian.id)}
-                      />
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-primary text-white text-xs">
-                            {guardian.firstName.charAt(0)}{guardian.lastName.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Achternaam</Label>
+                  <Input 
+                    id="lastName" 
+                    placeholder="Achternaam" 
+                    className="h-8 text-sm"
+                    value={newGuardian.lastName}
+                    onChange={(e) => setNewGuardian({...newGuardian, lastName: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="relationship">Relatie tot Student</Label>
+                  <Select 
+                    value={newGuardian.relationship} 
+                    onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
+                  >
+                    <SelectTrigger id="relationship" className="h-8 text-sm">
+                      <SelectValue placeholder="Selecteer relatie" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="parent">Ouder</SelectItem>
+                      <SelectItem value="guardian">Voogd</SelectItem>
+                      <SelectItem value="grandparent">Grootouder</SelectItem>
+                      <SelectItem value="sibling">Broer/Zus</SelectItem>
+                      <SelectItem value="other">Anders</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="isEmergencyContact">Noodcontact</Label>
+                  <div className="flex items-center h-8 border rounded-sm px-3">
+                    <Checkbox 
+                      id="isEmergencyContact" 
+                      checked={newGuardian.isEmergencyContact}
+                      onCheckedChange={(checked) => 
+                        setNewGuardian({
+                          ...newGuardian, 
+                          isEmergencyContact: checked === true
+                        })
+                      }
+                      className="mr-2 h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
+                    />
+                    <label
+                      htmlFor="isEmergencyContact"
+                      className="text-xs leading-none"
+                    >
+                      Deze persoon is een noodcontact
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="contact" className="space-y-4 min-h-[300px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">E-mailadres</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="E-mailadres" 
+                    className="h-8 text-sm"
+                    value={newGuardian.email || ''}
+                    onChange={(e) => setNewGuardian({...newGuardian, email: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Telefoonnummer</Label>
+                  <Input 
+                    id="phone" 
+                    placeholder="Telefoonnummer" 
+                    className="h-8 text-sm"
+                    value={newGuardian.phone || ''}
+                    onChange={(e) => setNewGuardian({...newGuardian, phone: e.target.value})}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowNewGuardianDialog(false)}
+              className="h-8 text-xs rounded-sm"
+            >
+              Annuleren
+            </Button>
+            <Button
+              onClick={handleSaveGuardian}
+              className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
+            >
+              <Save className="h-3.5 w-3.5 mr-1" />
+              Opslaan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Voogd details dialoog */}
+      <Dialog open={selectedGuardian !== null && !showDeleteDialog} onOpenChange={(open) => !open && setSelectedGuardian(null)}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle>Voogd details</DialogTitle>
+            <DialogDescription>
+              Details van de geselecteerde voogd.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedGuardian && (
+            <div className="py-4">
+              <div className="flex items-center space-x-4 mb-6">
+                <Avatar className="h-16 w-16">
+                  <AvatarFallback className="bg-[#1e40af] text-white text-lg">
+                    {selectedGuardian.firstName.charAt(0)}{selectedGuardian.lastName.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-lg font-medium">{selectedGuardian.firstName} {selectedGuardian.lastName}</h3>
+                  <p className="text-sm text-gray-500">{getRelationshipLabel(selectedGuardian.relationship)}</p>
+                </div>
+                
+                {selectedGuardian.isEmergencyContact && (
+                  <Badge className="ml-auto bg-red-100 text-red-800 border-transparent">
+                    Noodcontact
+                  </Badge>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500 mb-1">Contactgegevens</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center">
+                        <Mail className="h-4 w-4 text-gray-400 mr-2" />
+                        <span className="text-sm">{selectedGuardian.email}</span>
+                      </div>
+                      {selectedGuardian.phone && (
+                        <div className="flex items-center">
+                          <Phone className="h-4 w-4 text-gray-400 mr-2" />
+                          <span className="text-sm">{selectedGuardian.phone}</span>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap">
-                      <Badge variant="outline" className={`${guardian.isEmergencyContact ? "bg-red-50 text-red-700 border-red-200" : "bg-blue-50 text-blue-700 border-blue-200"}`}>
-                        {getRelationshipLabel(guardian.relationship)}
-                      </Badge>
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-500">{guardian.email}</span>
-                    </td>
-                    <td className="px-3 py-4 whitespace-nowrap text-right">
-                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                          onClick={() => handleShowGuardianDetails(guardian)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
-                          onClick={() => handleEditGuardian(guardian)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-800 hover:bg-red-50"
-                          onClick={() => openDeleteConfirmation(guardian)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-        
-        {/* Actieknoppen voor geselecteerde voogden */}
-        {selectedGuardians.length > 0 && (
-          <div className="px-4 py-2 bg-gray-50 border-t flex items-center justify-between">
-            <span className="text-sm">
-              {selectedGuardians.length} voogd{selectedGuardians.length !== 1 ? 'en' : ''} geselecteerd
-            </span>
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-1"
-                onClick={handleExportSelectedGuardians}
-              >
-                <FileDown className="h-4 w-4" />
-                Exporteren
-              </Button>
-              <Button 
-                variant="destructive" 
-                size="sm" 
-                className="gap-1"
-                onClick={handleDeleteSelectedGuardians}
-              >
-                <Trash2 className="h-4 w-4" />
-                Verwijderen
-              </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500 mb-1">Gekoppelde studenten</h4>
+                    <p className="text-sm text-gray-500 italic">Geen studenten gekoppeld</p>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setSelectedGuardian(null)}
+              className="h-8 text-xs rounded-sm"
+            >
+              Sluiten
+            </Button>
+            {selectedGuardian && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => handleEditGuardian(selectedGuardian)}
+                  className="h-8 text-xs rounded-sm"
+                >
+                  <Pencil className="h-3.5 w-3.5 mr-1" />
+                  Bewerken
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedGuardian(null);
+                    handleDeleteGuardian(selectedGuardian);
+                  }}
+                  className="h-8 text-xs rounded-sm border-red-300 text-red-600 hover:bg-red-50"
+                >
+                  <Trash2 className="h-3.5 w-3.5 mr-1" />
+                  Verwijderen
+                </Button>
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

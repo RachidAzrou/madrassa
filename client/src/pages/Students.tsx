@@ -1089,7 +1089,7 @@ export default function Students() {
                   </div>
                   <div>
                     <CustomFormLabel>Status</CustomFormLabel>
-                    <p className="text-sm mt-1">
+                    <div className="text-sm mt-1">
                       <Badge variant={selectedStudent.status === "active" ? "default" : "secondary"}>
                         {selectedStudent.status === "active" ? "Actief" : 
                          selectedStudent.status === "graduated" ? "Afgestudeerd" : 
@@ -1097,7 +1097,7 @@ export default function Students() {
                          selectedStudent.status === "withdrawn" ? "Teruggetrokken" : 
                          selectedStudent.status}
                       </Badge>
-                    </p>
+                    </div>
                   </div>
                   <div>
                     <CustomFormLabel>Klas</CustomFormLabel>
@@ -1130,25 +1130,234 @@ export default function Students() {
         />
       </CustomDialog>
 
+      {/* Edit Student Dialog */}
+      <CustomDialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogHeaderWithIcon 
+          title="Student Bewerken" 
+          description="Bewerk de gegevens van deze student"
+          icon={<FileEdit className="h-5 w-5 text-white" />}
+        />
+        
+        <form onSubmit={handleUpdateStudent} className="overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
+          <div className="px-6 py-4">
+            <div className="space-y-4">
+              <SectionContainer title="Persoonlijke Informatie" icon={<User className="h-4 w-4" />}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <CustomFormLabel htmlFor="firstName">Voornaam</CustomFormLabel>
+                    <Input
+                      id="firstName"
+                      value={formData.firstName}
+                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                      className="h-9"
+                    />
+                  </div>
+                  <div>
+                    <CustomFormLabel htmlFor="lastName">Achternaam</CustomFormLabel>
+                    <Input
+                      id="lastName"
+                      value={formData.lastName}
+                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                      className="h-9"
+                    />
+                  </div>
+                  <div>
+                    <CustomFormLabel htmlFor="email">Email</CustomFormLabel>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="h-9"
+                    />
+                  </div>
+                  <div>
+                    <CustomFormLabel htmlFor="phone">Telefoon</CustomFormLabel>
+                    <Input
+                      id="phone"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="h-9"
+                    />
+                  </div>
+                  <div>
+                    <CustomFormLabel htmlFor="gender">Geslacht</CustomFormLabel>
+                    <Select 
+                      value={formData.gender} 
+                      onValueChange={(value) => setFormData({ ...formData, gender: value })}
+                    >
+                      <SelectTrigger id="gender" className="h-9">
+                        <SelectValue placeholder="Selecteer geslacht" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="man">Man</SelectItem>
+                        <SelectItem value="vrouw">Vrouw</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <CustomFormLabel htmlFor="dateOfBirth">Geboortedatum</CustomFormLabel>
+                    <Input
+                      id="dateOfBirth"
+                      type="date"
+                      value={formData.dateOfBirth ? formData.dateOfBirth.split('T')[0] : ''}
+                      onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                      className="h-9"
+                    />
+                  </div>
+                </div>
+              </SectionContainer>
+              
+              <SectionContainer title="Adresgegevens" icon={<MapPin className="h-4 w-4" />}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <CustomFormLabel htmlFor="street">Straat</CustomFormLabel>
+                    <Input
+                      id="street"
+                      value={formData.street}
+                      onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                      className="h-9"
+                    />
+                  </div>
+                  <div>
+                    <CustomFormLabel htmlFor="houseNumber">Huisnummer</CustomFormLabel>
+                    <Input
+                      id="houseNumber"
+                      value={formData.houseNumber}
+                      onChange={(e) => setFormData({ ...formData, houseNumber: e.target.value })}
+                      className="h-9"
+                    />
+                  </div>
+                  <div>
+                    <CustomFormLabel htmlFor="postalCode">Postcode</CustomFormLabel>
+                    <Input
+                      id="postalCode"
+                      value={formData.postalCode}
+                      onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                      className="h-9"
+                    />
+                  </div>
+                  <div>
+                    <CustomFormLabel htmlFor="city">Plaats</CustomFormLabel>
+                    <Input
+                      id="city"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      className="h-9"
+                    />
+                  </div>
+                </div>
+              </SectionContainer>
+              
+              <SectionContainer title="Onderwijsgegevens" icon={<GraduationCap className="h-4 w-4" />}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <CustomFormLabel htmlFor="programId">Programma</CustomFormLabel>
+                    <Select 
+                      value={formData.programId} 
+                      onValueChange={(value) => setFormData({ ...formData, programId: value })}
+                    >
+                      <SelectTrigger id="programId" className="h-9">
+                        <SelectValue placeholder="Selecteer programma" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {programs.map((program) => (
+                          <SelectItem key={program.id} value={program.id.toString()}>
+                            {program.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <CustomFormLabel htmlFor="studentGroupId">Klas</CustomFormLabel>
+                    <Select 
+                      value={formData.studentGroupId} 
+                      onValueChange={(value) => setFormData({ ...formData, studentGroupId: value })}
+                    >
+                      <SelectTrigger id="studentGroupId" className="h-9">
+                        <SelectValue placeholder="Selecteer klas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {studentGroups.map((group) => (
+                          <SelectItem key={group.id} value={group.id.toString()}>
+                            {group.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <CustomFormLabel htmlFor="status">Status</CustomFormLabel>
+                    <Select 
+                      value={formData.status} 
+                      onValueChange={(value) => setFormData({ ...formData, status: value })}
+                    >
+                      <SelectTrigger id="status" className="h-9">
+                        <SelectValue placeholder="Selecteer status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Actief</SelectItem>
+                        <SelectItem value="graduated">Afgestudeerd</SelectItem>
+                        <SelectItem value="suspended">Geschorst</SelectItem>
+                        <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <CustomFormLabel htmlFor="enrollmentDate">Inschrijfdatum</CustomFormLabel>
+                    <Input
+                      id="enrollmentDate"
+                      type="date"
+                      value={formData.enrollmentDate ? formData.enrollmentDate.split('T')[0] : ''}
+                      onChange={(e) => setFormData({ ...formData, enrollmentDate: e.target.value })}
+                      className="h-9"
+                    />
+                  </div>
+                </div>
+              </SectionContainer>
+              
+              <SectionContainer title="Aantekeningen" icon={<NotebookText className="h-4 w-4" />}>
+                <div>
+                  <CustomFormLabel htmlFor="notes">Aantekeningen</CustomFormLabel>
+                  <Textarea
+                    id="notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    className="min-h-[100px]"
+                  />
+                </div>
+              </SectionContainer>
+            </div>
+          </div>
+          
+          <DialogFooterContainer
+            onCancel={() => setIsEditDialogOpen(false)}
+            submitText="Opslaan"
+          />
+        </form>
+      </CustomDialog>
+
       {/* Delete Student Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden">
           <div className="p-6">
             <div className="flex flex-col items-center gap-2 mb-4">
               <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center mb-2">
-                <Trash2 className="h-6 w-6 text-red-600" />
+                <div className="text-red-600">
+                  <Trash2 className="h-6 w-6" />
+                </div>
               </div>
               <DialogTitle className="text-center">Student Verwijderen</DialogTitle>
               <DialogDescription className="text-center">
-                Weet je zeker dat je deze student wilt verwijderen? 
-                Dit kan niet ongedaan worden gemaakt.
+                Weet je zeker dat je deze student wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
               </DialogDescription>
             </div>
             
             {selectedStudent && (
               <div className="bg-gray-50 rounded-md p-4 mb-6">
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
+                  <Avatar className="h-8 w-8">
                     {selectedStudent.photoUrl ? (
                       <AvatarImage src={selectedStudent.photoUrl} alt={`${selectedStudent.firstName} ${selectedStudent.lastName}`} />
                     ) : (
@@ -1158,8 +1367,8 @@ export default function Students() {
                     )}
                   </Avatar>
                   <div>
-                    <p className="font-medium">{selectedStudent.firstName} {selectedStudent.lastName}</p>
-                    <p className="text-sm text-gray-500">{selectedStudent.studentId}</p>
+                    <p className="text-sm font-medium">{selectedStudent.firstName} {selectedStudent.lastName}</p>
+                    <p className="text-xs text-gray-500">{selectedStudent.studentId}</p>
                   </div>
                 </div>
               </div>
@@ -1176,18 +1385,14 @@ export default function Students() {
               <Button 
                 type="button"
                 variant="destructive"
-                onClick={() => {
-                  setIsDeleteDialogOpen(false);
-                  toast({
-                    title: "Student verwijderd",
-                    description: "De student is succesvol verwijderd."
-                  });
-                }}
+                onClick={handleDeleteStudent}
               >
                 Verwijderen
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
         </DialogContent>
       </Dialog>
 

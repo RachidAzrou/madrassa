@@ -120,6 +120,21 @@ export default function StudentsPage() {
 
   // Status badge helper functie
   const getStatusBadge = (status: string) => {
+    // Vertaal Engelse statussen naar Nederlands (indien nodig)
+    const statusMapping: Record<string, string> = {
+      'Enrolled': 'Ingeschreven',
+      'Unenrolled': 'Uitgeschreven',
+      'Graduated': 'Afgestudeerd',
+      'Suspended': 'Geschorst',
+      // Bestaande Nederlandse termen blijven hetzelfde
+      'Ingeschreven': 'Ingeschreven',
+      'Uitgeschreven': 'Uitgeschreven',
+      'Afgestudeerd': 'Afgestudeerd',
+      'Geschorst': 'Geschorst'
+    };
+
+    const displayStatus = statusMapping[status] || status;
+    
     const statusColors: Record<string, string> = {
       'Ingeschreven': 'bg-green-100 text-green-800',
       'Uitgeschreven': 'bg-gray-100 text-gray-800',
@@ -128,8 +143,8 @@ export default function StudentsPage() {
     };
 
     return (
-      <Badge className={statusColors[status] || 'bg-gray-100'}>
-        {status}
+      <Badge className={statusColors[displayStatus] || 'bg-gray-100'}>
+        {displayStatus}
       </Badge>
     );
   };

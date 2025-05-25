@@ -257,7 +257,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUnreadMessagesCount(userId: number, userRole: string): Promise<number> {
-    const result = await db.select({ count: count() })
+    const result = await db.select({ count: sql`count(*)` })
       .from(messages)
       .where(and(
         eq(messages.receiverId, userId),
@@ -265,7 +265,7 @@ export class DatabaseStorage implements IStorage {
         eq(messages.isRead, false)
       ));
     
-    return result[0]?.count || 0;
+    return Number(result[0]?.count) || 0;
   }
 
   async createMessage(message: InsertMessage): Promise<Message> {
@@ -300,90 +300,105 @@ export class DatabaseStorage implements IStorage {
         // Admin kan berichten sturen naar iedereen
         const adminToTeachers = await db.select({
           id: teachers.id,
-          role: sql`'teacher'`.as('role'),
-          name: sql`CONCAT(${teachers.firstName}, ' ', ${teachers.lastName})`.as('name')
+          role: sql<string>`'teacher'`.as('role'),
+          name: sql<string>`CONCAT(${teachers.firstName}, ' ', ${teachers.lastName})`.as('name')
         }).from(teachers);
         
         const adminToStudents = await db.select({
           id: students.id,
-          role: sql`'student'`.as('role'),
-          name: sql`CONCAT(${students.firstName}, ' ', ${students.lastName})`.as('name')
+          role: sql<string>`'student'`.as('role'),
+          name: sql<string>`CONCAT(${students.firstName}, ' ', ${students.lastName})`.as('name')
         }).from(students);
         
         const adminToGuardians = await db.select({
           id: guardians.id,
-          role: sql`'guardian'`.as('role'),
-          name: sql`CONCAT(${guardians.firstName}, ' ', ${guardians.lastName})`.as('name')
+          role: sql<string>`'guardian'`.as('role'),
+          name: sql<string>`CONCAT(${guardians.firstName}, ' ', ${guardians.lastName})`.as('name')
         }).from(guardians);
         
-        receivers = [...adminToTeachers, ...adminToStudents, ...adminToGuardians];
+        receivers = [
+          ...(adminToTeachers as unknown as { id: number; role: string; name: string; }[]), 
+          ...(adminToStudents as unknown as { id: number; role: string; name: string; }[]), 
+          ...(adminToGuardians as unknown as { id: number; role: string; name: string; }[])
+        ];
         break;
         
       case 'teacher':
         // Docenten kunnen berichten sturen naar studenten, voogden en admins
         const teacherToStudents = await db.select({
           id: students.id,
-          role: sql`'student'`.as('role'),
-          name: sql`CONCAT(${students.firstName}, ' ', ${students.lastName})`.as('name')
+          role: sql<string>`'student'`.as('role'),
+          name: sql<string>`CONCAT(${students.firstName}, ' ', ${students.lastName})`.as('name')
         }).from(students);
         
         const teacherToGuardians = await db.select({
           id: guardians.id,
-          role: sql`'guardian'`.as('role'),
-          name: sql`CONCAT(${guardians.firstName}, ' ', ${guardians.lastName})`.as('name')
+          role: sql<string>`'guardian'`.as('role'),
+          name: sql<string>`CONCAT(${guardians.firstName}, ' ', ${guardians.lastName})`.as('name')
         }).from(guardians);
         
         const teacherToAdmins = await db.select({
           id: users.id,
           role: users.role,
-          name: sql`CONCAT(${users.firstName}, ' ', ${users.lastName})`.as('name')
+          name: sql<string>`CONCAT(${users.firstName}, ' ', ${users.lastName})`.as('name')
         }).from(users).where(eq(users.role, 'admin'));
         
-        receivers = [...teacherToStudents, ...teacherToGuardians, ...teacherToAdmins];
+        receivers = [
+          ...(teacherToStudents as unknown as { id: number; role: string; name: string; }[]), 
+          ...(teacherToGuardians as unknown as { id: number; role: string; name: string; }[]), 
+          ...(teacherToAdmins as unknown as { id: number; role: string; name: string; }[])
+        ];
         break;
         
       case 'student':
         // Studenten kunnen alleen berichten sturen naar docenten en admins
         const studentToTeachers = await db.select({
           id: teachers.id,
-          role: sql`'teacher'`.as('role'),
-          name: sql`CONCAT(${teachers.firstName}, ' ', ${teachers.lastName})`.as('name')
+          role: sql<string>`'teacher'`.as('role'),
+          name: sql<string>`CONCAT(${teachers.firstName}, ' ', ${teachers.lastName})`.as('name')
         }).from(teachers);
         
         const studentToAdmins = await db.select({
           id: users.id,
           role: users.role,
-          name: sql`CONCAT(${users.firstName}, ' ', ${users.lastName})`.as('name')
+          name: sql<string>`CONCAT(${users.firstName}, ' ', ${users.lastName})`.as('name')
         }).from(users).where(eq(users.role, 'admin'));
         
-        receivers = [...studentToTeachers, ...studentToAdmins];
+        receivers = [
+          ...(studentToTeachers as unknown as { id: number; role: string; name: string; }[]), 
+          ...(studentToAdmins as unknown as { id: number; role: string; name: string; }[])
+        ];
         break;
         
       case 'guardian':
         // Voogden kunnen berichten sturen naar docenten, admins en hun eigen studenten
         const guardianToTeachers = await db.select({
           id: teachers.id,
-          role: sql`'teacher'`.as('role'),
-          name: sql`CONCAT(${teachers.firstName}, ' ', ${teachers.lastName})`.as('name')
+          role: sql<string>`'teacher'`.as('role'),
+          name: sql<string>`CONCAT(${teachers.firstName}, ' ', ${teachers.lastName})`.as('name')
         }).from(teachers);
         
         const guardianToAdmins = await db.select({
           id: users.id,
           role: users.role,
-          name: sql`CONCAT(${users.firstName}, ' ', ${users.lastName})`.as('name')
+          name: sql<string>`CONCAT(${users.firstName}, ' ', ${users.lastName})`.as('name')
         }).from(users).where(eq(users.role, 'admin'));
         
         // Voeg alleen de studenten toe die aan deze voogd zijn gekoppeld
         const guardianStudents = await db.select({
           id: students.id,
-          role: sql`'student'`.as('role'),
-          name: sql`CONCAT(${students.firstName}, ' ', ${students.lastName})`.as('name')
+          role: sql<string>`'student'`.as('role'),
+          name: sql<string>`CONCAT(${students.firstName}, ' ', ${students.lastName})`.as('name')
         })
         .from(students)
         .innerJoin(studentGuardians, eq(students.id, studentGuardians.studentId))
         .where(eq(studentGuardians.guardianId, senderId));
         
-        receivers = [...guardianToTeachers, ...guardianToAdmins, ...guardianStudents];
+        receivers = [
+          ...(guardianToTeachers as unknown as { id: number; role: string; name: string; }[]), 
+          ...(guardianToAdmins as unknown as { id: number; role: string; name: string; }[]), 
+          ...(guardianStudents as unknown as { id: number; role: string; name: string; }[])
+        ];
         break;
     }
     

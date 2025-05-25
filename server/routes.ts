@@ -27,9 +27,11 @@ import {
   insertTeacherAttendanceSchema,
   insertBehaviorAssessmentSchema,
   insertNotificationSchema,
+  insertMessageSchema,
   type Student,
   type Teacher,
-  type BehaviorAssessment
+  type BehaviorAssessment,
+  type Message
 } from "@shared/schema";
 import { 
   getRooms, 
@@ -3611,6 +3613,189 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Verwijder een lokaal
   apiRouter.delete("/api/rooms/:id", deleteRoom);
+
+  // ****************
+  // Berichten (Messages)
+  // ****************
+
+  // Haal alle berichten op
+  apiRouter.get("/api/messages", async (_req, res) => {
+    try {
+      const messages = await storage.getMessages();
+      res.json(messages);
+    } catch (error) {
+      console.error("Fout bij ophalen berichten:", error);
+      res.status(500).json({ error: "Er is een fout opgetreden bij het ophalen van berichten" });
+    }
+  });
+
+  // Haal een specifiek bericht op
+  apiRouter.get("/api/messages/:id", async (req, res) => {
+    try {
+      const messageId = parseInt(req.params.id);
+      if (isNaN(messageId)) {
+        return res.status(400).json({ error: "Ongeldig bericht ID" });
+      }
+
+      const message = await storage.getMessage(messageId);
+      if (!message) {
+        return res.status(404).json({ error: "Bericht niet gevonden" });
+      }
+
+      res.json(message);
+    } catch (error) {
+      console.error("Fout bij ophalen bericht:", error);
+      res.status(500).json({ error: "Er is een fout opgetreden bij het ophalen van het bericht" });
+    }
+  });
+
+  // Haal berichten op voor een specifieke afzender
+  apiRouter.get("/api/messages/sender/:id/:role", async (req, res) => {
+    try {
+      const senderId = parseInt(req.params.id);
+      const senderRole = req.params.role;
+      
+      if (isNaN(senderId)) {
+        return res.status(400).json({ error: "Ongeldig afzender ID" });
+      }
+
+      const messages = await storage.getMessagesBySender(senderId, senderRole);
+      res.json(messages);
+    } catch (error) {
+      console.error("Fout bij ophalen berichten van afzender:", error);
+      res.status(500).json({ error: "Er is een fout opgetreden bij het ophalen van berichten" });
+    }
+  });
+
+  // Haal berichten op voor een specifieke ontvanger
+  apiRouter.get("/api/messages/receiver/:id/:role", async (req, res) => {
+    try {
+      const receiverId = parseInt(req.params.id);
+      const receiverRole = req.params.role;
+      
+      if (isNaN(receiverId)) {
+        return res.status(400).json({ error: "Ongeldig ontvanger ID" });
+      }
+
+      const messages = await storage.getMessagesByReceiver(receiverId, receiverRole);
+      res.json(messages);
+    } catch (error) {
+      console.error("Fout bij ophalen berichten voor ontvanger:", error);
+      res.status(500).json({ error: "Er is een fout opgetreden bij het ophalen van berichten" });
+    }
+  });
+
+  // Haal een thread van berichten op
+  apiRouter.get("/api/messages/thread/:id", async (req, res) => {
+    try {
+      const parentMessageId = parseInt(req.params.id);
+      
+      if (isNaN(parentMessageId)) {
+        return res.status(400).json({ error: "Ongeldig parent bericht ID" });
+      }
+
+      const messages = await storage.getMessageThread(parentMessageId);
+      res.json(messages);
+    } catch (error) {
+      console.error("Fout bij ophalen berichtenthread:", error);
+      res.status(500).json({ error: "Er is een fout opgetreden bij het ophalen van berichtenthread" });
+    }
+  });
+
+  // Haal het aantal ongelezen berichten op
+  apiRouter.get("/api/messages/unread/:id/:role", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const userRole = req.params.role;
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Ongeldig gebruiker ID" });
+      }
+
+      const count = await storage.getUnreadMessagesCount(userId, userRole);
+      res.json({ count });
+    } catch (error) {
+      console.error("Fout bij ophalen aantal ongelezen berichten:", error);
+      res.status(500).json({ error: "Er is een fout opgetreden bij het ophalen van het aantal ongelezen berichten" });
+    }
+  });
+
+  // Haal de geautoriseerde ontvangers op voor een afzender
+  apiRouter.get("/api/messages/receivers/:id/:role", async (req, res) => {
+    try {
+      const senderId = parseInt(req.params.id);
+      const senderRole = req.params.role;
+      
+      if (isNaN(senderId)) {
+        return res.status(400).json({ error: "Ongeldig afzender ID" });
+      }
+
+      const receivers = await storage.getAuthorizedReceivers(senderId, senderRole);
+      res.json(receivers);
+    } catch (error) {
+      console.error("Fout bij ophalen geautoriseerde ontvangers:", error);
+      res.status(500).json({ error: "Er is een fout opgetreden bij het ophalen van geautoriseerde ontvangers" });
+    }
+  });
+
+  // Maak een nieuw bericht aan
+  apiRouter.post("/api/messages", async (req, res) => {
+    try {
+      const messageData = insertMessageSchema.parse(req.body);
+      const newMessage = await storage.createMessage(messageData);
+      res.status(201).json(newMessage);
+    } catch (error) {
+      console.error("Fout bij aanmaken bericht:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Ongeldige berichtgegevens", details: error.format() });
+      }
+      res.status(500).json({ error: "Er is een fout opgetreden bij het aanmaken van het bericht" });
+    }
+  });
+
+  // Markeer een bericht als gelezen
+  apiRouter.patch("/api/messages/:id/read", async (req, res) => {
+    try {
+      const messageId = parseInt(req.params.id);
+      
+      if (isNaN(messageId)) {
+        return res.status(400).json({ error: "Ongeldig bericht ID" });
+      }
+
+      const updatedMessage = await storage.markMessageAsRead(messageId);
+      
+      if (!updatedMessage) {
+        return res.status(404).json({ error: "Bericht niet gevonden" });
+      }
+      
+      res.json(updatedMessage);
+    } catch (error) {
+      console.error("Fout bij markeren bericht als gelezen:", error);
+      res.status(500).json({ error: "Er is een fout opgetreden bij het markeren van het bericht als gelezen" });
+    }
+  });
+
+  // Verwijder een bericht
+  apiRouter.delete("/api/messages/:id", async (req, res) => {
+    try {
+      const messageId = parseInt(req.params.id);
+      
+      if (isNaN(messageId)) {
+        return res.status(400).json({ error: "Ongeldig bericht ID" });
+      }
+
+      const success = await storage.deleteMessage(messageId);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Bericht niet gevonden" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error("Fout bij verwijderen bericht:", error);
+      res.status(500).json({ error: "Er is een fout opgetreden bij het verwijderen van het bericht" });
+    }
+  });
 
   // creëer HTTP server
   const server = createServer(app);

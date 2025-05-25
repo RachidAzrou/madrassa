@@ -1557,23 +1557,27 @@ export default function Students() {
               </h3>
               <div className="grid grid-cols-2 gap-2">
                 <div className="text-xs text-gray-600">
+                  <p className="font-medium mb-1 text-[#1e40af]">Verplichte velden:</p>
                   <ul className="space-y-1">
-                    <li>• firstName (Voornaam)</li>
-                    <li>• lastName (Achternaam)</li>
-                    <li>• email (E-mail)</li>
-                    <li>• phone (Telefoon)</li>
-                    <li>• dateOfBirth (Geboortedatum)</li>
-                    <li>• gender (Geslacht)</li>
+                    <li>• <span className="font-medium">firstName</span> (Voornaam)</li>
+                    <li>• <span className="font-medium">lastName</span> (Achternaam)</li>
+                    <li>• <span className="font-medium">gender</span> (Geslacht)</li>
+                    <li>• <span className="font-medium">academicYear</span> (Schooljaar)</li>
+                    <li>• <span className="font-medium">studentGroupId</span> (Klas ID)</li>
+                    <li>• <span className="font-medium">status</span> (Status)</li>
                   </ul>
                 </div>
                 <div className="text-xs text-gray-600">
+                  <p className="font-medium mb-1 text-[#1e40af]">Optionele velden:</p>
                   <ul className="space-y-1">
+                    <li>• email (E-mail)</li>
+                    <li>• phone (Telefoon)</li>
+                    <li>• dateOfBirth (Geboortedatum)</li>
                     <li>• street (Straat)</li>
                     <li>• houseNumber (Huisnummer)</li>
                     <li>• postalCode (Postcode)</li>
                     <li>• city (Plaats)</li>
-                    <li>• programId (Programma ID)</li>
-                    <li>• studentGroupId (Groep ID)</li>
+                    <li>• notes (Aantekeningen)</li>
                   </ul>
                 </div>
               </div>

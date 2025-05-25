@@ -1176,7 +1176,7 @@ export default function Students() {
           <Button 
             variant="default" 
             size="default" 
-            className="bg-primary hover:bg-primary/90"
+            className="bg-[#1e40af] hover:bg-[#1e40af]/90"
             onClick={() => {
               resetForm();
               setIsCreateDialogOpen(true);

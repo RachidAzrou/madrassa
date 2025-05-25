@@ -305,55 +305,45 @@ export default function Students() {
       
       <DataTableContainer>
         <SearchActionBar>
-          {/* Zoekbalk */}
-          <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="text"
-              placeholder="Zoek op naam, ID of email..."
-              className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          {/* Acties */}
-          <div className="flex flex-wrap items-center gap-2">
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="h-7 text-xs rounded-sm">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle statussen</SelectItem>
-                <SelectItem value="active">Actief</SelectItem>
-                <SelectItem value="inactive">Inactief</SelectItem>
-                <SelectItem value="graduated">Afgestudeerd</SelectItem>
-                <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Select value={filterProgram} onValueChange={setFilterProgram}>
-              <Button variant="outline" className="h-7 text-xs rounded-sm flex items-center justify-between">
-                <SelectValue placeholder="Programma" />
+          <div className="flex items-center gap-2 w-full">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <Input
+                type="text"
+                placeholder="Zoek op naam, ID of email..."
+                className="pl-9 h-9 text-sm w-full"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Select value={filterProgram} onValueChange={setFilterProgram}>
+                <Button variant="outline" className="h-9 px-3 text-sm border-gray-300">
+                  <span>Alle programma's</span>
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-2 h-4 w-4">
+                    <path d="M4.5 6.5L7.5 9.5L10.5 6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
+                  </svg>
+                </Button>
+                <SelectContent>
+                  <SelectItem value="all">Alle programma's</SelectItem>
+                  {programs.map((program) => (
+                    <SelectItem key={program.id} value={program.id.toString()}>
+                      {program.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Button
+                size="default"
+                onClick={() => setIsCreateDialogOpen(true)}
+                className="h-9 px-3 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <PlusCircle className="h-4 w-4 mr-1.5" />
+                Nieuwe Student
               </Button>
-              <SelectContent>
-                <SelectItem value="all">Alle programma's</SelectItem>
-                {programs.map((program) => (
-                  <SelectItem key={program.id} value={program.id.toString()}>
-                    {program.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            
-            <Button
-              size="sm"
-              onClick={() => setIsCreateDialogOpen(true)}
-              className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white ml-auto"
-            >
-              <PlusCircle className="h-3.5 w-3.5 mr-1" />
-              Nieuwe Student
-            </Button>
+            </div>
           </div>
         </SearchActionBar>
 

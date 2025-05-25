@@ -8,7 +8,7 @@ import { NotificationProvider } from "./contexts/NotificationContext";
 import NotFound from "@/pages/not-found";
 import MainLayout from "@/components/layout/main-layout";
 import Dashboard from "@/pages/Dashboard";
-import Students from "@/pages/StudentsNew";
+import Students from "@/pages/Students";
 import Courses from "@/pages/Courses";
 import Programs from "@/pages/Programs";
 import Calendar from "@/pages/Calendar";

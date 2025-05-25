@@ -29,14 +29,8 @@ export function CustomDialog({
 }: CustomDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
-        className={`sm:max-w-[${maxWidth}] p-0 overflow-hidden max-h-[90vh] ${className}`}
-        aria-describedby="dialog-description"
-      >
+      <DialogContent className={`sm:max-w-[${maxWidth}] p-0 overflow-hidden max-h-[90vh] ${className}`}>
         {children}
-        <div id="dialog-description" className="sr-only">
-          Dialoogvenster met informatie of interactieve opties
-        </div>
       </DialogContent>
     </Dialog>
   );
@@ -286,10 +280,7 @@ export function ConfirmationDialog({
 }: ConfirmationDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
-        className={`sm:max-w-[${maxWidth}] p-0 overflow-hidden`}
-        aria-describedby="confirmation-dialog-description"
-      >
+      <DialogContent className={`sm:max-w-[${maxWidth}] p-0 overflow-hidden`}>
         <div className="p-6">
           <div className="flex flex-col items-center gap-2 mb-4">
             {icon && (
@@ -298,7 +289,7 @@ export function ConfirmationDialog({
               </div>
             )}
             <DialogTitle className="text-center">{title}</DialogTitle>
-            <DialogDescription id="confirmation-dialog-description" className="text-center">
+            <DialogDescription className="text-center">
               {description}
             </DialogDescription>
           </div>

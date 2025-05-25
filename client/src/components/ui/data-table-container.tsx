@@ -1,30 +1,140 @@
-import { ReactNode } from 'react';
-import { Loader2 } from 'lucide-react';
+import { ReactNode } from "react";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// DataTableContainer: Hoofdcontainer voor datatabellen
-export function DataTableContainer({ children }: { children: ReactNode }) {
+interface DataTableContainerProps {
+  children: ReactNode;
+  className?: string;
+}
+
+/**
+ * A reusable container component for data tables with consistent styling
+ * This maintains the standard style from the Guardians page
+ */
+export function DataTableContainer({ children, className = "" }: DataTableContainerProps) {
   return (
-    <div className="space-y-4">
+    <div className={`px-6 py-6 flex-1 ${className}`}>
       {children}
     </div>
   );
 }
 
-// SearchActionBar: Container voor zoekbalk en actieknoppen
-export function SearchActionBar({ children }: { children: ReactNode }) {
+/**
+ * Styled form label with consistent styling for use in tables and filters
+ */
+export function FilterLabel({ children, htmlFor, className = "" }: { children: ReactNode; htmlFor?: string; className?: string }) {
   return (
-    <div className="bg-white border border-[#e5e7eb] rounded-sm p-4 mb-4">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <Label htmlFor={htmlFor} className={`text-xs font-medium text-gray-700 ${className}`}>
+      {children}
+    </Label>
+  );
+}
+
+/**
+ * Styled select with consistent styling for use in tables and filters
+ */
+export function FilterSelect({ 
+  value, 
+  onValueChange, 
+  placeholder = "Selecteer...", 
+  children, 
+  className = "",
+  triggerClassName = ""
+}: { 
+  value: string; 
+  onValueChange: (value: string) => void; 
+  placeholder?: string;
+  children: ReactNode;
+  className?: string;
+  triggerClassName?: string;
+}) {
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className={`h-8 text-sm border-gray-300 ${triggerClassName}`}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent className={`bg-white ${className}`}>
+        {children}
+      </SelectContent>
+    </Select>
+  );
+}
+
+/**
+ * Styled select item with consistent styling for use in tables and filters
+ */
+export function FilterSelectItem({ value, children, className = "" }: { value: string; children: ReactNode; className?: string }) {
+  return (
+    <SelectItem value={value} className={`text-black hover:bg-blue-100 focus:bg-blue-200 ${className}`}>
+      {children}
+    </SelectItem>
+  );
+}
+
+/**
+ * Styled action buttons container with consistent styling
+ * Buttons inside this container will only be visible on row hover
+ */
+export function ActionButtonsContainer({ 
+  children, 
+  className = "" 
+}: { 
+  children: ReactNode; 
+  className?: string 
+}) {
+  return (
+    <div className={`flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Table header without text for action columns
+ */
+export function EmptyActionHeader({ 
+  className = "",
+  width = "120px" 
+}: { 
+  className?: string;
+  width?: string;
+}) {
+  return (
+    <th scope="col" className={`px-4 py-3 text-right w-[120px] ${className}`}>
+      <span className="text-xs font-medium text-gray-700"></span>
+    </th>
+  );
+}
+
+interface SearchActionBarProps {
+  children: ReactNode;
+  className?: string;
+}
+
+/**
+ * A reusable search and action bar component with consistent styling
+ */
+export function SearchActionBar({ children, className = "" }: SearchActionBarProps) {
+  return (
+    <div className={`bg-white border border-[#e5e7eb] rounded-sm mb-4 ${className}`}>
+      <div className="px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         {children}
       </div>
     </div>
   );
 }
 
-// TableContainer: Bevat de daadwerkelijke tabel met data
-export function TableContainer({ children }: { children: ReactNode }) {
+interface TableContainerProps {
+  children: ReactNode;
+  className?: string;
+}
+
+/**
+ * A reusable table container with consistent styling
+ */
+export function TableContainer({ children, className = "" }: TableContainerProps) {
   return (
-    <div className="bg-white border border-[#e5e7eb] rounded-sm overflow-hidden">
+    <div className={`bg-white border border-[#e5e7eb] rounded-sm overflow-hidden ${className}`}>
       <div className="overflow-x-auto">
         {children}
       </div>
@@ -32,68 +142,111 @@ export function TableContainer({ children }: { children: ReactNode }) {
   );
 }
 
-// DataTableHeader: Titel en beschrijving van een datatabelsectie
 interface DataTableHeaderProps {
-  title: string;
-  description?: string;
-  children?: ReactNode;
+  children: ReactNode;
+  className?: string;
 }
 
-export function DataTableHeader({ title, description, children }: DataTableHeaderProps) {
+/**
+ * A reusable table header with consistent styling
+ */
+export function DataTableHeader({ children, className = "" }: DataTableHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-      <div>
-        <h3 className="text-lg font-medium">{title}</h3>
-        {description && <p className="text-sm text-gray-500">{description}</p>}
-      </div>
-      {children && <div className="flex items-center gap-2">{children}</div>}
-    </div>
+    <thead className={`bg-[#f9fafc] ${className}`}>
+      {children}
+    </thead>
   );
 }
 
-// TableLoadingState: Laadstatus voor tabellen
+/**
+ * A loading state component for tables
+ */
 export function TableLoadingState() {
   return (
-    <div className="flex flex-col items-center justify-center py-8 px-4">
-      <Loader2 className="h-8 w-8 text-[#1e40af] animate-spin mb-2" />
-      <p className="text-sm text-gray-500">Gegevens laden...</p>
-    </div>
+    <tr>
+      <td colSpan={99} className="px-6 py-4 text-center">
+        <div className="flex justify-center items-center">
+          <div className="w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
+          <span className="ml-2 text-sm text-gray-500">Laden...</span>
+        </div>
+      </td>
+    </tr>
   );
 }
 
-// EmptyTableState: Weergave wanneer een tabel geen data bevat
+interface TableErrorStateProps {
+  message?: string;
+  onRetry?: () => void;
+}
+
+/**
+ * An error state component for tables
+ */
+export function TableErrorState({ 
+  message = "Fout bij het laden van gegevens.", 
+  onRetry 
+}: TableErrorStateProps) {
+  return (
+    <tr>
+      <td colSpan={99} className="px-6 py-4 text-center">
+        <div className="flex flex-col items-center justify-center py-6">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            className="h-8 w-8 text-red-500 mb-2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+          </svg>
+          <p className="text-sm text-red-500">{message}</p>
+          {onRetry && (
+            <button 
+              onClick={onRetry}
+              className="mt-2 h-7 text-xs rounded-sm border border-input bg-background hover:bg-accent hover:text-accent-foreground px-3"
+            >
+              Opnieuw proberen
+            </button>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+}
+
 interface EmptyTableStateProps {
-  icon: ReactNode;
-  title: string;
-  description: string;
+  icon?: ReactNode;
+  title?: string;
+  description?: string;
   action?: ReactNode;
 }
 
-export function EmptyTableState({ icon, title, description, action }: EmptyTableStateProps) {
+/**
+ * An empty state component for tables
+ */
+export function EmptyTableState({ 
+  icon, 
+  title = "Geen resultaten gevonden", 
+  description = "Er zijn geen items om weer te geven.", 
+  action 
+}: EmptyTableStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-8 px-4">
-      <div className="mb-2">{icon}</div>
-      <h3 className="text-sm font-medium mb-1">{title}</h3>
-      <p className="text-sm text-gray-500 mb-4 text-center max-w-md">{description}</p>
-      {action && <div>{action}</div>}
-    </div>
-  );
-}
-
-// ActionButtonsContainer: Container voor actieknoppen in tabellen met hover effect
-export function ActionButtonsContainer({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex items-center justify-end space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-      {children}
-    </div>
-  );
-}
-
-// EmptyActionHeader: Lege header cel voor actiekolom
-export function EmptyActionHeader() {
-  return (
-    <th className="px-4 py-3 text-right">
-      <span className="sr-only">Acties</span>
-    </th>
+    <tr>
+      <td colSpan={99} className="px-6 py-4 text-center">
+        <div className="py-6">
+          {icon && <div className="mb-3">{icon}</div>}
+          <h3 className="text-sm font-medium text-gray-900">{title}</h3>
+          <p className="mt-1 text-sm text-gray-500">{description}</p>
+          {action && <div className="mt-4">{action}</div>}
+        </div>
+      </td>
+    </tr>
   );
 }

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
+import { Link, useLocation } from 'wouter';
 import { 
   Search, PlusCircle, Filter, Download, Users, User, Camera,
   Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
   GraduationCap, NotebookText, MapPin, FileEdit, Upload, FileDown,
-  ArrowDownToLine, ArrowUpToLine, Info
+  ArrowDownToLine, ArrowUpToLine, Info, UserPlus
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -46,6 +47,7 @@ import {
 } from "@/components/ui/table";
 
 export default function Students() {
+  const [_, setLocation] = useLocation();
   // State hooks
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -222,9 +224,79 @@ export default function Students() {
     }
   };
 
-  const handleViewStudent = (student) => {
+  const handleViewStudent = async (student) => {
+    // Basisinformatie van de student instellen
     setSelectedStudent(student);
-    setIsViewDialogOpen(true);
+    
+    try {
+      // Simuleer ophalen van voogden voor deze student
+      // In een echte implementatie zou dit een API-aanroep zijn zoals:
+      // const guardiansResponse = await fetch(`/api/guardians/student/${student.id}`);
+      // const guardiansData = await guardiansResponse.json();
+      
+      // Voor ontwikkelingsdoeleinden, genereer mock voogden
+      const mockGuardians = [
+        {
+          id: 1,
+          firstName: "Ahmed",
+          lastName: "El Mouden",
+          relationship: "Vader",
+          email: "ahmed.elmouden@example.com",
+          phone: "0412345678"
+        },
+        {
+          id: 2,
+          firstName: "Fatima",
+          lastName: "El Mouden",
+          relationship: "Moeder",
+          email: "fatima.elmouden@example.com",
+          phone: "0487654321"
+        }
+      ];
+      
+      // Simuleer ophalen van gerelateerde studenten (broers/zussen)
+      // In een echte implementatie zou dit een API-aanroep zijn zoals:
+      // const relatedStudentsResponse = await fetch(`/api/students/related/${student.id}`);
+      // const relatedStudentsData = await relatedStudentsResponse.json();
+      
+      // Voor ontwikkelingsdoeleinden, genereer mock gerelateerde studenten
+      const mockRelatedStudents = [
+        {
+          id: 3,
+          firstName: "Nora",
+          lastName: "El Mouden",
+          photoUrl: null,
+          studentId: "ST24003"
+        },
+        {
+          id: 4,
+          firstName: "Yassin",
+          lastName: "El Mouden",
+          photoUrl: null,
+          studentId: "ST24004"
+        }
+      ];
+      
+      // Update de geselecteerde student met voogden en gerelateerde studenten
+      setSelectedStudent(prevStudent => ({
+        ...prevStudent,
+        guardians: mockGuardians,
+        relatedStudents: mockRelatedStudents
+      }));
+      
+      // Open het dialoogvenster
+      setIsViewDialogOpen(true);
+    } catch (error) {
+      console.error("Fout bij het ophalen van gerelateerde gegevens:", error);
+      toast({
+        title: "Waarschuwing",
+        description: "Kon niet alle gegevens voor deze student laden.",
+        variant: "destructive"
+      });
+      
+      // Open het dialoogvenster nog steeds met basis studentgegevens
+      setIsViewDialogOpen(true);
+    }
   };
 
   const handleEditStudent = (student) => {
@@ -1250,6 +1322,80 @@ export default function Students() {
                     <CustomFormLabel>Inschrijfdatum</CustomFormLabel>
                     <p className="text-sm mt-1">{selectedStudent.enrollmentDate ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) : "-"}</p>
                   </div>
+                </div>
+              </SectionContainer>
+              
+              <SectionContainer title="Familie" icon={<Users className="h-4 w-4" />}>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Voogden</h4>
+                    {selectedStudent.guardians && selectedStudent.guardians.length > 0 ? (
+                      <div className="space-y-3">
+                        {selectedStudent.guardians.map((guardian, index) => (
+                          <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
+                            <Avatar className="h-10 w-10">
+                              <AvatarFallback className="bg-[#1e40af] text-white">
+                                {guardian.firstName?.charAt(0)}{guardian.lastName?.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="text-sm font-medium">{guardian.firstName} {guardian.lastName}</p>
+                              <p className="text-xs text-gray-500">{guardian.relationship}</p>
+                            </div>
+                            <div className="ml-auto">
+                              <Link to={`/guardians?guardianId=${guardian.id}`} className="text-xs text-blue-600 hover:underline">Details</Link>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-gray-50 rounded-md text-center">
+                        <p className="text-sm text-gray-500">Geen voogden gevonden</p>
+                        <Button 
+                          variant="link" 
+                          className="mt-2 text-[#1e40af]"
+                          onClick={() => navigate(`/guardians?studentId=${selectedStudent.id}`)}
+                        >
+                          <UserPlus className="h-3.5 w-3.5 mr-1" />
+                          Voogd toevoegen
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {selectedStudent.relatedStudents && selectedStudent.relatedStudents.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Broers/Zussen</h4>
+                      <div className="space-y-2">
+                        {selectedStudent.relatedStudents.map((relatedStudent, index) => (
+                          <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
+                            <Avatar className="h-8 w-8">
+                              {relatedStudent.photoUrl ? (
+                                <AvatarImage src={relatedStudent.photoUrl} alt={`${relatedStudent.firstName} ${relatedStudent.lastName}`} />
+                              ) : (
+                                <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                                  {relatedStudent.firstName?.charAt(0)}{relatedStudent.lastName?.charAt(0)}
+                                </AvatarFallback>
+                              )}
+                            </Avatar>
+                            <div>
+                              <p className="text-sm">{relatedStudent.firstName} {relatedStudent.lastName}</p>
+                            </div>
+                            <div className="ml-auto">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 w-7 p-0"
+                                onClick={() => handleViewStudent(relatedStudent)}
+                              >
+                                <Eye className="h-3.5 w-3.5 text-gray-500" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </SectionContainer>
               

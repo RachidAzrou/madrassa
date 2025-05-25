@@ -503,18 +503,21 @@ export default function Cijfers() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="mb-8">
-        <div className="rounded-lg overflow-hidden shadow-sm">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] p-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <Percent className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white">Cijfers</h1>
-                <p className="text-base text-blue-100 mt-1">Beheer cijfers en gedragsbeoordelingen van studenten</p>
-              </div>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e40af] text-white">
+              <Percent className="h-7 w-7" />
             </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Cijfers</h1>
+              <p className="text-base text-gray-500 mt-1">Beheer cijfers en gedragsbeoordelingen van studenten</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 mt-4 md:mt-0 md:ml-auto">
+            <span className="text-sm text-gray-500 font-medium">
+              {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
           </div>
         </div>
       </div>
@@ -540,10 +543,24 @@ export default function Cijfers() {
               <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
                 <div className="flex flex-col md:flex-row items-center gap-6">
                   <div className="w-full md:w-auto order-2 md:order-1">
-                    <TabsList className="grid w-full md:w-[350px] grid-cols-2 p-1 bg-blue-900/10">
-                      <TabsTrigger value="grades" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Cijfers</TabsTrigger>
-                      <TabsTrigger value="behavior" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">Gedragsbeoordelingen</TabsTrigger>
-                    </TabsList>
+                    <div className="flex border rounded-md overflow-hidden w-full md:w-[350px]">
+                      <button 
+                        onClick={() => setActiveTab('grades')}
+                        className={`px-4 py-2 text-sm font-medium flex-1 ${activeTab === 'grades' 
+                          ? 'bg-[#1e40af] text-white' 
+                          : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                      >
+                        Cijfers
+                      </button>
+                      <button 
+                        onClick={() => setActiveTab('behavior')}
+                        className={`px-4 py-2 text-sm font-medium flex-1 ${activeTab === 'behavior' 
+                          ? 'bg-[#1e40af] text-white' 
+                          : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                      >
+                        Gedragsbeoordelingen
+                      </button>
+                    </div>
                   </div>
                   <div className="w-full md:w-auto max-w-md order-1 md:order-2">
                     <div className="flex items-center">

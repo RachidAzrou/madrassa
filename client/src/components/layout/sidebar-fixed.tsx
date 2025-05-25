@@ -13,6 +13,7 @@ import {
   BookText,
   Calendar,
   ClipboardCheck,
+  ClipboardList,
   Percent,
   BarChart3,
   LogOut,
@@ -238,7 +239,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                 />
                 <SidebarLink
                   href="/admissions"
-                  icon={<FileText className="h-4.5 w-4.5" />}
+                  icon={<ClipboardList className="h-4.5 w-4.5" />}
                   label="Aanmeldingen"
                   isActive={location.startsWith("/admissions")}
                   onClick={handleLinkClick}

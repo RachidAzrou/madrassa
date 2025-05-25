@@ -1005,6 +1005,19 @@ export default function Students() {
                       </div>
                       
                       <div>
+                        <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">Geboortedatum *</Label>
+                        <Input
+                          id="dateOfBirth"
+                          name="dateOfBirth"
+                          type="date"
+                          value={formData.dateOfBirth || ''}
+                          onChange={handleInputChange}
+                          required
+                          className={`mt-1 h-9 ${missingRequiredFields.includes('dateOfBirth') ? 'border-red-500 bg-red-50' : ''}`}
+                        />
+                      </div>
+                      
+                      <div>
                         <Label htmlFor="email" className="text-xs font-medium text-gray-700">Email</Label>
                         <Input
                           id="email"
@@ -1026,19 +1039,6 @@ export default function Students() {
                           onChange={handleInputChange}
                           className="mt-1 h-9"
                           placeholder="Telefoon"
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">Geboortedatum *</Label>
-                        <Input
-                          id="dateOfBirth"
-                          name="dateOfBirth"
-                          type="date"
-                          value={formData.dateOfBirth || ''}
-                          onChange={handleInputChange}
-                          required
-                          className={`mt-1 h-9 ${missingRequiredFields.includes('dateOfBirth') ? 'border-red-500 bg-red-50' : ''}`}
                         />
                       </div>
                     </div>

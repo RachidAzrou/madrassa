@@ -619,7 +619,7 @@ export default function Attendance() {
                           variant="outline" 
                           size="sm" 
                           onClick={markAllStudentsPresent} 
-                          className="bg-white border-green-500 text-green-600 hover:bg-green-50 flex-1 font-medium shadow-sm"
+                          className="bg-white border-gray-300 text-[#1e40af] hover:bg-gray-50 flex-1 font-medium"
                           disabled={!studentsData || !Array.isArray(studentsData) || studentsData.length === 0}
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
@@ -629,7 +629,7 @@ export default function Attendance() {
                           variant="outline" 
                           size="sm" 
                           onClick={markAllStudentsAbsent} 
-                          className="bg-white border-red-500 text-red-600 hover:bg-red-50 flex-1 font-medium shadow-sm"
+                          className="bg-white border-gray-300 text-[#1e40af] hover:bg-gray-50 flex-1 font-medium"
                           disabled={!studentsData || !Array.isArray(studentsData) || studentsData.length === 0}
                         >
                           <XCircle className="h-4 w-4 mr-2" />
@@ -648,21 +648,21 @@ export default function Attendance() {
                     </div>
                     
                     {isLoadingStudents ? (
-                      <div className="py-10 text-center bg-white rounded-lg border border-blue-100 shadow-sm">
-                        <div className="h-12 w-12 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-3">
-                          <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
+                      <div className="py-10 text-center bg-white rounded-md border border-gray-200">
+                        <div className="h-12 w-12 mx-auto bg-[#1e40af] rounded-md flex items-center justify-center mb-3">
+                          <Loader2 className="h-6 w-6 text-white animate-spin" />
                         </div>
-                        <p className="text-sm font-medium text-blue-800">Studenten laden...</p>
+                        <p className="text-sm font-medium text-gray-800">Studenten laden...</p>
                         <p className="mt-1 text-xs text-gray-500">Even geduld a.u.b.</p>
                       </div>
                     ) : studentsData && Array.isArray(studentsData) && studentsData.length > 0 ? (
-                      <div className="rounded-lg border border-blue-100 shadow-sm overflow-hidden">
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 border-b border-blue-100 text-sm font-medium text-blue-800 grid grid-cols-12">
+                      <div className="rounded-md border border-gray-200 overflow-hidden">
+                        <div className="bg-gray-50 p-3 border-b border-gray-200 text-sm font-medium text-gray-700 grid grid-cols-12">
                           <div className="col-span-4 sm:col-span-4">Student</div>
                           <div className="hidden sm:block col-span-3">Studentnummer</div>
                           <div className="col-span-8 sm:col-span-5 text-right">Aanwezigheidsstatus</div>
                         </div>
-                        <div className="divide-y divide-blue-50 bg-white">
+                        <div className="divide-y divide-gray-100 bg-white">
                           {studentsData.map((student: Student) => {
                             const status = studentAttendance[student.id]?.status;
                             const statusBadge = status === 'present' 

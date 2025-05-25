@@ -23,65 +23,124 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { apiRequest } from '@/lib/queryClient';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import myMadrassaLogo from '@assets/myMadrassa.png';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-// Helper function to format Dutch dates
-const formatDutchDate = (date: Date | string): string => {
-  if (!date) return '';
-  const d = new Date(date);
-  const months = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-};
+// Define types
+interface Student {
+  id: number;
+  studentId: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string | null;
+  status: string;
+  programId: number;
+  programName?: string;
+}
 
-// Template type definition
 interface ReportTemplate {
-  schoolName: string;
-  logoImg: string | null;
-  schoolAddress?: string;
-  schoolContact?: string;
-  signature?: string;
-  commentTemplate?: string;
-  footerText?: string;
+  id: number;
+  name: string;
+  type: string;
+  createdDate: string;
+  lastModified: string;
+  sections: TemplateSection[];
+}
+
+interface TemplateSection {
+  id: string;
+  title: string;
+  type: 'grades' | 'behavior' | 'attendance' | 'comments' | 'custom';
+  content?: string;
+  order: number;
+}
+
+interface ReportGeneration {
+  templateId: number;
+  studentIds: number[];
+  periodId?: number;
+  options: {
+    includeBehavior: boolean;
+    includeAttendance: boolean;
+    includeGrades: boolean;
+    includeComments: boolean;
+    signature: boolean;
+  };
 }
 
 export default function Reports() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // State for tabs and filters
   const [activeTab, setActiveTab] = useState('generate');
-  const [schoolYear, setSchoolYear] = useState('2023-2024');
   const [selectedClass, setSelectedClass] = useState('');
-  const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
-  const [selectAll, setSelectAll] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [selectedPeriod, setSelectedPeriod] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // State for template
-  const [template, setTemplate] = useState<ReportTemplate>({
-    schoolName: 'myMadrassa',
-    logoImg: myMadrassaLogo,
-    schoolAddress: 'Voorbeeldstraat 123, 1234 AB Amsterdam',
-    schoolContact: 'info@mymadrassa.nl | 020-1234567',
-    commentTemplate: 'De student heeft goede vooruitgang geboekt dit schooljaar.',
-    footerText: 'Handtekening Ouders/Verzorgers: _______________________',
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
+  const [options, setOptions] = useState({
+    includeBehavior: true,
+    includeAttendance: true,
+    includeGrades: true,
+    includeComments: true,
+    signature: true
   });
   
-  // Preview image for logo upload
-  const [logoPreview, setLogoPreview] = useState<string | null>(myMadrassaLogo);
+  const [editingTemplate, setEditingTemplate] = useState<ReportTemplate | null>(null);
+  const [reportPreviewUrl, setReportPreviewUrl] = useState<string | null>(null);
+  const [isGeneratingReports, setIsGeneratingReports] = useState(false);
+  const [reportProgress, setReportProgress] = useState(0);
+  
+  // Fetch all students
+  const { data: studentsData, isLoading: isLoadingStudents } = useQuery<Student[]>({
+    queryKey: ['/api/students'],
+    staleTime: 300000,
+  });
 
-  // Fetch classes for dropdown
+  // Fetch students by class/student group
+  const { data: classStudentsData } = useQuery<Student[]>({
+    queryKey: ['/api/student-groups', selectedClass, 'students'],
+    queryFn: async () => {
+      if (!selectedClass) return [];
+      const response = await apiRequest(`/api/student-groups/${selectedClass}/students`, {
+        method: 'GET'
+      });
+      return response;
+    },
+    staleTime: 60000,
+    enabled: !!selectedClass,
+  });
+  
+  // Get all students or filtered by class
+  const students = selectedClass ? (classStudentsData || []) : (studentsData || []);
+  
+  // Filter students based on search query
+  const filteredStudents = searchQuery
+    ? students.filter(student => 
+        student.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.studentId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        `${student.firstName} ${student.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : students;
+  
+  // Fetch student groups/classes for dropdown
   const { data: classesData } = useQuery<{ studentGroups: any[] }>({
     queryKey: ['/api/student-groups'],
     staleTime: 300000,
@@ -89,35 +148,32 @@ export default function Reports() {
   
   const classes = classesData?.studentGroups || [];
   
-  // Fetch students in the selected class
-  const { data: studentsData, isLoading: isLoadingStudents } = useQuery<{ students: any[] }>({
-    queryKey: ['/api/students', { classId: selectedClass }],
-    enabled: !!selectedClass,
+  // Fetch report templates
+  const { data: templatesData } = useQuery<ReportTemplate[]>({
+    queryKey: ['/api/report-templates'],
     staleTime: 60000,
   });
   
-  const students = studentsData?.students || [];
+  const templates = templatesData || [];
   
-  // Filter students based on search query
-  const filteredStudents = searchQuery
-    ? students.filter(student => 
-        student.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.studentId.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : students;
+  // Fetch academic periods
+  const { data: periodsData } = useQuery({
+    queryKey: ['/api/academic-periods'],
+    staleTime: 300000,
+  });
   
-  // Effect to handle "Select All" checkbox
+  const periods = periodsData || [];
+  
+  // Effect to handle selectAll changes
   useEffect(() => {
     if (selectAll) {
       setSelectedStudents(filteredStudents.map(student => student.id));
-    } else if (selectedStudents.length === filteredStudents.length) {
-      // User manually unselected one student after selecting all
+    } else {
       setSelectedStudents([]);
     }
-  }, [selectAll]);
+  }, [selectAll, filteredStudents]);
   
-  // Effect to update select all status when individual selections change
+  // Effect to update selectAll state based on individual selections
   useEffect(() => {
     if (filteredStudents.length > 0 && selectedStudents.length === filteredStudents.length) {
       setSelectAll(true);
@@ -125,278 +181,309 @@ export default function Reports() {
       setSelectAll(false);
     }
   }, [selectedStudents, filteredStudents]);
-
-  // Handle logo image upload
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setLogoPreview(result);
-        setTemplate({...template, logoImg: result});
-      };
-      reader.readAsDataURL(file);
-    }
-  };
   
-  // Toggle student selection
-  const toggleStudentSelection = (studentId: number) => {
-    if (selectedStudents.includes(studentId)) {
-      setSelectedStudents(selectedStudents.filter(id => id !== studentId));
-    } else {
-      setSelectedStudents([...selectedStudents, studentId]);
-    }
-  };
-
-  // Generate PDF report for selected students
-  const generatePDF = async () => {
-    try {
-      if (selectedStudents.length === 0) {
-        toast({
-          title: "Geen studenten geselecteerd",
-          description: "Selecteer tenminste één student om een rapport te genereren.",
-          variant: "destructive",
+  // Generate reports mutation
+  const generateReportsMutation = useMutation({
+    mutationFn: async (data: ReportGeneration) => {
+      setIsGeneratingReports(true);
+      setReportProgress(0);
+      
+      // Mock progress updates (in a real app, this would come from backend events)
+      const progressInterval = setInterval(() => {
+        setReportProgress(prev => {
+          const newProgress = prev + Math.random() * 10;
+          return newProgress >= 100 ? 100 : newProgress;
         });
-        return;
+      }, 300);
+      
+      try {
+        const response = await apiRequest('/api/reports/generate', {
+          method: 'POST',
+          body: data
+        });
+        
+        clearInterval(progressInterval);
+        setReportProgress(100);
+        
+        return response;
+      } catch (error) {
+        clearInterval(progressInterval);
+        throw error;
+      } finally {
+        setTimeout(() => {
+          setIsGeneratingReports(false);
+          setReportProgress(0);
+        }, 1000);
       }
-      
-      // Fetch grades, attendance and behavior data for the selected students
-      const studentsToReport = filteredStudents.filter(student => 
-        selectedStudents.includes(student.id)
-      );
-      
-      // Create PDF document
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      
-      // Logo dimensions and position
-      const logoWidth = 40;
-      const logoHeight = 20;
-      const logoX = 10;
-      const logoY = 10;
-      
-      // Add school info on each page
-      const addHeader = () => {
-        // Add logo if available
-        if (template.logoImg) {
-          doc.addImage(template.logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
-        }
-        
-        // School name
-        doc.setFontSize(20);
-        doc.setFont('helvetica', 'bold');
-        doc.text(template.schoolName, pageWidth / 2, 15, { align: 'center' });
-        
-        // School contact info
-        if (template.schoolAddress || template.schoolContact) {
-          doc.setFontSize(10);
-          doc.setFont('helvetica', 'normal');
-          
-          if (template.schoolAddress) {
-            doc.text(template.schoolAddress, pageWidth / 2, 22, { align: 'center' });
-          }
-          
-          if (template.schoolContact) {
-            doc.text(template.schoolContact, pageWidth / 2, 27, { align: 'center' });
-          }
-        }
-        
-        // Horizontal line
-        doc.setDrawColor(0);
-        doc.setLineWidth(0.5);
-        doc.line(10, 35, pageWidth - 10, 35);
-      };
-      
-      // Loop through each selected student and create report
-      studentsToReport.forEach((student, index) => {
-        if (index > 0) {
-          doc.addPage();
-        }
-        
-        addHeader();
-        
-        // Student information section
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text('STUDENTRAPPORT', pageWidth / 2, 45, { align: 'center' });
-        
-        doc.setFontSize(12);
-        doc.text('Schooljaar: ' + schoolYear, pageWidth / 2, 52, { align: 'center' });
-        doc.text('Datum rapport: ' + formatDutchDate(new Date()), pageWidth / 2, 58, { align: 'center' });
-        
-        // Student details
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Studentgegevens:', 20, 70);
-        
-        doc.setFont('helvetica', 'normal');
-        doc.text('Naam: ' + student.firstName + ' ' + student.lastName, 20, 78);
-        doc.text('Studentnummer: ' + student.studentId, 20, 84);
-        doc.text('Email: ' + student.email, 20, 90);
-        
-        const selectedGroup = classes.find(cls => cls.id === parseInt(selectedClass));
-        if (selectedGroup) {
-          doc.text('Klas: ' + selectedGroup.name, 20, 96);
-        }
-        
-        // Academic results section
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Academische resultaten:', 20, 110);
-        
-        const tableColumns = ['Vak', 'Cijfer', 'Beoordeling'];
-        const tableData = [
-          ['Nederlandse taal', '7,5', 'Voldoende'],
-          ['Rekenen/Wiskunde', '8,2', 'Goed'],
-          ['Engels', '6,8', 'Voldoende'],
-          ['Geschiedenis', '7,4', 'Voldoende'],
-          ['Aardrijkskunde', '8,0', 'Goed']
-        ];
-        
-        // @ts-ignore (jspdf-autotable types)
-        doc.autoTable({
-          startY: 115,
-          head: [tableColumns],
-          body: tableData,
-          theme: 'grid',
-          styles: { fontSize: 10 },
-          headStyles: { fillColor: [59, 89, 152], textColor: [255, 255, 255] }, // myMadrassa blue
-          margin: { left: 20, right: 20 },
-        });
-        
-        // Attendance section
-        let currentY = (doc as any).lastAutoTable.finalY + 15;
-        
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Aanwezigheid:', 20, currentY);
-        
-        const attendanceData = [
-          ['Totaal lesdagen', '120'],
-          ['Aanwezig', '110'],
-          ['Afwezig met reden', '8'],
-          ['Afwezig zonder reden', '2'],
-          ['Aanwezigheidspercentage', '92%']
-        ];
-        
-        // @ts-ignore
-        doc.autoTable({
-          startY: currentY + 5,
-          body: attendanceData,
-          theme: 'grid',
-          styles: { fontSize: 10 },
-          columns: [
-            { header: 'Categorie', dataKey: 0 },
-            { header: 'Aantal', dataKey: 1 }
-          ],
-          margin: { left: 20, right: 20 },
-        });
-        
-        // Behavior section
-        currentY = (doc as any).lastAutoTable.finalY + 15;
-        
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Gedragsbeoordeling:', 20, currentY);
-        
-        // Simulated data for behavior
-        const behaviorData = [
-          ['Gedrag', '4/5', 'Goed'],
-          ['Punctualiteit', '4/5', 'Goed'],
-          ['Werk ethiek', '3/5', 'Voldoende'],
-          ['Participatie', '4/5', 'Goed'],
-          ['Samenwerking', '5/5', 'Uitstekend']
-        ];
-        
-        // @ts-ignore
-        doc.autoTable({
-          startY: currentY + 5,
-          body: behaviorData,
-          theme: 'grid',
-          styles: { fontSize: 10 },
-          columns: [
-            { header: 'Categorie', dataKey: 0 },
-            { header: 'Score', dataKey: 1 },
-            { header: 'Beoordeling', dataKey: 2 }
-          ],
-          margin: { left: 20, right: 20 },
-        });
-        
-        // Comments section
-        currentY = (doc as any).lastAutoTable.finalY + 15;
-        
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Opmerkingen:', 20, currentY);
-        
-        doc.setFont('helvetica', 'normal');
-        const commentText = template.commentTemplate || 'Geen opmerkingen.';
-        
-        const splitCommentText = doc.splitTextToSize(commentText, pageWidth - 40);
-        doc.text(splitCommentText, 20, currentY + 7);
-        
-        // Footer with signature
-        currentY = doc.internal.pageSize.getHeight() - 30;
-        
-        doc.setFontSize(10);
-        doc.text(template.footerText || 'Handtekening ouders/verzorgers:', 20, currentY);
-        
-        // Current date and teacher signature
-        doc.text('Datum: ' + formatDutchDate(new Date()), pageWidth - 20, currentY, { align: 'right' });
-      });
-
-      // Save PDF
-      const fileName = selectedStudents.length === 1 
-        ? `rapport_${studentsToReport[0].firstName}_${studentsToReport[0].lastName}.pdf`
-        : `rapporten_${selectedClass ? classes.find(c => c.id === parseInt(selectedClass))?.name || 'meerdere' : 'meerdere'}_studenten.pdf`;
-      
-      doc.save(fileName);
-      
+    },
+    onSuccess: (data) => {
       toast({
-        title: "Rapport gegenereerd",
-        description: `${selectedStudents.length} rapport(en) is/zijn succesvol gegenereerd en gedownload.`,
+        title: "Rapporten gegenereerd",
+        description: `${selectedStudents.length} rapport(en) succesvol gegenereerd.`,
       });
       
-    } catch (error) {
-      console.error('Error generating PDF:', error);
+      // Set preview URL for the first report (if available)
+      if (data && data.urls && data.urls.length > 0) {
+        setReportPreviewUrl(data.urls[0]);
+      }
+    },
+    onError: (error: any) => {
+      console.error("Error generating reports:", error);
       toast({
-        title: "Fout bij genereren rapport",
-        description: "Er is een fout opgetreden bij het genereren van het rapport. Probeer het opnieuw.",
+        title: "Fout bij genereren rapporten",
+        description: error.message || "Er is een fout opgetreden bij het genereren van rapporten.",
         variant: "destructive",
       });
     }
-  };
-
-  // Function to update template
-  const saveTemplate = () => {
-    toast({
-      title: "Template opgeslagen",
-      description: "De rapporttemplate is succesvol opgeslagen.",
+  });
+  
+  // Save template mutation
+  const saveTemplateMutation = useMutation({
+    mutationFn: async (template: ReportTemplate) => {
+      if (template.id) {
+        // Update existing template
+        return await apiRequest(`/api/report-templates/${template.id}`, {
+          method: 'PUT',
+          body: template
+        });
+      } else {
+        // Create new template
+        return await apiRequest('/api/report-templates', {
+          method: 'POST',
+          body: template
+        });
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Template opgeslagen",
+        description: "Rapporttemplate is succesvol opgeslagen.",
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/report-templates'] });
+      setEditingTemplate(null);
+    },
+    onError: (error: any) => {
+      console.error("Error saving template:", error);
+      toast({
+        title: "Fout bij opslaan template",
+        description: error.message || "Er is een fout opgetreden bij het opslaan van het template.",
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Delete template mutation
+  const deleteTemplateMutation = useMutation({
+    mutationFn: async (templateId: number) => {
+      return await apiRequest(`/api/report-templates/${templateId}`, {
+        method: 'DELETE'
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Template verwijderd",
+        description: "Rapporttemplate is succesvol verwijderd.",
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/report-templates'] });
+    },
+    onError: (error: any) => {
+      console.error("Error deleting template:", error);
+      toast({
+        title: "Fout bij verwijderen template",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van het template.",
+        variant: "destructive",
+      });
+    }
+  });
+  
+  const handleToggleStudent = (studentId: number) => {
+    setSelectedStudents(prev => {
+      if (prev.includes(studentId)) {
+        return prev.filter(id => id !== studentId);
+      } else {
+        return [...prev, studentId];
+      }
     });
+  };
+  
+  const handleClassChange = (value: string) => {
+    setSelectedClass(value);
+    setSelectedStudents([]);
+    setSelectAll(false);
+  };
+  
+  const handleTemplateChange = (value: string) => {
+    setSelectedTemplate(value);
+  };
+  
+  const handlePeriodChange = (value: string) => {
+    setSelectedPeriod(value);
+  };
+  
+  const handleGenerateReports = () => {
+    if (!selectedTemplate) {
+      toast({
+        title: "Template ontbreekt",
+        description: "Selecteer een rapport template om door te gaan.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (selectedStudents.length === 0) {
+      toast({
+        title: "Geen studenten geselecteerd",
+        description: "Selecteer minstens één student om een rapport te genereren.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const reportData: ReportGeneration = {
+      templateId: parseInt(selectedTemplate),
+      studentIds: selectedStudents,
+      options: options
+    };
+    
+    if (selectedPeriod) {
+      reportData.periodId = parseInt(selectedPeriod);
+    }
+    
+    generateReportsMutation.mutate(reportData);
+  };
+  
+  const handleDownloadReports = () => {
+    // In a real app, this would trigger a download from the server
+    toast({
+      title: "Rapporten worden gedownload",
+      description: `${selectedStudents.length} rapport(en) worden gedownload als PDF.`,
+    });
+  };
+  
+  const handleCreateNewTemplate = () => {
+    setEditingTemplate({
+      id: 0, // New template gets 0 ID until saved
+      name: "Nieuw Template",
+      type: "standard",
+      createdDate: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+      sections: [
+        {
+          id: "section-" + Date.now(),
+          title: "Cijferoverzicht",
+          type: "grades",
+          order: 0
+        },
+        {
+          id: "section-" + (Date.now() + 1),
+          title: "Aanwezigheid",
+          type: "attendance",
+          order: 1
+        },
+        {
+          id: "section-" + (Date.now() + 2),
+          title: "Gedragsbeoordeling",
+          type: "behavior",
+          order: 2
+        },
+        {
+          id: "section-" + (Date.now() + 3),
+          title: "Opmerkingen",
+          type: "comments",
+          content: "",
+          order: 3
+        }
+      ]
+    });
+  };
+  
+  const handleEditTemplate = (template: ReportTemplate) => {
+    setEditingTemplate({...template});
+  };
+  
+  const handleDeleteTemplate = (templateId: number) => {
+    if (window.confirm("Weet u zeker dat u dit template wilt verwijderen?")) {
+      deleteTemplateMutation.mutate(templateId);
+    }
+  };
+  
+  const handleSaveTemplate = () => {
+    if (editingTemplate) {
+      saveTemplateMutation.mutate(editingTemplate);
+    }
+  };
+  
+  const handleAddSection = () => {
+    if (editingTemplate) {
+      const newSection: TemplateSection = {
+        id: "section-" + Date.now(),
+        title: "Nieuwe Sectie",
+        type: "custom",
+        content: "",
+        order: editingTemplate.sections.length
+      };
+      
+      setEditingTemplate({
+        ...editingTemplate,
+        sections: [...editingTemplate.sections, newSection],
+        lastModified: new Date().toISOString()
+      });
+    }
+  };
+  
+  const handleUpdateSection = (index: number, updates: Partial<TemplateSection>) => {
+    if (editingTemplate) {
+      const updatedSections = [...editingTemplate.sections];
+      updatedSections[index] = {
+        ...updatedSections[index],
+        ...updates
+      };
+      
+      setEditingTemplate({
+        ...editingTemplate,
+        sections: updatedSections,
+        lastModified: new Date().toISOString()
+      });
+    }
+  };
+  
+  const handleRemoveSection = (index: number) => {
+    if (editingTemplate) {
+      const updatedSections = editingTemplate.sections.filter((_, i) => i !== index);
+      
+      setEditingTemplate({
+        ...editingTemplate,
+        sections: updatedSections,
+        lastModified: new Date().toISOString()
+      });
+    }
   };
 
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="mb-8">
-        <div className="rounded-lg overflow-hidden shadow-sm">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] p-6">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <BookMarked className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white">Rapport</h1>
-                <p className="text-base text-blue-100 mt-1">Beheer en genereer rapporten voor studenten en klassen</p>
-              </div>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+          <div className="flex items-center gap-4 mb-2 md:mb-0">
+            <div className="p-3 rounded-md bg-[#1e40af] text-white">
+              <BookMarked className="h-7 w-7" />
             </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Rapport</h1>
+              <p className="text-base text-gray-500 mt-1">Beheer en genereer rapporten voor studenten en klassen</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 mt-4 md:mt-0 md:ml-auto">
+            <span className="text-sm text-gray-500 font-medium">
+              {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Tabs for Report Generation and Template */}
-      <Tabs defaultValue="generate" value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs defaultValue="generate" value={activeTab} onValueChange={setActiveTab as any} className="w-full">
         <div className="flex justify-between items-center mb-4">
           <TabsList className="grid grid-cols-3 md:w-[550px] p-1 bg-blue-900/10">
             <TabsTrigger value="generate" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
@@ -421,122 +508,214 @@ export default function Reports() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="schoolYear" className="mb-2 block">Schooljaar</Label>
-                <Select value={schoolYear} onValueChange={setSchoolYear}>
-                  <SelectTrigger id="schoolYear" className="w-full">
-                    <SelectValue placeholder="Kies een schooljaar" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="2023-2024">2023-2024</SelectItem>
-                    <SelectItem value="2022-2023">2022-2023</SelectItem>
-                    <SelectItem value="2021-2022">2021-2022</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="className" className="mb-2 block">Klas</Label>
-                <Select value={selectedClass} onValueChange={setSelectedClass}>
-                  <SelectTrigger id="className" className="w-full">
-                    <SelectValue placeholder="Kies een klas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {classes.length === 0 ? (
-                      <SelectItem value="loading" disabled>Klassen laden...</SelectItem>
-                    ) : (
-                      classes.map((cls: any) => (
-                        <SelectItem key={cls.id} value={cls.id.toString()}>
-                          {cls.name}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <Label className="text-base font-medium">Studenten</Label>
-                <div className="flex items-center space-x-2">
-                  <Label htmlFor="searchStudents" className="sr-only">Zoek studenten</Label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input 
-                      id="searchStudents"
-                      placeholder="Zoek op naam of nummer..." 
-                      className="w-64 pl-10"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="template" className="text-sm font-medium">Rapport template</Label>
+                    <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
+                      <SelectTrigger id="template" className="mt-1">
+                        <SelectValue placeholder="Selecteer een template" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {templates.map(template => (
+                          <SelectItem key={template.id} value={template.id.toString()}>
+                            {template.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="period" className="text-sm font-medium">Academische periode</Label>
+                    <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
+                      <SelectTrigger id="period" className="mt-1">
+                        <SelectValue placeholder="Selecteer een periode" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {periods.map((period: any) => (
+                          <SelectItem key={period.id} value={period.id.toString()}>
+                            {period.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="class" className="text-sm font-medium">Klas filter</Label>
+                    <Select value={selectedClass} onValueChange={handleClassChange}>
+                      <SelectTrigger id="class" className="mt-1">
+                        <SelectValue placeholder="Alle studenten" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Alle studenten</SelectItem>
+                        {classes.map((cls: any) => (
+                          <SelectItem key={cls.id} value={cls.id.toString()}>
+                            {cls.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="mt-6 space-y-4">
+                  <h3 className="text-md font-medium">Rapport onderdelen</h3>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="includeGrades" 
+                        checked={options.includeGrades}
+                        onCheckedChange={(checked) => setOptions({...options, includeGrades: checked === true})}
+                      />
+                      <Label htmlFor="includeGrades">Cijfers en resultaten</Label>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="includeBehavior" 
+                        checked={options.includeBehavior}
+                        onCheckedChange={(checked) => setOptions({...options, includeBehavior: checked === true})}
+                      />
+                      <Label htmlFor="includeBehavior">Gedragsbeoordeling</Label>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="includeAttendance" 
+                        checked={options.includeAttendance}
+                        onCheckedChange={(checked) => setOptions({...options, includeAttendance: checked === true})}
+                      />
+                      <Label htmlFor="includeAttendance">Aanwezigheidsgegevens</Label>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="includeComments" 
+                        checked={options.includeComments}
+                        onCheckedChange={(checked) => setOptions({...options, includeComments: checked === true})}
+                      />
+                      <Label htmlFor="includeComments">Opmerkingen en feedback</Label>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="signature" 
+                        checked={options.signature}
+                        onCheckedChange={(checked) => setOptions({...options, signature: checked === true})}
+                      />
+                      <Label htmlFor="signature">Inclusief handtekening docent</Label>
+                    </div>
                   </div>
                 </div>
               </div>
-
-              {!selectedClass ? (
-                <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                  <FileText className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-base font-medium text-gray-900">Geen klas geselecteerd</h3>
-                  <p className="mt-1 text-sm text-gray-500">Selecteer eerst een klas om studenten te laden.</p>
+              
+              <div className="flex flex-col h-full space-y-4">
+                <div>
+                  <Label htmlFor="search" className="sr-only">Zoek studenten</Label>
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                    <Input
+                      id="search"
+                      type="search"
+                      placeholder="Zoek studenten..."
+                      className="pl-8"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                      <button 
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
-              ) : isLoadingStudents ? (
-                <div className="flex justify-center py-12">
-                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              ) : filteredStudents.length === 0 ? (
-                <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                  <Users className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-base font-medium text-gray-900">Geen studenten gevonden</h3>
-                  <p className="mt-1 text-sm text-gray-500">Er zijn geen studenten gevonden voor de geselecteerde criteria.</p>
-                </div>
-              ) : (
-                <div className="border rounded-md">
-                  <div className="bg-gray-50 p-4 border-b">
+                
+                <div className="border rounded-lg flex-grow overflow-hidden">
+                  <div className="flex items-center px-4 py-3 bg-gray-50 border-b">
                     <div className="flex items-center">
                       <Checkbox 
                         id="selectAll" 
                         checked={selectAll} 
                         onCheckedChange={(checked) => setSelectAll(checked === true)}
                       />
-                      <Label htmlFor="selectAll" className="ml-2 font-medium">Alle studenten selecteren ({filteredStudents.length})</Label>
+                      <Label htmlFor="selectAll" className="ml-2 font-medium">Alle studenten selecteren</Label>
                     </div>
+                    <Badge className="ml-3" variant="secondary">{filteredStudents.length}</Badge>
                   </div>
                   
-                  <div className="divide-y max-h-[400px] overflow-y-auto">
-                    {filteredStudents.map((student: any) => (
-                      <div key={student.id} className="flex items-center p-4 hover:bg-gray-50">
-                        <Checkbox 
-                          id={`student-${student.id}`} 
-                          checked={selectedStudents.includes(student.id)}
-                          onCheckedChange={() => toggleStudentSelection(student.id)}
-                        />
-                        <Label htmlFor={`student-${student.id}`} className="ml-2 flex-1 cursor-pointer">
-                          <div className="flex items-center">
-                            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center mr-3 text-xs">
-                              {student.firstName.charAt(0)}{student.lastName.charAt(0)}
-                            </div>
-                            <div>
-                              <p className="font-medium">{student.firstName} {student.lastName}</p>
-                              <p className="text-sm text-gray-500">{student.studentId}</p>
+                  <div className="overflow-y-auto max-h-[350px]">
+                    {isLoadingStudents ? (
+                      <div className="flex justify-center py-12">
+                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    ) : filteredStudents.length === 0 ? (
+                      <div className="text-center py-8 bg-gray-50">
+                        <Users className="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 className="mt-2 text-base font-medium text-gray-900">Geen studenten gevonden</h3>
+                        <p className="mt-1 text-sm text-gray-500">Er zijn geen studenten gevonden voor de geselecteerde criteria.</p>
+                      </div>
+                    ) : (
+                      <div className="divide-y">
+                        {filteredStudents.map(student => (
+                          <div key={student.id} className="flex items-center px-4 py-3 hover:bg-gray-50">
+                            <Checkbox 
+                              id={`student-${student.id}`} 
+                              checked={selectedStudents.includes(student.id)}
+                              onCheckedChange={() => handleToggleStudent(student.id)}
+                            />
+                            <div className="ml-3 flex-grow">
+                              <div className="flex items-center justify-between">
+                                <Label htmlFor={`student-${student.id}`} className="font-medium cursor-pointer">
+                                  {student.firstName} {student.lastName}
+                                </Label>
+                                <Badge variant="outline">{student.studentId}</Badge>
+                              </div>
+                              <div className="text-sm text-gray-500 flex gap-2">
+                                {student.programName && (
+                                  <span>{student.programName}</span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </Label>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
-              )}
-            </div>
-
-            <div className="flex justify-end">
-              <Button 
-                onClick={generatePDF} 
-                className="flex items-center" 
-                disabled={selectedStudents.length === 0}
-              >
-                <FileText className="mr-2 h-4 w-4" />
-                Rapporten genereren ({selectedStudents.length})
-              </Button>
+                
+                <div className="flex gap-2 justify-end">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleDownloadReports}
+                    disabled={selectedStudents.length === 0}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Rapporten downloaden
+                  </Button>
+                  <Button 
+                    onClick={handleGenerateReports}
+                    disabled={selectedStudents.length === 0 || !selectedTemplate || isGeneratingReports}
+                    className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+                  >
+                    {isGeneratingReports ? (
+                      <>
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-e-transparent"></div>
+                        Bezig met genereren...
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="mr-2 h-4 w-4" />
+                        Rapporten genereren
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </TabsContent>
@@ -544,149 +723,245 @@ export default function Reports() {
         {/* Template Tab */}
         <TabsContent value="template" className="space-y-6">
           <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 space-y-6">
-            <h2 className="text-lg font-semibold mb-4">Rapport Template</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="schoolName" className="mb-2 block">Naam school</Label>
-                  <Input 
-                    id="schoolName" 
-                    value={template.schoolName} 
-                    onChange={(e) => setTemplate({...template, schoolName: e.target.value})}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="schoolAddress" className="mb-2 block">Adres school</Label>
-                  <Input 
-                    id="schoolAddress" 
-                    value={template.schoolAddress || ''} 
-                    onChange={(e) => setTemplate({...template, schoolAddress: e.target.value})}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="schoolContact" className="mb-2 block">Contact informatie</Label>
-                  <Input 
-                    id="schoolContact" 
-                    value={template.schoolContact || ''} 
-                    onChange={(e) => setTemplate({...template, schoolContact: e.target.value})}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="footerText" className="mb-2 block">Tekst voor ondertekening</Label>
-                  <Input 
-                    id="footerText" 
-                    value={template.footerText || ''} 
-                    onChange={(e) => setTemplate({...template, footerText: e.target.value})}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="commentTemplate" className="mb-2 block">Standaard opmerking</Label>
-                  <Textarea 
-                    id="commentTemplate" 
-                    rows={4}
-                    value={template.commentTemplate || ''} 
-                    onChange={(e) => setTemplate({...template, commentTemplate: e.target.value})}
-                    placeholder="Voer hier een standaard opmerking in..."
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <Label className="mb-2 block">School logo</Label>
-                <div className="border rounded-lg p-4 space-y-4">
-                  <div className="aspect-video bg-gray-100 flex items-center justify-center rounded-lg overflow-hidden">
-                    {logoPreview ? (
-                      <img 
-                        src={logoPreview} 
-                        alt="School logo" 
-                        className="max-h-full object-contain"
-                      />
-                    ) : (
-                      <div className="text-center p-6">
-                        <Image className="h-10 w-10 text-gray-400 mx-auto" />
-                        <p className="mt-2 text-sm text-gray-500">Geen logo geupload</p>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      ref={fileInputRef}
-                      onChange={handleLogoUpload}
-                      className="hidden"
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="flex items-center"
-                    >
-                      <UploadCloud className="mr-2 h-4 w-4" />
-                      Logo uploaden
-                    </Button>
-                    
-                    {logoPreview && (
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setLogoPreview(null);
-                          setTemplate({...template, logoImg: null});
-                        }}
-                        className="flex items-center text-red-500 hover:text-red-700"
-                      >
-                        <X className="mr-2 h-4 w-4" />
-                        Verwijderen
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-medium mb-2">Voorbeeld rapport</h3>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Het rapport bevat de volgende secties:
-                  </p>
-                  <ul className="text-sm space-y-2">
-                    <li className="flex items-center">
-                      <Check className="h-4 w-4 text-green-500 mr-2" />
-                      Studentgegevens
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="h-4 w-4 text-green-500 mr-2" />
-                      Cijferlijst per vak
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="h-4 w-4 text-green-500 mr-2" />
-                      Aanwezigheidsgegevens
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="h-4 w-4 text-green-500 mr-2" />
-                      Gedragsbeoordeling
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="h-4 w-4 text-green-500 mr-2" />
-                      Opmerkingen van docenten
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="h-4 w-4 text-green-500 mr-2" />
-                      Handtekening veld voor ouders
-                    </li>
-                  </ul>
-                </div>
-              </div>
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Rapport templates</h2>
+              <Button 
+                onClick={handleCreateNewTemplate}
+                className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Nieuw template
+              </Button>
             </div>
             
-            <div className="flex justify-end pt-4">
-              <Button onClick={saveTemplate} className="flex items-center">
-                <Save className="mr-2 h-4 w-4" />
-                Template opslaan
-              </Button>
+            {editingTemplate ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="template-name" className="text-sm font-medium">Template naam</Label>
+                    <Input
+                      id="template-name"
+                      value={editingTemplate.name}
+                      onChange={(e) => setEditingTemplate({...editingTemplate, name: e.target.value})}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="template-type" className="text-sm font-medium">Type rapport</Label>
+                    <Select 
+                      value={editingTemplate.type}
+                      onValueChange={(value) => setEditingTemplate({...editingTemplate, type: value})}
+                    >
+                      <SelectTrigger id="template-type" className="mt-1">
+                        <SelectValue placeholder="Selecteer type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="standard">Standaard rapport</SelectItem>
+                        <SelectItem value="midterm">Tussentijds rapport</SelectItem>
+                        <SelectItem value="final">Eindrapport</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-medium">Secties</h3>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddSection}
+                    >
+                      <Plus className="mr-2 h-3 w-3" />
+                      Sectie toevoegen
+                    </Button>
+                  </div>
+                  
+                  {editingTemplate.sections.map((section, index) => (
+                    <div key={section.id} className="mb-4 p-4 border rounded-md">
+                      <div className="flex justify-between items-center mb-2">
+                        <Input
+                          value={section.title}
+                          onChange={(e) => handleUpdateSection(index, { title: e.target.value })}
+                          className="font-medium border-0 p-0 h-auto text-lg focus-visible:ring-0 focus-visible:ring-offset-0"
+                        />
+                        <button
+                          onClick={() => handleRemoveSection(index)}
+                          className="text-gray-400 hover:text-red-500"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                      
+                      <div className="mb-3">
+                        <Label htmlFor={`section-type-${index}`} className="text-sm font-medium">Type sectie</Label>
+                        <Select 
+                          value={section.type}
+                          onValueChange={(value) => handleUpdateSection(index, { type: value as any })}
+                        >
+                          <SelectTrigger id={`section-type-${index}`} className="mt-1">
+                            <SelectValue placeholder="Selecteer type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="grades">Cijferoverzicht</SelectItem>
+                            <SelectItem value="behavior">Gedragsbeoordeling</SelectItem>
+                            <SelectItem value="attendance">Aanwezigheid</SelectItem>
+                            <SelectItem value="comments">Opmerkingen</SelectItem>
+                            <SelectItem value="custom">Aangepast</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {(section.type === 'comments' || section.type === 'custom') && (
+                        <div>
+                          <Label htmlFor={`section-content-${index}`} className="text-sm font-medium">Inhoud</Label>
+                          <Textarea
+                            id={`section-content-${index}`}
+                            value={section.content || ''}
+                            onChange={(e) => handleUpdateSection(index, { content: e.target.value })}
+                            rows={4}
+                            className="mt-1"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex justify-end gap-2 pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    onClick={() => setEditingTemplate(null)}
+                  >
+                    Annuleren
+                  </Button>
+                  <Button
+                    onClick={handleSaveTemplate}
+                    disabled={saveTemplateMutation.isPending}
+                    className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+                  >
+                    {saveTemplateMutation.isPending ? (
+                      <>
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-e-transparent"></div>
+                        Opslaan...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        Template opslaan
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                {templates.length === 0 ? (
+                  <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                    <ClipboardList className="mx-auto h-12 w-12 text-gray-400" />
+                    <h3 className="mt-2 text-base font-medium text-gray-900">Geen templates gevonden</h3>
+                    <p className="mt-1 text-sm text-gray-500 max-w-md mx-auto">
+                      Er zijn nog geen rapport templates aangemaakt. Maak een nieuw template om te beginnen.
+                    </p>
+                    <Button 
+                      onClick={handleCreateNewTemplate}
+                      className="mt-4 bg-[#1e40af] hover:bg-[#1e40af]/90"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Nieuw template aanmaken
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {templates.map(template => (
+                      <Card key={template.id} className="border shadow-sm">
+                        <CardHeader className="pb-2 pt-4">
+                          <CardTitle className="text-lg">{template.name}</CardTitle>
+                          <div className="flex gap-1 mt-1">
+                            <Badge variant="outline">{template.type}</Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              {template.sections.length} secties
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="text-sm text-gray-500 pt-2">
+                          <p>Gemaakt: {new Date(template.createdDate).toLocaleDateString('nl-NL')}</p>
+                          <p>Laatst bewerkt: {new Date(template.lastModified).toLocaleDateString('nl-NL')}</p>
+                        </CardContent>
+                        <CardContent className="pt-0">
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditTemplate(template)}
+                              className="flex-1"
+                            >
+                              <Edit className="mr-2 h-4 w-4" />
+                              Bewerken
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteTemplate(template.id)}
+                              className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Verwijderen
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        {/* Archive/Statistics Tab */}
+        <TabsContent value="archive" className="space-y-6">
+          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+            <h2 className="text-lg font-semibold mb-6">Rapport statistieken en analyses</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Totaal aantal rapporten</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">143</div>
+                  <p className="text-xs text-gray-500 mt-1">Dit academisch jaar</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Gegenereerd deze maand</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">38</div>
+                  <p className="text-xs text-gray-500 mt-1">Vorige maand: 65</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Populairste template</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xl font-bold">Standaard rapport</div>
+                  <p className="text-xs text-gray-500 mt-1">76% van alle rapporten</p>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div className="rounded-lg border bg-gray-50 p-8 text-center">
+              <BarChart className="h-16 w-16 text-gray-300 mx-auto" />
+              <h3 className="mt-4 text-lg font-medium">Geavanceerde statistieken binnenkort beschikbaar</h3>
+              <p className="mt-2 text-sm text-gray-500 max-w-md mx-auto">
+                Gedetailleerde rapportagestatistieken en analyses zullen binnenkort beschikbaar zijn in een toekomstige update.
+              </p>
             </div>
           </div>
         </TabsContent>

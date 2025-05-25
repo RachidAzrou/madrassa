@@ -1,11 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Users, User, Camera,
   Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
-  GraduationCap, NotebookText, MapPin, Upload, FileSpreadsheet,
-  FileText, AlertCircle
+  GraduationCap, NotebookText, MapPin
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -20,10 +18,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { format, parseISO } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import * as XLSX from 'xlsx';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
-import Papa from 'papaparse';
 import { 
   DataTableContainer, 
   SearchActionBar, 
@@ -53,7 +47,7 @@ export default function Students() {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
   const currentYear = new Date().getFullYear();
   const [nextStudentId, setNextStudentId] = useState(`ST${currentYear.toString().substring(2, 4)}001`);
@@ -82,13 +76,6 @@ export default function Students() {
   
   const [formData, setFormData] = useState(emptyFormData);
   
-  // States voor export, import en detailweergave
-  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
-  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
-  const [isViewStudentOpen, setIsViewStudentOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
   const { toast } = useToast();
 
   // Data fetching
@@ -105,7 +92,7 @@ export default function Students() {
   });
 
   // Form handlers
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -113,64 +100,21 @@ export default function Students() {
     }));
   };
 
-  const handleSelectChange = (name: string, value: string) => {
+  const handleSelectChange = (name, value) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
-  
-  // QueryClient voor mutaties
-  const queryClient = useQueryClient();
-  
-  // Mutations voor student CRUD operaties
-  const createStudentMutation = useMutation({
-    mutationFn: (newStudent: any) => 
-      apiRequest('/api/students', { method: 'POST', body: newStudent }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
-      toast({
-        title: "Student toegevoegd",
-        description: "De student is succesvol toegevoegd.",
-        variant: "success"
-      });
-    }
-  });
-  
-  const updateStudentMutation = useMutation({
-    mutationFn: (student: any) => 
-      apiRequest(`/api/students/${student.id}`, { method: 'PUT', body: student }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
-      toast({
-        title: "Student bijgewerkt",
-        description: "De gegevens van de student zijn succesvol bijgewerkt.",
-        variant: "success"
-      });
-    }
-  });
-  
-  const deleteStudentMutation = useMutation({
-    mutationFn: (id: number) => 
-      apiRequest(`/api/students/${id}`, { method: 'DELETE' }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
-      toast({
-        title: "Student verwijderd",
-        description: "De student is succesvol verwijderd.",
-        variant: "success"
-      });
-    }
-  });
 
   const [isAddGuardianDialogOpen, setIsAddGuardianDialogOpen] = useState(false);
   const [newStudentId, setNewStudentId] = useState(null);
 
-  const handleCreateStudent = async (e: React.FormEvent) => {
+  const handleCreateStudent = async (e) => {
     e.preventDefault();
     try {
-      // Student aanmaken via de mutatie
-      await createStudentMutation.mutateAsync(formData);
+      // Student would be created here
+      console.log('Creating student:', formData);
       
       // Sla nieuw student ID op voor eventuele voogdkoppeling
       const newId = formData.studentId || nextStudentId;

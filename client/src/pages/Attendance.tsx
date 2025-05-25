@@ -3,8 +3,9 @@ import {
   Filter, CheckCircle, XCircle, Clock, 
   ArrowLeft, ArrowRight, Save,
   ClipboardCheck, GraduationCap, Users2,
-  Loader2, Users, Building
+  Loader2, Users, Building, CalendarCheck
 } from 'lucide-react';
+import { PremiumHeader } from '@/components/layout/premium-header';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

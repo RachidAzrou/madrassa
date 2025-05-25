@@ -938,9 +938,9 @@ export default function Cijfers() {
             
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="student" className="text-right">
+                <div className="text-right font-medium text-sm">
                   Student
-                </Label>
+                </div>
                 <div className="col-span-3">
                   <Select
                     value={newScoreData.studentId}
@@ -961,9 +961,9 @@ export default function Cijfers() {
               </div>
               
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="subject" className="text-right">
+                <div className="text-right font-medium text-sm">
                   Vak
-                </Label>
+                </div>
                 <div className="col-span-3">
                   <Select
                     value={newScoreData.subject}
@@ -984,9 +984,9 @@ export default function Cijfers() {
               </div>
               
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="grade" className="text-right">
+                <div className="text-right font-medium text-sm">
                   Cijfer
-                </Label>
+                </div>
                 <Input
                   id="grade"
                   type="number"

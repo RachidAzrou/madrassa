@@ -561,15 +561,15 @@ export default function Guardians() {
                         value={newGuardian.relationship} 
                         onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
                       >
-                        <SelectTrigger id="relationship" className="h-8 text-sm">
+                        <SelectTrigger id="relationship" className="h-8 text-sm border-gray-300">
                           <SelectValue placeholder="Selecteer relatie" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="parent">Ouder</SelectItem>
-                          <SelectItem value="guardian">Voogd</SelectItem>
-                          <SelectItem value="grandparent">Grootouder</SelectItem>
-                          <SelectItem value="sibling">Broer/Zus</SelectItem>
-                          <SelectItem value="other">Anders</SelectItem>
+                        <SelectContent className="bg-white">
+                          <SelectItem value="parent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Ouder</SelectItem>
+                          <SelectItem value="guardian" className="text-black hover:bg-blue-100 focus:bg-blue-200">Voogd</SelectItem>
+                          <SelectItem value="grandparent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Grootouder</SelectItem>
+                          <SelectItem value="sibling" className="text-black hover:bg-blue-100 focus:bg-blue-200">Broer/Zus</SelectItem>
+                          <SelectItem value="other" className="text-black hover:bg-blue-100 focus:bg-blue-200">Anders</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -599,11 +599,11 @@ export default function Guardians() {
                                 isEmergencyContact: checked === true
                               })
                             }
-                            className="h-4 w-4 rounded-sm border-[#e5e7eb] data-[state=checked]:bg-[#1e40af]"
+                            className="h-4 w-4 rounded-sm border-gray-300 data-[state=checked]:bg-[#1e40af]"
                           />
                           <label
                             htmlFor="isEmergencyContact"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className="text-sm text-gray-700 leading-none"
                           >
                             Deze persoon is een primair noodcontact
                           </label>
@@ -669,15 +669,15 @@ export default function Guardians() {
                         value={newGuardian.emergencyContactRelationship || ''} 
                         onValueChange={(value) => setNewGuardian({...newGuardian, emergencyContactRelationship: value})}
                       >
-                        <SelectTrigger id="emergencyContactRelationship" className="h-8 text-sm">
+                        <SelectTrigger id="emergencyContactRelationship" className="h-8 text-sm border-gray-300">
                           <SelectValue placeholder="Selecteer relatie" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="parent">Ouder</SelectItem>
-                          <SelectItem value="guardian">Voogd</SelectItem>
-                          <SelectItem value="grandparent">Grootouder</SelectItem>
-                          <SelectItem value="sibling">Broer/Zus</SelectItem>
-                          <SelectItem value="other">Anders</SelectItem>
+                        <SelectContent className="bg-white">
+                          <SelectItem value="parent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Ouder</SelectItem>
+                          <SelectItem value="guardian" className="text-black hover:bg-blue-100 focus:bg-blue-200">Voogd</SelectItem>
+                          <SelectItem value="grandparent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Grootouder</SelectItem>
+                          <SelectItem value="sibling" className="text-black hover:bg-blue-100 focus:bg-blue-200">Broer/Zus</SelectItem>
+                          <SelectItem value="other" className="text-black hover:bg-blue-100 focus:bg-blue-200">Anders</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

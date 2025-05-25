@@ -39,6 +39,7 @@ export default function Students() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterProgram, setFilterProgram] = useState("all");
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -319,33 +320,24 @@ export default function Students() {
           
           {/* Acties */}
           <div className="flex flex-wrap items-center gap-2">
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <Button variant="outline" className="h-7 text-xs rounded-sm flex items-center justify-between">
-                <SelectValue placeholder="Status" />
-              </Button>
-              <SelectContent>
-                <SelectItem value="all">Alle statussen</SelectItem>
-                <SelectItem value="active">Actief</SelectItem>
-                <SelectItem value="inactive">Inactief</SelectItem>
-                <SelectItem value="graduated">Afgestudeerd</SelectItem>
-                <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Select value={filterProgram} onValueChange={setFilterProgram}>
-              <Button variant="outline" className="h-7 text-xs rounded-sm flex items-center justify-between">
-                <SelectValue placeholder="Programma" />
-              </Button>
-              <SelectContent>
-                <SelectItem value="all">Alle programma's</SelectItem>
-                {programs.map((program) => (
-                  <SelectItem key={program.id} value={program.id.toString()}>
-                    {program.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFilterOptions(!showFilterOptions)}
+              className="h-7 text-xs rounded-sm border-[#e5e7eb]"
+            >
+              <Filter className="h-3.5 w-3.5 mr-1" />
+              Filters
+              {showFilterOptions ? 
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1 h-3.5 w-3.5">
+                  <path d="M3.13523 6.15803C3.3241 5.95657 3.64052 5.94637 3.84197 6.13523L7.5 9.56464L11.158 6.13523C11.3595 5.94637 11.6759 5.95657 11.8648 6.15803C12.0536 6.35949 12.0434 6.67591 11.842 6.86477L7.84197 10.6148C7.64964 10.7951 7.35036 10.7951 7.15803 10.6148L3.15803 6.86477C2.95657 6.67591 2.94637 6.35949 3.13523 6.15803Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path>
+                </svg> : 
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1 h-3.5 w-3.5">
+                  <path d="M3.13523 8.84197C3.3241 9.04343 3.64052 9.05363 3.84197 8.86477L7.5 5.43536L11.158 8.86477C11.3595 9.05363 11.6759 9.04343 11.8648 8.84197C12.0536 8.64051 12.0434 8.32409 11.842 8.13523L7.84197 4.38523C7.64964 4.20492 7.35036 4.20492 7.15803 4.38523L3.15803 8.13523C2.95657 8.32409 2.94637 8.64051 3.13523 8.84197Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path>
+                </svg>
+              }
+            </Button>
+
             <Button
               size="sm"
               onClick={() => setIsCreateDialogOpen(true)}
@@ -356,6 +348,62 @@ export default function Students() {
             </Button>
           </div>
         </SearchActionBar>
+
+        {/* Filter opties */}
+        {showFilterOptions && (
+          <div className="px-4 py-3 border-t border-[#e5e7eb] flex flex-wrap gap-3 items-center">
+            <div className="flex items-center">
+              {(statusFilter !== 'all' || filterProgram !== 'all') && (
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={() => {
+                    setStatusFilter('all');
+                    setFilterProgram('all');
+                  }}
+                  className="h-7 text-xs text-blue-600 p-0 mr-3"
+                >
+                  Filters wissen
+                </Button>
+              )}
+            </div>
+            
+            <div className="flex flex-wrap gap-3">
+              <Select 
+                value={filterStatus} 
+                onValueChange={setFilterStatus}
+              >
+                <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle statussen</SelectItem>
+                  <SelectItem value="active">Actief</SelectItem>
+                  <SelectItem value="inactive">Inactief</SelectItem>
+                  <SelectItem value="graduated">Afgestudeerd</SelectItem>
+                  <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select 
+                value={filterProgram} 
+                onValueChange={setFilterProgram}
+              >
+                <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
+                  <SelectValue placeholder="Programma" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle programma's</SelectItem>
+                  {programs.map((program) => (
+                    <SelectItem key={program.id} value={program.id.toString()}>
+                      {program.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
 
         {/* Student Table */}
         <TableContainer>

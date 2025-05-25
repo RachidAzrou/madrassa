@@ -1,1810 +1,1996 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { StudentEmptyState } from '@/components/ui/empty-states';
-import * as XLSX from 'xlsx';
-import Papa from 'papaparse';
 import { 
-  Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle, Check,
+  Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle,
   ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
-  Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, CreditCard, AlertCircle,
-  FileUp, Upload, FilePlus2, FileSpreadsheet, Image, School, UserRound, Camera, CheckSquare, SquareSlash,
-  UserCheck, CalendarDays, Hash, Save, Plus, Loader2
+  Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash
 } from 'lucide-react';
-import { PageHeader } from '@/components/layout/page-header';
 
-// Aangepast ChalkboardTeacher icoon
-const ChalkBoard = (props: any) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg" 
-    width="20" 
-    height="20" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round"
-    {...props}
-  >
-    <rect x="2" y="2" width="20" height="14" rx="2" />
-    <line x1="2" y1="12" x2="22" y2="12" />
-    <path d="M6 16v4" />
-    <path d="M18 16v4" />
-    <path d="M8 7h.01" />
-    <path d="M12 7h.01" />
-    <path d="M16 7h.01" />
-  </svg>
-);
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { format, parseISO } from "date-fns";
-import { nl } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { jsPDF } from "jspdf";
+import autoTable from 'jspdf-autotable';
+import { apiRequest } from '@/lib/queryClient';
+import { formatDateToDisplayFormat } from '@/lib/utils';
 
 export default function Students() {
   const queryClient = useQueryClient();
-  
-  // API calls en data management
-  const { data: studentsData, isLoading, isError } = useQuery({
-    queryKey: ['/api/students'],
-    // Voor development zonder backend (mock data)
-    // queryFn: async () => {
-    //   await new Promise(resolve => setTimeout(resolve, 1000)); // simuleer netwerk vertraging
-    //   return { students: mockStudents, totalCount: mockStudents.length };
-    // }
-  });
-
-  const { data: programsData } = useQuery({
-    queryKey: ['/api/programs']
-  });
-
-  const { data: nextStudentIdData } = useQuery({
-    queryKey: ['/api/students/next-id']
-  });
-
-  // Referenties voor bestandsupload
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // UI state management
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('all');
-  const [selectedProgram, setSelectedProgram] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [sortColumn, setSortColumn] = useState('studentId');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  
-  // Dialoog states
-  const [addStudentDialogOpen, setAddStudentDialogOpen] = useState(false);
-  const [viewStudentDialogOpen, setViewStudentDialogOpen] = useState(false);
-  const [editStudentDialogOpen, setEditStudentDialogOpen] = useState(false);
-  const [deleteStudentDialogOpen, setDeleteStudentDialogOpen] = useState(false);
-  const [bulkImportDialogOpen, setBulkImportDialogOpen] = useState(false);
-  const [importPreviewData, setImportPreviewData] = useState<any[]>([]);
-  const [importFileType, setImportFileType] = useState('');
-  const [confirmImportDialogOpen, setConfirmImportDialogOpen] = useState(false);
-
-  // Student data voor bewerkingen
+  const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedProgramFilter, setSelectedProgramFilter] = useState('all');
+  const [selectedYearLevelFilter, setSelectedYearLevelFilter] = useState('all');
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState('all');
+  const [selectedStudentGroupFilter, setSelectedStudentGroupFilter] = useState('all');
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
+  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isStudentDetailDialogOpen, setIsStudentDetailDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  const [newStudent, setNewStudent] = useState({
+  
+  // State voor het studentformulier
+  const [studentFormData, setStudentFormData] = useState({
     studentId: '',
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    dateOfBirth: null,
+    dateOfBirth: null as string | null,
     address: '',
     street: '',
     houseNumber: '',
     postalCode: '',
     city: '',
-    country: 'België',
-    enrolledPrograms: [],
-    status: 'active',
-    gender: 'male',
-    notes: ''
+    programId: null as number | null,
+    yearLevel: '',
+    schoolYear: '' as string | null,
+    studentGroupId: null as number | null,
+    enrollmentDate: '',
+    status: 'active' as string,
+    notes: '',
+    gender: '' as string,
   });
   
-  // Mutations voor API acties
-  const addStudentMutation = useMutation({
-    mutationFn: async (student: any) => {
-      return await apiRequest('/api/students', {
+  // State voor meerdere programma's
+  const [selectedPrograms, setSelectedPrograms] = useState<{
+    programId: number;
+    yearLevel: string;
+  }[]>([]);
+
+  // Statusopties voor dropdown
+  const statusOptions = [
+    { value: 'active', label: 'Actief' },
+    { value: 'pending', label: 'In Afwachting' },
+    { value: 'inactive', label: 'Inactief' },
+    { value: 'graduated', label: 'Afgestudeerd' }
+  ];
+
+  // Geslacht opties voor dropdown
+  const genderOptions = [
+    { value: 'man', label: 'Man' },
+    { value: 'vrouw', label: 'Vrouw' },
+    { value: 'ander', label: 'Ander' }
+  ];
+
+  // Ophalen programma's voor dropdown
+  const { data: programsData = {} } = useQuery({
+    queryKey: ['/api/programs'],
+  });
+
+  // Ophalen studentengroepen voor dropdown
+  const { data: studentGroupsData = {} } = useQuery({
+    queryKey: ['/api/student-groups'],
+  });
+
+  // Ophalen studenten
+  const { data: studentsData = {}, isLoading } = useQuery({
+    queryKey: ['/api/students', { 
+      page, 
+      search: searchTerm, 
+      programId: selectedProgramFilter !== 'all' ? selectedProgramFilter : undefined, 
+      yearLevel: selectedYearLevelFilter !== 'all' ? selectedYearLevelFilter : undefined, 
+      status: selectedStatusFilter !== 'all' ? selectedStatusFilter : undefined, 
+      studentGroupId: selectedStudentGroupFilter !== 'all' ? selectedStudentGroupFilter : undefined 
+    }]
+  });
+
+  // Ophalen student details
+  const getStudentDetails = (studentId: string) => {
+    return apiRequest(`/api/students/${studentId}`);
+  };
+
+  // Create student mutation
+  const createStudentMutation = useMutation({
+    mutationFn: (data: any) => {
+      return apiRequest('/api/students', {
         method: 'POST',
-        body: student
+        body: data
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
-      setAddStudentDialogOpen(false);
-      resetNewStudent();
-      toast({
-        title: "Student succesvol toegevoegd",
-        description: "De nieuwe student is toegevoegd aan het systeem.",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Fout bij toevoegen van student",
-        description: error.message || "Er is een fout opgetreden. Probeer het opnieuw.",
-        variant: "destructive",
-      });
+      resetForm();
+      setIsCreateDialogOpen(false);
     }
   });
 
-  const editStudentMutation = useMutation({
-    mutationFn: async (student: any) => {
-      return await apiRequest(`/api/students/${student.id}`, {
-        method: 'PUT',
-        body: student
+  // Update student mutation
+  const updateStudentMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => {
+      return apiRequest(`/api/students/${id}`, {
+        method: 'PATCH',
+        body: data
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
-      setEditStudentDialogOpen(false);
-      toast({
-        title: "Student succesvol bijgewerkt",
-        description: "De student gegevens zijn bijgewerkt in het systeem.",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Fout bij bijwerken van student",
-        description: error.message || "Er is een fout opgetreden. Probeer het opnieuw.",
-        variant: "destructive",
-      });
+      resetForm();
+      setIsEditDialogOpen(false);
     }
   });
 
+  // Delete student mutation
   const deleteStudentMutation = useMutation({
-    mutationFn: async (studentId: number) => {
-      return await apiRequest(`/api/students/${studentId}`, {
+    mutationFn: (id: string) => {
+      return apiRequest(`/api/students/${id}`, {
         method: 'DELETE'
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
-      setDeleteStudentDialogOpen(false);
-      setSelectedStudent(null);
-      toast({
-        title: "Student succesvol verwijderd",
-        description: "De student is verwijderd uit het systeem.",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Fout bij verwijderen van student",
-        description: error.message || "Er is een fout opgetreden. Probeer het opnieuw.",
-        variant: "destructive",
-      });
+      setIsDeleteDialogOpen(false);
     }
   });
 
-  const bulkImportMutation = useMutation({
-    mutationFn: async (students: any[]) => {
-      return await apiRequest('/api/students/bulk-import', {
-        method: 'POST',
-        body: { students }
+  // Delete multiple students mutation
+  const deleteMultipleStudentsMutation = useMutation({
+    mutationFn: (ids: string[]) => {
+      return apiRequest('/api/students/batch', {
+        method: 'DELETE',
+        body: { ids }
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
-      setConfirmImportDialogOpen(false);
-      setBulkImportDialogOpen(false);
-      setImportPreviewData([]);
-      toast({
-        title: "Import succesvol",
-        description: `${data.imported || 'Alle'} studenten zijn succesvol geïmporteerd.`,
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Fout bij importeren",
-        description: error.message || "Er is een fout opgetreden tijdens het importeren.",
-        variant: "destructive",
-      });
+      setSelectedStudents([]);
     }
   });
 
-  // Reset nieuw student formulier
-  const resetNewStudent = () => {
-    if (nextStudentIdData?.nextStudentId) {
-      setNewStudent({
-        studentId: nextStudentIdData.nextStudentId,
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        dateOfBirth: null,
-        address: '',
-        street: '',
-        houseNumber: '',
-        postalCode: '',
-        city: '',
-        country: 'België',
-        enrolledPrograms: [],
-        status: 'active',
-        gender: 'male',
-        notes: ''
-      });
-    }
+  // Function to reset form
+  const resetForm = () => {
+    setStudentFormData({
+      studentId: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      dateOfBirth: null,
+      address: '',
+      street: '',
+      houseNumber: '',
+      postalCode: '',
+      city: '',
+      programId: null,
+      yearLevel: '',
+      schoolYear: '',
+      studentGroupId: null,
+      enrollmentDate: '',
+      status: 'active',
+      notes: '',
+      gender: '',
+    });
+    setSelectedPrograms([]);
   };
 
-  // Effect voor het zetten van student ID bij het openen van het toevoegen dialoog
-  useEffect(() => {
-    if (addStudentDialogOpen && nextStudentIdData?.nextStudentId) {
-      setNewStudent(prev => ({
-        ...prev,
-        studentId: nextStudentIdData.nextStudentId
-      }));
-    }
-  }, [addStudentDialogOpen, nextStudentIdData]);
-
-  // Verwerken van geüploade bestanden
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const fileReader = new FileReader();
-    const fileName = file.name.toLowerCase();
-
-    if (fileName.endsWith('.csv')) {
-      setImportFileType('csv');
-      fileReader.onload = (e) => {
-        const csvOutput = e.target?.result as string;
-        Papa.parse(csvOutput, {
-          header: true,
-          complete: (results) => {
-            setImportPreviewData(results.data);
-          }
-        });
-      };
-      fileReader.readAsText(file);
-    } 
-    else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
-      setImportFileType('excel');
-      fileReader.onload = (e) => {
-        const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
-        setImportPreviewData(jsonData);
-      };
-      fileReader.readAsArrayBuffer(file);
-    }
-    else {
-      toast({
-        title: "Ongeldig bestandsformaat",
-        description: "Upload een CSV of Excel bestand (.xlsx/.xls).",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Bulkimport uitvoeren
-  const handleConfirmImport = () => {
-    if (importPreviewData.length === 0) {
-      toast({
-        title: "Geen gegevens om te importeren",
-        description: "Upload een geldig bestand met studentgegevens.",
-        variant: "destructive",
-      });
+  // Function to handle student creation
+  const handleCreateStudent = () => {
+    // Validatie
+    if (!studentFormData.firstName || !studentFormData.lastName) {
+      alert('Vul alstublieft voornaam en achternaam in');
       return;
     }
 
-    // Transformeer importdata naar het juiste formaat
-    const formattedData = importPreviewData.map((item: any) => ({
-      studentId: item.studentId || item.StudentId || item['Student ID'] || '',
-      firstName: item.firstName || item.FirstName || item['First Name'] || item.Voornaam || '',
-      lastName: item.lastName || item.LastName || item['Last Name'] || item.Achternaam || '',
-      email: item.email || item.Email || item['E-mail'] || '',
-      phone: item.phone || item.Phone || item.Telefoon || '',
-      gender: (item.gender || item.Gender || item.Geslacht || '').toLowerCase() === 'female' ? 'female' : 'male',
-      dateOfBirth: item.dateOfBirth || item.DateOfBirth || item['Date of Birth'] || item.Geboortedatum || null,
-      street: item.street || item.Street || item.Straat || '',
-      houseNumber: item.houseNumber || item.HouseNumber || item['House Number'] || item.Huisnummer || '',
-      postalCode: item.postalCode || item.PostalCode || item['Postal Code'] || item.Postcode || '',
-      city: item.city || item.City || item.Stad || '',
-      country: item.country || item.Country || item.Land || 'België',
-      status: item.status || item.Status || 'active'
-    }));
+    // Maak een kopie van de data om te versturen
+    const dataToSubmit = {
+      ...studentFormData,
+      programs: selectedPrograms.length > 0 ? selectedPrograms : 
+        (studentFormData.programId ? [{ 
+          programId: studentFormData.programId, 
+          yearLevel: studentFormData.yearLevel 
+        }] : [])
+    };
 
-    bulkImportMutation.mutate(formattedData);
+    createStudentMutation.mutate(dataToSubmit);
   };
 
-  // Sorteren, filteren en paginering van studenten
-  const filteredAndSortedStudents = () => {
-    if (!studentsData?.students) return [];
+  // Function to handle student update
+  const handleUpdateStudent = () => {
+    if (!selectedStudent) return;
 
-    let filtered = [...studentsData.students];
+    // Maak een kopie van de data om te versturen
+    const dataToSubmit = {
+      ...studentFormData,
+      programs: selectedPrograms.length > 0 ? selectedPrograms : 
+        (studentFormData.programId ? [{ 
+          programId: studentFormData.programId, 
+          yearLevel: studentFormData.yearLevel 
+        }] : [])
+    };
+
+    updateStudentMutation.mutate({
+      id: selectedStudent.id,
+      data: dataToSubmit
+    });
+  };
+
+  // Function to handle student deletion
+  const handleDeleteStudent = () => {
+    if (!selectedStudent) return;
+    deleteStudentMutation.mutate(selectedStudent.id);
+  };
+
+  // Function to delete multiple students
+  const handleDeleteMultipleStudents = () => {
+    if (selectedStudents.length === 0) return;
+    deleteMultipleStudentsMutation.mutate(selectedStudents);
+  };
+
+  // Function to view student details
+  const handleViewStudentDetails = async (student: any) => {
+    const details = await getStudentDetails(student.id);
+    setSelectedStudent(details);
+    setIsStudentDetailDialogOpen(true);
+  };
+
+  // Function to edit student
+  const handleEditStudent = async (student: any) => {
+    const details = await getStudentDetails(student.id);
+    setSelectedStudent(details);
     
-    // Filteren op zoekterm
-    if (searchQuery) {
-      const lowerQuery = searchQuery.toLowerCase();
-      filtered = filtered.filter(student => 
-        student.firstName.toLowerCase().includes(lowerQuery) ||
-        student.lastName.toLowerCase().includes(lowerQuery) ||
-        student.studentId.toLowerCase().includes(lowerQuery) ||
-        (student.email && student.email.toLowerCase().includes(lowerQuery))
-      );
-    }
-    
-    // Filteren op status
-    if (selectedFilter !== 'all') {
-      filtered = filtered.filter(student => student.status === selectedFilter);
-    }
-    
-    // Filteren op programma
-    if (selectedProgram !== 'all') {
-      filtered = filtered.filter(student => 
-        student.enrolledPrograms && 
-        student.enrolledPrograms.some((enrollment: any) => 
-          enrollment.programId.toString() === selectedProgram
-        )
-      );
-    }
-    
-    // Sorteren
-    filtered.sort((a, b) => {
-      let valueA, valueB;
-      
-      switch (sortColumn) {
-        case 'studentId':
-          valueA = a.studentId;
-          valueB = b.studentId;
-          break;
-        case 'firstName':
-          valueA = a.firstName;
-          valueB = b.firstName;
-          break;
-        case 'lastName':
-          valueA = a.lastName;
-          valueB = b.lastName;
-          break;
-        case 'email':
-          valueA = a.email || '';
-          valueB = b.email || '';
-          break;
-        default:
-          valueA = a.studentId;
-          valueB = b.studentId;
-      }
-      
-      if (sortDirection === 'asc') {
-        return valueA.localeCompare(valueB);
-      } else {
-        return valueB.localeCompare(valueA);
-      }
+    // Set form data
+    setStudentFormData({
+      studentId: details.studentId || '',
+      firstName: details.firstName || '',
+      lastName: details.lastName || '',
+      email: details.email || '',
+      phone: details.phone || '',
+      dateOfBirth: details.dateOfBirth || null,
+      address: details.address || '',
+      street: details.street || '',
+      houseNumber: details.houseNumber || '',
+      postalCode: details.postalCode || '',
+      city: details.city || '',
+      programId: details.programs && details.programs[0] ? details.programs[0].programId : null,
+      yearLevel: details.programs && details.programs[0] ? details.programs[0].yearLevel : '',
+      schoolYear: details.schoolYear || '',
+      studentGroupId: details.studentGroupId || null,
+      enrollmentDate: details.enrollmentDate || '',
+      status: details.status || 'active',
+      notes: details.notes || '',
+      gender: details.gender || '',
     });
     
-    return filtered;
-  };
-  
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    // Set selected programs
+    if (details.programs && details.programs.length > 0) {
+      setSelectedPrograms(details.programs.map((p: any) => ({
+        programId: p.programId,
+        yearLevel: p.yearLevel
+      })));
     } else {
-      setSortColumn(column);
-      setSortDirection('asc');
+      setSelectedPrograms([]);
+    }
+    
+    setIsEditDialogOpen(true);
+  };
+
+  // Function to export student data as PDF
+  const exportStudentsAsPDF = () => {
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(18);
+    doc.text('Studentenlijst', 14, 22);
+    
+    // Subtitle with date
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(`Geëxporteerd op ${new Date().toLocaleDateString('nl-NL')}`, 14, 30);
+    
+    const students = studentsData.students || [];
+    
+    // Filter columns to include in PDF
+    const tableColumn = ["ID", "Naam", "Email", "Telefoon", "Status"];
+    
+    // Map the data to match the columns
+    const tableRows = students.map((student: any) => [
+      student.studentId,
+      `${student.firstName} ${student.lastName}`,
+      student.email,
+      student.phone,
+      student.status === 'active' ? 'Actief' : 
+      student.status === 'pending' ? 'In Afwachting' : 
+      student.status === 'inactive' ? 'Inactief' : 'Afgestudeerd'
+    ]);
+    
+    // Generate the PDF
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 40,
+      styles: {
+        fontSize: 10,
+        cellPadding: 3,
+        lineColor: [200, 200, 200]
+      },
+      headStyles: {
+        fillColor: [59, 89, 152],
+        textColor: 255,
+        fontStyle: 'bold'
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
+      }
+    });
+    
+    doc.save('studentenlijst.pdf');
+  };
+
+  // Filter unique year levels for dropdown
+  const yearLevels = Array.from(
+    new Set(
+      (studentsData.students || []).map((s: any) => 
+        s.programs && s.programs[0] ? s.programs[0].yearLevel : null
+      ).filter(Boolean)
+    )
+  );
+
+  // Handle checkbox selection
+  const handleSelectStudent = (studentId: string) => {
+    if (selectedStudents.includes(studentId)) {
+      setSelectedStudents(selectedStudents.filter(id => id !== studentId));
+    } else {
+      setSelectedStudents([...selectedStudents, studentId]);
     }
   };
-  
-  // Handlers voor student acties
-  const handleViewStudent = (student: any) => {
-    setSelectedStudent(student);
-    setViewStudentDialogOpen(true);
-  };
-  
-  const handleEditStudent = (student: any) => {
-    setSelectedStudent({
-      ...student,
-      dateOfBirth: student.dateOfBirth ? new Date(student.dateOfBirth) : null
-    });
-    setEditStudentDialogOpen(true);
-  };
-  
-  const handleDeleteStudent = (student: any) => {
-    setSelectedStudent(student);
-    setDeleteStudentDialogOpen(true);
-  };
-  
-  // UI berekeningen voor paginering
-  const totalItems = filteredAndSortedStudents().length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(startItem + itemsPerPage - 1, totalItems);
-  
-  // Laad en fout states
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Professionele header component */}
-        <PageHeader 
-          title="Studenten" 
-          icon={<Users className="h-5 w-5 text-white" />} 
-          parent="Beheer"
-          current="Studenten" 
-        />
 
-        {/* Main content area */}
-        <div className="px-6 py-6 flex-1">
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <div className="inline-block animate-spin h-8 w-8 border-4 border-[#1e3a8a] border-t-transparent rounded-full mb-4"></div>
-              <p className="text-gray-500">Studenten laden...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  if (isError) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Professionele header component */}
-        <PageHeader 
-          title="Studenten" 
-          icon={<Users className="h-5 w-5 text-white" />} 
-          parent="Beheer"
-          current="Studenten" 
-        />
+  // Handle select all
+  const handleSelectAll = () => {
+    if (selectedStudents.length === (studentsData.students || []).length) {
+      setSelectedStudents([]);
+    } else {
+      setSelectedStudents((studentsData.students || []).map((s: any) => s.id));
+    }
+  };
 
-        {/* Main content area */}
-        <div className="px-6 py-6 flex-1">
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Fout bij laden</h3>
-              <p className="text-gray-500 mb-4">Er is een probleem opgetreden bij het laden van de studentengegevens.</p>
-              <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/students'] })}>
-                Opnieuw proberen
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  // Leeg state als er geen studenten zijn
-  if (studentsData?.students.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Professionele header component */}
-        <PageHeader 
-          title="Studenten" 
-          icon={<Users className="h-5 w-5 text-white" />} 
-          parent="Beheer"
-          current="Studenten" 
-        />
+  // Function to render status badge
+  const renderStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">Actief</Badge>;
+      case 'pending':
+        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">In Afwachting</Badge>;
+      case 'inactive':
+        return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">Inactief</Badge>;
+      case 'graduated':
+        return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">Afgestudeerd</Badge>;
+      default:
+        return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">{status}</Badge>;
+    }
+  };
 
-        <div className="px-6 py-6 flex-1">
-          <StudentEmptyState
-            title="Geen studenten gevonden"
-            description="Er zijn nog geen studenten toegevoegd aan het systeem. Voeg je eerste student toe of importeer studentgegevens."
-            action={
-              <div className="flex gap-2 mt-2">
-                <Button onClick={() => setAddStudentDialogOpen(true)}>
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Student toevoegen
-                </Button>
-                <Button variant="outline" onClick={() => setBulkImportDialogOpen(true)}>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Studenten importeren
-                </Button>
-              </div>
-            }
-          />
-        </div>
-      </div>
-    );
-  }
+  // Programs and student groups arrays
+  const programs = programsData.programs || [];
+  const studentGroups = studentGroupsData.studentGroups || [];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Professionele header component */}
-      <PageHeader 
-        title="Studenten" 
-        icon={<Users className="h-5 w-5 text-white" />} 
-        parent="Beheer"
-        current="Studenten" 
-      />
-      
-      {/* Main content area */}
-      <div className="px-6 py-6 flex-1">
-        <div className="max-w-7xl mx-auto">
-          {/* Action bar */}
-          <div className="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                <Input
-                  type="search"
-                  placeholder="Zoek op naam, ID of email..."
-                  className="pl-8 w-full sm:w-[300px]"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              
-              <div className="flex gap-2">
-                <Select value={selectedFilter} onValueChange={setSelectedFilter}>
-                  <SelectTrigger className="w-[130px]">
-                    <Filter className="mr-2 h-4 w-4" />
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Alle status</SelectItem>
-                    <SelectItem value="active">Actief</SelectItem>
-                    <SelectItem value="inactive">Inactief</SelectItem>
-                    <SelectItem value="suspended">Geschorst</SelectItem>
-                    <SelectItem value="graduated">Afgestudeerd</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                {programsData?.length > 0 && (
-                  <Select value={selectedProgram} onValueChange={setSelectedProgram}>
-                    <SelectTrigger className="w-[160px]">
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      <SelectValue placeholder="Programma" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Alle programma's</SelectItem>
-                      {programsData.map((program: any) => (
-                        <SelectItem key={program.id} value={program.id.toString()}>
-                          {program.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-            </div>
+    <div className="container mx-auto p-4 max-w-7xl">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-semibold text-gray-800">Studenten</h1>
+        <Button 
+          variant="default" 
+          size="default" 
+          className="bg-primary hover:bg-primary/90"
+          onClick={() => {
+            resetForm();
+            setIsCreateDialogOpen(true);
+          }}
+        >
+          <PlusCircle className="mr-2 h-4 w-4" /> Student Toevoegen
+        </Button>
+      </div>
 
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button onClick={() => setAddStudentDialogOpen(true)}>
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Student toevoegen
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">
-                    <Download className="h-4 w-4 mr-2" />
-                    Exporteren
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => {
-                    const worksheet = XLSX.utils.json_to_sheet(filteredAndSortedStudents());
-                    const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, worksheet, "Studenten");
-                    XLSX.writeFile(workbook, "studenten_export.xlsx");
-                  }}>
-                    <FileSpreadsheet className="h-4 w-4 mr-2" />
-                    Excel exporteren
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => {
-                    const csv = Papa.unparse(filteredAndSortedStudents());
-                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                    const link = document.createElement('a');
-                    const url = URL.createObjectURL(blob);
-                    link.href = url;
-                    link.setAttribute('download', 'studenten_export.csv');
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    CSV exporteren
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button variant="outline" onClick={() => setBulkImportDialogOpen(true)}>
-                <Upload className="h-4 w-4 mr-2" />
-                Importeren
-              </Button>
-            </div>
-          </div>
+      <div className="mb-6 flex flex-col md:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoek studenten..."
+            className="pl-8 bg-white"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="default"
+            className="border-gray-300 text-gray-700"
+            onClick={() => setShowFilterOptions(!showFilterOptions)}
+          >
+            <Filter className="mr-2 h-4 w-4" /> Filteren
+          </Button>
           
-          {/* Table container */}
-          <div className="bg-white rounded-md border shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[80px]">
-                      <button
-                        className="flex items-center text-xs font-medium"
-                        onClick={() => handleSort('studentId')}
-                      >
-                        ID
-                        {sortColumn === 'studentId' && (
-                          sortDirection === 'asc' ? 
-                          <ChevronUp className="ml-1 h-3 w-3" /> : 
-                          <ChevronDown className="ml-1 h-3 w-3" />
-                        )}
-                      </button>
-                    </TableHead>
-                    <TableHead>
-                      <button
-                        className="flex items-center text-xs font-medium"
-                        onClick={() => handleSort('firstName')}
-                      >
-                        Voornaam
-                        {sortColumn === 'firstName' && (
-                          sortDirection === 'asc' ? 
-                          <ChevronUp className="ml-1 h-3 w-3" /> : 
-                          <ChevronDown className="ml-1 h-3 w-3" />
-                        )}
-                      </button>
-                    </TableHead>
-                    <TableHead>
-                      <button
-                        className="flex items-center text-xs font-medium"
-                        onClick={() => handleSort('lastName')}
-                      >
-                        Achternaam
-                        {sortColumn === 'lastName' && (
-                          sortDirection === 'asc' ? 
-                          <ChevronUp className="ml-1 h-3 w-3" /> : 
-                          <ChevronDown className="ml-1 h-3 w-3" />
-                        )}
-                      </button>
-                    </TableHead>
-                    <TableHead>
-                      <button
-                        className="flex items-center text-xs font-medium"
-                        onClick={() => handleSort('email')}
-                      >
-                        Email
-                        {sortColumn === 'email' && (
-                          sortDirection === 'asc' ? 
-                          <ChevronUp className="ml-1 h-3 w-3" /> : 
-                          <ChevronDown className="ml-1 h-3 w-3" />
-                        )}
-                      </button>
-                    </TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Programma</TableHead>
-                    <TableHead className="text-right">Acties</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredAndSortedStudents()
-                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-                    .map((student: any) => (
-                      <TableRow key={student.id}>
-                        <TableCell className="font-medium">{student.studentId}</TableCell>
-                        <TableCell>{student.firstName}</TableCell>
-                        <TableCell>{student.lastName}</TableCell>
-                        <TableCell>{student.email}</TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={
-                              student.status === 'active' ? 'default' :
-                              student.status === 'inactive' ? 'secondary' :
-                              student.status === 'suspended' ? 'destructive' :
-                              'outline'
-                            }
-                          >
-                            {student.status === 'active' && 'Actief'}
-                            {student.status === 'inactive' && 'Inactief'}
-                            {student.status === 'suspended' && 'Geschorst'}
-                            {student.status === 'graduated' && 'Afgestudeerd'}
-                            {!['active', 'inactive', 'suspended', 'graduated'].includes(student.status) && student.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {student.enrolledPrograms && student.enrolledPrograms.length > 0 ? (
-                            <div className="flex flex-wrap gap-1">
-                              {student.enrolledPrograms.map((enrollment: any, index: number) => (
-                                <Badge key={index} variant="outline" className="whitespace-nowrap">
-                                  {enrollment.programName || (
-                                    programsData?.find((p: any) => p.id === enrollment.programId)?.name || 
-                                    'Onbekend programma'
-                                  )}
-                                </Badge>
-                              ))}
-                            </div>
-                          ) : (
-                            <span className="text-gray-400 text-xs">Geen programma</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button variant="ghost" size="icon" onClick={() => handleViewStudent(student)}>
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleEditStudent(student)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteStudent(student)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
+          <Button 
+            variant="outline" 
+            size="default"
+            className="border-gray-300 text-gray-700"
+            onClick={exportStudentsAsPDF}
+          >
+            <Download className="mr-2 h-4 w-4" /> Exporteren
+          </Button>
+        </div>
+      </div>
+
+      {/* Filter opties */}
+      {showFilterOptions && (
+        <div className="mb-6 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+          <h3 className="text-lg font-medium mb-4">Filter Opties</h3>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor="program-filter">Programma</Label>
+              <Select 
+                value={selectedProgramFilter} 
+                onValueChange={setSelectedProgramFilter}
+              >
+                <SelectTrigger id="program-filter" className="bg-white">
+                  <SelectValue placeholder="Alle programma's" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle programma's</SelectItem>
+                  {programs.map((program: any) => (
+                    <SelectItem key={program.id} value={program.id.toString()}>
+                      {program.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
-            {/* Pagination */}
-            <div className="px-4 py-2 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-sm text-gray-500">
-                Toont {startItem}-{endItem} van {totalItems} studenten
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                >
-                  Vorige
-                </Button>
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    // Calculate page numbers to show (centered around current page)
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    
-                    return (
-                      <Button
-                        key={i}
-                        variant={currentPage === pageNum ? "default" : "outline"}
-                        size="sm"
-                        className="w-9"
-                        onClick={() => setCurrentPage(pageNum)}
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  })}
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
-                  Volgende
-                </Button>
-              </div>
+            <div>
+              <Label htmlFor="year-filter">Leerjaar</Label>
+              <Select 
+                value={selectedYearLevelFilter} 
+                onValueChange={setSelectedYearLevelFilter}
+              >
+                <SelectTrigger id="year-filter" className="bg-white">
+                  <SelectValue placeholder="Alle leerjaren" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle leerjaren</SelectItem>
+                  {yearLevels.map((year: any) => (
+                    <SelectItem key={year} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="status-filter">Status</Label>
+              <Select 
+                value={selectedStatusFilter} 
+                onValueChange={setSelectedStatusFilter}
+              >
+                <SelectTrigger id="status-filter" className="bg-white">
+                  <SelectValue placeholder="Alle statussen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle statussen</SelectItem>
+                  {statusOptions.map(status => (
+                    <SelectItem key={status.value} value={status.value}>
+                      {status.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="group-filter">Klas</Label>
+              <Select 
+                value={selectedStudentGroupFilter} 
+                onValueChange={setSelectedStudentGroupFilter}
+              >
+                <SelectTrigger id="group-filter" className="bg-white">
+                  <SelectValue placeholder="Alle klassen" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle klassen</SelectItem>
+                  {studentGroups.map((group: any) => (
+                    <SelectItem key={group.id} value={group.id.toString()}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Studenten tabel */}
+      <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">
+                  <Checkbox 
+                    checked={
+                      selectedStudents.length > 0 && 
+                      selectedStudents.length === (studentsData.students || []).length
+                    }
+                    onCheckedChange={handleSelectAll}
+                    aria-label="Select all"
+                  />
+                </TableHead>
+                <TableHead>Student ID</TableHead>
+                <TableHead>Naam</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Programma</TableHead>
+                <TableHead>Leerjaar</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Acties</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8">
+                    <div className="flex justify-center items-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                      <span className="ml-2">Laden...</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (studentsData.students || []).length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8">
+                    Geen studenten gevonden
+                  </TableCell>
+                </TableRow>
+              ) : (
+                (studentsData.students || []).map((student: any) => (
+                  <TableRow key={student.id}>
+                    <TableCell>
+                      <Checkbox 
+                        checked={selectedStudents.includes(student.id)}
+                        onCheckedChange={() => handleSelectStudent(student.id)}
+                        aria-label={`Select ${student.firstName}`}
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">{student.studentId}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <Avatar className="h-8 w-8 mr-2">
+                          <AvatarFallback className="bg-primary/10 text-primary">
+                            {student.firstName[0]}{student.lastName[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        {student.firstName} {student.lastName}
+                      </div>
+                    </TableCell>
+                    <TableCell>{student.email}</TableCell>
+                    <TableCell>
+                      {student.programs && student.programs[0] 
+                        ? programs.find((p: any) => p.id === student.programs[0].programId)?.name 
+                        : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {student.programs && student.programs[0] 
+                        ? student.programs[0].yearLevel 
+                        : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {renderStatusBadge(student.status)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleViewStudentDetails(student)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleEditStudent(student)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => {
+                            setSelectedStudent(student);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Batch acties */}
+        {selectedStudents.length > 0 && (
+          <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
+            <div className="text-sm">
+              {selectedStudents.length} student(en) geselecteerd
+            </div>
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={handleDeleteMultipleStudents}
+            >
+              <Trash2 className="mr-2 h-4 w-4" /> Verwijder geselecteerde
+            </Button>
+          </div>
+        )}
+
+        {/* Paginering */}
+        {(studentsData.students || []).length > 0 && (
+          <div className="p-4 border-t border-gray-200">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (page > 1) setPage(page - 1);
+                    }}
+                  />
+                </PaginationItem>
+                
+                {/* Toon paginanummers */}
+                {Array.from({ length: Math.ceil((studentsData.totalCount || 0) / 10) }, (_, i) => (
+                  <PaginationItem key={i}>
+                    <PaginationLink 
+                      href="#"
+                      isActive={page === i + 1}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setPage(i + 1);
+                      }}
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (page < Math.ceil((studentsData.totalCount || 0) / 10)) {
+                        setPage(page + 1);
+                      }
+                    }}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
-      
-      {/* Add Student Dialog */}
-      <Dialog open={addStudentDialogOpen} onOpenChange={setAddStudentDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+
+      {/* Create Student Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Student toevoegen</DialogTitle>
+            <DialogTitle>Nieuwe Student Toevoegen</DialogTitle>
             <DialogDescription>
-              Vul de onderstaande gegevens in om een nieuwe student toe te voegen.
+              Vul de studentinformatie in om een nieuwe student toe te voegen aan het systeem.
             </DialogDescription>
           </DialogHeader>
           
-          <Tabs defaultValue="general" className="mt-4">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="general">Algemeen</TabsTrigger>
-              <TabsTrigger value="contact">Contact</TabsTrigger>
-              <TabsTrigger value="programs">Programma's</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="general" className="py-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="studentId">Student ID</Label>
-                  <Input 
-                    id="studentId" 
-                    value={newStudent.studentId} 
-                    onChange={(e) => setNewStudent({...newStudent, studentId: e.target.value})}
-                    placeholder="Bijv. S-001"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Geslacht</Label>
-                  <RadioGroup 
-                    value={newStudent.gender} 
-                    onValueChange={(value) => setNewStudent({...newStudent, gender: value})}
-                    className="flex space-x-4"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="male" id="male" />
-                      <Label htmlFor="male" className="cursor-pointer">Man</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="female" id="female" />
-                      <Label htmlFor="female" className="cursor-pointer">Vrouw</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Voornaam</Label>
-                  <Input 
-                    id="firstName" 
-                    value={newStudent.firstName} 
-                    onChange={(e) => setNewStudent({...newStudent, firstName: e.target.value})}
-                    placeholder="Voornaam"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Achternaam</Label>
-                  <Input 
-                    id="lastName" 
-                    value={newStudent.lastName} 
-                    onChange={(e) => setNewStudent({...newStudent, lastName: e.target.value})}
-                    placeholder="Achternaam"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="dateOfBirth">Geboortedatum</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !newStudent.dateOfBirth && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {newStudent.dateOfBirth ? (
-                          format(newStudent.dateOfBirth, "PPP", { locale: nl })
-                        ) : (
-                          <span>Kies een datum</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={newStudent.dateOfBirth || undefined}
-                        onSelect={(date) => setNewStudent({...newStudent, dateOfBirth: date})}
-                        initialFocus
-                        locale={nl}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select 
-                    value={newStudent.status} 
-                    onValueChange={(value) => setNewStudent({...newStudent, status: value})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecteer status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Actief</SelectItem>
-                      <SelectItem value="inactive">Inactief</SelectItem>
-                      <SelectItem value="suspended">Geschorst</SelectItem>
-                      <SelectItem value="graduated">Afgestudeerd</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="notes">Notities</Label>
-                  <Textarea 
-                    id="notes" 
-                    value={newStudent.notes} 
-                    onChange={(e) => setNewStudent({...newStudent, notes: e.target.value})}
-                    placeholder="Aanvullende informatie over de student"
-                    rows={3}
-                  />
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="contact" className="py-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">E-mailadres</Label>
-                  <Input 
-                    id="email" 
-                    type="email"
-                    value={newStudent.email} 
-                    onChange={(e) => setNewStudent({...newStudent, email: e.target.value})}
-                    placeholder="email@voorbeeld.com"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Telefoonnummer</Label>
-                  <Input 
-                    id="phone" 
-                    value={newStudent.phone} 
-                    onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})}
-                    placeholder="+32 000 00 00 00"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="street">Straat</Label>
-                  <Input 
-                    id="street" 
-                    value={newStudent.street} 
-                    onChange={(e) => setNewStudent({...newStudent, street: e.target.value})}
-                    placeholder="Straatnaam"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="houseNumber">Huisnummer</Label>
-                  <Input 
-                    id="houseNumber" 
-                    value={newStudent.houseNumber} 
-                    onChange={(e) => setNewStudent({...newStudent, houseNumber: e.target.value})}
-                    placeholder="123"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="postalCode">Postcode</Label>
-                  <Input 
-                    id="postalCode" 
-                    value={newStudent.postalCode} 
-                    onChange={(e) => setNewStudent({...newStudent, postalCode: e.target.value})}
-                    placeholder="1000"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="city">Plaats</Label>
-                  <Input 
-                    id="city" 
-                    value={newStudent.city} 
-                    onChange={(e) => setNewStudent({...newStudent, city: e.target.value})}
-                    placeholder="Brussel"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="country">Land</Label>
-                  <Input 
-                    id="country" 
-                    value={newStudent.country} 
-                    onChange={(e) => setNewStudent({...newStudent, country: e.target.value})}
-                    placeholder="België"
-                  />
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="programs" className="py-4">
-              {programsData?.length > 0 ? (
-                <div className="space-y-4">
-                  <div className="text-sm text-gray-500">
-                    Selecteer de programma's waarin deze student is ingeschreven.
-                  </div>
-                  
-                  <div className="space-y-2 border rounded-md p-4">
-                    {programsData.map((program: any) => (
-                      <div key={program.id} className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={`program-${program.id}`}
-                          checked={newStudent.enrolledPrograms.some((p: any) => p.programId === program.id)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setNewStudent({
-                                ...newStudent, 
-                                enrolledPrograms: [
-                                  ...newStudent.enrolledPrograms, 
-                                  { programId: program.id, programName: program.name }
-                                ]
-                              });
-                            } else {
-                              setNewStudent({
-                                ...newStudent,
-                                enrolledPrograms: newStudent.enrolledPrograms.filter(
-                                  (p: any) => p.programId !== program.id
-                                )
-                              });
-                            }
-                          }}
-                        />
-                        <Label htmlFor={`program-${program.id}`} className="cursor-pointer">
-                          {program.name}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <BookOpen className="h-12 w-12 text-gray-300 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Geen programma's beschikbaar</h3>
-                  <p className="text-gray-500 mb-4 text-center">
-                    Er zijn nog geen opleidingsprogramma's toegevoegd aan het systeem.
-                  </p>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-          
-          <DialogFooter className="mt-6">
-            <Button variant="outline" onClick={() => setAddStudentDialogOpen(false)}>
-              Annuleren
-            </Button>
-            <Button 
-              onClick={() => {
-                // Combineer adresgegevens
-                const fullAddress = [
-                  newStudent.street,
-                  newStudent.houseNumber,
-                  newStudent.postalCode,
-                  newStudent.city,
-                  newStudent.country
-                ].filter(Boolean).join(', ');
-                
-                addStudentMutation.mutate({
-                  ...newStudent,
-                  address: fullAddress
-                });
-              }}
-              disabled={addStudentMutation.isPending || !newStudent.firstName || !newStudent.lastName}
-            >
-              {addStudentMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Bezig met opslaan...
-                </>
-              ) : (
-                <>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Student toevoegen
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* View Student Dialog */}
-      <Dialog open={viewStudentDialogOpen} onOpenChange={setViewStudentDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-          {selectedStudent && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <span>Student details</span>
-                  <Badge 
-                    variant={
-                      selectedStudent.status === 'active' ? 'default' :
-                      selectedStudent.status === 'inactive' ? 'secondary' :
-                      selectedStudent.status === 'suspended' ? 'destructive' :
-                      'outline'
-                    }
-                  >
-                    {selectedStudent.status === 'active' && 'Actief'}
-                    {selectedStudent.status === 'inactive' && 'Inactief'}
-                    {selectedStudent.status === 'suspended' && 'Geschorst'}
-                    {selectedStudent.status === 'graduated' && 'Afgestudeerd'}
-                    {!['active', 'inactive', 'suspended', 'graduated'].includes(selectedStudent.status) && selectedStudent.status}
-                  </Badge>
-                </DialogTitle>
-              </DialogHeader>
+          <div className="py-4">
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid grid-cols-5 mb-4">
+                <TabsTrigger value="personal">
+                  <User className="mr-2 h-4 w-4" />
+                  Persoonlijk
+                </TabsTrigger>
+                <TabsTrigger value="contact">
+                  <Phone className="mr-2 h-4 w-4" />
+                  Contact
+                </TabsTrigger>
+                <TabsTrigger value="address">
+                  <MapPin className="mr-2 h-4 w-4" />
+                  Adres
+                </TabsTrigger>
+                <TabsTrigger value="class">
+                  <Users className="mr-2 h-4 w-4" />
+                  Klas
+                </TabsTrigger>
+                <TabsTrigger value="subjects">
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Vakken
+                </TabsTrigger>
+              </TabsList>
               
-              <div className="flex flex-col md:flex-row gap-6 py-4">
-                <div className="md:w-1/3 flex flex-col items-center">
-                  <Avatar className="h-32 w-32 mb-4">
-                    <AvatarImage src="" alt={`${selectedStudent.firstName} ${selectedStudent.lastName}`} />
-                    <AvatarFallback className="text-2xl bg-blue-100 text-blue-600">
-                      {selectedStudent.gender === 'female' ? (
-                        <img src="/attached_assets/muslima_icon.png" alt="Student" className="h-20 w-20" />
-                      ) : (
-                        <img src="/attached_assets/muslim_icon.png" alt="Student" className="h-20 w-20" />
-                      )}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <h3 className="text-xl font-medium text-center">{selectedStudent.firstName} {selectedStudent.lastName}</h3>
-                  <p className="text-gray-500 text-sm mb-2">{selectedStudent.studentId}</p>
-                  
-                  {selectedStudent.enrolledPrograms && selectedStudent.enrolledPrograms.length > 0 && (
-                    <div className="flex flex-wrap gap-1 justify-center">
-                      {selectedStudent.enrolledPrograms.map((enrollment: any, index: number) => (
-                        <Badge key={index} variant="outline" className="whitespace-nowrap">
-                          {enrollment.programName || (
-                            programsData?.find((p: any) => p.id === enrollment.programId)?.name || 
-                            'Onbekend programma'
-                          )}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="md:w-2/3">
-                  <Tabs defaultValue="details">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="details">Details</TabsTrigger>
-                      <TabsTrigger value="contact">Contact</TabsTrigger>
-                      <TabsTrigger value="notes">Notities</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="details" className="pt-4 space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-500">Student ID</h4>
-                          <p>{selectedStudent.studentId}</p>
-                        </div>
-                        
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-500">Geslacht</h4>
-                          <p>{selectedStudent.gender === 'male' ? 'Man' : 'Vrouw'}</p>
-                        </div>
-                        
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-500">Geboortedatum</h4>
-                          <p>
-                            {selectedStudent.dateOfBirth ? 
-                              format(new Date(selectedStudent.dateOfBirth), 'dd MMMM yyyy', { locale: nl }) : 
-                              'Niet ingevuld'
-                            }
-                          </p>
-                        </div>
-                        
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-500">Status</h4>
-                          <p>
-                            {selectedStudent.status === 'active' && 'Actief'}
-                            {selectedStudent.status === 'inactive' && 'Inactief'}
-                            {selectedStudent.status === 'suspended' && 'Geschorst'}
-                            {selectedStudent.status === 'graduated' && 'Afgestudeerd'}
-                            {!['active', 'inactive', 'suspended', 'graduated'].includes(selectedStudent.status) && selectedStudent.status}
-                          </p>
-                        </div>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="contact" className="pt-4 space-y-4">
-                      <div className="grid grid-cols-1 gap-4">
-                        <div className="flex items-start gap-2">
-                          <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-500">E-mailadres</h4>
-                            <p>{selectedStudent.email || 'Niet ingevuld'}</p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-start gap-2">
-                          <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-500">Telefoonnummer</h4>
-                            <p>{selectedStudent.phone || 'Niet ingevuld'}</p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-start gap-2">
-                          <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
-                          <div>
-                            <h4 className="text-sm font-medium text-gray-500">Adres</h4>
-                            <p>
-                              {[
-                                selectedStudent.street,
-                                selectedStudent.houseNumber,
-                                selectedStudent.postalCode,
-                                selectedStudent.city,
-                                selectedStudent.country
-                              ].filter(Boolean).join(', ') || 'Niet ingevuld'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="notes" className="pt-4">
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium text-gray-500">Notities</h4>
-                        {selectedStudent.notes ? (
-                          <p className="whitespace-pre-line">{selectedStudent.notes}</p>
-                        ) : (
-                          <p className="text-gray-400 italic">Geen notities beschikbaar</p>
-                        )}
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-              </div>
-              
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setViewStudentDialogOpen(false)}>
-                  Sluiten
-                </Button>
-                <Button onClick={() => {
-                  setViewStudentDialogOpen(false);
-                  handleEditStudent(selectedStudent);
-                }}>
-                  <Edit className="h-4 w-4 mr-2" />
-                  Bewerken
-                </Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
-      
-      {/* Edit Student Dialog */}
-      <Dialog open={editStudentDialogOpen} onOpenChange={setEditStudentDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-          {selectedStudent && (
-            <>
-              <DialogHeader>
-                <DialogTitle>Student bewerken</DialogTitle>
-                <DialogDescription>
-                  Bewerk de gegevens van student {selectedStudent.firstName} {selectedStudent.lastName}.
-                </DialogDescription>
-              </DialogHeader>
-              
-              <Tabs defaultValue="general" className="mt-4">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="general">Algemeen</TabsTrigger>
-                  <TabsTrigger value="contact">Contact</TabsTrigger>
-                  <TabsTrigger value="programs">Programma's</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="general" className="py-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-studentId">Student ID</Label>
-                      <Input 
-                        id="edit-studentId" 
-                        value={selectedStudent.studentId} 
-                        onChange={(e) => setSelectedStudent({...selectedStudent, studentId: e.target.value})}
-                        placeholder="Bijv. S-001"
+              {/* Persoonlijke informatie tab */}
+              <TabsContent value="personal" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label htmlFor="studentId" className="text-sm font-medium text-gray-700">
+                        Studentnummer <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="studentId"
+                        value={studentFormData.studentId}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, studentId: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Bijv. S12345"
                       />
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label>Geslacht</Label>
-                      <RadioGroup 
-                        value={selectedStudent.gender} 
-                        onValueChange={(value) => setSelectedStudent({...selectedStudent, gender: value})}
-                        className="flex space-x-4"
+                    <div>
+                      <Label htmlFor="status" className="text-sm font-medium text-gray-700">
+                        Status <span className="text-primary">*</span>
+                      </Label>
+                      <Select
+                        value={studentFormData.status}
+                        onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
                       >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="male" id="edit-male" />
-                          <Label htmlFor="edit-male" className="cursor-pointer">Man</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="female" id="edit-female" />
-                          <Label htmlFor="edit-female" className="cursor-pointer">Vrouw</Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-firstName">Voornaam</Label>
-                      <Input 
-                        id="edit-firstName" 
-                        value={selectedStudent.firstName} 
-                        onChange={(e) => setSelectedStudent({...selectedStudent, firstName: e.target.value})}
-                        placeholder="Voornaam"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-lastName">Achternaam</Label>
-                      <Input 
-                        id="edit-lastName" 
-                        value={selectedStudent.lastName} 
-                        onChange={(e) => setSelectedStudent({...selectedStudent, lastName: e.target.value})}
-                        placeholder="Achternaam"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-dateOfBirth">Geboortedatum</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !selectedStudent.dateOfBirth && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {selectedStudent.dateOfBirth ? (
-                              format(new Date(selectedStudent.dateOfBirth), "PPP", { locale: nl })
-                            ) : (
-                              <span>Kies een datum</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={selectedStudent.dateOfBirth ? new Date(selectedStudent.dateOfBirth) : undefined}
-                            onSelect={(date) => setSelectedStudent({...selectedStudent, dateOfBirth: date})}
-                            initialFocus
-                            locale={nl}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-status">Status</Label>
-                      <Select 
-                        value={selectedStudent.status} 
-                        onValueChange={(value) => setSelectedStudent({...selectedStudent, status: value})}
-                      >
-                        <SelectTrigger>
+                        <SelectTrigger id="status" className="mt-1 bg-white">
                           <SelectValue placeholder="Selecteer status" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="active">Actief</SelectItem>
-                          <SelectItem value="inactive">Inactief</SelectItem>
-                          <SelectItem value="suspended">Geschorst</SelectItem>
-                          <SelectItem value="graduated">Afgestudeerd</SelectItem>
+                          {statusOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
                     
-                    <div className="space-y-2 md:col-span-2">
-                      <Label htmlFor="edit-notes">Notities</Label>
-                      <Textarea 
-                        id="edit-notes" 
-                        value={selectedStudent.notes || ''} 
-                        onChange={(e) => setSelectedStudent({...selectedStudent, notes: e.target.value})}
-                        placeholder="Aanvullende informatie over de student"
-                        rows={3}
+                    <div>
+                      <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                        Voornaam <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="firstName"
+                        value={studentFormData.firstName}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, firstName: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Voornaam"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                        Achternaam <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="lastName"
+                        value={studentFormData.lastName}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Achternaam"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
+                        Geslacht
+                      </Label>
+                      <Select
+                        value={studentFormData.gender}
+                        onValueChange={(value) => setStudentFormData({ ...studentFormData, gender: value })}
+                      >
+                        <SelectTrigger id="gender" className="mt-1 bg-white">
+                          <SelectValue placeholder="Selecteer geslacht" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {genderOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700">
+                        Geboortedatum
+                      </Label>
+                      <Input
+                        id="dateOfBirth"
+                        type="date"
+                        value={studentFormData.dateOfBirth || ''}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
+                        className="mt-1 bg-white"
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <Label htmlFor="notes" className="text-sm font-medium text-gray-700">
+                        Notities
+                      </Label>
+                      <Textarea
+                        id="notes"
+                        value={studentFormData.notes}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, notes: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Voeg hier aanvullende informatie toe..."
+                        rows={4}
                       />
                     </div>
                   </div>
-                </TabsContent>
-                
-                <TabsContent value="contact" className="py-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-email">E-mailadres</Label>
-                      <Input 
-                        id="edit-email" 
+                </div>
+              </TabsContent>
+              
+              {/* Contact informatie tab */}
+              <TabsContent value="contact" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                        Email
+                      </Label>
+                      <Input
+                        id="email"
                         type="email"
-                        value={selectedStudent.email || ''} 
-                        onChange={(e) => setSelectedStudent({...selectedStudent, email: e.target.value})}
-                        placeholder="email@voorbeeld.com"
+                        value={studentFormData.email}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="student@mymadrassa.nl"
                       />
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-phone">Telefoonnummer</Label>
-                      <Input 
-                        id="edit-phone" 
-                        value={selectedStudent.phone || ''} 
-                        onChange={(e) => setSelectedStudent({...selectedStudent, phone: e.target.value})}
-                        placeholder="+32 000 00 00 00"
+                    <div>
+                      <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                        Telefoonnummer
+                      </Label>
+                      <Input
+                        id="phone"
+                        value={studentFormData.phone}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="06 1234 5678"
                       />
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-street">Straat</Label>
-                      <Input 
-                        id="edit-street" 
-                        value={selectedStudent.street || ''} 
-                        onChange={(e) => setSelectedStudent({...selectedStudent, street: e.target.value})}
+                    <div className="md:col-span-2">
+                      <Label htmlFor="enrollmentDate" className="text-sm font-medium text-gray-700">
+                        Inschrijvingsdatum
+                      </Label>
+                      <Input
+                        id="enrollmentDate"
+                        type="date"
+                        value={studentFormData.enrollmentDate}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, enrollmentDate: e.target.value })}
+                        className="mt-1 bg-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Adres informatie tab */}
+              <TabsContent value="address" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label htmlFor="street" className="text-sm font-medium text-gray-700">
+                        Straat
+                      </Label>
+                      <Input
+                        id="street"
+                        value={studentFormData.street}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, street: e.target.value })}
+                        className="mt-1 bg-white"
                         placeholder="Straatnaam"
                       />
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-houseNumber">Huisnummer</Label>
-                      <Input 
-                        id="edit-houseNumber" 
-                        value={selectedStudent.houseNumber || ''} 
-                        onChange={(e) => setSelectedStudent({...selectedStudent, houseNumber: e.target.value})}
+                    <div>
+                      <Label htmlFor="houseNumber" className="text-sm font-medium text-gray-700">
+                        Huisnummer
+                      </Label>
+                      <Input
+                        id="houseNumber"
+                        value={studentFormData.houseNumber}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, houseNumber: e.target.value })}
+                        className="mt-1 bg-white"
                         placeholder="123"
                       />
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-postalCode">Postcode</Label>
-                      <Input 
-                        id="edit-postalCode" 
-                        value={selectedStudent.postalCode || ''} 
-                        onChange={(e) => setSelectedStudent({...selectedStudent, postalCode: e.target.value})}
-                        placeholder="1000"
+                    <div>
+                      <Label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
+                        Postcode
+                      </Label>
+                      <Input
+                        id="postalCode"
+                        value={studentFormData.postalCode}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="1234 AB"
                       />
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-city">Plaats</Label>
-                      <Input 
-                        id="edit-city" 
-                        value={selectedStudent.city || ''} 
-                        onChange={(e) => setSelectedStudent({...selectedStudent, city: e.target.value})}
-                        placeholder="Brussel"
+                    <div>
+                      <Label htmlFor="city" className="text-sm font-medium text-gray-700">
+                        Stad
+                      </Label>
+                      <Input
+                        id="city"
+                        value={studentFormData.city}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Amsterdam"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Klas toewijzing tab */}
+              <TabsContent value="class" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold text-primary">Klas Toewijzing</h3>
+                    {studentFormData.studentGroupId && (
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
+                        Klas toegewezen
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="space-y-6">
+                    <p className="text-sm text-gray-500">
+                      Wijs de student toe aan een klas. Een student kan maar in één klas zitten.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 gap-6">
+                      <div>
+                        <Label htmlFor="schoolYear" className="text-sm font-medium text-gray-700">
+                          Schooljaar <span className="text-primary">*</span>
+                        </Label>
+                        <div className="mt-2">
+                          <Select
+                            value={studentFormData.schoolYear || ''}
+                            onValueChange={(value) => setStudentFormData({ 
+                              ...studentFormData, 
+                              schoolYear: value
+                            })}
+                          >
+                            <SelectTrigger className="border-gray-200 bg-white">
+                              <SelectValue placeholder="Selecteer schooljaar" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="">Selecteer schooljaar</SelectItem>
+                              <SelectItem value="2024-2025">2024-2025</SelectItem>
+                              <SelectItem value="2025-2026">2025-2026</SelectItem>
+                              <SelectItem value="2026-2027">2026-2027</SelectItem>
+                              <SelectItem value="2027-2028">2027-2028</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="studentGroupId" className="text-sm font-medium text-gray-700">
+                          Selecteer klas
+                        </Label>
+                        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Select
+                              value={studentFormData.studentGroupId?.toString() || 'none'}
+                              onValueChange={(value) => setStudentFormData({ 
+                                ...studentFormData, 
+                                studentGroupId: value === 'none' ? null : parseInt(value) 
+                              })}
+                            >
+                              <SelectTrigger className="border-gray-200 bg-white">
+                                <SelectValue placeholder="Selecteer klas" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">Geen klas</SelectItem>
+                                {studentGroups.map((group: any) => (
+                                  <SelectItem key={group.id} value={group.id.toString()}>
+                                    {group.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {studentFormData.studentGroupId && (
+                      <div className="flex items-center p-4 mt-4 rounded-md bg-blue-50 border border-blue-100">
+                        <div className="mr-4 p-2 bg-primary rounded-full">
+                          <Users className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-primary">
+                            {studentGroups.find((g: any) => g.id === studentFormData.studentGroupId)?.name}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            De student wordt toegewezen aan deze klas
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Vakken toewijzing tab */}
+              <TabsContent value="subjects" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold text-primary">Vakken Toewijzing</h3>
+                    {selectedPrograms.length > 0 && (
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
+                        {selectedPrograms.length} vakken toegewezen
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <p className="text-sm text-gray-500">
+                      Wijs de student toe aan vakken. Dit is optioneel voor studenten die individuele vakken willen volgen.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <Label htmlFor="programId" className="text-sm font-medium text-gray-700">
+                          Programma
+                        </Label>
+                        <Select
+                          value={studentFormData.programId?.toString() || ''}
+                          onValueChange={(value) => setStudentFormData({ 
+                            ...studentFormData, 
+                            programId: value ? parseInt(value) : null 
+                          })}
+                        >
+                          <SelectTrigger id="programId" className="mt-1 bg-white">
+                            <SelectValue placeholder="Selecteer programma" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Selecteer programma</SelectItem>
+                            {programs.map((program: any) => (
+                              <SelectItem key={program.id} value={program.id.toString()}>
+                                {program.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="yearLevel" className="text-sm font-medium text-gray-700">
+                          Leerjaar
+                        </Label>
+                        <Input
+                          id="yearLevel"
+                          value={studentFormData.yearLevel}
+                          onChange={(e) => setStudentFormData({ ...studentFormData, yearLevel: e.target.value })}
+                          className="mt-1 bg-white"
+                          placeholder="Bijv. Jaar 1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="mt-2"
+                      onClick={() => {
+                        if (studentFormData.programId) {
+                          // Check if program already exists
+                          const programExists = selectedPrograms.some(
+                            p => p.programId === studentFormData.programId
+                          );
+                          
+                          if (!programExists) {
+                            setSelectedPrograms([
+                              ...selectedPrograms,
+                              {
+                                programId: studentFormData.programId,
+                                yearLevel: studentFormData.yearLevel
+                              }
+                            ]);
+                          }
+                        }
+                      }}
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4" /> Voeg programma toe
+                    </Button>
+                    
+                    {/* Geselecteerde programma's */}
+                    {selectedPrograms.length > 0 && (
+                      <div className="mt-6">
+                        <h4 className="font-medium mb-2">Geselecteerde programma's:</h4>
+                        <div className="space-y-2">
+                          {selectedPrograms.map((program, index) => (
+                            <div 
+                              key={index}
+                              className="flex justify-between items-center p-3 bg-gray-50 rounded-md border border-gray-200"
+                            >
+                              <div>
+                                <span className="font-medium">
+                                  {programs.find((p: any) => p.id === program.programId)?.name}
+                                </span>
+                                <span className="text-sm text-gray-600 ml-2">
+                                  ({program.yearLevel})
+                                </span>
+                              </div>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => {
+                                  setSelectedPrograms(
+                                    selectedPrograms.filter((_, i) => i !== index)
+                                  );
+                                }}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              resetForm();
+              setIsCreateDialogOpen(false);
+            }}>
+              Annuleren
+            </Button>
+            <Button 
+              type="submit" 
+              onClick={handleCreateStudent}
+              disabled={createStudentMutation.isPending}
+            >
+              {createStudentMutation.isPending && (
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></div>
+              )}
+              Student toevoegen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Student Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Student Bewerken</DialogTitle>
+            <DialogDescription>
+              Werk de gegevens bij voor student: {studentFormData.firstName} {studentFormData.lastName}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid grid-cols-5 mb-4">
+                <TabsTrigger value="personal">
+                  <User className="mr-2 h-4 w-4" />
+                  Persoonlijk
+                </TabsTrigger>
+                <TabsTrigger value="contact">
+                  <Phone className="mr-2 h-4 w-4" />
+                  Contact
+                </TabsTrigger>
+                <TabsTrigger value="address">
+                  <MapPin className="mr-2 h-4 w-4" />
+                  Adres
+                </TabsTrigger>
+                <TabsTrigger value="class">
+                  <Users className="mr-2 h-4 w-4" />
+                  Klas
+                </TabsTrigger>
+                <TabsTrigger value="subjects">
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Vakken
+                </TabsTrigger>
+              </TabsList>
+              
+              {/* Same tabs as create student dialog */}
+              {/* Persoonlijke informatie tab */}
+              <TabsContent value="personal" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label htmlFor="edit-studentId" className="text-sm font-medium text-gray-700">
+                        Studentnummer <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="edit-studentId"
+                        value={studentFormData.studentId}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, studentId: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Bijv. S12345"
                       />
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-country">Land</Label>
-                      <Input 
-                        id="edit-country" 
-                        value={selectedStudent.country || ''} 
-                        onChange={(e) => setSelectedStudent({...selectedStudent, country: e.target.value})}
-                        placeholder="België"
+                    <div>
+                      <Label htmlFor="edit-status" className="text-sm font-medium text-gray-700">
+                        Status <span className="text-primary">*</span>
+                      </Label>
+                      <Select
+                        value={studentFormData.status}
+                        onValueChange={(value) => setStudentFormData({ ...studentFormData, status: value })}
+                      >
+                        <SelectTrigger id="edit-status" className="mt-1 bg-white">
+                          <SelectValue placeholder="Selecteer status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {statusOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="edit-firstName" className="text-sm font-medium text-gray-700">
+                        Voornaam <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="edit-firstName"
+                        value={studentFormData.firstName}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, firstName: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Voornaam"
                       />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="edit-lastName" className="text-sm font-medium text-gray-700">
+                        Achternaam <span className="text-primary">*</span>
+                      </Label>
+                      <Input
+                        id="edit-lastName"
+                        value={studentFormData.lastName}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, lastName: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Achternaam"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="edit-gender" className="text-sm font-medium text-gray-700">
+                        Geslacht
+                      </Label>
+                      <Select
+                        value={studentFormData.gender}
+                        onValueChange={(value) => setStudentFormData({ ...studentFormData, gender: value })}
+                      >
+                        <SelectTrigger id="edit-gender" className="mt-1 bg-white">
+                          <SelectValue placeholder="Selecteer geslacht" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {genderOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="edit-dateOfBirth" className="text-sm font-medium text-gray-700">
+                        Geboortedatum
+                      </Label>
+                      <Input
+                        id="edit-dateOfBirth"
+                        type="date"
+                        value={studentFormData.dateOfBirth || ''}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, dateOfBirth: e.target.value })}
+                        className="mt-1 bg-white"
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <Label htmlFor="edit-notes" className="text-sm font-medium text-gray-700">
+                        Notities
+                      </Label>
+                      <Textarea
+                        id="edit-notes"
+                        value={studentFormData.notes}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, notes: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Voeg hier aanvullende informatie toe..."
+                        rows={4}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Contact informatie tab */}
+              <TabsContent value="contact" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label htmlFor="edit-email" className="text-sm font-medium text-gray-700">
+                        Email
+                      </Label>
+                      <Input
+                        id="edit-email"
+                        type="email"
+                        value={studentFormData.email}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, email: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="student@mymadrassa.nl"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="edit-phone" className="text-sm font-medium text-gray-700">
+                        Telefoonnummer
+                      </Label>
+                      <Input
+                        id="edit-phone"
+                        value={studentFormData.phone}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, phone: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="06 1234 5678"
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <Label htmlFor="edit-enrollmentDate" className="text-sm font-medium text-gray-700">
+                        Inschrijvingsdatum
+                      </Label>
+                      <Input
+                        id="edit-enrollmentDate"
+                        type="date"
+                        value={studentFormData.enrollmentDate}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, enrollmentDate: e.target.value })}
+                        className="mt-1 bg-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Adres informatie tab */}
+              <TabsContent value="address" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <Label htmlFor="edit-street" className="text-sm font-medium text-gray-700">
+                        Straat
+                      </Label>
+                      <Input
+                        id="edit-street"
+                        value={studentFormData.street}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, street: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Straatnaam"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="edit-houseNumber" className="text-sm font-medium text-gray-700">
+                        Huisnummer
+                      </Label>
+                      <Input
+                        id="edit-houseNumber"
+                        value={studentFormData.houseNumber}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, houseNumber: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="123"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="edit-postalCode" className="text-sm font-medium text-gray-700">
+                        Postcode
+                      </Label>
+                      <Input
+                        id="edit-postalCode"
+                        value={studentFormData.postalCode}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, postalCode: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="1234 AB"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="edit-city" className="text-sm font-medium text-gray-700">
+                        Stad
+                      </Label>
+                      <Input
+                        id="edit-city"
+                        value={studentFormData.city}
+                        onChange={(e) => setStudentFormData({ ...studentFormData, city: e.target.value })}
+                        className="mt-1 bg-white"
+                        placeholder="Amsterdam"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Klas toewijzing tab */}
+              <TabsContent value="class" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold text-primary">Klas Toewijzing</h3>
+                    {studentFormData.studentGroupId && (
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
+                        Klas toegewezen
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="space-y-6">
+                    <p className="text-sm text-gray-500">
+                      Wijs de student toe aan een klas. Een student kan maar in één klas zitten.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 gap-6">
+                      <div>
+                        <Label htmlFor="edit-schoolYear" className="text-sm font-medium text-gray-700">
+                          Schooljaar <span className="text-primary">*</span>
+                        </Label>
+                        <div className="mt-2">
+                          <Select
+                            value={studentFormData.schoolYear || ''}
+                            onValueChange={(value) => setStudentFormData({ 
+                              ...studentFormData, 
+                              schoolYear: value
+                            })}
+                          >
+                            <SelectTrigger className="border-gray-200 bg-white">
+                              <SelectValue placeholder="Selecteer schooljaar" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="">Selecteer schooljaar</SelectItem>
+                              <SelectItem value="2024-2025">2024-2025</SelectItem>
+                              <SelectItem value="2025-2026">2025-2026</SelectItem>
+                              <SelectItem value="2026-2027">2026-2027</SelectItem>
+                              <SelectItem value="2027-2028">2027-2028</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="edit-studentGroupId" className="text-sm font-medium text-gray-700">
+                          Selecteer klas
+                        </Label>
+                        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Select
+                              value={studentFormData.studentGroupId?.toString() || 'none'}
+                              onValueChange={(value) => setStudentFormData({ 
+                                ...studentFormData, 
+                                studentGroupId: value === 'none' ? null : parseInt(value) 
+                              })}
+                            >
+                              <SelectTrigger className="border-gray-200 bg-white">
+                                <SelectValue placeholder="Selecteer klas" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">Geen klas</SelectItem>
+                                {studentGroups.map((group: any) => (
+                                  <SelectItem key={group.id} value={group.id.toString()}>
+                                    {group.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {studentFormData.studentGroupId && (
+                      <div className="flex items-center p-4 mt-4 rounded-md bg-blue-50 border border-blue-100">
+                        <div className="mr-4 p-2 bg-primary rounded-full">
+                          <Users className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-primary">
+                            {studentGroups.find((g: any) => g.id === studentFormData.studentGroupId)?.name}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            De student wordt toegewezen aan deze klas
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </TabsContent>
+              
+              {/* Vakken toewijzing tab */}
+              <TabsContent value="subjects" className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold text-primary">Vakken Toewijzing</h3>
+                    {selectedPrograms.length > 0 && (
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 font-medium">
+                        {selectedPrograms.length} vakken toegewezen
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <p className="text-sm text-gray-500">
+                      Wijs de student toe aan vakken. Dit is optioneel voor studenten die individuele vakken willen volgen.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <Label htmlFor="edit-programId" className="text-sm font-medium text-gray-700">
+                          Programma
+                        </Label>
+                        <Select
+                          value={studentFormData.programId?.toString() || ''}
+                          onValueChange={(value) => setStudentFormData({ 
+                            ...studentFormData, 
+                            programId: value ? parseInt(value) : null 
+                          })}
+                        >
+                          <SelectTrigger id="edit-programId" className="mt-1 bg-white">
+                            <SelectValue placeholder="Selecteer programma" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Selecteer programma</SelectItem>
+                            {programs.map((program: any) => (
+                              <SelectItem key={program.id} value={program.id.toString()}>
+                                {program.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="edit-yearLevel" className="text-sm font-medium text-gray-700">
+                          Leerjaar
+                        </Label>
+                        <Input
+                          id="edit-yearLevel"
+                          value={studentFormData.yearLevel}
+                          onChange={(e) => setStudentFormData({ ...studentFormData, yearLevel: e.target.value })}
+                          className="mt-1 bg-white"
+                          placeholder="Bijv. Jaar 1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="mt-2"
+                      onClick={() => {
+                        if (studentFormData.programId) {
+                          // Check if program already exists
+                          const programExists = selectedPrograms.some(
+                            p => p.programId === studentFormData.programId
+                          );
+                          
+                          if (!programExists) {
+                            setSelectedPrograms([
+                              ...selectedPrograms,
+                              {
+                                programId: studentFormData.programId,
+                                yearLevel: studentFormData.yearLevel
+                              }
+                            ]);
+                          }
+                        }
+                      }}
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4" /> Voeg programma toe
+                    </Button>
+                    
+                    {/* Geselecteerde programma's */}
+                    {selectedPrograms.length > 0 && (
+                      <div className="mt-6">
+                        <h4 className="font-medium mb-2">Geselecteerde programma's:</h4>
+                        <div className="space-y-2">
+                          {selectedPrograms.map((program, index) => (
+                            <div 
+                              key={index}
+                              className="flex justify-between items-center p-3 bg-gray-50 rounded-md border border-gray-200"
+                            >
+                              <div>
+                                <span className="font-medium">
+                                  {programs.find((p: any) => p.id === program.programId)?.name}
+                                </span>
+                                <span className="text-sm text-gray-600 ml-2">
+                                  ({program.yearLevel})
+                                </span>
+                              </div>
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => {
+                                  setSelectedPrograms(
+                                    selectedPrograms.filter((_, i) => i !== index)
+                                  );
+                                }}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              resetForm();
+              setIsEditDialogOpen(false);
+            }}>
+              Annuleren
+            </Button>
+            <Button 
+              type="submit" 
+              onClick={handleUpdateStudent}
+              disabled={updateStudentMutation.isPending}
+            >
+              {updateStudentMutation.isPending && (
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></div>
+              )}
+              Wijzigingen opslaan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Student Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[450px]">
+          <DialogHeader>
+            <DialogTitle>Student verwijderen</DialogTitle>
+            <DialogDescription>
+              Weet je zeker dat je de student <span className="font-semibold">
+                {selectedStudent?.firstName} {selectedStudent?.lastName}
+              </span> wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteStudent}
+              disabled={deleteStudentMutation.isPending}
+            >
+              {deleteStudentMutation.isPending && (
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></div>
+              )}
+              Verwijderen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Student Detail Dialog */}
+      <Dialog open={isStudentDetailDialogOpen} onOpenChange={setIsStudentDetailDialogOpen}>
+        <DialogContent className="sm:max-w-[95%] sm:h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Student Details</DialogTitle>
+            <DialogDescription>
+              Gedetailleerde informatie over {selectedStudent?.firstName} {selectedStudent?.lastName}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedStudent && (
+            <div className="py-4">
+              <Tabs defaultValue="personal" className="w-full">
+                <TabsList className="grid grid-cols-5 mb-4">
+                  <TabsTrigger value="personal">
+                    <User className="mr-2 h-4 w-4" />
+                    Persoonlijk
+                  </TabsTrigger>
+                  <TabsTrigger value="contact">
+                    <Phone className="mr-2 h-4 w-4" />
+                    Contact
+                  </TabsTrigger>
+                  <TabsTrigger value="address">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    Adres
+                  </TabsTrigger>
+                  <TabsTrigger value="class">
+                    <Users className="mr-2 h-4 w-4" />
+                    Klas
+                  </TabsTrigger>
+                  <TabsTrigger value="subjects">
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    Vakken
+                  </TabsTrigger>
+                </TabsList>
+                
+                {/* Persoonlijke informatie tab */}
+                <TabsContent value="personal" className="pt-2">
+                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Persoonlijke gegevens</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <div className="md:col-span-2 flex">
+                        <div className="mr-4">
+                          <Avatar className="h-16 w-16">
+                            <AvatarFallback className="bg-primary/10 text-primary text-xl">
+                              {selectedStudent.firstName[0]}{selectedStudent.lastName[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-semibold mb-1">
+                            {selectedStudent.firstName} {selectedStudent.lastName}
+                          </h2>
+                          <p className="text-gray-600">{selectedStudent.studentId}</p>
+                          <div className="mt-2">
+                            {renderStatusBadge(selectedStudent.status)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                      <div className="md:col-span-1">
+                        <p className="text-sm font-medium text-gray-700">Geboortedatum</p>
+                        <p className="mt-1">{selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "Niet ingevuld"}</p>
+                      </div>
+                      <div className="md:col-span-1">
+                        <p className="text-sm font-medium text-gray-700">Geslacht</p>
+                        <p className="mt-1">
+                          {selectedStudent.gender === 'man' ? 'Man' : 
+                           selectedStudent.gender === 'vrouw' ? 'Vrouw' : 'Niet ingevuld'}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">Notities</p>
+                        <p className="mt-1 whitespace-pre-wrap">{selectedStudent.notes || "Geen notities"}</p>
+                      </div>
                     </div>
                   </div>
                 </TabsContent>
                 
-                <TabsContent value="programs" className="py-4">
-                  {programsData?.length > 0 ? (
-                    <div className="space-y-4">
-                      <div className="text-sm text-gray-500">
-                        Selecteer de programma's waarin deze student is ingeschreven.
+                {/* Contact tab */}
+                <TabsContent value="contact" className="pt-2">
+                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Contactgegevens</h3>
+                    
+                    <div className="grid grid-cols-1 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">Email</p>
+                          <p className="mt-1 flex items-center">
+                            <Mail className="h-4 w-4 mr-2 text-gray-500" />
+                            {selectedStudent.email || "Niet ingevuld"}
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">Telefoonnummer</p>
+                          <p className="mt-1 flex items-center">
+                            <Phone className="h-4 w-4 mr-2 text-gray-500" />
+                            {selectedStudent.phone || "Niet ingevuld"}
+                          </p>
+                        </div>
                       </div>
                       
-                      <div className="space-y-2 border rounded-md p-4">
-                        {programsData.map((program: any) => (
-                          <div key={program.id} className="flex items-center space-x-2">
-                            <Checkbox 
-                              id={`edit-program-${program.id}`}
-                              checked={selectedStudent.enrolledPrograms && 
-                                selectedStudent.enrolledPrograms.some((p: any) => p.programId === program.id)}
-                              onCheckedChange={(checked) => {
-                                const currentPrograms = selectedStudent.enrolledPrograms || [];
-                                
-                                if (checked) {
-                                  setSelectedStudent({
-                                    ...selectedStudent, 
-                                    enrolledPrograms: [
-                                      ...currentPrograms, 
-                                      { programId: program.id, programName: program.name }
-                                    ]
-                                  });
-                                } else {
-                                  setSelectedStudent({
-                                    ...selectedStudent,
-                                    enrolledPrograms: currentPrograms.filter(
-                                      (p: any) => p.programId !== program.id
-                                    )
-                                  });
-                                }
-                              }}
-                            />
-                            <Label htmlFor={`edit-program-${program.id}`} className="cursor-pointer">
-                              {program.name}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-8">
-                      <BookOpen className="h-12 w-12 text-gray-300 mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">Geen programma's beschikbaar</h3>
-                      <p className="text-gray-500 mb-4 text-center">
-                        Er zijn nog geen opleidingsprogramma's toegevoegd aan het systeem.
-                      </p>
-                    </div>
-                  )}
-                </TabsContent>
-              </Tabs>
-              
-              <DialogFooter className="mt-6">
-                <Button variant="outline" onClick={() => setEditStudentDialogOpen(false)}>
-                  Annuleren
-                </Button>
-                <Button 
-                  onClick={() => {
-                    // Combineer adresgegevens
-                    const fullAddress = [
-                      selectedStudent.street,
-                      selectedStudent.houseNumber,
-                      selectedStudent.postalCode,
-                      selectedStudent.city,
-                      selectedStudent.country
-                    ].filter(Boolean).join(', ');
-                    
-                    editStudentMutation.mutate({
-                      ...selectedStudent,
-                      address: fullAddress
-                    });
-                  }}
-                  disabled={editStudentMutation.isPending || !selectedStudent.firstName || !selectedStudent.lastName}
-                >
-                  {editStudentMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Bezig met opslaan...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-4 w-4" />
-                      Wijzigingen opslaan
-                    </>
-                  )}
-                </Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
-      
-      {/* Delete Student Dialog */}
-      <Dialog open={deleteStudentDialogOpen} onOpenChange={setDeleteStudentDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          {selectedStudent && (
-            <>
-              <DialogHeader>
-                <DialogTitle>Student verwijderen</DialogTitle>
-                <DialogDescription>
-                  Weet je zeker dat je de gegevens van {selectedStudent.firstName} {selectedStudent.lastName} wilt verwijderen?
-                </DialogDescription>
-              </DialogHeader>
-              
-              <div className="py-4">
-                <div className="rounded-md bg-red-50 p-4 border border-red-100">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <AlertCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
-                    </div>
-                    <div className="ml-3">
-                      <h3 className="text-sm font-medium text-red-800">Let op</h3>
-                      <div className="mt-2 text-sm text-red-700">
-                        <p>
-                          Deze actie kan niet ongedaan worden gemaakt. Alle gegevens van deze student worden permanent verwijderd uit het systeem.
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">Inschrijvingsdatum</p>
+                        <p className="mt-1">
+                          {selectedStudent.enrollmentDate 
+                            ? formatDateToDisplayFormat(selectedStudent.enrollmentDate) 
+                            : "Niet ingevuld"}
                         </p>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                </TabsContent>
+                
+                {/* Adres tab */}
+                <TabsContent value="address" className="pt-2">
+                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Adresgegevens</h3>
+                    
+                    <div className="grid grid-cols-1 gap-6">
+                      <div className="flex items-start">
+                        <MapPin className="h-5 w-5 mr-2 mt-0.5 text-gray-500" />
+                        <div>
+                          <p className="font-medium">
+                            {selectedStudent.street} {selectedStudent.houseNumber}
+                          </p>
+                          <p className="text-gray-600">
+                            {selectedStudent.postalCode} {selectedStudent.city}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">Straat</p>
+                          <p className="mt-1">{selectedStudent.street || "Niet ingevuld"}</p>
+                        </div>
+                        
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">Huisnummer</p>
+                          <p className="mt-1">{selectedStudent.houseNumber || "Niet ingevuld"}</p>
+                        </div>
+                        
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">Postcode</p>
+                          <p className="mt-1">{selectedStudent.postalCode || "Niet ingevuld"}</p>
+                        </div>
+                        
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">Stad</p>
+                          <p className="mt-1">{selectedStudent.city || "Niet ingevuld"}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                {/* Klas tab */}
+                <TabsContent value="class" className="pt-2">
+                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Klas Informatie</h3>
+                    
+                    <div className="grid grid-cols-1 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">Schooljaar</p>
+                          <p className="mt-1">{selectedStudent.schoolYear || "Niet toegewezen"}</p>
+                        </div>
+                        
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">Klas</p>
+                          <p className="mt-1">
+                            {selectedStudent.studentGroupId 
+                              ? studentGroups.find((g: any) => g.id === selectedStudent.studentGroupId)?.name
+                              : "Niet toegewezen"}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {selectedStudent.studentGroupId && (
+                        <div className="flex items-center p-4 mt-2 rounded-md bg-blue-50 border border-blue-100">
+                          <div className="mr-4 p-2 bg-primary rounded-full">
+                            <Users className="h-5 w-5 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-primary">
+                              {studentGroups.find((g: any) => g.id === selectedStudent.studentGroupId)?.name}
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              De student is toegewezen aan deze klas
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                {/* Vakken tab */}
+                <TabsContent value="subjects" className="pt-2">
+                  <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
+                    <h3 className="text-lg font-semibold text-primary mb-4">Vakken Informatie</h3>
+                    
+                    {(!selectedStudent.programs || selectedStudent.programs.length === 0) ? (
+                      <div className="p-4 bg-gray-50 rounded-md border border-gray-200 text-center">
+                        <GraduationCap className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                        <p className="text-gray-600">
+                          Deze student volgt geen vakken
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {selectedStudent.programs.map((program: any, index: number) => (
+                          <div 
+                            key={index}
+                            className="flex justify-between items-center p-4 bg-gray-50 rounded-md border border-gray-200"
+                          >
+                            <div>
+                              <h4 className="font-medium">
+                                {programs.find((p: any) => p.id === program.programId)?.name || "Onbekend programma"}
+                              </h4>
+                              <p className="text-sm text-gray-600 mt-1">
+                                Leerjaar: {program.yearLevel || "Niet gespecificeerd"}
+                              </p>
+                            </div>
+                            <div>
+                              <BookOpen className="h-5 w-5 text-primary" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
               
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setDeleteStudentDialogOpen(false)}>
-                  Annuleren
+              <div className="flex justify-end gap-2 mt-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsStudentDetailDialogOpen(false)}
+                >
+                  Sluiten
                 </Button>
                 <Button 
-                  variant="destructive" 
-                  onClick={() => deleteStudentMutation.mutate(selectedStudent.id)}
-                  disabled={deleteStudentMutation.isPending}
+                  variant="default" 
+                  onClick={() => {
+                    setIsStudentDetailDialogOpen(false);
+                    handleEditStudent(selectedStudent);
+                  }}
                 >
-                  {deleteStudentMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Bezig met verwijderen...
-                    </>
-                  ) : (
-                    <>
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Student verwijderen
-                    </>
-                  )}
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Bewerken
                 </Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
-      
-      {/* Bulk Import Dialog */}
-      <Dialog open={bulkImportDialogOpen} onOpenChange={setBulkImportDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Studenten importeren</DialogTitle>
-            <DialogDescription>
-              Upload een CSV of Excel bestand met studentgegevens om in bulk te importeren.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="py-4">
-            {importPreviewData.length === 0 ? (
-              <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-12">
-                <FileUp className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Upload een bestand</h3>
-                <p className="text-gray-500 mb-4 text-center max-w-md">
-                  Sleep een CSV of Excel bestand hierheen, of klik om een bestand te selecteren.
-                </p>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  accept=".csv,.xlsx,.xls"
-                  onChange={handleFileUpload}
-                />
-                <Button onClick={() => fileInputRef.current?.click()}>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Bestand selecteren
-                </Button>
-              </div>
-            ) : (
-              <>
-                <div className="mb-4 flex justify-between items-center">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">Voorbeeld van gegevens</h3>
-                    <p className="text-gray-500 text-sm">
-                      {importPreviewData.length} records gevonden in het {importFileType === 'csv' ? 'CSV' : 'Excel'} bestand.
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={() => {
-                    setImportPreviewData([]);
-                    setImportFileType('');
-                  }}>
-                    <X className="h-4 w-4 mr-2" />
-                    Wissen
-                  </Button>
-                </div>
-                
-                <div className="border rounded-md overflow-x-auto mb-4">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        {importPreviewData.length > 0 && 
-                          Object.keys(importPreviewData[0]).slice(0, 5).map((key) => (
-                            <TableHead key={key}>{key}</TableHead>
-                          ))
-                        }
-                        {importPreviewData.length > 0 && Object.keys(importPreviewData[0]).length > 5 && (
-                          <TableHead>...</TableHead>
-                        )}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {importPreviewData.slice(0, 5).map((row, rowIndex) => (
-                        <TableRow key={rowIndex}>
-                          {Object.values(row).slice(0, 5).map((value: any, valueIndex) => (
-                            <TableCell key={valueIndex}>{value}</TableCell>
-                          ))}
-                          {Object.values(row).length > 5 && (
-                            <TableCell>...</TableCell>
-                          )}
-                        </TableRow>
-                      ))}
-                      {importPreviewData.length > 5 && (
-                        <TableRow>
-                          <TableCell colSpan={6} className="text-center text-gray-500">
-                            +{importPreviewData.length - 5} meer records
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-                
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Opmerkingen</h4>
-                  <ul className="text-sm text-gray-500 space-y-1 list-disc list-inside">
-                    <li>Zorg ervoor dat de kolomnamen overeenkomen met de verwachte velden.</li>
-                    <li>Voeg minimaal de verplichte velden toe: voornaam, achternaam en student ID.</li>
-                    <li>Duplicaten worden bijgewerkt op basis van student ID of email.</li>
-                  </ul>
-                </div>
-                
-                <Button
-                  className="w-full"
-                  onClick={() => setConfirmImportDialogOpen(true)}
-                >
-                  <CheckSquare className="h-4 w-4 mr-2" />
-                  Importeren starten
-                </Button>
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Confirm Import Dialog */}
-      <Dialog open={confirmImportDialogOpen} onOpenChange={setConfirmImportDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Importeren bevestigen</DialogTitle>
-            <DialogDescription>
-              Je staat op het punt om {importPreviewData.length} studenten te importeren.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="py-4">
-            <div className="rounded-md bg-blue-50 p-4 border border-blue-100">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <AlertCircle className="h-5 w-5 text-blue-400" aria-hidden="true" />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-blue-800">Let op</h3>
-                  <div className="mt-2 text-sm text-blue-700">
-                    <p>
-                      Bestaande studenten worden bijgewerkt als er een match is op student ID of email. Nieuwe studenten worden toegevoegd.
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmImportDialogOpen(false)}>
-              Annuleren
-            </Button>
-            <Button 
-              onClick={handleConfirmImport}
-              disabled={bulkImportMutation.isPending}
-            >
-              {bulkImportMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Bezig met importeren...
-                </>
-              ) : (
-                <>
-                  <CheckSquare className="mr-2 h-4 w-4" />
-                  Importeren bevestigen
-                </>
-              )}
-            </Button>
-          </DialogFooter>
+          )}
         </DialogContent>
       </Dialog>
     </div>

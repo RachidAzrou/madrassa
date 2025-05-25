@@ -362,6 +362,9 @@ export default function Students() {
 
   return (
     <div className="bg-[#f7f9fc] min-h-screen">
+      {/* Top navigation bar */}
+      <Topbar />
+      
       {/* Professionele header */}
       <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
         <div className="flex flex-col">

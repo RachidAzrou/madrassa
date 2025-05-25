@@ -4,7 +4,7 @@ import { LucideIcon } from 'lucide-react';
 interface PremiumHeaderProps {
   title: string;
   path: string; // Bijvoorbeeld "Beheer > Studenten"
-  icon: LucideIcon;
+  icon: LucideIcon | React.FC<any>;
 }
 
 export function PremiumHeader({ title, path, icon: Icon }: PremiumHeaderProps) {

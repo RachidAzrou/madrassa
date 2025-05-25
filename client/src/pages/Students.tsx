@@ -88,13 +88,19 @@ export default function Students() {
   };
   
   const [formData, setFormData] = useState(emptyFormData);
-  const [students, setStudents] = useState([]);
+  // Initialiseer students state met data uit localStorage indien beschikbaar
+  const [students, setStudents] = useState(() => {
+    const savedStudents = localStorage.getItem('students');
+    return savedStudents ? JSON.parse(savedStudents) : [];
+  });
   
   const { toast } = useToast();
 
-  // Data fetching
+  // Data fetching met voorkeur voor localStorage data tijdens ontwikkeling
   const { data: studentsData = [], isLoading: studentsLoading } = useQuery({
     queryKey: ['/api/students'],
+    // Gebruik staleTime om cache langer te behouden tijdens ontwikkeling
+    staleTime: Infinity
   });
   
   const { data: programsData = [] } = useQuery({
@@ -163,28 +169,23 @@ export default function Students() {
     }
     
     try {
-      // Student would be created here
-      console.log('Creating student:', formData);
-      
-      // In een echte applicatie zou hier een API-aanroep zijn:
-      // const response = await fetch('/api/students', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
-      // const data = await response.json();
-      
-      // Voor demo-doeleinden: direct toevoegen aan de lokale state
+      // Genereer een uniek ID voor de nieuwe student
       const newStudent = {
         ...formData,
-        id: Date.now().toString(), // Tijdelijk ID voor demo
+        id: Date.now(), // Gebruik timestamp als unieke ID
         studentId: formData.studentId || nextStudentId,
+        status: formData.status || "ingeschreven", // Default waarde
         programName: programs.find(p => p.id.toString() === formData.programId)?.name || '',
         studentGroupName: studentGroups.find(g => g.id.toString() === formData.studentGroupId)?.name || '',
       };
       
       // Update studenten lijst met nieuwe student
-      setStudents(prevStudents => [newStudent, ...prevStudents]);
+      setStudents(prevStudents => {
+        const updatedStudents = [newStudent, ...prevStudents];
+        // Sla de bijgewerkte lijst op in localStorage
+        localStorage.setItem('students', JSON.stringify(updatedStudents));
+        return updatedStudents;
+      });
       
       // Sla nieuw student ID op voor eventuele voogdkoppeling
       const newId = formData.studentId || nextStudentId;

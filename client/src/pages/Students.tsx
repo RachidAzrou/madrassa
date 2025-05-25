@@ -668,16 +668,21 @@ export default function Students() {
                       <Badge 
                         variant="outline" 
                         className={`text-xs rounded-sm ${
-                          student.status === 'active' ? "bg-green-50 text-green-700 border-green-200" : 
-                          student.status === 'inactive' ? "bg-gray-50 text-gray-700 border-gray-200" : 
+                          student.status === 'active' || student.status === 'enrolled' ? "bg-green-50 text-green-700 border-green-200" : 
+                          student.status === 'inactive' || student.status === 'unenrolled' ? "bg-gray-50 text-gray-700 border-gray-200" : 
                           student.status === 'graduated' ? "bg-blue-50 text-blue-700 border-blue-200" :
+                          student.status === 'suspended' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
                           "bg-yellow-50 text-yellow-700 border-yellow-200"
                         }`}
                       >
                         {student.status === 'active' ? 'Actief' : 
                          student.status === 'inactive' ? 'Inactief' : 
                          student.status === 'graduated' ? 'Afgestudeerd' : 
-                         student.status === 'withdrawn' ? 'Teruggetrokken' : student.status}
+                         student.status === 'withdrawn' ? 'Teruggetrokken' :
+                         student.status === 'enrolled' ? 'Ingeschreven' :
+                         student.status === 'unenrolled' ? 'Uitgeschreven' :
+                         student.status === 'suspended' ? 'Geschorst' :
+                         student.status}
                       </Badge>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-right">
@@ -1104,8 +1109,21 @@ export default function Students() {
                 <div>
                   <h2 className="text-xl font-semibold">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
                   <p className="text-sm text-gray-500">{selectedStudent.studentId}</p>
-                  <Badge className="mt-2" variant={selectedStudent.status === "active" ? "default" : "secondary"}>
-                    {selectedStudent.status === "active" ? "Actief" : selectedStudent.status}
+                  <Badge className="mt-2" 
+                    variant={
+                      selectedStudent.status === "active" || 
+                      selectedStudent.status === "enrolled" ? 
+                      "default" : "secondary"
+                    }
+                  >
+                    {selectedStudent.status === 'active' ? 'Actief' : 
+                     selectedStudent.status === 'inactive' ? 'Inactief' : 
+                     selectedStudent.status === 'graduated' ? 'Afgestudeerd' : 
+                     selectedStudent.status === 'withdrawn' ? 'Teruggetrokken' :
+                     selectedStudent.status === 'enrolled' ? 'Ingeschreven' :
+                     selectedStudent.status === 'unenrolled' ? 'Uitgeschreven' :
+                     selectedStudent.status === 'suspended' ? 'Geschorst' :
+                     selectedStudent.status}
                   </Badge>
                 </div>
               </div>

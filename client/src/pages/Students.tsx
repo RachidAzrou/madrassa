@@ -1393,8 +1393,6 @@ export default function Students() {
           </div>
         </DialogContent>
       </Dialog>
-        </DialogContent>
-      </Dialog>
 
       {/* Dialoogvenster voor voogd toevoegen */}
       <Dialog open={isAddGuardianDialogOpen} onOpenChange={setIsAddGuardianDialogOpen}>

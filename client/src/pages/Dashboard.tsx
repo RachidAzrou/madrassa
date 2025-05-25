@@ -164,7 +164,7 @@ export default function Dashboard() {
     <div className="bg-[#f7f9fc] min-h-screen">
       {/* Desktop application header bar */}
       <header className="bg-white border-b border-[#e5e7eb] shadow-sm">
-        <div className="px-6 py-3 flex items-center justify-between">
+        <div className="px-6 py-3 flex items-center justify-between bg-[#1e40af] text-white">
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 flex items-center justify-center rounded-sm bg-[#1e40af] text-white">
               <LayoutDashboard className="h-4 w-4" />

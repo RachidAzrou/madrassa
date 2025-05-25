@@ -56,35 +56,41 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   };
 
   return (
-    <div className="flex h-full min-h-screen">
-      {/* Mobile sidebar backdrop */}
-      {isMobile && sidebarOpen && (
-        <div
-          className="fixed inset-0 z-20 bg-black bg-opacity-50"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar for both mobile and desktop */}
-      <div 
-        className={`fixed md:static inset-y-0 left-0 transform ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 z-30 transition duration-200 ease-in-out h-screen flex-shrink-0`}
-      >
-        <Sidebar 
-          isMobile={isMobile} 
-          onClose={() => setSidebarOpen(false)} 
-          className="h-full" />
-      </div>
-
-      {/* Main content */}
-      <div className="flex flex-col flex-1 overflow-hidden bg-gray-50">
+    <div className="flex flex-col h-full min-h-screen">
+      {/* Topbar - volledig boven alles */}
+      <div className="w-full z-40">
         <Topbar />
-        <main className="flex-1 p-2 sm:p-4 md:p-6 pt-10 overflow-x-auto overflow-y-auto border-l border-gray-200" style={{ minHeight: "calc(100vh - 64px)" }}>
-          <div className="max-w-7xl mx-auto w-full min-h-full pb-12">
-            {children}
-          </div>
-        </main>
+      </div>
+      
+      <div className="flex flex-1 overflow-hidden">
+        {/* Mobile sidebar backdrop */}
+        {isMobile && sidebarOpen && (
+          <div
+            className="fixed inset-0 z-20 bg-black bg-opacity-50"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Sidebar for both mobile and desktop */}
+        <div 
+          className={`fixed md:static inset-y-auto top-[64px] left-0 transform ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 z-30 transition duration-200 ease-in-out h-[calc(100vh-64px)] flex-shrink-0`}
+        >
+          <Sidebar 
+            isMobile={isMobile} 
+            onClose={() => setSidebarOpen(false)} 
+            className="h-full" />
+        </div>
+
+        {/* Main content */}
+        <div className="flex flex-col flex-1 overflow-hidden bg-gray-50">
+          <main className="flex-1 p-2 sm:p-4 md:p-6 pt-10 overflow-x-auto overflow-y-auto border-l border-gray-200">
+            <div className="max-w-7xl mx-auto w-full min-h-full pb-12">
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );

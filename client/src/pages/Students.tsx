@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { 
   Search, PlusCircle, Filter, Download, Users, User, Camera,
@@ -119,6 +119,10 @@ export default function Students() {
       [name]: value
     }));
   };
+  
+  const resetForm = () => {
+    setFormData(emptyFormData);
+  };
 
   const [isAddGuardianDialogOpen, setIsAddGuardianDialogOpen] = useState(false);
   const [newStudentId, setNewStudentId] = useState(null);
@@ -129,20 +133,36 @@ export default function Students() {
       // Student would be created here
       console.log('Creating student:', formData);
       
+      // Creëer nieuwe student en voeg toe aan lijst
+      const newStudent = {
+        ...formData,
+        id: Date.now().toString(), // Tijdelijk ID voor demo
+        studentId: formData.studentId || nextStudentId,
+        programName: programs.find(p => p.id.toString() === formData.programId)?.name || '',
+        studentGroupName: studentGroups.find(g => g.id.toString() === formData.studentGroupId)?.name || '',
+      };
+      
+      // Update studenten lijst met nieuwe student
+      setStudents([newStudent, ...students]);
+      
       // Sla nieuw student ID op voor eventuele voogdkoppeling
       const newId = formData.studentId || nextStudentId;
       setNewStudentId(newId);
       
-      // Sluit het huidige dialoogvenster
+      // Reset formulier en sluit dialoogvenster
+      resetForm();
       setIsCreateDialogOpen(false);
       
       toast({
         title: "Student toegevoegd",
-        description: "De student is succesvol toegevoegd."
+        description: "De student is succesvol toegevoegd aan de lijst."
       });
       
       // Open het dialoogvenster om een voogd toe te voegen
       setIsAddGuardianDialogOpen(true);
+      
+      // Vernieuw de lijst direct met de toegevoegde student
+      // De cache wordt automatisch bijgewerkt bij de volgende pagina-refresh
     } catch (error) {
       toast({
         title: "Fout",
@@ -1030,7 +1050,10 @@ export default function Students() {
               <Button 
                 type="button" 
                 variant="outline"
-                onClick={() => setIsCreateDialogOpen(false)}
+                onClick={() => {
+                  setIsCreateDialogOpen(false);
+                  resetForm();
+                }}
               >
                 Annuleren
               </Button>

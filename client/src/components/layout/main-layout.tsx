@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
-import Sidebar from "./sidebar-fixed";
+import Sidebar from "./sidebar-collapsible";
 import Header from "./header";
 import TestBanner from "./test-banner";
 import { Topbar } from "./topbar";

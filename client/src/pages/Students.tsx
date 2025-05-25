@@ -7,6 +7,7 @@ import {
   UserPlus, ClipboardEdit, CreditCard, Smartphone, NotebookText, CheckCircle2, Loader2,
   ScanLine, Fingerprint, AlertCircle, Home, Camera
 } from 'lucide-react';
+
 import { Topbar } from '@/components/layout/topbar';
 import { PremiumHeader } from '@/components/layout/premium-header';
 
@@ -612,7 +613,7 @@ export default function Students() {
                         </h3>
                         <div className="mb-4">
                           <p className="text-sm font-medium text-gray-700 mb-1">Foto</p>
-                          <div className="flex flex-col gap-2">
+                          <div className="flex gap-4">
                             <div 
                               className="w-32 h-32 rounded-md border border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:bg-gray-100 transition-colors"
                               onClick={() => document.getElementById('photo-upload').click()}
@@ -623,23 +624,24 @@ export default function Students() {
                                 <Camera className="h-12 w-12 text-gray-400" />
                               )}
                             </div>
-                            <div className="flex gap-2">
-                              <Button 
+                            <div className="flex flex-col gap-3 justify-center">
+                              <button 
                                 type="button" 
-                                variant="outline" 
-                                size="sm" 
-                                className="text-xs"
+                                className="flex items-center justify-center gap-2 border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-50 transition-colors bg-[#8CD3AF]"
                               >
-                                eID
-                              </Button>
-                              <Button 
+                                <div className="bg-[#8CD3AF] rounded-sm px-1 text-white font-bold">
+                                  <span className="text-black text-xs">be</span>
+                                  <span className="text-white text-xs">ID</span>
+                                </div>
+                                <span className="text-xs font-medium text-gray-700">Identificeer met eID</span>
+                              </button>
+                              <button 
                                 type="button" 
-                                variant="outline" 
-                                size="sm" 
-                                className="text-xs"
+                                className="flex items-center justify-center gap-2 border border-gray-300 rounded-md px-3 py-2 bg-[#FF4D27] text-white hover:bg-[#e04423] transition-colors"
                               >
-                                itsme
-                              </Button>
+                                <Fingerprint className="h-4 w-4" />
+                                <span className="text-xs font-medium">Identificeer met itsme</span>
+                              </button>
                             </div>
                             <input
                               id="photo-upload"

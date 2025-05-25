@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { queryClient } from '@/lib/queryClient';
 import { 
   Search, PlusCircle, Filter, Download, Users, User, Camera,
   Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
@@ -180,18 +181,23 @@ export default function Students() {
     setIsDeleteDialogOpen(true);
   };
   
-  const handleDeleteStudent = () => {
+  const handleDeleteStudent = async () => {
     try {
-      // Delete student implementation would be here
-      console.log('Deleting student:', selectedStudent);
+      // Werkelijke API-aanroep om de student te verwijderen
+      await fetch(`/api/students/${selectedStudent.id}`, {
+        method: 'DELETE',
+      });
       
-      // Mock success feedback
+      // Vernieuw de studentenlijst na het verwijderen
+      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      
       toast({
         title: "Succes",
         description: `Student ${selectedStudent.firstName} ${selectedStudent.lastName} is succesvol verwijderd.`,
       });
       setIsDeleteDialogOpen(false);
     } catch (error) {
+      console.error('Fout bij het verwijderen van student:', error);
       toast({
         title: "Fout",
         description: "Er is een fout opgetreden bij het verwijderen van de student.",

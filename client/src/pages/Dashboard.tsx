@@ -13,6 +13,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
+import { Topbar } from '@/components/layout/topbar';
 import { Button } from '@/components/ui/button';
 import { format, startOfWeek, endOfWeek, addDays, parseISO, isToday, isWithinInterval } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -164,6 +165,9 @@ export default function Dashboard() {
 
   return (
     <div className="bg-[#f7f9fc] min-h-screen">
+      {/* Top navigation bar */}
+      <Topbar />
+      
       {/* Desktop application header bar - Professionele stijl - Premium variant */}
       <PageHeader
         title="Dashboard"

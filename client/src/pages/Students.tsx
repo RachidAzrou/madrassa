@@ -5,6 +5,7 @@ import {
   ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
   Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, ChevronRight
 } from 'lucide-react';
+import { Topbar } from '@/components/layout/topbar';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';

@@ -52,6 +52,7 @@ export default function Guardians() {
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showNewGuardianDialog, setShowNewGuardianDialog] = useState(false);
+  const [hasValidationAttempt, setHasValidationAttempt] = useState(false);
   const [newGuardian, setNewGuardian] = useState<Partial<GuardianType>>({
     firstName: '',
     lastName: '',
@@ -229,6 +230,9 @@ export default function Guardians() {
 
   // Opslaan van nieuwe voogd
   const handleSaveGuardian = async () => {
+    // Markeer dat we validatie hebben geprobeerd
+    setHasValidationAttempt(true);
+    
     if (!validateNewGuardian()) return;
     
     try {
@@ -614,7 +618,7 @@ export default function Guardians() {
                       <Input 
                         id="firstName" 
                         placeholder="Voornaam" 
-                        className={`h-8 text-sm ${!newGuardian.firstName ? 'border-red-300' : ''}`}
+                        className={`h-8 text-sm ${hasValidationAttempt && !newGuardian.firstName ? 'border-red-300' : ''}`}
                         value={newGuardian.firstName}
                         onChange={(e) => setNewGuardian({...newGuardian, firstName: e.target.value})}
                         required
@@ -627,7 +631,7 @@ export default function Guardians() {
                       <Input 
                         id="lastName" 
                         placeholder="Achternaam" 
-                        className={`h-8 text-sm ${!newGuardian.lastName ? 'border-red-300' : ''}`}
+                        className={`h-8 text-sm ${hasValidationAttempt && !newGuardian.lastName ? 'border-red-300' : ''}`}
                         value={newGuardian.lastName}
                         onChange={(e) => setNewGuardian({...newGuardian, lastName: e.target.value})}
                         required
@@ -640,7 +644,7 @@ export default function Guardians() {
                       <Input 
                         id="phone" 
                         placeholder="Telefoonnummer" 
-                        className={`h-8 text-sm ${!newGuardian.phone ? 'border-red-300' : ''}`}
+                        className={`h-8 text-sm ${hasValidationAttempt && !newGuardian.phone ? 'border-red-300' : ''}`}
                         value={newGuardian.phone || ''}
                         onChange={(e) => setNewGuardian({...newGuardian, phone: e.target.value})}
                         required
@@ -668,7 +672,7 @@ export default function Guardians() {
                         onValueChange={(value) => setNewGuardian({...newGuardian, relationship: value})}
                         required
                       >
-                        <SelectTrigger id="relationship" className={`h-8 text-sm border-gray-300 ${!newGuardian.relationship ? 'border-red-300' : ''}`}>
+                        <SelectTrigger id="relationship" className={`h-8 text-sm border-gray-300 ${hasValidationAttempt && !newGuardian.relationship ? 'border-red-300' : ''}`}>
                           <SelectValue placeholder="Selecteer relatie" />
                         </SelectTrigger>
                         <SelectContent className="bg-white">
@@ -689,7 +693,7 @@ export default function Guardians() {
                         <Input 
                           id="relationshipOther" 
                           placeholder="Beschrijf de relatie" 
-                          className={`h-8 text-sm ${newGuardian.relationship === 'other' && !newGuardian.relationshipOther ? 'border-red-300' : ''}`}
+                          className={`h-8 text-sm ${hasValidationAttempt && newGuardian.relationship === 'other' && !newGuardian.relationshipOther ? 'border-red-300' : ''}`}
                           value={newGuardian.relationshipOther || ''}
                           onChange={(e) => setNewGuardian({...newGuardian, relationshipOther: e.target.value})}
                           required

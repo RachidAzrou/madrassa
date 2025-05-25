@@ -213,6 +213,8 @@ export default function Students() {
         status: formData.status || "ingeschreven", // Default waarde
         programName: programs.find(p => p.id.toString() === formData.programId)?.name || '',
         studentGroupName: studentGroups.find(g => g.id.toString() === formData.studentGroupId)?.name || '',
+        guardians: selectedGuardians,
+        relatedStudents: selectedSiblings
       };
       
       // Update studenten lijst met nieuwe student
@@ -254,59 +256,17 @@ export default function Students() {
     setSelectedStudent(student);
     
     try {
-      // Simuleer ophalen van voogden voor deze student
-      // In een echte implementatie zou dit een API-aanroep zijn zoals:
-      // const guardiansResponse = await fetch(`/api/guardians/student/${student.id}`);
-      // const guardiansData = await guardiansResponse.json();
+      // Haal de werkelijke voogden op die aan deze student zijn gekoppeld
+      const studentGuardians = student.guardians || [];
       
-      // Voor ontwikkelingsdoeleinden, genereer mock voogden
-      const mockGuardians = [
-        {
-          id: 1,
-          firstName: "Ahmed",
-          lastName: "El Mouden",
-          relationship: "Vader",
-          email: "ahmed.elmouden@example.com",
-          phone: "0412345678"
-        },
-        {
-          id: 2,
-          firstName: "Fatima",
-          lastName: "El Mouden",
-          relationship: "Moeder",
-          email: "fatima.elmouden@example.com",
-          phone: "0487654321"
-        }
-      ];
+      // Haal de werkelijke broers/zussen op die aan deze student zijn gekoppeld
+      const studentSiblings = student.relatedStudents || [];
       
-      // Simuleer ophalen van gerelateerde studenten (broers/zussen)
-      // In een echte implementatie zou dit een API-aanroep zijn zoals:
-      // const relatedStudentsResponse = await fetch(`/api/students/related/${student.id}`);
-      // const relatedStudentsData = await relatedStudentsResponse.json();
-      
-      // Voor ontwikkelingsdoeleinden, genereer mock gerelateerde studenten
-      const mockRelatedStudents = [
-        {
-          id: 3,
-          firstName: "Nora",
-          lastName: "El Mouden",
-          photoUrl: null,
-          studentId: "ST24003"
-        },
-        {
-          id: 4,
-          firstName: "Yassin",
-          lastName: "El Mouden",
-          photoUrl: null,
-          studentId: "ST24004"
-        }
-      ];
-      
-      // Update de geselecteerde student met voogden en gerelateerde studenten
+      // Update de geselecteerde student met de werkelijke gegevens
       setSelectedStudent(prevStudent => ({
         ...prevStudent,
-        guardians: mockGuardians,
-        relatedStudents: mockRelatedStudents
+        guardians: studentGuardians,
+        relatedStudents: studentSiblings
       }));
       
       // Open het dialoogvenster

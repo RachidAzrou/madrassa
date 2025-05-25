@@ -130,6 +130,32 @@ export default function Students() {
 
   const handleCreateStudent = async (e) => {
     e.preventDefault();
+    
+    // Controleer verplichte velden
+    const requiredFields = [
+      { name: 'firstName', label: 'Voornaam' },
+      { name: 'lastName', label: 'Achternaam' },
+      { name: 'dateOfBirth', label: 'Geboortedatum' },
+      { name: 'gender', label: 'Geslacht' },
+      { name: 'street', label: 'Straat' },
+      { name: 'houseNumber', label: 'Huisnummer' },
+      { name: 'postalCode', label: 'Postcode' },
+      { name: 'city', label: 'Plaats' },
+      { name: 'academicYear', label: 'Schooljaar' },
+      { name: 'status', label: 'Status' }
+    ];
+    
+    const missingFields = requiredFields.filter(field => !formData[field.name]);
+    
+    if (missingFields.length > 0) {
+      toast({
+        title: "Verplichte velden ontbreken",
+        description: `Vul de volgende verplichte velden in: ${missingFields.map(f => f.label).join(', ')}`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
       // Student would be created here
       console.log('Creating student:', formData);

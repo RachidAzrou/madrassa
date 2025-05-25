@@ -2666,6 +2666,7 @@ export default function Students() {
                         className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
                         onClick={() => {
                           setNewStudentSiblings([...newStudentSiblings, student]);
+                          setSelectedSiblings([...selectedSiblings, student]);
                           toast({
                             title: "Broer/Zus gekoppeld",
                             description: "De student is toegevoegd als broer/zus"

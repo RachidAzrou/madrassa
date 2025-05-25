@@ -630,22 +630,19 @@ export default function Students() {
                   />
                 </TableHead>
                 <TableHead className="px-4 py-3 text-center">
-                  <span className="text-xs font-medium text-gray-700">Student ID</span>
+                  <span className="text-xs font-medium text-gray-700">ID</span>
                 </TableHead>
                 <TableHead className="px-4 py-3 text-center">
                   <span className="text-xs font-medium text-gray-700">Naam</span>
                 </TableHead>
                 <TableHead className="px-4 py-3 text-left">
-                  <span className="text-xs font-medium text-gray-700">Opleiding</span>
+                  <span className="text-xs font-medium text-gray-700">Klas</span>
+                </TableHead>
+                <TableHead className="px-4 py-3 text-left">
+                  <span className="text-xs font-medium text-gray-700">Schooljaar</span>
                 </TableHead>
                 <TableHead className="px-4 py-3 text-left">
                   <span className="text-xs font-medium text-gray-700">Status</span>
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left">
-                  <span className="text-xs font-medium text-gray-700">Email</span>
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left">
-                  <span className="text-xs font-medium text-gray-700">Telefoon</span>
                 </TableHead>
                 <EmptyActionHeader />
               </TableRow>
@@ -653,13 +650,13 @@ export default function Students() {
             <TableBody>
               {studentsLoading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-24 text-center">
+                  <TableCell colSpan={7} className="h-24 text-center">
                     <TableLoadingState />
                   </TableCell>
                 </TableRow>
               ) : filteredStudents.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-24 text-center">
+                  <TableCell colSpan={7} className="h-24 text-center">
                     <EmptyTableState 
                       icon={<Users className="h-8 w-8 text-gray-400" />}
                       title="Geen studenten gevonden"
@@ -699,7 +696,12 @@ export default function Students() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-xs text-gray-500">{student.programName}</TableCell>
+                    <TableCell className="px-4 py-3 text-xs text-gray-500">
+                      {student.studentGroupName || "-"}
+                    </TableCell>
+                    <TableCell className="px-4 py-3 text-xs text-gray-500">
+                      {student.academicYear || "2023-2024"}
+                    </TableCell>
                     <TableCell className="px-4 py-3">
                       <Badge 
                         variant="outline" 
@@ -716,8 +718,6 @@ export default function Students() {
                          'Ingeschreven'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-xs text-gray-500">{student.email}</TableCell>
-                    <TableCell className="px-4 py-3 text-xs text-gray-500">{student.phone}</TableCell>
                     <TableCell className="px-4 py-3 text-right">
                       <ActionButtonsContainer>
                         <Button

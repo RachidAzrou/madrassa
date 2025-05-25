@@ -379,15 +379,15 @@ export default function Students() {
                 value={statusFilter} 
                 onValueChange={setStatusFilter}
               >
-                <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
-                  <SelectValue placeholder="Status" />
+                <SelectTrigger className="w-40 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white">
+                  <SelectValue placeholder="Status" className="text-[#1e40af]" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle statussen</SelectItem>
-                  <SelectItem value="active">Actief</SelectItem>
-                  <SelectItem value="inactive">Inactief</SelectItem>
-                  <SelectItem value="graduated">Afgestudeerd</SelectItem>
-                  <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
+                <SelectContent className="bg-white border-[#e5e7eb]">
+                  <SelectItem value="all" className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">Alle statussen</SelectItem>
+                  <SelectItem value="active" className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">Actief</SelectItem>
+                  <SelectItem value="inactive" className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">Inactief</SelectItem>
+                  <SelectItem value="graduated" className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">Afgestudeerd</SelectItem>
+                  <SelectItem value="withdrawn" className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">Teruggetrokken</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -395,13 +395,13 @@ export default function Students() {
                 value={filterProgram} 
                 onValueChange={setFilterProgram}
               >
-                <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
-                  <SelectValue placeholder="Programma" />
+                <SelectTrigger className="w-40 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white">
+                  <SelectValue placeholder="Programma" className="text-[#1e40af]" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle programma's</SelectItem>
+                <SelectContent className="bg-white border-[#e5e7eb]">
+                  <SelectItem value="all" className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">Alle programma's</SelectItem>
                   {programs.map((program) => (
-                    <SelectItem key={program.id} value={program.id.toString()}>
+                    <SelectItem key={program.id} value={program.id.toString()} className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">
                       {program.name}
                     </SelectItem>
                   ))}
@@ -412,14 +412,14 @@ export default function Students() {
                 value={filterAcademicYear} 
                 onValueChange={setFilterAcademicYear}
               >
-                <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
-                  <SelectValue placeholder="Schooljaar" />
+                <SelectTrigger className="w-40 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white">
+                  <SelectValue placeholder="Schooljaar" className="text-[#1e40af]" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle schooljaren</SelectItem>
-                  <SelectItem value="2024-2025">2024-2025</SelectItem>
-                  <SelectItem value="2023-2024">2023-2024</SelectItem>
-                  <SelectItem value="2022-2023">2022-2023</SelectItem>
+                <SelectContent className="bg-white border-[#e5e7eb]">
+                  <SelectItem value="all" className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">Alle schooljaren</SelectItem>
+                  <SelectItem value="2024-2025" className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">2024-2025</SelectItem>
+                  <SelectItem value="2023-2024" className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">2023-2024</SelectItem>
+                  <SelectItem value="2022-2023" className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">2022-2023</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -427,13 +427,13 @@ export default function Students() {
                 value={filterStudentGroup} 
                 onValueChange={setFilterStudentGroup}
               >
-                <SelectTrigger className="w-40 h-7 text-xs rounded-sm">
-                  <SelectValue placeholder="Klas" />
+                <SelectTrigger className="w-40 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white">
+                  <SelectValue placeholder="Klas" className="text-[#1e40af]" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle klassen</SelectItem>
+                <SelectContent className="bg-white border-[#e5e7eb]">
+                  <SelectItem value="all" className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">Alle klassen</SelectItem>
                   {studentGroups.map((group) => (
-                    <SelectItem key={group.id} value={group.id.toString()}>
+                    <SelectItem key={group.id} value={group.id.toString()} className="text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af]">
                       {group.name}
                     </SelectItem>
                   ))}

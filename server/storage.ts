@@ -1,4 +1,4 @@
-import { users, type User, type InsertUser } from "@shared/schema";
+import { users, type User, type InsertUser, feeDiscounts, type FeeDiscount, feeSettings, type FeeSettings } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -7,6 +7,8 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(insertUser: InsertUser): Promise<User>;
+  getFeeDiscounts(): Promise<FeeDiscount[]>;
+  getFeeSettings(): Promise<FeeSettings[]>;
 }
 
 // DatabaseStorage implementatie die gebruik maakt van de database
@@ -27,6 +29,14 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+  
+  async getFeeDiscounts(): Promise<FeeDiscount[]> {
+    return await db.select().from(feeDiscounts);
+  }
+  
+  async getFeeSettings(): Promise<FeeSettings[]> {
+    return await db.select().from(feeSettings);
   }
 }
 

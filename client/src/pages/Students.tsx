@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, X, UserCircle,
-  ChevronUp, ChevronDown, FileText, FileDown, Mail, Home, BookOpen, Phone,
-  Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, ChevronRight
+  ChevronUp, ChevronDown, FileText, FileDown, Mail, Home as HomeIcon, BookOpen, Phone,
+  Users, User, MapPin, GraduationCap, UsersRound, Pencil, Trash, ChevronRight,
+  UserPlus, ClipboardEdit, CreditCard, Smartphone, NotebookText, CheckCircle2, Loader2,
+  ScanLine, Fingerprint, AlertCircle, Home
 } from 'lucide-react';
 import { Topbar } from '@/components/layout/topbar';
 import { PremiumHeader } from '@/components/layout/premium-header';
@@ -547,264 +549,336 @@ export default function Students() {
 
       {/* Create Student Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[700px]">
-          <DialogHeader>
-            <DialogTitle className="text-[#1e40af]">Student Toevoegen</DialogTitle>
-            <DialogDescription>
-              Voeg een nieuwe student toe aan het systeem.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden">
+          <div className="bg-[#1e40af] py-5 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <UserPlus className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Student Toevoegen</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Voeg een nieuwe student toe aan het systeem.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
           
           <form onSubmit={handleCreateStudent}>
-            <Tabs defaultValue="handmatig" className="mt-2">
-              <TabsList className="grid w-full grid-cols-3 mb-4">
-                <TabsTrigger value="handmatig">Handmatig</TabsTrigger>
-                <TabsTrigger value="eid">e-ID Kaart</TabsTrigger>
-                <TabsTrigger value="itsme">itsme®</TabsTrigger>
-              </TabsList>
+            <Tabs defaultValue="handmatig" className="mt-0">
+              <div className="bg-[#f8fafc] px-6 py-3 border-b">
+                <TabsList className="grid w-full grid-cols-3 bg-[#e2e8f0]">
+                  <TabsTrigger 
+                    value="handmatig" 
+                    className="data-[state=active]:bg-white data-[state=active]:text-[#1e40af] data-[state=active]:shadow"
+                  >
+                    <ClipboardEdit className="h-4 w-4 mr-2" />
+                    Handmatig
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="eid" 
+                    className="data-[state=active]:bg-white data-[state=active]:text-[#1e40af] data-[state=active]:shadow"
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    e-ID Kaart
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="itsme" 
+                    className="data-[state=active]:bg-white data-[state=active]:text-[#1e40af] data-[state=active]:shadow"
+                  >
+                    <Smartphone className="h-4 w-4 mr-2" />
+                    itsme®
+                  </TabsTrigger>
+                </TabsList>
+              </div>
               
-              <TabsContent value="handmatig">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="studentId">Student ID</Label>
-                    <Input
-                      id="studentId"
-                      name="studentId"
-                      value={formData.studentId}
-                      onChange={handleInputChange}
-                      required
-                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="gender">Geslacht</Label>
-                    <Select 
-                      value={formData.gender} 
-                      onValueChange={(value) => handleSelectChange('gender', value)}
-                      required
-                    >
-                      <SelectTrigger className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]">
-                        <SelectValue placeholder="Selecteer geslacht" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="man">Man</SelectItem>
-                        <SelectItem value="vrouw">Vrouw</SelectItem>
-                        <SelectItem value="anders">Anders</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Voornaam</Label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      required
-                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Achternaam</Label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      required
-                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Telefoon</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="dateOfBirth">Geboortedatum</Label>
-                    <Input
-                      id="dateOfBirth"
-                      name="dateOfBirth"
-                      type="date"
-                      value={formData.dateOfBirth || ""}
-                      onChange={handleInputChange}
-                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="programId">Programma</Label>
-                    <Select 
-                      value={formData.programId} 
-                      onValueChange={(value) => handleSelectChange('programId', value)}
-                    >
-                      <SelectTrigger className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]">
-                        <SelectValue placeholder="Selecteer programma" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {programs.map((program) => (
-                          <SelectItem key={program.id} value={program.id.toString()}>
-                            {program.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="yearLevel">Jaar Niveau</Label>
-                    <Select 
-                      value={formData.yearLevel} 
-                      onValueChange={(value) => handleSelectChange('yearLevel', value)}
-                    >
-                      <SelectTrigger className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]">
-                        <SelectValue placeholder="Selecteer niveau" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">Jaar 1</SelectItem>
-                        <SelectItem value="2">Jaar 2</SelectItem>
-                        <SelectItem value="3">Jaar 3</SelectItem>
-                        <SelectItem value="4">Jaar 4</SelectItem>
-                        <SelectItem value="5">Jaar 5</SelectItem>
-                        <SelectItem value="6">Jaar 6</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="studentGroupId">Klassengroep</Label>
-                    <Select 
-                      value={formData.studentGroupId} 
-                      onValueChange={(value) => handleSelectChange('studentGroupId', value)}
-                    >
-                      <SelectTrigger className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]">
-                        <SelectValue placeholder="Selecteer klassengroep" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {studentGroups.map((group) => (
-                          <SelectItem key={group.id} value={group.id.toString()}>
-                            {group.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="enrollmentDate">Inschrijvingsdatum</Label>
-                    <Input
-                      id="enrollmentDate"
-                      name="enrollmentDate"
-                      type="date"
-                      value={formData.enrollmentDate || ""}
-                      onChange={handleInputChange}
-                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="status">Status</Label>
-                    <Select 
-                      value={formData.status} 
-                      onValueChange={(value) => handleSelectChange('status', value)}
-                    >
-                      <SelectTrigger className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]">
-                        <SelectValue placeholder="Selecteer status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="active">Actief</SelectItem>
-                        <SelectItem value="inactive">Inactief</SelectItem>
-                        <SelectItem value="graduated">Afgestudeerd</SelectItem>
-                        <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="col-span-1 md:col-span-2 space-y-2">
-                    <Label htmlFor="street">Straat</Label>
-                    <Input
-                      id="street"
-                      name="street"
-                      value={formData.street}
-                      onChange={handleInputChange}
-                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="houseNumber">Huisnummer</Label>
-                    <Input
-                      id="houseNumber"
-                      name="houseNumber"
-                      value={formData.houseNumber}
-                      onChange={handleInputChange}
-                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="postalCode">Postcode</Label>
-                    <Input
-                      id="postalCode"
-                      name="postalCode"
-                      value={formData.postalCode}
-                      onChange={handleInputChange}
-                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="city">Stad</Label>
-                    <Input
-                      id="city"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
-                    />
-                  </div>
-                  
-                  <div className="col-span-1 md:col-span-2 space-y-2">
-                    <Label htmlFor="notes">Notities</Label>
-                    <Textarea
-                      id="notes"
-                      name="notes"
-                      value={formData.notes}
-                      onChange={handleInputChange}
-                      rows={3}
-                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
-                    />
+              <TabsContent value="handmatig" className="p-0 mt-0">
+                <div className="px-6 py-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div className="space-y-4 md:col-span-2">
+                      <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                        <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                          <User className="h-4 w-4 mr-2" />
+                          Persoonlijke Informatie
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="studentId" className="text-xs font-medium text-gray-700">Student ID *</Label>
+                            <Input
+                              id="studentId"
+                              name="studentId"
+                              value={formData.studentId}
+                              onChange={handleInputChange}
+                              required
+                              className="mt-1 h-9"
+                              placeholder="Bijv. STU-001"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="gender" className="text-xs font-medium text-gray-700">Geslacht *</Label>
+                            <Select 
+                              value={formData.gender} 
+                              onValueChange={(value) => handleSelectChange('gender', value)}
+                              required
+                            >
+                              <SelectTrigger className="mt-1 h-9">
+                                <SelectValue placeholder="Selecteer geslacht" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="man">Man</SelectItem>
+                                <SelectItem value="vrouw">Vrouw</SelectItem>
+                                <SelectItem value="anders">Anders</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">Voornaam *</Label>
+                            <Input
+                              id="firstName"
+                              name="firstName"
+                              value={formData.firstName}
+                              onChange={handleInputChange}
+                              required
+                              className="mt-1 h-9"
+                              placeholder="Voornaam"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">Achternaam *</Label>
+                            <Input
+                              id="lastName"
+                              name="lastName"
+                              value={formData.lastName}
+                              onChange={handleInputChange}
+                              required
+                              className="mt-1 h-9"
+                              placeholder="Achternaam"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="email" className="text-xs font-medium text-gray-700">Email</Label>
+                            <Input
+                              id="email"
+                              name="email"
+                              type="email"
+                              value={formData.email}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="email@voorbeeld.com"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="phone" className="text-xs font-medium text-gray-700">Telefoon</Label>
+                            <Input
+                              id="phone"
+                              name="phone"
+                              value={formData.phone}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="+32 123 456 789"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">Geboortedatum</Label>
+                            <Input
+                              id="dateOfBirth"
+                              name="dateOfBirth"
+                              type="date"
+                              value={formData.dateOfBirth || ""}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                        <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                          <HomeIcon className="h-4 w-4 mr-2" />
+                          Adresgegevens
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                          <div className="md:col-span-4">
+                            <Label htmlFor="street" className="text-xs font-medium text-gray-700">Straat</Label>
+                            <Input
+                              id="street"
+                              name="street"
+                              value={formData.street}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="Straatnaam"
+                            />
+                          </div>
+                          
+                          <div className="md:col-span-2">
+                            <Label htmlFor="houseNumber" className="text-xs font-medium text-gray-700">Huisnummer</Label>
+                            <Input
+                              id="houseNumber"
+                              name="houseNumber"
+                              value={formData.houseNumber}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="123"
+                            />
+                          </div>
+                          
+                          <div className="md:col-span-2">
+                            <Label htmlFor="postalCode" className="text-xs font-medium text-gray-700">Postcode</Label>
+                            <Input
+                              id="postalCode"
+                              name="postalCode"
+                              value={formData.postalCode}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="1000"
+                            />
+                          </div>
+                          
+                          <div className="md:col-span-4">
+                            <Label htmlFor="city" className="text-xs font-medium text-gray-700">Stad</Label>
+                            <Input
+                              id="city"
+                              name="city"
+                              value={formData.city}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="Brussel"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                        <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                          <GraduationCap className="h-4 w-4 mr-2" />
+                          Onderwijsgegevens
+                        </h3>
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="programId" className="text-xs font-medium text-gray-700">Programma</Label>
+                            <Select 
+                              value={formData.programId} 
+                              onValueChange={(value) => handleSelectChange('programId', value)}
+                            >
+                              <SelectTrigger className="mt-1 h-9">
+                                <SelectValue placeholder="Selecteer programma" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {programs.map((program) => (
+                                  <SelectItem key={program.id} value={program.id}>
+                                    {program.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="yearLevel" className="text-xs font-medium text-gray-700">Jaar Niveau</Label>
+                            <Select 
+                              value={formData.yearLevel} 
+                              onValueChange={(value) => handleSelectChange('yearLevel', value)}
+                            >
+                              <SelectTrigger className="mt-1 h-9">
+                                <SelectValue placeholder="Selecteer niveau" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="1">Jaar 1</SelectItem>
+                                <SelectItem value="2">Jaar 2</SelectItem>
+                                <SelectItem value="3">Jaar 3</SelectItem>
+                                <SelectItem value="4">Jaar 4</SelectItem>
+                                <SelectItem value="5">Jaar 5</SelectItem>
+                                <SelectItem value="6">Jaar 6</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="studentGroupId" className="text-xs font-medium text-gray-700">Klassengroep</Label>
+                            <Select 
+                              value={formData.studentGroupId} 
+                              onValueChange={(value) => handleSelectChange('studentGroupId', value)}
+                            >
+                              <SelectTrigger className="mt-1 h-9">
+                                <SelectValue placeholder="Selecteer klassengroep" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {studentGroups.map((group) => (
+                                  <SelectItem key={group.id} value={group.id}>
+                                    {group.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="enrollmentDate" className="text-xs font-medium text-gray-700">Inschrijvingsdatum</Label>
+                            <Input
+                              id="enrollmentDate"
+                              name="enrollmentDate"
+                              type="date"
+                              value={formData.enrollmentDate || ""}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="status" className="text-xs font-medium text-gray-700">Status</Label>
+                            <Select 
+                              value={formData.status} 
+                              onValueChange={(value) => handleSelectChange('status', value)}
+                            >
+                              <SelectTrigger className="mt-1 h-9">
+                                <SelectValue placeholder="Selecteer status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="active">Actief</SelectItem>
+                                <SelectItem value="inactive">Inactief</SelectItem>
+                                <SelectItem value="graduated">Afgestudeerd</SelectItem>
+                                <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                        <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                          <NotebookText className="h-4 w-4 mr-2" />
+                          Notities
+                        </h3>
+                        <div>
+                          <Textarea
+                            id="notes"
+                            name="notes"
+                            value={formData.notes}
+                            onChange={handleInputChange}
+                            rows={3}
+                            className="resize-none"
+                            placeholder="Eventuele opmerkingen of bijzonderheden over deze student"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </TabsContent>
               
-              <TabsContent value="eid">
-                <div className="p-6 space-y-6">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-[#77CC9A] rounded-lg flex items-center justify-center text-white mx-auto mb-4">
-                      <span className="font-bold text-2xl">eID</span>
+              <TabsContent value="eid" className="p-0 mt-0">
+                <div className="p-6">
+                  <div className="bg-[#f8fafc] p-6 rounded-lg border border-[#e2e8f0] max-w-md mx-auto text-center">
+                    <div className="w-16 h-16 bg-[#77CC9A] rounded-full flex items-center justify-center text-white mx-auto mb-4">
+                      <CreditCard className="h-8 w-8" />
                     </div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Identificatie via e-ID kaart</h3>
                     <p className="text-sm text-gray-500 mb-6">
@@ -812,8 +886,8 @@ export default function Students() {
                     </p>
                     
                     <div className="flex flex-col items-center">
-                      <div className="w-64 h-36 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-6">
-                        <div className="text-center text-gray-500">
+                      <div className="w-64 h-36 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-6 bg-white">
+                        <div className="text-center text-gray-400">
                           <User className="w-12 h-12 mx-auto text-gray-300" />
                           <p className="text-xs mt-1">e-ID kaart hier plaatsen</p>
                         </div>
@@ -823,19 +897,23 @@ export default function Students() {
                         className="bg-[#1e40af] hover:bg-[#1e40af]/90 mb-2"
                         disabled
                       >
+                        <ScanLine className="h-4 w-4 mr-2" />
                         Gegevens Inlezen
                       </Button>
-                      <p className="text-xs text-gray-500">Kaartlezer niet gedetecteerd</p>
+                      <p className="text-xs text-gray-500 flex items-center gap-1 justify-center">
+                        <AlertCircle className="h-3 w-3" />
+                        Kaartlezer niet gedetecteerd
+                      </p>
                     </div>
                   </div>
                 </div>
               </TabsContent>
               
-              <TabsContent value="itsme">
-                <div className="p-6 space-y-6">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-[#FF4D27] rounded-lg flex items-center justify-center text-white mx-auto mb-4">
-                      <span className="font-bold text-lg">itsme®</span>
+              <TabsContent value="itsme" className="p-0 mt-0">
+                <div className="p-6">
+                  <div className="bg-[#f8fafc] p-6 rounded-lg border border-[#e2e8f0] max-w-md mx-auto text-center">
+                    <div className="w-16 h-16 bg-[#FF4D27] rounded-full flex items-center justify-center text-white mx-auto mb-4">
+                      <Fingerprint className="h-8 w-8" />
                     </div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Identificatie via itsme®</h3>
                     <p className="text-sm text-gray-500 mb-6">
@@ -843,7 +921,7 @@ export default function Students() {
                     </p>
                     
                     <div className="max-w-sm mx-auto space-y-6">
-                      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                      <div className="bg-white rounded-lg p-5 border border-gray-200">
                         <ol className="list-decimal list-inside text-sm text-gray-600 space-y-3">
                           <li>Open de itsme® app op uw smartphone</li>
                           <li>Klik op de knop hieronder om de identificatie te starten</li>
@@ -853,6 +931,7 @@ export default function Students() {
                       </div>
                       
                       <Button className="bg-[#FF4D27] hover:bg-[#FF4D27]/90 w-full">
+                        <Smartphone className="h-4 w-4 mr-2" />
                         Identificeren met itsme®
                       </Button>
                     </div>
@@ -861,14 +940,24 @@ export default function Students() {
               </TabsContent>
             </Tabs>
             
-            <DialogFooter className="mt-6 gap-2">
+            <div className="border-t border-gray-200 px-6 py-4 flex justify-end gap-2 bg-[#f8fafc]">
               <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                 Annuleren
               </Button>
               <Button type="submit" className="bg-[#1e40af] hover:bg-[#1e40af]/90">
-                {createStudentMutation.isPending ? "Bezig met opslaan..." : "Student Toevoegen"}
+                {createStudentMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Bezig met opslaan...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                    Student Toevoegen
+                  </>
+                )}
               </Button>
-            </DialogFooter>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
@@ -1024,7 +1113,7 @@ export default function Students() {
                               
                               {guardian.address && (
                                 <div className="flex items-center gap-1 text-sm text-gray-600 md:col-span-2">
-                                  <Home className="h-3.5 w-3.5 text-gray-500" />
+                                  <HomeIcon className="h-3.5 w-3.5 text-gray-500" />
                                   <span>{guardian.address}</span>
                                 </div>
                               )}

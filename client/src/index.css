@@ -3,49 +3,79 @@
 @tailwind utilities;
 
 :root {
-      --background: 0 0% 100%;
---foreground: 20 14.3% 4.1%;
---muted: 60 4.8% 95.9%;
---muted-foreground: 25 5.3% 44.7%;
---popover: 0 0% 100%;
---popover-foreground: 20 14.3% 4.1%;
---card: 0 0% 100%;
---card-foreground: 20 14.3% 4.1%;
---border: 20 5.9% 90%;
---input: 20 5.9% 90%;
---primary: 219 85% 34%;
---primary-foreground: 211 100% 99%;
---secondary: 60 4.8% 95.9%;
---secondary-foreground: 24 9.8% 10%;
---accent: 60 4.8% 95.9%;
---accent-foreground: 24 9.8% 10%;
---destructive: 0 84.2% 60.2%;
---destructive-foreground: 60 9.1% 97.8%;
---ring: 20 14.3% 4.1%;
---radius: 0.5rem;
+  /* Neutrale kleuren voor zakelijke uitstraling */
+  --background: 0 0% 100%;
+  --foreground: 222 14% 9%;
+  --muted: 210 40% 98%;
+  --muted-foreground: 215 16% 47%;
+  
+  /* Containers en randen */
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 14% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 14% 9%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  
+  /* Blauwtinten als accentkleuren voor het logo */
+  --primary: 214 89% 34%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 214 32% 96%;
+  --secondary-foreground: 222 14% 9%;
+  --accent: 214 84% 15%;
+  --accent-foreground: 0 0% 100%;
+  
+  /* Functionele kleuren */
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 142 69% 34%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 0%;
+  --info: 214 100% 50%;
+  --info-foreground: 0 0% 100%;
+  
+  /* Algemene UI eigenschappen */
+  --ring: 214 89% 34%;
+  --radius: 0.25rem;
   }
   .dark {
-      --background: 220 18% 14%;
-      --foreground: 220 10% 98%;
-      --muted: 220 15% 20%;
-      --muted-foreground: 220 10% 70%;
-      --popover: 220 18% 14%;
-      --popover-foreground: 220 10% 98%;
-      --card: 220 18% 16%;
-      --card-foreground: 220 10% 98%;
-      --border: 220 15% 25%;
-      --input: 220 15% 25%;
-      --primary: 219 85% 45%;
-      --primary-foreground: 0 0% 100%;
-      --secondary: 220 15% 25%;
-      --secondary-foreground: 220 10% 98%;
-      --accent: 219 70% 25%;
-      --accent-foreground: 220 10% 98%;
-      --destructive: 0 62.8% 40%;
-      --destructive-foreground: 0 0% 98%;
-      --ring: 219 85% 45%;
-      --radius: 0.5rem;
-  }
+  /* Neutrale kleuren voor zakelijke dark mode */
+  --background: 222 18% 12%;
+  --foreground: 210 40% 98%;
+  --muted: 217 19% 18%;
+  --muted-foreground: 215 20% 65%;
+  
+  /* Containers en randen */
+  --popover: 222 18% 12%;
+  --popover-foreground: 210 40% 98%;
+  --card: 222 20% 15%;
+  --card-foreground: 210 40% 98%;
+  --border: 217 19% 27%;
+  --input: 217 19% 27%;
+  
+  /* Blauwtinten als accentkleuren */
+  --primary: 214 85% 45%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 217 19% 27%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 214 84% 40%;
+  --accent-foreground: 0 0% 100%;
+  
+  /* Functionele kleuren */
+  --destructive: 0 62.8% 40%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 142 60% 30%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 90% 45%;
+  --warning-foreground: 0 0% 0%;
+  --info: 214 90% 45%;
+  --info-foreground: 0 0% 100%;
+  
+  /* Algemene UI eigenschappen */
+  --ring: 214 85% 45%;
+  --radius: 0.25rem;
+}
 
 @layer base {
   * {

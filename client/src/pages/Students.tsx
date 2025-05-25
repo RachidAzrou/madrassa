@@ -607,7 +607,7 @@ export default function Students() {
             setFormData(emptyFormData);
           }
         }}>
-        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden max-h-[90vh]">
+        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden max-h-[90vh]" aria-describedby="student-dialog-description">
           <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-2 rounded-full">
@@ -615,7 +615,7 @@ export default function Students() {
               </div>
               <div>
                 <DialogTitle className="text-white text-lg font-semibold m-0">Student Toevoegen</DialogTitle>
-                <DialogDescription className="text-white/70 text-sm m-0">
+                <DialogDescription id="student-dialog-description" className="text-white/70 text-sm m-0">
                   Voeg een nieuwe student toe aan het systeem.
                 </DialogDescription>
               </div>

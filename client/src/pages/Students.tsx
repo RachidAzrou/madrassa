@@ -1665,7 +1665,7 @@ export default function Students() {
                   className="h-24 rounded-md border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-blue-300 hover:bg-blue-50"
                   onClick={() => handleExportStudents('excel')}
                 >
-                  <FileDown className="h-8 w-8 text-green-600" />
+                  <Upload className="h-8 w-8 text-green-600" />
                   <span className="text-sm font-medium">Excel</span>
                 </Button>
                 <Button 
@@ -1673,7 +1673,7 @@ export default function Students() {
                   className="h-24 rounded-md border-gray-300 flex flex-col items-center justify-center gap-2 hover:border-blue-300 hover:bg-blue-50"
                   onClick={() => handleExportStudents('pdf')}
                 >
-                  <FileDown className="h-8 w-8 text-red-600" />
+                  <Upload className="h-8 w-8 text-red-600" />
                   <span className="text-sm font-medium">PDF</span>
                 </Button>
               </div>

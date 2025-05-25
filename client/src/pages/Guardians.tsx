@@ -22,6 +22,10 @@ import {
   SectionContainer, 
   DialogFooterContainer 
 } from '@/components/ui/custom-dialog';
+import {
+  ActionButtonsContainer,
+  EmptyActionHeader
+} from '@/components/ui/data-table-container';
 
 // Type definities
 type GuardianType = {
@@ -320,9 +324,7 @@ export default function Guardians() {
                   <th scope="col" className="px-4 py-3 text-left">
                     <span className="text-xs font-medium text-gray-700">Telefoon</span>
                   </th>
-                  <th scope="col" className="px-4 py-3 text-right w-[120px]">
-                    <span className="text-xs font-medium text-gray-700">Acties</span>
-                  </th>
+                  <EmptyActionHeader />
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-[#e5e7eb]">
@@ -413,7 +415,7 @@ export default function Guardians() {
                       <td className="px-4 py-3 text-xs text-gray-500">{guardian.email}</td>
                       <td className="px-4 py-3 text-xs text-gray-500">{guardian.phone || "-"}</td>
                       <td className="px-4 py-3 text-right">
-                        <div className="flex justify-end gap-1">
+                        <ActionButtonsContainer>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -438,7 +440,7 @@ export default function Guardians() {
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
-                        </div>
+                        </ActionButtonsContainer>
                       </td>
                     </tr>
                   ))

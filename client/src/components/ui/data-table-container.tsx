@@ -71,6 +71,41 @@ export function FilterSelectItem({ value, children, className = "" }: { value: s
   );
 }
 
+/**
+ * Styled action buttons container with consistent styling
+ * Buttons inside this container will only be visible on row hover
+ */
+export function ActionButtonsContainer({ 
+  children, 
+  className = "" 
+}: { 
+  children: ReactNode; 
+  className?: string 
+}) {
+  return (
+    <div className={`flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Table header without text for action columns
+ */
+export function EmptyActionHeader({ 
+  className = "",
+  width = "120px" 
+}: { 
+  className?: string;
+  width?: string;
+}) {
+  return (
+    <th scope="col" className={`px-4 py-3 text-right w-[120px] ${className}`}>
+      <span className="text-xs font-medium text-gray-700"></span>
+    </th>
+  );
+}
+
 interface SearchActionBarProps {
   children: ReactNode;
   className?: string;

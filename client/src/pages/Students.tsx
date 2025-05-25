@@ -621,8 +621,7 @@ export default function Students() {
                             ) : (
                               <>
                                 <UserCircle className="h-12 w-12 text-gray-400 mb-2" />
-                                <p className="text-xs text-gray-500 text-center px-2">Klik om foto handmatig te uploaden</p>
-                                <p className="text-xs text-gray-400 text-center px-2 mt-1">Foto wordt automatisch geladen via eID of itsme</p>
+                                <p className="text-xs text-gray-400 text-center px-2">Foto wordt automatisch geladen via eID of itsme</p>
                               </>
                             )}
                           </div>
@@ -673,7 +672,6 @@ export default function Students() {
                               <SelectContent>
                                 <SelectItem value="man">Man</SelectItem>
                                 <SelectItem value="vrouw">Vrouw</SelectItem>
-                                <SelectItem value="anders">Anders</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -808,52 +806,25 @@ export default function Students() {
                         </h3>
                         <div className="space-y-4">
                           <div>
-                            <Label htmlFor="programId" className="text-xs font-medium text-gray-700">Programma</Label>
-                            <Select 
-                              value={formData.programId} 
-                              onValueChange={(value) => handleSelectChange('programId', value)}
-                            >
-                              <SelectTrigger className="mt-1 h-9">
-                                <SelectValue placeholder="Selecteer programma" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {programs.map((program) => (
-                                  <SelectItem key={program.id} value={program.id}>
-                                    {program.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <Label htmlFor="schoolYear" className="text-xs font-medium text-gray-700">Schooljaar</Label>
+                            <Input
+                              id="schoolYear"
+                              name="schoolYear"
+                              value={formData.schoolYear}
+                              onChange={handleInputChange}
+                              className="mt-1 h-9"
+                              placeholder="Bijv. 2023-2024"
+                            />
                           </div>
                           
                           <div>
-                            <Label htmlFor="yearLevel" className="text-xs font-medium text-gray-700">Jaar Niveau</Label>
-                            <Select 
-                              value={formData.yearLevel} 
-                              onValueChange={(value) => handleSelectChange('yearLevel', value)}
-                            >
-                              <SelectTrigger className="mt-1 h-9">
-                                <SelectValue placeholder="Selecteer niveau" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="1">Jaar 1</SelectItem>
-                                <SelectItem value="2">Jaar 2</SelectItem>
-                                <SelectItem value="3">Jaar 3</SelectItem>
-                                <SelectItem value="4">Jaar 4</SelectItem>
-                                <SelectItem value="5">Jaar 5</SelectItem>
-                                <SelectItem value="6">Jaar 6</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          
-                          <div>
-                            <Label htmlFor="studentGroupId" className="text-xs font-medium text-gray-700">Klassengroep</Label>
+                            <Label htmlFor="studentGroupId" className="text-xs font-medium text-gray-700">Klas</Label>
                             <Select 
                               value={formData.studentGroupId} 
                               onValueChange={(value) => handleSelectChange('studentGroupId', value)}
                             >
                               <SelectTrigger className="mt-1 h-9">
-                                <SelectValue placeholder="Selecteer klassengroep" />
+                                <SelectValue placeholder="Selecteer klas" />
                               </SelectTrigger>
                               <SelectContent>
                                 {studentGroups.map((group) => (
@@ -887,10 +858,10 @@ export default function Students() {
                                 <SelectValue placeholder="Selecteer status" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="active">Actief</SelectItem>
-                                <SelectItem value="inactive">Inactief</SelectItem>
+                                <SelectItem value="active">Ingeschreven</SelectItem>
+                                <SelectItem value="inactive">Uitgeschreven</SelectItem>
+                                <SelectItem value="suspended">Geschorst</SelectItem>
                                 <SelectItem value="graduated">Afgestudeerd</SelectItem>
-                                <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -1060,9 +1031,10 @@ export default function Students() {
                         selectedStudent.status === 'inactive' ? 'secondary' :
                         selectedStudent.status === 'graduated' ? 'success' : 'destructive'
                       } className="mt-2">
-                        {selectedStudent.status === 'active' ? 'Actief' : 
-                        selectedStudent.status === 'inactive' ? 'Inactief' :
-                        selectedStudent.status === 'graduated' ? 'Afgestudeerd' : 'Teruggetrokken'}
+                        {selectedStudent.status === 'active' ? 'Ingeschreven' : 
+                        selectedStudent.status === 'inactive' ? 'Uitgeschreven' :
+                        selectedStudent.status === 'suspended' ? 'Geschorst' :
+                        selectedStudent.status === 'graduated' ? 'Afgestudeerd' : 'Niet ingevuld'}
                       </Badge>
                     )}
                   </div>
@@ -1087,8 +1059,7 @@ export default function Students() {
                     <p className="text-sm font-medium text-gray-700">Geslacht</p>
                     <p className="mt-1">
                       {selectedStudent.gender === 'man' ? 'Man' : 
-                       selectedStudent.gender === 'vrouw' ? 'Vrouw' : 
-                       selectedStudent.gender === 'anders' ? 'Anders' : 'Niet ingevuld'}
+                       selectedStudent.gender === 'vrouw' ? 'Vrouw' : 'Niet ingevuld'}
                     </p>
                   </div>
                   

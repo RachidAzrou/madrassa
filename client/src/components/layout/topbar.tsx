@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/popover';
 
 // Import logo
-import myMadrassaLogo from '@/assets/mymadrassa_new_logo.png';
+import myMadrassaLogo from '@/assets/mymadrassa_logo.png';
 
 // Notificatie type definitie
 type Notification = {

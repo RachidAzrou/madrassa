@@ -599,7 +599,7 @@ export default function Guardians() {
                                 isEmergencyContact: checked === true
                               })
                             }
-                            className="h-4 w-4 rounded-sm border-gray-300 data-[state=checked]:bg-[#1e40af]"
+                            className="peer shrink-0 border ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:text-primary-foreground h-4 w-4 rounded-sm border-gray-300 data-[state=checked]:bg-[#1e40af] bg-[#fff]"
                           />
                           <label
                             htmlFor="isEmergencyContact"

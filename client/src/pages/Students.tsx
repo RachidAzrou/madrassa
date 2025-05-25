@@ -1510,47 +1510,62 @@ export default function Students() {
 
       {/* Dialoogvenster voor voogd toevoegen */}
       <Dialog open={isAddGuardianDialogOpen} onOpenChange={setIsAddGuardianDialogOpen}>
-        <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden">
-          <div className="p-6">
-            <div className="flex flex-col items-center gap-2 mb-4">
-              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
-                <Users className="h-6 w-6 text-blue-600" />
+        <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
+          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <Users className="h-5 w-5 text-white" />
               </div>
-              <DialogTitle className="text-center">Voogd toevoegen</DialogTitle>
-              <DialogDescription className="text-center">
-                Wil je een voogd toevoegen en koppelen aan deze student?
-              </DialogDescription>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Voogd Toevoegen</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Koppel een voogd aan de nieuwe student
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6 space-y-4">
+            <div className="bg-[#f1f5f9] p-4 rounded-md">
+              <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                <User className="h-4 w-4 mr-2" />
+                Student Informatie
+              </h3>
+              <p className="text-sm text-gray-700 mb-1">De student is succesvol toegevoegd.</p>
+              <p className="text-sm text-gray-700">Student ID: <span className="font-semibold">{newStudentId}</span></p>
             </div>
             
-            <div className="bg-gray-50 rounded-md p-4 mb-6">
-              <p className="text-gray-700">De student is succesvol toegevoegd. Wil je nu direct een voogd toevoegen en koppelen aan deze student?</p>
-              <p className="mt-2 text-gray-700">Student ID: <span className="font-semibold">{newStudentId}</span></p>
+            <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
+              <p className="text-xs text-amber-800 flex items-start">
+                <Users className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
+                <span>Wil je nu direct een voogd toevoegen en koppelen aan deze student? Je kunt dit ook later doen via het voogdenbeheer.</span>
+              </p>
             </div>
-            
-            <div className="flex justify-end gap-2">
-              <Button 
-                type="button" 
-                variant="outline"
-                onClick={() => setIsAddGuardianDialogOpen(false)}
-              >
-                Later toevoegen
-              </Button>
-              <Button 
-                type="button"
-                onClick={() => {
-                  console.log('Navigating to add guardian for student:', newStudentId);
-                  // Hier zou je naar het voogd formulier navigeren met de student ID
-                  setIsAddGuardianDialogOpen(false);
-                  // Voorbeeld navigatie (in een echte implementatie zou je naar de voogd pagina navigeren)
-                  toast({
-                    title: "Voogd toevoegen",
-                    description: "Je wordt doorgestuurd naar het voogd formulier.",
-                  });
-                }}
-              >
-                Voogd toevoegen
-              </Button>
-            </div>
+          </div>
+          
+          <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsAddGuardianDialogOpen(false)}
+              className="h-8 text-xs rounded-sm border-[#e5e7eb]"
+            >
+              Later toevoegen
+            </Button>
+            <Button 
+              onClick={() => {
+                console.log('Navigating to add guardian for student:', newStudentId);
+                // Hier zou je naar het voogd formulier navigeren met de student ID
+                setIsAddGuardianDialogOpen(false);
+                // Voorbeeld navigatie (in een echte implementatie zou je naar de voogd pagina navigeren)
+                toast({
+                  title: "Voogd toevoegen",
+                  description: "Je wordt doorgestuurd naar het voogd formulier.",
+                });
+              }}
+              className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
+            >
+              Voogd toevoegen
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

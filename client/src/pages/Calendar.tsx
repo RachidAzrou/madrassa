@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, 
@@ -20,8 +20,6 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Users } from 'lucide-react';
 
 // Define types
 interface CalendarEvent {
@@ -451,436 +449,241 @@ export default function Calendar() {
               onClick={handleAddEvent}
               variant="default"
               size="default"
-              className="bg-primary hover:bg-primary/90 flex items-center"
+              className="bg-[#1e40af] hover:bg-[#1e40af]/90 flex items-center"
             >
               <Plus className="mr-2 h-4 w-4" />
               <span>Evenement Toevoegen</span>
             </Button>
           </div>
         </div>
+       
+        {/* Calendar navigation header */}
+        <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md border border-gray-200">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={navigatePrevious}
+            className="border-0 bg-white shadow-sm"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span className="ml-1">Vorige</span>
+          </Button>
+          
+          <h2 className="text-lg font-semibold">
+            {view === 'month' ? `${month} ${year}` : 
+             view === 'week' ? `Week van ${formatDate(currentDate)}` : 
+             formatDayDate(currentDate)}
+          </h2>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={navigateNext}
+            className="border-0 bg-white shadow-sm"
+          >
+            <span className="mr-1">Volgende</span>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
-
-      {/* Calendar navigation */}
-      <div className="flex items-center justify-between bg-white rounded-lg shadow-md px-4 py-4 border border-sky-200">
-        <button 
-          onClick={navigatePrevious}
-          className="p-2 rounded-md text-sky-600 hover:bg-sky-50 transition-colors"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <h2 className="text-xl font-semibold text-sky-900">
-          {month} {year}
-        </h2>
-        <button 
-          onClick={navigateNext}
-          className="p-2 rounded-md text-sky-600 hover:bg-sky-50 transition-colors"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
-      </div>
-
-      {/* Calendar Content */}
-      {view === 'month' ? (
-        <div className="bg-white rounded-lg shadow-md border border-sky-200 overflow-hidden">
-          {/* Week days header */}
-          <div className="grid grid-cols-7 border-b border-sky-200">
-            {['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].map((day, index) => (
-              <div 
-                key={day} 
-                className={`py-3 text-center ${
-                  index === 5 || index === 6 
-                    ? 'bg-gradient-to-b from-sky-50 to-sky-100/40 text-sky-700' 
-                    : 'bg-white text-gray-700'
-                } text-sm font-semibold border-b border-sky-100`}
-              >
+      
+      {/* Calendar body - conditionally render based on view */}
+      {view === 'month' && (
+        <div className="rounded-lg overflow-hidden border border-gray-200">
+          {/* Day labels */}
+          <div className="grid grid-cols-7 bg-gray-100">
+            {["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"].map((day, i) => (
+              <div key={i} className="py-2 px-3 text-sm font-medium text-gray-700 text-center">
                 {day}
               </div>
             ))}
           </div>
           
-          {/* Calendar grid */}
-          <div className="grid grid-cols-7 grid-rows-6 divide-y divide-gray-100">
-            {calendarDays.map((dayData, index) => {
-              // Bepaal of het weekend is (zaterdag of zondag)
-              const isWeekend = index % 7 === 5 || index % 7 === 6;
+          {/* Calendar days grid */}
+          <div className="grid grid-cols-7 auto-rows-fr bg-white">
+            {calendarDays.map((day, index) => (
+              <div 
+                key={index} 
+                className={`
+                  min-h-[100px] p-1 border-t border-l
+                  ${day.isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'} 
+                  ${day.isToday ? 'ring-2 ring-inset ring-[#1e40af]' : ''}
+                  ${index % 7 === 6 ? 'border-r' : ''}
+                  ${index >= calendarDays.length - 7 ? 'border-b' : ''}
+                `}
+              >
+                <div className="flex flex-col h-full">
+                  <div className="flex justify-between items-center">
+                    <span className={`text-sm font-medium p-1 ${day.isToday ? 'bg-[#1e40af] text-white rounded-full w-6 h-6 flex items-center justify-center' : ''}`}>
+                      {day.day}
+                    </span>
+                  </div>
+                  
+                  {/* Events for this day */}
+                  <div className="flex-grow overflow-y-auto space-y-1 mt-1">
+                    {day.events.slice(0, 3).map((event, idx) => {
+                      const colors = getEventColors(event.type);
+                      return (
+                        <div 
+                          key={idx} 
+                          className="text-xs rounded px-1 py-0.5 truncate"
+                          style={{ 
+                            backgroundColor: colors.bgColor,
+                            borderLeft: `2px solid ${colors.borderColor}`
+                          }}
+                        >
+                          {event.title}
+                        </div>
+                      );
+                    })}
+                    
+                    {/* If there are more events than we can display */}
+                    {day.events.length > 3 && (
+                      <div className="text-xs text-gray-500 pl-1">
+                        +{day.events.length - 3} meer
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {view === 'week' && (
+        <div className="rounded-lg overflow-hidden border border-gray-200">
+          <div className="grid grid-cols-8 bg-white">
+            {/* Time slots column */}
+            <div className="border-r">
+              <div className="h-12 border-b"></div>
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="h-16 border-b relative">
+                  <span className="absolute -top-3 left-2 text-xs text-gray-500">
+                    {`${i + 8}:00`}
+                  </span>
+                </div>
+              ))}
+            </div>
+            
+            {/* Days columns */}
+            {Array.from({ length: 7 }).map((_, dayIndex) => {
+              const dayDate = new Date(currentDate);
+              dayDate.setDate(currentDate.getDate() - currentDate.getDay() + dayIndex + 1);
+              const dayEvents = events.filter(event => 
+                event.date.startsWith(dayDate.toISOString().split('T')[0])
+              );
               
-              // Bouw dynamische stijl op voor de cel
-              let cellBaseClass = "min-h-[110px] p-2 relative transition-colors duration-200 cursor-pointer border";
-              
-              if (!dayData.day) {
-                // Lege dag (zou niet meer moeten voorkomen met onze nieuwe genereerlogica)
-                cellBaseClass += " bg-gray-50/40 border-gray-100";
-              } else if (dayData.isToday) {
-                // Huidige dag
-                cellBaseClass += " bg-blue-50 hover:bg-blue-100/60 border-blue-300";
-              } else if (!dayData.isCurrentMonth) {
-                // Dag van vorige of volgende maand
-                cellBaseClass += " bg-gray-50/30 hover:bg-gray-50 border-gray-100 opacity-70";
-              } else if (isWeekend) {
-                // Weekend dag
-                cellBaseClass += " bg-sky-50/20 hover:bg-sky-50/50 border-sky-50";
-              } else {
-                // Normale dag in huidige maand
-                cellBaseClass += " hover:bg-sky-50/50 border-sky-50";
-              }
+              const isToday = new Date().toDateString() === dayDate.toDateString();
               
               return (
-                <div 
-                  key={index} 
-                  className={cellBaseClass}
-                  onClick={() => {
-                    if (dayData.day && dayData.date) {
-                      setCurrentDate(dayData.date);
-                      setView('day');
-                    }
-                  }}
-                >
-                  {dayData.day && (
-                    <>
-                      <div className={`text-right ${
-                        dayData.date && new Date().toDateString() === dayData.date.toDateString() 
-                          ? 'bg-sky-500 text-white w-6 h-6 rounded-full flex items-center justify-center ml-auto' 
-                          : 'font-medium text-gray-700'
-                      }`}>
-                        {dayData.date && new Date().toDateString() === dayData.date.toDateString() ? (
-                          <span>{dayData.day}</span>
-                        ) : (
-                          dayData.day
-                        )}
-                      </div>
-                      <div className="mt-2 space-y-1.5 max-h-24 overflow-y-auto">
-                        {dayData.events.slice(0, 3).map((event) => (
-                          <div 
-                            key={event.id} 
-                            className="px-2 py-1 text-xs rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                            style={{ 
-                              backgroundColor: getEventColors(event.type).bgColor,
-                              borderLeft: `3px solid ${getEventColors(event.type).borderColor}`,
-                            }}
-                          >
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              <span className="font-medium">{event.startTime.slice(0, 5)}</span>
+                <div key={dayIndex} className="border-r last:border-r-0">
+                  {/* Day header */}
+                  <div className={`h-12 p-2 border-b text-center ${isToday ? 'bg-blue-50' : ''}`}>
+                    <div className="text-sm font-medium">
+                      {dayDate.toLocaleDateString('nl-NL', { weekday: 'short' })}
+                    </div>
+                    <div className={`text-sm ${isToday ? 'text-[#1e40af] font-semibold' : ''}`}>
+                      {dayDate.getDate()}
+                    </div>
+                  </div>
+                  
+                  {/* Time slots */}
+                  {Array.from({ length: 12 }).map((_, timeIndex) => {
+                    const hourEvents = dayEvents.filter(event => {
+                      const eventHour = parseInt(event.startTime.split(':')[0]);
+                      return eventHour === timeIndex + 8;
+                    });
+                    
+                    return (
+                      <div key={timeIndex} className="h-16 border-b relative p-1">
+                        {hourEvents.map((event, idx) => {
+                          const colors = getEventColors(event.type);
+                          return (
+                            <div 
+                              key={idx} 
+                              className="text-xs rounded p-1 truncate mb-1 text-gray-800"
+                              style={{ 
+                                backgroundColor: colors.bgColor,
+                                borderLeft: `2px solid ${colors.borderColor}`
+                              }}
+                            >
+                              <div className="font-medium">{event.title}</div>
+                              <div className="text-xs opacity-75">{event.startTime} - {event.endTime}</div>
                             </div>
-                            <div className="font-medium truncate mt-0.5">{event.title}</div>
-                          </div>
-                        ))}
-                        
-                        {/* Indicator voor meer evenementen */}
-                        {dayData.events.length > 3 && (
-                          <div className="text-xs bg-gray-50 text-gray-600 rounded-md p-1 text-center font-medium shadow-sm">
-                            +{dayData.events.length - 3} meer
-                          </div>
-                        )}
+                          );
+                        })}
                       </div>
-                    </>
-                  )}
+                    );
+                  })}
                 </div>
               );
             })}
           </div>
         </div>
-      ) : view === 'week' ? (
-        <div className="bg-white rounded-lg shadow-md border border-sky-200 overflow-hidden">
-          {/* Weekdagen header - Nieuwe stijl met tijden in aparte kolom */}
-          <div className="grid grid-cols-8 bg-white">
-            {/* Lege cel voor de tijdskolom */}
-            <div className="text-center border-r border-b border-gray-200 py-2">
-              <div className="text-sm font-medium text-gray-500">Tijd</div>
-            </div>
-          
-            {/* Weekdagen */}
-            {['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].map((day, index) => {
-              // Bereken datum voor elke dag van de huidige week (maandag als start)
-              const currentWeekDay = new Date(currentDate);
-              // Pas aan voor maandag als startdag van de week (1 = Ma, 2 = Di, etc.)
-              // Zondag wordt 0, dus bij zondag zorgen we dat het 7 wordt
-              const currentDay = currentWeekDay.getDay() || 7; // Zondag van 0 naar 7
-              const distanceFromMonday = currentDay - 1; // Verschil met maandag
-              const mondayOfWeek = new Date(currentWeekDay);
-              mondayOfWeek.setDate(currentWeekDay.getDate() - distanceFromMonday);
-              
-              // Nu berekenen we de datum voor elke weekdag, startend bij maandag (0 = ma, 1 = di, etc.)
-              const targetDay = new Date(mondayOfWeek);
-              targetDay.setDate(mondayOfWeek.getDate() + index);
-              
-              // Check of dag vandaag is
-              const isToday = targetDay.toDateString() === new Date().toDateString();
-              
-              return (
-                <div 
-                  key={day} 
-                  className={`text-center border-r border-b border-gray-200 py-2 ${isToday ? 'bg-sky-50' : ''}`}
-                >
-                  <div className={`text-sm font-medium ${isToday ? 'text-sky-600' : 'text-gray-600'}`}>{day} {targetDay.getDate()}</div>
-                </div>
-              );
-            })}
+      )}
+      
+      {view === 'day' && (
+        <div className="rounded-lg overflow-hidden border border-gray-200">
+          <div className="p-4 bg-gray-50 border-b text-center">
+            <h3 className="text-lg font-semibold">{formatDayDate(currentDate)}</h3>
           </div>
           
-          {/* Week view tijdslots - Nieuwe stijl met tijden in aparte kolom */}
-          <div className="grid grid-cols-8 overflow-hidden">
-            {/* Tijdskolom */}
-            <div className="border-r border-gray-200 relative">
-              {Array.from({ length: 14 }).map((_, hourIndex) => {
-                const hour = hourIndex + 7; // Start vanaf 7:00
-                return (
-                  <div 
-                    key={hourIndex} 
-                    className="h-12 border-b border-gray-200 relative"
-                  >
-                    <div className="h-full flex items-center justify-center">
-                      <span className="text-xs text-gray-600 font-medium">
-                        {hour}:00
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            
-            {/* Weekdagen kolommen */}
-            {Array.from({ length: 7 }).map((_, dayIndex) => {
-              // Bereken datum voor elke dag startend op maandag
-              const currentWeekDay = new Date(currentDate);
-              // Pas aan voor maandag als startdag van de week
-              const currentDay = currentWeekDay.getDay() || 7; // Zondag van 0 naar 7
-              const distanceFromMonday = currentDay - 1; // Verschil met maandag
-              const mondayOfWeek = new Date(currentWeekDay);
-              mondayOfWeek.setDate(currentWeekDay.getDate() - distanceFromMonday);
+          <div className="grid grid-cols-[80px_1fr] bg-white">
+            {/* Time slots */}
+            {Array.from({ length: 14 }).map((_, i) => {
+              const hour = i + 7; // Start at 7 AM
+              const hourStr = `${hour}:00`;
               
-              // Dan berekenen we de datum voor elke weekdag, startend bij maandag
-              const targetDay = new Date(mondayOfWeek);
-              targetDay.setDate(mondayOfWeek.getDate() + dayIndex);
-              
-              // Check of dag vandaag is
-              const isToday = targetDay.toDateString() === new Date().toDateString();
-              // Check of dag weekend is
-              const isWeekend = dayIndex >= 5;
-              
-              // Filter evenementen voor deze dag
-              const dayEvents = (events || []).filter(event => {
-                const eventDate = new Date(event.date);
-                return eventDate.toDateString() === targetDay.toDateString();
+              // Find events that start during this hour
+              const hourEvents = events.filter(event => {
+                const eventDate = event.date;
+                const eventHour = parseInt(event.startTime.split(':')[0]);
+                return eventDate.startsWith(currentDate.toISOString().split('T')[0]) && eventHour === hour;
               });
               
               return (
-                <div key={dayIndex} className="border-r border-gray-200 relative">
-                  {/* Genereer tijdslots (7:00 - 20:00) */}
-                  {Array.from({ length: 14 }).map((_, hourIndex) => {
-                    const hour = hourIndex + 7; // Start vanaf 7:00
-                    return (
-                      <div key={hourIndex} className="h-12 border-b border-gray-200 relative" />
-                    );
-                  })}
-                  
-                  {/* Plaats evenementen - Nieuwe stijl */}
-                  {dayEvents.map((event) => {
-                    // Bereken positie gebaseerd op starttijd
-                    const [hours, minutes] = event.startTime.split(':').map(Number);
-                    const top = (hours - 7) * 48 + (minutes / 60) * 48; // 48px per uur
-                    
-                    // Bereken hoogte gebaseerd op duur
-                    const [endHours, endMinutes] = event.endTime.split(':').map(Number);
-                    const duration = (endHours - hours) + (endMinutes - minutes) / 60;
-                    const height = Math.max(20, duration * 48); // Minimale hoogte
-                    
-                    // Bepaal de kleur gebaseerd op event type
-                    let bgColor = "#E3F2FD"; // Default lichtblauw
-                    let borderColor = "#1E88E5"; // Default blauw
-                    
-                    switch (event.type) {
-                      case 'exam':
-                        bgColor = "#FFEBEE"; // Lichtroze
-                        borderColor = "#E53935"; // Rood
-                        break;
-                      case 'class':
-                        bgColor = "#E3F2FD"; // Lichtblauw
-                        borderColor = "#1E88E5"; // Blauw
-                        break;
-                      case 'holiday':
-                        bgColor = "#E8F5E9"; // Lichtgroen
-                        borderColor = "#43A047"; // Groen
-                        break;
-                      case 'event':
-                        bgColor = "#FFF9C4"; // Lichtgeel
-                        borderColor = "#FDD835"; // Geel
-                        break;
-                    }
-                    
-                    return (
-                      <div 
-                        key={event.id}
-                        className="absolute w-[95%] overflow-hidden transition-shadow hover:shadow-md"
-                        style={{ 
-                          backgroundColor: bgColor,
-                          top: `${top}px`, 
-                          height: `${height}px`,
-                          left: '2.5%',
-                          borderLeft: `4px solid ${borderColor}`,
-                        }}
-                      >
-                        <div className="px-2 py-1 h-full flex flex-col">
-                          <div className="text-xs font-medium flex items-start text-gray-800 mb-1">
-                            {event.title}
-                          </div>
-                          <div className="text-[10px] text-gray-700">
+                <React.Fragment key={i}>
+                  <div className="p-2 border-b border-r text-xs text-gray-500 text-right">
+                    {hourStr}
+                  </div>
+                  <div className="p-1 border-b relative">
+                    {hourEvents.map((event, idx) => {
+                      const colors = getEventColors(event.type);
+                      return (
+                        <div 
+                          key={idx} 
+                          className="text-sm rounded-sm p-2 mb-1"
+                          style={{ 
+                            backgroundColor: colors.bgColor,
+                            borderLeft: `3px solid ${colors.borderColor}`
+                          }}
+                        >
+                          <div className="font-medium">{event.title}</div>
+                          <div className="text-xs flex items-center mt-1">
+                            <Clock className="h-3 w-3 mr-1" /> 
                             {event.startTime} - {event.endTime}
                           </div>
+                          {event.location && (
+                            <div className="text-xs flex items-center mt-1">
+                              <MapPin className="h-3 w-3 mr-1" /> 
+                              {event.location}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                </React.Fragment>
               );
             })}
           </div>
         </div>
-      ) : view === 'day' ? (
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-          {/* Dag header */}
-          <div className="p-4 text-center border-b border-gray-200">
-            <div className="text-base font-medium text-gray-700">
-              {formatDayDate(currentDate)}
-            </div>
-          </div>
-          
-          {/* Dag tijdslots in dezelfde stijl als de week */}
-          <div className="min-h-[700px] relative grid grid-cols-8">
-            {/* Tijdskolom */}
-            <div className="border-r border-gray-200 relative">
-              {Array.from({ length: 14 }).map((_, hourIndex) => {
-                const hour = hourIndex + 7; // Start vanaf 7:00
-                return (
-                  <div key={hourIndex} className="h-12 border-b border-gray-200 relative">
-                    <div className="h-full flex items-center justify-center">
-                      <span className="text-xs text-gray-600 font-medium">
-                        {hour}:00
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            
-            {/* Contentkolom */}
-            <div className="col-span-7 relative">
-              {/* Uurlijnen */}
-              {Array.from({ length: 14 }).map((_, hourIndex) => (
-                <div key={hourIndex} className="h-12 border-b border-gray-200 relative" />
-              ))}
-              
-              {/* Evenementen van deze dag */}
-              {(events || [])
-                .filter(event => {
-                  const eventDate = new Date(event.date);
-                  return eventDate.toDateString() === currentDate.toDateString();
-                })
-                .map((event) => {
-                  // Bereken positie gebaseerd op starttijd
-                  const [hours, minutes] = event.startTime.split(':').map(Number);
-                  const top = (hours - 7) * 48 + (minutes / 60) * 48; // 48px per uur
-                  
-                  // Bereken hoogte gebaseerd op duur
-                  const [endHours, endMinutes] = event.endTime.split(':').map(Number);
-                  const duration = (endHours - hours) + (endMinutes - minutes) / 60;
-                  const height = Math.max(30, duration * 48); // Minimale hoogte
-                  
-                  // Bepaal de kleur gebaseerd op event type
-                  let bgColor = "#E3F2FD"; // Default lichtblauw
-                  let borderColor = "#1E88E5"; // Default blauw
-                  
-                  switch (event.type) {
-                    case 'exam':
-                      bgColor = "#FFEBEE"; // Lichtroze
-                      borderColor = "#E53935"; // Rood
-                      break;
-                    case 'class':
-                      bgColor = "#E3F2FD"; // Lichtblauw
-                      borderColor = "#1E88E5"; // Blauw
-                      break;
-                    case 'holiday':
-                      bgColor = "#E8F5E9"; // Lichtgroen
-                      borderColor = "#43A047"; // Groen
-                      break;
-                    case 'event':
-                      bgColor = "#FFF9C4"; // Lichtgeel
-                      borderColor = "#FDD835"; // Geel
-                      break;
-                  }
-                  
-                  return (
-                    <div 
-                      key={event.id}
-                      className="absolute w-[98%] left-[1%] overflow-hidden transition-shadow hover:shadow-md"
-                      style={{ 
-                        backgroundColor: bgColor,
-                        top: `${top}px`, 
-                        height: `${height}px`,
-                        borderLeft: `4px solid ${borderColor}`,
-                      }}
-                    >
-                      <div className="px-3 py-1.5 h-full flex flex-col">
-                        <div className="text-sm font-medium text-gray-800">
-                          {event.title}
-                        </div>
-                        <div className="text-xs text-gray-700 mt-1">
-                          {event.startTime} - {event.endTime}
-                        </div>
-                        {event.location && (
-                          <div className="text-xs text-gray-700 mt-1">
-                            <MapPin className="h-3 w-3 inline mr-1" />
-                            {event.location}
-                          </div>
-                        )}
-                        {event.description && (
-                          <div className="text-xs mt-2 pt-1.5 border-t border-gray-200 text-gray-600">
-                            {event.description}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })
-              }
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
-          <CalendarIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">Geen Weergave Geselecteerd</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            Selecteer maand, week of dag om de kalender te bekijken.
-          </p>
-        </div>
       )}
-
-      {/* Legend */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-        <div className="flex flex-wrap gap-3">
-          <div className="flex items-center">
-            <span className="w-3 h-3 bg-red-100 border border-red-200 rounded-sm mr-1.5"></span>
-            <span className="text-xs text-gray-600">Examens</span>
-          </div>
-          <div className="flex items-center">
-            <span className="w-3 h-3 bg-blue-100 border border-blue-200 rounded-sm mr-1.5"></span>
-            <span className="text-xs text-gray-600">Lessen</span>
-          </div>
-          <div className="flex items-center">
-            <span className="w-3 h-3 bg-purple-100 border border-purple-200 rounded-sm mr-1.5"></span>
-            <span className="text-xs text-gray-600">Vakanties</span>
-          </div>
-          <div className="flex items-center">
-            <span className="w-3 h-3 bg-green-100 border border-green-200 rounded-sm mr-1.5"></span>
-            <span className="text-xs text-gray-600">Activiteiten</span>
-          </div>
-        </div>
-      </div>
-
+      
       {/* Add Event Dialog */}
       <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
-        <DialogContent className="max-w-[95vw] w-[720px] max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Evenement Toevoegen</DialogTitle>
             <DialogDescription>
@@ -888,286 +691,268 @@ export default function Calendar() {
             </DialogDescription>
           </DialogHeader>
           
-          <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value as 'exam' | 'class' | 'holiday' | 'event')}>
-            <TabsList className="grid grid-cols-4 mt-2 p-1 bg-blue-900/10">
-              <TabsTrigger value="exam" className="flex items-center justify-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+          <div className="mt-4">
+            <div className="grid grid-cols-4 gap-1">
+              <button 
+                onClick={() => handleTabChange('exam')}
+                className={`px-3 py-2 text-sm font-medium rounded-sm flex items-center justify-center gap-2 ${activeTab === 'exam' 
+                  ? 'bg-[#1e40af] text-white' 
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}`}
+              >
                 <FilePlus className="h-4 w-4" />
                 <span>Examen</span>
-              </TabsTrigger>
-              <TabsTrigger value="class" className="flex items-center justify-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+              </button>
+              <button 
+                onClick={() => handleTabChange('class')}
+                className={`px-3 py-2 text-sm font-medium rounded-sm flex items-center justify-center gap-2 ${activeTab === 'class' 
+                  ? 'bg-[#1e40af] text-white' 
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}`}
+              >
                 <BookOpen className="h-4 w-4" />
                 <span>Les</span>
-              </TabsTrigger>
-              <TabsTrigger value="holiday" className="flex items-center justify-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+              </button>
+              <button 
+                onClick={() => handleTabChange('holiday')}
+                className={`px-3 py-2 text-sm font-medium rounded-sm flex items-center justify-center gap-2 ${activeTab === 'holiday' 
+                  ? 'bg-[#1e40af] text-white' 
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}`}
+              >
                 <Palmtree className="h-4 w-4" />
                 <span>Vakantie</span>
-              </TabsTrigger>
-              <TabsTrigger value="event" className="flex items-center justify-center gap-2 data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
+              </button>
+              <button 
+                onClick={() => handleTabChange('event')}
+                className={`px-3 py-2 text-sm font-medium rounded-sm flex items-center justify-center gap-2 ${activeTab === 'event' 
+                  ? 'bg-[#1e40af] text-white' 
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}`}
+              >
                 <PartyPopper className="h-4 w-4" />
-                <span>Activiteit</span>
-              </TabsTrigger>
-            </TabsList>
-            
-            <form onSubmit={handleSubmitEvent}>
-              <div className="space-y-4 mt-4">
-                {/* Gemeenschappelijke velden */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="eventTitle">Titel<span className="text-red-500">*</span></Label>
-                    <Input
-                      id="eventTitle"
-                      value={newEvent.title}
-                      onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                      placeholder="Voer een titel in"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="eventDate">Datum<span className="text-red-500">*</span></Label>
-                    <Input
-                      id="eventDate"
-                      type="date"
-                      value={newEvent.date}
-                      onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="startTime">Starttijd</Label>
-                    <Input
-                      id="startTime"
-                      type="time"
-                      value={newEvent.startTime}
-                      onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="endTime">Eindtijd</Label>
-                    <Input
-                      id="endTime"
-                      type="time"
-                      value={newEvent.endTime}
-                      onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
-                    />
-                  </div>
-                </div>
-                
+                <span>Evenement</span>
+              </button>
+            </div>
+          </div>
+          
+          <form onSubmit={handleSubmitEvent}>
+            {/* Common fields for all event types */}
+            <div className="space-y-4 pt-4 border-t mt-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="location">Locatie</Label>
+                  <Label htmlFor="title">Titel</Label>
                   <Input
-                    id="location"
-                    value={newEvent.location}
-                    onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-                    placeholder="Bijv. Lokaal A1.02 of Online"
+                    id="title"
+                    value={newEvent.title}
+                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                    placeholder="Titel van het evenement"
                   />
                 </div>
-                
-                {/* Specifieke velden per type evenement */}
-                <TabsContent value="exam" className="space-y-4 pt-4 border-t">
-                  <h3 className="text-lg font-medium flex items-center mb-2">
-                    <FilePlus className="mr-2 h-5 w-5 text-primary" />
-                    Examen details
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="courseExam">Vak<span className="text-red-500">*</span></Label>
-                      <Select
-                        value={newEvent.courseId}
-                        onValueChange={(value) => setNewEvent({ 
-                          ...newEvent, 
-                          courseId: value,
-                          courseName: value // In werkelijkheid zou je hier de naam opzoeken
-                        })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer vak" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">Arabisch</SelectItem>
-                          <SelectItem value="2">Islamitische studies</SelectItem>
-                          <SelectItem value="3">Koran</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="classExam">Klas<span className="text-red-500">*</span></Label>
-                      <Select
-                        value={newEvent.classId}
-                        onValueChange={(value) => setNewEvent({ 
-                          ...newEvent, 
-                          classId: value,
-                          className: value // In werkelijkheid zou je hier de naam opzoeken
-                        })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer klas" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">Klas 1A</SelectItem>
-                          <SelectItem value="2">Klas 2B</SelectItem>
-                          <SelectItem value="3">Klas 3C</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="class" className="space-y-4 pt-4 border-t">
-                  <h3 className="text-lg font-medium flex items-center mb-2">
-                    <BookOpen className="mr-2 h-5 w-5 text-primary" />
-                    Les details
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="courseClass">Vak<span className="text-red-500">*</span></Label>
-                      <Select
-                        value={newEvent.courseId}
-                        onValueChange={(value) => setNewEvent({ 
-                          ...newEvent, 
-                          courseId: value,
-                          courseName: value // In werkelijkheid zou je hier de naam opzoeken
-                        })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer vak" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">Arabisch</SelectItem>
-                          <SelectItem value="2">Islamitische studies</SelectItem>
-                          <SelectItem value="3">Koran</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="classClass">Klas<span className="text-red-500">*</span></Label>
-                      <Select
-                        value={newEvent.classId}
-                        onValueChange={(value) => setNewEvent({ 
-                          ...newEvent, 
-                          classId: value,
-                          className: value // In werkelijkheid zou je hier de naam opzoeken
-                        })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecteer klas" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">Klas 1A</SelectItem>
-                          <SelectItem value="2">Klas 2B</SelectItem>
-                          <SelectItem value="3">Klas 3C</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="holiday" className="space-y-4 pt-4 border-t">
-                  <h3 className="text-lg font-medium flex items-center mb-2">
-                    <Palmtree className="mr-2 h-5 w-5 text-primary" />
-                    Vakantie details
-                  </h3>
-                </TabsContent>
-                
-                <TabsContent value="event" className="space-y-4 pt-4 border-t">
-                  <h3 className="text-lg font-medium flex items-center mb-2">
-                    <PartyPopper className="mr-2 h-5 w-5 text-primary" />
-                    Activiteit details
-                  </h3>
-                </TabsContent>
-                
-                {/* Beschrijving veld */}
                 <div className="space-y-2">
-                  <Label htmlFor="description">Beschrijving</Label>
+                  <Label htmlFor="date">Datum</Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    value={newEvent.date}
+                    onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="startTime">Starttijd</Label>
+                  <Input
+                    id="startTime"
+                    type="time"
+                    value={newEvent.startTime}
+                    onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="endTime">Eindtijd</Label>
+                  <Input
+                    id="endTime"
+                    type="time"
+                    value={newEvent.endTime}
+                    onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="location">Locatie</Label>
+                <Input
+                  id="location"
+                  value={newEvent.location}
+                  onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+                  placeholder="Locatie"
+                />
+              </div>
+            </div>
+            
+            {/* Conditional fields based on event type */}
+            {activeTab === 'exam' && (
+              <div className="space-y-4 pt-4 border-t mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="courseId">Vak</Label>
+                    <Select
+                      value={newEvent.courseId}
+                      onValueChange={(value) => setNewEvent({ ...newEvent, courseId: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecteer een vak" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Arabisch</SelectItem>
+                        <SelectItem value="2">Islamitische Studies</SelectItem>
+                        <SelectItem value="3">Koranrecitatie</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="classId">Klas</Label>
+                    <Select
+                      value={newEvent.classId}
+                      onValueChange={(value) => setNewEvent({ ...newEvent, classId: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecteer een klas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Klas 1A</SelectItem>
+                        <SelectItem value="2">Klas 2B</SelectItem>
+                        <SelectItem value="3">Klas 3C</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="examDescription">Beschrijving</Label>
                   <Textarea
-                    id="description"
+                    id="examDescription"
                     value={newEvent.description}
                     onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                    placeholder="Optionele beschrijving"
+                    placeholder="Extra informatie over het examen"
+                    rows={3}
+                  />
+                </div>
+              </div>
+            )}
+            
+            {activeTab === 'class' && (
+              <div className="space-y-4 pt-4 border-t mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="courseId">Vak</Label>
+                    <Select
+                      value={newEvent.courseId}
+                      onValueChange={(value) => setNewEvent({ ...newEvent, courseId: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecteer een vak" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Arabisch</SelectItem>
+                        <SelectItem value="2">Islamitische Studies</SelectItem>
+                        <SelectItem value="3">Koranrecitatie</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="classId">Klas</Label>
+                    <Select
+                      value={newEvent.classId}
+                      onValueChange={(value) => setNewEvent({ ...newEvent, classId: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecteer een klas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Klas 1A</SelectItem>
+                        <SelectItem value="2">Klas 2B</SelectItem>
+                        <SelectItem value="3">Klas 3C</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="classDescription">Beschrijving</Label>
+                  <Textarea
+                    id="classDescription"
+                    value={newEvent.description}
+                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                    placeholder="Extra informatie over de les"
                     rows={3}
                   />
                 </div>
                 
-                {/* Herhalingsopties - beschikbaar voor alle evenementtypes */}
-                <div className="space-y-4 pt-4 border-t">
-                  <h3 className="text-lg font-medium flex items-center mb-2">
-                    <Timer className="mr-2 h-5 w-5 text-primary" />
-                    Herhaling
-                  </h3>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      checked={newEvent.isRecurring}
-                      onCheckedChange={(checked) => setNewEvent({ ...newEvent, isRecurring: checked })}
-                      id="isRecurring"
-                    />
-                    <Label htmlFor="isRecurring">Dit is een terugkerend evenement</Label>
-                  </div>
-                  
-                  {newEvent.isRecurring && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6 border-l-2 border-l-gray-200 mt-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="recurrencePattern">Herhalingspatroon</Label>
-                        <Select
-                          value={newEvent.recurrencePattern}
-                          onValueChange={(value: 'daily' | 'weekly' | 'monthly' | 'yearly') => setNewEvent({
-                            ...newEvent,
-                            recurrencePattern: value
-                          })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Kies patroon" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="daily">Dagelijks</SelectItem>
-                            <SelectItem value="weekly">Wekelijks</SelectItem>
-                            <SelectItem value="monthly">Maandelijks</SelectItem>
-                            <SelectItem value="yearly">Jaarlijks</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="recurrenceEndDate">Einddatum herhaling</Label>
-                        <Input
-                          id="recurrenceEndDate"
-                          type="date"
-                          value={newEvent.recurrenceEndDate}
-                          onChange={(e) => setNewEvent({ ...newEvent, recurrenceEndDate: e.target.value })}
-                          min={newEvent.date}
-                        />
-                      </div>
-                    </div>
-                  )}
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="recurring"
+                    checked={newEvent.isRecurring}
+                    onCheckedChange={(checked) => setNewEvent({ ...newEvent, isRecurring: checked })}
+                  />
+                  <Label htmlFor="recurring">Wekelijks herhalen</Label>
                 </div>
                 
-                <DialogFooter className="pt-4">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setIsAddEventDialogOpen(false)}
-                  >
-                    Annuleren
-                  </Button>
-                  <Button 
-                    type="submit"
-                    disabled={createEventMutation.isPending}
-                    className="bg-primary hover:bg-primary/90"
-                  >
-                    {createEventMutation.isPending ? 'Bezig met toevoegen...' : 'Evenement toevoegen'}
-                  </Button>
-                </DialogFooter>
+                {newEvent.isRecurring && (
+                  <div className="space-y-2">
+                    <Label htmlFor="recurrenceEndDate">Tot datum</Label>
+                    <Input
+                      id="recurrenceEndDate"
+                      type="date"
+                      value={newEvent.recurrenceEndDate}
+                      onChange={(e) => setNewEvent({ ...newEvent, recurrenceEndDate: e.target.value })}
+                    />
+                  </div>
+                )}
               </div>
-            </form>
-          </Tabs>
+            )}
+            
+            {activeTab === 'holiday' && (
+              <div className="space-y-4 pt-4 border-t mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="holidayDescription">Beschrijving</Label>
+                  <Textarea
+                    id="holidayDescription"
+                    value={newEvent.description}
+                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                    placeholder="Beschrijving van de vakantie"
+                    rows={3}
+                  />
+                </div>
+              </div>
+            )}
+            
+            {activeTab === 'event' && (
+              <div className="space-y-4 pt-4 border-t mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="eventDescription">Beschrijving</Label>
+                  <Textarea
+                    id="eventDescription"
+                    value={newEvent.description}
+                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                    placeholder="Beschrijving van het evenement"
+                    rows={3}
+                  />
+                </div>
+              </div>
+            )}
+          
+            <DialogFooter className="mt-6">
+              <Button type="button" variant="outline" onClick={() => setIsAddEventDialogOpen(false)}>
+                Annuleren
+              </Button>
+              <Button 
+                type="submit" 
+                className="bg-[#1e40af] text-white hover:bg-[#1e40af]/90"
+                disabled={createEventMutation.isPending}
+              >
+                {createEventMutation.isPending ? "Bezig met toevoegen..." : "Toevoegen"}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

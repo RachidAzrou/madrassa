@@ -925,7 +925,7 @@ export default function Calendar() {
                         <SelectValue placeholder="Selecteer klas" />
                       </SelectTrigger>
                       <SelectContent>
-                        {classGroupsData.groups.map((group: any) => (
+                        {classGroupsData?.groups?.map((group: any) => (
                           <SelectItem key={group.id} value={group.id.toString()}>
                             {group.name}
                           </SelectItem>

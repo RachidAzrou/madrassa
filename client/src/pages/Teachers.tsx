@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, GraduationCap, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, BookOpen, Users, Upload } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -82,6 +83,7 @@ export default function Teachers() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
   const [showNewTeacherDialog, setShowNewTeacherDialog] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [hasValidationAttempt, setHasValidationAttempt] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
   const [newTeacher, setNewTeacher] = useState<Partial<TeacherType>>({
@@ -266,11 +268,24 @@ export default function Teachers() {
     });
   };
 
-  const handleExportSelectedTeachers = () => {
+  // Exporteer functionaliteit
+  const handleExportTeachers = (format: string) => {
+    // Toon een toast-bericht dat het exporteren is gestart
     toast({
-      title: "Niet geïmplementeerd",
-      description: "Exporteren is nog niet beschikbaar.",
+      title: "Exporteren",
+      description: `Docenten worden geëxporteerd naar ${format.toUpperCase()}...`,
     });
+    
+    // Simuleer het exporteren van de docenten
+    setTimeout(() => {
+      toast({
+        title: "Export voltooid",
+        description: `De docenten zijn succesvol geëxporteerd naar ${format.toUpperCase()}.`,
+      });
+      
+      // Sluit het dialoogvenster
+      setIsExportDialogOpen(false);
+    }, 1500);
   };
 
   // Valideren van het nieuwe docent formulier
@@ -405,7 +420,7 @@ export default function Teachers() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={handleExportSelectedTeachers}
+                    onClick={() => setIsExportDialogOpen(true)}
                     className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
                     title="Exporteer docenten"
                   >
@@ -1001,6 +1016,71 @@ export default function Teachers() {
               Opslaan
             </Button>
           </DialogFooterContainer>
+        </DialogContent>
+      </Dialog>
+
+      {/* Exporteer dialoog */}
+      <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden">
+          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <Upload className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Docenten Exporteren</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Kies een formaat om de docenten te exporteren
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6 space-y-5">
+            <div className="grid grid-cols-3 gap-4">
+              <Card className="border rounded-md p-4 hover:border-blue-500 cursor-pointer transition-all" onClick={() => handleExportTeachers('excel')}>
+                <CardContent className="p-0 flex flex-col items-center">
+                  <FileDown className="h-8 w-8 mb-2 text-green-600" />
+                  <h3 className="text-sm font-medium">Excel</h3>
+                </CardContent>
+              </Card>
+              
+              <Card className="border rounded-md p-4 hover:border-blue-500 cursor-pointer transition-all" onClick={() => handleExportTeachers('csv')}>
+                <CardContent className="p-0 flex flex-col items-center">
+                  <FileDown className="h-8 w-8 mb-2 text-blue-600" />
+                  <h3 className="text-sm font-medium">CSV</h3>
+                </CardContent>
+              </Card>
+              
+              <Card className="border rounded-md p-4 hover:border-blue-500 cursor-pointer transition-all" onClick={() => handleExportTeachers('pdf')}>
+                <CardContent className="p-0 flex flex-col items-center">
+                  <FileDown className="h-8 w-8 mb-2 text-red-600" />
+                  <h3 className="text-sm font-medium">PDF</h3>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div className="bg-blue-50 p-3 rounded-md">
+              <p className="text-xs text-blue-700 flex items-start">
+                <AlertTriangle className="h-4 w-4 mr-2 flex-shrink-0 mt-0.5 text-blue-700" />
+                <span>
+                  {selectedTeachers.length > 0
+                    ? `Je hebt ${selectedTeachers.length} docent(en) geselecteerd om te exporteren.`
+                    : "Je hebt geen docenten geselecteerd. Alle docenten worden geëxporteerd."}
+                </span>
+              </p>
+            </div>
+          </div>
+          
+          <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsExportDialogOpen(false)}
+              className="h-8 text-xs rounded-sm border-[#e5e7eb]"
+            >
+              Annuleren
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

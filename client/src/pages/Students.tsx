@@ -4,7 +4,7 @@ import { queryClient } from '@/lib/queryClient';
 import { 
   Search, PlusCircle, Filter, Download, Users, User, Camera,
   Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
-  GraduationCap, NotebookText, MapPin, FileEdit
+  GraduationCap, NotebookText, MapPin, FileEdit, Upload, FileDown
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -56,10 +56,13 @@ export default function Students() {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
   const currentYear = new Date().getFullYear();
   const [nextStudentId, setNextStudentId] = useState(`ST${currentYear.toString().substring(2, 4)}001`);
+  const [importFile, setImportFile] = useState<File | null>(null);
   
   // Lege formulierdata template
   const emptyFormData = {
@@ -274,6 +277,65 @@ export default function Students() {
     }, 2000);
   };
   
+  // Importeer functionaliteit
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImportFile(file);
+    }
+  };
+  
+  const handleImportStudents = () => {
+    if (!importFile) {
+      toast({
+        title: "Geen bestand geselecteerd",
+        description: "Selecteer een CSV of Excel bestand om te importeren.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Simuleer het verwerken van het bestand
+    toast({
+      title: "Verwerken",
+      description: "Bestand wordt verwerkt...",
+    });
+    
+    // Hier zou echte import logica komen om het bestand te verwerken
+    setTimeout(() => {
+      // Vernieuw de studentenlijst na het importeren
+      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      
+      toast({
+        title: "Import voltooid",
+        description: "De studenten zijn succesvol geïmporteerd.",
+      });
+      
+      setIsImportDialogOpen(false);
+      setImportFile(null);
+    }, 2000);
+  };
+  
+  // Exporteer functionaliteit
+  const handleExportStudents = (format) => {
+    // Toon een toast-bericht dat het exporteren is gestart
+    toast({
+      title: "Exporteren",
+      description: `Studenten worden geëxporteerd naar ${format.toUpperCase()}...`,
+    });
+    
+    // Simuleer het exporteren van de studenten
+    setTimeout(() => {
+      toast({
+        title: "Export voltooid",
+        description: `De studenten zijn succesvol geëxporteerd naar ${format.toUpperCase()}.`,
+      });
+      
+      // Sluit het dialoogvenster
+      setIsExportDialogOpen(false);
+    }, 1500);
+  };
+  
   // Functie voor het ophalen van gegevens via itsme
   const handleItsmeAuthentication = () => {
     // Toon een bericht dat het systeem wacht op itsme authenticatie
@@ -366,6 +428,26 @@ export default function Students() {
                   <path d="M3.13523 8.84197C3.3241 9.04343 3.64052 9.05363 3.84197 8.86477L7.5 5.43536L11.158 8.86477C11.3595 9.05363 11.6759 9.04343 11.8648 8.84197C12.0536 8.64051 12.0434 8.32409 11.842 8.13523L7.84197 4.38523C7.64964 4.20492 7.35036 4.20492 7.15803 4.38523L3.15803 8.13523C2.95657 8.32409 2.94637 8.64051 3.13523 8.84197Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path>
                 </svg>
               }
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsImportDialogOpen(true)}
+              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
+              title="Importeer studenten"
+            >
+              <Upload className="h-3.5 w-3.5" />
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsExportDialogOpen(true)}
+              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
+              title="Exporteer studenten"
+            >
+              <FileDown className="h-3.5 w-3.5" />
             </Button>
 
             <Button
@@ -1454,6 +1536,147 @@ export default function Students() {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Importeer dialoog */}
+      <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+        <DialogContent className="sm:max-w-[525px]">
+          <DialogHeader>
+            <DialogTitle>Studenten importeren</DialogTitle>
+            <DialogDescription>
+              Upload een CSV of Excel bestand met studentgegevens. Zorg ervoor dat het bestand de juiste kolomnamen heeft.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="bg-gray-50 p-4 rounded-md">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Vereiste velden</h3>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="text-xs text-gray-500">
+                  <ul className="space-y-1">
+                    <li>• firstName (Voornaam)</li>
+                    <li>• lastName (Achternaam)</li>
+                    <li>• email (E-mail)</li>
+                    <li>• phone (Telefoon)</li>
+                    <li>• dateOfBirth (Geboortedatum)</li>
+                    <li>• gender (Geslacht)</li>
+                  </ul>
+                </div>
+                <div className="text-xs text-gray-500">
+                  <ul className="space-y-1">
+                    <li>• street (Straat)</li>
+                    <li>• houseNumber (Huisnummer)</li>
+                    <li>• postalCode (Postcode)</li>
+                    <li>• city (Plaats)</li>
+                    <li>• programId (Programma ID)</li>
+                    <li>• studentGroupId (Groep ID)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div className="border-2 border-dashed border-gray-300 rounded-md px-6 py-8">
+              <div className="flex flex-col items-center text-center">
+                <Upload className="h-10 w-10 text-gray-400 mb-3" />
+                <h3 className="text-sm font-medium text-gray-900">
+                  {importFile ? importFile.name : "Sleep bestand hierheen of klik om te uploaden"}
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  CSV of Excel bestanden worden ondersteund
+                </p>
+                <label className="mt-4">
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept=".csv,.xlsx,.xls"
+                    onChange={handleFileChange}
+                  />
+                  <Button 
+                    variant="outline" 
+                    className="h-8 text-xs rounded-sm"
+                    asChild
+                  >
+                    <span>Bestand selecteren</span>
+                  </Button>
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsImportDialogOpen(false);
+                setImportFile(null);
+              }}
+              className="h-8 text-xs rounded-sm"
+            >
+              Annuleren
+            </Button>
+            <Button 
+              onClick={handleImportStudents}
+              className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
+              disabled={!importFile}
+            >
+              Importeren
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Exporteer dialoog */}
+      <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Studenten exporteren</DialogTitle>
+            <DialogDescription>
+              Kies een formaat om de studenten te exporteren.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-4">
+            <div className="flex flex-col space-y-2">
+              <h3 className="text-sm font-medium text-gray-700">Selecteer exportformaat</h3>
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <Button 
+                  variant="outline"
+                  className="h-24 rounded-md border-gray-300 flex flex-col items-center justify-center gap-2"
+                  onClick={() => handleExportStudents('excel')}
+                >
+                  <FileDown className="h-8 w-8 text-green-600" />
+                  <span className="text-sm font-medium">Excel</span>
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="h-24 rounded-md border-gray-300 flex flex-col items-center justify-center gap-2"
+                  onClick={() => handleExportStudents('pdf')}
+                >
+                  <FileDown className="h-8 w-8 text-red-600" />
+                  <span className="text-sm font-medium">PDF</span>
+                </Button>
+              </div>
+            </div>
+            
+            <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
+              <p className="text-xs text-amber-800">
+                {selectedStudents.length > 0
+                  ? `Je hebt ${selectedStudents.length} student(en) geselecteerd om te exporteren.`
+                  : "Je hebt geen studenten geselecteerd. Alle studenten worden geëxporteerd."}
+              </p>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsExportDialogOpen(false)}
+              className="h-8 text-xs rounded-sm"
+            >
+              Annuleren
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

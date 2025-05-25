@@ -229,7 +229,6 @@ export default function Guardians() {
           current: "Voogden"
         }}
       />
-
       {/* Main content area */}
       <div className="px-6 py-6 flex-1">
         {/* Zoek- en actiebalk - Desktop style */}
@@ -449,9 +448,7 @@ export default function Guardians() {
           </div>
         </div>
       </div>
-
       {/* Dialogen */}
-      
       {/* Verwijder dialoog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent className="sm:max-w-[425px]">
@@ -494,7 +491,6 @@ export default function Guardians() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
       {/* Nieuwe voogd dialoog */}
       <Dialog 
         open={showNewGuardianDialog} 
@@ -705,7 +701,6 @@ export default function Guardians() {
           </div>
         </DialogContent>
       </Dialog>
-      
       {/* Voogd details dialoog */}
       <Dialog open={selectedGuardian !== null && !showDeleteDialog} onOpenChange={(open) => !open && setSelectedGuardian(null)}>
         <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden">

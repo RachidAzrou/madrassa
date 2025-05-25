@@ -550,239 +550,321 @@ export default function Students() {
 
       {/* Create Student Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[700px]">
           <DialogHeader>
-            <DialogTitle>Student Toevoegen</DialogTitle>
+            <DialogTitle className="text-[#1e40af]">Student Toevoegen</DialogTitle>
             <DialogDescription>
               Voeg een nieuwe student toe aan het systeem.
             </DialogDescription>
           </DialogHeader>
           
           <form onSubmit={handleCreateStudent}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="studentId">Student ID</Label>
-                <Input
-                  id="studentId"
-                  name="studentId"
-                  value={formData.studentId}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+            <Tabs defaultValue="handmatig" className="mt-2">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsTrigger value="handmatig">Handmatig</TabsTrigger>
+                <TabsTrigger value="eid">e-ID Kaart</TabsTrigger>
+                <TabsTrigger value="itsme">itsme®</TabsTrigger>
+              </TabsList>
               
-              <div className="space-y-2">
-                <Label htmlFor="gender">Geslacht</Label>
-                <Select 
-                  value={formData.gender} 
-                  onValueChange={(value) => handleSelectChange('gender', value)}
-                  required
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer geslacht" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="man">Man</SelectItem>
-                    <SelectItem value="vrouw">Vrouw</SelectItem>
-                    <SelectItem value="anders">Anders</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <TabsContent value="handmatig">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="studentId">Student ID</Label>
+                    <Input
+                      id="studentId"
+                      name="studentId"
+                      value={formData.studentId}
+                      onChange={handleInputChange}
+                      required
+                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="gender">Geslacht</Label>
+                    <Select 
+                      value={formData.gender} 
+                      onValueChange={(value) => handleSelectChange('gender', value)}
+                      required
+                    >
+                      <SelectTrigger className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]">
+                        <SelectValue placeholder="Selecteer geslacht" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="man">Man</SelectItem>
+                        <SelectItem value="vrouw">Vrouw</SelectItem>
+                        <SelectItem value="anders">Anders</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">Voornaam</Label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      required
+                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Achternaam</Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      required
+                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Telefoon</Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="dateOfBirth">Geboortedatum</Label>
+                    <Input
+                      id="dateOfBirth"
+                      name="dateOfBirth"
+                      type="date"
+                      value={formData.dateOfBirth || ""}
+                      onChange={handleInputChange}
+                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="programId">Programma</Label>
+                    <Select 
+                      value={formData.programId} 
+                      onValueChange={(value) => handleSelectChange('programId', value)}
+                    >
+                      <SelectTrigger className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]">
+                        <SelectValue placeholder="Selecteer programma" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {programs.map((program) => (
+                          <SelectItem key={program.id} value={program.id.toString()}>
+                            {program.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="yearLevel">Jaar Niveau</Label>
+                    <Select 
+                      value={formData.yearLevel} 
+                      onValueChange={(value) => handleSelectChange('yearLevel', value)}
+                    >
+                      <SelectTrigger className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]">
+                        <SelectValue placeholder="Selecteer niveau" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Jaar 1</SelectItem>
+                        <SelectItem value="2">Jaar 2</SelectItem>
+                        <SelectItem value="3">Jaar 3</SelectItem>
+                        <SelectItem value="4">Jaar 4</SelectItem>
+                        <SelectItem value="5">Jaar 5</SelectItem>
+                        <SelectItem value="6">Jaar 6</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="studentGroupId">Klassengroep</Label>
+                    <Select 
+                      value={formData.studentGroupId} 
+                      onValueChange={(value) => handleSelectChange('studentGroupId', value)}
+                    >
+                      <SelectTrigger className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]">
+                        <SelectValue placeholder="Selecteer klassengroep" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {studentGroups.map((group) => (
+                          <SelectItem key={group.id} value={group.id.toString()}>
+                            {group.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="enrollmentDate">Inschrijvingsdatum</Label>
+                    <Input
+                      id="enrollmentDate"
+                      name="enrollmentDate"
+                      type="date"
+                      value={formData.enrollmentDate || ""}
+                      onChange={handleInputChange}
+                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="status">Status</Label>
+                    <Select 
+                      value={formData.status} 
+                      onValueChange={(value) => handleSelectChange('status', value)}
+                    >
+                      <SelectTrigger className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]">
+                        <SelectValue placeholder="Selecteer status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Actief</SelectItem>
+                        <SelectItem value="inactive">Inactief</SelectItem>
+                        <SelectItem value="graduated">Afgestudeerd</SelectItem>
+                        <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="col-span-1 md:col-span-2 space-y-2">
+                    <Label htmlFor="street">Straat</Label>
+                    <Input
+                      id="street"
+                      name="street"
+                      value={formData.street}
+                      onChange={handleInputChange}
+                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="houseNumber">Huisnummer</Label>
+                    <Input
+                      id="houseNumber"
+                      name="houseNumber"
+                      value={formData.houseNumber}
+                      onChange={handleInputChange}
+                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="postalCode">Postcode</Label>
+                    <Input
+                      id="postalCode"
+                      name="postalCode"
+                      value={formData.postalCode}
+                      onChange={handleInputChange}
+                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="city">Stad</Label>
+                    <Input
+                      id="city"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
+                    />
+                  </div>
+                  
+                  <div className="col-span-1 md:col-span-2 space-y-2">
+                    <Label htmlFor="notes">Notities</Label>
+                    <Textarea
+                      id="notes"
+                      name="notes"
+                      value={formData.notes}
+                      onChange={handleInputChange}
+                      rows={3}
+                      className="border-gray-300 focus:border-[#1e40af] focus:ring-[#1e40af]"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
               
-              <div className="space-y-2">
-                <Label htmlFor="firstName">Voornaam</Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+              <TabsContent value="eid">
+                <div className="p-6 space-y-6">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-[#77CC9A] rounded-lg flex items-center justify-center text-white mx-auto mb-4">
+                      <span className="font-bold text-2xl">eID</span>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Identificatie via e-ID kaart</h3>
+                    <p className="text-sm text-gray-500 mb-6">
+                      Sluit uw kaartlezer aan en plaats uw e-ID kaart om automatisch gegevens in te lezen.
+                    </p>
+                    
+                    <div className="flex flex-col items-center">
+                      <div className="w-64 h-36 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-6">
+                        <div className="text-center text-gray-500">
+                          <User className="w-12 h-12 mx-auto text-gray-300" />
+                          <p className="text-xs mt-1">e-ID kaart hier plaatsen</p>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        className="bg-[#1e40af] hover:bg-[#1e40af]/90 mb-2"
+                        disabled
+                      >
+                        Gegevens Inlezen
+                      </Button>
+                      <p className="text-xs text-gray-500">Kaartlezer niet gedetecteerd</p>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
               
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Achternaam</Label>
-                <Input
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="phone">Telefoon</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="dateOfBirth">Geboortedatum</Label>
-                <Input
-                  id="dateOfBirth"
-                  name="dateOfBirth"
-                  type="date"
-                  value={formData.dateOfBirth || ""}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="programId">Programma</Label>
-                <Select 
-                  value={formData.programId} 
-                  onValueChange={(value) => handleSelectChange('programId', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer programma" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {programs.map((program) => (
-                      <SelectItem key={program.id} value={program.id.toString()}>
-                        {program.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="yearLevel">Jaar Niveau</Label>
-                <Select 
-                  value={formData.yearLevel} 
-                  onValueChange={(value) => handleSelectChange('yearLevel', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer niveau" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Jaar 1</SelectItem>
-                    <SelectItem value="2">Jaar 2</SelectItem>
-                    <SelectItem value="3">Jaar 3</SelectItem>
-                    <SelectItem value="4">Jaar 4</SelectItem>
-                    <SelectItem value="5">Jaar 5</SelectItem>
-                    <SelectItem value="6">Jaar 6</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="studentGroupId">Klassengroep</Label>
-                <Select 
-                  value={formData.studentGroupId} 
-                  onValueChange={(value) => handleSelectChange('studentGroupId', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer klassengroep" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {studentGroups.map((group) => (
-                      <SelectItem key={group.id} value={group.id.toString()}>
-                        {group.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="enrollmentDate">Inschrijvingsdatum</Label>
-                <Input
-                  id="enrollmentDate"
-                  name="enrollmentDate"
-                  type="date"
-                  value={formData.enrollmentDate || ""}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select 
-                  value={formData.status} 
-                  onValueChange={(value) => handleSelectChange('status', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Actief</SelectItem>
-                    <SelectItem value="inactive">Inactief</SelectItem>
-                    <SelectItem value="graduated">Afgestudeerd</SelectItem>
-                    <SelectItem value="withdrawn">Teruggetrokken</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="col-span-1 md:col-span-2 space-y-2">
-                <Label htmlFor="street">Straat</Label>
-                <Input
-                  id="street"
-                  name="street"
-                  value={formData.street}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="houseNumber">Huisnummer</Label>
-                <Input
-                  id="houseNumber"
-                  name="houseNumber"
-                  value={formData.houseNumber}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="postalCode">Postcode</Label>
-                <Input
-                  id="postalCode"
-                  name="postalCode"
-                  value={formData.postalCode}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="city">Stad</Label>
-                <Input
-                  id="city"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="col-span-1 md:col-span-2 space-y-2">
-                <Label htmlFor="notes">Notities</Label>
-                <Textarea
-                  id="notes"
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleInputChange}
-                  rows={3}
-                />
-              </div>
-            </div>
+              <TabsContent value="itsme">
+                <div className="p-6 space-y-6">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-[#FF4D27] rounded-lg flex items-center justify-center text-white mx-auto mb-4">
+                      <span className="font-bold text-lg">itsme®</span>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Identificatie via itsme®</h3>
+                    <p className="text-sm text-gray-500 mb-6">
+                      Gebruik de itsme® app op uw smartphone om snel en veilig te identificeren.
+                    </p>
+                    
+                    <div className="max-w-sm mx-auto space-y-6">
+                      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                        <ol className="list-decimal list-inside text-sm text-gray-600 space-y-3">
+                          <li>Open de itsme® app op uw smartphone</li>
+                          <li>Klik op de knop hieronder om de identificatie te starten</li>
+                          <li>Scan de QR-code die verschijnt met uw itsme® app</li>
+                          <li>Bevestig uw identiteit in de app</li>
+                        </ol>
+                      </div>
+                      
+                      <Button className="bg-[#FF4D27] hover:bg-[#FF4D27]/90 w-full">
+                        Identificeren met itsme®
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
             
-            <DialogFooter>
+            <DialogFooter className="mt-6 gap-2">
               <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                 Annuleren
               </Button>

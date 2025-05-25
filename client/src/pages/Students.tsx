@@ -3,10 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { ResponsiveTable } from '@/components/ui/data-table-responsive';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2, Plus, Search, XCircle } from 'lucide-react';
+import { Eye, Edit, Trash2, Plus, Search, XCircle, GraduationCap } from 'lucide-react';
 import { DataTableContainer, SearchActionBar } from '@/components/ui/data-table-container';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { PremiumHeader } from '@/components/layout/premium-header';
 
 interface Student {
   id: number;
@@ -257,7 +258,11 @@ export default function StudentsPage() {
 
   return (
     <DataTableContainer>
-      <h1 className="text-2xl font-bold mb-6">Studenten</h1>
+      <PremiumHeader
+        title="Studenten"
+        description="Beheer alle studenten in het systeem"
+        icon={GraduationCap}
+      />
       
       {/* Zoek- en actie balk */}
       <SearchActionBar>

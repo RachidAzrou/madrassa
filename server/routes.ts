@@ -3832,26 +3832,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Calendar events routes met direct werkende storage
+  // Global storage voor calendar events (simpele workaround)
+  const calendarEventsStore = new Map();
+
+  // Calendar events routes
   apiRouter.get("/api/calendar/events", async (req, res) => {
     try {
-      // Voor nu direct enkele events teruggeven zodat de kalender werkt
-      const events = [
-        {
-          id: "1",
-          title: "Arabisch Les",
-          date: "2025-05-26",
-          startTime: "09:00", 
-          endTime: "10:00",
-          location: "Lokaal A1",
-          type: "class",
-          description: "Arabische grammatica",
-          courseId: "1",
-          courseName: "Arabisch",
-          classId: "1",
-          className: "Klas 1A"
-        }
-      ];
+      const events = Array.from(calendarEventsStore.values());
+      console.log("Returning events:", events.length);
       res.json({ events });
     } catch (error) {
       console.error("Error fetching calendar events:", error);
@@ -3866,6 +3854,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: Date.now().toString(),
         ...req.body
       };
+      
+      // Sla op in de Map
+      calendarEventsStore.set(newEvent.id, newEvent);
+      console.log("Event stored, total events:", calendarEventsStore.size);
       
       res.status(201).json(newEvent);
     } catch (error) {

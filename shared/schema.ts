@@ -790,6 +790,51 @@ export const teacherAttendanceRelations = relations(teacherAttendance, ({ one })
   })
 }));
 
+// Calendar Events
+export const calendarEvents = pgTable("calendar_events", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  date: date("date").notNull(),
+  startTime: text("start_time").notNull(),
+  endTime: text("end_time").notNull(),
+  location: text("location"),
+  type: text("type").notNull(), // class, exam, meeting, event
+  description: text("description"),
+  courseId: integer("course_id").references(() => courses.id),
+  courseName: text("course_name"),
+  classId: integer("class_id").references(() => studentGroups.id),
+  className: text("class_name"),
+  teacherId: integer("teacher_id").references(() => teachers.id),
+  teacherName: text("teacher_name"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertCalendarEventSchema = createInsertSchema(calendarEvents).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export type InsertCalendarEvent = z.infer<typeof insertCalendarEventSchema>;
+export type CalendarEvent = typeof calendarEvents.$inferSelect;
+
+// Calendar Events Relations
+export const calendarEventsRelations = relations(calendarEvents, ({ one }) => ({
+  course: one(courses, {
+    fields: [calendarEvents.courseId],
+    references: [courses.id],
+  }),
+  class: one(studentGroups, {
+    fields: [calendarEvents.classId],
+    references: [studentGroups.id],
+  }),
+  teacher: one(teachers, {
+    fields: [calendarEvents.teacherId],
+    references: [teachers.id],
+  }),
+}));
+
 // Notificaties
 export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),

@@ -242,10 +242,10 @@ export default function Scheduling() {
       schedule.teacherName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       schedule.roomName.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesClass = !selectedClass || schedule.className === selectedClass;
-    const matchesTeacher = !selectedTeacher || schedule.teacherName === selectedTeacher;
-    const matchesSubject = !selectedSubject || schedule.subjectName === selectedSubject;
-    const matchesDay = !selectedDay || schedule.dayOfWeek === selectedDay;
+    const matchesClass = !selectedClass || selectedClass === 'all' || schedule.className === selectedClass;
+    const matchesTeacher = !selectedTeacher || selectedTeacher === 'all' || schedule.teacherName === selectedTeacher;
+    const matchesSubject = !selectedSubject || selectedSubject === 'all' || schedule.subjectName === selectedSubject;
+    const matchesDay = !selectedDay || selectedDay === 'all' || schedule.dayOfWeek === selectedDay;
 
     return matchesSearch && matchesClass && matchesTeacher && matchesSubject && matchesDay;
   });
@@ -298,7 +298,7 @@ export default function Scheduling() {
     setSelectedDay('');
   };
 
-  if (schedulesLoading || coursesLoading || teachersLoading || roomsLoading) {
+  if ((schedulesLoading || coursesLoading || teachersLoading || roomsLoading) && schedules.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
         <PremiumHeader 
@@ -426,7 +426,7 @@ export default function Scheduling() {
                 <SelectValue placeholder="Alle klassen" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Alle klassen</SelectItem>
+                <SelectItem value="all">Alle klassen</SelectItem>
                 {uniqueClasses.map((className) => (
                   <SelectItem key={className} value={className}>
                     {className}
@@ -440,7 +440,7 @@ export default function Scheduling() {
                 <SelectValue placeholder="Alle docenten" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Alle docenten</SelectItem>
+                <SelectItem value="all">Alle docenten</SelectItem>
                 {uniqueTeachers.map((teacherName) => (
                   <SelectItem key={teacherName} value={teacherName}>
                     {teacherName}
@@ -454,7 +454,7 @@ export default function Scheduling() {
                 <SelectValue placeholder="Alle vakken" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Alle vakken</SelectItem>
+                <SelectItem value="all">Alle vakken</SelectItem>
                 {uniqueSubjects.map((subjectName) => (
                   <SelectItem key={subjectName} value={subjectName}>
                     {subjectName}
@@ -468,7 +468,7 @@ export default function Scheduling() {
                 <SelectValue placeholder="Alle dagen" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Alle dagen</SelectItem>
+                <SelectItem value="all">Alle dagen</SelectItem>
                 {uniqueDays.map((day) => (
                   <SelectItem key={day} value={day}>
                     {day}

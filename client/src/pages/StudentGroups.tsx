@@ -17,6 +17,20 @@ import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from "@/hooks/use-toast";
+import { 
+  DataTableContainer, 
+  SearchActionBar, 
+  TableContainer, 
+  DataTableHeader,
+  ActionButtonsContainer,
+  FilterLabel,
+  FilterSelect,
+  FilterSelectItem,
+  QuickActions,
+  EmptyTableState,
+  TableLoadingState,
+  TableErrorState 
+} from '@/components/ui/data-table-container';
 import { apiRequest } from '@/lib/queryClient';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { DeleteDialog } from '@/components/ui/delete-dialog';
@@ -89,7 +103,7 @@ export default function StudentGroups() {
     name: '',
     location: '',
     maxCapacity: '',
-    subjects: [] as string[],
+    subjects: [] as number[], // Changed to store subject IDs
     teacherId: '',
     prerequisites: '',
     learningGoals: '',
@@ -116,6 +130,17 @@ export default function StudentGroups() {
   });
 
   const teachers = Array.isArray(teachersData) ? teachersData : (teachersData?.teachers || []);
+
+  // Query voor vakken
+  const { data: coursesData = [] } = useQuery({
+    queryKey: ['/api/courses'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/courses');
+      return response || [];
+    },
+  });
+
+  const courses = Array.isArray(coursesData) ? coursesData : (coursesData?.courses || []);
 
   // Filter function
   const filteredClasses = classes.filter((cls: ClassType) => {
@@ -266,21 +291,16 @@ export default function StudentGroups() {
     setEditFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const addSubjectToNewClass = () => {
-    setNewClass(prev => ({ ...prev, subjects: [...prev.subjects, ''] }));
+  const addSubjectToNewClass = (subjectId: number) => {
+    if (!newClass.subjects.includes(subjectId)) {
+      setNewClass(prev => ({ ...prev, subjects: [...prev.subjects, subjectId] }));
+    }
   };
 
-  const updateSubjectInNewClass = (index: number, value: string) => {
+  const removeSubjectFromNewClass = (subjectId: number) => {
     setNewClass(prev => ({
       ...prev,
-      subjects: prev.subjects.map((subject, i) => i === index ? value : subject)
-    }));
-  };
-
-  const removeSubjectFromNewClass = (index: number) => {
-    setNewClass(prev => ({
-      ...prev,
-      subjects: prev.subjects.filter((_, i) => i !== index)
+      subjects: prev.subjects.filter(id => id !== subjectId)
     }));
   };
 
@@ -301,9 +321,9 @@ export default function StudentGroups() {
         description="Beheer klasgroepen, bekijk studentenlijsten en wijs docenten toe aan klassen"
       />
 
-      <div className="px-6 py-6 flex-1">
+      <DataTableContainer>
         {/* Search and action bar */}
-        <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4 p-4">
+        <SearchActionBar>
           <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
             <div className="flex-1 w-full lg:w-auto">
               <div className="relative">
@@ -374,7 +394,7 @@ export default function StudentGroups() {
                       <SelectValue placeholder="Alle jaren" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Alle jaren</SelectItem>
+                      <SelectItem value="all">Alle jaren</SelectItem>
                       <SelectItem value="2024">2024</SelectItem>
                       <SelectItem value="2025">2025</SelectItem>
                     </SelectContent>
@@ -404,10 +424,10 @@ export default function StudentGroups() {
               </div>
             </CollapsibleContent>
           </Collapsible>
-        </div>
+        </SearchActionBar>
 
         {/* Classes table */}
-        <div className="bg-white rounded-md border border-[#e5e7eb] shadow-sm overflow-hidden">
+        <TableContainer>
           {isLoading ? (
             <div className="p-8 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1e40af] mx-auto"></div>
@@ -633,35 +653,48 @@ export default function StudentGroups() {
             <div className="mt-4 space-y-2">
               <Label className="text-xs font-medium text-gray-700">Vakken</Label>
               <div className="space-y-2">
-                {newClass.subjects.map((subject, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      placeholder="Vak naam"
-                      className="h-8 text-sm flex-1"
-                      value={subject}
-                      onChange={(e) => updateSubjectInNewClass(index, e.target.value)}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeSubjectFromNewClass(index)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                {/* Dropdown voor beschikbare vakken */}
+                <Select value="" onValueChange={(value) => addSubjectToNewClass(parseInt(value))}>
+                  <SelectTrigger className="h-8 text-sm border-gray-300">
+                    <SelectValue placeholder="Selecteer een vak om toe te voegen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {courses.filter(course => !newClass.subjects.includes(course.id)).map((course: any) => (
+                      <SelectItem key={course.id} value={course.id.toString()}>
+                        {course.name} ({course.code})
+                      </SelectItem>
+                    ))}
+                    {courses.filter(course => !newClass.subjects.includes(course.id)).length === 0 && (
+                      <SelectItem value="none" disabled>Alle vakken zijn al toegevoegd</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                
+                {/* Geselecteerde vakken tonen */}
+                {newClass.subjects.length > 0 && (
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-gray-500">Geselecteerde vakken:</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {newClass.subjects.map((subjectId) => {
+                        const course = courses.find((c: any) => c.id === subjectId);
+                        return course ? (
+                          <div key={subjectId} className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-sm text-xs">
+                            <span>{course.name}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeSubjectFromNewClass(subjectId)}
+                              className="h-4 w-4 p-0 hover:bg-blue-100"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
                   </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addSubjectToNewClass}
-                  className="h-8 text-xs"
-                >
-                  <Plus className="h-3.5 w-3.5 mr-1" />
-                  Vak toevoegen
-                </Button>
+                )}
               </div>
             </div>
             

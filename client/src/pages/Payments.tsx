@@ -89,13 +89,25 @@ export default function Payments() {
   // Create payment mutation
   const createPaymentMutation = useMutation({
     mutationFn: async (paymentData: any) => {
+      console.log("Creating payment with data:", paymentData);
       const response = await fetch("/api/payments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(paymentData),
       });
-      if (!response.ok) throw new Error("Failed to create payment");
-      return response.json();
+      
+      console.log("Response status:", response.status);
+      console.log("Response ok:", response.ok);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Server error:", errorText);
+        throw new Error(`Failed to create payment: ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log("Payment created successfully:", result);
+      return result;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/payments"] });

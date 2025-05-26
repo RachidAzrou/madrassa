@@ -900,6 +900,9 @@ export default function Programs() {
               duration: 4,
               department: '',
               isActive: true,
+              entryRequirements: '',
+              learningObjectives: '',
+              competencies: '',
               assignedClasses: [],
               assignedTeachers: [],
             });
@@ -1017,38 +1020,39 @@ export default function Programs() {
               </div>
             </TabsContent>
 
-            <TabsContent value="curriculum" className="space-y-4 bg-gray-50 p-4 rounded-lg">
-              <div className="space-y-2">
-                <FormLabel className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  Klassen toewijzen
-                </FormLabel>
-                <div className="bg-white border border-gray-200 rounded-md p-4 max-h-60 overflow-y-auto">
-                  {programFormData.assignedClasses && programFormData.assignedClasses.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {programFormData.assignedClasses.map((classItem) => (
-                        <div key={classItem.id} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`edit-class-${classItem.id}`}
-                            checked={classItem.selected}
-                            onCheckedChange={(checked) => {
-                              setProgramFormData(prev => ({
-                                ...prev,
-                                assignedClasses: prev.assignedClasses.map(c => 
-                                  c.id === classItem.id ? { ...c, selected: checked as boolean } : c
-                                )
-                              }));
-                            }}
-                          />
-                          <FormLabel htmlFor={`edit-class-${classItem.id}`} className="text-sm">
-                            {classItem.name}
-                          </FormLabel>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-sm">Geen klassen beschikbaar</p>
-                  )}
+            <TabsContent value="curriculum" className="mt-0">
+              <div className="space-y-4 p-4 bg-gray-50 rounded-md">
+                <div className="space-y-2">
+                  <FormLabel htmlFor="edit-instroomvereisten">Instroomvereisten</FormLabel>
+                  <Textarea
+                    id="edit-instroomvereisten"
+                    value={programFormData.entryRequirements}
+                    onChange={(e) => setProgramFormData(prev => ({ ...prev, entryRequirements: e.target.value }))}
+                    className="min-h-[100px] resize-none text-sm"
+                    placeholder="Beschrijf de instroomvereisten..."
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel htmlFor="edit-leerdoelen">Leerdoelen</FormLabel>
+                  <Textarea
+                    id="edit-leerdoelen"
+                    value={programFormData.learningObjectives}
+                    onChange={(e) => setProgramFormData(prev => ({ ...prev, learningObjectives: e.target.value }))}
+                    className="min-h-[100px] resize-none text-sm"
+                    placeholder="Beschrijf de leerdoelen van dit vak..."
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel htmlFor="edit-competenties">Competenties</FormLabel>
+                  <Textarea
+                    id="edit-competenties"
+                    value={programFormData.competencies}
+                    onChange={(e) => setProgramFormData(prev => ({ ...prev, competencies: e.target.value }))}
+                    className="min-h-[100px] resize-none text-sm"
+                    placeholder="Lijst van competenties die studenten ontwikkelen..."
+                  />
                 </div>
               </div>
             </TabsContent>

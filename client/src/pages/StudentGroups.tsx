@@ -294,40 +294,36 @@ export default function StudentGroups() {
       <DataTableContainer>
         {/* Search and action bar */}
         <SearchActionBar>
-          <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
-            <div className="flex-1 w-full lg:w-auto">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                <Input
-                  type="search"
-                  placeholder="Zoek klassen op naam, docent of locatie..."
-                  className="pl-9 h-8 text-xs bg-white rounded-sm border-[#e5e7eb]"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="search"
+              placeholder="Zoek klassen op naam, docent of locatie..."
+              className="pl-9 h-8 text-xs bg-white rounded-sm border-[#e5e7eb]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex gap-2 items-center ml-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFilterOptions(!showFilterOptions)}
+              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
+              title="Filters"
+            >
+              <Filter className="h-3.5 w-3.5" />
+            </Button>
             
-            <div className="flex flex-wrap gap-2 items-center">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowFilterOptions(!showFilterOptions)}
-                className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
-                title="Filters"
-              >
-                <Filter className="h-3.5 w-3.5" />
-              </Button>
-              
-              <Button
-                onClick={() => setShowNewClassDialog(true)}
-                size="sm"
-                className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white ml-auto"
-              >
-                <PlusCircle className="h-3.5 w-3.5 mr-1" />
-                Nieuwe Klas
-              </Button>
-            </div>
+            <Button
+              onClick={() => setShowNewClassDialog(true)}
+              size="sm"
+              className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white"
+            >
+              <PlusCircle className="h-3.5 w-3.5 mr-1" />
+              Nieuwe Klas
+            </Button>
           </div>
 
         {/* Filter opties - exact copy from Students page */}

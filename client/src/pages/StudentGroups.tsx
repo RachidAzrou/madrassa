@@ -107,13 +107,15 @@ export default function StudentGroups() {
     },
   });
 
-  const { data: teachers = [] } = useQuery({
+  const { data: teachersData = [] } = useQuery({
     queryKey: ['/api/teachers'],
     queryFn: async () => {
       const response = await apiRequest('/api/teachers');
       return response || [];
     },
   });
+
+  const teachers = Array.isArray(teachersData) ? teachersData : (teachersData?.teachers || []);
 
   // Filter function
   const filteredClasses = classes.filter((cls: ClassType) => {
@@ -133,7 +135,7 @@ export default function StudentGroups() {
   // Mutations
   const createClassMutation = useMutation({
     mutationFn: async (classData: any) => {
-      return apiRequest('/api/student-groups', 'POST', classData);
+      return apiRequest('/api/student-groups', { method: 'POST', body: classData });
     },
     onSuccess: () => {
       toast({ title: "Klas aangemaakt", description: "De nieuwe klas is succesvol aangemaakt." });
@@ -152,7 +154,7 @@ export default function StudentGroups() {
 
   const updateClassMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      return apiRequest(`/api/student-groups/${id}`, 'PUT', data);
+      return apiRequest(`/api/student-groups/${id}`, { method: 'PUT', body: data });
     },
     onSuccess: () => {
       toast({ title: "Klas bijgewerkt", description: "De klas is succesvol bijgewerkt." });
@@ -170,7 +172,7 @@ export default function StudentGroups() {
 
   const deleteClassMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/student-groups/${id}`, 'DELETE');
+      return apiRequest(`/api/student-groups/${id}`, { method: 'DELETE' });
     },
     onSuccess: () => {
       toast({ title: "Klas verwijderd", description: "De klas is succesvol verwijderd." });
@@ -941,8 +943,8 @@ export default function StudentGroups() {
 
       {/* Delete dialog */}
       <DeleteDialog
-        isOpen={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
         onConfirm={() => selectedClass && deleteClassMutation.mutate(selectedClass.id)}
         title="Klas verwijderen"
         description={`Weet je zeker dat je de klas "${selectedClass?.name}" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
@@ -951,8 +953,8 @@ export default function StudentGroups() {
 
       {/* Export dialog */}
       <ExportDialog
-        isOpen={isExportDialogOpen}
-        onClose={() => setIsExportDialogOpen(false)}
+        open={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
         title="Klassen exporteren"
         description="Exporteer de klassenlijst naar het gewenste formaat."
         data={filteredClasses}

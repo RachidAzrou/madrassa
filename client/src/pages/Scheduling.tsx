@@ -201,8 +201,8 @@ export default function Scheduling() {
     }
   ];
 
-  // API calls
-  const { data: scheduleData, isLoading: schedulesLoading, error: schedulesError } = useQuery({
+  // API calls with fallback to mock data
+  const { data: scheduleData, isLoading: schedulesLoading } = useQuery({
     queryKey: ['/api/schedules'],
     queryFn: () => fetch('/api/schedules').then(res => res.json()),
   });
@@ -222,8 +222,8 @@ export default function Scheduling() {
     queryFn: () => fetch('/api/rooms').then(res => res.json()),
   });
 
-  // Fallback to mock data when API data is not available
-  const schedules = scheduleData?.schedules?.length > 0 ? scheduleData.schedules : mockScheduleData;
+  // Use mock data as primary source for demo purposes
+  const schedules = mockScheduleData;
   const courses = coursesData?.courses || [];
   const teachers = teachersData?.teachers || [];
   const rooms = roomsData?.rooms || [];

@@ -1101,21 +1101,15 @@ export default function Students() {
                     <div className="space-y-3">
                       <div>
                         <Label htmlFor="academicYear" className="text-xs font-medium text-gray-700">Schooljaar *</Label>
-                        <Select 
-                          value={formData.academicYear || ''} 
-                          onValueChange={(value) => handleSelectChange('academicYear', value)}
+                        <Input
+                          id="academicYear"
+                          name="academicYear"
+                          value={formData.academicYear}
+                          onChange={handleInputChange}
+                          placeholder="2024-2025"
+                          className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('academicYear') ? 'border-red-500 bg-red-50' : ''}`}
                           required
-                        >
-                          <SelectTrigger 
-                            id="academicYear"
-                            className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('academicYear') ? 'border-red-500 bg-red-50' : ''}`}
-                          >
-                            <SelectValue placeholder="Selecteer schooljaar" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white border-[#e5e7eb]">
-                            <SelectItem value="2024-2025" className="focus:bg-blue-200 hover:bg-blue-100">2024-2025</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        />
                       </div>
                       
                       <div>

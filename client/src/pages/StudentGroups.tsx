@@ -92,9 +92,10 @@ export default function StudentGroups() {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   // Filter states
+  const [classNameFilter, setClassNameFilter] = useState('');
+  const [academicYearFilter, setAcademicYearFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [teacherFilter, setTeacherFilter] = useState('');
-  const [academicYearFilter, setAcademicYearFilter] = useState('');
   const [capacityFilter, setCapacityFilter] = useState('');
 
   // Form data for new/edit class
@@ -148,12 +149,13 @@ export default function StudentGroups() {
       cls.teacherName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       cls.location?.toLowerCase().includes(searchQuery.toLowerCase());
 
+    const matchesClassName = !classNameFilter || cls.name.toLowerCase().includes(classNameFilter.toLowerCase());
+    const matchesAcademicYear = !academicYearFilter || cls.academicYear === academicYearFilter;
     const matchesLocation = !locationFilter || cls.location?.toLowerCase().includes(locationFilter.toLowerCase());
     const matchesTeacher = !teacherFilter || cls.teacherName?.toLowerCase().includes(teacherFilter.toLowerCase());
-    const matchesAcademicYear = !academicYearFilter || cls.academicYear === academicYearFilter;
     const matchesCapacity = !capacityFilter || (cls.maxCapacity && cls.maxCapacity >= parseInt(capacityFilter));
 
-    return matchesSearch && matchesLocation && matchesTeacher && matchesAcademicYear && matchesCapacity;
+    return matchesSearch && matchesClassName && matchesAcademicYear && matchesLocation && matchesTeacher && matchesCapacity;
   });
 
   // Mutations
@@ -305,9 +307,10 @@ export default function StudentGroups() {
 
   const clearFilters = () => {
     setSearchQuery('');
+    setClassNameFilter('');
+    setAcademicYearFilter('');
     setLocationFilter('');
     setTeacherFilter('');
-    setAcademicYearFilter('');
     setCapacityFilter('');
   };
 
@@ -365,6 +368,29 @@ export default function StudentGroups() {
           <Collapsible open={showAdvancedFilters}>
             <CollapsibleContent className="mt-4 pt-4 border-t border-gray-200">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <Label className="text-xs font-medium text-gray-700">Klas</Label>
+                  <Input
+                    placeholder="Filter op klasnaam"
+                    className="h-8 text-xs mt-1"
+                    value={classNameFilter}
+                    onChange={(e) => setClassNameFilter(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-medium text-gray-700">Schooljaar</Label>
+                  <Select value={academicYearFilter} onValueChange={setAcademicYearFilter}>
+                    <SelectTrigger className="h-8 text-xs mt-1">
+                      <SelectValue placeholder="Alle schooljaren" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Alle schooljaren</SelectItem>
+                      <SelectItem value="2023-2024">2023-2024</SelectItem>
+                      <SelectItem value="2024-2025">2024-2025</SelectItem>
+                      <SelectItem value="2025-2026">2025-2026</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div>
                   <Label className="text-xs font-medium text-gray-700">Locatie</Label>
                   <Input

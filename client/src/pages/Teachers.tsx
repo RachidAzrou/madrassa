@@ -107,6 +107,8 @@ export default function Teachers() {
   const [showTeacherDetail, setShowTeacherDetail] = useState(false);
   const [showEditTeacherDialog, setShowEditTeacherDialog] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingTeacherId, setEditingTeacherId] = useState<number | null>(null);
   
   // Mock data - in een echte applicatie komt dit van de API
   const mockTeachers: TeacherType[] = [
@@ -151,18 +153,10 @@ export default function Teachers() {
     }
   ];
   
-  // In een echte applicatie haal je de data op met React Query
-  const { data: teachers = mockTeachers, isLoading, isError } = useQuery({
-    queryKey: ['/api/teachers'],
-    queryFn: async () => {
-      // In een echte applicatie haal je dit op van de server
-      // const response = await apiRequest('/api/teachers');
-      // return response;
-      
-      // Voor nu gebruiken we mock data
-      return mockTeachers;
-    },
-    enabled: true // Schakel deze in voor ontwikkeling
+  // State voor docenten met localStorage
+  const [teachers, setTeachers] = useState<TeacherType[]>(() => {
+    const savedTeachers = localStorage.getItem('teachers');
+    return savedTeachers ? JSON.parse(savedTeachers) : mockTeachers;
   });
   
   // Mock onderwerpen voor de dropdown
@@ -227,11 +221,24 @@ export default function Teachers() {
   };
 
   const handleEditTeacher = (teacher: TeacherType) => {
-    // Implementatie voor bewerken
-    toast({
-      title: "Niet geïmplementeerd",
-      description: "Deze functie is nog niet beschikbaar.",
+    setNewTeacher({
+      firstName: teacher.firstName,
+      lastName: teacher.lastName,
+      email: teacher.email,
+      phone: teacher.phone || '',
+      specialty: teacher.specialty || '',
+      bio: teacher.bio || '',
+      status: teacher.status,
+      dateOfBirth: teacher.dateOfBirth || '',
+      hireDate: teacher.hireDate || '',
+      photoUrl: teacher.photoUrl || '',
     });
+    setIsEditMode(true);
+    setEditingTeacherId(teacher.id);
+    setShowNewTeacherDialog(true);
+    setActiveTab('basic');
+    setHasValidationAttempt(false);
+    setShowViewDialog(false);
   };
 
   const handleDeleteTeacher = (teacher: TeacherType) => {
@@ -243,18 +250,17 @@ export default function Teachers() {
     if (!selectedTeacher) return;
     
     try {
-      // In een echte applicatie doe je dit via de API
-      // await apiRequest(`/api/teachers/${selectedTeacher.id}`, {
-      //   method: 'DELETE'
-      // });
+      // Verwijder docent uit localStorage
+      const updatedTeachers = teachers.filter(teacher => teacher.id !== selectedTeacher.id);
+      localStorage.setItem('teachers', JSON.stringify(updatedTeachers));
+      
+      // Update state
+      setTeachers(updatedTeachers);
       
       toast({
         title: "Docent verwijderd",
-        description: "De docent is succesvol verwijderd.",
+        description: `${selectedTeacher.firstName} ${selectedTeacher.lastName} is succesvol verwijderd.`,
       });
-      
-      // Vernieuw de lijst (in een echte applicatie)
-      // queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
       
       setShowDeleteDialog(false);
       setSelectedTeacher(null);

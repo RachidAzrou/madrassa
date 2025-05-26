@@ -96,8 +96,14 @@ export default function Teachers() {
     bio: '',
     status: 'active',
     dateOfBirth: '',
-    hireDate: '',
+    hireDate: new Date().toISOString().split('T')[0], // Standaard vandaag
   });
+  
+  const [teacherEducations, setTeacherEducations] = useState<string[]>([]);
+  const [teacherLanguages, setTeacherLanguages] = useState<string[]>([]);
+  const [newEducation, setNewEducation] = useState('');
+  const [newLanguage, setNewLanguage] = useState('');
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   
   // Mock data - in een echte applicatie komt dit van de API
   const mockTeachers: TeacherType[] = [
@@ -310,6 +316,28 @@ export default function Teachers() {
     return `${prefix}${nextId}`;
   };
 
+  // Reset formulier functie
+  const resetTeacherForm = () => {
+    setNewTeacher({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      specialty: '',
+      bio: '',
+      status: 'active',
+      dateOfBirth: '',
+      hireDate: new Date().toISOString().split('T')[0],
+    });
+    setTeacherEducations([]);
+    setTeacherLanguages([]);
+    setNewEducation('');
+    setNewLanguage('');
+    setSelectedSubjects([]);
+    setHasValidationAttempt(false);
+    setActiveTab('basic');
+  };
+
   // Opslaan van nieuwe docent
   const handleSaveTeacher = async () => {
     // Markeer dat we validatie hebben geprobeerd
@@ -323,7 +351,10 @@ export default function Teachers() {
       
       const newTeacherWithId = {
         ...newTeacher,
-        teacherId
+        teacherId,
+        educations: teacherEducations,
+        languages: teacherLanguages,
+        subjects: selectedSubjects
       };
       
       // In een echte applicatie doe je dit via de API
@@ -338,17 +369,7 @@ export default function Teachers() {
       });
       
       // Reset formulier en sluit dialoog
-      setNewTeacher({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        specialty: '',
-        bio: '',
-        status: 'active',
-        dateOfBirth: '',
-        hireDate: '',
-      });
+      resetTeacherForm();
       setShowNewTeacherDialog(false);
       
       // Vernieuw de lijst (in een echte applicatie)
@@ -920,24 +941,16 @@ export default function Teachers() {
                 <SectionContainer title="Aanvullende informatie">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                     <div>
-                      <Label htmlFor="specialty" className="text-xs text-gray-700">
-                        Specialisatie
+                      <Label htmlFor="profession" className="text-xs text-gray-700">
+                        Beroep
                       </Label>
-                      <Select
-                        value={newTeacher.specialty}
-                        onValueChange={(value) => setNewTeacher(prev => ({ ...prev, specialty: value }))}
-                      >
-                        <SelectTrigger className="mt-1 w-full">
-                          <SelectValue placeholder="Selecteer specialisatie" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {mockSubjects.map(subject => (
-                            <SelectItem key={subject.id} value={subject.name}>
-                              {subject.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Input
+                        id="profession"
+                        value={newTeacher.specialty || ''}
+                        onChange={(e) => setNewTeacher(prev => ({ ...prev, specialty: e.target.value }))}
+                        className="mt-1 w-full"
+                        placeholder="Bijv. Docent Arabisch, Imam, ..."
+                      />
                     </div>
                     <div>
                       <Label htmlFor="status" className="text-xs text-gray-700">
@@ -958,18 +971,104 @@ export default function Teachers() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="col-span-1 md:col-span-2">
-                      <Label htmlFor="bio" className="text-xs text-gray-700">
-                        Biografie
-                      </Label>
-                      <Textarea
-                        id="bio"
-                        value={newTeacher.bio}
-                        onChange={(e) => setNewTeacher(prev => ({ ...prev, bio: e.target.value }))}
-                        className="mt-1 w-full"
-                        rows={5}
+                  </div>
+                </SectionContainer>
+
+                <SectionContainer title="Opleidingen">
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Input
+                        value={newEducation}
+                        onChange={(e) => setNewEducation(e.target.value)}
+                        placeholder="Voeg een opleiding toe..."
+                        className="flex-1"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && newEducation.trim()) {
+                            setTeacherEducations(prev => [...prev, newEducation.trim()]);
+                            setNewEducation('');
+                          }
+                        }}
                       />
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          if (newEducation.trim()) {
+                            setTeacherEducations(prev => [...prev, newEducation.trim()]);
+                            setNewEducation('');
+                          }
+                        }}
+                        className="px-3"
+                      >
+                        <PlusCircle className="h-4 w-4" />
+                      </Button>
                     </div>
+                    {teacherEducations.length > 0 && (
+                      <div className="space-y-2">
+                        {teacherEducations.map((education, index) => (
+                          <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md">
+                            <span className="text-sm">{education}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setTeacherEducations(prev => prev.filter((_, i) => i !== index))}
+                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </SectionContainer>
+
+                <SectionContainer title="Talen">
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Input
+                        value={newLanguage}
+                        onChange={(e) => setNewLanguage(e.target.value)}
+                        placeholder="Voeg een taal toe..."
+                        className="flex-1"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && newLanguage.trim()) {
+                            setTeacherLanguages(prev => [...prev, newLanguage.trim()]);
+                            setNewLanguage('');
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          if (newLanguage.trim()) {
+                            setTeacherLanguages(prev => [...prev, newLanguage.trim()]);
+                            setNewLanguage('');
+                          }
+                        }}
+                        className="px-3"
+                      >
+                        <PlusCircle className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {teacherLanguages.length > 0 && (
+                      <div className="space-y-2">
+                        {teacherLanguages.map((language, index) => (
+                          <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md">
+                            <span className="text-sm">{language}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setTeacherLanguages(prev => prev.filter((_, i) => i !== index))}
+                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </SectionContainer>
               </TabsContent>
@@ -977,9 +1076,29 @@ export default function Teachers() {
               <TabsContent value="subjects" className="space-y-6">
                 <SectionContainer title="Vakken toewijzen">
                   <div className="space-y-4 w-full">
-                    <p className="text-sm text-gray-500">
-                      Je kunt vakken toewijzen aan deze docent nadat het profiel is aangemaakt.
+                    <p className="text-sm text-gray-600">
+                      Selecteer de vakken die deze docent kan onderwijzen.
                     </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {mockSubjects.map(subject => (
+                        <div key={subject.id} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`subject-${subject.id}`}
+                            checked={selectedSubjects.includes(subject.id.toString())}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedSubjects(prev => [...prev, subject.id.toString()]);
+                              } else {
+                                setSelectedSubjects(prev => prev.filter(id => id !== subject.id.toString()));
+                              }
+                            }}
+                          />
+                          <Label htmlFor={`subject-${subject.id}`} className="text-sm">
+                            {subject.name} ({subject.code})
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </SectionContainer>
               </TabsContent>
@@ -989,7 +1108,10 @@ export default function Teachers() {
           <DialogFooterContainer>
             <Button 
               variant="outline" 
-              onClick={() => setShowNewTeacherDialog(false)}
+              onClick={() => {
+                resetTeacherForm();
+                setShowNewTeacherDialog(false);
+              }}
               className="w-full sm:w-auto"
             >
               Annuleren

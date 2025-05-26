@@ -132,6 +132,10 @@ export default function Calendar() {
 
   const events: CalendarEvent[] = data?.events || [];
   
+  // Debug logging om te zien welke events we krijgen
+  console.log("Events received:", events);
+  console.log("Current date:", currentDate.toISOString().split('T')[0]);
+  
   // Filter evenementen gebaseerd op filter en zoekterm
   const filteredEvents = events.filter(event => {
     // Eerst filteren op type

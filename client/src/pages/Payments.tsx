@@ -18,7 +18,7 @@ import {
   StyledSelectItem 
 } from "@/components/ui/custom-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CreditCard, Euro, Users, TrendingUp, ExternalLink, RefreshCw } from "lucide-react";
+import { CreditCard, Euro, Users, TrendingUp, ExternalLink, RefreshCw, User, GraduationCap } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 
 interface Payment {
@@ -52,6 +52,8 @@ interface PaymentStats {
 
 export default function Payments() {
   const [selectedStudentId, setSelectedStudentId] = useState<string>("");
+  const [selectedClassId, setSelectedClassId] = useState<string>("");
+  const [paymentMethod, setPaymentMethod] = useState<"individual" | "class">("individual");
   const [paymentAmount, setPaymentAmount] = useState<string>("");
   const [paymentDescription, setPaymentDescription] = useState<string>("");
   const [paymentNotes, setPaymentNotes] = useState<string>("");
@@ -70,6 +72,11 @@ export default function Payments() {
   // Fetch students voor dropdown
   const { data: students } = useQuery<any[]>({
     queryKey: ["/api/students"],
+  });
+
+  // Fetch klassen voor dropdown
+  const { data: classes } = useQuery<any[]>({
+    queryKey: ["/api/student-groups"],
   });
 
   // Create payment mutation
@@ -108,18 +115,51 @@ export default function Payments() {
     },
   });
 
-  const handleCreatePayment = () => {
-    if (!selectedStudentId || !paymentAmount || !paymentDescription) return;
-
-    createPaymentMutation.mutate({
-      studentId: parseInt(selectedStudentId),
-      amount: paymentAmount,
-      currency: "EUR",
-      description: paymentDescription,
-      notes: paymentNotes || null,
-      academicYear: "2024-2025",
-      semester: "1"
-    });
+  const handleCreatePayment = async () => {
+    if (!paymentAmount || !paymentDescription) return;
+    
+    if (paymentMethod === "individual") {
+      if (!selectedStudentId) return;
+      
+      createPaymentMutation.mutate({
+        studentId: parseInt(selectedStudentId),
+        amount: paymentAmount,
+        currency: "EUR",
+        description: paymentDescription,
+        notes: paymentNotes || null,
+        academicYear: "2024-2025",
+        semester: "1"
+      });
+    } else if (paymentMethod === "class") {
+      if (!selectedClassId) return;
+      
+      // Haal studenten van geselecteerde klas op
+      const selectedClass = classes?.find(cls => cls.id.toString() === selectedClassId);
+      if (!selectedClass) return;
+      
+      // Filter studenten die in deze klas zitten
+      const classStudents = students?.filter(student => 
+        student.studentGroupId === selectedClass.id
+      ) || [];
+      
+      if (classStudents.length === 0) {
+        alert("Geen studenten gevonden in deze klas");
+        return;
+      }
+      
+      // Maak betalingen voor alle studenten in de klas
+      for (const student of classStudents) {
+        createPaymentMutation.mutate({
+          studentId: student.id,
+          amount: paymentAmount,
+          currency: "EUR",
+          description: `${paymentDescription} (Klas: ${selectedClass.name})`,
+          notes: paymentNotes || null,
+          academicYear: "2024-2025",
+          semester: "1"
+        });
+      }
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -200,22 +240,82 @@ export default function Payments() {
           />
           
           <DialogFormContainer>
+            <SectionContainer title="Betalingsmethode" icon={<Users className="h-4 w-4" />}>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div 
+                  onClick={() => setPaymentMethod("individual")}
+                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    paymentMethod === "individual" 
+                      ? "border-[#1e40af] bg-blue-50" 
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <User className="h-5 w-5 text-[#1e40af]" />
+                    <div>
+                      <h3 className="font-medium">Individuele student</h3>
+                      <p className="text-sm text-gray-500">Selecteer één student</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div 
+                  onClick={() => setPaymentMethod("class")}
+                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    paymentMethod === "class" 
+                      ? "border-[#1e40af] bg-blue-50" 
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <GraduationCap className="h-5 w-5 text-[#1e40af]" />
+                    <div>
+                      <h3 className="font-medium">Hele klas</h3>
+                      <p className="text-sm text-gray-500">Alle studenten van een klas</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </SectionContainer>
+
             <SectionContainer title="Betalingsgegevens" icon={<CreditCard className="h-4 w-4" />}>
               <div className="grid grid-cols-1 gap-4">
-                <div className="space-y-2">
-                  <FormLabel htmlFor="student">Student</FormLabel>
-                  <StyledSelect 
-                    value={selectedStudentId} 
-                    onValueChange={setSelectedStudentId}
-                    placeholder="Selecteer een student..."
-                  >
-                    {students?.map((student) => (
-                      <StyledSelectItem key={student.id} value={student.id.toString()}>
-                        {student.firstName} {student.lastName} ({student.studentId})
-                      </StyledSelectItem>
-                    ))}
-                  </StyledSelect>
-                </div>
+                {paymentMethod === "individual" ? (
+                  <div className="space-y-2">
+                    <FormLabel htmlFor="student">Student</FormLabel>
+                    <StyledSelect 
+                      value={selectedStudentId} 
+                      onValueChange={setSelectedStudentId}
+                      placeholder="Selecteer een student..."
+                    >
+                      {students?.map((student) => (
+                        <StyledSelectItem key={student.id} value={student.id.toString()}>
+                          {student.firstName} {student.lastName} ({student.studentId})
+                        </StyledSelectItem>
+                      ))}
+                    </StyledSelect>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <FormLabel htmlFor="class">Klas</FormLabel>
+                    <StyledSelect 
+                      value={selectedClassId} 
+                      onValueChange={setSelectedClassId}
+                      placeholder="Selecteer een klas..."
+                    >
+                      {classes?.map((cls) => (
+                        <StyledSelectItem key={cls.id} value={cls.id.toString()}>
+                          {cls.name} ({cls.academicYear})
+                        </StyledSelectItem>
+                      ))}
+                    </StyledSelect>
+                    {selectedClassId && (
+                      <p className="text-sm text-gray-500">
+                        {students?.filter(s => s.studentGroupId === parseInt(selectedClassId)).length || 0} studenten in deze klas
+                      </p>
+                    )}
+                  </div>
+                )}
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -268,10 +368,17 @@ export default function Payments() {
             </Button>
             <Button 
               onClick={handleCreatePayment}
-              disabled={createPaymentMutation.isPending || !selectedStudentId || !paymentAmount || !paymentDescription}
+              disabled={
+                createPaymentMutation.isPending || 
+                !paymentAmount || 
+                !paymentDescription ||
+                (paymentMethod === "individual" && !selectedStudentId) ||
+                (paymentMethod === "class" && !selectedClassId)
+              }
               className="bg-[#1e40af] hover:bg-[#1e3a8a] w-full sm:w-auto"
             >
-              {createPaymentMutation.isPending ? "Bezig..." : "Betaling aanmaken"}
+              {createPaymentMutation.isPending ? "Bezig..." : 
+               paymentMethod === "class" ? "Betalingen aanmaken voor klas" : "Betaling aanmaken"}
             </Button>
           </DialogFooterContainer>
         </CustomDialog>

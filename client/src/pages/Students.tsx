@@ -8,7 +8,7 @@ import {
   Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
   GraduationCap, NotebookText, MapPin, FileEdit, Upload, FileDown,
   ArrowDownToLine, ArrowUpToLine, Info, UserPlus, UserCheck, HeartPulse,
-  Mail, Save, FileText, Calendar, Phone, AlertTriangle
+  Mail, Save, FileText, Calendar, Phone, AlertTriangle, Plus, Link2
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -344,6 +344,11 @@ export default function Students() {
       studentId: student.studentId || "",
       academicYear: student.academicYear || "2024-2025"
     });
+    
+    // Load existing family data
+    setNewStudentGuardians(student.guardians || []);
+    setNewStudentSiblings(student.siblings || []);
+    
     setIsEditDialogOpen(true);
   };
 
@@ -410,7 +415,12 @@ export default function Students() {
       // Update lokale state
       const updatedStudents = students.map(student => 
         student.id === selectedStudent.id 
-          ? { ...student, ...editFormData }
+          ? { 
+              ...student, 
+              ...editFormData,
+              guardians: newStudentGuardians,
+              siblings: newStudentSiblings
+            }
           : student
       );
       setStudents(updatedStudents);
@@ -1838,6 +1848,119 @@ export default function Students() {
                       <SelectItem value="geschorst" className="focus:bg-blue-200 hover:bg-blue-100">Geschorst</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Familie */}
+            <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+              <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                <Users className="h-4 w-4 mr-2" />
+                Familie
+              </h3>
+              <div className="space-y-4">
+                {/* Voogden */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Voogden</h4>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsAddGuardianDialogOpen(true)}
+                      className="text-xs h-7 px-2 border-[#1e40af] text-[#1e40af] hover:bg-[#1e40af] hover:text-white"
+                    >
+                      <PlusCircle className="h-3 w-3 mr-1" />
+                      Voogd Toevoegen
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {newStudentGuardians.length > 0 ? (
+                      newStudentGuardians.map((guardian, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-white rounded-md border border-gray-200">
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
+                                {guardian.firstName?.charAt(0)}{guardian.lastName?.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</p>
+                              <p className="text-xs text-gray-500">{guardian.relationship || 'Relatie niet opgegeven'}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="text-right">
+                              <p className="text-xs text-gray-600">{guardian.phone || 'Geen telefoon'}</p>
+                              <p className="text-xs text-gray-500">{guardian.email || 'Geen email'}</p>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setNewStudentGuardians(prev => prev.filter((_, i) => i !== index));
+                              }}
+                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500 italic">Geen voogden toegevoegd</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Broers/Zussen */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Broers/Zussen</h4>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsLinkSiblingDialogOpen(true)}
+                      className="text-xs h-7 px-2 border-[#1e40af] text-[#1e40af] hover:bg-[#1e40af] hover:text-white"
+                    >
+                      <Link className="h-3 w-3 mr-1" />
+                      Broer/Zus Koppelen
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {newStudentSiblings.length > 0 ? (
+                      newStudentSiblings.map((sibling, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-white rounded-md border border-gray-200">
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="bg-green-100 text-green-700 text-xs">
+                                {sibling.firstName?.charAt(0)}{sibling.lastName?.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{sibling.firstName} {sibling.lastName}</p>
+                              <p className="text-xs text-gray-500">{sibling.studentId || 'Student ID niet beschikbaar'}</p>
+                            </div>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setNewStudentSiblings(prev => prev.filter((_, i) => i !== index));
+                            }}
+                            className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500 italic">Geen broers/zussen gekoppeld</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

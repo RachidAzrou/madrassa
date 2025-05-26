@@ -403,11 +403,29 @@ export default function Teachers() {
     return true;
   };
 
-  // Genereer een uniek docent ID
+  // Genereer een uniek, oplopend docent ID
   const generateTeacherId = () => {
-    const prefix = 'DC';
-    const nextId = (teachers.length + 1).toString().padStart(3, '0');
-    return `${prefix}${nextId}`;
+    if (teachers.length === 0) return 'DC001';
+    
+    // Haal alle bestaande docent ID's op en sorteer ze
+    const existingIds = teachers
+      .map(teacher => teacher.teacherId)
+      .filter(id => id && id.startsWith('DC'))
+      .map(id => parseInt(id.substring(2)))
+      .filter(num => !isNaN(num))
+      .sort((a, b) => a - b);
+    
+    // Zoek het volgende beschikbare nummer
+    let nextNumber = 1;
+    for (const num of existingIds) {
+      if (num === nextNumber) {
+        nextNumber++;
+      } else {
+        break;
+      }
+    }
+    
+    return `DC${nextNumber.toString().padStart(3, '0')}`;
   };
 
   // Reset formulier functie

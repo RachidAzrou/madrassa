@@ -124,6 +124,31 @@ export default function Students() {
     const savedStudents = localStorage.getItem('students');
     return savedStudents ? JSON.parse(savedStudents) : [];
   });
+
+  // Functie om de volgende beschikbare student ID te genereren
+  const generateNextStudentId = () => {
+    if (students.length === 0) return 'STU001';
+    
+    // Haal alle bestaande student ID's op en sorteer ze
+    const existingIds = students
+      .map(student => student.studentId)
+      .filter(id => id && id.startsWith('STU'))
+      .map(id => parseInt(id.substring(3)))
+      .filter(num => !isNaN(num))
+      .sort((a, b) => a - b);
+    
+    // Zoek het volgende beschikbare nummer
+    let nextNumber = 1;
+    for (const num of existingIds) {
+      if (num === nextNumber) {
+        nextNumber++;
+      } else {
+        break;
+      }
+    }
+    
+    return `STU${nextNumber.toString().padStart(3, '0')}`;
+  };
   
   const { toast } = useToast();
 
@@ -212,11 +237,13 @@ export default function Students() {
     }
     
     try {
-      // Genereer een uniek ID voor de nieuwe student
+      // Genereer automatisch een uniek, oplopend student ID
+      const generatedStudentId = generateNextStudentId();
+      
       const newStudent = {
         ...formData,
         id: Date.now(), // Gebruik timestamp als unieke ID
-        studentId: formData.studentId || nextStudentId,
+        studentId: generatedStudentId,
         status: formData.status || "ingeschreven", // Default waarde
         programName: programs.find(p => p.id.toString() === formData.programId)?.name || '',
         studentGroupName: studentGroups.find(g => g.id.toString() === formData.studentGroupId)?.name || '',

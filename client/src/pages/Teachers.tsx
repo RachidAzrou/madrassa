@@ -558,9 +558,17 @@ export default function Teachers() {
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center">
                           <Avatar className="h-7 w-7 mr-2">
-                            <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
-                              {teacher.firstName.charAt(0)}{teacher.lastName.charAt(0)}
-                            </AvatarFallback>
+                            {teacher.photoUrl ? (
+                              <img 
+                                src={teacher.photoUrl} 
+                                alt={`${teacher.firstName} ${teacher.lastName}`}
+                                className="w-full h-full rounded-full object-cover"
+                              />
+                            ) : (
+                              <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
+                                {teacher.firstName.charAt(0)}{teacher.lastName.charAt(0)}
+                              </AvatarFallback>
+                            )}
                           </Avatar>
                           <div>
                             <div className="text-sm font-medium text-gray-900">{teacher.firstName} {teacher.lastName}</div>
@@ -629,9 +637,17 @@ export default function Teachers() {
               <div className="space-y-6">
                 <div className="flex items-center space-x-4">
                   <Avatar className="h-16 w-16">
-                    <AvatarFallback className="text-lg bg-blue-100 text-blue-600">
-                      {selectedTeacher.firstName.charAt(0)}{selectedTeacher.lastName.charAt(0)}
-                    </AvatarFallback>
+                    {selectedTeacher.photoUrl ? (
+                      <img 
+                        src={selectedTeacher.photoUrl} 
+                        alt={`${selectedTeacher.firstName} ${selectedTeacher.lastName}`}
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <AvatarFallback className="text-lg bg-blue-100 text-blue-600">
+                        {selectedTeacher.firstName.charAt(0)}{selectedTeacher.lastName.charAt(0)}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                   <div>
                     <h3 className="text-lg font-semibold">{selectedTeacher.firstName} {selectedTeacher.lastName}</h3>
@@ -811,6 +827,93 @@ export default function Teachers() {
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+              </SectionContainer>
+
+              <SectionContainer title="Profielfoto">
+                <div className="space-y-4">
+                  {newTeacher.photoUrl && (
+                    <div className="flex justify-center">
+                      <img 
+                        src={newTeacher.photoUrl} 
+                        alt="Docent foto" 
+                        className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <Label htmlFor="edit-photo" className="text-xs text-gray-700">
+                      Upload foto
+                    </Label>
+                    <Input
+                      id="edit-photo"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            setNewTeacher(prev => ({
+                              ...prev,
+                              photoUrl: reader.result as string
+                            }));
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="mt-1 w-full"
+                    />
+                  </div>
+                </div>
+              </SectionContainer>
+
+              <SectionContainer title="Identiteitsverificatie">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 border-2 border-dashed border-blue-300 hover:border-blue-500 hover:bg-blue-50"
+                      onClick={() => {
+                        // Hier zou de itsme integratie komen
+                        toast({
+                          title: "itsme® integratie",
+                          description: "itsme® functionaliteit wordt binnenkort toegevoegd.",
+                        });
+                      }}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">its</span>
+                        </div>
+                        <span className="text-sm">Verifieer met itsme®</span>
+                      </div>
+                    </Button>
+                    
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 border-2 border-dashed border-yellow-300 hover:border-yellow-500 hover:bg-yellow-50"
+                      onClick={() => {
+                        // Hier zou de BeID integratie komen
+                        toast({
+                          title: "BeID integratie",
+                          description: "BeID functionaliteit wordt binnenkort toegevoegd.",
+                        });
+                      }}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-red-600 rounded flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">BE</span>
+                        </div>
+                        <span className="text-sm">Verifieer met BeID</span>
+                      </div>
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Gebruik itsme® of BeID om de identiteit van de docent veilig te verifiëren en gegevens automatisch in te vullen.
+                  </p>
                 </div>
               </SectionContainer>
             </TabsContent>
@@ -1300,6 +1403,91 @@ export default function Teachers() {
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+                </SectionContainer>
+
+                <SectionContainer title="Profielfoto">
+                  <div className="space-y-4">
+                    {newTeacher.photoUrl && (
+                      <div className="flex justify-center">
+                        <img 
+                          src={newTeacher.photoUrl} 
+                          alt="Docent foto" 
+                          className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <Label htmlFor="new-photo" className="text-xs text-gray-700">
+                        Upload foto
+                      </Label>
+                      <Input
+                        id="new-photo"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                              setNewTeacher(prev => ({
+                                ...prev,
+                                photoUrl: reader.result as string
+                              }));
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="mt-1 w-full"
+                      />
+                    </div>
+                  </div>
+                </SectionContainer>
+
+                <SectionContainer title="Identiteitsverificatie">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-12 border-2 border-dashed border-blue-300 hover:border-blue-500 hover:bg-blue-50"
+                        onClick={() => {
+                          toast({
+                            title: "itsme® integratie",
+                            description: "itsme® functionaliteit wordt binnenkort toegevoegd.",
+                          });
+                        }}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded flex items-center justify-center">
+                            <span className="text-white text-xs font-bold">its</span>
+                          </div>
+                          <span className="text-sm">Verifieer met itsme®</span>
+                        </div>
+                      </Button>
+                      
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-12 border-2 border-dashed border-yellow-300 hover:border-yellow-500 hover:bg-yellow-50"
+                        onClick={() => {
+                          toast({
+                            title: "BeID integratie",
+                            description: "BeID functionaliteit wordt binnenkort toegevoegd.",
+                          });
+                        }}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-red-600 rounded flex items-center justify-center">
+                            <span className="text-white text-xs font-bold">BE</span>
+                          </div>
+                          <span className="text-sm">Verifieer met BeID</span>
+                        </div>
+                      </Button>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Gebruik itsme® of BeID om de identiteit van de docent veilig te verifiëren en gegevens automatisch in te vullen.
+                    </p>
                   </div>
                 </SectionContainer>
               </TabsContent>

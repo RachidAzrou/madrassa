@@ -321,7 +321,7 @@ export default function Programs() {
 
   // Verbeterde mutatie voor het verwijderen van een programma
   const deleteProgramMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string | number) => {
       try {
         return await apiRequest(`/api/programs/${id}`, {
           method: 'DELETE'
@@ -910,21 +910,107 @@ export default function Programs() {
           icon={<Pencil className="h-5 w-5" />}
         />
         
-        <DialogFormContainer
-          formData={programFormData}
-          onFormChange={setProgramFormData}
-          onSubmit={(updatedFormData) => {
-            if (selectedProgram) {
-              updateProgramMutation.mutate({
-                id: selectedProgram.id,
-                programData: updatedFormData
-              });
-            }
-          }}
-          onCancel={() => setIsEditDialogOpen(false)}
-          cancelText="Annuleren"
-          submitText="Vak bijwerken"
-        />
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          if (selectedProgram) {
+            updateProgramMutation.mutate({
+              id: selectedProgram.id,
+              programData: programFormData
+            });
+          }
+        }}>
+          <div className="p-6 pt-4 bg-gray-50">
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <FormLabel>Naam vak *</FormLabel>
+                  <input
+                    type="text"
+                    value={programFormData.name}
+                    onChange={(e) => setProgramFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full h-9 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel>Code *</FormLabel>
+                  <input
+                    type="text"
+                    value={programFormData.code}
+                    onChange={(e) => setProgramFormData(prev => ({ ...prev, code: e.target.value }))}
+                    className="w-full h-9 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel>Duur *</FormLabel>
+                  <Select value={programFormData.duration.toString()} onValueChange={(value) => setProgramFormData(prev => ({ ...prev, duration: parseInt(value) }))}>
+                    <SelectTrigger className="w-full h-9">
+                      <SelectValue placeholder="Selecteer duur" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Jaar</SelectItem>
+                      <SelectItem value="2">Semester</SelectItem>
+                      <SelectItem value="3">Trimester</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel>Departement</FormLabel>
+                  <input
+                    type="text"
+                    value={programFormData.department}
+                    onChange={(e) => setProgramFormData(prev => ({ ...prev, department: e.target.value }))}
+                    className="w-full h-9 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                
+                <div className="space-y-2 md:col-span-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="edit-is-active"
+                      checked={programFormData.isActive}
+                      onCheckedChange={(checked) => setProgramFormData(prev => ({ ...prev, isActive: checked as boolean }))}
+                    />
+                    <FormLabel htmlFor="edit-is-active">Actief programma</FormLabel>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <FormLabel>Beschrijving</FormLabel>
+                <textarea
+                  value={programFormData.description}
+                  onChange={(e) => setProgramFormData(prev => ({ ...prev, description: e.target.value }))}
+                  rows={4}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Voer een beschrijving in..."
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-3 p-6 pt-4 bg-white border-t border-gray-200">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+              disabled={updateProgramMutation.isPending}
+            >
+              Annuleren
+            </Button>
+            <Button
+              type="submit"
+              disabled={updateProgramMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {updateProgramMutation.isPending ? 'Bijwerken...' : 'Vak bijwerken'}
+            </Button>
+          </div>
+        </form>
       </CustomDialog>
       {/* Vak verwijderen dialoogvenster */}
       <DeleteDialog
@@ -932,15 +1018,19 @@ export default function Programs() {
         onOpenChange={setIsDeleteDialogOpen}
         title="Vak Verwijderen"
         description="Ben je zeker dat je dit vak wilt verwijderen?"
-        itemName={selectedProgram?.name || ''}
-        itemId={selectedProgram?.code || ''}
+        item={{
+          name: selectedProgram?.name || '',
+          id: selectedProgram?.code || '',
+          initials: selectedProgram?.code ? selectedProgram.code.substring(0, 2).toUpperCase() : 'VK'
+        }}
         onConfirm={() => {
           if (selectedProgram) {
             deleteProgramMutation.mutate(selectedProgram.id);
           }
         }}
-        confirmText="Verwijderen"
-        cancelText="Annuleren"
+        confirmButtonText="Verwijderen"
+        cancelButtonText="Annuleren"
+        isLoading={deleteProgramMutation.isPending}
       />
 
       {/* Vak bekijken dialoogvenster */}

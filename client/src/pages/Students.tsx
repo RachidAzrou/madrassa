@@ -1258,23 +1258,23 @@ export default function Students() {
                   </div>
                   
                 </div>
+              </div>
                 
-                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md mt-4">
-                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                    <NotebookText className="h-4 w-4 mr-2" />
-                    Aantekeningen
-                  </h3>
-                  <div>
-                    <Textarea
-                      id="notes"
-                      name="notes"
-                      value={formData.notes}
-                      onChange={handleInputChange}
-                      rows={5}
-                      className="resize-none"
-                      placeholder="Voeg hier eventuele opmerkingen of aantekeningen toe..."
-                    />
-                  </div>
+              <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                  <NotebookText className="h-4 w-4 mr-2" />
+                  Aantekeningen
+                </h3>
+                <div>
+                  <Textarea
+                    id="notes"
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleInputChange}
+                    rows={5}
+                    className="resize-none"
+                    placeholder="Voeg hier eventuele opmerkingen of aantekeningen toe..."
+                  />
                 </div>
               </div>
             </div>

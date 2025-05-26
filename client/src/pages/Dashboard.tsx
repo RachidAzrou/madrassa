@@ -299,7 +299,17 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="p-4 space-y-4">
-              {chartData.map((item, index) => {
+              {/* Toon alle klassen, ook lege klassen */}
+              {(studentGroupsData as any[]).map((group, index) => {
+                // Zoek hoeveel studenten er in deze klas zitten
+                const enrolledStudents = (studentGroupEnrollmentsData as any[]).filter(
+                  enrollment => enrollment.studentGroupId === group.id
+                ).length;
+                
+                // Gebruik een standaard capaciteit als er geen is ingesteld
+                const maxCapacity = group.maxCapacity || 30;
+                const percentageFilled = maxCapacity > 0 ? enrolledStudents / maxCapacity : 0;
+                
                 // Gebruik de huisstijl kleuren
                 const getStatusColor = (percentage: number) => {
                   if (percentage < 0.5) return { bg: 'bg-yellow-100', border: 'border-yellow-200', text: 'text-yellow-800', bar: 'bg-yellow-500' };
@@ -315,9 +325,9 @@ export default function Dashboard() {
                   return 'Vol';
                 };
 
-                const colors = getStatusColor(item.percentageFilled);
-                const statusLabel = getStatusLabel(item.percentageFilled);
-                const barWidth = `${Math.max(3, Math.min(100, item.percentageFilled * 100))}%`;
+                const colors = getStatusColor(percentageFilled);
+                const statusLabel = getStatusLabel(percentageFilled);
+                const barWidth = `${Math.max(3, Math.min(100, percentageFilled * 100))}%`;
                 
                 return (
                   <div key={index} className="bg-white border border-[#e5e7eb] rounded-lg p-4 hover:shadow-sm transition-shadow">
@@ -327,8 +337,8 @@ export default function Dashboard() {
                           <ChalkBoard className="h-5 w-5 text-[#1e40af]" />
                         </div>
                         <div>
-                          <h4 className="text-sm font-semibold text-gray-900">{item.name}</h4>
-                          <p className="text-xs text-gray-500">{item.count} van {item.maxCapacity} studenten</p>
+                          <h4 className="text-sm font-semibold text-gray-900">{group.name}</h4>
+                          <p className="text-xs text-gray-500">{enrolledStudents} van {maxCapacity} studenten</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -341,7 +351,7 @@ export default function Dashboard() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-gray-500">Bezetting</span>
-                        <span className="font-medium text-gray-700">{Math.round(item.percentageFilled * 100)}%</span>
+                        <span className="font-medium text-gray-700">{Math.round(percentageFilled * 100)}%</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
                         <div 

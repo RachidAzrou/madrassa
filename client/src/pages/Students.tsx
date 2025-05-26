@@ -169,7 +169,7 @@ export default function Students() {
     queryKey: ['/api/programs'],
   });
   
-  const { data: studentGroupsData = [] } = useQuery({
+  const { data: studentGroupsData = [], isLoading: isGroupsLoading } = useQuery({
     queryKey: ['/api/student-groups'],
   });
   
@@ -1814,7 +1814,7 @@ export default function Students() {
                 <GraduationCap className="h-4 w-4 mr-2" />
                 Onderwijsgegevens
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="edit-academicYear" className="text-xs font-medium text-gray-700">Schooljaar *</Label>
                   <Input
@@ -1826,6 +1826,38 @@ export default function Students() {
                     className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('academicYear') ? 'border-red-500 bg-red-50' : ''}`}
                     required
                   />
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-studentGroup" className="text-xs font-medium text-gray-700">Klas</Label>
+                  <Select 
+                    value={editFormData.studentGroup || ''} 
+                    onValueChange={(value) => handleEditSelectChange('studentGroup', value)}
+                  >
+                    <SelectTrigger 
+                      id="edit-studentGroup"
+                      className="mt-1 h-9 w-full border-[#e5e7eb] bg-white"
+                    >
+                      <SelectValue placeholder="Selecteer klas" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border-[#e5e7eb]">
+                      {isGroupsLoading ? (
+                        <SelectItem value="" disabled>Klassen laden...</SelectItem>
+                      ) : studentGroupsData && studentGroupsData.length > 0 ? (
+                        studentGroupsData.map((group: any) => (
+                          <SelectItem 
+                            key={group.id} 
+                            value={group.name}
+                            className="focus:bg-blue-200 hover:bg-blue-100"
+                          >
+                            {group.name} ({group.academicYear})
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="" disabled>Geen klassen beschikbaar</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div>

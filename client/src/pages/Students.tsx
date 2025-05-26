@@ -1257,22 +1257,23 @@ export default function Students() {
                     </div>
                   </div>
                   
-                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md mt-4">
-                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                      <NotebookText className="h-4 w-4 mr-2" />
-                      Aantekeningen
-                    </h3>
-                    <div>
-                      <Textarea
-                        id="notes"
-                        name="notes"
-                        value={formData.notes}
-                        onChange={handleInputChange}
-                        rows={5}
-                        className="resize-none"
-                        placeholder="Voeg hier eventuele opmerkingen of aantekeningen toe..."
-                      />
-                    </div>
+                </div>
+                
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md mt-4">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <NotebookText className="h-4 w-4 mr-2" />
+                    Aantekeningen
+                  </h3>
+                  <div>
+                    <Textarea
+                      id="notes"
+                      name="notes"
+                      value={formData.notes}
+                      onChange={handleInputChange}
+                      rows={5}
+                      className="resize-none"
+                      placeholder="Voeg hier eventuele opmerkingen of aantekeningen toe..."
+                    />
                   </div>
                 </div>
               </div>
@@ -1485,7 +1486,7 @@ export default function Students() {
 
       {/* Add Guardian Dialog */}
       <Dialog open={isAddGuardianDialogOpen} onOpenChange={setIsAddGuardianDialogOpen}>
-        <DialogContent className="sm:max-w-3xl max-h-[95vh] overflow-hidden p-0" aria-describedby="guardian-dialog-description">
+        <DialogContent className="sm:max-w-3xl max-h-[95vh] flex flex-col p-0" aria-describedby="guardian-dialog-description">
           <div className="bg-[#1e40af] py-5 px-8 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="bg-white/20 p-3 rounded-full">
@@ -1500,7 +1501,7 @@ export default function Students() {
             </div>
           </div>
           
-          <div className="px-8 py-6 overflow-y-auto" style={{ maxHeight: 'calc(95vh - 200px)' }}>
+          <div className="flex-1 px-8 py-6 overflow-y-auto">{/* Note: removed maxHeight style */}
             <Tabs value={isAddingNewGuardian ? "new" : "existing"} onValueChange={(value) => setIsAddingNewGuardian(value === "new")}>
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="new" className="flex items-center gap-2">
@@ -1837,7 +1838,8 @@ export default function Students() {
           </Tabs>
           </div>
 
-          <DialogFooter className="bg-gray-50 px-8 py-5 border-t -mx-8 -mb-6 mt-8">
+          
+          <div className="bg-gray-50 px-8 py-4 border-t flex justify-end gap-3">
             <Button variant="outline" onClick={() => setIsAddGuardianDialogOpen(false)}>
               Annuleren
             </Button>
@@ -1900,7 +1902,7 @@ export default function Students() {
               <UserPlus className="h-4 w-4 mr-2" />
               Voogd Toevoegen
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 

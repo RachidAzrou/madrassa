@@ -637,69 +637,119 @@ export default function Programs() {
                   <div className="border border-gray-200 bg-white rounded-md p-4 max-h-[300px] overflow-auto">
                     {availableTeachers && availableTeachers.length > 0 ? (
                       <div className="space-y-3">
-                        {availableTeachers.map((teacher: any) => (
-                          <div key={teacher.id} className="flex items-center space-x-3 py-2 px-3 hover:bg-blue-50 rounded-md border border-transparent hover:border-blue-200 transition-colors">
-                            <StyledCheckbox 
-                              id={`teacher-${teacher.id}`}
-                              checked={programFormData.assignedTeachers.find(t => t.id === teacher.id)?.selected || false}
-                              onCheckedChange={(checked) => handleTeacherSelection(teacher.id, checked === true)}
-                            />
-                            <div className="flex-grow min-w-0">
-                              <Label 
-                                htmlFor={`teacher-${teacher.id}`}
-                                className="text-sm font-medium text-gray-900 cursor-pointer block"
-                              >
-                                {teacher.firstName} {teacher.lastName}
-                              </Label>
-                              <p className="text-xs text-gray-500 mt-0.5">
-                                {teacher.email || 'Geen email beschikbaar'}
-                              </p>
-                            </div>
-                            {teacher.subjects && teacher.subjects.length > 0 && (
-                              <div className="flex flex-wrap gap-1">
-                                {teacher.subjects.slice(0, 2).map((subject: string, index: number) => (
-                                  <span key={index} className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                                    {subject}
-                                  </span>
-                                ))}
-                                {teacher.subjects.length > 2 && (
-                                  <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                                    +{teacher.subjects.length - 2}
-                                  </span>
+                        {availableTeachers.map((teacher: any) => {
+                          const isSelected = programFormData.assignedTeachers.find(t => t.id === teacher.id)?.selected || false;
+                          return (
+                            <div key={teacher.id} className={`flex items-center space-x-3 py-3 px-3 rounded-md border transition-all cursor-pointer ${
+                              isSelected 
+                                ? 'bg-blue-50 border-blue-200 ring-2 ring-blue-100' 
+                                : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                            }`}
+                            onClick={() => handleTeacherSelection(teacher.id, !isSelected)}
+                            >
+                              <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                                isSelected 
+                                  ? 'bg-blue-600 border-blue-600' 
+                                  : 'border-gray-300 bg-white'
+                              }`}>
+                                {isSelected && (
+                                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
                                 )}
                               </div>
-                            )}
-                          </div>
-                        ))}
+                              
+                              <div className="flex-grow min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <span className="text-xs font-semibold text-blue-600">
+                                      {teacher.firstName?.charAt(0) || 'D'}{teacher.lastName?.charAt(0) || 'T'}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-900">
+                                      {teacher.firstName} {teacher.lastName}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                      {teacher.email || 'Geen email beschikbaar'}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {teacher.specialty && (
+                                <div className="flex flex-wrap gap-1">
+                                  <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                                    {teacher.specialty}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     ) : (
                       <div className="text-center py-8 text-gray-500">
                         <Users className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                        <p className="text-sm font-medium">Geen docenten beschikbaar</p>
-                        <p className="text-xs mt-1">Voeg eerst docenten toe aan het systeem</p>
+                        <p className="text-sm font-medium">Geen docenten gevonden</p>
+                        <p className="text-xs mt-1">Probeer een andere zoekterm of voeg docenten toe</p>
                       </div>
                     )}
                   </div>
                   
                   {programFormData.assignedTeachers.filter(t => t.selected).length > 0 && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-                      <h4 className="text-sm font-medium text-blue-900 mb-2">Geselecteerde docenten:</h4>
-                      <div className="flex flex-wrap gap-2">
+                    <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-medium text-blue-900">Geselecteerde docenten</h4>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setProgramFormData(prev => ({
+                              ...prev,
+                              assignedTeachers: prev.assignedTeachers.map(t => ({ ...t, selected: false }))
+                            }));
+                          }}
+                          className="h-7 px-2 text-xs"
+                        >
+                          Alles deselecteren
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-1 gap-2">
                         {programFormData.assignedTeachers
                           .filter(t => t.selected)
                           .map(assignedTeacher => {
                             const teacher = availableTeachers.find((t: any) => t.id === assignedTeacher.id);
                             return teacher ? (
-                              <div key={teacher.id} className="flex items-center gap-1 bg-white border border-blue-300 rounded-md px-2 py-1">
-                                <span className="text-xs font-medium text-blue-900">
-                                  {teacher.firstName} {teacher.lastName}
-                                </span>
+                              <div key={teacher.id} className="flex items-center gap-3 bg-white border border-blue-300 rounded-md p-2">
+                                <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                                  <span className="text-xs font-semibold text-blue-600">
+                                    {teacher.firstName?.charAt(0) || 'D'}{teacher.lastName?.charAt(0) || 'T'}
+                                  </span>
+                                </div>
+                                <div className="flex-grow">
+                                  <p className="text-sm font-medium text-blue-900">
+                                    {teacher.firstName} {teacher.lastName}
+                                  </p>
+                                  <p className="text-xs text-blue-600">
+                                    {teacher.email || 'Geen email'}
+                                  </p>
+                                </div>
+                                {teacher.specialty && (
+                                  <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                    {teacher.specialty}
+                                  </span>
+                                )}
                                 <button
                                   type="button"
-                                  onClick={() => handleTeacherSelection(teacher.id, false)}
-                                  className="text-blue-600 hover:text-blue-800"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleTeacherSelection(teacher.id, false);
+                                  }}
+                                  className="text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded p-1"
                                 >
-                                  <X className="h-3 w-3" />
+                                  <X className="h-4 w-4" />
                                 </button>
                               </div>
                             ) : null;

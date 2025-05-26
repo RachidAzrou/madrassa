@@ -84,6 +84,7 @@ export default function Students() {
     emergencyContactLastName: '',
     emergencyContactPhone: '',
     emergencyContactRelationship: '',
+    emergencyContactRelationshipOther: '',
   });
   const [isAddingNewGuardian, setIsAddingNewGuardian] = useState(true);
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('');
@@ -1159,10 +1160,7 @@ export default function Students() {
                             {newStudentGuardians.map((guardian, index) => (
                               <div key={index} className="flex items-center gap-3 p-2 bg-white rounded-md border">
                                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                  {guardian.relationship === 'parent' && <span className="text-sm">👨‍👩‍👧‍👦</span>}
-                                  {guardian.relationship === 'guardian' && <span className="text-sm">👨‍⚖️</span>}
-                                  {guardian.relationship === 'grandparent' && <span className="text-sm">👴</span>}
-                                  {guardian.relationship === 'other' && <span className="text-sm">👤</span>}
+                                  <User className="h-4 w-4 text-blue-600" />
                                 </div>
                                 <div className="flex-1">
                                   <p className="text-sm font-medium">{guardian.firstName} {guardian.lastName}</p>
@@ -1216,7 +1214,7 @@ export default function Students() {
                             {newStudentSiblings.map((sibling, index) => (
                               <div key={index} className="flex items-center gap-3 p-2 bg-white rounded-md border">
                                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                  <span className="text-sm">👫</span>
+                                  <Users className="h-4 w-4 text-green-600" />
                                 </div>
                                 <div className="flex-1">
                                   <p className="text-sm font-medium">{sibling.firstName} {sibling.lastName}</p>
@@ -1562,11 +1560,10 @@ export default function Students() {
                         <SelectValue placeholder="Selecteer relatie" />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
-                        <SelectItem value="parent" className="text-black hover:bg-blue-100 focus:bg-blue-200">👨‍👩‍👧‍👦 Ouder</SelectItem>
-                        <SelectItem value="guardian" className="text-black hover:bg-blue-100 focus:bg-blue-200">🛡️ Voogd</SelectItem>
-                        <SelectItem value="grandparent" className="text-black hover:bg-blue-100 focus:bg-blue-200">👴👵 Grootouder</SelectItem>
-                        <SelectItem value="sibling" className="text-black hover:bg-blue-100 focus:bg-blue-200">👫 Broer/Zus</SelectItem>
-                        <SelectItem value="other" className="text-black hover:bg-blue-100 focus:bg-blue-200">❓ Anders</SelectItem>
+                        <SelectItem value="parent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Ouder</SelectItem>
+                        <SelectItem value="guardian" className="text-black hover:bg-blue-100 focus:bg-blue-200">Voogd</SelectItem>
+                        <SelectItem value="grandparent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Grootouder</SelectItem>
+                        <SelectItem value="other" className="text-black hover:bg-blue-100 focus:bg-blue-200">Anders</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -1717,6 +1714,22 @@ export default function Students() {
                             </SelectContent>
                           </Select>
                         </div>
+                        
+                        {guardianFormData.emergencyContactRelationship === 'other' && (
+                          <div className="space-y-2">
+                            <Label htmlFor="guardian-emergencyContactRelationshipOther" className="text-xs font-medium text-gray-700">
+                              Specificeer relatie <span className="text-red-500">*</span>
+                            </Label>
+                            <Input 
+                              id="guardian-emergencyContactRelationshipOther" 
+                              placeholder="Bijv. vriend, buurman, collega..." 
+                              className="h-8 text-sm"
+                              value={guardianFormData.emergencyContactRelationshipOther || ''}
+                              onChange={(e) => setGuardianFormData(prev => ({...prev, emergencyContactRelationshipOther: e.target.value}))}
+                              required
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -1732,21 +1745,92 @@ export default function Students() {
                 </h3>
                 <div className="space-y-3">
                   <div>
-                    <Label htmlFor="guardian-search" className="text-xs font-medium text-gray-700">Zoek op naam</Label>
+                    <Label htmlFor="guardian-search" className="text-xs font-medium text-gray-700">Zoek op naam of telefoon</Label>
                     <Input
                       id="guardian-search"
                       value={guardianSearchTerm}
                       onChange={(e) => setGuardianSearchTerm(e.target.value)}
-                      placeholder="Typ de naam van de voogd..."
-                      className="h-9 text-sm"
+                      placeholder="Typ naam of telefoonnummer..."
+                      className="h-9 text-sm mt-2"
                     />
                   </div>
                   
-                  <div className="text-center text-gray-500 py-8 bg-white rounded-md border-2 border-dashed border-gray-200">
-                    <Users className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-sm font-medium">Functionaliteit komt binnenkort</p>
-                    <p className="text-xs text-gray-400 mt-1">Je kunt straks bestaande voogden zoeken en koppelen</p>
-                  </div>
+                  {/* Mock bestaande voogden voor demonstratie */}
+                  {guardianSearchTerm.length > 0 && (
+                    <div className="bg-white border rounded-lg divide-y max-h-60 overflow-y-auto">
+                      {[
+                        { id: 1, firstName: 'Ahmed', lastName: 'Hassan', phone: '0612345678', email: 'ahmed.hassan@email.com', relationship: 'parent' },
+                        { id: 2, firstName: 'Fatima', lastName: 'Al-Zahra', phone: '0687654321', email: 'fatima.alzahra@email.com', relationship: 'parent' },
+                        { id: 3, firstName: 'Omar', lastName: 'Ibn Khattab', phone: '0698765432', email: 'omar.khattab@email.com', relationship: 'grandparent' },
+                        { id: 4, firstName: 'Zaina', lastName: 'El Mouden', phone: '0456789123', email: 'zaina.mouden@email.com', relationship: 'guardian' },
+                      ].filter(guardian => 
+                        guardian.firstName.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
+                        guardian.lastName.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
+                        guardian.phone.includes(guardianSearchTerm)
+                      ).map((guardian) => (
+                        <div key={guardian.id} className="p-3 hover:bg-gray-50 cursor-pointer" 
+                             onClick={() => {
+                               const existingGuardian = {
+                                 ...guardian,
+                                 id: Date.now(),
+                                 relationshipOther: '',
+                                 isEmergencyContact: false,
+                                 emergencyContactFirstName: '',
+                                 emergencyContactLastName: '',
+                                 emergencyContactPhone: '',
+                                 emergencyContactRelationship: '',
+                               };
+                               setNewStudentGuardians([...newStudentGuardians, existingGuardian]);
+                               setGuardianSearchTerm('');
+                               toast({
+                                 title: "Voogd gekoppeld",
+                                 description: `${guardian.firstName} ${guardian.lastName} is gekoppeld aan de student.`,
+                               });
+                               setIsAddGuardianDialogOpen(false);
+                             }}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <p className="font-medium text-sm">{guardian.firstName} {guardian.lastName}</p>
+                              <p className="text-xs text-gray-500">{guardian.phone} • {guardian.email}</p>
+                              <p className="text-xs text-blue-600">
+                                {guardian.relationship === 'parent' && 'Ouder'}
+                                {guardian.relationship === 'guardian' && 'Voogd'}
+                                {guardian.relationship === 'grandparent' && 'Grootouder'}
+                              </p>
+                            </div>
+                            <Button size="sm" variant="outline" className="h-7 text-xs">
+                              <UserPlus className="h-3 w-3 mr-1" />
+                              Koppelen
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {[
+                        { id: 1, firstName: 'Ahmed', lastName: 'Hassan', phone: '0612345678', email: 'ahmed.hassan@email.com', relationship: 'parent' },
+                        { id: 2, firstName: 'Fatima', lastName: 'Al-Zahra', phone: '0687654321', email: 'fatima.alzahra@email.com', relationship: 'parent' },
+                        { id: 3, firstName: 'Omar', lastName: 'Ibn Khattab', phone: '0698765432', email: 'omar.khattab@email.com', relationship: 'grandparent' },
+                        { id: 4, firstName: 'Zaina', lastName: 'El Mouden', phone: '0456789123', email: 'zaina.mouden@email.com', relationship: 'guardian' },
+                      ].filter(guardian => 
+                        guardian.firstName.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
+                        guardian.lastName.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
+                        guardian.phone.includes(guardianSearchTerm)
+                      ).length === 0 && (
+                        <div className="p-4 text-center text-gray-500">
+                          <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm">Geen bestaande voogden gevonden voor "{guardianSearchTerm}"</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {guardianSearchTerm.length === 0 && (
+                    <div className="text-center text-gray-500 py-8 bg-white rounded-md border-2 border-dashed border-gray-200">
+                      <Search className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-sm font-medium">Begin met typen om bestaande voogden te zoeken</p>
+                      <p className="text-xs text-gray-400 mt-1">Zoek op naam of telefoonnummer om een bestaande voogd te koppelen</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </TabsContent>
@@ -1801,6 +1885,7 @@ export default function Students() {
                     emergencyContactLastName: '',
                     emergencyContactPhone: '',
                     emergencyContactRelationship: '',
+                    emergencyContactRelationshipOther: '',
                   });
 
                   toast({

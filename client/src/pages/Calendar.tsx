@@ -86,8 +86,7 @@ export default function Calendar() {
   });
   
   const [activeTab, setActiveTab] = useState<'exam' | 'class' | 'holiday' | 'event'>('event');
-  const [isEventDetailDialogOpen, setIsEventDetailDialogOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
 
   // Functie om alle velden te resetten
   const resetEventForm = () => {
@@ -112,10 +111,42 @@ export default function Calendar() {
     setActiveTab('event');
   };
 
-  // Functie om event details te tonen
+  // Functie om event click te handelen (toggle expand/collapse)
   const handleEventClick = (event: CalendarEvent) => {
-    setSelectedEvent(event);
-    setIsEventDetailDialogOpen(true);
+    if (expandedEventId === event.id) {
+      setExpandedEventId(null); // Collapse als het al open is
+    } else {
+      setExpandedEventId(event.id); // Expand het event
+    }
+  };
+
+  // Functie om event te verwijderen
+  const handleDeleteEvent = async (eventId: string) => {
+    try {
+      await apiRequest(`/api/calendar/events/${eventId}`, {
+        method: 'DELETE'
+      });
+      
+      // Update localStorage
+      const storedEvents = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+      const updatedEvents = storedEvents.filter((e: CalendarEvent) => e.id !== eventId);
+      localStorage.setItem('calendarEvents', JSON.stringify(updatedEvents));
+      
+      setExpandedEventId(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/calendar/events'] });
+      
+      toast({
+        title: "Evenement verwijderd",
+        description: "Het evenement is succesvol verwijderd.",
+      });
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het verwijderen van het evenement.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Get month name, year - in Dutch
@@ -662,21 +693,50 @@ export default function Calendar() {
                       <div key={i} className="min-h-[3rem] relative">
                         {hourEvents.map((event, idx) => {
                           const colors = getEventColors(event.type);
+                          const isExpanded = expandedEventId === event.id;
                           return (
                             <div 
                               key={idx} 
-                              className="absolute top-0 left-0 right-0 mx-1 my-0.5 px-1 py-0.5 text-xs font-medium rounded-sm overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                              className={`absolute left-0 right-0 mx-1 my-0.5 px-2 py-1 text-xs font-medium rounded-sm cursor-pointer hover:shadow-md transition-all duration-200 ${
+                                isExpanded ? 'shadow-lg z-50' : 'hover:opacity-80'
+                              }`}
                               style={{ 
                                 backgroundColor: colors.bgColor,
-                                borderLeft: `2px solid ${colors.borderColor}`,
-                                zIndex: idx + 1
+                                borderLeft: `3px solid ${colors.borderColor}`,
+                                zIndex: isExpanded ? 50 : idx + 1,
+                                top: isExpanded ? '-10px' : '0',
+                                height: isExpanded ? 'auto' : '100%',
+                                minHeight: isExpanded ? '120px' : 'auto'
                               }}
                               onClick={() => handleEventClick(event)}
                             >
-                              <div className="truncate">{event.title}</div>
+                              <div className="truncate font-semibold">{event.title}</div>
                               <div className="truncate text-[10px] text-gray-600">
                                 {event.startTime} - {event.endTime}
                               </div>
+                              
+                              {isExpanded && (
+                                <div className="mt-2 space-y-1 text-[11px] text-gray-700">
+                                  {event.location && <div>📍 {event.location}</div>}
+                                  {event.courseName && <div>📚 {event.courseName}</div>}
+                                  {event.className && <div>🎓 {event.className}</div>}
+                                  {event.description && <div className="italic">💬 {event.description}</div>}
+                                  
+                                  <div className="flex gap-1 mt-2">
+                                    <Button
+                                      size="sm"
+                                      variant="destructive"
+                                      className="h-6 px-2 text-[10px]"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteEvent(event.id || '');
+                                      }}
+                                    >
+                                      🗑️ Verwijder
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           );
                         })}
@@ -1099,59 +1159,7 @@ export default function Calendar() {
         </DialogFooterContainer>
       </CustomDialog>
 
-      {/* Event Detail Popup */}
-      <CustomDialog 
-        open={isEventDetailDialogOpen} 
-        onOpenChange={setIsEventDetailDialogOpen} 
-        maxWidth="400px"
-      >
-        {selectedEvent && (
-          <>
-            <div className="sr-only">
-              <h2 id="dialog-title">Event Details</h2>
-              <p id="dialog-description">Details for calendar event</p>
-            </div>
-            <div 
-              className="bg-white p-4 rounded-lg shadow-lg border-l-4 max-w-xs"
-              style={{ borderLeftColor: getEventColors(selectedEvent.type).borderColor }}
-            >
-              <div className="space-y-3">
-                <div>
-                  <h3 className="font-semibold text-gray-900">{selectedEvent.title}</h3>
-                  <span 
-                    className="inline-block px-2 py-1 text-xs rounded mt-1"
-                    style={{
-                      backgroundColor: getEventColors(selectedEvent.type).bgColor,
-                      color: getEventColors(selectedEvent.type).borderColor
-                    }}
-                  >
-                    {selectedEvent.type === 'class' ? 'Les' : 
-                     selectedEvent.type === 'exam' ? 'Examen' :
-                     selectedEvent.type === 'holiday' ? 'Vakantie' : 'Evenement'}
-                  </span>
-                </div>
 
-                <div className="text-sm text-gray-600 space-y-1">
-                  <div>{new Date(selectedEvent.date + 'T00:00:00').toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' })}</div>
-                  <div>{selectedEvent.startTime} - {selectedEvent.endTime}</div>
-                  {selectedEvent.location && <div>{selectedEvent.location}</div>}
-                  {selectedEvent.courseName && <div>{selectedEvent.courseName}</div>}
-                  {selectedEvent.description && <div className="italic">{selectedEvent.description}</div>}
-                </div>
-
-                <Button 
-                  onClick={() => setIsEventDetailDialogOpen(false)}
-                  variant="ghost" 
-                  size="sm"
-                  className="w-full text-xs"
-                >
-                  Sluiten
-                </Button>
-              </div>
-            </div>
-          </>
-        )}
-      </CustomDialog>
     </div>
   );
 }

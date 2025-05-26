@@ -1069,48 +1069,56 @@ export default function Teachers() {
         </DialogContent>
       </Dialog>
 
-      {/* Dialoogvenster voor verwijderen */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Docent verwijderen</DialogTitle>
-            <DialogDescription>
-              Weet je zeker dat je deze docent wilt verwijderen? Dit kan niet ongedaan worden gemaakt.
-            </DialogDescription>
-          </DialogHeader>
-          
+      {/* Delete Teacher Dialog */}
+      <CustomDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogHeaderWithIcon 
+          title="Docent Verwijderen" 
+          description="Weet je zeker dat je deze docent wilt verwijderen?"
+          icon={<Trash2 className="h-5 w-5 text-white" />}
+        />
+        
+        <div className="px-6 py-4">
           {selectedTeacher && (
-            <div className="flex items-center space-x-4 py-4">
-              <Avatar className="h-10 w-10">
-                <AvatarFallback className="bg-[#e5e7eb] text-gray-600">
-                  {selectedTeacher.firstName.charAt(0)}{selectedTeacher.lastName.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">{selectedTeacher.firstName} {selectedTeacher.lastName}</p>
-                <p className="text-sm text-gray-500">{selectedTeacher.email}</p>
+            <div className="mb-6">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10 border border-gray-200">
+                  {selectedTeacher.photoUrl ? (
+                    <AvatarImage src={selectedTeacher.photoUrl} alt={`${selectedTeacher.firstName} ${selectedTeacher.lastName}`} />
+                  ) : (
+                    <AvatarFallback className="bg-[#1e40af] text-white">
+                      {selectedTeacher.firstName?.charAt(0)}{selectedTeacher.lastName?.charAt(0)}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <div>
+                  <p className="font-medium">{selectedTeacher.firstName} {selectedTeacher.lastName}</p>
+                  <p className="text-xs text-gray-500">Docent ID: {selectedTeacher.teacherId}</p>
+                </div>
               </div>
             </div>
           )}
           
-          <DialogFooter>
-            <Button
+          <p className="text-sm text-gray-600 mb-6">Deze actie kan niet ongedaan worden gemaakt. De docent wordt permanent verwijderd uit het systeem.</p>
+          
+          <DialogFooterContainer>
+            <Button 
+              type="button" 
               variant="outline"
               onClick={() => setShowDeleteDialog(false)}
-              className="h-8 text-xs rounded-sm"
+              className="border-gray-300"
             >
               Annuleren
             </Button>
-            <Button
+            <Button 
+              type="button"
               variant="destructive"
               onClick={confirmDeleteTeacher}
-              className="h-8 text-xs rounded-sm"
             >
               Verwijderen
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </DialogFooterContainer>
+        </div>
+      </CustomDialog>
 
       {/* Dialoogvenster voor bekijken van docent gegevens */}
       <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>

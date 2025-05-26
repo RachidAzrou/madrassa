@@ -754,8 +754,14 @@ export default function Calendar() {
                     value={newEvent.title}
                     onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                     className="mt-1"
-                    required
+                    placeholder={activeTab === 'class' ? "Wordt automatisch ingevuld bij vak selectie" : "Voer een titel in"}
+                    required={activeTab !== 'class'}
                   />
+                  {activeTab === 'class' && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Titel wordt automatisch de naam van het geselecteerde vak
+                    </p>
+                  )}
                 </div>
                 <div>
                   <FormLabel htmlFor="location">Locatie</FormLabel>
@@ -833,10 +839,13 @@ export default function Calendar() {
                         autoTeacherName = "Omar Ibn Khattab";
                       }
                       
+                      const courseName = value === "1" ? "Arabisch" : value === "2" ? "Islamitische Geschiedenis" : "Koran Memorisatie";
+                      
                       setNewEvent({ 
                         ...newEvent, 
                         courseId: value,
-                        courseName: value === "1" ? "Arabisch" : value === "2" ? "Islamitische Geschiedenis" : "Koran Memorisatie",
+                        courseName: courseName,
+                        title: courseName, // Automatisch titel invullen voor lessen
                         teacherId: autoTeacher,
                         teacherName: autoTeacherName
                       });

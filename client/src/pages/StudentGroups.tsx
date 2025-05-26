@@ -819,6 +819,10 @@ export default function StudentGroups() {
                         <p className="text-sm text-gray-900">{selectedClass.name}</p>
                       </div>
                       <div>
+                        <label className="text-xs font-medium text-gray-700">Schooljaar</label>
+                        <p className="text-sm text-gray-900">{selectedClass.academicYear || '-'}</p>
+                      </div>
+                      <div>
                         <label className="text-xs font-medium text-gray-700">Locatie</label>
                         <p className="text-sm text-gray-900">{selectedClass.location || '-'}</p>
                       </div>

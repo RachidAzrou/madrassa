@@ -1097,9 +1097,10 @@ export default function Guardians() {
           <form onSubmit={handleEditSubmit} className="flex flex-col h-full">
             <div className="flex-1 p-6 overflow-y-auto max-h-[70vh]">
               <Tabs defaultValue="general" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="general">Algemeen</TabsTrigger>
                   <TabsTrigger value="contact">Noodcontact</TabsTrigger>
+                  <TabsTrigger value="students">Studenten</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="general" className="space-y-4 min-h-[300px]">
@@ -1288,6 +1289,70 @@ export default function Guardians() {
                           </SelectContent>
                         </Select>
                       </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="students" className="space-y-4 min-h-[300px]">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <Users className="h-4 w-4 mr-2" />
+                      Gekoppelde studenten
+                    </h3>
+                    
+                    <div className="space-y-3">
+                      {selectedGuardian && students.filter(student => 
+                        student.guardians && student.guardians.some(g => g.id === selectedGuardian.id)
+                      ).length > 0 ? (
+                        students
+                          .filter(student => 
+                            student.guardians && student.guardians.some(g => g.id === selectedGuardian.id)
+                          )
+                          .map(student => (
+                            <div key={student.id} className="flex items-center gap-3 p-3 bg-white rounded-md border">
+                              <div className="w-10 h-10 rounded-full bg-[#1e40af] flex items-center justify-center text-white font-medium text-sm">
+                                {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {student.firstName} {student.lastName}
+                                </p>
+                                <p className="text-xs text-gray-600">Student ID: {student.studentId}</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                  student.status === 'Ingeschreven' ? 'bg-green-100 text-green-800' :
+                                  student.status === 'Uitgeschreven' ? 'bg-red-100 text-red-800' :
+                                  student.status === 'Afgestudeerd' ? 'bg-gray-100 text-gray-800' :
+                                  student.status === 'Geschorst' ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {student.status}
+                                </span>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    // Hier kun je functionaliteit toevoegen om de koppeling te verwijderen
+                                    toast({
+                                      title: "Koppeling verwijderen",
+                                      description: "Deze functionaliteit kan later worden geïmplementeerd."
+                                    });
+                                  }}
+                                  className="h-7 w-7 p-0 border-red-300 text-red-600 hover:bg-red-50"
+                                >
+                                  <XCircle className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))
+                      ) : (
+                        <div className="text-center py-6 text-gray-500 text-sm">
+                          <Users className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                          <p>Geen studenten gekoppeld aan deze voogd</p>
+                          <p className="text-xs mt-1">Voeg studenten toe via de studentenpagina</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </TabsContent>

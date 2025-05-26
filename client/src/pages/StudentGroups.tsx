@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, Plus, Eye, Edit, Trash2, Users, MapPin, BookOpen, 
-  GraduationCap, Target, Filter, Download, X, Save, UserCheck
+  GraduationCap, Target, X, Save, UserCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -342,18 +342,6 @@ export default function StudentGroups() {
             
             <div className="flex flex-wrap gap-2 items-center">
               <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="h-8 text-xs rounded-sm border-[#e5e7eb]"
-              >
-                <Filter className="h-3.5 w-3.5 mr-1" />
-                Filters
-              </Button>
-              
-
-              
-              <Button
                 onClick={() => setShowNewClassDialog(true)}
                 size="sm"
                 className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white"
@@ -364,88 +352,49 @@ export default function StudentGroups() {
             </div>
           </div>
 
-          {/* Advanced filters */}
-          <Collapsible open={showAdvancedFilters}>
-            <CollapsibleContent className="mt-4 pt-4 border-t border-gray-200">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <Label className="text-xs font-medium text-gray-700">Klas</Label>
-                  <Input
-                    placeholder="Filter op klasnaam"
-                    className="h-8 text-xs mt-1"
-                    value={classNameFilter}
-                    onChange={(e) => setClassNameFilter(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs font-medium text-gray-700">Schooljaar</Label>
-                  <Select value={academicYearFilter} onValueChange={setAcademicYearFilter}>
-                    <SelectTrigger className="h-8 text-xs mt-1">
-                      <SelectValue placeholder="Alle schooljaren" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Alle schooljaren</SelectItem>
-                      <SelectItem value="2023-2024">2023-2024</SelectItem>
-                      <SelectItem value="2024-2025">2024-2025</SelectItem>
-                      <SelectItem value="2025-2026">2025-2026</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-xs font-medium text-gray-700">Locatie</Label>
-                  <Input
-                    placeholder="Filter op locatie"
-                    className="h-8 text-xs mt-1"
-                    value={locationFilter}
-                    onChange={(e) => setLocationFilter(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs font-medium text-gray-700">Docent</Label>
-                  <Input
-                    placeholder="Filter op docent"
-                    className="h-8 text-xs mt-1"
-                    value={teacherFilter}
-                    onChange={(e) => setTeacherFilter(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs font-medium text-gray-700">Academisch jaar</Label>
-                  <Select value={academicYearFilter} onValueChange={setAcademicYearFilter}>
-                    <SelectTrigger className="h-8 text-xs mt-1">
-                      <SelectValue placeholder="Alle jaren" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Alle jaren</SelectItem>
-                      <SelectItem value="2024">2024</SelectItem>
-                      <SelectItem value="2025">2025</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-xs font-medium text-gray-700">Min. capaciteit</Label>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    className="h-8 text-xs mt-1"
-                    value={capacityFilter}
-                    onChange={(e) => setCapacityFilter(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end mt-4">
+          {/* Inline filters in studentenpagina stijl */}
+          <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200 mt-4">
+            <div className="flex items-center">
+              {(classNameFilter || academicYearFilter !== 'all' || locationFilter) && (
                 <Button
-                  variant="outline"
+                  variant="link"
                   size="sm"
                   onClick={clearFilters}
-                  className="h-8 text-xs"
+                  className="h-7 text-xs text-blue-600 p-0 mr-3"
                 >
-                  <X className="h-3.5 w-3.5 mr-1" />
-                  Wis filters
+                  Filters wissen
                 </Button>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+              )}
+            </div>
+            
+            <div className="flex flex-wrap gap-3">
+              <Input
+                placeholder="Klas"
+                value={classNameFilter}
+                onChange={(e) => setClassNameFilter(e.target.value)}
+                className="w-32 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white"
+              />
+              
+              <Select value={academicYearFilter} onValueChange={setAcademicYearFilter}>
+                <SelectTrigger className="w-40 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white">
+                  <SelectValue placeholder="Schooljaar" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-[#e5e7eb]">
+                  <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle schooljaren</SelectItem>
+                  <SelectItem value="2023-2024" className="focus:bg-blue-200 hover:bg-blue-100">2023-2024</SelectItem>
+                  <SelectItem value="2024-2025" className="focus:bg-blue-200 hover:bg-blue-100">2024-2025</SelectItem>
+                  <SelectItem value="2025-2026" className="focus:bg-blue-200 hover:bg-blue-100">2025-2026</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Input
+                placeholder="Locatie"
+                value={locationFilter}
+                onChange={(e) => setLocationFilter(e.target.value)}
+                className="w-32 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white"
+              />
+            </div>
+          </div>
         </SearchActionBar>
 
         {/* Classes table */}

@@ -69,15 +69,22 @@ export default function Payments() {
     queryKey: ["/api/payments/stats"],
   });
 
-  // Fetch students voor dropdown
-  const { data: students } = useQuery<any[]>({
+  // Fetch students voor dropdown - combineer API en localStorage
+  const { data: apiStudents } = useQuery<any[]>({
     queryKey: ["/api/students"],
   });
 
-  // Fetch klassen voor dropdown
-  const { data: classes } = useQuery<any[]>({
+  // Haal students uit localStorage als fallback
+  const localStudents = JSON.parse(localStorage.getItem('students') || '[]');
+  const students = apiStudents && apiStudents.length > 0 ? apiStudents : localStudents;
+
+  // Fetch klassen voor dropdown - combineer API en localStorage
+  const { data: apiClasses } = useQuery<any[]>({
     queryKey: ["/api/student-groups"],
   });
+
+  const localClasses = JSON.parse(localStorage.getItem('studentGroups') || '[]');
+  const classes = apiClasses && apiClasses.length > 0 ? apiClasses : localClasses;
 
   // Create payment mutation
   const createPaymentMutation = useMutation({
@@ -138,8 +145,12 @@ export default function Payments() {
       if (!selectedClass) return;
       
       // Filter studenten die in deze klas zitten
+      // Controleer verschillende mogelijke veldnamen voor klasassociatie
       const classStudents = students?.filter(student => 
-        student.studentGroupId === selectedClass.id
+        student.studentGroupId === selectedClass.id || 
+        student.classId === selectedClass.id ||
+        student.klas === selectedClass.name ||
+        student.studentGroup === selectedClass.name
       ) || [];
       
       if (classStudents.length === 0) {
@@ -311,7 +322,14 @@ export default function Payments() {
                     </StyledSelect>
                     {selectedClassId && (
                       <p className="text-sm text-gray-500">
-                        {students?.filter(s => s.studentGroupId === parseInt(selectedClassId)).length || 0} studenten in deze klas
+                        {students?.filter(s => {
+                          const selectedClass = classes?.find(cls => cls.id.toString() === selectedClassId);
+                          if (!selectedClass) return false;
+                          return s.studentGroupId === selectedClass.id || 
+                                 s.classId === selectedClass.id ||
+                                 s.klas === selectedClass.name ||
+                                 s.studentGroup === selectedClass.name;
+                        }).length || 0} studenten in deze klas
                       </p>
                     )}
                   </div>

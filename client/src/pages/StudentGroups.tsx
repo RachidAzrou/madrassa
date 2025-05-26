@@ -21,17 +21,26 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   DataTableContainer, 
   SearchActionBar, 
-  TableContainer, 
-  DataTableHeader,
   ActionButtonsContainer,
   FilterLabel,
   FilterSelect,
   FilterSelectItem,
-  QuickActions,
-  EmptyTableState,
-  TableLoadingState,
-  TableErrorState 
+  QuickActions
 } from '@/components/ui/data-table-container';
+import { 
+  StandardTable, 
+  StandardTableHeader, 
+  StandardTableBody, 
+  StandardTableRow, 
+  StandardTableHeaderCell, 
+  StandardTableCell,
+  TableLoadingState,
+  TableErrorState,
+  TableEmptyState,
+  TableCheckboxHeader,
+  TableCheckboxCell,
+  EmptyActionHeader
+} from '@/components/ui/standard-table';
 import { apiRequest } from '@/lib/queryClient';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { DeleteDialog } from '@/components/ui/delete-dialog';
@@ -406,155 +415,100 @@ export default function StudentGroups() {
         )}
 
         {/* Classes table */}
-        <div className="bg-white border border-[#e5e7eb] rounded-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-[#e5e7eb]">
-              <thead className="bg-[#f9fafc]">
-                <tr>
-                  <th scope="col" className="px-4 py-3 text-left w-10">
-                    <Checkbox
-                      checked={selectedClasses.length > 0 && selectedClasses.length === filteredClasses.length}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedClasses(filteredClasses.map((cls: ClassType) => cls.id));
-                        } else {
-                          setSelectedClasses([]);
-                        }
-                      }}
-                      className="h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
+        <StandardTable>
+          <StandardTableHeader>
+            <tr>
+              <TableCheckboxHeader
+                checked={selectedClasses.length > 0 && selectedClasses.length === filteredClasses.length}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setSelectedClasses(filteredClasses.map((cls: ClassType) => cls.id));
+                  } else {
+                    setSelectedClasses([]);
+                  }
+                }}
+              />
+              <StandardTableHeaderCell>Klas</StandardTableHeaderCell>
+              <StandardTableHeaderCell>Schooljaar</StandardTableHeaderCell>
+              <StandardTableHeaderCell>Locatie</StandardTableHeaderCell>
+              <StandardTableHeaderCell>Capaciteit</StandardTableHeaderCell>
+              <StandardTableHeaderCell>Klastitularis</StandardTableHeaderCell>
+              <EmptyActionHeader />
+            </tr>
+          </StandardTableHeader>
+          <StandardTableBody>
+            {isLoading ? (
+              <TableLoadingState colSpan={7} message="Klassen laden..." />
+            ) : isError ? (
+              <TableErrorState 
+                colSpan={7} 
+                message="Er is een fout opgetreden bij het laden van de klassen."
+                onRetry={() => queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] })}
+              />
+            ) : filteredClasses.length === 0 ? (
+              <TableEmptyState
+                colSpan={7}
+                icon={<School className="h-12 w-12 mx-auto text-gray-300" />}
+                title="Geen klassen gevonden"
+                description={searchTerm || filterAcademicYear !== 'all' 
+                  ? "Geen klassen komen overeen met uw zoekcriteria."
+                  : "Er zijn nog geen klassen aangemaakt."}
+                action={
+                  <Button
+                    onClick={() => setShowNewClassDialog(true)}
+                    className="bg-[#1e40af] hover:bg-[#1e3a8a]"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Eerste Klas Aanmaken
+                  </Button>
+                }
+              />
+            ) : (
+              filteredClasses.map((cls: ClassType) => (
+                <StandardTableRow key={cls.id}>
+                  <TableCheckboxCell
+                    checked={selectedClasses.includes(cls.id)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedClasses([...selectedClasses, cls.id]);
+                      } else {
+                        setSelectedClasses(selectedClasses.filter(id => id !== cls.id));
+                      }
+                    }}
+                  />
+                  <StandardTableCell className="whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{cls.name}</div>
+                      </div>
+                    </div>
+                  </StandardTableCell>
+                  <StandardTableCell className="whitespace-nowrap">
+                    <span className="text-sm text-gray-900">{cls.academicYear || '-'}</span>
+                  </StandardTableCell>
+                  <StandardTableCell className="whitespace-nowrap">
+                    <span className="text-sm text-gray-900">{cls.location || '-'}</span>
+                  </StandardTableCell>
+                  <StandardTableCell className="whitespace-nowrap">
+                    <span className="text-sm text-gray-900">
+                      {cls.studentCount || 0}/{cls.maxCapacity || 'Onbeperkt'}
+                    </span>
+                  </StandardTableCell>
+                  <StandardTableCell className="whitespace-nowrap">
+                    <span className="text-sm text-gray-900">{cls.teacherName || '-'}</span>
+                  </StandardTableCell>
+                  <StandardTableCell className="whitespace-nowrap text-right">
+                    <QuickActions
+                      onView={() => handleViewClass(cls)}
+                      onEdit={() => handleEditClass(cls)}
+                      onDelete={() => handleDeleteClass(cls)}
                     />
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-left">
-                    <span className="text-xs font-medium text-gray-700">Klas</span>
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-left">
-                    <span className="text-xs font-medium text-gray-700">Schooljaar</span>
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-left">
-                    <span className="text-xs font-medium text-gray-700">Locatie</span>
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-left">
-                    <span className="text-xs font-medium text-gray-700">Capaciteit</span>
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-left">
-                    <span className="text-xs font-medium text-gray-700">Klastitularis</span>
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-right w-[120px]">
-                    <span className="text-xs font-medium text-gray-700"></span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-[#e5e7eb]">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={7} className="px-6 py-4 text-center">
-                      <div className="flex justify-center items-center">
-                        <div className="w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
-                        <span className="ml-2 text-sm text-gray-500">Klassen laden...</span>
-                      </div>
-                    </td>
-                  </tr>
-                ) : isError ? (
-                  <tr>
-                    <td colSpan={7} className="px-6 py-4 text-center">
-                      <div className="flex flex-col items-center justify-center py-6">
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          width="24" 
-                          height="24" 
-                          viewBox="0 0 24 24" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          strokeWidth="2" 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          className="h-8 w-8 text-red-500 mb-2"
-                        >
-                          <circle cx="12" cy="12" r="10" />
-                          <line x1="15" y1="9" x2="9" y2="15" />
-                          <line x1="9" y1="9" x2="15" y2="15" />
-                        </svg>
-                        <p className="text-sm text-red-500">Er is een fout opgetreden bij het laden van de klassen.</p>
-                      </div>
-                    </td>
-                  </tr>
-                ) : filteredClasses.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-6 py-4 text-center">
-                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
-                        <div className="text-[#1e3a8a] mb-2">
-                          <School className="h-12 w-12" />
-                        </div>
-                        <p className="text-sm font-medium">Geen klassen gevonden</p>
-                        <p className="text-sm text-gray-400 mb-4">
-                          {searchTerm || filterAcademicYear !== 'all' 
-                            ? "Geen klassen komen overeen met uw zoekcriteria."
-                            : "Er zijn nog geen klassen aangemaakt."}
-                        </p>
-                        <Button
-                          onClick={() => setShowNewClassDialog(true)}
-                          className="bg-[#1e40af] hover:bg-[#1e3a8a]"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Eerste Klas Aanmaken
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  filteredClasses.map((cls: ClassType) => (
-                    <tr 
-                      key={cls.id} 
-                      className="hover:bg-gray-50 group transition-colors"
-                    >
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <Checkbox
-                          checked={selectedClasses.includes(cls.id)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedClasses([...selectedClasses, cls.id]);
-                            } else {
-                              setSelectedClasses(selectedClasses.filter(id => id !== cls.id));
-                            }
-                          }}
-                          className="h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
-                        />
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">{cls.name}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">{cls.academicYear || '-'}</span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">{cls.location || '-'}</span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">
-                          {cls.studentCount || 0}/{cls.maxCapacity || 'Onbeperkt'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">{cls.teacherName || '-'}</span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-right">
-                        <QuickActions
-                          onView={() => handleViewClass(cls)}
-                          onEdit={() => handleEditClass(cls)}
-                          onDelete={() => handleDeleteClass(cls)}
-                        />
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                  </StandardTableCell>
+                </StandardTableRow>
+              ))
+            )}
+          </StandardTableBody>
+        </StandardTable>
 
         <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
           <div>

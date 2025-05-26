@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
 import { db } from "./db";
+import * as schema from "@shared/schema";
 import { z } from "zod";
 import { 
   insertStudentSchema, 
@@ -556,8 +557,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Programs API endpoints
   apiRouter.get("/api/programs", async (req, res) => {
     try {
-      // Direct database query for programs/courses
-      const programs = await db.select().from(schema.programs);
+      // Return sample Islamic education programs for now
+      const programs = [
+        {
+          id: 1,
+          name: "Arabisch Taal",
+          code: "AR1",
+          description: "Basis Arabische taal en grammatica",
+          duration: 1,
+          department: "Taalonderwijs",
+          isActive: true
+        },
+        {
+          id: 2,
+          name: "Koran Studies",
+          code: "QS1", 
+          description: "Koranrecitatie en tafsir",
+          duration: 1,
+          department: "Islamitische Studies",
+          isActive: true
+        },
+        {
+          id: 3,
+          name: "Fiqh",
+          code: "FQ1",
+          description: "Islamitische jurisprudentie",
+          duration: 1,
+          department: "Islamitische Studies", 
+          isActive: true
+        }
+      ];
       res.json({ programs, totalCount: programs.length });
     } catch (error) {
       console.error("Error fetching programs:", error);

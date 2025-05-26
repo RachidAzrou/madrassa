@@ -1071,36 +1071,40 @@ export default function Teachers() {
 
       {/* Dialoogvenster voor verwijderen */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Docent verwijderen</DialogTitle>
             <DialogDescription>
-              Weet je zeker dat je de volgende docent wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+              Weet je zeker dat je deze docent wilt verwijderen? Dit kan niet ongedaan worden gemaakt.
             </DialogDescription>
           </DialogHeader>
+          
           {selectedTeacher && (
-            <div className="flex items-center gap-4 py-2">
+            <div className="flex items-center space-x-4 py-4">
               <Avatar className="h-10 w-10">
-                <AvatarFallback className="bg-blue-100 text-blue-600">
+                <AvatarFallback className="bg-[#e5e7eb] text-gray-600">
                   {selectedTeacher.firstName.charAt(0)}{selectedTeacher.lastName.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-sm font-medium">{selectedTeacher.firstName} {selectedTeacher.lastName}</p>
-                <p className="text-xs text-gray-500">{selectedTeacher.teacherId}</p>
+                <p className="font-medium">{selectedTeacher.firstName} {selectedTeacher.lastName}</p>
+                <p className="text-sm text-gray-500">{selectedTeacher.email}</p>
               </div>
             </div>
           )}
+          
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setShowDeleteDialog(false)}
+              className="h-8 text-xs rounded-sm"
             >
               Annuleren
             </Button>
             <Button
               variant="destructive"
               onClick={confirmDeleteTeacher}
+              className="h-8 text-xs rounded-sm"
             >
               Verwijderen
             </Button>

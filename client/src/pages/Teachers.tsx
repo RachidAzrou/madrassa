@@ -311,7 +311,7 @@ export default function Teachers() {
 
   // Genereer een uniek docent ID
   const generateTeacherId = () => {
-    const prefix = 'TCH';
+    const prefix = 'DC';
     const nextId = (teachers.length + 1).toString().padStart(3, '0');
     return `${prefix}${nextId}`;
   };
@@ -865,6 +865,18 @@ export default function Teachers() {
                 <SectionContainer title="Persoonlijke informatie">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                     <div>
+                      <Label htmlFor="teacherId" className="text-xs text-gray-700">
+                        Docent ID
+                      </Label>
+                      <Input
+                        id="teacherId"
+                        value={generateTeacherId()}
+                        disabled
+                        className="mt-1 w-full bg-gray-50"
+                        placeholder="Wordt automatisch gegenereerd"
+                      />
+                    </div>
+                    <div>
                       <Label htmlFor="firstName" className="text-xs text-gray-700">
                         Voornaam <span className="text-red-500">*</span>
                       </Label>
@@ -933,25 +945,6 @@ export default function Teachers() {
                         className="mt-1 w-full"
                       />
                     </div>
-                  </div>
-                </SectionContainer>
-              </TabsContent>
-              
-              <TabsContent value="details" className="space-y-6">
-                <SectionContainer title="Aanvullende informatie">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                    <div>
-                      <Label htmlFor="profession" className="text-xs text-gray-700">
-                        Beroep
-                      </Label>
-                      <Input
-                        id="profession"
-                        value={newTeacher.specialty || ''}
-                        onChange={(e) => setNewTeacher(prev => ({ ...prev, specialty: e.target.value }))}
-                        className="mt-1 w-full"
-                        placeholder="Bijv. Docent Arabisch, Imam, ..."
-                      />
-                    </div>
                     <div>
                       <Label htmlFor="status" className="text-xs text-gray-700">
                         Status
@@ -965,11 +958,28 @@ export default function Teachers() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="active">Actief</SelectItem>
-                          <SelectItem value="inactive">Inactief</SelectItem>
-                          <SelectItem value="onleave">Met verlof</SelectItem>
-                          <SelectItem value="retired">Gepensioneerd</SelectItem>
+                          <SelectItem value="inactive">Niet actief</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+                  </div>
+                </SectionContainer>
+              </TabsContent>
+              
+              <TabsContent value="details" className="space-y-6">
+                <SectionContainer title="Aanvullende informatie">
+                  <div className="grid grid-cols-1 gap-4 w-full">
+                    <div>
+                      <Label htmlFor="profession" className="text-xs text-gray-700">
+                        Beroep
+                      </Label>
+                      <Input
+                        id="profession"
+                        value={newTeacher.specialty || ''}
+                        onChange={(e) => setNewTeacher(prev => ({ ...prev, specialty: e.target.value }))}
+                        className="mt-1 w-full"
+                        placeholder="Bijv. Docent Arabisch, Imam, ..."
+                      />
                     </div>
                   </div>
                 </SectionContainer>

@@ -746,7 +746,11 @@ export default function Calendar() {
                     value={newEvent.location}
                     onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
                     className="mt-1"
+                    placeholder="Wordt automatisch ingevuld bij klas selectie"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Locatie wordt automatisch ingevuld bij klas keuze, maar kan handmatig aangepast worden
+                  </p>
                 </div>
               </div>
               
@@ -832,11 +836,28 @@ export default function Calendar() {
                   <FormLabel htmlFor="classId">Klas</FormLabel>
                   <StyledSelect 
                     value={newEvent.classId || ""} 
-                    onValueChange={(value) => setNewEvent({ 
-                      ...newEvent, 
-                      classId: value,
-                      className: value === "1" ? "Klas 1A" : value === "2" ? "Klas 2B" : "Klas 3C"
-                    })}
+                    onValueChange={(value) => {
+                      // Auto-select location based on class
+                      let autoLocation = "";
+                      let className = "";
+                      if (value === "1") { // Klas 1A
+                        autoLocation = "Lokaal A1 - Begane grond";
+                        className = "Klas 1A";
+                      } else if (value === "2") { // Klas 2B
+                        autoLocation = "Lokaal B2 - Eerste verdieping";
+                        className = "Klas 2B";
+                      } else if (value === "3") { // Klas 3C
+                        autoLocation = "Lokaal C3 - Tweede verdieping";
+                        className = "Klas 3C";
+                      }
+                      
+                      setNewEvent({ 
+                        ...newEvent, 
+                        classId: value,
+                        className: className,
+                        location: autoLocation
+                      });
+                    }}
                     placeholder="Selecteer een klas"
                     className="mt-1"
                   >

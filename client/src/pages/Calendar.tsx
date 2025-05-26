@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, 
   FilePlus, GraduationCap, Palmtree, PartyPopper, Pencil, BookOpen, Timer,
-  MapPin, Clock, Search, XCircle, FileText, RotateCcw
+  MapPin, Clock, Search, XCircle, FileText, RotateCcw, Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -116,6 +116,26 @@ export default function Calendar() {
   const handleEventClick = (event: CalendarEvent) => {
     setSelectedEvent(event);
     setIsEventDetailDialogOpen(true);
+  };
+
+  const handleDeleteEvent = (event: CalendarEvent) => {
+    if (event.id) {
+      // Remove from localStorage for local events
+      if (event.id.startsWith('local-')) {
+        const savedEvents = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+        const updatedEvents = savedEvents.filter((e: CalendarEvent) => e.id !== event.id);
+        localStorage.setItem('calendarEvents', JSON.stringify(updatedEvents));
+        
+        // Trigger a refetch to update the UI
+        queryClient.invalidateQueries({ queryKey: ['/api/calendar/events'] });
+      } else {
+        // For backend events, use the delete mutation
+        deleteEventMutation.mutate(event.id);
+      }
+      
+      setIsEventDetailDialogOpen(false);
+      setSelectedEvent(null);
+    }
   };
 
   // Get month name, year - in Dutch
@@ -1183,16 +1203,16 @@ export default function Calendar() {
                 )}
               </div>
 
-              {/* Close button */}
-              <div className="flex justify-end mt-4">
+              {/* Delete button */}
+              <div className="absolute top-2 right-2">
                 <Button 
                   type="button" 
                   variant="ghost" 
                   size="sm"
-                  onClick={() => setIsEventDetailDialogOpen(false)}
-                  className="text-gray-700 hover:text-gray-900 hover:bg-white/20"
+                  onClick={() => handleDeleteEvent(selectedEvent)}
+                  className="h-8 w-8 p-0 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full"
                 >
-                  Sluiten
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </div>

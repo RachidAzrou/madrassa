@@ -80,7 +80,6 @@ export default function Teachers() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTeachers, setSelectedTeachers] = useState<number[]>([]);
-  const [selectedTeacher, setSelectedTeacher] = useState<TeacherType | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
   const [showNewTeacherDialog, setShowNewTeacherDialog] = useState(false);
@@ -104,6 +103,10 @@ export default function Teachers() {
   const [newEducation, setNewEducation] = useState('');
   const [newLanguage, setNewLanguage] = useState('');
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [selectedTeacher, setSelectedTeacher] = useState<TeacherType | null>(null);
+  const [showTeacherDetail, setShowTeacherDetail] = useState(false);
+  const [showEditTeacherDialog, setShowEditTeacherDialog] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   // Mock data - in een echte applicatie komt dit van de API
   const mockTeachers: TeacherType[] = [
@@ -482,15 +485,14 @@ export default function Teachers() {
                     <span className="text-xs font-medium text-gray-700">Naam</span>
                   </th>
                   <th scope="col" className="px-4 py-3 text-left">
-                    <span className="text-xs font-medium text-gray-700">Specialisatie</span>
-                  </th>
-                  <th scope="col" className="px-4 py-3 text-left">
-                    <span className="text-xs font-medium text-gray-700">E-mail</span>
+                    <span className="text-xs font-medium text-gray-700">Vakken</span>
                   </th>
                   <th scope="col" className="px-4 py-3 text-left">
                     <span className="text-xs font-medium text-gray-700">Status</span>
                   </th>
-                  <EmptyActionHeader />
+                  <th scope="col" className="px-4 py-3 text-right">
+                    <span className="text-xs font-medium text-gray-700">Acties</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-[#e5e7eb]">
@@ -562,15 +564,12 @@ export default function Teachers() {
                           </Avatar>
                           <div>
                             <div className="text-sm font-medium text-gray-900">{teacher.firstName} {teacher.lastName}</div>
-                            <div className="text-xs text-gray-500">{teacher.phone}</div>
+                            <div className="text-xs text-gray-500">{teacher.email}</div>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-xs text-gray-600">{teacher.specialty || 'Niet opgegeven'}</span>
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-xs text-gray-600">{teacher.email}</span>
+                        <span className="text-xs text-gray-600">{teacher.specialty || 'Geen vakken toegewezen'}</span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <Badge className={`px-2 py-1 text-xs font-normal ${getStatusColor(teacher.status)}`}>
@@ -616,6 +615,345 @@ export default function Teachers() {
           </div>
         </div>
       </div>
+
+      {/* Docent detailvenster */}
+      <Dialog open={showTeacherDetail} onOpenChange={setShowTeacherDetail}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedTeacher && (
+            <>
+              <DialogHeaderWithIcon
+                icon={<GraduationCap className="h-5 w-5" />}
+                title="Docent Details"
+                description={`Bekijk de details van ${selectedTeacher.firstName} ${selectedTeacher.lastName}`}
+              />
+              <div className="space-y-6">
+                <div className="flex items-center space-x-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarFallback className="text-lg bg-blue-100 text-blue-600">
+                      {selectedTeacher.firstName.charAt(0)}{selectedTeacher.lastName.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="text-lg font-semibold">{selectedTeacher.firstName} {selectedTeacher.lastName}</h3>
+                    <p className="text-sm text-gray-600">{selectedTeacher.teacherId}</p>
+                    <Badge className={`px-2 py-1 text-xs font-normal ${getStatusColor(selectedTeacher.status)}`}>
+                      {getStatusLabel(selectedTeacher.status)}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-xs text-gray-700">E-mail</Label>
+                    <p className="text-sm">{selectedTeacher.email}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-700">Telefoon</Label>
+                    <p className="text-sm">{selectedTeacher.phone || 'Niet opgegeven'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-700">Vakgebied</Label>
+                    <p className="text-sm">{selectedTeacher.specialty || 'Niet opgegeven'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-700">Datum in dienst</Label>
+                    <p className="text-sm">{selectedTeacher.hireDate || 'Niet opgegeven'}</p>
+                  </div>
+                </div>
+
+                {selectedTeacher.bio && (
+                  <div>
+                    <Label className="text-xs text-gray-700">Biografie</Label>
+                    <p className="text-sm">{selectedTeacher.bio}</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowTeacherDetail(false)}
+                >
+                  Sluiten
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowTeacherDetail(false);
+                    handleEditTeacher(selectedTeacher);
+                  }}
+                  className="bg-[#1e40af] hover:bg-[#1e3a8a]"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Bewerken
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Bewerk docent dialog */}
+      <Dialog open={showEditTeacherDialog} onOpenChange={setShowEditTeacherDialog}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeaderWithIcon
+            icon={<Edit className="h-5 w-5" />}
+            title="Docent Bewerken"
+            description="Pas de docentgegevens aan"
+          />
+          
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="basic">Basisgegevens</TabsTrigger>
+              <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="subjects">Vakken</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="basic" className="space-y-6">
+              <SectionContainer title="Persoonlijke informatie">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                  <div>
+                    <Label htmlFor="edit-teacherId" className="text-xs text-gray-700">
+                      Docent ID <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="edit-teacherId"
+                      value={newTeacher.teacherId || ''}
+                      disabled
+                      className="mt-1 w-full bg-gray-50"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-firstName" className="text-xs text-gray-700">
+                      Voornaam <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="edit-firstName"
+                      value={newTeacher.firstName || ''}
+                      onChange={(e) => setNewTeacher(prev => ({ ...prev, firstName: e.target.value }))}
+                      className="mt-1 w-full"
+                      placeholder="Voornaam"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-lastName" className="text-xs text-gray-700">
+                      Achternaam <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="edit-lastName"
+                      value={newTeacher.lastName || ''}
+                      onChange={(e) => setNewTeacher(prev => ({ ...prev, lastName: e.target.value }))}
+                      className="mt-1 w-full"
+                      placeholder="Achternaam"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-email" className="text-xs text-gray-700">
+                      E-mail <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="edit-email"
+                      type="email"
+                      value={newTeacher.email || ''}
+                      onChange={(e) => setNewTeacher(prev => ({ ...prev, email: e.target.value }))}
+                      className="mt-1 w-full"
+                      placeholder="naam@email.com"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-phone" className="text-xs text-gray-700">
+                      Telefoon
+                    </Label>
+                    <Input
+                      id="edit-phone"
+                      value={newTeacher.phone || ''}
+                      onChange={(e) => setNewTeacher(prev => ({ ...prev, phone: e.target.value }))}
+                      className="mt-1 w-full"
+                      placeholder="06 12345678"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-dateOfBirth" className="text-xs text-gray-700">
+                      Geboortedatum
+                    </Label>
+                    <Input
+                      id="edit-dateOfBirth"
+                      type="date"
+                      value={newTeacher.dateOfBirth || ''}
+                      onChange={(e) => setNewTeacher(prev => ({ ...prev, dateOfBirth: e.target.value }))}
+                      className="mt-1 w-full"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-hireDate" className="text-xs text-gray-700">
+                      Datum in dienst
+                    </Label>
+                    <Input
+                      id="edit-hireDate"
+                      type="date"
+                      value={newTeacher.hireDate || ''}
+                      onChange={(e) => setNewTeacher(prev => ({ ...prev, hireDate: e.target.value }))}
+                      className="mt-1 w-full"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-status" className="text-xs text-gray-700">
+                      Status
+                    </Label>
+                    <Select
+                      value={newTeacher.status || ''}
+                      onValueChange={(value) => setNewTeacher(prev => ({ ...prev, status: value }))}
+                    >
+                      <SelectTrigger className="mt-1 w-full">
+                        <SelectValue placeholder="Selecteer status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Actief</SelectItem>
+                        <SelectItem value="inactive">Niet actief</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </SectionContainer>
+            </TabsContent>
+
+            <TabsContent value="details" className="space-y-6">
+              <SectionContainer title="Aanvullende informatie">
+                <div className="grid grid-cols-1 gap-4 w-full">
+                  <div>
+                    <Label htmlFor="edit-profession" className="text-xs text-gray-700">
+                      Beroep
+                    </Label>
+                    <Input
+                      id="edit-profession"
+                      value={newTeacher.specialty || ''}
+                      onChange={(e) => setNewTeacher(prev => ({ ...prev, specialty: e.target.value }))}
+                      className="mt-1 w-full"
+                      placeholder="Bijv. Docent Arabisch, Imam, ..."
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-bio" className="text-xs text-gray-700">
+                      Biografie
+                    </Label>
+                    <textarea
+                      id="edit-bio"
+                      value={newTeacher.bio || ''}
+                      onChange={(e) => setNewTeacher(prev => ({ ...prev, bio: e.target.value }))}
+                      className="mt-1 w-full p-3 border border-gray-300 rounded-md resize-none"
+                      rows={4}
+                      placeholder="Korte beschrijving over de docent..."
+                    />
+                  </div>
+                </div>
+              </SectionContainer>
+            </TabsContent>
+
+            <TabsContent value="subjects" className="space-y-6">
+              <SectionContainer title="Vakken">
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600">Selecteer de vakken die deze docent onderwijst</p>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {mockSubjects.map((subject) => (
+                      <div key={subject.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`edit-subject-${subject.id}`}
+                          checked={selectedSubjects.includes(subject.name)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedSubjects(prev => [...prev, subject.name]);
+                            } else {
+                              setSelectedSubjects(prev => prev.filter(s => s !== subject.name));
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`edit-subject-${subject.id}`} className="text-sm">
+                          {subject.name}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </SectionContainer>
+            </TabsContent>
+          </Tabs>
+
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowEditTeacherDialog(false);
+                setSelectedTeacher(null);
+              }}
+            >
+              Annuleren
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setShowEditTeacherDialog(false);
+                setShowDeleteConfirm(true);
+              }}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Verwijderen
+            </Button>
+            <Button
+              onClick={() => {
+                // Hier zou de update logica komen
+                toast({
+                  title: "Docent bijgewerkt",
+                  description: "De docentgegevens zijn succesvol bijgewerkt.",
+                });
+                setShowEditTeacherDialog(false);
+                setSelectedTeacher(null);
+              }}
+              className="bg-[#1e40af] hover:bg-[#1e3a8a]"
+            >
+              Opslaan
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Verwijder bevestiging dialog */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeaderWithIcon
+            icon={<Trash2 className="h-5 w-5 text-red-600" />}
+            title="Docent verwijderen"
+            description="Deze actie kan niet ongedaan worden gemaakt"
+          />
+          {selectedTeacher && (
+            <div className="py-4">
+              <p className="text-sm text-gray-600">
+                Weet je zeker dat je <strong>{selectedTeacher.firstName} {selectedTeacher.lastName}</strong> ({selectedTeacher.teacherId}) wilt verwijderen?
+              </p>
+            </div>
+          )}
+          <div className="flex justify-end space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteConfirm(false)}
+            >
+              Annuleren
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                // Hier zou de delete logica komen
+                toast({
+                  title: "Docent verwijderd",
+                  description: "De docent is succesvol verwijderd.",
+                });
+                setShowDeleteConfirm(false);
+                setSelectedTeacher(null);
+              }}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Verwijderen
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialoogvenster voor verwijderen */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

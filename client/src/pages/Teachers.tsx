@@ -23,6 +23,7 @@ import {
   DialogFooterContainer,
   DialogHeaderWithIcon
 } from '@/components/ui/custom-dialog';
+import { DeleteDialog } from '@/components/ui/delete-dialog';
 import {
   ActionButtonsContainer,
   EmptyActionHeader
@@ -1070,55 +1071,20 @@ export default function Teachers() {
       </Dialog>
 
       {/* Delete Teacher Dialog */}
-      <CustomDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogHeaderWithIcon 
-          title="Docent Verwijderen" 
-          description="Weet je zeker dat je deze docent wilt verwijderen?"
-          icon={<Trash2 className="h-5 w-5 text-white" />}
-        />
-        
-        <div className="px-6 py-4">
-          {selectedTeacher && (
-            <div className="mb-6">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10 border border-gray-200">
-                  {selectedTeacher.photoUrl ? (
-                    <AvatarImage src={selectedTeacher.photoUrl} alt={`${selectedTeacher.firstName} ${selectedTeacher.lastName}`} />
-                  ) : (
-                    <AvatarFallback className="bg-[#1e40af] text-white">
-                      {selectedTeacher.firstName?.charAt(0)}{selectedTeacher.lastName?.charAt(0)}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-                <div>
-                  <p className="font-medium">{selectedTeacher.firstName} {selectedTeacher.lastName}</p>
-                  <p className="text-xs text-gray-500">Docent ID: {selectedTeacher.teacherId}</p>
-                </div>
-              </div>
-            </div>
-          )}
-          
-          <p className="text-sm text-gray-600 mb-6">Deze actie kan niet ongedaan worden gemaakt. De docent wordt permanent verwijderd uit het systeem.</p>
-          
-          <DialogFooterContainer>
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={() => setShowDeleteDialog(false)}
-              className="border-gray-300"
-            >
-              Annuleren
-            </Button>
-            <Button 
-              type="button"
-              variant="destructive"
-              onClick={confirmDeleteTeacher}
-            >
-              Verwijderen
-            </Button>
-          </DialogFooterContainer>
-        </div>
-      </CustomDialog>
+      <DeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Docent Verwijderen"
+        description="Weet je zeker dat je deze docent wilt verwijderen?"
+        onConfirm={confirmDeleteTeacher}
+        item={selectedTeacher ? {
+          name: `${selectedTeacher.firstName} ${selectedTeacher.lastName}`,
+          id: `Docent ID: ${selectedTeacher.teacherId}`,
+          photoUrl: selectedTeacher.photoUrl,
+          initials: `${selectedTeacher.firstName?.charAt(0)}${selectedTeacher.lastName?.charAt(0)}`
+        } : undefined}
+        warningText="Deze actie kan niet ongedaan worden gemaakt. De docent wordt permanent verwijderd uit het systeem."
+      />
 
       {/* Dialoogvenster voor bekijken van docent gegevens */}
       <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>

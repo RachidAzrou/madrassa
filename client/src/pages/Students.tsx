@@ -1470,23 +1470,24 @@ export default function Students() {
                     )}
                   </div>
                   
-                  {selectedStudent.relatedStudents && selectedStudent.relatedStudents.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Broers/Zussen</h4>
-                      <div className="space-y-2">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Broers/Zussen</h4>
+                    {selectedStudent.relatedStudents && selectedStudent.relatedStudents.length > 0 ? (
+                      <div className="space-y-3">
                         {selectedStudent.relatedStudents.map((relatedStudent, index) => (
                           <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-10 w-10">
                               {relatedStudent.photoUrl ? (
                                 <AvatarImage src={relatedStudent.photoUrl} alt={`${relatedStudent.firstName} ${relatedStudent.lastName}`} />
                               ) : (
-                                <AvatarFallback className="bg-[#1e40af] text-white text-xs">
+                                <AvatarFallback className="bg-[#1e40af] text-white">
                                   {relatedStudent.firstName?.charAt(0)}{relatedStudent.lastName?.charAt(0)}
                                 </AvatarFallback>
                               )}
                             </Avatar>
                             <div>
-                              <p className="text-sm">{relatedStudent.firstName} {relatedStudent.lastName}</p>
+                              <p className="text-sm font-medium">{relatedStudent.firstName} {relatedStudent.lastName}</p>
+                              <p className="text-xs text-gray-500">{relatedStudent.studentId}</p>
                             </div>
                             <div className="ml-auto">
                               <Button 
@@ -1501,8 +1502,20 @@ export default function Students() {
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="p-3 bg-gray-50 rounded-md text-center">
+                        <p className="text-sm text-gray-500">Geen broers/zussen gevonden</p>
+                        <Button 
+                          variant="link" 
+                          className="mt-2 text-[#1e40af]"
+                          onClick={() => setShowSiblingDialog(true)}
+                        >
+                          <UserPlus className="h-3.5 w-3.5 mr-1" />
+                          Broer/zus toevoegen
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </SectionContainer>
               

@@ -411,6 +411,7 @@ export default function Teachers() {
     setNewTeacher({
       firstName: '',
       lastName: '',
+      gender: '',
       email: '',
       phone: '',
       specialty: '',
@@ -418,6 +419,10 @@ export default function Teachers() {
       status: 'active',
       dateOfBirth: '',
       hireDate: new Date().toISOString().split('T')[0],
+      street: '',
+      houseNumber: '',
+      postalCode: '',
+      city: '',
     });
     setTeacherEducations([]);
     setTeacherLanguages([]);
@@ -1322,7 +1327,6 @@ export default function Teachers() {
             icon={<GraduationCap className="h-5 w-5" />}
             title="Nieuwe docent toevoegen"
             description="Vul de gegevens in om een nieuwe docent toe te voegen."
-            onClose={() => setShowNewTeacherDialog(false)}
           />
           
           {/* Tabs met formulier secties */}

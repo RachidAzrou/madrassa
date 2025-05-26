@@ -4,10 +4,11 @@ import {
   feeSettings, type FeeSettings, type InsertFeeSettings,
   fees, type Fee, type InsertFee,
   messages, type Message, type InsertMessage,
+  payments, type Payment, type InsertPayment,
   students, teachers, guardians, studentGuardians
 } from "@shared/schema";
 import { db } from "./db";
-import { and, eq, sql, count } from "drizzle-orm";
+import { and, eq, sql, count, desc } from "drizzle-orm";
 
 // Interface voor storage operaties
 export interface IStorage {

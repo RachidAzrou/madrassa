@@ -28,6 +28,7 @@ import Messages from "@/pages/Messages";
 
 import Planning from "@/pages/Planning";
 import Fees from "@/pages/Fees";
+import Payments from "@/pages/Payments";
 import Settings from "@/pages/Settings";
 
 // Authentication check route component
@@ -64,6 +65,7 @@ function AuthenticatedRouter() {
         <Route path="/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
         <Route path="/grading" component={() => <AuthenticatedRoute component={Cijfers} />} />
         <Route path="/fees" component={() => <AuthenticatedRoute component={Fees} />} />
+        <Route path="/payments" component={() => <AuthenticatedRoute component={Payments} />} />
         <Route path="/reports" component={() => <AuthenticatedRoute component={Reports} />} />
         <Route path="/settings" component={() => <AuthenticatedRoute component={Settings} />} />
         <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />

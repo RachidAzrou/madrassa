@@ -3895,6 +3895,174 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Initialize Mollie client
+  const mollieClient = createMollieClient({ apiKey: process.env.MOLLIE_API_KEY! });
+
+  // Mollie Payment Routes
+  
+  // Get all payments
+  app.get("/api/payments", async (req, res) => {
+    try {
+      const payments = await storage.getPayments();
+      res.json(payments);
+    } catch (error) {
+      console.error("Error fetching payments:", error);
+      res.status(500).json({ error: "Failed to fetch payments" });
+    }
+  });
+
+  // Get payments by student
+  app.get("/api/payments/student/:studentId", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      const payments = await storage.getPaymentsByStudent(studentId);
+      res.json(payments);
+    } catch (error) {
+      console.error("Error fetching student payments:", error);
+      res.status(500).json({ error: "Failed to fetch student payments" });
+    }
+  });
+
+  // Create new payment (start Mollie payment process)
+  app.post("/api/payments", async (req, res) => {
+    try {
+      const paymentData = insertPaymentSchema.parse(req.body);
+      
+      // Create payment in Mollie
+      const molliePayment = await mollieClient.payments.create({
+        amount: {
+          currency: paymentData.currency || 'EUR',
+          value: paymentData.amount
+        },
+        description: paymentData.description,
+        redirectUrl: paymentData.redirectUrl || `${req.protocol}://${req.get('host')}/payment-success`,
+        webhookUrl: paymentData.webhookUrl || `${req.protocol}://${req.get('host')}/api/payments/webhook`,
+        metadata: {
+          studentId: paymentData.studentId.toString(),
+          feeId: paymentData.feeId?.toString() || null
+        }
+      });
+
+      // Save payment to database
+      const payment = await storage.createPayment({
+        ...paymentData,
+        molliePaymentId: molliePayment.id,
+        checkoutUrl: molliePayment._links.checkout?.href || null,
+        status: 'pending',
+        mollieStatus: molliePayment.status,
+        expiresAt: molliePayment.expiresAt ? new Date(molliePayment.expiresAt) : null
+      });
+
+      res.json(payment);
+    } catch (error) {
+      console.error("Error creating payment:", error);
+      res.status(500).json({ error: "Failed to create payment" });
+    }
+  });
+
+  // Mollie webhook endpoint
+  app.post("/api/payments/webhook", async (req, res) => {
+    try {
+      const paymentId = req.body.id;
+      
+      if (!paymentId) {
+        return res.status(400).json({ error: "Missing payment ID" });
+      }
+
+      // Get payment details from Mollie
+      const molliePayment = await mollieClient.payments.get(paymentId);
+      
+      // Update payment in database
+      const updateData: any = {
+        mollieStatus: molliePayment.status,
+        status: molliePayment.status === 'paid' ? 'paid' : 
+                molliePayment.status === 'failed' ? 'failed' :
+                molliePayment.status === 'canceled' ? 'canceled' :
+                molliePayment.status === 'expired' ? 'expired' : 'pending'
+      };
+
+      if (molliePayment.status === 'paid' && molliePayment.paidAt) {
+        updateData.paidAt = new Date(molliePayment.paidAt);
+        updateData.paymentMethod = molliePayment.method;
+      }
+
+      if (molliePayment.status === 'failed' && molliePayment.details) {
+        updateData.failureReason = molliePayment.details.failureReason;
+      }
+
+      await storage.updatePaymentByMollieId(paymentId, updateData);
+
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("Error processing webhook:", error);
+      res.status(500).json({ error: "Failed to process webhook" });
+    }
+  });
+
+  // Get payment by ID
+  app.get("/api/payments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const payment = await storage.getPayment(id);
+      
+      if (!payment) {
+        return res.status(404).json({ error: "Payment not found" });
+      }
+
+      res.json(payment);
+    } catch (error) {
+      console.error("Error fetching payment:", error);
+      res.status(500).json({ error: "Failed to fetch payment" });
+    }
+  });
+
+  // Get payment status from Mollie
+  app.get("/api/payments/:id/status", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const payment = await storage.getPayment(id);
+      
+      if (!payment || !payment.molliePaymentId) {
+        return res.status(404).json({ error: "Payment not found" });
+      }
+
+      // Get latest status from Mollie
+      const molliePayment = await mollieClient.payments.get(payment.molliePaymentId);
+      
+      // Update local payment status
+      const updateData: any = {
+        mollieStatus: molliePayment.status,
+        status: molliePayment.status === 'paid' ? 'paid' : 
+                molliePayment.status === 'failed' ? 'failed' :
+                molliePayment.status === 'canceled' ? 'canceled' :
+                molliePayment.status === 'expired' ? 'expired' : 'pending'
+      };
+
+      if (molliePayment.status === 'paid' && molliePayment.paidAt) {
+        updateData.paidAt = new Date(molliePayment.paidAt);
+        updateData.paymentMethod = molliePayment.method;
+      }
+
+      const updatedPayment = await storage.updatePayment(id, updateData);
+
+      res.json(updatedPayment);
+    } catch (error) {
+      console.error("Error checking payment status:", error);
+      res.status(500).json({ error: "Failed to check payment status" });
+    }
+  });
+
+  // Get payment statistics
+  app.get("/api/payments/stats", async (req, res) => {
+    try {
+      const stats = await storage.getPaymentStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching payment stats:", error);
+      res.status(500).json({ error: "Failed to fetch payment stats" });
+    }
+  });
+
   // creëer HTTP server
   const server = createServer(app);
 

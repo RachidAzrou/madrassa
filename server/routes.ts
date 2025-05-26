@@ -3832,33 +3832,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Global storage voor calendar events (voor development)
-  if (!global.calendarEvents) {
-    global.calendarEvents = [
-      {
-        id: "1",
-        title: "Arabisch Les", 
-        date: "2025-01-26",
-        startTime: "09:00",
-        endTime: "10:00",
-        location: "Lokaal A1",
-        type: "class",
-        description: "Arabische grammatica les",
-        courseId: "1",
-        courseName: "Arabisch",
-        classId: "1", 
-        className: "Klas 1A"
-      }
-    ];
-  }
-  const calendarEvents = global.calendarEvents;
+  // Simple in-memory storage voor calendar events
+  const calendarEventsStorage: any[] = [];
 
   // Calendar events routes
   apiRouter.get("/api/calendar/events", async (req, res) => {
     try {
-      console.log("GET calendar events - returning:", calendarEvents.length, "events");
-      console.log("Events data:", JSON.stringify(calendarEvents, null, 2));
-      res.json({ events: calendarEvents });
+      console.log("GET calendar events - returning:", calendarEventsStorage.length, "events");
+      res.json({ events: calendarEventsStorage });
     } catch (error) {
       console.error("Error fetching calendar events:", error);
       res.status(500).json({ error: "Failed to fetch calendar events" });
@@ -3873,8 +3854,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body
       };
       
-      // Voeg toe aan in-memory storage
-      calendarEvents.push(newEvent);
+      // Voeg toe aan storage
+      calendarEventsStorage.push(newEvent);
+      console.log("Event added, total events:", calendarEventsStorage.length);
       
       res.status(201).json(newEvent);
     } catch (error) {

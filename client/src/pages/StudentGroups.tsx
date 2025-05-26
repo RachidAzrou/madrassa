@@ -811,7 +811,7 @@ export default function StudentGroups() {
                   <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                     <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
                       <ChalkBoard className="h-4 w-4 mr-2" />
-                      Basisinformatie
+                      Algemene informatie
                     </h3>
                     <div className="space-y-3">
                       <div>
@@ -821,16 +821,6 @@ export default function StudentGroups() {
                       <div>
                         <label className="text-xs font-medium text-gray-700">Schooljaar</label>
                         <p className="text-sm text-gray-900">{selectedClass.academicYear || '-'}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-700">Locatie</label>
-                        <p className="text-sm text-gray-900">{selectedClass.location || '-'}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-700">Capaciteit</label>
-                        <p className="text-sm text-gray-900">
-                          {selectedClass.studentCount || 0}/{selectedClass.maxCapacity || 'Onbeperkt'}
-                        </p>
                       </div>
                       <div>
                         <label className="text-xs font-medium text-gray-700">Klastitularis</label>
@@ -843,20 +833,41 @@ export default function StudentGroups() {
                 <div className="space-y-4">
                   <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                     <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Vakken
+                      <MapPin className="h-4 w-4 mr-2" />
+                      Locatie & Capaciteit
                     </h3>
-                    <div className="space-y-2">
-                      {selectedClass.subjects && selectedClass.subjects.length > 0 ? (
-                        selectedClass.subjects.map((subject, index) => (
-                          <Badge key={index} variant="outline" className="mr-1 mb-1">
-                            {subject}
-                          </Badge>
-                        ))
-                      ) : (
-                        <p className="text-sm text-gray-500">Geen vakken toegewezen</p>
-                      )}
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs font-medium text-gray-700">Locatie</label>
+                        <p className="text-sm text-gray-900">{selectedClass.location || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-700">Capaciteit</label>
+                        <p className="text-sm text-gray-900">
+                          {selectedClass.studentCount || 0}/{selectedClass.maxCapacity || 'Onbeperkt'}
+                        </p>
+                      </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Vakken
+                  </h3>
+                  <div className="space-y-2">
+                    {selectedClass.subjects && selectedClass.subjects.length > 0 ? (
+                      selectedClass.subjects.map((subject, index) => (
+                        <Badge key={index} variant="outline" className="mr-1 mb-1">
+                          {subject}
+                        </Badge>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">Geen vakken toegewezen</p>
+                    )}
                   </div>
                 </div>
               </div>

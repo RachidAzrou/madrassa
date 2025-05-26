@@ -116,6 +116,20 @@ export default function Calendar() {
   const month = monthNames[currentDate.getMonth()];
   const year = currentDate.getFullYear();
 
+  // Gebruik localStorage voor persistentie van kalender evenementen
+  const getStoredEvents = (): CalendarEvent[] => {
+    try {
+      const stored = localStorage.getItem('calendarEvents');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const saveEventsToStorage = (events: CalendarEvent[]) => {
+    localStorage.setItem('calendarEvents', JSON.stringify(events));
+  };
+
   // Fetch calendar events for the current month/view
   const { data, isLoading, isError } = useQuery<{ events: CalendarEvent[] }>({
     queryKey: ['/api/calendar/events', 
@@ -130,7 +144,10 @@ export default function Calendar() {
     staleTime: 30000,
   });
 
-  const events: CalendarEvent[] = data?.events || [];
+  // Combineer server data met localStorage data
+  const serverEvents: CalendarEvent[] = data?.events || [];
+  const storedEvents: CalendarEvent[] = getStoredEvents();
+  const events: CalendarEvent[] = [...serverEvents, ...storedEvents];
   
   // Debug logging om te zien welke events we krijgen
   console.log("Events received:", events);
@@ -216,7 +233,8 @@ export default function Calendar() {
     // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-      const dateStr = date.toISOString().split('T')[0];
+      // Gebruik lokale datum string om tijdzone problemen te voorkomen
+      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       
       // Find events for this day
       const dayEvents = events.filter(event => {
@@ -267,7 +285,16 @@ export default function Calendar() {
         body: eventData
       });
     },
-    onSuccess: () => {
+    onSuccess: (response, eventData) => {
+      // Voeg het nieuwe evenement toe aan localStorage
+      const currentStoredEvents = getStoredEvents();
+      const newEventWithId = {
+        ...eventData,
+        id: `local-${Date.now()}`, // Unieke ID voor localStorage
+      };
+      currentStoredEvents.push(newEventWithId);
+      saveEventsToStorage(currentStoredEvents);
+      
       // Invalidate query cache to refresh data
       queryClient.invalidateQueries({
         queryKey: ['/api/calendar/events'],

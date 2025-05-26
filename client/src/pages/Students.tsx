@@ -1908,22 +1908,23 @@ export default function Students() {
 
       {/* Link Sibling Dialog */}
       <Dialog open={isLinkSiblingDialogOpen} onOpenChange={setIsLinkSiblingDialogOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="sibling-dialog-description">
-          <div className="bg-[#1e40af] py-5 px-6 flex items-center justify-between -mx-6 -mt-6 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-white/20 p-2 rounded-full">
-                <Users className="h-5 w-5 text-white" />
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col p-0" aria-describedby="sibling-dialog-description">
+          <div className="bg-[#1e40af] py-5 px-8 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 p-3 rounded-full">
+                <Users className="h-6 w-6 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-white text-lg font-semibold m-0">Bestaande Student als Broer/Zus Koppelen</DialogTitle>
-                <DialogDescription id="sibling-dialog-description" className="text-white/70 text-sm m-0 mt-1">
+                <DialogTitle className="text-white text-xl font-semibold m-0">Bestaande Student als Broer/Zus Koppelen</DialogTitle>
+                <DialogDescription id="sibling-dialog-description" className="text-white/80 text-sm m-0 mt-1">
                   Koppel een bestaande student als broer of zus.
                 </DialogDescription>
               </div>
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="flex-1 px-8 py-6 overflow-y-auto">
+            <div className="space-y-4">
             <div>
               <Label htmlFor="sibling-search" className="text-sm font-medium text-gray-700">Zoek student om te koppelen als broer/zus</Label>
               <Input
@@ -2002,13 +2003,14 @@ export default function Students() {
                 <p className="text-xs text-gray-400 mt-1">Zoek op naam of student ID om een broer/zus te koppelen</p>
               </div>
             )}
+            </div>
           </div>
 
-          <DialogFooter className="mt-6">
+          <div className="bg-gray-50 px-8 py-4 border-t flex justify-end gap-3">
             <Button variant="outline" onClick={() => setIsLinkSiblingDialogOpen(false)}>
               Sluiten
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

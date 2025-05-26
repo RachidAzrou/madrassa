@@ -1936,26 +1936,22 @@ export default function Students() {
               />
             </div>
             
-            {/* Mock students voor demonstratie - deze zouden normaal uit de API komen */}
+            {/* Bestaande studenten uit localStorage */}
             {siblingSearchTerm.length > 0 && (
               <div className="bg-white border rounded-lg divide-y max-h-60 overflow-y-auto">
-                {[
-                  { id: 'STU001', firstName: 'Ahmed', lastName: 'Hassan', class: 'Klas 3A' },
-                  { id: 'STU002', firstName: 'Fatima', lastName: 'Al-Zahra', class: 'Klas 2B' },
-                  { id: 'STU003', firstName: 'Omar', lastName: 'Ibn Khattab', class: 'Klas 4A' },
-                ].filter(student => 
+                {students.filter(student => 
                   student.firstName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
                   student.lastName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
-                  student.id.toLowerCase().includes(siblingSearchTerm.toLowerCase())
+                  student.studentId.toLowerCase().includes(siblingSearchTerm.toLowerCase())
                 ).map((student) => (
                   <div key={student.id} className="p-3 hover:bg-gray-50 cursor-pointer" 
                        onClick={() => {
                          const newSibling = {
                            id: Date.now(),
-                           studentId: student.id,
+                           studentId: student.studentId,
                            firstName: student.firstName,
                            lastName: student.lastName,
-                           class: student.class,
+                           class: student.studentGroupName || 'Onbekend',
                            relationship: 'broer/zus'
                          };
                          setNewStudentSiblings([...newStudentSiblings, newSibling]);
@@ -1969,7 +1965,7 @@ export default function Students() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium text-sm">{student.firstName} {student.lastName}</p>
-                        <p className="text-xs text-gray-500">{student.id} • {student.class}</p>
+                        <p className="text-xs text-gray-500">{student.studentId} • {student.studentGroupName || 'Geen klas'}</p>
                       </div>
                       <Button size="sm" variant="outline" className="h-7 text-xs">
                         <Users className="h-3 w-3 mr-1" />
@@ -1979,14 +1975,10 @@ export default function Students() {
                   </div>
                 ))}
                 
-                {[
-                  { id: 'STU001', firstName: 'Ahmed', lastName: 'Hassan', class: 'Klas 3A' },
-                  { id: 'STU002', firstName: 'Fatima', lastName: 'Al-Zahra', class: 'Klas 2B' },
-                  { id: 'STU003', firstName: 'Omar', lastName: 'Ibn Khattab', class: 'Klas 4A' },
-                ].filter(student => 
+                {students.filter(student => 
                   student.firstName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
                   student.lastName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
-                  student.id.toLowerCase().includes(siblingSearchTerm.toLowerCase())
+                  student.studentId.toLowerCase().includes(siblingSearchTerm.toLowerCase())
                 ).length === 0 && (
                   <div className="p-4 text-center text-gray-500">
                     <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />

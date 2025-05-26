@@ -108,7 +108,7 @@ export default function Dashboard() {
   });
   
   // Fetch group enrollments
-  const { data: groupEnrollments = [], isLoading: isEnrollmentsLoading } = useQuery({
+  const { data: studentGroupEnrollmentsData = [], isLoading: isEnrollmentsLoading } = useQuery({
     queryKey: ['/api/student-group-enrollments'],
     staleTime: 60000,
   });
@@ -132,24 +132,17 @@ export default function Dashboard() {
   
   // Calculate student counts per group and track max capacity
   const studentCountsPerGroup = (studentGroupsData as StudentGroup[]).map((group) => {
-    const count = (groupEnrollments as StudentGroupEnrollment[]).filter(
+    const count = (studentGroupEnrollmentsData as StudentGroupEnrollment[]).filter(
       enrollment => enrollment.studentGroupId === group.id
     ).length;
     
     return {
       name: group.name,
       count: count,
-      maxCapacity: group.maxCapacity || 25, // Default to 25 if no maxCapacity
-      percentageFilled: count / (group.maxCapacity || 25) // Calculate fill percentage
+      maxCapacity: group.maxCapacity || 30, // Default to 30 if no maxCapacity
+      percentageFilled: count / (group.maxCapacity || 30) // Calculate fill percentage
     };
   });
-  
-  // Add default data if no real data exists
-  const chartData = studentCountsPerGroup.length > 0 ? studentCountsPerGroup : [
-    { name: "Klas 1", count: 0, maxCapacity: 25, percentageFilled: 0 },
-    { name: "Klas 2", count: 0, maxCapacity: 25, percentageFilled: 0 },
-    { name: "Klas 3", count: 0, maxCapacity: 25, percentageFilled: 0 }
-  ];
   
   // Filter events for the current week
   const currentWeekEvents = events.filter((event) => {

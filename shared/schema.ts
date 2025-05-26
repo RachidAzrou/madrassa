@@ -112,6 +112,9 @@ export const programs = pgTable("programs", {
   duration: integer("duration").notNull(), // in years
   department: text("department").notNull(),
   isActive: boolean("is_active").default(true),
+  entryRequirements: text("entry_requirements"), // Instroomvereisten
+  learningObjectives: text("learning_objectives"), // Leerdoelen
+  competencies: text("competencies"), // Competenties
 });
 
 export const insertProgramSchema = createInsertSchema(programs).omit({

@@ -108,6 +108,9 @@ export default function Programs() {
     duration: 4,
     department: '',
     isActive: true,
+    entryRequirements: '',
+    learningObjectives: '',
+    competencies: '',
     assignedClasses: [] as { id: string; name: string; selected: boolean }[],
     assignedTeachers: [] as { id: string; name: string; selected: boolean }[],
   });
@@ -659,6 +662,8 @@ export default function Programs() {
                     <FormLabel htmlFor="instroomvereisten">Instroomvereisten</FormLabel>
                     <Textarea
                       id="instroomvereisten"
+                      value={programFormData.entryRequirements}
+                      onChange={(e) => setProgramFormData(prev => ({ ...prev, entryRequirements: e.target.value }))}
                       className="min-h-[100px] resize-none text-sm"
                       placeholder="Beschrijf de instroomvereisten..."
                     />
@@ -668,6 +673,8 @@ export default function Programs() {
                     <FormLabel htmlFor="leerdoelen">Leerdoelen</FormLabel>
                     <Textarea
                       id="leerdoelen"
+                      value={programFormData.learningObjectives}
+                      onChange={(e) => setProgramFormData(prev => ({ ...prev, learningObjectives: e.target.value }))}
                       className="min-h-[100px] resize-none text-sm"
                       placeholder="Beschrijf de leerdoelen van dit vak..."
                     />
@@ -677,6 +684,8 @@ export default function Programs() {
                     <FormLabel htmlFor="competenties">Competenties</FormLabel>
                     <Textarea
                       id="competenties"
+                      value={programFormData.competencies}
+                      onChange={(e) => setProgramFormData(prev => ({ ...prev, competencies: e.target.value }))}
                       className="min-h-[100px] resize-none text-sm"
                       placeholder="Lijst van competenties die studenten ontwikkelen..."
                     />
@@ -872,6 +881,9 @@ export default function Programs() {
               duration: programFormData.duration,
               department: programFormData.department,
               isActive: programFormData.isActive,
+              entryRequirements: programFormData.entryRequirements,
+              learningObjectives: programFormData.learningObjectives,
+              competencies: programFormData.competencies,
               assignedTeachers: programFormData.assignedTeachers.filter(t => t.selected),
               createdAt: new Date().toISOString()
             };

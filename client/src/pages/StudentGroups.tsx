@@ -325,6 +325,7 @@ export default function StudentGroups() {
               Nieuwe Klas
             </Button>
           </div>
+        </SearchActionBar>
 
         {/* Filter opties - exact copy from Students page */}
         {showFilterOptions && (
@@ -363,7 +364,6 @@ export default function StudentGroups() {
             </div>
           </div>
         )}
-        </SearchActionBar>
 
         {/* Classes table */}
         <div className="bg-white border border-[#e5e7eb] rounded-sm overflow-hidden">

@@ -86,6 +86,8 @@ export default function Calendar() {
   });
   
   const [activeTab, setActiveTab] = useState<'exam' | 'class' | 'holiday' | 'event'>('event');
+  const [isEventDetailDialogOpen, setIsEventDetailDialogOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
   // Functie om alle velden te resetten
   const resetEventForm = () => {
@@ -108,6 +110,12 @@ export default function Calendar() {
       recurrenceEndDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0]
     });
     setActiveTab('event');
+  };
+
+  // Functie om event details te tonen
+  const handleEventClick = (event: CalendarEvent) => {
+    setSelectedEvent(event);
+    setIsEventDetailDialogOpen(true);
   };
 
   // Get month name, year - in Dutch
@@ -592,11 +600,12 @@ export default function Calendar() {
                       return (
                         <div 
                           key={idx} 
-                          className="px-1.5 py-0.5 text-xs font-medium truncate rounded-sm flex items-center"
+                          className="px-1.5 py-0.5 text-xs font-medium truncate rounded-sm flex items-center cursor-pointer hover:opacity-80 transition-opacity"
                           style={{ 
                             backgroundColor: colors.bgColor,
                             borderLeft: `2px solid ${colors.borderColor}`
                           }}
+                          onClick={() => handleEventClick(event)}
                         >
                           <span className="truncate">{event.title}</span>
                         </div>
@@ -656,12 +665,13 @@ export default function Calendar() {
                           return (
                             <div 
                               key={idx} 
-                              className="absolute top-0 left-0 right-0 mx-1 my-0.5 px-1 py-0.5 text-xs font-medium rounded-sm overflow-hidden"
+                              className="absolute top-0 left-0 right-0 mx-1 my-0.5 px-1 py-0.5 text-xs font-medium rounded-sm overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
                               style={{ 
                                 backgroundColor: colors.bgColor,
                                 borderLeft: `2px solid ${colors.borderColor}`,
                                 zIndex: idx + 1
                               }}
+                              onClick={() => handleEventClick(event)}
                             >
                               <div className="truncate">{event.title}</div>
                               <div className="truncate text-[10px] text-gray-600">
@@ -708,11 +718,12 @@ export default function Calendar() {
                         return (
                           <div 
                             key={idx} 
-                            className="p-2 mb-1 text-sm rounded-sm"
+                            className="p-2 mb-1 text-sm rounded-sm cursor-pointer hover:opacity-80 transition-opacity"
                             style={{ 
                               backgroundColor: colors.bgColor,
                               borderLeft: `3px solid ${colors.borderColor}`,
                             }}
+                            onClick={() => handleEventClick(event)}
                           >
                             <div className="font-medium">{event.title}</div>
                             <div className="text-xs text-gray-600 mt-1">
@@ -1086,6 +1097,151 @@ export default function Calendar() {
             )}
           </Button>
         </DialogFooterContainer>
+      </CustomDialog>
+
+      {/* Event Detail Dialog */}
+      <CustomDialog 
+        open={isEventDetailDialogOpen} 
+        onOpenChange={setIsEventDetailDialogOpen} 
+        maxWidth="500px"
+      >
+        {selectedEvent && (
+          <>
+            <DialogHeaderWithIcon 
+              title="Evenement Details"
+              description="Bekijk de details van dit evenement"
+              icon={selectedEvent.type === 'class' ? <BookOpen className="h-5 w-5" /> : 
+                    selectedEvent.type === 'exam' ? <FilePlus className="h-5 w-5" /> :
+                    selectedEvent.type === 'holiday' ? <Palmtree className="h-5 w-5" /> :
+                    <PartyPopper className="h-5 w-5" />}
+            />
+            
+            <div className="p-6 space-y-6">
+              {/* Event Type Badge */}
+              <div className="flex items-center gap-2">
+                <div 
+                  className="w-3 h-3 rounded-sm border" 
+                  style={{
+                    backgroundColor: getEventColors(selectedEvent.type).bgColor,
+                    borderColor: getEventColors(selectedEvent.type).borderColor
+                  }}
+                ></div>
+                <span className="text-sm font-medium capitalize text-gray-600">
+                  {selectedEvent.type === 'class' ? 'Les' : 
+                   selectedEvent.type === 'exam' ? 'Examen' :
+                   selectedEvent.type === 'holiday' ? 'Vakantie' : 'Evenement'}
+                </span>
+              </div>
+
+              {/* Basic Info */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{selectedEvent.title}</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <CalendarDays className="h-4 w-4 mr-2 text-gray-400" />
+                    {new Date(selectedEvent.date + 'T00:00:00').toLocaleDateString('nl-NL', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </div>
+                  
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Clock className="h-4 w-4 mr-2 text-gray-400" />
+                    {selectedEvent.startTime} - {selectedEvent.endTime}
+                  </div>
+                  
+                  {selectedEvent.location && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <MapPin className="h-4 w-4 mr-2 text-gray-400" />
+                      {selectedEvent.location}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Educational Details */}
+              {(selectedEvent.type === 'class' || selectedEvent.type === 'exam') && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-gray-900 flex items-center">
+                    <GraduationCap className="h-4 w-4 mr-2 text-gray-400" />
+                    Onderwijs Details
+                  </h4>
+                  <div className="bg-gray-50 p-3 rounded-md space-y-2">
+                    {selectedEvent.courseName && (
+                      <div className="text-sm">
+                        <span className="text-gray-500">Vak:</span>
+                        <span className="ml-2 text-gray-900">{selectedEvent.courseName}</span>
+                      </div>
+                    )}
+                    {selectedEvent.className && (
+                      <div className="text-sm">
+                        <span className="text-gray-500">Klas:</span>
+                        <span className="ml-2 text-gray-900">{selectedEvent.className}</span>
+                      </div>
+                    )}
+                    {selectedEvent.teacherName && selectedEvent.type === 'class' && (
+                      <div className="text-sm">
+                        <span className="text-gray-500">Docent:</span>
+                        <span className="ml-2 text-gray-900">{selectedEvent.teacherName}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Description */}
+              {selectedEvent.description && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-gray-900 flex items-center">
+                    <FileText className="h-4 w-4 mr-2 text-gray-400" />
+                    Beschrijving
+                  </h4>
+                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+                    {selectedEvent.description}
+                  </p>
+                </div>
+              )}
+
+              {/* Recurring Info */}
+              {selectedEvent.isRecurring && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-gray-900 flex items-center">
+                    <RotateCcw className="h-4 w-4 mr-2 text-gray-400" />
+                    Herhaling
+                  </h4>
+                  <div className="bg-blue-50 p-3 rounded-md">
+                    <div className="text-sm text-blue-800">
+                      Dit evenement herhaalt zich {
+                        selectedEvent.recurrencePattern === 'daily' ? 'dagelijks' :
+                        selectedEvent.recurrencePattern === 'weekly' ? 'wekelijks' :
+                        selectedEvent.recurrencePattern === 'monthly' ? 'maandelijks' : 'jaarlijks'
+                      }
+                      {selectedEvent.recurrenceEndDate && (
+                        <> tot {new Date(selectedEvent.recurrenceEndDate + 'T00:00:00').toLocaleDateString('nl-NL')}</>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end p-6 pt-0">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsEventDetailDialogOpen(false)}
+                className="w-full sm:w-auto"
+              >
+                Sluiten
+              </Button>
+            </div>
+          </>
+        )}
       </CustomDialog>
     </div>
   );

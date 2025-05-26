@@ -125,15 +125,20 @@ export default function Students() {
     return savedStudents ? JSON.parse(savedStudents) : [];
   });
 
-  // Functie om de volgende beschikbare student ID te genereren
+  // Functie om de volgende beschikbare student ID te genereren op basis van schooljaar
   const generateNextStudentId = () => {
-    if (students.length === 0) return 'STU001';
+    // Haal het huidige jaar op en maak suffix (bijv. 2025 -> 25)
+    const currentYear = new Date().getFullYear();
+    const yearSuffix = currentYear.toString().slice(-2); // Laatste 2 cijfers van het jaar
+    const prefix = `ST${yearSuffix}`;
     
-    // Haal alle bestaande student ID's op en sorteer ze
+    if (students.length === 0) return `${prefix}001`;
+    
+    // Haal alle bestaande student ID's op voor het huidige jaar
     const existingIds = students
       .map(student => student.studentId)
-      .filter(id => id && id.startsWith('STU'))
-      .map(id => parseInt(id.substring(3)))
+      .filter(id => id && id.startsWith(prefix))
+      .map(id => parseInt(id.substring(prefix.length)))
       .filter(num => !isNaN(num))
       .sort((a, b) => a - b);
     
@@ -147,7 +152,7 @@ export default function Students() {
       }
     }
     
-    return `STU${nextNumber.toString().padStart(3, '0')}`;
+    return `${prefix}${nextNumber.toString().padStart(3, '0')}`;
   };
   
   const { toast } = useToast();

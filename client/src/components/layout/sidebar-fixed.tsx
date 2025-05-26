@@ -295,17 +295,11 @@ const Sidebar = ({ isMobile = false, onClose, className = "", defaultCollapsed =
                   isActive={location.startsWith("/programs")}
                   onClick={handleLinkClick}
                 />
-                <SidebarLink
-                  href="/scheduling"
-                  icon={<Clock className="h-4.5 w-4.5" />}
-                  label="Planning"
-                  isActive={location.startsWith("/scheduling")}
-                  onClick={handleLinkClick}
-                />
+
                 <SidebarLink
                   href="/calendar"
                   icon={<Calendar className="h-4.5 w-4.5" />}
-                  label="Kalender"
+                  label="Rooster"
                   isActive={location.startsWith("/calendar")}
                   onClick={handleLinkClick}
                 />

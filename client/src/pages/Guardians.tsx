@@ -201,6 +201,11 @@ export default function Guardians() {
     });
   };
 
+  const handleExportGuardians = (format: string) => {
+    // Export logica wordt hier geïmplementeerd
+    console.log(`Exporteren van ${selectedGuardians.length > 0 ? selectedGuardians.length : guardians.length} voogden naar ${format}`);
+  };
+
   const handleExportSelectedGuardians = () => {
     toast({
       title: "Niet geïmplementeerd",
@@ -358,15 +363,10 @@ export default function Guardians() {
                 </>
               ) : (
                 <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleExportSelectedGuardians}
-                    className="h-7 text-xs rounded-sm border-[#e5e7eb]"
-                  >
-                    <FileDown className="h-3.5 w-3.5 mr-1" />
-                    Exporteren
-                  </Button>
+                  <ExportButton
+                    onClick={() => setIsExportDialogOpen(true)}
+                    title="Exporteer voogden"
+                  />
                   <Button
                     size="sm"
                     onClick={handleAddNewGuardian}
@@ -533,6 +533,17 @@ export default function Guardians() {
         </div>
       </div>
       {/* Dialogen */}
+      {/* Export dialoog */}
+      <ExportDialog
+        open={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+        title="Voogden Exporteren"
+        description="Kies een formaat om de voogden te exporteren"
+        selectedCount={selectedGuardians.length}
+        totalCount={guardians.length}
+        entityName="voogden"
+        onExport={handleExportGuardians}
+      />
       {/* Verwijder dialoog */}
       <DeleteDialog
         open={showDeleteDialog}

@@ -34,8 +34,7 @@ import {
 import { apiRequest } from '@/lib/queryClient';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { DeleteDialog } from '@/components/ui/delete-dialog';
-import { ExportButton } from '@/components/ui/export-button';
-import { ExportDialog } from '@/components/ui/export-dialog';
+
 
 // Custom icon voor klassen
 const ChalkBoard = (props: any) => (
@@ -89,7 +88,7 @@ export default function StudentGroups() {
   const [showNewClassDialog, setShowNewClassDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   // Filter states
@@ -349,10 +348,7 @@ export default function StudentGroups() {
                 Filters
               </Button>
               
-              <ExportButton
-                onClick={() => setIsExportDialogOpen(true)}
-                title="Exporteer klassen"
-              />
+
               
               <Button
                 onClick={() => setShowNewClassDialog(true)}
@@ -1063,15 +1059,7 @@ export default function StudentGroups() {
         isLoading={deleteClassMutation.isPending}
       />
 
-      {/* Export dialog */}
-      <ExportDialog
-        open={isExportDialogOpen}
-        onOpenChange={setIsExportDialogOpen}
-        title="Klassen exporteren"
-        description="Exporteer de klassenlijst naar het gewenste formaat."
-        data={filteredClasses}
-        filename="klassen"
-      />
+
     </div>
   );
 }

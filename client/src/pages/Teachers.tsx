@@ -1393,6 +1393,20 @@ export default function Teachers() {
                     </div>
                   </div>
                   
+                  {/* Docent ID direct onder foto */}
+                  <div className="mb-6">
+                    <Label htmlFor="teacherId" className="text-xs text-gray-700">
+                      Docent ID
+                    </Label>
+                    <Input
+                      id="teacherId"
+                      value={generateTeacherId()}
+                      disabled
+                      className="mt-1 w-full bg-gray-50"
+                      placeholder="Wordt automatisch gegenereerd"
+                    />
+                  </div>
+                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                     <div>
                       <Label htmlFor="firstName" className="text-xs text-gray-700">
@@ -1496,18 +1510,6 @@ export default function Teachers() {
                           <SelectItem value="inactive">Niet actief</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="teacherId" className="text-xs text-gray-700">
-                        Docent ID
-                      </Label>
-                      <Input
-                        id="teacherId"
-                        value={generateTeacherId()}
-                        disabled
-                        className="mt-1 w-full bg-gray-50"
-                        placeholder="Wordt automatisch gegenereerd"
-                      />
                     </div>
                   </div>
 

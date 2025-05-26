@@ -339,6 +339,8 @@ export default function Students() {
       status: student.status || "active",
       notes: student.notes || "",
       studentGroupId: student.studentGroupId?.toString() || "",
+      studentGroup: student.studentGroupName || "", // Laad bestaande klasnaam
+      studentGroupName: student.studentGroupName || "", // Voor tabelweergave
       gender: student.gender || "man",
       photoUrl: student.photoUrl || "",
       studentId: student.studentId || "",
@@ -401,7 +403,16 @@ export default function Students() {
 
   // Functie om edit form select te hanteren
   const handleEditSelectChange = (name, value) => {
-    setEditFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'studentGroup') {
+      // Als klas wordt gewijzigd, sla ook de klasnaam op voor weergave in tabel
+      setEditFormData(prev => ({ 
+        ...prev, 
+        [name]: value,
+        studentGroupName: value // Zorg dat klasnaam wordt opgeslagen voor tabelweergave
+      }));
+    } else {
+      setEditFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   // Functie om edit form te submitten

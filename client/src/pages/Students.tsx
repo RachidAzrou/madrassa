@@ -1457,7 +1457,7 @@ export default function Students() {
                   <GraduationCap className="h-4 w-4 mr-2" />
                   Onderwijsgegevens
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2 text-gray-500">
                       <Calendar className="h-4 w-4" />
@@ -1473,6 +1473,94 @@ export default function Students() {
                     </div>
                     <p className="text-sm font-medium text-gray-900">{selectedStudent.studentGroupName || "Niet toegewezen"}</p>
                   </div>
+
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <Calendar className="h-4 w-4" />
+                      <span className="text-xs font-medium uppercase tracking-wide">Inschrijvingsdatum</span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {selectedStudent.enrollmentDate ? format(parseISO(selectedStudent.enrollmentDate), 'd MMMM yyyy', { locale: nl }) : "Niet opgegeven"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Familie Informatie */}
+              <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                  <Users className="h-4 w-4 mr-2" />
+                  Familie
+                </h3>
+                <div className="space-y-4">
+                  {/* Voogden */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">Voogden</h4>
+                    <div className="space-y-2">
+                      {selectedStudent.guardians && selectedStudent.guardians.length > 0 ? (
+                        selectedStudent.guardians.map((guardian: any, index: number) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-white rounded-md border border-gray-200">
+                            <div className="flex items-center space-x-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
+                                  {guardian.firstName?.charAt(0)}{guardian.lastName?.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</p>
+                                <p className="text-xs text-gray-500">{guardian.relationship || 'Relatie niet opgegeven'}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-gray-600">{guardian.phone || 'Geen telefoon'}</p>
+                              <p className="text-xs text-gray-500">{guardian.email || 'Geen email'}</p>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">Geen voogden toegewezen</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Broers/Zussen */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">Broers/Zussen</h4>
+                    <div className="space-y-2">
+                      {selectedStudent.siblings && selectedStudent.siblings.length > 0 ? (
+                        selectedStudent.siblings.map((sibling: any, index: number) => (
+                          <div key={index} className="flex items-center space-x-3 p-3 bg-white rounded-md border border-gray-200">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="bg-green-100 text-green-700 text-xs">
+                                {sibling.firstName?.charAt(0)}{sibling.lastName?.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{sibling.firstName} {sibling.lastName}</p>
+                              <p className="text-xs text-gray-500">{sibling.studentId || 'Student ID niet beschikbaar'}</p>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">Geen broers/zussen geregistreerd</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Notities - volledige breedte */}
+              <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Notities
+                </h3>
+                <div className="bg-white rounded-md border border-gray-200 p-4">
+                  {selectedStudent.notes ? (
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{selectedStudent.notes}</p>
+                  ) : (
+                    <p className="text-sm text-gray-500 italic">Geen notities toegevoegd</p>
+                  )}
                 </div>
               </div>
             </div>

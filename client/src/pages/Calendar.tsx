@@ -86,7 +86,8 @@ export default function Calendar() {
   });
   
   const [activeTab, setActiveTab] = useState<'exam' | 'class' | 'holiday' | 'event'>('event');
-  const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
+  const [isEventDetailDialogOpen, setIsEventDetailDialogOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
   // Functie om alle velden te resetten
   const resetEventForm = () => {
@@ -111,42 +112,10 @@ export default function Calendar() {
     setActiveTab('event');
   };
 
-  // Functie om event click te handelen (toggle expand/collapse)
+  // Functie om event details te tonen
   const handleEventClick = (event: CalendarEvent) => {
-    if (expandedEventId === event.id) {
-      setExpandedEventId(null); // Collapse als het al open is
-    } else {
-      setExpandedEventId(event.id); // Expand het event
-    }
-  };
-
-  // Functie om event te verwijderen
-  const handleDeleteEvent = async (eventId: string) => {
-    try {
-      await apiRequest(`/api/calendar/events/${eventId}`, {
-        method: 'DELETE'
-      });
-      
-      // Update localStorage
-      const storedEvents = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
-      const updatedEvents = storedEvents.filter((e: CalendarEvent) => e.id !== eventId);
-      localStorage.setItem('calendarEvents', JSON.stringify(updatedEvents));
-      
-      setExpandedEventId(null);
-      queryClient.invalidateQueries({ queryKey: ['/api/calendar/events'] });
-      
-      toast({
-        title: "Evenement verwijderd",
-        description: "Het evenement is succesvol verwijderd.",
-      });
-    } catch (error) {
-      console.error('Error deleting event:', error);
-      toast({
-        title: "Fout",
-        description: "Er is een fout opgetreden bij het verwijderen van het evenement.",
-        variant: "destructive",
-      });
-    }
+    setSelectedEvent(event);
+    setIsEventDetailDialogOpen(true);
   };
 
   // Get month name, year - in Dutch
@@ -628,46 +597,17 @@ export default function Calendar() {
                   <div className="space-y-1">
                     {day.events.map((event, idx) => {
                       const colors = getEventColors(event.type);
-                      const isExpanded = expandedEventId === event.id;
                       return (
                         <div 
                           key={idx} 
-                          className={`px-2 py-1 text-xs font-medium rounded-sm cursor-pointer transition-all duration-200 ${
-                            isExpanded ? 'shadow-lg z-10 transform scale-105' : 'hover:opacity-80'
-                          }`}
+                          className="px-1.5 py-0.5 text-xs font-medium truncate rounded-sm flex items-center cursor-pointer hover:opacity-80 transition-opacity"
                           style={{ 
                             backgroundColor: colors.bgColor,
-                            borderLeft: `3px solid ${colors.borderColor}`,
-                            position: isExpanded ? 'relative' : 'static',
-                            zIndex: isExpanded ? 10 : 'auto'
+                            borderLeft: `2px solid ${colors.borderColor}`
                           }}
                           onClick={() => handleEventClick(event)}
                         >
-                          <div className="truncate font-semibold">{event.title}</div>
-                          <div className="text-[10px] text-gray-600">{event.startTime}</div>
-                          
-                          {isExpanded && (
-                            <div className="mt-2 space-y-1 text-[11px] text-gray-700 bg-white p-2 rounded border shadow-sm">
-                              {event.location && <div>📍 {event.location}</div>}
-                              {event.courseName && <div>📚 {event.courseName}</div>}
-                              {event.className && <div>🎓 {event.className}</div>}
-                              {event.description && <div className="italic">💬 {event.description}</div>}
-                              
-                              <div className="flex gap-1 mt-2">
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  className="h-5 px-2 text-[9px]"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteEvent(event.id || '');
-                                  }}
-                                >
-                                  🗑️ Verwijder
-                                </Button>
-                              </div>
-                            </div>
-                          )}
+                          <span className="truncate">{event.title}</span>
                         </div>
                       );
                     })}
@@ -722,50 +662,21 @@ export default function Calendar() {
                       <div key={i} className="min-h-[3rem] relative">
                         {hourEvents.map((event, idx) => {
                           const colors = getEventColors(event.type);
-                          const isExpanded = expandedEventId === event.id;
                           return (
                             <div 
                               key={idx} 
-                              className={`absolute left-0 right-0 mx-1 my-0.5 px-2 py-1 text-xs font-medium rounded-sm cursor-pointer hover:shadow-md transition-all duration-200 ${
-                                isExpanded ? 'shadow-lg z-50' : 'hover:opacity-80'
-                              }`}
+                              className="absolute top-0 left-0 right-0 mx-1 my-0.5 px-1 py-0.5 text-xs font-medium rounded-sm overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
                               style={{ 
                                 backgroundColor: colors.bgColor,
-                                borderLeft: `3px solid ${colors.borderColor}`,
-                                zIndex: isExpanded ? 50 : idx + 1,
-                                top: isExpanded ? '-10px' : '0',
-                                height: isExpanded ? 'auto' : '100%',
-                                minHeight: isExpanded ? '120px' : 'auto'
+                                borderLeft: `2px solid ${colors.borderColor}`,
+                                zIndex: idx + 1
                               }}
                               onClick={() => handleEventClick(event)}
                             >
-                              <div className="truncate font-semibold">{event.title}</div>
+                              <div className="truncate">{event.title}</div>
                               <div className="truncate text-[10px] text-gray-600">
                                 {event.startTime} - {event.endTime}
                               </div>
-                              
-                              {isExpanded && (
-                                <div className="mt-2 space-y-1 text-[11px] text-gray-700">
-                                  {event.location && <div>📍 {event.location}</div>}
-                                  {event.courseName && <div>📚 {event.courseName}</div>}
-                                  {event.className && <div>🎓 {event.className}</div>}
-                                  {event.description && <div className="italic">💬 {event.description}</div>}
-                                  
-                                  <div className="flex gap-1 mt-2">
-                                    <Button
-                                      size="sm"
-                                      variant="destructive"
-                                      className="h-6 px-2 text-[10px]"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteEvent(event.id || '');
-                                      }}
-                                    >
-                                      🗑️ Verwijder
-                                    </Button>
-                                  </div>
-                                </div>
-                              )}
                             </div>
                           );
                         })}
@@ -1188,7 +1099,106 @@ export default function Calendar() {
         </DialogFooterContainer>
       </CustomDialog>
 
+      {/* Event Detail Popup */}
+      <CustomDialog 
+        open={isEventDetailDialogOpen} 
+        onOpenChange={setIsEventDetailDialogOpen} 
+        maxWidth="400px"
+      >
+        {selectedEvent && (
+          <>
+            <div className="sr-only">
+              <h2 id="dialog-title">Event Details</h2>
+              <p id="dialog-description">Details for calendar event</p>
+            </div>
+            <div 
+              className="p-4 rounded-lg border-l-4 backdrop-blur-sm transition-all duration-300 transform"
+              style={{
+                backgroundColor: getEventColors(selectedEvent.type).bgColor + '20',
+                borderLeftColor: getEventColors(selectedEvent.type).borderColor,
+                backdropFilter: 'blur(8px)',
+                transform: isEventDetailDialogOpen ? 'scale(1) translateY(0)' : 'scale(0.9) translateY(-10px)',
+                opacity: isEventDetailDialogOpen ? 1 : 0,
+                transformOrigin: 'center top'
+              }}
+              aria-labelledby="dialog-title"
+              aria-describedby="dialog-description"
+            >
+              {/* Event Title */}
+              <div className="mb-3">
+                <h3 className="text-lg font-semibold text-gray-900">{selectedEvent.title}</h3>
+                <span className="text-xs font-medium uppercase tracking-wide text-gray-700">
+                  {selectedEvent.type === 'class' ? 'Les' : 
+                   selectedEvent.type === 'exam' ? 'Examen' :
+                   selectedEvent.type === 'holiday' ? 'Vakantie' : 'Evenement'}
+                </span>
+              </div>
+              
+              {/* Basic Info */}
+              <div className="space-y-2 text-sm text-gray-800">
+                <div className="flex items-center">
+                  <CalendarIcon className="h-4 w-4 mr-2 text-gray-600" />
+                  {new Date(selectedEvent.date + 'T00:00:00').toLocaleDateString('nl-NL', { 
+                    weekday: 'short', 
+                    day: 'numeric', 
+                    month: 'short' 
+                  })}
+                </div>
+                
+                <div className="flex items-center">
+                  <Clock className="h-4 w-4 mr-2 text-gray-600" />
+                  {selectedEvent.startTime} - {selectedEvent.endTime}
+                </div>
+                
+                {selectedEvent.location && (
+                  <div className="flex items-center">
+                    <MapPin className="h-4 w-4 mr-2 text-gray-600" />
+                    {selectedEvent.location}
+                  </div>
+                )}
 
+                {/* Course and Class info for lessons/exams */}
+                {(selectedEvent.type === 'class' || selectedEvent.type === 'exam') && (
+                  <>
+                    {selectedEvent.courseName && (
+                      <div className="flex items-center">
+                        <BookOpen className="h-4 w-4 mr-2 text-gray-600" />
+                        {selectedEvent.courseName}
+                      </div>
+                    )}
+                    {selectedEvent.className && (
+                      <div className="flex items-center">
+                        <GraduationCap className="h-4 w-4 mr-2 text-gray-600" />
+                        {selectedEvent.className}
+                      </div>
+                    )}
+                  </>
+                )}
+                
+                {/* Description if available */}
+                {selectedEvent.description && (
+                  <div className="mt-3 pt-2 border-t border-gray-400">
+                    <p className="text-sm text-gray-700">{selectedEvent.description}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Close button */}
+              <div className="flex justify-end mt-4">
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setIsEventDetailDialogOpen(false)}
+                  className="text-gray-700 hover:text-gray-900 hover:bg-white/20"
+                >
+                  Sluiten
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+      </CustomDialog>
     </div>
   );
 }

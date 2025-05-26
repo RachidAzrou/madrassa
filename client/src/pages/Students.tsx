@@ -8,7 +8,7 @@ import {
   Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
   GraduationCap, NotebookText, MapPin, FileEdit, Upload, FileDown,
   ArrowDownToLine, ArrowUpToLine, Info, UserPlus, UserCheck, HeartPulse,
-  Mail, Save
+  Mail, Save, FileText
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -32,6 +32,7 @@ import {
   EmptyTableState,
   QuickActions
 } from "@/components/ui/data-table-container";
+import { DeleteDialog } from "@/components/ui/delete-dialog";
 import {
   CustomDialog,
   DialogHeaderWithIcon,
@@ -67,6 +68,7 @@ export default function Students() {
   const [isAddGuardianDialogOpen, setIsAddGuardianDialogOpen] = useState(false);
   const [isLinkSiblingDialogOpen, setIsLinkSiblingDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentToDelete, setStudentToDelete] = useState(null);
   const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
   const [newStudentGuardians, setNewStudentGuardians] = useState<any[]>([]);
   const [newStudentSiblings, setNewStudentSiblings] = useState<any[]>([]);
@@ -343,6 +345,11 @@ export default function Students() {
         variant: "destructive"
       });
     }
+  };
+
+  const confirmDeleteStudent = () => {
+    setStudentToDelete(selectedStudent);
+    handleDeleteStudent();
   };
   
   const handleUpdateStudent = (e) => {

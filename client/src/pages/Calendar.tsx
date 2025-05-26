@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, 
   FilePlus, GraduationCap, Palmtree, PartyPopper, Pencil, BookOpen, Timer,
-  MapPin, Clock, Search, XCircle, FileText
+  MapPin, Clock, Search, XCircle, FileText, RotateCcw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -1141,7 +1141,7 @@ export default function Calendar() {
                 
                 <div className="grid grid-cols-1 gap-4">
                   <div className="flex items-center text-sm text-gray-600">
-                    <CalendarDays className="h-4 w-4 mr-2 text-gray-400" />
+                    <CalendarIcon className="h-4 w-4 mr-2 text-gray-400" />
                     {new Date(selectedEvent.date + 'T00:00:00').toLocaleDateString('nl-NL', { 
                       weekday: 'long', 
                       year: 'numeric', 
@@ -1184,10 +1184,10 @@ export default function Calendar() {
                         <span className="ml-2 text-gray-900">{selectedEvent.className}</span>
                       </div>
                     )}
-                    {selectedEvent.teacherName && selectedEvent.type === 'class' && (
+                    {(selectedEvent as any).teacherName && selectedEvent.type === 'class' && (
                       <div className="text-sm">
                         <span className="text-gray-500">Docent:</span>
-                        <span className="ml-2 text-gray-900">{selectedEvent.teacherName}</span>
+                        <span className="ml-2 text-gray-900">{(selectedEvent as any).teacherName}</span>
                       </div>
                     )}
                   </div>

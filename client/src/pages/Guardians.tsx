@@ -907,6 +907,28 @@ export default function Guardians() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Import Dialog */}
+      <ImportDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        title="Voogden Importeren"
+        description="Upload een CSV of Excel bestand met voogdgegevens"
+        fields={[
+          { label: "firstName - Voornaam", required: true },
+          { label: "lastName - Achternaam", required: true },
+          { label: "email - E-mailadres", required: true },
+          { label: "phone - Telefoonnummer", required: true },
+          { label: "relationship - Relatie tot student", required: true },
+          { label: "isEmergencyContact - Noodcontact (true/false)" },
+          { label: "emergencyContactFirstName - Noodcontact voornaam" },
+          { label: "emergencyContactLastName - Noodcontact achternaam" },
+          { label: "emergencyContactPhone - Noodcontact telefoon" },
+          { label: "emergencyContactRelationship - Noodcontact relatie" }
+        ]}
+        apiEndpoint="/api/guardians/import"
+        queryKey={['/api/guardians']}
+      />
     </div>
   );
 }

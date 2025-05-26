@@ -75,12 +75,15 @@ export default function Students() {
   const [guardianFormData, setGuardianFormData] = useState({
     firstName: '',
     lastName: '',
-    relationship: 'ouder',
+    relationship: 'parent',
+    relationshipOther: '',
     email: '',
     phone: '',
-    address: '',
-    occupation: '',
-    isEmergencyContact: true,
+    isEmergencyContact: false,
+    emergencyContactFirstName: '',
+    emergencyContactLastName: '',
+    emergencyContactPhone: '',
+    emergencyContactRelationship: '',
   });
   const [isAddingNewGuardian, setIsAddingNewGuardian] = useState(true);
   const [guardianSearchTerm, setGuardianSearchTerm] = useState('');
@@ -1495,97 +1498,206 @@ export default function Students() {
             </TabsList>
             
             <TabsContent value="new" className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="guardian-firstName">Voornaam *</Label>
-                  <Input
-                    id="guardian-firstName"
-                    value={guardianFormData.firstName}
-                    onChange={(e) => setGuardianFormData(prev => ({...prev, firstName: e.target.value}))}
-                    placeholder="Voornaam"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="guardian-lastName">Achternaam *</Label>
-                  <Input
-                    id="guardian-lastName"
-                    value={guardianFormData.lastName}
-                    onChange={(e) => setGuardianFormData(prev => ({...prev, lastName: e.target.value}))}
-                    placeholder="Achternaam"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="guardian-relationship">Relatie *</Label>
-                  <Select 
-                    value={guardianFormData.relationship} 
-                    onValueChange={(value) => setGuardianFormData(prev => ({...prev, relationship: value}))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecteer relatie" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ouder">Ouder</SelectItem>
-                      <SelectItem value="voogd">Voogd</SelectItem>
-                      <SelectItem value="grootouder">Grootouder</SelectItem>
-                      <SelectItem value="oom_tante">Oom/Tante</SelectItem>
-                      <SelectItem value="anders">Anders</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="guardian-email">Email</Label>
-                  <Input
-                    id="guardian-email"
-                    type="email"
-                    value={guardianFormData.email}
-                    onChange={(e) => setGuardianFormData(prev => ({...prev, email: e.target.value}))}
-                    placeholder="Email"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="guardian-phone">Telefoon</Label>
-                  <Input
-                    id="guardian-phone"
-                    value={guardianFormData.phone}
-                    onChange={(e) => setGuardianFormData(prev => ({...prev, phone: e.target.value}))}
-                    placeholder="Telefoon"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="guardian-occupation">Beroep</Label>
-                  <Input
-                    id="guardian-occupation"
-                    value={guardianFormData.occupation}
-                    onChange={(e) => setGuardianFormData(prev => ({...prev, occupation: e.target.value}))}
-                    placeholder="Beroep"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="guardian-address">Adres</Label>
-                <Input
-                  id="guardian-address"
-                  value={guardianFormData.address}
-                  onChange={(e) => setGuardianFormData(prev => ({...prev, address: e.target.value}))}
-                  placeholder="Volledig adres"
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="guardian-emergency"
-                  checked={guardianFormData.isEmergencyContact}
-                  onCheckedChange={(checked) => setGuardianFormData(prev => ({...prev, isEmergencyContact: !!checked}))}
-                />
-                <Label htmlFor="guardian-emergency">Noodcontact</Label>
-              </div>
+              <Tabs defaultValue="personal" className="space-y-4">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="personal">Persoonlijk</TabsTrigger>
+                  <TabsTrigger value="contact">Noodcontact</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="personal" className="space-y-4 min-h-[300px]">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <UserCheck className="h-4 w-4 mr-2" />
+                      Persoonlijke Informatie
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="guardian-firstName" className="text-xs font-medium text-gray-700">
+                          Voornaam <span className="text-red-500">*</span>
+                        </Label>
+                        <Input 
+                          id="guardian-firstName" 
+                          placeholder="Voornaam" 
+                          className="h-8 text-sm"
+                          value={guardianFormData.firstName}
+                          onChange={(e) => setGuardianFormData(prev => ({...prev, firstName: e.target.value}))}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="guardian-lastName" className="text-xs font-medium text-gray-700">
+                          Achternaam <span className="text-red-500">*</span>
+                        </Label>
+                        <Input 
+                          id="guardian-lastName" 
+                          placeholder="Achternaam" 
+                          className="h-8 text-sm"
+                          value={guardianFormData.lastName}
+                          onChange={(e) => setGuardianFormData(prev => ({...prev, lastName: e.target.value}))}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="guardian-phone" className="text-xs font-medium text-gray-700">
+                          Telefoonnummer <span className="text-red-500">*</span>
+                        </Label>
+                        <Input 
+                          id="guardian-phone" 
+                          placeholder="Telefoonnummer" 
+                          className="h-8 text-sm"
+                          value={guardianFormData.phone || ''}
+                          onChange={(e) => setGuardianFormData(prev => ({...prev, phone: e.target.value}))}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="guardian-email" className="text-xs font-medium text-gray-700">
+                          E-mailadres
+                        </Label>
+                        <Input 
+                          id="guardian-email" 
+                          type="email"
+                          placeholder="E-mailadres" 
+                          className="h-8 text-sm"
+                          value={guardianFormData.email || ''}
+                          onChange={(e) => setGuardianFormData(prev => ({...prev, email: e.target.value}))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="guardian-relationship" className="text-xs font-medium text-gray-700">
+                          Relatie tot Student <span className="text-red-500">*</span>
+                        </Label>
+                        <Select 
+                          value={guardianFormData.relationship} 
+                          onValueChange={(value) => setGuardianFormData(prev => ({...prev, relationship: value}))}
+                          required
+                        >
+                          <SelectTrigger id="guardian-relationship" className="h-8 text-sm border-gray-300">
+                            <SelectValue placeholder="Selecteer een relatie" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            <SelectItem value="parent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Ouder</SelectItem>
+                            <SelectItem value="guardian" className="text-black hover:bg-blue-100 focus:bg-blue-200">Voogd</SelectItem>
+                            <SelectItem value="grandparent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Grootouder</SelectItem>
+                            <SelectItem value="sibling" className="text-black hover:bg-blue-100 focus:bg-blue-200">Broer/Zus</SelectItem>
+                            <SelectItem value="other" className="text-black hover:bg-blue-100 focus:bg-blue-200">Anders</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {guardianFormData.relationship === 'other' && (
+                        <div className="space-y-2">
+                          <Label htmlFor="guardian-relationshipOther">
+                            Specificeer relatie <span className="text-red-500">*</span>
+                          </Label>
+                          <Input 
+                            id="guardian-relationshipOther" 
+                            placeholder="Beschrijf de relatie" 
+                            className="h-8 text-sm"
+                            value={guardianFormData.relationshipOther || ''}
+                            onChange={(e) => setGuardianFormData(prev => ({...prev, relationshipOther: e.target.value}))}
+                            required
+                          />
+                        </div>
+                      )}
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="guardian-isEmergencyContact" className="text-xs font-medium text-gray-700">Noodcontact</Label>
+                        <div className="flex items-center gap-2 h-8 py-0.5">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="guardian-isEmergencyContact" 
+                              checked={guardianFormData.isEmergencyContact}
+                              onCheckedChange={(checked) => 
+                                setGuardianFormData(prev => ({
+                                  ...prev, 
+                                  isEmergencyContact: checked === true
+                                }))
+                              }
+                              className="h-4 w-4 rounded-sm border-gray-300 data-[state=checked]:bg-[#1e40af] bg-[#fff]"
+                            />
+                            <label
+                              htmlFor="guardian-isEmergencyContact"
+                              className="text-sm text-gray-700 leading-none"
+                            >
+                              Deze persoon is een primair noodcontact
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="contact" className="space-y-4 min-h-[300px]">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <Mail className="h-4 w-4 mr-2" />
+                      Secundair Noodcontact
+                    </h3>
+                    
+                    {guardianFormData.isEmergencyContact ? (
+                      <div className="mb-4 px-3 py-2 bg-amber-50 border border-amber-200 rounded-md">
+                        <p className="text-sm text-amber-700">
+                          Deze persoon is al ingesteld als primair noodcontact. 
+                          Hieronder kunt u een secundair noodcontact toevoegen.
+                        </p>
+                      </div>
+                    ) : null}
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="guardian-emergencyContactFirstName" className="text-xs font-medium text-gray-700">Voornaam</Label>
+                        <Input 
+                          id="guardian-emergencyContactFirstName" 
+                          placeholder="Voornaam" 
+                          className="h-8 text-sm"
+                          value={guardianFormData.emergencyContactFirstName || ''}
+                          onChange={(e) => setGuardianFormData(prev => ({...prev, emergencyContactFirstName: e.target.value}))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="guardian-emergencyContactLastName" className="text-xs font-medium text-gray-700">Achternaam</Label>
+                        <Input 
+                          id="guardian-emergencyContactLastName" 
+                          placeholder="Achternaam" 
+                          className="h-8 text-sm"
+                          value={guardianFormData.emergencyContactLastName || ''}
+                          onChange={(e) => setGuardianFormData(prev => ({...prev, emergencyContactLastName: e.target.value}))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="guardian-emergencyContactPhone" className="text-xs font-medium text-gray-700">Telefoonnummer</Label>
+                        <Input 
+                          id="guardian-emergencyContactPhone" 
+                          placeholder="Telefoonnummer" 
+                          className="h-8 text-sm"
+                          value={guardianFormData.emergencyContactPhone || ''}
+                          onChange={(e) => setGuardianFormData(prev => ({...prev, emergencyContactPhone: e.target.value}))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="guardian-emergencyContactRelationship" className="text-xs font-medium text-gray-700">Relatie tot student</Label>
+                        <Select 
+                          value={guardianFormData.emergencyContactRelationship || ''} 
+                          onValueChange={(value) => setGuardianFormData(prev => ({...prev, emergencyContactRelationship: value}))}
+                        >
+                          <SelectTrigger id="guardian-emergencyContactRelationship" className="h-8 text-sm border-gray-300">
+                            <SelectValue placeholder="Selecteer een relatie" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            <SelectItem value="parent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Ouder</SelectItem>
+                            <SelectItem value="guardian" className="text-black hover:bg-blue-100 focus:bg-blue-200">Voogd</SelectItem>
+                            <SelectItem value="grandparent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Grootouder</SelectItem>
+                            <SelectItem value="sibling" className="text-black hover:bg-blue-100 focus:bg-blue-200">Broer/Zus</SelectItem>
+                            <SelectItem value="other" className="text-black hover:bg-blue-100 focus:bg-blue-200">Anders</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </TabsContent>
             
             <TabsContent value="existing" className="space-y-4">
@@ -1619,12 +1731,15 @@ export default function Students() {
                   setGuardianFormData({
                     firstName: '',
                     lastName: '',
-                    relationship: 'ouder',
+                    relationship: 'parent',
+                    relationshipOther: '',
                     email: '',
                     phone: '',
-                    address: '',
-                    occupation: '',
-                    isEmergencyContact: true,
+                    isEmergencyContact: false,
+                    emergencyContactFirstName: '',
+                    emergencyContactLastName: '',
+                    emergencyContactPhone: '',
+                    emergencyContactRelationship: '',
                   });
                 }
                 setIsAddGuardianDialogOpen(false);

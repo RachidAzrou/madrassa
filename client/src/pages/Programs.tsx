@@ -120,6 +120,8 @@ export default function Programs() {
     staleTime: 30000,
   });
 
+  console.log('Fetched teachers:', teachersData);
+
   // Als data direct een array is, gebruik het; anders zoek naar data.programs
   const programs = Array.isArray(data) ? data : data?.programs || [];
 

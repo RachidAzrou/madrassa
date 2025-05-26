@@ -502,33 +502,7 @@ export default function Teachers() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-[#e5e7eb]">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={7} className="px-6 py-4 text-center">
-                      <div className="flex justify-center items-center">
-                        <div className="w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
-                        <span className="ml-2 text-sm text-gray-500">Laden...</span>
-                      </div>
-                    </td>
-                  </tr>
-                ) : isError ? (
-                  <tr>
-                    <td colSpan={7} className="px-6 py-4 text-center">
-                      <div className="flex flex-col items-center justify-center py-6">
-                        <XCircle className="h-8 w-8 text-red-500 mb-2" />
-                        <p className="text-sm text-red-500">Fout bij het laden van docenten.</p>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="mt-2"
-                          onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/teachers'] })}
-                        >
-                          Opnieuw proberen
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ) : searchResults.length === 0 ? (
+                {searchResults.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-6 py-4 text-center">
                       <EmptyState

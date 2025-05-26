@@ -1395,18 +1395,6 @@ export default function Teachers() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                     <div>
-                      <Label htmlFor="teacherId" className="text-xs text-gray-700">
-                        Docent ID
-                      </Label>
-                      <Input
-                        id="teacherId"
-                        value={generateTeacherId()}
-                        disabled
-                        className="mt-1 w-full bg-gray-50"
-                        placeholder="Wordt automatisch gegenereerd"
-                      />
-                    </div>
-                    <div>
                       <Label htmlFor="firstName" className="text-xs text-gray-700">
                         Voornaam <span className="text-red-500">*</span>
                       </Label>
@@ -1429,6 +1417,35 @@ export default function Teachers() {
                       />
                     </div>
                     <div>
+                      <Label htmlFor="dateOfBirth" className="text-xs text-gray-700">
+                        Geboortedatum
+                      </Label>
+                      <Input
+                        id="dateOfBirth"
+                        type="date"
+                        value={newTeacher.dateOfBirth}
+                        onChange={(e) => setNewTeacher(prev => ({ ...prev, dateOfBirth: e.target.value }))}
+                        className="mt-1 w-full"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="gender" className="text-xs text-gray-700">
+                        Geslacht
+                      </Label>
+                      <Select
+                        value={newTeacher.gender}
+                        onValueChange={(value) => setNewTeacher(prev => ({ ...prev, gender: value }))}
+                      >
+                        <SelectTrigger className="mt-1 w-full">
+                          <SelectValue placeholder="Selecteer geslacht" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Man">Man</SelectItem>
+                          <SelectItem value="Vrouw">Vrouw</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
                       <Label htmlFor="email" className="text-xs text-gray-700">
                         Email <span className="text-red-500">*</span>
                       </Label>
@@ -1448,18 +1465,6 @@ export default function Teachers() {
                         id="phone"
                         value={newTeacher.phone}
                         onChange={(e) => setNewTeacher(prev => ({ ...prev, phone: e.target.value }))}
-                        className="mt-1 w-full"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="dateOfBirth" className="text-xs text-gray-700">
-                        Geboortedatum
-                      </Label>
-                      <Input
-                        id="dateOfBirth"
-                        type="date"
-                        value={newTeacher.dateOfBirth}
-                        onChange={(e) => setNewTeacher(prev => ({ ...prev, dateOfBirth: e.target.value }))}
                         className="mt-1 w-full"
                       />
                     </div>
@@ -1491,6 +1496,18 @@ export default function Teachers() {
                           <SelectItem value="inactive">Niet actief</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="teacherId" className="text-xs text-gray-700">
+                        Docent ID
+                      </Label>
+                      <Input
+                        id="teacherId"
+                        value={generateTeacherId()}
+                        disabled
+                        className="mt-1 w-full bg-gray-50"
+                        placeholder="Wordt automatisch gegenereerd"
+                      />
                     </div>
                   </div>
 

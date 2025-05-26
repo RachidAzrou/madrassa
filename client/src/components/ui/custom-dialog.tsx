@@ -129,7 +129,7 @@ export function DialogHeaderWithIcon({
     <div className={`bg-[#1e40af] py-4 px-6 flex items-center justify-between ${className}`}>
       <div className="flex items-center gap-3">
         {icon && (
-          <div className="bg-white/20 p-2 rounded-full">
+          <div className="p-2 rounded-full text-[#f5f6f7] bg-[#ffffff33]">
             {icon}
           </div>
         )}

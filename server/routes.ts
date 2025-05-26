@@ -3832,27 +3832,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // In-memory storage voor calendar events (voor development)
+  let calendarEvents: any[] = [
+    {
+      id: "1",
+      title: "Arabisch Les",
+      date: "2025-01-26",
+      startTime: "09:00",
+      endTime: "10:00",
+      location: "Lokaal A1",
+      type: "class",
+      description: "Arabische grammatica les",
+      courseId: "1",
+      courseName: "Arabisch",
+      classId: "1", 
+      className: "Klas 1A"
+    }
+  ];
+
   // Calendar events routes
   apiRouter.get("/api/calendar/events", async (req, res) => {
     try {
-      // Mock data voor nu - in productie zou dit uit de database komen
-      const events = [
-        {
-          id: "1",
-          title: "Arabisch Les",
-          date: "2025-01-26",
-          startTime: "09:00",
-          endTime: "10:00",
-          location: "Lokaal A1",
-          type: "class",
-          description: "Arabische grammatica les",
-          courseId: "1",
-          courseName: "Arabisch",
-          classId: "1", 
-          className: "Klas 1A"
-        }
-      ];
-      res.json({ events });
+      res.json({ events: calendarEvents });
     } catch (error) {
       console.error("Error fetching calendar events:", error);
       res.status(500).json({ error: "Failed to fetch calendar events" });
@@ -3862,11 +3863,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/api/calendar/events", async (req, res) => {
     try {
       console.log("Creating calendar event:", req.body);
-      // Voor nu gewoon een succesvol antwoord teruggeven
       const newEvent = {
         id: Date.now().toString(),
         ...req.body
       };
+      
+      // Voeg toe aan in-memory storage
+      calendarEvents.push(newEvent);
+      
       res.status(201).json(newEvent);
     } catch (error) {
       console.error("Error creating calendar event:", error);

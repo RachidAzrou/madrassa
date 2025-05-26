@@ -1281,33 +1281,34 @@ export default function Students() {
         </DialogContent>
       </Dialog>
 
-      {/* View Student Dialog */}
+      {/* View Student Dialog - Readonly Details */}
       <CustomDialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogHeaderWithIcon 
-          title="Student Details" 
-          description="Gedetailleerde informatie over de student"
-          icon={<User className="h-5 w-5 text-white" />}
+          title="Student Overzicht" 
+          description="Bekijk studentinformatie (alleen-lezen)"
+          icon={<Eye className="h-5 w-5 text-white" />}
         />
         
         <div className="px-6 py-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
           {selectedStudent && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 mb-6">
-                <Avatar className="h-16 w-16 border-2 border-gray-200">
+            <div className="space-y-6">
+              {/* Student Header */}
+              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                <Avatar className="h-20 w-20 border-4 border-white shadow-md">
                   {selectedStudent.photoUrl ? (
                     <AvatarImage src={selectedStudent.photoUrl} alt={`${selectedStudent.firstName} ${selectedStudent.lastName}`} />
                   ) : (
-                    <AvatarFallback className="bg-[#1e40af] text-white text-lg">
+                    <AvatarFallback className="bg-[#1e40af] text-white text-xl">
                       {selectedStudent.firstName?.charAt(0)}{selectedStudent.lastName?.charAt(0)}
                     </AvatarFallback>
                   )}
                 </Avatar>
-                <div>
-                  <h2 className="text-xl font-semibold">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
-                  <p className="text-sm text-gray-500">{selectedStudent.studentId}</p>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-gray-900">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
+                  <p className="text-lg text-gray-600 font-medium">{selectedStudent.studentId}</p>
                   <Badge 
                     variant="outline" 
-                    className={`text-xs rounded-sm ${
+                    className={`text-sm rounded-full px-3 py-1 font-medium ${
                       selectedStudent.status === 'active' || selectedStudent.status === 'ingeschreven' ? "bg-green-50 text-green-700 border-green-200" : 
                       selectedStudent.status === 'inactive' || selectedStudent.status === 'uitgeschreven' ? "bg-gray-50 text-gray-700 border-gray-200" : 
                       selectedStudent.status === 'afgestudeerd' ? "bg-blue-50 text-blue-700 border-blue-200" :
@@ -1325,49 +1326,134 @@ export default function Students() {
                 </div>
               </div>
               
-              <SectionContainer title="Persoonlijke Informatie" icon={<User className="h-4 w-4" />}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <CustomFormLabel>Student ID</CustomFormLabel>
-                    <p className="text-sm mt-1">{selectedStudent.studentId}</p>
-                  </div>
-                  <div>
-                    <CustomFormLabel>Naam</CustomFormLabel>
-                    <p className="text-sm mt-1">{selectedStudent.firstName} {selectedStudent.lastName}</p>
-                  </div>
-                  <div>
-                    <CustomFormLabel>Email</CustomFormLabel>
-                    <p className="text-sm mt-1">{selectedStudent.email || "-"}</p>
-                  </div>
-                  <div>
-                    <CustomFormLabel>Telefoon</CustomFormLabel>
-                    <p className="text-sm mt-1">{selectedStudent.phone || "-"}</p>
-                  </div>
-                  <div>
-                    <CustomFormLabel>Geboortedatum</CustomFormLabel>
-                    <p className="text-sm mt-1">{selectedStudent.dateOfBirth ? formatDateToDisplayFormat(selectedStudent.dateOfBirth) : "-"}</p>
-                  </div>
-                  <div>
-                    <CustomFormLabel>Geslacht</CustomFormLabel>
-                    <p className="text-sm mt-1">{selectedStudent.gender === "man" ? "Man" : "Vrouw"}</p>
+              {/* Persoonlijke Informatie */}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-3 border-b">
+                  <h3 className="text-lg font-semibold text-[#1e40af] flex items-center">
+                    <User className="h-5 w-5 mr-2" />
+                    Persoonlijke Informatie
+                  </h3>
+                </div>
+                <div className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-500">Email</dt>
+                      <dd className="text-sm text-gray-900">{selectedStudent.email || "Niet opgegeven"}</dd>
+                    </div>
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-500">Telefoon</dt>
+                      <dd className="text-sm text-gray-900">{selectedStudent.phone || "Niet opgegeven"}</dd>
+                    </div>
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-500">Geboortedatum</dt>
+                      <dd className="text-sm text-gray-900">
+                        {selectedStudent.dateOfBirth ? format(parseISO(selectedStudent.dateOfBirth), 'd MMMM yyyy', { locale: nl }) : "Niet opgegeven"}
+                      </dd>
+                    </div>
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-500">Geslacht</dt>
+                      <dd className="text-sm text-gray-900">{selectedStudent.gender || "Niet opgegeven"}</dd>
+                    </div>
                   </div>
                 </div>
-              </SectionContainer>
-              
-              <SectionContainer title="Adresgegevens" icon={<MapPin className="h-4 w-4" />}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
-                    <CustomFormLabel>Adres</CustomFormLabel>
-                    <p className="text-sm mt-1">
-                      {selectedStudent.street ? `${selectedStudent.street} ${selectedStudent.houseNumber || ""}` : "-"}
-                    </p>
+              </div>
+
+              {/* Onderwijs Informatie */}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-3 border-b">
+                  <h3 className="text-lg font-semibold text-green-700 flex items-center">
+                    <GraduationCap className="h-5 w-5 mr-2" />
+                    Onderwijs
+                  </h3>
+                </div>
+                <div className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-500">Klas</dt>
+                      <dd className="text-sm text-gray-900">{selectedStudent.studentGroupName || "Geen klas toegewezen"}</dd>
+                    </div>
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-500">Programma</dt>
+                      <dd className="text-sm text-gray-900">{selectedStudent.programName || "Geen programma toegewezen"}</dd>
+                    </div>
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-500">Schooljaar</dt>
+                      <dd className="text-sm text-gray-900">{selectedStudent.academicYear || "Niet opgegeven"}</dd>
+                    </div>
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-500">Inschrijfdatum</dt>
+                      <dd className="text-sm text-gray-900">
+                        {selectedStudent.enrollmentDate ? format(parseISO(selectedStudent.enrollmentDate), 'd MMMM yyyy', { locale: nl }) : "Niet opgegeven"}
+                      </dd>
+                    </div>
                   </div>
-                  <div>
-                    <CustomFormLabel>Postcode</CustomFormLabel>
-                    <p className="text-sm mt-1">{selectedStudent.postalCode || "-"}</p>
+                </div>
+              </div>
+
+              {/* Adres Informatie */}
+              {(selectedStudent.street || selectedStudent.city) && (
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-4 py-3 border-b">
+                    <h3 className="text-lg font-semibold text-purple-700 flex items-center">
+                      <MapPin className="h-5 w-5 mr-2" />
+                      Adres
+                    </h3>
                   </div>
-                  <div>
-                    <CustomFormLabel>Plaats</CustomFormLabel>
+                  <div className="p-4">
+                    <div className="space-y-1">
+                      <dt className="text-sm font-medium text-gray-500">Adres</dt>
+                      <dd className="text-sm text-gray-900">
+                        {[selectedStudent.street, selectedStudent.houseNumber].filter(Boolean).join(' ')}<br/>
+                        {[selectedStudent.postalCode, selectedStudent.city].filter(Boolean).join(' ')}
+                      </dd>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Opmerkingen */}
+              {selectedStudent.notes && (
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-3 border-b">
+                    <h3 className="text-lg font-semibold text-orange-700 flex items-center">
+                      <FileText className="h-5 w-5 mr-2" />
+                      Opmerkingen
+                    </h3>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-sm text-gray-900">{selectedStudent.notes}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        
+        <DialogFooterContainer>
+          <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
+            Sluiten
+          </Button>
+        </DialogFooterContainer>
+      </CustomDialog>
+
+      {/* Edit Student Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Student bewerken</DialogTitle>
+          </DialogHeader>
+          <p>Edit dialog inhoud komt hier...</p>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={confirmDeleteStudent}
+        title="Student verwijderen"
+        description={`Weet je zeker dat je ${studentToDelete?.firstName} ${studentToDelete?.lastName} wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
+      />
                     <p className="text-sm mt-1">{selectedStudent.city || "-"}</p>
                   </div>
                 </div>

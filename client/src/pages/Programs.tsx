@@ -464,8 +464,8 @@ export default function Programs() {
         />
         
         <form onSubmit={handleSubmitProgram}>
-          <div className="p-6">
-            <Tabs defaultValue="algemeen" className="mt-2">
+          <div className="p-6 pt-4">
+            <Tabs defaultValue="algemeen" className="mt-4">
               <TabsList className="mb-4">
                 <TabsTrigger value="algemeen">Algemene informatie</TabsTrigger>
                 <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
@@ -621,8 +621,8 @@ export default function Programs() {
         />
         
         <form onSubmit={handleSubmitEditProgram}>
-          <div className="p-6">
-            <div className="space-y-4">
+          <div className="p-6 pt-4">
+            <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <FormLabel htmlFor="edit-name">
@@ -704,8 +704,8 @@ export default function Programs() {
           icon={<Trash2 className="h-5 w-5" />}
         />
         
-        <div className="p-6">
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-md">
+        <div className="p-6 pt-4">
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-md mt-2">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">

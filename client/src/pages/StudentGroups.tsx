@@ -449,16 +449,16 @@ export default function StudentGroups() {
                     <span className="text-xs font-medium text-gray-700">Klas</span>
                   </th>
                   <th scope="col" className="px-4 py-3 text-left">
-                    <span className="text-xs font-medium text-gray-700">Locatie</span>
+                    <span className="text-xs font-medium text-gray-700">Schooljaar</span>
                   </th>
                   <th scope="col" className="px-4 py-3 text-left">
-                    <span className="text-xs font-medium text-gray-700">Klastitularis</span>
+                    <span className="text-xs font-medium text-gray-700">Locatie</span>
                   </th>
                   <th scope="col" className="px-4 py-3 text-left">
                     <span className="text-xs font-medium text-gray-700">Capaciteit</span>
                   </th>
                   <th scope="col" className="px-4 py-3 text-left">
-                    <span className="text-xs font-medium text-gray-700">Status</span>
+                    <span className="text-xs font-medium text-gray-700">Klastitularis</span>
                   </th>
                   <th scope="col" className="px-4 py-3 text-right w-[120px]">
                     <span className="text-xs font-medium text-gray-700"></span>
@@ -545,15 +545,14 @@ export default function StudentGroups() {
                         <div className="flex items-center">
                           <div>
                             <div className="text-sm font-medium text-gray-900">{cls.name}</div>
-                            <div className="text-xs text-gray-500">{cls.academicYear}</div>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">{cls.location || '-'}</span>
+                        <span className="text-sm text-gray-900">{cls.academicYear || '-'}</span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">{cls.teacherName || '-'}</span>
+                        <span className="text-sm text-gray-900">{cls.location || '-'}</span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className="text-sm text-gray-900">
@@ -561,15 +560,7 @@ export default function StudentGroups() {
                         </span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <Badge 
-                          className={`px-2 py-1 text-xs font-normal ${
-                            cls.isActive 
-                              ? "bg-green-100 text-green-800 hover:bg-green-100" 
-                              : "bg-gray-100 text-gray-800 hover:bg-gray-100"
-                          }`}
-                        >
-                          {cls.isActive ? 'Actief' : 'Inactief'}
-                        </Badge>
+                        <span className="text-sm text-gray-900">{cls.teacherName || '-'}</span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-right">
                         <QuickActions

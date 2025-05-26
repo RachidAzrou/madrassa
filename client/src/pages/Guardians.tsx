@@ -1107,6 +1107,54 @@ export default function Guardians() {
                   )}
                 </div>
               </div>
+              
+              {/* Gekoppelde studenten sectie */}
+              <div className="mt-6">
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <Users className="h-4 w-4 mr-2" />
+                    Gekoppelde studenten
+                  </h3>
+                  <div className="space-y-3">
+                    {students.filter(student => 
+                      student.guardians && student.guardians.some(g => g.id === selectedGuardian.id)
+                    ).length > 0 ? (
+                      students
+                        .filter(student => 
+                          student.guardians && student.guardians.some(g => g.id === selectedGuardian.id)
+                        )
+                        .map(student => (
+                          <div key={student.id} className="flex items-center gap-3 p-3 bg-white rounded-md border">
+                            <div className="w-10 h-10 rounded-full bg-[#1e40af] flex items-center justify-center text-white font-medium text-sm">
+                              {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900">
+                                {student.firstName} {student.lastName}
+                              </p>
+                              <p className="text-xs text-gray-600">Student ID: {student.studentId}</p>
+                            </div>
+                            <div className="text-right">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                student.status === 'Ingeschreven' ? 'bg-green-100 text-green-800' :
+                                student.status === 'Uitgeschreven' ? 'bg-red-100 text-red-800' :
+                                student.status === 'Afgestudeerd' ? 'bg-gray-100 text-gray-800' :
+                                student.status === 'Geschorst' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {student.status}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                    ) : (
+                      <div className="text-center py-4 text-gray-500 text-sm">
+                        Geen studenten gekoppeld aan deze voogd
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
           

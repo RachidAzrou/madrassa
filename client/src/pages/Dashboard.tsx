@@ -408,26 +408,59 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div>
-                  <table className="w-full text-xs border-collapse">
-                    <tbody>
-                      {currentWeekEvents.slice(0, 5).map((event, index) => (
-                        <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#f9fafc]'} hover:bg-gray-50 border-b border-[#e5e7eb] last:border-b-0`}>
-                          <td className="py-2 px-3 text-left">
-                            <div className="flex items-center">
-                              <Clock className="h-3 w-3 text-[#1e40af] mr-2 flex-shrink-0" />
-                              <span className="font-medium text-gray-700">{event.title || event.courseName}</span>
+                  <div className="space-y-2">
+                    {currentWeekEvents.slice(0, 5).map((event, index) => {
+                      const getEventTypeColor = (type: string) => {
+                        switch(type) {
+                          case 'class': return 'bg-blue-100 text-blue-800 border-blue-200';
+                          case 'exam': return 'bg-red-100 text-red-800 border-red-200';
+                          case 'holiday': return 'bg-green-100 text-green-800 border-green-200';
+                          case 'event': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                          default: return 'bg-gray-100 text-gray-800 border-gray-200';
+                        }
+                      };
+
+                      const getEventTypeLabel = (type: string) => {
+                        switch(type) {
+                          case 'class': return 'Les';
+                          case 'exam': return 'Examen';
+                          case 'holiday': return 'Vakantie';
+                          case 'event': return 'Evenement';
+                          default: return 'Onbekend';
+                        }
+                      };
+
+                      return (
+                        <div key={index} className="bg-white border border-[#e5e7eb] rounded-sm p-3 hover:shadow-sm transition-shadow">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border ${getEventTypeColor(event.type)}`}>
+                                  {getEventTypeLabel(event.type)}
+                                </span>
+                                <span className="text-xs font-medium text-gray-900">{event.title || event.courseName}</span>
+                              </div>
+                              <div className="flex items-center gap-3 text-[10px] text-gray-500">
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
+                                  <span>{format(parseISO(event.date), 'EEEE d MMMM', { locale: nl })}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  <span>{event.startTime} - {event.endTime}</span>
+                                </div>
+                              </div>
+                              {event.location && (
+                                <div className="mt-1 text-[10px] text-gray-500">
+                                  📍 {event.location}
+                                </div>
+                              )}
                             </div>
-                          </td>
-                          <td className="py-2 px-3 text-left text-gray-500">
-                            {format(parseISO(event.date), 'EEE d MMM', { locale: nl })}
-                          </td>
-                          <td className="py-2 px-3 text-right whitespace-nowrap text-gray-500">
-                            {event.startTime} - {event.endTime}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                   
                   {currentWeekEvents.length > 5 && (
                     <div className="px-3 py-2 text-right bg-[#f9fafc] border-t border-[#e5e7eb]">

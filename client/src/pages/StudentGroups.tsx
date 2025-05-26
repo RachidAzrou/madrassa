@@ -427,40 +427,14 @@ export default function StudentGroups() {
         </SearchActionBar>
 
         {/* Classes table */}
-        <TableContainer>
-          {isLoading ? (
-            <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1e40af] mx-auto"></div>
-              <p className="mt-2 text-sm text-gray-600">Klassen laden...</p>
-            </div>
-          ) : isError ? (
-            <div className="p-8 text-center">
-              <p className="text-red-600">Er is een fout opgetreden bij het laden van de klassen.</p>
-            </div>
-          ) : filteredClasses.length === 0 ? (
-            <div className="p-8 text-center">
-              <ChalkBoard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Geen klassen gevonden</h3>
-              <p className="text-gray-500 mb-4">
-                {searchQuery || Object.values({locationFilter, teacherFilter, academicYearFilter, capacityFilter}).some(f => f) 
-                  ? "Geen klassen komen overeen met uw zoekcriteria."
-                  : "Er zijn nog geen klassen aangemaakt."}
-              </p>
-              <Button
-                onClick={() => setShowNewClassDialog(true)}
-                className="bg-[#1e40af] hover:bg-[#1e3a8a]"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Eerste Klas Aanmaken
-              </Button>
-            </div>
-          ) : (
-            <table className="w-full text-sm">
-              <DataTableHeader>
-                <tr className="border-b border-gray-200">
-                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">
+        <div className="bg-white border border-[#e5e7eb] rounded-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-[#e5e7eb]">
+              <thead className="bg-[#f9fafc]">
+                <tr>
+                  <th scope="col" className="px-4 py-3 text-left w-10">
                     <Checkbox
-                      checked={selectedClasses.length === filteredClasses.length && filteredClasses.length > 0}
+                      checked={selectedClasses.length > 0 && selectedClasses.length === filteredClasses.length}
                       onCheckedChange={(checked) => {
                         if (checked) {
                           setSelectedClasses(filteredClasses.map((cls: ClassType) => cls.id));
@@ -468,25 +442,93 @@ export default function StudentGroups() {
                           setSelectedClasses([]);
                         }
                       }}
-                      className="mr-2"
+                      className="h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
                     />
-                    Klas
                   </th>
-                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Locatie</th>
-                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Klastitularis</th>
-                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Capaciteit</th>
-                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Status</th>
-                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right">Acties</th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Klas</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Locatie</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Klastitularis</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Capaciteit</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Status</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-right w-[120px]">
+                    <span className="text-xs font-medium text-gray-700"></span>
+                  </th>
                 </tr>
-              </DataTableHeader>
-              <tbody>
-                {filteredClasses.map((cls: ClassType) => (
-                  <tr 
-                    key={cls.id} 
-                    className="border-b border-gray-100 hover:bg-gray-50 group"
-                  >
-                    <td className="py-3 px-4">
-                      <div className="flex items-center">
+              </thead>
+              <tbody className="bg-white divide-y divide-[#e5e7eb]">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-4 text-center">
+                      <div className="flex justify-center items-center">
+                        <div className="w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
+                        <span className="ml-2 text-sm text-gray-500">Klassen laden...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : isError ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-4 text-center">
+                      <div className="flex flex-col items-center justify-center py-6">
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="24" 
+                          height="24" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          className="h-8 w-8 text-red-500 mb-2"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="15" y1="9" x2="9" y2="15" />
+                          <line x1="9" y1="9" x2="15" y2="15" />
+                        </svg>
+                        <p className="text-sm text-red-500">Er is een fout opgetreden bij het laden van de klassen.</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredClasses.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-4 text-center">
+                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                        <div className="text-[#1e3a8a] mb-2">
+                          <ChalkBoard className="h-12 w-12" />
+                        </div>
+                        <p className="text-sm font-medium">Geen klassen gevonden</p>
+                        <p className="text-sm text-gray-400 mb-4">
+                          {searchQuery || Object.values({locationFilter, teacherFilter, academicYearFilter, capacityFilter}).some(f => f) 
+                            ? "Geen klassen komen overeen met uw zoekcriteria."
+                            : "Er zijn nog geen klassen aangemaakt."}
+                        </p>
+                        <Button
+                          onClick={() => setShowNewClassDialog(true)}
+                          className="bg-[#1e40af] hover:bg-[#1e3a8a]"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Eerste Klas Aanmaken
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredClasses.map((cls: ClassType) => (
+                    <tr 
+                      key={cls.id} 
+                      className="hover:bg-gray-50 group transition-colors"
+                    >
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <Checkbox
                           checked={selectedClasses.includes(cls.id)}
                           onCheckedChange={(checked) => {
@@ -496,44 +538,53 @@ export default function StudentGroups() {
                               setSelectedClasses(selectedClasses.filter(id => id !== cls.id));
                             }
                           }}
-                          className="mr-3"
+                          className="h-3.5 w-3.5 rounded-sm border-[#e5e7eb]"
                         />
-                        <div>
-                          <p className="font-medium text-gray-900">{cls.name}</p>
-                          <p className="text-xs text-gray-500">{cls.academicYear}</p>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{cls.name}</div>
+                            <div className="text-xs text-gray-500">{cls.academicYear}</div>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-gray-900">
-                      {cls.location || '-'}
-                    </td>
-                    <td className="py-3 px-4 text-gray-900">
-                      {cls.teacherName || '-'}
-                    </td>
-                    <td className="py-3 px-4 text-gray-900">
-                      {cls.studentCount || 0}/{cls.maxCapacity || 'Onbeperkt'}
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge 
-                        variant={cls.isActive ? "default" : "secondary"}
-                        className={cls.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
-                      >
-                        {cls.isActive ? 'Actief' : 'Inactief'}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <QuickActions
-                        onView={() => handleViewClass(cls)}
-                        onEdit={() => handleEditClass(cls)}
-                        onDelete={() => handleDeleteClass(cls)}
-                      />
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="text-sm text-gray-900">{cls.location || '-'}</span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="text-sm text-gray-900">{cls.teacherName || '-'}</span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="text-sm text-gray-900">
+                          {cls.studentCount || 0}/{cls.maxCapacity || 'Onbeperkt'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <Badge 
+                          className={`px-2 py-1 text-xs font-normal ${
+                            cls.isActive 
+                              ? "bg-green-100 text-green-800 hover:bg-green-100" 
+                              : "bg-gray-100 text-gray-800 hover:bg-gray-100"
+                          }`}
+                        >
+                          {cls.isActive ? 'Actief' : 'Inactief'}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-right">
+                        <QuickActions
+                          onView={() => handleViewClass(cls)}
+                          onEdit={() => handleEditClass(cls)}
+                          onDelete={() => handleDeleteClass(cls)}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
-          )}
-        </TableContainer>
+          </div>
+        </div>
 
         <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
           <div>

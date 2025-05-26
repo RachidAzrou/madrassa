@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, GraduationCap, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, BookOpen, Users, Upload } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, GraduationCap, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, BookOpen, Users, Upload, Edit } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -682,7 +682,7 @@ export default function Teachers() {
                   }}
                   className="bg-[#1e40af] hover:bg-[#1e3a8a]"
                 >
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Pencil className="h-4 w-4 mr-2" />
                   Bewerken
                 </Button>
               </div>
@@ -695,7 +695,7 @@ export default function Teachers() {
       <Dialog open={showEditTeacherDialog} onOpenChange={setShowEditTeacherDialog}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeaderWithIcon
-            icon={<Edit className="h-5 w-5" />}
+            icon={<Pencil className="h-5 w-5" />}
             title="Docent Bewerken"
             description="Pas de docentgegevens aan"
           />

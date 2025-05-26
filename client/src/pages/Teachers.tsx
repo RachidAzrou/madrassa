@@ -1460,7 +1460,7 @@ export default function Teachers() {
                         value={newTeacher.gender}
                         onValueChange={(value) => setNewTeacher(prev => ({ ...prev, gender: value }))}
                       >
-                        <SelectTrigger className="mt-1 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                        <SelectTrigger className="mt-1 w-full focus:!border-blue-500 focus:!ring-blue-500">
                           <SelectValue placeholder="Selecteer geslacht" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1512,7 +1512,7 @@ export default function Teachers() {
                         value={newTeacher.status}
                         onValueChange={(value) => setNewTeacher(prev => ({ ...prev, status: value }))}
                       >
-                        <SelectTrigger className="mt-1 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                        <SelectTrigger className="mt-1 w-full focus:!border-blue-500 focus:!ring-blue-500">
                           <SelectValue placeholder="Selecteer status" />
                         </SelectTrigger>
                         <SelectContent>

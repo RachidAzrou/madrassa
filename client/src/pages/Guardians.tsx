@@ -27,6 +27,8 @@ import {
   EmptyActionHeader
 } from '@/components/ui/data-table-container';
 import { DeleteDialog } from '@/components/ui/delete-dialog';
+import { ExportButton } from '@/components/ui/export-button';
+import { ExportDialog } from '@/components/ui/export-dialog';
 
 // Type definities
 type GuardianType = {
@@ -54,6 +56,7 @@ export default function Guardians() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showNewGuardianDialog, setShowNewGuardianDialog] = useState(false);
   const [hasValidationAttempt, setHasValidationAttempt] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [newGuardian, setNewGuardian] = useState<Partial<GuardianType>>({
     firstName: '',
     lastName: '',

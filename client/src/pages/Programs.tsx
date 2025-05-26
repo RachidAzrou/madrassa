@@ -405,7 +405,10 @@ export default function Programs() {
           
           <div className="flex gap-2 items-center">
             <Button
-              onClick={handleAddProgram}
+              onClick={() => {
+                console.log('Vak Toevoegen knop geklikt');
+                setIsAddDialogOpen(true);
+              }}
               size="sm"
               className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white"
             >

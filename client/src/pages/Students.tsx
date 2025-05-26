@@ -115,7 +115,7 @@ export default function Students() {
     gender: "man",
     photoUrl: "",
     studentId: "",
-    academicYear: ""
+    academicYear: "2024-2025"
   };
   
   const [formData, setFormData] = useState(emptyFormData);
@@ -1114,8 +1114,6 @@ export default function Students() {
                           </SelectTrigger>
                           <SelectContent className="bg-white border-[#e5e7eb]">
                             <SelectItem value="2024-2025" className="focus:bg-blue-200 hover:bg-blue-100">2024-2025</SelectItem>
-                            <SelectItem value="2025-2026" className="focus:bg-blue-200 hover:bg-blue-100">2025-2026</SelectItem>
-                            <SelectItem value="2026-2027" className="focus:bg-blue-200 hover:bg-blue-100">2026-2027</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

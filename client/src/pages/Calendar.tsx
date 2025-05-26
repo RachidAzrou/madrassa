@@ -628,17 +628,46 @@ export default function Calendar() {
                   <div className="space-y-1">
                     {day.events.map((event, idx) => {
                       const colors = getEventColors(event.type);
+                      const isExpanded = expandedEventId === event.id;
                       return (
                         <div 
                           key={idx} 
-                          className="px-1.5 py-0.5 text-xs font-medium truncate rounded-sm flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+                          className={`px-2 py-1 text-xs font-medium rounded-sm cursor-pointer transition-all duration-200 ${
+                            isExpanded ? 'shadow-lg z-10 transform scale-105' : 'hover:opacity-80'
+                          }`}
                           style={{ 
                             backgroundColor: colors.bgColor,
-                            borderLeft: `2px solid ${colors.borderColor}`
+                            borderLeft: `3px solid ${colors.borderColor}`,
+                            position: isExpanded ? 'relative' : 'static',
+                            zIndex: isExpanded ? 10 : 'auto'
                           }}
                           onClick={() => handleEventClick(event)}
                         >
-                          <span className="truncate">{event.title}</span>
+                          <div className="truncate font-semibold">{event.title}</div>
+                          <div className="text-[10px] text-gray-600">{event.startTime}</div>
+                          
+                          {isExpanded && (
+                            <div className="mt-2 space-y-1 text-[11px] text-gray-700 bg-white p-2 rounded border shadow-sm">
+                              {event.location && <div>📍 {event.location}</div>}
+                              {event.courseName && <div>📚 {event.courseName}</div>}
+                              {event.className && <div>🎓 {event.className}</div>}
+                              {event.description && <div className="italic">💬 {event.description}</div>}
+                              
+                              <div className="flex gap-1 mt-2">
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  className="h-5 px-2 text-[9px]"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteEvent(event.id || '');
+                                  }}
+                                >
+                                  🗑️ Verwijder
+                                </Button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}

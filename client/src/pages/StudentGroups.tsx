@@ -65,6 +65,8 @@ export default function StudentGroups() {
   const [filterProgram, setFilterProgram] = useState("all");
   const [filterAcademicYear, setFilterAcademicYear] = useState("all");
   const [filterStudentGroup, setFilterStudentGroup] = useState("all");
+  const [filterClassName, setFilterClassName] = useState("all");
+  const [filterLocation, setFilterLocation] = useState("all");
   const [showFilterOptions, setShowFilterOptions] = useState(false);
   
   const [selectedClasses, setSelectedClasses] = useState<number[]>([]);
@@ -126,8 +128,10 @@ export default function StudentGroups() {
       cls.location?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesAcademicYear = filterAcademicYear === 'all' || cls.academicYear === filterAcademicYear;
+    const matchesClassName = filterClassName === 'all' || cls.name === filterClassName;
+    const matchesLocation = filterLocation === 'all' || cls.location === filterLocation;
 
-    return matchesSearch && matchesAcademicYear;
+    return matchesSearch && matchesAcademicYear && matchesClassName && matchesLocation;
   });
 
   // Mutations
@@ -331,12 +335,14 @@ export default function StudentGroups() {
         {showFilterOptions && (
           <div className="px-4 py-3 border-t border-[#e5e7eb] flex flex-wrap gap-3 items-center">
             <div className="flex items-center">
-              {(filterAcademicYear !== 'all') && (
+              {(filterAcademicYear !== 'all' || filterClassName !== 'all' || filterLocation !== 'all') && (
                 <Button
                   variant="link"
                   size="sm"
                   onClick={() => {
                     setFilterAcademicYear('all');
+                    setFilterClassName('all');
+                    setFilterLocation('all');
                   }}
                   className="h-7 text-xs text-blue-600 p-0 mr-3"
                 >
@@ -346,6 +352,23 @@ export default function StudentGroups() {
             </div>
             
             <div className="flex flex-wrap gap-3">
+              <Select 
+                value={filterClassName} 
+                onValueChange={setFilterClassName}
+              >
+                <SelectTrigger className="w-40 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white">
+                  <SelectValue placeholder="Klas" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-[#e5e7eb]">
+                  <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle klassen</SelectItem>
+                  {[...new Set(classes.map((cls: ClassType) => cls.name))].map((className) => (
+                    <SelectItem key={className} value={className} className="focus:bg-blue-200 hover:bg-blue-100">
+                      {className}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
               <Select 
                 value={filterAcademicYear} 
                 onValueChange={setFilterAcademicYear}
@@ -359,6 +382,23 @@ export default function StudentGroups() {
                   <SelectItem value="2024-2025" className="focus:bg-blue-200 hover:bg-blue-100">2024-2025</SelectItem>
                   <SelectItem value="2023-2024" className="focus:bg-blue-200 hover:bg-blue-100">2023-2024</SelectItem>
                   <SelectItem value="2022-2023" className="focus:bg-blue-200 hover:bg-blue-100">2022-2023</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select 
+                value={filterLocation} 
+                onValueChange={setFilterLocation}
+              >
+                <SelectTrigger className="w-40 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white">
+                  <SelectValue placeholder="Locatie" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-[#e5e7eb]">
+                  <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle locaties</SelectItem>
+                  {[...new Set(classes.map((cls: ClassType) => cls.location).filter(Boolean))].map((location) => (
+                    <SelectItem key={location} value={location} className="focus:bg-blue-200 hover:bg-blue-100">
+                      {location}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

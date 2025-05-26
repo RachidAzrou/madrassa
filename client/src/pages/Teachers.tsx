@@ -544,7 +544,7 @@ export default function Teachers() {
                   </tr>
                 ) : (
                   searchResults.map((teacher: TeacherType) => (
-                    <tr key={teacher.id} className="hover:bg-[#f9fafb]">
+                    <tr key={teacher.id} className="hover:bg-[#f9fafb] group">
                       <td className="px-4 py-3 whitespace-nowrap">
                         <Checkbox 
                           checked={selectedTeachers.includes(teacher.id)}
@@ -585,7 +585,7 @@ export default function Teachers() {
                         </Badge>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-right">
-                        <ActionButtonsContainer>
+                        <div className="flex justify-end space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                           <Button 
                             size="icon" 
                             variant="ghost" 
@@ -613,7 +613,7 @@ export default function Teachers() {
                             <Trash2 className="h-3.5 w-3.5" />
                             <span className="sr-only">Verwijderen</span>
                           </Button>
-                        </ActionButtonsContainer>
+                        </div>
                       </td>
                     </tr>
                   ))

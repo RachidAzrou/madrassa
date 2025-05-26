@@ -58,6 +58,7 @@ export default function Guardians() {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [hasValidationAttempt, setHasValidationAttempt] = useState(false);
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [editFormData, setEditFormData] = useState<Partial<GuardianType>>({
     firstName: '',
@@ -72,7 +73,7 @@ export default function Guardians() {
     emergencyContactPhone: '',
     emergencyContactRelationship: ''
   });
-  const [newGuardian, setNewGuardian] = useState<Partial<GuardianType>>({
+  const [newGuardian, setNewGuardian] = useState<Partial<GuardianType> & { linkedStudents?: number[] }>({
     firstName: '',
     lastName: '',
     relationship: 'parent',
@@ -83,7 +84,8 @@ export default function Guardians() {
     emergencyContactFirstName: '',
     emergencyContactLastName: '',
     emergencyContactPhone: '',
-    emergencyContactRelationship: ''
+    emergencyContactRelationship: '',
+    linkedStudents: []
   });
   
   // Data ophalen
@@ -677,7 +679,7 @@ export default function Guardians() {
           
           <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
             <Tabs defaultValue="gegevens" className="mb-4">
-              <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
                 <TabsTrigger value="gegevens" className="flex items-center gap-2">
                   <UserCheck className="h-3.5 w-3.5" />
                   <span>Persoonlijke gegevens</span>
@@ -685,6 +687,10 @@ export default function Guardians() {
                 <TabsTrigger value="contact" className="flex items-center gap-2">
                   <HeartPulse className="h-3.5 w-3.5" />
                   <span>Noodcontact</span>
+                </TabsTrigger>
+                <TabsTrigger value="students" className="flex items-center gap-2">
+                  <Users className="h-3.5 w-3.5" />
+                  <span>Studenten</span>
                 </TabsTrigger>
               </TabsList>
               
@@ -879,6 +885,91 @@ export default function Guardians() {
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="students" className="space-y-4 min-h-[300px]">
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <Users className="h-4 w-4 mr-2" />
+                    Studenten koppelen
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <div className="text-sm text-gray-600 mb-4">
+                      Selecteer welke studenten aan deze voogd gekoppeld moeten worden.
+                    </div>
+                    
+                    {/* Search for students */}
+                    <div className="relative">
+                      <Input 
+                        placeholder="Zoek studenten om te koppelen..." 
+                        className="h-8 text-sm pl-8"
+                        value={studentSearchTerm}
+                        onChange={(e) => setStudentSearchTerm(e.target.value)}
+                      />
+                      <Search className="h-4 w-4 absolute left-2.5 top-2 text-gray-400" />
+                    </div>
+                    
+                    {/* Available students list */}
+                    <div className="max-h-48 overflow-y-auto space-y-2">
+                      {students
+                        .filter(student => 
+                          (student.firstName + ' ' + student.lastName + ' ' + student.studentId)
+                            .toLowerCase()
+                            .includes(studentSearchTerm.toLowerCase())
+                        )
+                        .map(student => (
+                          <div key={student.id} className="flex items-center gap-3 p-3 bg-white rounded-md border hover:border-blue-300">
+                            <Checkbox 
+                              checked={newGuardian.linkedStudents?.includes(student.id) || false}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setNewGuardian({
+                                    ...newGuardian,
+                                    linkedStudents: [...(newGuardian.linkedStudents || []), student.id]
+                                  });
+                                } else {
+                                  setNewGuardian({
+                                    ...newGuardian,
+                                    linkedStudents: (newGuardian.linkedStudents || []).filter(id => id !== student.id)
+                                  });
+                                }
+                              }}
+                              className="h-4 w-4"
+                            />
+                            <div className="w-10 h-10 rounded-full bg-[#1e40af] flex items-center justify-center text-white font-medium text-sm">
+                              {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900">
+                                {student.firstName} {student.lastName}
+                              </p>
+                              <p className="text-xs text-gray-600">Student ID: {student.studentId}</p>
+                            </div>
+                            <div className="text-right">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                student.status === 'Ingeschreven' ? 'bg-green-100 text-green-800' :
+                                student.status === 'Uitgeschreven' ? 'bg-red-100 text-red-800' :
+                                student.status === 'Afgestudeerd' ? 'bg-gray-100 text-gray-800' :
+                                student.status === 'Geschorst' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {student.status}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                    
+                    {students.length === 0 && (
+                      <div className="text-center py-6 text-gray-500 text-sm">
+                        <Users className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                        <p>Geen studenten beschikbaar</p>
+                        <p className="text-xs mt-1">Voeg eerst studenten toe via de studentenpagina</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </TabsContent>

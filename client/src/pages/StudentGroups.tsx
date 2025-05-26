@@ -675,6 +675,20 @@ export default function StudentGroups() {
                   </SelectContent>
                 </Select>
               </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="academicYear" className="text-xs font-medium text-gray-700">
+                  Schooljaar <span className="text-red-500">*</span>
+                </Label>
+                <Input 
+                  id="academicYear" 
+                  placeholder="2024-2025" 
+                  className="h-8 text-sm"
+                  value={newClass.academicYear}
+                  onChange={(e) => setNewClass({...newClass, academicYear: e.target.value})}
+                  required
+                />
+              </div>
             </div>
             
             <div className="mt-4 space-y-2">
@@ -953,6 +967,20 @@ export default function StudentGroups() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-gray-700">
+                  Schooljaar <span className="text-red-500">*</span>
+                </Label>
+                <Input 
+                  name="academicYear"
+                  placeholder="2024-2025" 
+                  className="h-8 text-sm"
+                  value={editFormData.academicYear || ''}
+                  onChange={handleEditInputChange}
+                  required
+                />
               </div>
             </div>
             

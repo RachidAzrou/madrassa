@@ -632,15 +632,16 @@ export default function StudentGroups() {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="location" className="text-xs font-medium text-gray-700">
-                  Locatie van de klas
+                <Label htmlFor="academicYear" className="text-xs font-medium text-gray-700">
+                  Schooljaar <span className="text-red-500">*</span>
                 </Label>
                 <Input 
-                  id="location" 
-                  placeholder="Bijv. Lokaal 101, Gebouw A" 
+                  id="academicYear" 
+                  placeholder="2024-2025" 
                   className="h-8 text-sm"
-                  value={newClass.location}
-                  onChange={(e) => setNewClass({...newClass, location: e.target.value})}
+                  value={newClass.academicYear}
+                  onChange={(e) => setNewClass({...newClass, academicYear: e.target.value})}
+                  required
                 />
               </div>
               
@@ -656,6 +657,69 @@ export default function StudentGroups() {
                   value={newClass.maxCapacity}
                   onChange={(e) => setNewClass({...newClass, maxCapacity: e.target.value})}
                 />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="location" className="text-xs font-medium text-gray-700">
+                  Locatie van de klas
+                </Label>
+                <Input 
+                  id="location" 
+                  placeholder="Bijv. Lokaal 101, Gebouw A" 
+                  className="h-8 text-sm"
+                  value={newClass.location}
+                  onChange={(e) => setNewClass({...newClass, location: e.target.value})}
+                />
+              </div>
+            </div>
+            
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-gray-700">Vakken</Label>
+                <div className="space-y-2">
+                  {/* Dropdown voor beschikbare vakken */}
+                  <Select value="" onValueChange={(value) => addSubjectToNewClass(parseInt(value))}>
+                    <SelectTrigger className="h-8 text-sm border-gray-300">
+                      <SelectValue placeholder="Selecteer een vak om toe te voegen" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {courses.filter(course => !newClass.subjects.includes(course.id)).map((course: any) => (
+                        <SelectItem key={course.id} value={course.id.toString()}>
+                          {course.name} ({course.code})
+                        </SelectItem>
+                      ))}
+                      {courses.filter(course => !newClass.subjects.includes(course.id)).length === 0 && (
+                        <SelectItem value="none" disabled>Alle vakken zijn al toegevoegd</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  
+                  {/* Geselecteerde vakken tonen */}
+                  {newClass.subjects.length > 0 && (
+                    <div className="space-y-1">
+                      <Label className="text-xs font-medium text-gray-500">Geselecteerde vakken:</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {newClass.subjects.map((subjectId) => {
+                          const course = courses.find((c: any) => c.id === subjectId);
+                          return course ? (
+                            <div key={subjectId} className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-sm text-xs">
+                              <span>{course.name}</span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeSubjectFromNewClass(subjectId)}
+                                className="h-4 w-4 p-0 hover:bg-blue-100"
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ) : null;
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div className="space-y-2">
@@ -675,69 +739,8 @@ export default function StudentGroups() {
                   </SelectContent>
                 </Select>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="academicYear" className="text-xs font-medium text-gray-700">
-                  Schooljaar <span className="text-red-500">*</span>
-                </Label>
-                <Input 
-                  id="academicYear" 
-                  placeholder="2024-2025" 
-                  className="h-8 text-sm"
-                  value={newClass.academicYear}
-                  onChange={(e) => setNewClass({...newClass, academicYear: e.target.value})}
-                  required
-                />
-              </div>
             </div>
-            
-            <div className="mt-4 space-y-2">
-              <Label className="text-xs font-medium text-gray-700">Vakken</Label>
-              <div className="space-y-2">
-                {/* Dropdown voor beschikbare vakken */}
-                <Select value="" onValueChange={(value) => addSubjectToNewClass(parseInt(value))}>
-                  <SelectTrigger className="h-8 text-sm border-gray-300">
-                    <SelectValue placeholder="Selecteer een vak om toe te voegen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {courses.filter(course => !newClass.subjects.includes(course.id)).map((course: any) => (
-                      <SelectItem key={course.id} value={course.id.toString()}>
-                        {course.name} ({course.code})
-                      </SelectItem>
-                    ))}
-                    {courses.filter(course => !newClass.subjects.includes(course.id)).length === 0 && (
-                      <SelectItem value="none" disabled>Alle vakken zijn al toegevoegd</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-                
-                {/* Geselecteerde vakken tonen */}
-                {newClass.subjects.length > 0 && (
-                  <div className="space-y-1">
-                    <Label className="text-xs font-medium text-gray-500">Geselecteerde vakken:</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {newClass.subjects.map((subjectId) => {
-                        const course = courses.find((c: any) => c.id === subjectId);
-                        return course ? (
-                          <div key={subjectId} className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-sm text-xs">
-                            <span>{course.name}</span>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeSubjectFromNewClass(subjectId)}
-                              className="h-4 w-4 p-0 hover:bg-blue-100"
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ) : null;
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+
             
             <div className="mt-4 space-y-2">
               <Label htmlFor="prerequisites" className="text-xs font-medium text-gray-700">
@@ -928,13 +931,16 @@ export default function StudentGroups() {
               </div>
               
               <div className="space-y-2">
-                <Label className="text-xs font-medium text-gray-700">Locatie</Label>
+                <Label className="text-xs font-medium text-gray-700">
+                  Schooljaar <span className="text-red-500">*</span>
+                </Label>
                 <Input 
-                  name="location"
-                  placeholder="Lokaal of gebouw" 
+                  name="academicYear"
+                  placeholder="2024-2025" 
                   className="h-8 text-sm"
-                  value={editFormData.location || ''}
+                  value={editFormData.academicYear || ''}
                   onChange={handleEditInputChange}
+                  required
                 />
               </div>
               
@@ -948,6 +954,27 @@ export default function StudentGroups() {
                   value={editFormData.maxCapacity || ''}
                   onChange={(e) => setEditFormData(prev => ({ ...prev, maxCapacity: parseInt(e.target.value) || undefined }))}
                 />
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-gray-700">Locatie</Label>
+                <Input 
+                  name="location"
+                  placeholder="Lokaal of gebouw" 
+                  className="h-8 text-sm"
+                  value={editFormData.location || ''}
+                  onChange={handleEditInputChange}
+                />
+              </div>
+            </div>
+            
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-gray-700">Vakken</Label>
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-500">Voeg vakken toe aan deze klas</p>
+                  <div className="text-sm text-gray-500">Voor het bewerken van vakken ga naar de vakken sectie in de navigatie.</div>
+                </div>
               </div>
               
               <div className="space-y-2">
@@ -967,20 +994,6 @@ export default function StudentGroups() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-gray-700">
-                  Schooljaar <span className="text-red-500">*</span>
-                </Label>
-                <Input 
-                  name="academicYear"
-                  placeholder="2024-2025" 
-                  className="h-8 text-sm"
-                  value={editFormData.academicYear || ''}
-                  onChange={handleEditInputChange}
-                  required
-                />
               </div>
             </div>
             

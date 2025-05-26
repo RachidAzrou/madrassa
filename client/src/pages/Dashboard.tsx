@@ -298,69 +298,72 @@ export default function Dashboard() {
               </Button>
             </div>
           ) : (
-            <div className="p-0">
-              <table className="w-full text-xs border-collapse">
-                <thead>
-                  <tr className="bg-[#f7f9fc] border-t border-b border-[#e5e7eb]">
-                    <th className="py-1.5 px-4 text-left font-medium text-gray-500 w-1/5">Klas</th>
-                    <th className="py-1.5 px-4 text-left font-medium text-gray-500 w-3/5">Bezetting</th>
-                    <th className="py-1.5 px-4 text-right font-medium text-gray-500 w-1/5">Aantal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {chartData.map((item, index) => {
-                    // Gebruik de huisstijl kleuren
-                    const barColor = item.percentageFilled < 0.5 
-                      ? 'bg-blue-400' 
-                      : item.percentageFilled < 0.75 
-                        ? 'bg-[#1e3a8a]' 
-                        : 'bg-[#1e40af]';
+            <div className="p-4 space-y-4">
+              {chartData.map((item, index) => {
+                // Gebruik de huisstijl kleuren
+                const getStatusColor = (percentage: number) => {
+                  if (percentage < 0.5) return { bg: 'bg-yellow-100', border: 'border-yellow-200', text: 'text-yellow-800', bar: 'bg-yellow-500' };
+                  if (percentage < 0.75) return { bg: 'bg-blue-100', border: 'border-blue-200', text: 'text-blue-800', bar: 'bg-blue-500' };
+                  if (percentage < 0.9) return { bg: 'bg-green-100', border: 'border-green-200', text: 'text-green-800', bar: 'bg-green-500' };
+                  return { bg: 'bg-red-100', border: 'border-red-200', text: 'text-red-800', bar: 'bg-red-500' };
+                };
+
+                const getStatusLabel = (percentage: number) => {
+                  if (percentage < 0.5) return 'Lage bezetting';
+                  if (percentage < 0.75) return 'Gemiddelde bezetting';
+                  if (percentage < 0.9) return 'Goede bezetting';
+                  return 'Vol';
+                };
+
+                const colors = getStatusColor(item.percentageFilled);
+                const statusLabel = getStatusLabel(item.percentageFilled);
+                const barWidth = `${Math.max(3, Math.min(100, item.percentageFilled * 100))}%`;
+                
+                return (
+                  <div key={index} className="bg-white border border-[#e5e7eb] rounded-lg p-4 hover:shadow-sm transition-shadow">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-10 h-10 bg-[#f0f4ff] border border-[#e5e7eb] rounded-lg">
+                          <ChalkBoard className="h-5 w-5 text-[#1e40af]" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-900">{item.name}</h4>
+                          <p className="text-xs text-gray-500">{item.count} van {item.maxCapacity} studenten</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${colors.bg} ${colors.border} ${colors.text}`}>
+                          {statusLabel}
+                        </span>
+                      </div>
+                    </div>
                     
-                    // Bereken breedte voor de balk
-                    const barWidth = `${Math.max(3, Math.min(100, item.percentageFilled * 100))}%`;
-                    
-                    return (
-                      <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#f9fafc]'} hover:bg-gray-50`}>
-                        <td className="py-1.5 px-4 text-left font-medium text-gray-700">{item.name}</td>
-                        <td className="py-1.5 px-4">
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 h-5 bg-[#f0f0f0] rounded-none overflow-hidden relative">
-                              <div 
-                                className={`absolute top-0 left-0 h-full ${barColor}`} 
-                                style={{ width: barWidth }}>
-                              </div>
-                            </div>
-                            <span className="text-[10px] text-gray-500 w-8 text-right">
-                              {Math.round(item.percentageFilled * 100)}%
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-1.5 px-4 text-right text-gray-700 font-medium">
-                          {item.count}/{item.maxCapacity}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-500">Bezetting</span>
+                        <span className="font-medium text-gray-700">{Math.round(item.percentageFilled * 100)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                        <div 
+                          className={`h-full ${colors.bar} rounded-full transition-all duration-500 ease-out`}
+                          style={{ width: barWidth }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
               
-              {/* Totalen en legenda (footer) */}
-              <div className="flex items-center justify-between px-4 py-2 border-t border-[#e5e7eb] bg-[#f9fafc] text-[10px] text-gray-500">
-                <div>
-                  Totaal: {stats.totalStudents} studenten verdeeld over {stats.studentGroups} klassen
-                </div>
-                <div className="flex gap-3">
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-blue-400 mr-1"></div>
-                    <span>&lt;50%</span>
+              {/* Samenvatting */}
+              <div className="bg-[#f9fafc] border border-[#e5e7eb] rounded-lg p-4 mt-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-[#1e40af]" />
+                    <span className="text-xs font-medium text-gray-700">Totaal overzicht</span>
                   </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-[#1e3a8a] mr-1"></div>
-                    <span>50-75%</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-[#1e40af] mr-1"></div>
-                    <span>&gt;75%</span>
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-gray-900">{stats.totalStudents} studenten</div>
+                    <div className="text-xs text-gray-500">{stats.studentGroups} klassen</div>
                   </div>
                 </div>
               </div>
@@ -430,11 +433,6 @@ export default function Dashboard() {
             
             {/* Events for selected day - Desktop app stijl evenementenrooster */}
             <div className="p-3">
-              <div className="mb-3">
-                <h4 className="text-xs font-medium text-gray-700">
-                  Evenementen voor {format(selectedDate, 'EEEE d MMMM yyyy', { locale: nl })}
-                </h4>
-              </div>
               {isEventsLoading ? (
                 <div className="h-24 flex items-center justify-center">
                   <div className="w-5 h-5 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>

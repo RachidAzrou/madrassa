@@ -728,39 +728,67 @@ export default function Teachers() {
                 {/* Foto en verificatie sectie */}
                 <div className="mb-6 pb-6 border-b border-gray-200">
                   <h4 className="text-sm font-medium text-gray-900 mb-4">Foto & Verificatie</h4>
-                  <div className="flex gap-4 justify-between">
-                    <div 
-                      className="w-32 h-32 rounded-md border border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:bg-gray-100 transition-colors"
-                      onClick={() => document.getElementById('photo-upload')?.click()}
-                    >
-                      {newTeacher.photoUrl ? (
-                        <img src={newTeacher.photoUrl} alt="Docent foto" className="w-full h-full object-cover" />
-                      ) : (
-                        <Camera className="h-12 w-12 text-gray-400" />
-                      )}
-                    </div>
-                    <div className="flex flex-col gap-2 justify-center items-end">
-                      <button 
-                        type="button" 
-                        className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                        onClick={() => {
-                          alert("BeID functionaliteit wordt binnenkort toegevoegd.");
-                        }}
+                  <div className="flex flex-col md:flex-row gap-6 items-start">
+                    {/* Foto upload sectie */}
+                    <div className="flex flex-col items-center space-y-3">
+                      <div 
+                        className="w-32 h-32 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 group"
+                        onClick={() => document.getElementById('photo-upload')?.click()}
                       >
-                        <img src="/images/beid-logo.png" alt="eID" className="h-5" />
-                        <span className="text-xs font-medium text-gray-700">eID</span>
-                      </button>
-                      <button 
-                        type="button" 
-                        className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                        onClick={() => {
-                          alert("itsme® functionaliteit wordt binnenkort toegevoegd.");
-                        }}
-                      >
-                        <img src="/images/itsme-logo.jpeg" alt="itsme" className="h-5" />
-                        <span className="text-xs font-medium">itsme</span>
-                      </button>
+                        {newTeacher.photoUrl ? (
+                          <>
+                            <img src={newTeacher.photoUrl} alt="Docent foto" className="w-full h-full object-cover rounded-lg" />
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center rounded-lg">
+                              <Camera className="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex flex-col items-center space-y-2">
+                            <Camera className="h-8 w-8 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                            <span className="text-xs text-gray-500 text-center">Klik om foto<br />te uploaden</span>
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500 text-center">JPG, PNG max 5MB</span>
                     </div>
+                    
+                    {/* Verificatie knoppen */}
+                    <div className="flex-1">
+                      <h5 className="text-xs font-medium text-gray-700 mb-3">Identiteit verificatie</h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button 
+                          type="button" 
+                          className="flex items-center justify-center gap-3 p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 group"
+                          onClick={() => {
+                            alert("BeID functionaliteit wordt binnenkort toegevoegd.");
+                          }}
+                        >
+                          <img src="/images/beid-logo.png" alt="eID" className="h-6 w-6" />
+                          <div className="text-left">
+                            <div className="text-sm font-medium text-gray-900">eID</div>
+                            <div className="text-xs text-gray-500">Belgische identiteitskaart</div>
+                          </div>
+                        </button>
+                        
+                        <button 
+                          type="button" 
+                          className="flex items-center justify-center gap-3 p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 group"
+                          onClick={() => {
+                            alert("itsme® functionaliteit wordt binnenkort toegevoegd.");
+                          }}
+                        >
+                          <img src="/images/itsme-logo.jpeg" alt="itsme" className="h-6 w-6 rounded" />
+                          <div className="text-left">
+                            <div className="text-sm font-medium text-gray-900">itsme®</div>
+                            <div className="text-xs text-gray-500">Digitale identiteit</div>
+                          </div>
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-3">
+                        Gebruik een van bovenstaande methoden om gegevens automatisch in te vullen
+                      </p>
+                    </div>
+                    
                     <input
                       id="photo-upload"
                       type="file"
@@ -1300,39 +1328,67 @@ export default function Teachers() {
                   {/* Foto en verificatie sectie */}
                   <div className="mb-6 pb-6 border-b border-gray-200">
                     <h4 className="text-sm font-medium text-gray-900 mb-4">Foto & Verificatie</h4>
-                    <div className="flex gap-4 justify-between">
-                      <div 
-                        className="w-32 h-32 rounded-md border border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:bg-gray-100 transition-colors"
-                        onClick={() => document.getElementById('new-photo-upload')?.click()}
-                      >
-                        {newTeacher.photoUrl ? (
-                          <img src={newTeacher.photoUrl} alt="Docent foto" className="w-full h-full object-cover" />
-                        ) : (
-                          <Camera className="h-12 w-12 text-gray-400" />
-                        )}
-                      </div>
-                      <div className="flex flex-col gap-2 justify-center items-end">
-                        <button 
-                          type="button" 
-                          className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                          onClick={() => {
-                            alert("BeID functionaliteit wordt binnenkort toegevoegd.");
-                          }}
+                    <div className="flex flex-col md:flex-row gap-6 items-start">
+                      {/* Foto upload sectie */}
+                      <div className="flex flex-col items-center space-y-3">
+                        <div 
+                          className="w-32 h-32 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 group"
+                          onClick={() => document.getElementById('new-photo-upload')?.click()}
                         >
-                          <img src="/images/beid-logo.png" alt="eID" className="h-5" />
-                          <span className="text-xs font-medium text-gray-700">eID</span>
-                        </button>
-                        <button 
-                          type="button" 
-                          className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                          onClick={() => {
-                            alert("itsme® functionaliteit wordt binnenkort toegevoegd.");
-                          }}
-                        >
-                          <img src="/images/itsme-logo.jpeg" alt="itsme" className="h-5" />
-                          <span className="text-xs font-medium">itsme</span>
-                        </button>
+                          {newTeacher.photoUrl ? (
+                            <>
+                              <img src={newTeacher.photoUrl} alt="Docent foto" className="w-full h-full object-cover rounded-lg" />
+                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center rounded-lg">
+                                <Camera className="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex flex-col items-center space-y-2">
+                              <Camera className="h-8 w-8 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                              <span className="text-xs text-gray-500 text-center">Klik om foto<br />te uploaden</span>
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-500 text-center">JPG, PNG max 5MB</span>
                       </div>
+                      
+                      {/* Verificatie knoppen */}
+                      <div className="flex-1">
+                        <h5 className="text-xs font-medium text-gray-700 mb-3">Identiteit verificatie</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <button 
+                            type="button" 
+                            className="flex items-center justify-center gap-3 p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 group"
+                            onClick={() => {
+                              alert("BeID functionaliteit wordt binnenkort toegevoegd.");
+                            }}
+                          >
+                            <img src="/images/beid-logo.png" alt="eID" className="h-6 w-6" />
+                            <div className="text-left">
+                              <div className="text-sm font-medium text-gray-900">eID</div>
+                              <div className="text-xs text-gray-500">Belgische identiteitskaart</div>
+                            </div>
+                          </button>
+                          
+                          <button 
+                            type="button" 
+                            className="flex items-center justify-center gap-3 p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 group"
+                            onClick={() => {
+                              alert("itsme® functionaliteit wordt binnenkort toegevoegd.");
+                            }}
+                          >
+                            <img src="/images/itsme-logo.jpeg" alt="itsme" className="h-6 w-6 rounded" />
+                            <div className="text-left">
+                              <div className="text-sm font-medium text-gray-900">itsme®</div>
+                              <div className="text-xs text-gray-500">Digitale identiteit</div>
+                            </div>
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-3">
+                          Gebruik een van bovenstaande methoden om gegevens automatisch in te vullen
+                        </p>
+                      </div>
+                      
                       <input
                         id="new-photo-upload"
                         type="file"

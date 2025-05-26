@@ -118,25 +118,7 @@ export default function Calendar() {
     setIsEventDetailDialogOpen(true);
   };
 
-  const handleDeleteEvent = (event: CalendarEvent) => {
-    if (event.id) {
-      // Remove from localStorage for local events
-      if (event.id.startsWith('local-')) {
-        const savedEvents = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
-        const updatedEvents = savedEvents.filter((e: CalendarEvent) => e.id !== event.id);
-        localStorage.setItem('calendarEvents', JSON.stringify(updatedEvents));
-        
-        // Trigger a refetch to update the UI
-        queryClient.invalidateQueries({ queryKey: ['/api/calendar/events'] });
-      } else {
-        // For backend events, use the delete mutation
-        deleteEventMutation.mutate(event.id);
-      }
-      
-      setIsEventDetailDialogOpen(false);
-      setSelectedEvent(null);
-    }
-  };
+
 
   // Get month name, year - in Dutch
   const monthNames = ["Januari", "Februari", "Maart", "April", "Mei", "Juni", 
@@ -347,6 +329,50 @@ export default function Calendar() {
       });
     }
   });
+
+  // Mutation voor het verwijderen van een event
+  const deleteEventMutation = useMutation({
+    mutationFn: (eventId: string) => {
+      return apiRequest(`/api/calendar/events/${eventId}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/calendar/events'] });
+      toast({
+        title: "Evenement verwijderd",
+        description: "Het evenement is succesvol verwijderd uit de kalender.",
+        variant: "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout bij verwijderen",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van het evenement.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleDeleteEvent = (event: CalendarEvent) => {
+    if (event.id) {
+      // Remove from localStorage for local events
+      if (event.id.startsWith('local-')) {
+        const savedEvents = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+        const updatedEvents = savedEvents.filter((e: CalendarEvent) => e.id !== event.id);
+        localStorage.setItem('calendarEvents', JSON.stringify(updatedEvents));
+        
+        // Trigger a refetch to update the UI
+        queryClient.invalidateQueries({ queryKey: ['/api/calendar/events'] });
+      } else {
+        // For backend events, use the delete mutation
+        deleteEventMutation.mutate(event.id);
+      }
+      
+      setIsEventDetailDialogOpen(false);
+      setSelectedEvent(null);
+    }
+  };
 
   const handleAddEvent = () => {
     // Open dialoogvenster
@@ -1132,7 +1158,7 @@ export default function Calendar() {
               <p id="dialog-description">Details for calendar event</p>
             </div>
             <div 
-              className="p-4 rounded-lg border-l-4 backdrop-blur-sm transition-all duration-300 transform"
+              className="relative p-4 rounded-lg border-l-4 backdrop-blur-sm transition-all duration-300 transform"
               style={{
                 backgroundColor: getEventColors(selectedEvent.type).bgColor + '20',
                 borderLeftColor: getEventColors(selectedEvent.type).borderColor,

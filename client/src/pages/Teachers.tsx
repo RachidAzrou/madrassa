@@ -1236,98 +1236,23 @@ export default function Teachers() {
                   </div>
                 </div>
 
-                {/* Vakken en Klassen */}
-                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-4 sm:px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                      <BookOpen className="h-5 w-5 mr-2 text-green-600" />
-                      Vakken & Klassen
-                    </h3>
-                  </div>
-                  <div className="p-4 sm:p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium text-blue-900">Arabisch - Basis</h4>
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-200 text-blue-800">
-                            Actief
-                          </span>
-                        </div>
-                        <p className="text-sm text-blue-700">3 klassen • 45 leerlingen</p>
-                        <p className="text-xs text-blue-600 mt-1">Ma, Wo, Za</p>
-                      </div>
-                      
-                      <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium text-purple-900">Islamitische Studies</h4>
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-200 text-purple-800">
-                            Actief
-                          </span>
-                        </div>
-                        <p className="text-sm text-purple-700">2 klassen • 30 leerlingen</p>
-                        <p className="text-xs text-purple-600 mt-1">Za, Zo</p>
-                      </div>
-                      
-                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200 opacity-75">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium text-gray-600">Geen andere vakken</h4>
-                        </div>
-                        <p className="text-sm text-gray-500">Voeg meer vakken toe via bewerken</p>
+                {/* Extra Informatie */}
+                {selectedTeacher.specialty && (
+                  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-4 sm:px-6 py-4 border-b border-gray-200">
+                      <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                        <BookOpen className="h-5 w-5 mr-2 text-green-600" />
+                        Aanvullende Informatie
+                      </h3>
+                    </div>
+                    <div className="p-4 sm:p-6">
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900 mb-2">Specialisatie</h4>
+                        <p className="text-sm text-gray-700">{selectedTeacher.specialty}</p>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Rooster Overzicht */}
-                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                  <div className="bg-gradient-to-r from-orange-50 to-amber-50 px-4 sm:px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                      <BookOpen className="h-5 w-5 mr-2 text-orange-600" />
-                      Wekelijks Rooster
-                    </h3>
-                  </div>
-                  <div className="p-4 sm:p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <div className="space-y-3">
-                        <h4 className="font-medium text-gray-900 border-b border-gray-200 pb-2">Maandag</h4>
-                        <div className="bg-gray-50 rounded-lg p-3">
-                          <p className="text-sm text-gray-500">Geen lessen ingepland</p>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <h4 className="font-medium text-gray-900 border-b border-gray-200 pb-2">Woensdag</h4>
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="text-sm font-medium text-blue-900">16:00 - 17:30</p>
-                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Lokaal 3</span>
-                          </div>
-                          <p className="text-sm text-blue-700">Arabisch - Basis</p>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <h4 className="font-medium text-gray-900 border-b border-gray-200 pb-2">Zaterdag</h4>
-                        <div className="space-y-2">
-                          <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                            <div className="flex items-center justify-between mb-1">
-                              <p className="text-sm font-medium text-purple-900">10:00 - 11:30</p>
-                              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">Lokaal 1</span>
-                            </div>
-                            <p className="text-sm text-purple-700">Islamitische Studies</p>
-                          </div>
-                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                            <div className="flex items-center justify-between mb-1">
-                              <p className="text-sm font-medium text-blue-900">12:00 - 13:30</p>
-                              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Lokaal 3</span>
-                            </div>
-                            <p className="text-sm text-blue-700">Arabisch - Basis</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           )}

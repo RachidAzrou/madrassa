@@ -2008,6 +2008,15 @@ export default function Students() {
         onConfirm={confirmDeleteStudent}
         title="Student verwijderen"
         description={`Weet je zeker dat je ${studentToDelete?.firstName} ${studentToDelete?.lastName} wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
+        item={studentToDelete ? {
+          name: `${studentToDelete.firstName} ${studentToDelete.lastName}`,
+          id: studentToDelete.studentId,
+          photoUrl: studentToDelete.photoUrl,
+          initials: `${studentToDelete.firstName?.charAt(0)}${studentToDelete.lastName?.charAt(0)}`
+        } : undefined}
+        warningText="Let op: Als je deze student verwijdert, worden ook alle gekoppelde gegevens zoals voogden, inschrijvingen en rapporten permanent verwijderd."
+        confirmButtonText="Verwijderen"
+        cancelButtonText="Annuleren"
       />
 
       {/* Add Guardian Dialog */}

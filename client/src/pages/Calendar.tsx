@@ -78,12 +78,37 @@ export default function Calendar() {
     courseName: '',
     classId: '',
     className: '',
+    teacherId: '',
+    teacherName: '',
     isRecurring: false,
     recurrencePattern: 'weekly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
     recurrenceEndDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0] // 3 maanden vooruit als standaard
   });
   
   const [activeTab, setActiveTab] = useState<'exam' | 'class' | 'holiday' | 'event'>('event');
+
+  // Functie om alle velden te resetten
+  const resetEventForm = () => {
+    setNewEvent({
+      title: '',
+      date: new Date().toISOString().split('T')[0],
+      startTime: '09:00',
+      endTime: '10:00',
+      location: '',
+      type: 'event' as 'exam' | 'class' | 'holiday' | 'event',
+      description: '',
+      courseId: '',
+      courseName: '',
+      classId: '',
+      className: '',
+      teacherId: '',
+      teacherName: '',
+      isRecurring: false,
+      recurrencePattern: 'weekly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
+      recurrenceEndDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0]
+    });
+    setActiveTab('event');
+  };
 
   // Get month name, year - in Dutch
   const monthNames = ["Januari", "Februari", "Maart", "April", "Mei", "Juni", 
@@ -238,23 +263,7 @@ export default function Calendar() {
       });
       
       // Reset form and close dialog
-      setNewEvent({
-        title: '',
-        date: new Date().toISOString().split('T')[0],
-        startTime: '09:00',
-        endTime: '10:00',
-        location: '',
-        type: 'event',
-        description: '',
-        courseId: '',
-        courseName: '',
-        classId: '',
-        className: '',
-        isRecurring: false,
-        recurrencePattern: 'weekly' as 'daily' | 'weekly' | 'monthly' | 'yearly',
-        recurrenceEndDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0]
-      });
-      setActiveTab('event');
+      resetEventForm();
       setIsAddEventDialogOpen(false);
       
       // Toon succesmelding
@@ -665,7 +674,16 @@ export default function Calendar() {
       </div>
       
       {/* Add Event Dialog */}
-      <CustomDialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen} maxWidth="600px">
+      <CustomDialog 
+        open={isAddEventDialogOpen} 
+        onOpenChange={(open) => {
+          if (!open) {
+            resetEventForm();
+          }
+          setIsAddEventDialogOpen(open);
+        }} 
+        maxWidth="600px"
+      >
         <DialogHeaderWithIcon 
           title="Evenement Toevoegen"
           description="Voeg een nieuw evenement toe aan de rooster"
@@ -963,14 +981,20 @@ export default function Calendar() {
         </DialogFormContainer>
 
         <DialogFooterContainer 
-          onCancel={() => setIsAddEventDialogOpen(false)}
+          onCancel={() => {
+            resetEventForm();
+            setIsAddEventDialogOpen(false);
+          }}
           cancelText="Annuleren"
           submitText={createEventMutation.isPending ? "Toevoegen..." : "Toevoegen"}
         >
           <Button 
             type="button" 
             variant="outline" 
-            onClick={() => setIsAddEventDialogOpen(false)}
+            onClick={() => {
+              resetEventForm();
+              setIsAddEventDialogOpen(false);
+            }}
             className="w-full sm:w-auto mt-2 sm:mt-0"
           >
             Annuleren

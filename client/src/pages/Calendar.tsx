@@ -3,12 +3,21 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, 
   FilePlus, GraduationCap, Palmtree, PartyPopper, Pencil, BookOpen, Timer,
-  MapPin, Clock, Search, XCircle
+  MapPin, Clock, Search, XCircle, FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { apiRequest, queryClient } from '@/lib/queryClient';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { 
+  CustomDialog, 
+  DialogHeaderWithIcon, 
+  DialogFormContainer, 
+  DialogFooterContainer,
+  SectionContainer,
+  FormLabel,
+  StyledSelect,
+  StyledSelectItem
+} from "@/components/ui/custom-dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -656,21 +665,22 @@ export default function Calendar() {
       </div>
       
       {/* Add Event Dialog */}
-      <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Evenement Toevoegen</DialogTitle>
-            <DialogDescription>
-              Voeg een nieuw evenement toe aan de kalender.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex border-b mb-4">
+      <CustomDialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen} maxWidth="600px">
+        <DialogHeaderWithIcon 
+          title="Evenement Toevoegen"
+          description="Voeg een nieuw evenement toe aan de rooster"
+          icon={<Plus className="h-5 w-5" />}
+        />
+        
+        <DialogFormContainer onSubmit={handleSubmitEvent}>
+          {/* Tab Navigation */}
+          <div className="flex border-b mb-6">
             <button
               className={`px-3 py-2 text-sm font-medium border-b-2 ${
                 activeTab === 'event' ? 'border-[#1e40af] text-[#1e40af]' : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
               onClick={() => handleTabChange('event')}
+              type="button"
             >
               <div className="flex items-center">
                 <PartyPopper className="mr-2 h-4 w-4" />
@@ -682,6 +692,7 @@ export default function Calendar() {
                 activeTab === 'class' ? 'border-[#1e40af] text-[#1e40af]' : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
               onClick={() => handleTabChange('class')}
+              type="button"
             >
               <div className="flex items-center">
                 <BookOpen className="mr-2 h-4 w-4" />
@@ -693,6 +704,7 @@ export default function Calendar() {
                 activeTab === 'exam' ? 'border-[#1e40af] text-[#1e40af]' : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
               onClick={() => handleTabChange('exam')}
+              type="button"
             >
               <div className="flex items-center">
                 <FilePlus className="mr-2 h-4 w-4" />
@@ -704,6 +716,7 @@ export default function Calendar() {
                 activeTab === 'holiday' ? 'border-[#1e40af] text-[#1e40af]' : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
               onClick={() => handleTabChange('holiday')}
+              type="button"
             >
               <div className="flex items-center">
                 <Palmtree className="mr-2 h-4 w-4" />
@@ -711,216 +724,201 @@ export default function Calendar() {
               </div>
             </button>
           </div>
-          
-          <form onSubmit={handleSubmitEvent}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="title" className="text-right">
-                  Titel
-                </Label>
-                <Input
-                  id="title"
-                  value={newEvent.title}
-                  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                  className="col-span-3"
-                />
+
+          {/* Basis Informatie */}
+          <SectionContainer title="Basis Informatie" icon={<Timer className="h-4 w-4" />}>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <FormLabel htmlFor="title">Titel</FormLabel>
+                  <Input
+                    id="title"
+                    value={newEvent.title}
+                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                    className="mt-1"
+                    required
+                  />
+                </div>
+                <div>
+                  <FormLabel htmlFor="location">Locatie</FormLabel>
+                  <Input
+                    id="location"
+                    value={newEvent.location}
+                    onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
               </div>
               
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="date" className="text-right">
-                  Datum
-                </Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={newEvent.date}
-                  onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
-                  className="col-span-3"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <FormLabel htmlFor="date">Datum</FormLabel>
+                  <Input
+                    id="date"
+                    type="date"
+                    value={newEvent.date}
+                    onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                    className="mt-1"
+                    required
+                  />
+                </div>
+                <div>
+                  <FormLabel htmlFor="startTime">Starttijd</FormLabel>
+                  <Input
+                    id="startTime"
+                    type="time"
+                    value={newEvent.startTime}
+                    onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
+                    className="mt-1"
+                    required
+                  />
+                </div>
+                <div>
+                  <FormLabel htmlFor="endTime">Eindtijd</FormLabel>
+                  <Input
+                    id="endTime"
+                    type="time"
+                    value={newEvent.endTime}
+                    onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
+                    className="mt-1"
+                    required
+                  />
+                </div>
               </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="startTime" className="text-right">
-                  Starttijd
-                </Label>
-                <Input
-                  id="startTime"
-                  type="time"
-                  value={newEvent.startTime}
-                  onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
-                  className="col-span-3"
-                />
+            </div>
+          </SectionContainer>
+
+          {/* Onderwijs Details (alleen voor les en examen) */}
+          {(activeTab === 'class' || activeTab === 'exam') && (
+            <SectionContainer title="Onderwijs Details" icon={<GraduationCap className="h-4 w-4" />} className="mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <FormLabel htmlFor="courseId">Vak</FormLabel>
+                  <StyledSelect 
+                    value={newEvent.courseId || ""} 
+                    onValueChange={(value) => setNewEvent({ 
+                      ...newEvent, 
+                      courseId: value,
+                      courseName: "Vak Naam"
+                    })}
+                    placeholder="Selecteer een vak"
+                    className="mt-1"
+                  >
+                    <StyledSelectItem value="1">Arabisch</StyledSelectItem>
+                    <StyledSelectItem value="2">Islamitische Geschiedenis</StyledSelectItem>
+                    <StyledSelectItem value="3">Koran Memorisatie</StyledSelectItem>
+                  </StyledSelect>
+                </div>
+                
+                <div>
+                  <FormLabel htmlFor="classId">Klas</FormLabel>
+                  <StyledSelect 
+                    value={newEvent.classId || ""} 
+                    onValueChange={(value) => setNewEvent({ 
+                      ...newEvent, 
+                      classId: value,
+                      className: "Klas Naam"
+                    })}
+                    placeholder="Selecteer een klas"
+                    className="mt-1"
+                  >
+                    <StyledSelectItem value="1">Klas 1A</StyledSelectItem>
+                    <StyledSelectItem value="2">Klas 2B</StyledSelectItem>
+                    <StyledSelectItem value="3">Klas 3C</StyledSelectItem>
+                  </StyledSelect>
+                </div>
               </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="endTime" className="text-right">
-                  Eindtijd
-                </Label>
-                <Input
-                  id="endTime"
-                  type="time"
-                  value={newEvent.endTime}
-                  onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
-                  className="col-span-3"
-                />
-              </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="location" className="text-right">
-                  Locatie
-                </Label>
-                <Input
-                  id="location"
-                  value={newEvent.location}
-                  onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-                  className="col-span-3"
-                />
-              </div>
-              
-              {(activeTab === 'class' || activeTab === 'exam') && (
-                <>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="courseId" className="text-right">
-                      Vak
-                    </Label>
-                    <Select 
-                      value={newEvent.courseId} 
-                      onValueChange={(value) => setNewEvent({ 
-                        ...newEvent, 
-                        courseId: value,
-                        courseName: "Vak Naam" // Normaal zou je dit ophalen uit je data
-                      })}
-                    >
-                      <SelectTrigger className="col-span-3">
-                        <SelectValue placeholder="Selecteer een vak" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">Arabisch</SelectItem>
-                        <SelectItem value="2">Islamitische Geschiedenis</SelectItem>
-                        <SelectItem value="3">Koran Memorisatie</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="classId" className="text-right">
-                      Klas
-                    </Label>
-                    <Select 
-                      value={newEvent.classId} 
-                      onValueChange={(value) => setNewEvent({ 
-                        ...newEvent, 
-                        classId: value,
-                        className: "Klas Naam" // Normaal zou je dit ophalen uit je data
-                      })}
-                    >
-                      <SelectTrigger className="col-span-3">
-                        <SelectValue placeholder="Selecteer een klas" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">Klas 1A</SelectItem>
-                        <SelectItem value="2">Klas 2B</SelectItem>
-                        <SelectItem value="3">Klas 3C</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </>
-              )}
-              
-              <div className="grid grid-cols-4 items-start gap-4">
-                <Label htmlFor="description" className="text-right pt-2">
-                  Beschrijving
-                </Label>
+            </SectionContainer>
+          )}
+
+          {/* Aanvullende Informatie */}
+          <SectionContainer title="Aanvullende Informatie" icon={<FileText className="h-4 w-4" />} className="mt-4">
+            <div className="space-y-4">
+              <div>
+                <FormLabel htmlFor="description">Beschrijving</FormLabel>
                 <Textarea
                   id="description"
                   value={newEvent.description}
                   onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                  className="col-span-3"
-                  placeholder="Optionele beschrijving"
+                  className="mt-1"
+                  placeholder="Optionele beschrijving van het evenement"
+                  rows={3}
                 />
               </div>
               
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="recurring" className="text-right">
-                  Herhalend
-                </Label>
-                <div className="flex items-center space-x-2 col-span-3">
-                  <Switch
-                    id="recurring"
-                    checked={newEvent.isRecurring}
-                    onCheckedChange={(checked) => setNewEvent({ ...newEvent, isRecurring: checked })}
-                  />
-                  <Label htmlFor="recurring">Evenement herhalen</Label>
-                </div>
+              <div className="flex items-center space-x-3">
+                <Switch
+                  id="recurring"
+                  checked={newEvent.isRecurring}
+                  onCheckedChange={(checked) => setNewEvent({ ...newEvent, isRecurring: checked })}
+                />
+                <FormLabel htmlFor="recurring">Herhalend evenement</FormLabel>
               </div>
               
               {newEvent.isRecurring && (
-                <>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="recurrencePattern" className="text-right">
-                      Herhalingspatroon
-                    </Label>
-                    <Select 
-                      value={newEvent.recurrencePattern} 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <div>
+                    <FormLabel htmlFor="recurrencePattern">Herhalingspatroon</FormLabel>
+                    <StyledSelect 
+                      value={newEvent.recurrencePattern || ""} 
                       onValueChange={(value) => setNewEvent({ 
                         ...newEvent, 
                         recurrencePattern: value as any
                       })}
+                      placeholder="Kies een patroon"
+                      className="mt-1"
                     >
-                      <SelectTrigger className="col-span-3">
-                        <SelectValue placeholder="Kies een patroon" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="daily">Dagelijks</SelectItem>
-                        <SelectItem value="weekly">Wekelijks</SelectItem>
-                        <SelectItem value="monthly">Maandelijks</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <StyledSelectItem value="daily">Dagelijks</StyledSelectItem>
+                      <StyledSelectItem value="weekly">Wekelijks</StyledSelectItem>
+                      <StyledSelectItem value="monthly">Maandelijks</StyledSelectItem>
+                    </StyledSelect>
                   </div>
                   
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="recurrenceEndDate" className="text-right">
-                      Einddatum
-                    </Label>
+                  <div>
+                    <FormLabel htmlFor="recurrenceEndDate">Einddatum herhaling</FormLabel>
                     <Input
                       id="recurrenceEndDate"
                       type="date"
                       value={newEvent.recurrenceEndDate}
                       onChange={(e) => setNewEvent({ ...newEvent, recurrenceEndDate: e.target.value })}
-                      className="col-span-3"
+                      className="mt-1"
                     />
                   </div>
-                </>
+                </div>
               )}
             </div>
-            
-            <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setIsAddEventDialogOpen(false)}
-              >
-                Annuleren
-              </Button>
-              <Button 
-                type="submit" 
-                variant="default"
-                className="bg-[#1e40af] hover:bg-[#1e40af]/90"
-                disabled={createEventMutation.isPending}
-              >
-                {createEventMutation.isPending ? (
-                  <>
-                    <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                    Toevoegen...
-                  </>
-                ) : (
-                  'Toevoegen'
-                )}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+          </SectionContainer>
+        </DialogFormContainer>
+
+        <DialogFooterContainer 
+          onCancel={() => setIsAddEventDialogOpen(false)}
+          cancelText="Annuleren"
+          submitText={createEventMutation.isPending ? "Toevoegen..." : "Toevoegen"}
+        >
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => setIsAddEventDialogOpen(false)}
+            className="w-full sm:w-auto mt-2 sm:mt-0"
+          >
+            Annuleren
+          </Button>
+          <Button 
+            type="submit" 
+            className="bg-[#1e40af] hover:bg-[#1e40af]/90 w-full sm:w-auto"
+            disabled={createEventMutation.isPending}
+          >
+            {createEventMutation.isPending ? (
+              <>
+                <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                Toevoegen...
+              </>
+            ) : (
+              'Toevoegen'
+            )}
+          </Button>
+        </DialogFooterContainer>
+      </CustomDialog>
     </div>
   );
 }

@@ -1,19 +1,29 @@
-import { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { 
-  Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, School, 
-  Pencil, MoreVertical, Plus, GraduationCap, BookOpen, UsersRound,
-  CalendarIcon, Loader2, XCircle, Users2, X, AlertTriangle, Save
+  Search, Plus, Eye, Edit, Trash2, Users, MapPin, BookOpen, 
+  GraduationCap, Target, Filter, Download, X, Save, UserCheck
 } from 'lucide-react';
-import ManageStudentEnrollments from "@/components/student-groups/ManageStudentEnrollments";
-import { ClassEmptyState } from "@/components/ui/empty-states";
-import { PremiumHeader } from "@/components/layout/premium-header";
-// Aangepast ChalkboardTeacher icoon
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from '@/lib/queryClient';
+import { PremiumHeader } from '@/components/layout/premium-header';
+import { DeleteDialog } from '@/components/ui/delete-dialog';
+import { ExportButton } from '@/components/ui/export-button';
+import { ExportDialog } from '@/components/ui/export-dialog';
+
+// Custom icon voor klassen
 const ChalkBoard = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg" 
@@ -36,257 +46,252 @@ const ChalkBoard = (props: any) => (
     <path d="M8 8h8" />
   </svg>
 );
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Calendar } from "@/components/ui/calendar";
-import { Switch } from "@/components/ui/switch";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { apiRequest } from '@/lib/queryClient';
-import { useToast } from "@/hooks/use-toast";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+type ClassType = {
+  id: number;
+  name: string;
+  location?: string;
+  maxCapacity?: number;
+  subjects?: string[];
+  teacherId?: number;
+  teacherName?: string;
+  prerequisites?: string;
+  learningGoals?: string;
+  academicYear?: string;
+  isActive?: boolean;
+  studentCount?: number;
+};
 
 export default function StudentGroups() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [academicYear, setAcademicYear] = useState('all');
-  const [program, setProgram] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Dialog controls
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<any>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // State management
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedClasses, setSelectedClasses] = useState<number[]>([]);
+  const [selectedClass, setSelectedClass] = useState<ClassType | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showNewClassDialog, setShowNewClassDialog] = useState(false);
+  const [showViewDialog, setShowViewDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
-  // Fetch student groups with filters
-  const { data: studentGroupsData, isLoading, isError } = useQuery({
-    queryKey: ['/api/student-groups', { searchTerm, academicYear, program, page: currentPage }],
-    staleTime: 1000, // Kortere stale time om updates sneller te zien
+  // Filter states
+  const [locationFilter, setLocationFilter] = useState('');
+  const [teacherFilter, setTeacherFilter] = useState('');
+  const [academicYearFilter, setAcademicYearFilter] = useState('');
+  const [capacityFilter, setCapacityFilter] = useState('');
+
+  // Form data for new/edit class
+  const [newClass, setNewClass] = useState({
+    name: '',
+    location: '',
+    maxCapacity: '',
+    subjects: [] as string[],
+    teacherId: '',
+    prerequisites: '',
+    learningGoals: '',
+    academicYear: new Date().getFullYear().toString(),
   });
 
-  // Direct gebruik van de data uit de API response
-  const studentGroups = Array.isArray(studentGroupsData) ? studentGroupsData : [];
-  const totalStudentGroups = studentGroups.length;
-  const totalPages = Math.ceil(totalStudentGroups / 9);
+  const [editFormData, setEditFormData] = useState<Partial<ClassType>>({});
 
-  // Form validation schema
-  const studentGroupSchema = z.object({
-    name: z.string().min(2, { message: "Naam moet minimaal 2 tekens bevatten" }),
-    academicYear: z.string({ required_error: "Selecteer een academisch jaar" }),
-    programId: z.coerce.number().optional(),
-    courseId: z.coerce.number().optional(),
-    curriculum: z.string().optional(),
-    instructor: z.string().optional(),
-    notes: z.string().optional(),
-    location: z.string().optional(),
-    startTime: z.string().optional(),
-    endTime: z.string().optional(),
-    dayOfWeek: z.string().optional(),
-    maxCapacity: z.coerce.number().optional(),
-    isActive: z.boolean().default(true),
-  });
-
-  // Initialize form for add/edit
-  const form = useForm<z.infer<typeof studentGroupSchema>>({
-    resolver: zodResolver(studentGroupSchema),
-    defaultValues: {
-      name: "",
-      academicYear: new Date().getFullYear().toString(),
-      programId: undefined,
-      courseId: undefined,
-      curriculum: "",
-      instructor: "",
-      notes: "",
-      location: "",
-      startTime: "",
-      endTime: "",
-      dayOfWeek: "",
-      maxCapacity: 25,
-      isActive: true,
+  // Data queries
+  const { data: classes = [], isLoading, isError } = useQuery({
+    queryKey: ['/api/student-groups'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/student-groups');
+      return response || [];
     },
   });
 
-  // Initialize form for student enrollments
-  const [showManageEnrollments, setShowManageEnrollments] = useState(false);
-  const [selectedGroupForEnrollments, setSelectedGroupForEnrollments] = useState<any>(null);
-
-  // Fetch programs for dropdown
-  const { data: programsData } = useQuery({
-    queryKey: ['/api/programs'],
+  const { data: teachers = [] } = useQuery({
+    queryKey: ['/api/teachers'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/teachers');
+      return response || [];
+    },
   });
 
-  // Fetch courses for dropdown
-  const { data: coursesData } = useQuery({
-    queryKey: ['/api/courses'],
+  // Filter function
+  const filteredClasses = classes.filter((cls: ClassType) => {
+    const matchesSearch = !searchQuery || 
+      cls.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cls.teacherName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cls.location?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesLocation = !locationFilter || cls.location?.toLowerCase().includes(locationFilter.toLowerCase());
+    const matchesTeacher = !teacherFilter || cls.teacherName?.toLowerCase().includes(teacherFilter.toLowerCase());
+    const matchesAcademicYear = !academicYearFilter || cls.academicYear === academicYearFilter;
+    const matchesCapacity = !capacityFilter || (cls.maxCapacity && cls.maxCapacity >= parseInt(capacityFilter));
+
+    return matchesSearch && matchesLocation && matchesTeacher && matchesAcademicYear && matchesCapacity;
   });
 
-  // Fetch academic years for dropdown
-  const { data: academicYearsData } = useQuery({
-    queryKey: ['/api/academic-years'],
-  });
-
-  // Create student group mutation
-  const createStudentGroupMutation = useMutation({
-    mutationFn: (data: z.infer<typeof studentGroupSchema>) => {
-      return apiRequest('/api/student-groups', 'POST', data);
+  // Mutations
+  const createClassMutation = useMutation({
+    mutationFn: async (classData: any) => {
+      return apiRequest('/api/student-groups', 'POST', classData);
     },
     onSuccess: () => {
-      toast({
-        title: "Klas aangemaakt",
-        description: "De klas is succesvol aangemaakt.",
-      });
-      setIsAddDialogOpen(false);
-      form.reset();
+      toast({ title: "Klas aangemaakt", description: "De nieuwe klas is succesvol aangemaakt." });
+      setShowNewClassDialog(false);
+      resetNewClassForm();
       queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
     },
     onError: (error: any) => {
-      toast({
-        title: "Fout bij aanmaken",
-        description: error?.message || "Er is een fout opgetreden bij het aanmaken van de klas.",
-        variant: "destructive",
+      toast({ 
+        title: "Fout bij aanmaken", 
+        description: error?.message || "Er is een fout opgetreden.", 
+        variant: "destructive" 
       });
-    },
+    }
   });
 
-  // Update student group mutation
-  const updateStudentGroupMutation = useMutation({
-    mutationFn: (data: any) => {
-      return apiRequest(`/api/student-groups/${data.id}`, 'PUT', data);
+  const updateClassMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      return apiRequest(`/api/student-groups/${id}`, 'PUT', data);
     },
     onSuccess: () => {
-      toast({
-        title: "Klas bijgewerkt",
-        description: "De klas is succesvol bijgewerkt.",
-      });
-      setIsEditDialogOpen(false);
+      toast({ title: "Klas bijgewerkt", description: "De klas is succesvol bijgewerkt." });
+      setShowEditDialog(false);
       queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
     },
     onError: (error: any) => {
-      toast({
-        title: "Fout bij bijwerken",
-        description: error?.message || "Er is een fout opgetreden bij het bijwerken van de klas.",
-        variant: "destructive",
+      toast({ 
+        title: "Fout bij bijwerken", 
+        description: error?.message || "Er is een fout opgetreden.", 
+        variant: "destructive" 
       });
-    },
+    }
   });
 
-  // Delete student group mutation
-  const deleteStudentGroupMutation = useMutation({
-    mutationFn: (id: number) => {
+  const deleteClassMutation = useMutation({
+    mutationFn: async (id: number) => {
       return apiRequest(`/api/student-groups/${id}`, 'DELETE');
     },
     onSuccess: () => {
-      toast({
-        title: "Klas verwijderd",
-        description: "De klas is succesvol verwijderd.",
-      });
-      setIsDeleteDialogOpen(false);
+      toast({ title: "Klas verwijderd", description: "De klas is succesvol verwijderd." });
+      setShowDeleteDialog(false);
       queryClient.invalidateQueries({ queryKey: ['/api/student-groups'] });
     },
     onError: (error: any) => {
-      toast({
-        title: "Fout bij verwijderen",
-        description: error?.message || "Er is een fout opgetreden bij het verwijderen van de klas.",
-        variant: "destructive",
+      toast({ 
+        title: "Fout bij verwijderen", 
+        description: error?.message || "Er is een fout opgetreden.", 
+        variant: "destructive" 
       });
-    },
+    }
   });
 
-  // Form submission handlers
-  const onAddSubmit = (data: z.infer<typeof studentGroupSchema>) => {
-    createStudentGroupMutation.mutate(data);
+  // Event handlers
+  const resetNewClassForm = () => {
+    setNewClass({
+      name: '',
+      location: '',
+      maxCapacity: '',
+      subjects: [],
+      teacherId: '',
+      prerequisites: '',
+      learningGoals: '',
+      academicYear: new Date().getFullYear().toString(),
+    });
   };
 
-  const onEditSubmit = (data: z.infer<typeof studentGroupSchema>) => {
-    if (selectedGroup?.id) {
-      updateStudentGroupMutation.mutate({
-        ...data,
-        id: selectedGroup.id
+  const handleSaveClass = () => {
+    if (!newClass.name.trim()) {
+      toast({ title: "Validatiefout", description: "Klasnaam is verplicht.", variant: "destructive" });
+      return;
+    }
+
+    const classData = {
+      name: newClass.name,
+      location: newClass.location,
+      maxCapacity: newClass.maxCapacity ? parseInt(newClass.maxCapacity) : undefined,
+      subjects: newClass.subjects,
+      teacherId: newClass.teacherId ? parseInt(newClass.teacherId) : undefined,
+      prerequisites: newClass.prerequisites,
+      learningGoals: newClass.learningGoals,
+      academicYear: newClass.academicYear,
+      isActive: true,
+    };
+
+    createClassMutation.mutate(classData);
+  };
+
+  const handleViewClass = (cls: ClassType) => {
+    setSelectedClass(cls);
+    setShowViewDialog(true);
+  };
+
+  const handleEditClass = (cls: ClassType) => {
+    setSelectedClass(cls);
+    setEditFormData({
+      name: cls.name,
+      location: cls.location || '',
+      maxCapacity: cls.maxCapacity,
+      subjects: cls.subjects || [],
+      teacherId: cls.teacherId,
+      prerequisites: cls.prerequisites || '',
+      learningGoals: cls.learningGoals || '',
+      academicYear: cls.academicYear || new Date().getFullYear().toString(),
+    });
+    setShowEditDialog(true);
+  };
+
+  const handleDeleteClass = (cls: ClassType) => {
+    setSelectedClass(cls);
+    setShowDeleteDialog(true);
+  };
+
+  const handleEditSubmit = () => {
+    if (selectedClass && editFormData.name?.trim()) {
+      updateClassMutation.mutate({
+        id: selectedClass.id,
+        data: editFormData
       });
     }
   };
 
-  const handleEditGroup = (group: any) => {
-    setSelectedGroup(group);
-    form.reset({
-      name: group.name,
-      academicYear: group.academicYear || new Date().getFullYear().toString(),
-      programId: group.programId,
-      courseId: group.courseId,
-      curriculum: group.curriculum || "",
-      instructor: group.instructor || "",
-      notes: group.notes || "",
-      location: group.location || "",
-      startTime: group.startTime || "",
-      endTime: group.endTime || "",
-      dayOfWeek: group.dayOfWeek || "",
-      maxCapacity: group.maxCapacity || 25,
-      isActive: group.isActive !== false,
-    });
-    setIsEditDialogOpen(true);
+  const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleDeleteGroup = (group: any) => {
-    setSelectedGroup(group);
-    setIsDeleteDialogOpen(true);
+  const handleEditSelectChange = (name: string, value: string) => {
+    setEditFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const confirmDeleteGroup = () => {
-    if (selectedGroup?.id) {
-      deleteStudentGroupMutation.mutate(selectedGroup.id);
-    }
+  const addSubjectToNewClass = () => {
+    setNewClass(prev => ({ ...prev, subjects: [...prev.subjects, ''] }));
   };
 
-  const handleManageEnrollments = (group: any) => {
-    setSelectedGroupForEnrollments(group);
-    setShowManageEnrollments(true);
+  const updateSubjectInNewClass = (index: number, value: string) => {
+    setNewClass(prev => ({
+      ...prev,
+      subjects: prev.subjects.map((subject, i) => i === index ? value : subject)
+    }));
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
+  const removeSubjectFromNewClass = (index: number) => {
+    setNewClass(prev => ({
+      ...prev,
+      subjects: prev.subjects.filter((_, i) => i !== index)
+    }));
   };
 
-  const handleProgramChange = (value: string) => {
-    setProgram(value);
-    setCurrentPage(1);
+  const clearFilters = () => {
+    setSearchQuery('');
+    setLocationFilter('');
+    setTeacherFilter('');
+    setAcademicYearFilter('');
+    setCapacityFilter('');
   };
 
-  const handleAcademicYearChange = (value: string) => {
-    setAcademicYear(value);
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  // Render the page
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Page header - Professionele desktop stijl (conform Dashboard) */}
       <PremiumHeader 
         title="Klassen" 
         path="Beheer > Klassen" 
@@ -294,699 +299,665 @@ export default function StudentGroups() {
         description="Beheer klasgroepen, bekijk studentenlijsten en wijs docenten toe aan klassen"
       />
 
-      {/* Main content area */}
       <div className="px-6 py-6 flex-1">
-        {/* Zoek- en actiebalk - Desktop style */}
+        {/* Search and action bar */}
         <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4 p-4">
-          <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
-            {/* Zoekbalk */}
-            <div className="relative w-full md:w-auto flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-              <Input
-                type="search"
-                placeholder="Zoek klassen..."
-                className="pl-9 h-8 text-xs bg-white w-full rounded-sm border-[#e5e7eb]"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
+          <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
+            <div className="flex-1 w-full lg:w-auto">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                <Input
+                  type="search"
+                  placeholder="Zoek klassen op naam, docent of locatie..."
+                  className="pl-9 h-8 text-xs bg-white rounded-sm border-[#e5e7eb]"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
             
-            {/* Filters */}
             <div className="flex flex-wrap gap-2 items-center">
-              <Select value={academicYear} onValueChange={handleAcademicYearChange}>
-                <SelectTrigger className="w-full sm:w-40 h-8 text-xs rounded-sm border-[#e5e7eb]">
-                  <SelectValue placeholder="Academisch jaar" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle jaren</SelectItem>
-                  {academicYearsData?.map((year: any) => (
-                    <SelectItem key={year.id} value={year.name}>{year.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className="h-8 text-xs rounded-sm border-[#e5e7eb]"
+              >
+                <Filter className="h-3.5 w-3.5 mr-1" />
+                Filters
+              </Button>
               
-              <Select value={program} onValueChange={handleProgramChange}>
-                <SelectTrigger className="w-full sm:w-40 h-8 text-xs rounded-sm border-[#e5e7eb]">
-                  <SelectValue placeholder="Programma" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle programma's</SelectItem>
-                  {programsData?.map((prog: any) => (
-                    <SelectItem key={prog.id} value={prog.id.toString()}>{prog.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ExportButton
+                onClick={() => setIsExportDialogOpen(true)}
+                title="Exporteer klassen"
+              />
               
               <Button
-                onClick={() => {
-                  form.reset();
-                  setIsAddDialogOpen(true);
-                }}
+                onClick={() => setShowNewClassDialog(true)}
                 size="sm"
                 className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white"
               >
-                <PlusCircle className="h-3.5 w-3.5 mr-1" />
+                <Plus className="h-3.5 w-3.5 mr-1" />
                 Nieuwe Klas
               </Button>
             </div>
           </div>
-        </div>
-        
-        {/* Cards grid */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array(6).fill(0).map((_, index) => (
-              <Card key={index} className="border border-[#e5e7eb] shadow-none rounded-sm">
-                <CardHeader className="pb-2">
-                  <Skeleton className="h-5 w-3/4 mb-2" />
-                  <Skeleton className="h-4 w-1/2" />
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-2/3" />
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Skeleton className="h-8 w-full" />
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        ) : isError ? (
-          <div className="text-center py-12 bg-white border border-[#e5e7eb] rounded-sm">
-            <XCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900">Fout bij laden</h3>
-            <p className="mt-2 text-gray-500 max-w-md mx-auto">
-              Er is een fout opgetreden bij het laden van de klassen. Probeer het later opnieuw.
-            </p>
-            <Button 
-              onClick={() => queryClient.invalidateQueries({queryKey: ['/api/student-groups']})}
-              className="mt-4 bg-[#1e40af] hover:bg-[#1e3a8a]"
-            >
-              Opnieuw laden
-            </Button>
-          </div>
-        ) : studentGroups.length === 0 ? (
-          <div className="bg-white border border-[#e5e7eb] rounded-sm p-8">
-            <ClassEmptyState 
-              title="Geen klassen gevonden"
-              description="Er zijn nog geen klassen aangemaakt of er zijn geen resultaten die overeenkomen met uw zoekcriteria."
-              action={
+
+          {/* Advanced filters */}
+          <Collapsible open={showAdvancedFilters}>
+            <CollapsibleContent className="mt-4 pt-4 border-t border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <Label className="text-xs font-medium text-gray-700">Locatie</Label>
+                  <Input
+                    placeholder="Filter op locatie"
+                    className="h-8 text-xs mt-1"
+                    value={locationFilter}
+                    onChange={(e) => setLocationFilter(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-medium text-gray-700">Docent</Label>
+                  <Input
+                    placeholder="Filter op docent"
+                    className="h-8 text-xs mt-1"
+                    value={teacherFilter}
+                    onChange={(e) => setTeacherFilter(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-medium text-gray-700">Academisch jaar</Label>
+                  <Select value={academicYearFilter} onValueChange={setAcademicYearFilter}>
+                    <SelectTrigger className="h-8 text-xs mt-1">
+                      <SelectValue placeholder="Alle jaren" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Alle jaren</SelectItem>
+                      <SelectItem value="2024">2024</SelectItem>
+                      <SelectItem value="2025">2025</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-xs font-medium text-gray-700">Min. capaciteit</Label>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    className="h-8 text-xs mt-1"
+                    value={capacityFilter}
+                    onChange={(e) => setCapacityFilter(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end mt-4">
                 <Button
-                  onClick={() => {
-                    form.reset();
-                    setIsAddDialogOpen(true);
-                  }}
-                  className="bg-[#1e40af] hover:bg-[#1e3a8a]"
+                  variant="outline"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="h-8 text-xs"
                 >
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  Nieuwe Klas Aanmaken
+                  <X className="h-3.5 w-3.5 mr-1" />
+                  Wis filters
                 </Button>
-              }
-            />
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {studentGroups.map((group: any) => (
-                <Card key={group.id} className="border border-[#e5e7eb] shadow-none rounded-sm">
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-base font-medium">{group.name}</CardTitle>
-                        <CardDescription className="text-xs">
-                          {group.academicYear || new Date().getFullYear().toString()}
-                        </CardDescription>
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[160px]">
-                          <DropdownMenuItem 
-                            onClick={() => handleManageEnrollments(group)}
-                            className="text-xs cursor-pointer"
-                          >
-                            <Users2 className="mr-2 h-3.5 w-3.5" />
-                            Beheer Studenten
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleEditGroup(group)}
-                            className="text-xs cursor-pointer"
-                          >
-                            <Pencil className="mr-2 h-3.5 w-3.5" />
-                            Bewerken
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            onClick={() => handleDeleteGroup(group)}
-                            className="text-red-600 text-xs cursor-pointer"
-                          >
-                            <Trash2 className="mr-2 h-3.5 w-3.5" />
-                            Verwijderen
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pb-2">
-                    <div className="space-y-2 text-xs">
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+
+        {/* Classes table */}
+        <div className="bg-white rounded-md border border-[#e5e7eb] shadow-sm overflow-hidden">
+          {isLoading ? (
+            <div className="p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1e40af] mx-auto"></div>
+              <p className="mt-2 text-sm text-gray-600">Klassen laden...</p>
+            </div>
+          ) : isError ? (
+            <div className="p-8 text-center">
+              <p className="text-red-600">Er is een fout opgetreden bij het laden van de klassen.</p>
+            </div>
+          ) : filteredClasses.length === 0 ? (
+            <div className="p-8 text-center">
+              <ChalkBoard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Geen klassen gevonden</h3>
+              <p className="text-gray-500 mb-4">
+                {searchQuery || Object.values({locationFilter, teacherFilter, academicYearFilter, capacityFilter}).some(f => f) 
+                  ? "Geen klassen komen overeen met uw zoekcriteria."
+                  : "Er zijn nog geen klassen aangemaakt."}
+              </p>
+              <Button
+                onClick={() => setShowNewClassDialog(true)}
+                className="bg-[#1e40af] hover:bg-[#1e3a8a]"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Eerste Klas Aanmaken
+              </Button>
+            </div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr className="border-b border-gray-200">
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">
+                    <Checkbox
+                      checked={selectedClasses.length === filteredClasses.length && filteredClasses.length > 0}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedClasses(filteredClasses.map((cls: ClassType) => cls.id));
+                        } else {
+                          setSelectedClasses([]);
+                        }
+                      }}
+                      className="mr-2"
+                    />
+                    Klas
+                  </th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Locatie</th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Klastitularis</th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Capaciteit</th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Status</th>
+                  <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right">Acties</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredClasses.map((cls: ClassType) => (
+                  <tr 
+                    key={cls.id} 
+                    className="border-b border-gray-100 hover:bg-gray-50 group"
+                  >
+                    <td className="py-3 px-4">
                       <div className="flex items-center">
-                        <BookOpen className="h-3.5 w-3.5 text-gray-500 mr-2" />
-                        <span>
-                          {group.programName || "Geen programma"}
-                          {group.courseName && ` - ${group.courseName}`}
-                        </span>
-                      </div>
-                      {group.instructor && (
-                        <div className="flex items-center">
-                          <GraduationCap className="h-3.5 w-3.5 text-gray-500 mr-2" />
-                          <span>{group.instructor}</span>
+                        <Checkbox
+                          checked={selectedClasses.includes(cls.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedClasses([...selectedClasses, cls.id]);
+                            } else {
+                              setSelectedClasses(selectedClasses.filter(id => id !== cls.id));
+                            }
+                          }}
+                          className="mr-3"
+                        />
+                        <div>
+                          <p className="font-medium text-gray-900">{cls.name}</p>
+                          <p className="text-xs text-gray-500">{cls.academicYear}</p>
                         </div>
-                      )}
-                      <div className="flex items-center">
-                        <UsersRound className="h-3.5 w-3.5 text-gray-500 mr-2" />
-                        <span>{group.studentCount || 0} studenten</span>
                       </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="pt-2">
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="outline" className="text-xs font-normal">
-                        {group.isActive !== false ? "Actief" : "Inactief"}
+                    </td>
+                    <td className="py-3 px-4 text-gray-900">
+                      {cls.location || '-'}
+                    </td>
+                    <td className="py-3 px-4 text-gray-900">
+                      {cls.teacherName || '-'}
+                    </td>
+                    <td className="py-3 px-4 text-gray-900">
+                      {cls.studentCount || 0}/{cls.maxCapacity || 'Onbeperkt'}
+                    </td>
+                    <td className="py-3 px-4">
+                      <Badge 
+                        variant={cls.isActive ? "default" : "secondary"}
+                        className={cls.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
+                      >
+                        {cls.isActive ? 'Actief' : 'Inactief'}
                       </Badge>
-                      {group.dayOfWeek && (
-                        <Badge variant="outline" className="text-xs font-normal">
-                          {group.dayOfWeek}
-                        </Badge>
-                      )}
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewClass(cls)}
+                          className="h-8 w-8 p-0 hover:bg-blue-50"
+                          title="Bekijken"
+                        >
+                          <Eye className="h-4 w-4 text-blue-600" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditClass(cls)}
+                          className="h-8 w-8 p-0 hover:bg-blue-50"
+                          title="Bewerken"
+                        >
+                          <Edit className="h-4 w-4 text-blue-600" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteClass(cls)}
+                          className="h-8 w-8 p-0 hover:bg-red-50"
+                          title="Verwijderen"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-600" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
+          <div>
+            {filteredClasses.length > 0 && (
+              <span>
+                {filteredClasses.length} klas{filteredClasses.length !== 1 ? 'sen' : ''} gevonden
+                {selectedClasses.length > 0 && ` (${selectedClasses.length} geselecteerd)`}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Nieuwe klas dialoog */}
+      <Dialog open={showNewClassDialog} onOpenChange={setShowNewClassDialog}>
+        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+          <div className="bg-[#1e40af] py-4 px-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <ChalkBoard className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Nieuwe Klas Toevoegen</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Vul de gegevens in om een nieuwe klas toe te voegen.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6 max-h-[calc(90vh-150px)] overflow-y-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="className" className="text-xs font-medium text-gray-700">
+                  Klasnaam <span className="text-red-500">*</span>
+                </Label>
+                <Input 
+                  id="className" 
+                  placeholder="Bijv. 1A, Wiskunde Gevorderden" 
+                  className="h-8 text-sm"
+                  value={newClass.name}
+                  onChange={(e) => setNewClass({...newClass, name: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="location" className="text-xs font-medium text-gray-700">
+                  Locatie van de klas
+                </Label>
+                <Input 
+                  id="location" 
+                  placeholder="Bijv. Lokaal 101, Gebouw A" 
+                  className="h-8 text-sm"
+                  value={newClass.location}
+                  onChange={(e) => setNewClass({...newClass, location: e.target.value})}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="maxCapacity" className="text-xs font-medium text-gray-700">
+                  Maximum capaciteit
+                </Label>
+                <Input 
+                  id="maxCapacity" 
+                  type="number"
+                  placeholder="25" 
+                  className="h-8 text-sm"
+                  value={newClass.maxCapacity}
+                  onChange={(e) => setNewClass({...newClass, maxCapacity: e.target.value})}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="teacher" className="text-xs font-medium text-gray-700">
+                  Klastitularis
+                </Label>
+                <Select value={newClass.teacherId} onValueChange={(value) => setNewClass({...newClass, teacherId: value})}>
+                  <SelectTrigger className="h-8 text-sm border-gray-300">
+                    <SelectValue placeholder="Selecteer een docent" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teachers.map((teacher: any) => (
+                      <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                        {teacher.firstName} {teacher.lastName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
-            {/* Paginering */}
-            {totalPages > 1 && (
-              <div className="flex justify-center mt-6">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          onClick={() => handlePageChange(page)}
-                          isActive={currentPage === page}
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
-                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+            <div className="mt-4 space-y-2">
+              <Label className="text-xs font-medium text-gray-700">Vakken</Label>
+              <div className="space-y-2">
+                {newClass.subjects.map((subject, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      placeholder="Vak naam"
+                      className="h-8 text-sm flex-1"
+                      value={subject}
+                      onChange={(e) => updateSubjectInNewClass(index, e.target.value)}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeSubjectFromNewClass(index)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addSubjectToNewClass}
+                  className="h-8 text-xs"
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Vak toevoegen
+                </Button>
               </div>
-            )}
-          </>
-        )}
-      </div>
-      
-      {/* Add Student Group Dialog */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[550px]">
-          <DialogHeader>
-            <DialogTitle>Nieuwe Klas Aanmaken</DialogTitle>
-            <DialogDescription>
-              Vul de details in om een nieuwe klas aan te maken.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onAddSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2">
-                      <FormLabel>Naam</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Voer een naam in" 
-                          {...field} 
-                          className="h-8 text-sm"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="academicYear"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Academisch Jaar</FormLabel>
-                      <Select 
-                        value={field.value} 
-                        onValueChange={field.onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="h-8 text-sm">
-                            <SelectValue placeholder="Selecteer jaar" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {academicYearsData?.map((year: any) => (
-                            <SelectItem key={year.id} value={year.name}>{year.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="programId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Programma</FormLabel>
-                      <Select 
-                        value={field.value?.toString() || ""} 
-                        onValueChange={(value) => field.onChange(parseInt(value) || undefined)}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="h-8 text-sm">
-                            <SelectValue placeholder="Selecteer programma" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none_program">Geen programma</SelectItem>
-                          {programsData?.map((prog: any) => (
-                            <SelectItem key={prog.id} value={prog.id.toString()}>{prog.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="courseId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Vak</FormLabel>
-                      <Select 
-                        value={field.value?.toString() || ""} 
-                        onValueChange={(value) => field.onChange(parseInt(value) || undefined)}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="h-8 text-sm">
-                            <SelectValue placeholder="Selecteer vak" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none_course">Geen vak</SelectItem>
-                          {coursesData?.map((course: any) => (
-                            <SelectItem key={course.id} value={course.id.toString()}>{course.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="instructor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Docent</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Docent naam" 
-                          {...field} 
-                          className="h-8 text-sm"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="maxCapacity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Max. Capaciteit</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          min="1"
-                          placeholder="Aantal studenten" 
-                          {...field} 
-                          value={field.value || ""}
-                          onChange={e => field.onChange(parseInt(e.target.value) || undefined)}
-                          className="h-8 text-sm"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Locatie</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Klaslokaal" 
-                          {...field} 
-                          className="h-8 text-sm"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="dayOfWeek"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Dag</FormLabel>
-                      <Select 
-                        value={field.value || ""} 
-                        onValueChange={field.onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="h-8 text-sm">
-                            <SelectValue placeholder="Selecteer dag" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none_day">Geen dag</SelectItem>
-                          <SelectItem value="Maandag">Maandag</SelectItem>
-                          <SelectItem value="Dinsdag">Dinsdag</SelectItem>
-                          <SelectItem value="Woensdag">Woensdag</SelectItem>
-                          <SelectItem value="Donderdag">Donderdag</SelectItem>
-                          <SelectItem value="Vrijdag">Vrijdag</SelectItem>
-                          <SelectItem value="Zaterdag">Zaterdag</SelectItem>
-                          <SelectItem value="Zondag">Zondag</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="startTime"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Starttijd</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="time" 
-                          {...field} 
-                          className="h-8 text-sm"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="endTime"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Eindtijd</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="time" 
-                          {...field} 
-                          className="h-8 text-sm"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2">
-                      <FormLabel>Notities</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Extra informatie over de klas" 
-                          {...field} 
-                          className="text-sm min-h-[80px]"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="isActive"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2 flex flex-row items-center justify-between rounded-lg border p-3">
-                      <div className="space-y-0.5">
-                        <FormLabel>Actieve status</FormLabel>
-                        <FormDescription className="text-xs">
-                          Geeft aan of deze klas actief is in het huidige academische jaar.
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <DialogFooter>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setIsAddDialogOpen(false)}
-                  className="h-8 text-xs rounded-sm"
-                >
-                  Annuleren
-                </Button>
-                <Button 
-                  type="submit" 
-                  className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
-                >
-                  Klas Aanmaken
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Edit Student Group Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[550px]">
-          <DialogHeader>
-            <DialogTitle>Klas Bewerken</DialogTitle>
-            <DialogDescription>
-              Pas de details van de geselecteerde klas aan.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onEditSubmit)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2">
-                      <FormLabel>Naam</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Voer een naam in" 
-                          {...field} 
-                          className="h-8 text-sm"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                {/* Resterende form fields (dezelfde als in de Add dialog) */}
-                {/* ... */}
-                
-                <FormField
-                  control={form.control}
-                  name="academicYear"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Academisch Jaar</FormLabel>
-                      <Select 
-                        value={field.value} 
-                        onValueChange={field.onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="h-8 text-sm">
-                            <SelectValue placeholder="Selecteer jaar" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {academicYearsData?.map((year: any) => (
-                            <SelectItem key={year.id} value={year.name}>{year.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="programId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Programma</FormLabel>
-                      <Select 
-                        value={field.value?.toString() || ""} 
-                        onValueChange={(value) => field.onChange(parseInt(value) || undefined)}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="h-8 text-sm">
-                            <SelectValue placeholder="Selecteer programma" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="none_program">Geen programma</SelectItem>
-                          {programsData?.map((prog: any) => (
-                            <SelectItem key={prog.id} value={prog.id.toString()}>{prog.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                {/* Verkorte versie van de overige velden voor bewerking */}
-                <FormField
-                  control={form.control}
-                  name="isActive"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2 flex flex-row items-center justify-between rounded-lg border p-3">
-                      <div className="space-y-0.5">
-                        <FormLabel>Actieve status</FormLabel>
-                        <FormDescription className="text-xs">
-                          Geeft aan of deze klas actief is in het huidige academische jaar.
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <DialogFooter>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setIsEditDialogOpen(false)}
-                  className="h-8 text-xs rounded-sm"
-                >
-                  Annuleren
-                </Button>
-                <Button 
-                  type="submit" 
-                  className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
-                >
-                  Wijzigingen Opslaan
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Delete Student Group Confirmation */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent className="max-w-[450px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Klas verwijderen</AlertDialogTitle>
-            <AlertDialogDescription>
-              Weet je zeker dat je deze klas wilt verwijderen? Alle gegevens gerelateerd aan deze klas, inclusief studenteninschrijvingen, zullen worden verwijderd. Deze actie kan niet ongedaan worden gemaakt.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="h-8 text-xs rounded-sm">Annuleren</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmDeleteGroup}
-              className="h-8 text-xs rounded-sm bg-red-600 hover:bg-red-700 text-white"
+            </div>
+            
+            <div className="mt-4 space-y-2">
+              <Label htmlFor="prerequisites" className="text-xs font-medium text-gray-700">
+                Instroomvereisten
+              </Label>
+              <Textarea 
+                id="prerequisites" 
+                placeholder="Beschrijf de vereisten om deze klas te volgen..."
+                className="text-sm resize-none"
+                rows={3}
+                value={newClass.prerequisites}
+                onChange={(e) => setNewClass({...newClass, prerequisites: e.target.value})}
+              />
+            </div>
+            
+            <div className="mt-4 space-y-2">
+              <Label htmlFor="learningGoals" className="text-xs font-medium text-gray-700">
+                Leerdoelen van de klas
+              </Label>
+              <Textarea 
+                id="learningGoals" 
+                placeholder="Beschrijf wat studenten moeten kunnen na het succesvol afronden van deze klas..."
+                className="text-sm resize-none"
+                rows={3}
+                value={newClass.learningGoals}
+                onChange={(e) => setNewClass({...newClass, learningGoals: e.target.value})}
+              />
+            </div>
+          </div>
+          
+          <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
+            <Button
+              variant="outline"
+              onClick={() => setShowNewClassDialog(false)}
+              className="h-8 text-xs rounded-sm"
             >
-              Verwijderen
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      
-      {/* Manage Enrollments Dialog */}
-      {showManageEnrollments && selectedGroupForEnrollments && (
-        <Dialog open={showManageEnrollments} onOpenChange={setShowManageEnrollments}>
-          <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Studenten Beheren - {selectedGroupForEnrollments.name}</DialogTitle>
-              <DialogDescription>
-                Voeg studenten toe aan deze klas of verwijder ze.
-              </DialogDescription>
-            </DialogHeader>
-            <ManageStudentEnrollments 
-              groupId={selectedGroupForEnrollments.id} 
-              onClose={() => setShowManageEnrollments(false)}
-            />
-          </DialogContent>
-        </Dialog>
-      )}
+              Annuleren
+            </Button>
+            <Button
+              onClick={handleSaveClass}
+              disabled={createClassMutation.isPending}
+              className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
+            >
+              <Save className="h-3.5 w-3.5 mr-1" />
+              Opslaan
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bekijk klas dialoog */}
+      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+        <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden">
+          <div className="bg-[#1e40af] py-4 px-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <Eye className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Klas bekijken</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Bekijk de details van de geselecteerde klas.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+          
+          {selectedClass && (
+            <div className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <ChalkBoard className="h-4 w-4 mr-2" />
+                      Basisinformatie
+                    </h3>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs font-medium text-gray-700">Klasnaam</label>
+                        <p className="text-sm text-gray-900">{selectedClass.name}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-700">Locatie</label>
+                        <p className="text-sm text-gray-900">{selectedClass.location || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-700">Capaciteit</label>
+                        <p className="text-sm text-gray-900">
+                          {selectedClass.studentCount || 0}/{selectedClass.maxCapacity || 'Onbeperkt'}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-700">Klastitularis</label>
+                        <p className="text-sm text-gray-900">{selectedClass.teacherName || '-'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Vakken
+                    </h3>
+                    <div className="space-y-2">
+                      {selectedClass.subjects && selectedClass.subjects.length > 0 ? (
+                        selectedClass.subjects.map((subject, index) => (
+                          <Badge key={index} variant="outline" className="mr-1 mb-1">
+                            {subject}
+                          </Badge>
+                        ))
+                      ) : (
+                        <p className="text-sm text-gray-500">Geen vakken toegewezen</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 space-y-4">
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <GraduationCap className="h-4 w-4 mr-2" />
+                    Instroomvereisten
+                  </h3>
+                  <p className="text-sm text-gray-900">
+                    {selectedClass.prerequisites || 'Geen specifieke vereisten'}
+                  </p>
+                </div>
+                
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <Target className="h-4 w-4 mr-2" />
+                    Leerdoelen
+                  </h3>
+                  <p className="text-sm text-gray-900">
+                    {selectedClass.learningGoals || 'Geen leerdoelen gedefinieerd'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
+            <Button
+              variant="outline"
+              onClick={() => setShowViewDialog(false)}
+              className="h-8 text-xs rounded-sm"
+            >
+              Sluiten
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bewerk klas dialoog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+          <div className="bg-[#1e40af] py-4 px-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <Edit className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Klas bewerken</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Bewerk de gegevens van de geselecteerde klas.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6 max-h-[calc(90vh-150px)] overflow-y-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-gray-700">
+                  Klasnaam <span className="text-red-500">*</span>
+                </Label>
+                <Input 
+                  name="name"
+                  placeholder="Klasnaam" 
+                  className="h-8 text-sm"
+                  value={editFormData.name || ''}
+                  onChange={handleEditInputChange}
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-gray-700">Locatie</Label>
+                <Input 
+                  name="location"
+                  placeholder="Lokaal of gebouw" 
+                  className="h-8 text-sm"
+                  value={editFormData.location || ''}
+                  onChange={handleEditInputChange}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-gray-700">Maximum capaciteit</Label>
+                <Input 
+                  name="maxCapacity"
+                  type="number"
+                  placeholder="25" 
+                  className="h-8 text-sm"
+                  value={editFormData.maxCapacity || ''}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, maxCapacity: parseInt(e.target.value) || undefined }))}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-gray-700">Klastitularis</Label>
+                <Select 
+                  value={editFormData.teacherId?.toString() || ''} 
+                  onValueChange={(value) => handleEditSelectChange('teacherId', value)}
+                >
+                  <SelectTrigger className="h-8 text-sm border-gray-300">
+                    <SelectValue placeholder="Selecteer een docent" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teachers.map((teacher: any) => (
+                      <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                        {teacher.firstName} {teacher.lastName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="mt-4 space-y-2">
+              <Label className="text-xs font-medium text-gray-700">Instroomvereisten</Label>
+              <Textarea 
+                name="prerequisites"
+                placeholder="Vereisten voor deze klas..."
+                className="text-sm resize-none"
+                rows={3}
+                value={editFormData.prerequisites || ''}
+                onChange={handleEditInputChange}
+              />
+            </div>
+            
+            <div className="mt-4 space-y-2">
+              <Label className="text-xs font-medium text-gray-700">Leerdoelen</Label>
+              <Textarea 
+                name="learningGoals"
+                placeholder="Leerdoelen van deze klas..."
+                className="text-sm resize-none"
+                rows={3}
+                value={editFormData.learningGoals || ''}
+                onChange={handleEditInputChange}
+              />
+            </div>
+          </div>
+          
+          <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
+            <Button
+              variant="outline"
+              onClick={() => setShowEditDialog(false)}
+              className="h-8 text-xs rounded-sm"
+            >
+              Annuleren
+            </Button>
+            <Button
+              onClick={handleEditSubmit}
+              disabled={updateClassMutation.isPending}
+              className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
+            >
+              <Save className="h-3.5 w-3.5 mr-1" />
+              Opslaan
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete dialog */}
+      <DeleteDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={() => selectedClass && deleteClassMutation.mutate(selectedClass.id)}
+        title="Klas verwijderen"
+        description={`Weet je zeker dat je de klas "${selectedClass?.name}" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
+        isLoading={deleteClassMutation.isPending}
+      />
+
+      {/* Export dialog */}
+      <ExportDialog
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+        title="Klassen exporteren"
+        description="Exporteer de klassenlijst naar het gewenste formaat."
+        data={filteredClasses}
+        filename="klassen"
+      />
     </div>
   );
 }

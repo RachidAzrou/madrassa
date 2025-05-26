@@ -884,10 +884,7 @@ export default function Guardians() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => {
-                    setSelectedGuardian(null);
-                    handleDeleteGuardian(selectedGuardian);
-                  }}
+                  onClick={() => handleDeleteGuardian(selectedGuardian)}
                   className="h-8 text-xs rounded-sm border-red-300 text-red-600 hover:bg-red-50"
                 >
                   <Trash2 className="h-3.5 w-3.5 mr-1" />

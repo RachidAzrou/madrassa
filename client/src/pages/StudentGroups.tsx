@@ -1082,6 +1082,11 @@ export default function StudentGroups() {
         onConfirm={() => selectedClass && deleteClassMutation.mutate(selectedClass.id)}
         title="Klas verwijderen"
         description={`Weet je zeker dat je de klas "${selectedClass?.name}" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
+        item={selectedClass ? {
+          name: selectedClass.name,
+          id: `ID: ${selectedClass.id}`,
+          initials: selectedClass.name.substring(0, 2).toUpperCase()
+        } : null}
         isLoading={deleteClassMutation.isPending}
       />
 

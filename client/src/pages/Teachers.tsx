@@ -1180,93 +1180,85 @@ export default function Teachers() {
                 </div>
 
                 {/* Persoonlijke Informatie */}
-                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 sm:px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                      <Users className="h-5 w-5 mr-2 text-blue-600" />
-                      Persoonlijke Informatie
-                    </h3>
-                  </div>
-                  <div className="p-4 sm:p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2 text-gray-500">
-                          <Mail className="h-4 w-4" />
-                          <span className="text-xs font-medium uppercase tracking-wide">Email</span>
-                        </div>
-                        <p className="text-sm font-medium text-gray-900 break-all">{selectedTeacher.email}</p>
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <Users className="h-4 w-4 mr-2" />
+                    Persoonlijke Informatie
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2 text-gray-500">
+                        <Mail className="h-4 w-4" />
+                        <span className="text-xs font-medium uppercase tracking-wide">Email</span>
                       </div>
-                      
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2 text-gray-500">
-                          <Phone className="h-4 w-4" />
-                          <span className="text-xs font-medium uppercase tracking-wide">Telefoon</span>
-                        </div>
-                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.phone || 'Niet opgegeven'}</p>
+                      <p className="text-sm font-medium text-gray-900 break-all">{selectedTeacher.email}</p>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2 text-gray-500">
+                        <Phone className="h-4 w-4" />
+                        <span className="text-xs font-medium uppercase tracking-wide">Telefoon</span>
                       </div>
-                      
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2 text-gray-500">
-                          <Calendar className="h-4 w-4" />
-                          <span className="text-xs font-medium uppercase tracking-wide">Geboortedatum</span>
-                        </div>
-                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.dateOfBirth || 'Niet opgegeven'}</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedTeacher.phone || 'Niet opgegeven'}</p>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2 text-gray-500">
+                        <Calendar className="h-4 w-4" />
+                        <span className="text-xs font-medium uppercase tracking-wide">Geboortedatum</span>
                       </div>
-                      
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2 text-gray-500">
-                          <Users className="h-4 w-4" />
-                          <span className="text-xs font-medium uppercase tracking-wide">Geslacht</span>
-                        </div>
-                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.gender || 'Niet opgegeven'}</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedTeacher.dateOfBirth || 'Niet opgegeven'}</p>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2 text-gray-500">
+                        <Users className="h-4 w-4" />
+                        <span className="text-xs font-medium uppercase tracking-wide">Geslacht</span>
                       </div>
-                      
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2 text-gray-500">
-                          <BookOpen className="h-4 w-4" />
-                          <span className="text-xs font-medium uppercase tracking-wide">Specialisatie</span>
-                        </div>
-                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.specialty || 'Niet opgegeven'}</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedTeacher.gender || 'Niet opgegeven'}</p>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2 text-gray-500">
+                        <BookOpen className="h-4 w-4" />
+                        <span className="text-xs font-medium uppercase tracking-wide">Specialisatie</span>
                       </div>
-                      
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2 text-gray-500">
-                          <Calendar className="h-4 w-4" />
-                          <span className="text-xs font-medium uppercase tracking-wide">In dienst sinds</span>
-                        </div>
-                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.hireDate || 'Niet opgegeven'}</p>
+                      <p className="text-sm font-medium text-gray-900">{selectedTeacher.specialty || 'Niet opgegeven'}</p>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2 text-gray-500">
+                        <Calendar className="h-4 w-4" />
+                        <span className="text-xs font-medium uppercase tracking-wide">In dienst sinds</span>
                       </div>
+                      <p className="text-sm font-medium text-gray-900">{selectedTeacher.hireDate || 'Niet opgegeven'}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Professionele Informatie */}
-                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                  <div className="bg-gradient-to-r from-purple-50 to-violet-50 px-4 sm:px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                      <GraduationCap className="h-5 w-5 mr-2 text-purple-600" />
-                      Professionele Informatie
-                    </h3>
-                  </div>
-                  <div className="p-4 sm:p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2 text-gray-500">
-                          <Badge className="h-4 w-4" />
-                          <span className="text-xs font-medium uppercase tracking-wide">Status</span>
-                        </div>
-                        <Badge className={`inline-flex px-3 py-1 text-xs font-medium ${getStatusColor(selectedTeacher.status)}`}>
-                          {getStatusLabel(selectedTeacher.status)}
-                        </Badge>
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <GraduationCap className="h-4 w-4 mr-2" />
+                    Professionele Informatie
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2 text-gray-500">
+                        <Badge className="h-4 w-4" />
+                        <span className="text-xs font-medium uppercase tracking-wide">Status</span>
                       </div>
-                      
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2 text-gray-500">
-                          <BookOpen className="h-4 w-4" />
-                          <span className="text-xs font-medium uppercase tracking-wide">Vakgebied</span>
-                        </div>
-                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.specialty || 'Niet gespecificeerd'}</p>
+                      <Badge className={`inline-flex px-3 py-1 text-xs font-medium ${getStatusColor(selectedTeacher.status)}`}>
+                        {getStatusLabel(selectedTeacher.status)}
+                      </Badge>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2 text-gray-500">
+                        <BookOpen className="h-4 w-4" />
+                        <span className="text-xs font-medium uppercase tracking-wide">Vakgebied</span>
                       </div>
+                      <p className="text-sm font-medium text-gray-900">{selectedTeacher.specialty || 'Niet gespecificeerd'}</p>
                     </div>
                   </div>
                 </div>

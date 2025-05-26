@@ -1352,10 +1352,6 @@ export default function Teachers() {
                 <SectionContainer title="Persoonlijke informatie" icon={<User className="h-4 w-4" />}>
                   {/* Foto en verificatie sectie */}
                   <div className="mb-6 pb-6 border-b border-gray-200">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Camera className="h-4 w-4 text-gray-600" />
-                      <h4 className="text-sm font-medium text-gray-900">Foto & Verificatie</h4>
-                    </div>
                     <div className="flex gap-4 justify-between">
                       <div 
                         className="w-32 h-32 rounded-md border border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:bg-gray-100 transition-colors"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, GraduationCap, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, BookOpen, Users, Upload, Edit, Camera, User, Calendar, Clock, Briefcase } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, GraduationCap, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, BookOpen, Users, Upload, Edit, Camera, User, Calendar, Clock, Briefcase, MapPin, FileText } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -1349,10 +1349,13 @@ export default function Teachers() {
               </TabsList>
               
               <TabsContent value="basic" className="space-y-6 w-full">
-                <SectionContainer title="Persoonlijke informatie">
+                <SectionContainer title="Persoonlijke informatie" icon={<User className="h-4 w-4" />}>
                   {/* Foto en verificatie sectie */}
                   <div className="mb-6 pb-6 border-b border-gray-200">
-                    <h4 className="text-sm font-medium text-gray-900 mb-4">Foto & Verificatie</h4>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Camera className="h-4 w-4 text-gray-600" />
+                      <h4 className="text-sm font-medium text-gray-900">Foto & Verificatie</h4>
+                    </div>
                     <div className="flex gap-4 justify-between">
                       <div 
                         className="w-32 h-32 rounded-md border border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:bg-gray-100 transition-colors"
@@ -1526,7 +1529,7 @@ export default function Teachers() {
 
                 </SectionContainer>
 
-                <SectionContainer title="Adresgegevens">
+                <SectionContainer title="Adresgegevens" icon={<MapPin className="h-4 w-4" />}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-1">
                       <Label htmlFor="street" className="text-xs text-gray-700">
@@ -1582,7 +1585,7 @@ export default function Teachers() {
               </TabsContent>
               
               <TabsContent value="details" className="space-y-6">
-                <SectionContainer title="Aanvullende informatie">
+                <SectionContainer title="Aanvullende informatie" icon={<FileText className="h-4 w-4" />}>
                   <div className="grid grid-cols-1 gap-4 w-full">
                     <div>
                       <Label htmlFor="profession" className="text-xs text-gray-700">
@@ -1599,7 +1602,7 @@ export default function Teachers() {
                   </div>
                 </SectionContainer>
 
-                <SectionContainer title="Opleidingen">
+                <SectionContainer title="Opleidingen" icon={<GraduationCap className="h-4 w-4" />}>
                   <div className="space-y-3">
                     <div className="flex gap-2">
                       <Input
@@ -1648,7 +1651,7 @@ export default function Teachers() {
                   </div>
                 </SectionContainer>
 
-                <SectionContainer title="Talen">
+                <SectionContainer title="Talen" icon={<Users className="h-4 w-4" />}>
                   <div className="space-y-3">
                     <div className="flex gap-2">
                       <Input
@@ -1699,7 +1702,7 @@ export default function Teachers() {
               </TabsContent>
               
               <TabsContent value="subjects" className="space-y-6">
-                <SectionContainer title="Vakken toewijzen">
+                <SectionContainer title="Vakken toewijzen" icon={<BookOpen className="h-4 w-4" />}>
                   <div className="space-y-4 w-full">
                     <p className="text-sm text-gray-600">
                       Selecteer de vakken die deze docent kan onderwijzen.

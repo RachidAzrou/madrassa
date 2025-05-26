@@ -77,6 +77,9 @@ type TeacherType = {
   houseNumber?: string;
   postalCode?: string;
   city?: string;
+  educations?: string[];
+  languages?: string[];
+  subjects?: string[];
 };
 
 type SubjectType = {
@@ -1196,7 +1199,7 @@ export default function Teachers() {
                 {/* Persoonlijke Informatie */}
                 <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                   <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                    <Users className="h-4 w-4 mr-2" />
+                    <User className="h-4 w-4 mr-2" />
                     Persoonlijke Informatie
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1234,18 +1237,20 @@ export default function Teachers() {
                     
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2 text-gray-500">
-                        <BookOpen className="h-4 w-4" />
-                        <span className="text-xs font-medium uppercase tracking-wide">Specialisatie</span>
-                      </div>
-                      <p className="text-sm font-medium text-gray-900">{selectedTeacher.specialty || 'Niet opgegeven'}</p>
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <div className="flex items-center space-x-2 text-gray-500">
-                        <Calendar className="h-4 w-4" />
+                        <Clock className="h-4 w-4" />
                         <span className="text-xs font-medium uppercase tracking-wide">In dienst sinds</span>
                       </div>
                       <p className="text-sm font-medium text-gray-900">{selectedTeacher.hireDate || 'Niet opgegeven'}</p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2 text-gray-500">
+                        <Briefcase className="h-4 w-4" />
+                        <span className="text-xs font-medium uppercase tracking-wide">Status</span>
+                      </div>
+                      <Badge className={`inline-flex px-3 py-1 text-xs font-medium ${getStatusColor(selectedTeacher.status)}`}>
+                        {getStatusLabel(selectedTeacher.status)}
+                      </Badge>
                     </div>
                   </div>
                 </div>
@@ -1259,23 +1264,120 @@ export default function Teachers() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2 text-gray-500">
-                        <Badge className="h-4 w-4" />
-                        <span className="text-xs font-medium uppercase tracking-wide">Status</span>
-                      </div>
-                      <Badge className={`inline-flex px-3 py-1 text-xs font-medium ${getStatusColor(selectedTeacher.status)}`}>
-                        {getStatusLabel(selectedTeacher.status)}
-                      </Badge>
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <div className="flex items-center space-x-2 text-gray-500">
                         <BookOpen className="h-4 w-4" />
-                        <span className="text-xs font-medium uppercase tracking-wide">Vakgebied</span>
+                        <span className="text-xs font-medium uppercase tracking-wide">Beroep/Specialisatie</span>
                       </div>
                       <p className="text-sm font-medium text-gray-900">{selectedTeacher.specialty || 'Niet gespecificeerd'}</p>
                     </div>
+                    
+                    {selectedTeacher.bio && (
+                      <div className="space-y-1 md:col-span-2">
+                        <div className="flex items-center space-x-2 text-gray-500">
+                          <FileText className="h-4 w-4" />
+                          <span className="text-xs font-medium uppercase tracking-wide">Bio</span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.bio}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {/* Adresgegevens */}
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Adresgegevens
+                  </h3>
+                  {selectedTeacher.street || selectedTeacher.city ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-gray-500">
+                          <MapPin className="h-4 w-4" />
+                          <span className="text-xs font-medium uppercase tracking-wide">Adres</span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {selectedTeacher.street && selectedTeacher.houseNumber 
+                            ? `${selectedTeacher.street} ${selectedTeacher.houseNumber}`
+                            : selectedTeacher.street || 'Niet opgegeven'
+                          }
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-gray-500">
+                          <MapPin className="h-4 w-4" />
+                          <span className="text-xs font-medium uppercase tracking-wide">Postcode & Plaats</span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {selectedTeacher.postalCode && selectedTeacher.city 
+                            ? `${selectedTeacher.postalCode} ${selectedTeacher.city}`
+                            : selectedTeacher.city || 'Niet opgegeven'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">Geen adresgegevens beschikbaar</p>
+                  )}
+                </div>
+
+                {/* Opleidingen */}
+                {selectedTeacher.educations && selectedTeacher.educations.length > 0 && (
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <GraduationCap className="h-4 w-4 mr-2" />
+                      Opleidingen
+                    </h3>
+                    <div className="space-y-2">
+                      {selectedTeacher.educations.map((education, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+                          <p className="text-sm font-medium text-gray-900">{education}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Talen */}
+                {selectedTeacher.languages && selectedTeacher.languages.length > 0 && (
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <Users className="h-4 w-4 mr-2" />
+                      Gesproken Talen
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedTeacher.languages.map((language, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {language}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Vakken */}
+                {selectedTeacher.subjects && selectedTeacher.subjects.length > 0 && (
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Lesgegeven Vakken
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {selectedTeacher.subjects.map((subjectId, index) => {
+                        const subject = mockSubjects.find(s => s.id.toString() === subjectId);
+                        return (
+                          <div key={index} className="flex items-center space-x-2 bg-white p-2 rounded border">
+                            <BookOpen className="h-4 w-4 text-blue-600" />
+                            <span className="text-sm font-medium text-gray-900">
+                              {subject ? `${subject.name} (${subject.code})` : subjectId}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

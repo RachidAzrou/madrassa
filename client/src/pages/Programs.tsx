@@ -927,45 +927,21 @@ export default function Programs() {
         />
       </CustomDialog>
       {/* Vak verwijderen dialoogvenster */}
-      <CustomDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen} maxWidth="450px">
-        <DialogHeaderWithIcon
-          title="Vak Verwijderen"
-          description="Weet je zeker dat je dit vak wilt verwijderen?"
-          icon={<Trash2 className="h-5 w-5" />}
-        />
-        
-        <div className="p-6 pt-4">
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-md mt-2">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-yellow-700">
-                  {selectedProgram && (
-                    <>
-                      Je staat op het punt om het vak <span className="font-medium">{selectedProgram.name}</span> ({selectedProgram.code}) te verwijderen.
-                      <br />
-                      <span className="text-red-600 font-medium">Deze actie kan niet ongedaan worden gemaakt.</span>
-                    </>
-                  )}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <DialogFooterContainer>
-          <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="w-full sm:w-auto">
-            Annuleren
-          </Button>
-          <Button variant="destructive" onClick={confirmDeleteProgram} className="w-full sm:w-auto">
-            Verwijderen
-          </Button>
-        </DialogFooterContainer>
-      </CustomDialog>
+      <DeleteDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Vak Verwijderen"
+        description="Ben je zeker dat je dit vak wilt verwijderen?"
+        itemName={selectedProgram?.name || ''}
+        itemId={selectedProgram?.code || ''}
+        onConfirm={() => {
+          if (selectedProgram) {
+            deleteProgramMutation.mutate(selectedProgram.id);
+          }
+        }}
+        confirmText="Verwijderen"
+        cancelText="Annuleren"
+      />
 
       {/* Vak bekijken dialoogvenster */}
       <CustomDialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen} maxWidth="600px">

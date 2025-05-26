@@ -100,12 +100,29 @@ export default function Payments() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/payments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/payments/stats"] });
+      
+      // Reset form
+      setSelectedStudentId("");
+      setSelectedClassId("");
+      setPaymentAmount("");
+      setPaymentDescription("");
+      setPaymentNotes("");
+      setPaymentMethod("individual");
       setIsCreateDialogOpen(false);
+      
+      // Show success message
+      alert(paymentMethod === "class" ? 
+        `Betalingen voor klas succesvol aangemaakt!` : 
+        `Betaling succesvol aangemaakt!`);
       
       // Open Mollie checkout URL if available
       if (data.checkoutUrl) {
         window.open(data.checkoutUrl, '_blank');
       }
+    },
+    onError: (error) => {
+      console.error("Payment creation error:", error);
+      alert("Er ging iets mis bij het aanmaken van de betaling. Probeer het opnieuw.");
     },
   });
 

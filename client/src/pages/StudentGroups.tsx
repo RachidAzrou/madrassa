@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Search, Plus, Eye, Edit, Trash2, Users, MapPin, BookOpen, 
-  GraduationCap, Target, X, Save, UserCheck
+  GraduationCap, Target, X, Save, UserCheck, Filter, PlusCircle,
+  School
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,29 +37,7 @@ import { PremiumHeader } from '@/components/layout/premium-header';
 import { DeleteDialog } from '@/components/ui/delete-dialog';
 
 
-// Custom icon voor klassen
-const ChalkBoard = (props: any) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg" 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round"
-    {...props}
-  >
-    <rect x="2" y="2" width="20" height="14" rx="2" />
-    <line x1="2" y1="12" x2="22" y2="12" />
-    <line x1="6" y1="12" x2="6" y2="20" />
-    <line x1="18" y1="12" x2="18" y2="20" />
-    <ellipse cx="12" cy="18" rx="3" ry="2" />
-    <path d="M10 4h4" />
-    <path d="M8 8h8" />
-  </svg>
-);
+
 
 type ClassType = {
   id: number;
@@ -308,7 +287,7 @@ export default function StudentGroups() {
       <PremiumHeader 
         title="Klassen" 
         path="Beheer > Klassen" 
-        icon={ChalkBoard}
+        icon={School}
         description="Beheer klasgroepen, bekijk studentenlijsten en wijs docenten toe aan klassen"
       />
 
@@ -334,18 +313,18 @@ export default function StudentGroups() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowFilterOptions(!showFilterOptions)}
-                className="h-8 text-xs rounded-sm border-[#e5e7eb]"
+                className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
+                title="Filters"
               >
-                <Search className="h-3.5 w-3.5 mr-1" />
-                Filters
+                <Filter className="h-3.5 w-3.5" />
               </Button>
               
               <Button
                 onClick={() => setShowNewClassDialog(true)}
                 size="sm"
-                className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white"
+                className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white ml-auto"
               >
-                <Plus className="h-3.5 w-3.5 mr-1" />
+                <PlusCircle className="h-3.5 w-3.5 mr-1" />
                 Nieuwe Klas
               </Button>
             </div>
@@ -559,7 +538,7 @@ export default function StudentGroups() {
           <div className="bg-[#1e40af] py-4 px-6">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-2 rounded-full">
-                <ChalkBoard className="h-5 w-5 text-white" />
+                <School className="h-5 w-5 text-white" />
               </div>
               <div>
                 <DialogTitle className="text-white text-lg font-semibold m-0">Nieuwe Klas Toevoegen</DialogTitle>
@@ -774,7 +753,7 @@ export default function StudentGroups() {
                 <div className="space-y-4">
                   <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                     <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                      <ChalkBoard className="h-4 w-4 mr-2" />
+                      <School className="h-4 w-4 mr-2" />
                       Algemene informatie
                     </h3>
                     <div className="space-y-3">

@@ -442,22 +442,27 @@ export default function Teachers() {
     if (!validateNewTeacher()) return;
     
     try {
-      // Genereer een teacherId
+      // Genereer een teacherId en uniek ID
       const teacherId = generateTeacherId();
+      const newId = Math.max(...teachers.map(t => t.id), 0) + 1;
       
       const newTeacherWithId = {
         ...newTeacher,
+        id: newId,
         teacherId,
         educations: teacherEducations,
         languages: teacherLanguages,
         subjects: selectedSubjects
       };
       
-      // In een echte applicatie doe je dit via de API
-      // const teacherResponse = await apiRequest('/api/teachers', {
-      //   method: 'POST',
-      //   body: newTeacherWithId
-      // });
+      // Voeg toe aan de teachers lijst
+      const updatedTeachers = [...teachers, newTeacherWithId];
+      setTeachers(updatedTeachers);
+      
+      // Sla op in localStorage
+      localStorage.setItem('teachers', JSON.stringify(updatedTeachers));
+      
+      console.log('Docenten opgeslagen in localStorage:', updatedTeachers.length);
       
       toast({
         title: "Docent toegevoegd",
@@ -468,8 +473,6 @@ export default function Teachers() {
       resetTeacherForm();
       setShowNewTeacherDialog(false);
       
-      // Vernieuw de lijst (in een echte applicatie)
-      // queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
     } catch (error) {
       toast({
         title: "Fout bij toevoegen",

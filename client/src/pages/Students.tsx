@@ -277,9 +277,6 @@ export default function Students() {
         description: "De student is succesvol toegevoegd aan de lijst."
       });
       
-      // Open het dialoogvenster om een voogd toe te voegen
-      setIsAddGuardianDialogOpen(true);
-      
     } catch (error) {
       console.error("Fout bij toevoegen student:", error);
       toast({

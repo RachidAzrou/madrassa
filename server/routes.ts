@@ -3924,7 +3924,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new payment (start Mollie payment process)
-  app.post("/api/payments", async (req, res) => {
+  apiRouter.post("/api/payments", async (req, res) => {
     try {
       const paymentData = insertPaymentSchema.parse(req.body);
       

@@ -1130,165 +1130,213 @@ export default function Teachers() {
 
       {/* Dialoogvenster voor bekijken van docent gegevens */}
       <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
-        <DialogContent className="sm:max-w-[85vw] p-0">
-          {/* Dialog Header */}
-          <div className="bg-blue-600 py-4 px-6 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-white/20 p-2 rounded-full">
-                <GraduationCap className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <DialogTitle className="text-white text-lg font-semibold m-0">Docent gegevens</DialogTitle>
-                <DialogDescription className="text-white/70 text-sm m-0">
-                  Details van de geselecteerde docent.
-                </DialogDescription>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0 text-white/70 hover:text-white"
-              onClick={() => setShowViewDialog(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+        <DialogContent className="sm:max-w-[95vw] lg:max-w-[85vw] p-0 max-h-[95vh] overflow-hidden">
+          <DialogHeaderWithIcon
+            icon={<GraduationCap className="h-5 w-5" />}
+            title="Docent Details"
+            description="Overzicht van alle docentgegevens en informatie"
+          />
           
           {selectedTeacher && (
-            <div className="p-6">
-              <div className="flex flex-col md:flex-row gap-6">
-                {/* Linker kolom - Persoonlijke info */}
-                <div className="w-full md:w-1/3">
-                  <div className="flex flex-col items-center p-6 border rounded-lg bg-gray-50">
-                    <Avatar className="h-24 w-24 mb-4">
-                      <AvatarFallback className="text-xl bg-blue-100 text-blue-600">
-                        {selectedTeacher.firstName.charAt(0)}{selectedTeacher.lastName.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <h3 className="text-xl font-semibold">{selectedTeacher.firstName} {selectedTeacher.lastName}</h3>
-                    <p className="text-sm text-gray-500 mb-3">{selectedTeacher.teacherId}</p>
-                    <Badge className={`px-2 py-1 text-xs font-normal mb-4 ${getStatusColor(selectedTeacher.status)}`}>
-                      {getStatusLabel(selectedTeacher.status)}
-                    </Badge>
-                    
-                    <div className="w-full space-y-3">
-                      <div className="flex items-start">
-                        <Mail className="h-4 w-4 mt-0.5 text-gray-500 mr-2" />
-                        <div>
-                          <p className="text-xs text-gray-500">Email</p>
-                          <p className="text-sm">{selectedTeacher.email}</p>
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-4 sm:p-6 space-y-6">
+                {/* Persoonlijke Informatie Card */}
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 sm:px-6 py-4 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                      <User className="h-5 w-5 mr-2 text-blue-600" />
+                      Persoonlijke Informatie
+                    </h3>
+                  </div>
+                  <div className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row items-start gap-6">
+                      {/* Foto en basis info */}
+                      <div className="flex flex-col items-center space-y-4">
+                        <div className="relative">
+                          <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
+                            {selectedTeacher.photoUrl ? (
+                              <img 
+                                src={selectedTeacher.photoUrl} 
+                                alt={`${selectedTeacher.firstName} ${selectedTeacher.lastName}`}
+                                className="w-full h-full rounded-full object-cover"
+                              />
+                            ) : (
+                              <AvatarFallback className="text-xl bg-blue-100 text-blue-600 font-semibold">
+                                {selectedTeacher.firstName.charAt(0)}{selectedTeacher.lastName.charAt(0)}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                        </div>
+                        <div className="text-center">
+                          <h2 className="text-xl font-bold text-gray-900">
+                            {selectedTeacher.firstName} {selectedTeacher.lastName}
+                          </h2>
+                          <p className="text-sm text-gray-500 font-medium">{selectedTeacher.teacherId}</p>
+                          <Badge className={`mt-2 px-3 py-1 text-xs font-medium ${getStatusColor(selectedTeacher.status)}`}>
+                            {getStatusLabel(selectedTeacher.status)}
+                          </Badge>
                         </div>
                       </div>
                       
-                      <div className="flex items-start">
-                        <Phone className="h-4 w-4 mt-0.5 text-gray-500 mr-2" />
-                        <div>
-                          <p className="text-xs text-gray-500">Telefoonnummer</p>
-                          <p className="text-sm">{selectedTeacher.phone || 'Niet opgegeven'}</p>
+                      {/* Details grid */}
+                      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-4">
+                          <div className="flex items-start space-x-3">
+                            <Mail className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Email</p>
+                              <p className="text-sm font-medium text-gray-900 break-all">{selectedTeacher.email}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-start space-x-3">
+                            <Phone className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Telefoon</p>
+                              <p className="text-sm font-medium text-gray-900">{selectedTeacher.phone || 'Niet opgegeven'}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-start space-x-3">
+                            <Calendar className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Geboortedatum</p>
+                              <p className="text-sm font-medium text-gray-900">{selectedTeacher.dateOfBirth || 'Niet opgegeven'}</p>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="flex items-start">
-                        <BookOpen className="h-4 w-4 mt-0.5 text-gray-500 mr-2" />
-                        <div>
-                          <p className="text-xs text-gray-500">Specialisatie</p>
-                          <p className="text-sm">{selectedTeacher.specialty || 'Niet opgegeven'}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start">
-                        <Users className="h-4 w-4 mt-0.5 text-gray-500 mr-2" />
-                        <div>
-                          <p className="text-xs text-gray-500">In dienst sinds</p>
-                          <p className="text-sm">{selectedTeacher.hireDate || 'Niet opgegeven'}</p>
+                        
+                        <div className="space-y-4">
+                          <div className="flex items-start space-x-3">
+                            <BookOpen className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Specialisatie</p>
+                              <p className="text-sm font-medium text-gray-900">{selectedTeacher.specialty || 'Niet opgegeven'}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-start space-x-3">
+                            <Briefcase className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">In dienst sinds</p>
+                              <p className="text-sm font-medium text-gray-900">{selectedTeacher.hireDate || 'Niet opgegeven'}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-start space-x-3">
+                            <Users className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Geslacht</p>
+                              <p className="text-sm font-medium text-gray-900">{selectedTeacher.gender || 'Niet opgegeven'}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                
-                {/* Rechter kolom - Tabs met aanvullende info */}
-                <div className="flex-1">
-                  <Tabs defaultValue="profile" className="w-full">
-                    <TabsList className="w-full justify-start mb-4 bg-gray-100 p-1">
-                      <TabsTrigger value="profile" className="data-[state=active]:bg-white">
-                        Profiel
-                      </TabsTrigger>
-                      <TabsTrigger value="subjects" className="data-[state=active]:bg-white">
-                        Vakken
-                      </TabsTrigger>
-                      <TabsTrigger value="schedule" className="data-[state=active]:bg-white">
-                        Rooster
-                      </TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="profile" className="p-4 border rounded-md">
-                      <h4 className="text-lg font-medium mb-3">Over {selectedTeacher.firstName}</h4>
-                      <p className="text-gray-700 mb-6">{selectedTeacher.bio || 'Geen bio opgegeven.'}</p>
+
+                {/* Vakken en Klassen */}
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-4 sm:px-6 py-4 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                      <BookOpen className="h-5 w-5 mr-2 text-green-600" />
+                      Vakken & Klassen
+                    </h3>
+                  </div>
+                  <div className="p-4 sm:p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium text-blue-900">Arabisch - Basis</h4>
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-200 text-blue-800">
+                            Actief
+                          </span>
+                        </div>
+                        <p className="text-sm text-blue-700">3 klassen • 45 leerlingen</p>
+                        <p className="text-xs text-blue-600 mt-1">Ma, Wo, Za</p>
+                      </div>
                       
-                      <h4 className="text-lg font-medium mb-3">Extra informatie</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 border rounded-md bg-gray-50">
-                          <h5 className="text-sm font-medium mb-2">Aankomende lessen</h5>
-                          <p className="text-sm text-gray-500">Geen geplande lessen</p>
+                      <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium text-purple-900">Islamitische Studies</h4>
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-200 text-purple-800">
+                            Actief
+                          </span>
                         </div>
-                        <div className="p-4 border rounded-md bg-gray-50">
-                          <h5 className="text-sm font-medium mb-2">Recente activiteit</h5>
-                          <p className="text-sm text-gray-500">Geen recente activiteit</p>
-                        </div>
+                        <p className="text-sm text-purple-700">2 klassen • 30 leerlingen</p>
+                        <p className="text-xs text-purple-600 mt-1">Za, Zo</p>
                       </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="subjects" className="p-4 border rounded-md">
-                      <h4 className="text-lg font-medium mb-3">Vakken</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 border rounded-md">
-                          <div className="flex items-center mb-2">
-                            <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-                            <h5 className="text-sm font-medium">Arabisch - Basis</h5>
-                          </div>
-                          <p className="text-xs text-gray-500">3 klassen · 45 leerlingen</p>
+                      
+                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200 opacity-75">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium text-gray-600">Geen andere vakken</h4>
                         </div>
-                        
-                        <div className="p-4 border rounded-md">
-                          <div className="flex items-center mb-2">
-                            <div className="h-2 w-2 rounded-full bg-blue-500 mr-2"></div>
-                            <h5 className="text-sm font-medium">Islamitische Studies</h5>
-                          </div>
-                          <p className="text-xs text-gray-500">2 klassen · 30 leerlingen</p>
-                        </div>
+                        <p className="text-sm text-gray-500">Voeg meer vakken toe via bewerken</p>
                       </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="schedule" className="p-4 border rounded-md">
-                      <h4 className="text-lg font-medium mb-3">Wekelijks rooster</h4>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rooster Overzicht */}
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                  <div className="bg-gradient-to-r from-orange-50 to-amber-50 px-4 sm:px-6 py-4 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                      <Clock className="h-5 w-5 mr-2 text-orange-600" />
+                      Wekelijks Rooster
+                    </h3>
+                  </div>
+                  <div className="p-4 sm:p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div className="space-y-3">
-                        <div className="flex flex-col">
-                          <h5 className="text-sm font-medium">Maandag</h5>
+                        <h4 className="font-medium text-gray-900 border-b border-gray-200 pb-2">Maandag</h4>
+                        <div className="bg-gray-50 rounded-lg p-3">
                           <p className="text-sm text-gray-500">Geen lessen ingepland</p>
                         </div>
-                        <div className="flex flex-col">
-                          <h5 className="text-sm font-medium">Woensdag</h5>
-                          <p className="text-sm text-gray-500">16:00 - 17:30 · Arabisch - Basis · Lokaal 3</p>
-                        </div>
-                        <div className="flex flex-col">
-                          <h5 className="text-sm font-medium">Zaterdag</h5>
-                          <p className="text-sm text-gray-500">10:00 - 11:30 · Islamitische Studies · Lokaal 1</p>
-                          <p className="text-sm text-gray-500">12:00 - 13:30 · Arabisch - Basis · Lokaal 3</p>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-gray-900 border-b border-gray-200 pb-2">Woensdag</h4>
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-sm font-medium text-blue-900">16:00 - 17:30</p>
+                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Lokaal 3</span>
+                          </div>
+                          <p className="text-sm text-blue-700">Arabisch - Basis</p>
                         </div>
                       </div>
-                    </TabsContent>
-                  </Tabs>
+                      
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-gray-900 border-b border-gray-200 pb-2">Zaterdag</h4>
+                        <div className="space-y-2">
+                          <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="text-sm font-medium text-purple-900">10:00 - 11:30</p>
+                              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">Lokaal 1</span>
+                            </div>
+                            <p className="text-sm text-purple-700">Islamitische Studies</p>
+                          </div>
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="text-sm font-medium text-blue-900">12:00 - 13:30</p>
+                              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Lokaal 3</span>
+                            </div>
+                            <p className="text-sm text-blue-700">Arabisch - Basis</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           )}
           
-          <DialogFooter className="px-6 py-4 bg-gray-50">
+          <DialogFooterContainer>
             <Button variant="outline" onClick={() => setShowViewDialog(false)}>
               Sluiten
             </Button>
             <Button 
-              variant="default" 
               className="bg-[#1e40af] hover:bg-[#1e3a8a]"
               onClick={() => {
                 setShowViewDialog(false);
@@ -1300,7 +1348,7 @@ export default function Teachers() {
               <Pencil className="h-3.5 w-3.5 mr-1" />
               Bewerken
             </Button>
-          </DialogFooter>
+          </DialogFooterContainer>
         </DialogContent>
       </Dialog>
 

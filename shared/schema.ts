@@ -287,6 +287,34 @@ export const events = pgTable("events", {
   isAllDay: boolean("is_all_day").default(false),
 });
 
+// Schedule (lessenrooster)
+export const schedules = pgTable("schedules", {
+  id: serial("id").primaryKey(),
+  dayOfWeek: text("day_of_week").notNull(), // Maandag, Dinsdag, etc.
+  timeSlot: text("time_slot").notNull(), // 08:30-09:20
+  startTime: text("start_time").notNull(), // 08:30
+  endTime: text("end_time").notNull(), // 09:20
+  className: text("class_name").notNull(), // 1A, 2B, etc.
+  classId: integer("class_id"),
+  subjectName: text("subject_name").notNull(), // Arabisch, Koran Studies, etc.
+  subjectId: integer("subject_id"),
+  teacherName: text("teacher_name").notNull(), // Ahmed Al-Mansouri
+  teacherId: integer("teacher_id"),
+  roomName: text("room_name").notNull(), // Lokaal A1
+  roomId: integer("room_id"),
+  type: text("type").default("regular"), // regular, exam, special
+  status: text("status").default("active"), // active, cancelled, rescheduled
+  notes: text("notes"),
+  academicYear: text("academic_year").default("2024-2025"),
+});
+
+export const insertScheduleSchema = createInsertSchema(schedules).omit({
+  id: true
+});
+
+export type InsertSchedule = z.infer<typeof insertScheduleSchema>;
+export type Schedule = typeof schedules.$inferSelect;
+
 export const insertEventSchema = createInsertSchema(events).omit({
   id: true
 });

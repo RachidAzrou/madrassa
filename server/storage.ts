@@ -62,6 +62,13 @@ export interface IStorage {
   markMessageAsRead(id: number): Promise<Message | undefined>;
   deleteMessage(id: number): Promise<boolean>;
   getAuthorizedReceivers(senderId: number, senderRole: string): Promise<{id: number, role: string, name: string}[]>;
+  
+  // Schedule operations
+  getSchedules(): Promise<Schedule[]>;
+  getSchedule(id: number): Promise<Schedule | undefined>;
+  createSchedule(schedule: InsertSchedule): Promise<Schedule>;
+  updateSchedule(id: number, schedule: Partial<Schedule>): Promise<Schedule | undefined>;
+  deleteSchedule(id: number): Promise<boolean>;
 }
 
 // DatabaseStorage implementatie die gebruik maakt van de database

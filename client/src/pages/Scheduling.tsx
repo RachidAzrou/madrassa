@@ -479,85 +479,107 @@ export default function Scheduling() {
           </div>
         </div>
 
-        {/* Schedule Table */}
-        <div className="bg-white border border-gray-200 rounded-sm overflow-hidden">
-          <StandardTable>
-            <StandardTableHeader>
-              <StandardTableRow>
-                <StandardTableHeaderCell>Dag</StandardTableHeaderCell>
-                <StandardTableHeaderCell>Tijdslot</StandardTableHeaderCell>
-                <StandardTableHeaderCell>Klas</StandardTableHeaderCell>
-                <StandardTableHeaderCell>Vak</StandardTableHeaderCell>
-                <StandardTableHeaderCell>Docent</StandardTableHeaderCell>
-                <StandardTableHeaderCell>Lokaal</StandardTableHeaderCell>
-                <StandardTableHeaderCell>Status</StandardTableHeaderCell>
-                <EmptyActionHeader />
-              </StandardTableRow>
-            </StandardTableHeader>
-            <StandardTableBody>
-              {filteredSchedules.length === 0 ? (
-                <StandardTableRow>
-                  <StandardTableCell colSpan={8}>
-                    <TableEmptyState 
-                      colSpan={8}
-                      title="Geen lessen gevonden"
-                      description="Er zijn geen lessen die voldoen aan de geselecteerde filters."
-                    />
-                  </StandardTableCell>
-                </StandardTableRow>
-              ) : (
-                filteredSchedules.map((schedule: ScheduleEntry) => (
-                  <StandardTableRow key={schedule.id}>
-                    <StandardTableCell>
-                      <Badge variant="outline" className={getDayColor(schedule.dayOfWeek)}>
-                        {schedule.dayOfWeek}
-                      </Badge>
-                    </StandardTableCell>
-                    <StandardTableCell>
-                      <div className="flex items-center gap-1 text-sm">
-                        <Clock className="h-3 w-3 text-gray-400" />
-                        {schedule.timeSlot}
-                      </div>
-                    </StandardTableCell>
-                    <StandardTableCell>
-                      <div className="flex items-center gap-1">
-                        <Users className="h-3 w-3 text-gray-400" />
-                        <span className="font-medium">{schedule.className}</span>
-                      </div>
-                    </StandardTableCell>
-                    <StandardTableCell>
-                      <div className="flex items-center gap-1">
-                        <BookOpen className="h-3 w-3 text-gray-400" />
-                        {schedule.subjectName}
-                      </div>
-                    </StandardTableCell>
-                    <StandardTableCell>
-                      <div className="flex items-center gap-1">
-                        <User className="h-3 w-3 text-gray-400" />
-                        {schedule.teacherName}
-                      </div>
-                    </StandardTableCell>
-                    <StandardTableCell>
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3 text-gray-400" />
-                        {schedule.roomName}
-                      </div>
-                    </StandardTableCell>
-                    <StandardTableCell>
-                      {getStatusBadge(schedule.status)}
-                    </StandardTableCell>
-                    <StandardTableCell>
-                      <QuickActions
-                        onView={() => handleViewSchedule(schedule)}
-                        onEdit={() => handleEditSchedule(schedule)}
-                        onDelete={() => handleDeleteSchedule(schedule)}
-                      />
-                    </StandardTableCell>
-                  </StandardTableRow>
-                ))
-              )}
-            </StandardTableBody>
-          </StandardTable>
+        {/* Weekly Schedule Grid */}
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+          <div className="grid grid-cols-6 gap-0">
+            {/* Header Row */}
+            <div className="bg-blue-50 p-4 border-b border-r font-semibold text-sm text-gray-700">
+              Tijd
+            </div>
+            {['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag'].map((day) => (
+              <div key={day} className="bg-blue-50 p-4 border-b border-r font-semibold text-sm text-center text-gray-700">
+                {day}
+              </div>
+            ))}
+            
+            {/* Time slots and schedule grid */}
+            {['08:30-09:20', '09:30-10:20', '10:40-11:30', '11:40-12:30'].map((timeSlot) => (
+              <>
+                {/* Time column */}
+                <div key={`time-${timeSlot}`} className="bg-gray-50 p-4 border-b border-r font-medium text-sm text-center text-gray-600">
+                  <div className="flex items-center justify-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {timeSlot}
+                  </div>
+                </div>
+                
+                {/* Schedule cells for each day */}
+                {['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag'].map((day) => {
+                  const daySchedules = filteredSchedules.filter(
+                    (schedule: ScheduleEntry) => 
+                      schedule.dayOfWeek === day && 
+                      schedule.timeSlot === timeSlot
+                  );
+                  
+                  return (
+                    <div key={`${day}-${timeSlot}`} className="border-b border-r min-h-[120px] p-3 hover:bg-gray-50">
+                      {daySchedules.length > 0 ? (
+                        <div className="space-y-2">
+                          {daySchedules.map((schedule: ScheduleEntry) => (
+                            <div
+                              key={schedule.id}
+                              className="bg-gradient-to-br from-blue-100 to-blue-50 hover:from-blue-200 hover:to-blue-100 p-3 rounded-lg text-xs cursor-pointer transition-all duration-200 group shadow-sm border border-blue-200"
+                              onClick={() => handleViewSchedule(schedule)}
+                            >
+                              <div className="font-semibold text-blue-900 mb-1 flex items-center gap-1">
+                                <BookOpen className="w-3 h-3" />
+                                {schedule.subjectName}
+                              </div>
+                              <div className="text-blue-700 mb-1 flex items-center gap-1">
+                                <Users className="w-3 h-3" />
+                                {schedule.className}
+                              </div>
+                              <div className="text-blue-600 mb-1 flex items-center gap-1">
+                                <User className="w-3 h-3" />
+                                {schedule.teacherName}
+                              </div>
+                              <div className="text-blue-500 flex items-center gap-1">
+                                <MapPin className="w-3 h-3" />
+                                {schedule.roomName}
+                              </div>
+                              
+                              {/* Action buttons that appear on hover */}
+                              <div className="opacity-0 group-hover:opacity-100 flex gap-1 mt-2 transition-opacity">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditSchedule(schedule);
+                                  }}
+                                  className="h-6 w-6 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-300"
+                                >
+                                  <Pencil className="w-3 h-3" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteSchedule(schedule);
+                                  }}
+                                  className="h-6 w-6 p-0 text-red-600 hover:text-red-800 hover:bg-red-300"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-gray-400 text-xs">
+                          <div className="text-center">
+                            <div className="text-gray-300 mb-1">—</div>
+                            <div>Geen les</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            ))}
+          </div>
         </div>
       </div>
 

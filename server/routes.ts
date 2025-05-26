@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
+import { db } from "./db";
 import { z } from "zod";
 import { 
   insertStudentSchema, 
@@ -549,6 +550,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(program);
     } catch (error) {
       res.status(500).json({ message: "Error fetching program" });
+    }
+  });
+
+  // Programs API endpoints
+  apiRouter.get("/api/programs", async (req, res) => {
+    try {
+      // Direct database query for programs/courses
+      const programs = await db.select().from(schema.programs);
+      res.json({ programs, totalCount: programs.length });
+    } catch (error) {
+      console.error("Error fetching programs:", error);
+      res.status(500).json({ message: "Error fetching programs" });
     }
   });
 

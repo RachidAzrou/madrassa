@@ -27,6 +27,8 @@ import {
   EmptyActionHeader
 } from '@/components/ui/data-table-container';
 import { DeleteDialog } from '@/components/ui/delete-dialog';
+import { ImportButton } from '@/components/ui/import-button';
+import { ImportDialog } from '@/components/ui/import-dialog';
 
 // Type definities
 type GuardianType = {
@@ -53,6 +55,7 @@ export default function Guardians() {
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showNewGuardianDialog, setShowNewGuardianDialog] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [hasValidationAttempt, setHasValidationAttempt] = useState(false);
   const [newGuardian, setNewGuardian] = useState<Partial<GuardianType>>({
     firstName: '',
@@ -355,6 +358,10 @@ export default function Guardians() {
                 </>
               ) : (
                 <>
+                  <ImportButton
+                    onClick={() => setIsImportDialogOpen(true)}
+                    title="Importeer voogden"
+                  />
                   <Button
                     variant="outline"
                     size="sm"

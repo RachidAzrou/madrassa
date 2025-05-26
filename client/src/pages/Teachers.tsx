@@ -845,16 +845,13 @@ export default function Teachers() {
                   <div className="flex flex-col gap-2 justify-center items-end">
                     <button 
                       type="button" 
-                      className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors bg-[#8CD3AF] text-sm"
+                      className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
                       onClick={() => {
                         alert("BeID functionaliteit wordt binnenkort toegevoegd.");
                       }}
                     >
-                      <div className="bg-[#8CD3AF] rounded-sm px-1 text-white font-bold">
-                        <span className="text-black text-xs">be</span>
-                        <span className="text-white text-xs">ID</span>
-                      </div>
-                      <span className="text-xs font-medium text-gray-700">Identificeer met eID</span>
+                      <img src="/images/beid-logo.png" alt="eID" className="h-5" />
+                      <span className="text-xs font-medium text-gray-700">eID</span>
                     </button>
                     <button 
                       type="button" 
@@ -863,9 +860,7 @@ export default function Teachers() {
                         alert("itsme® functionaliteit wordt binnenkort toegevoegd.");
                       }}
                     >
-                      <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-sm px-1">
-                        <span className="text-white text-xs font-bold">its</span>
-                      </div>
+                      <img src="/images/itsme-logo.jpeg" alt="itsme" className="h-5" />
                       <span className="text-xs font-medium">itsme</span>
                     </button>
                   </div>
@@ -1395,29 +1390,22 @@ export default function Teachers() {
                     <div className="flex flex-col gap-2 justify-center items-end">
                       <button 
                         type="button" 
-                        className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors bg-[#8CD3AF] text-sm"
+                        className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
                         onClick={() => {
-                          // BeID functionaliteit placeholder
                           alert("BeID functionaliteit wordt binnenkort toegevoegd.");
                         }}
                       >
-                        <div className="bg-[#8CD3AF] rounded-sm px-1 text-white font-bold">
-                          <span className="text-black text-xs">be</span>
-                          <span className="text-white text-xs">ID</span>
-                        </div>
-                        <span className="text-xs font-medium text-gray-700">Identificeer met eID</span>
+                        <img src="/images/beid-logo.png" alt="eID" className="h-5" />
+                        <span className="text-xs font-medium text-gray-700">eID</span>
                       </button>
                       <button 
                         type="button" 
                         className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
                         onClick={() => {
-                          // itsme functionaliteit placeholder
                           alert("itsme® functionaliteit wordt binnenkort toegevoegd.");
                         }}
                       >
-                        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-sm px-1">
-                          <span className="text-white text-xs font-bold">its</span>
-                        </div>
+                        <img src="/images/itsme-logo.jpeg" alt="itsme" className="h-5" />
                         <span className="text-xs font-medium">itsme</span>
                       </button>
                     </div>

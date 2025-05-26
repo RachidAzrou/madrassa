@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { 
@@ -15,7 +16,7 @@ import {
 import { PageHeader } from '@/components/layout/page-header';
 import { Topbar } from '@/components/layout/topbar';
 import { Button } from '@/components/ui/button';
-import { format, startOfWeek, endOfWeek, addDays, parseISO, isToday, isWithinInterval } from 'date-fns';
+import { format, startOfWeek, endOfWeek, addDays, parseISO, isToday, isWithinInterval, isSameDay } from 'date-fns';
 import { nl } from 'date-fns/locale';
 
 // Aangepast ChalkBoard icoon
@@ -91,6 +92,7 @@ interface StudentGroupEnrollment {
 
 export default function Dashboard() {
   const [_, setLocation] = useLocation();
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const weekdays = getCurrentWeekDays();
   
   // Fetch stats data
@@ -156,6 +158,13 @@ export default function Dashboard() {
     const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
     const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });
     return isWithinInterval(eventDate, { start: weekStart, end: weekEnd });
+  });
+
+  // Filter events for the selected date
+  const selectedDateEvents = events.filter((event) => {
+    if (!event.date) return false;
+    const eventDate = parseISO(event.date);
+    return format(eventDate, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd');
   });
   
   // Navigatiefuncties
@@ -372,31 +381,70 @@ export default function Dashboard() {
           {/* Week view - Desktop app stijl weekkalender */}
           <div className="px-0 py-0">
             <div className="grid grid-cols-7 border-b border-[#e5e7eb]">
-              {weekdays.map((day, index) => (
-                <div 
-                  key={index}
-                  className={`text-center py-2 ${index < 6 ? 'border-r' : ''} border-[#e5e7eb] ${day.isToday ? 'bg-[#f0f4ff]' : ''}`}
-                >
-                  <div className="text-[10px] uppercase font-medium mb-1 text-gray-500">{day.dayShort}</div>
-                  <div className={`${day.isToday ? 'text-[#1e40af] font-semibold' : 'text-gray-700'} text-sm`}>
-                    {day.dayNumber}
+              {weekdays.map((day, index) => {
+                const dayEvents = events.filter(event => {
+                  if (!event.date) return false;
+                  const eventDate = parseISO(event.date);
+                  return isSameDay(eventDate, day.date);
+                });
+                
+                const isSelected = isSameDay(day.date, selectedDate);
+                
+                return (
+                  <div 
+                    key={index}
+                    onClick={() => setSelectedDate(day.date)}
+                    className={`text-center py-2 cursor-pointer transition-colors ${index < 6 ? 'border-r' : ''} border-[#e5e7eb] ${
+                      isSelected 
+                        ? 'bg-[#1e40af] text-white' 
+                        : day.isToday 
+                          ? 'bg-[#f0f4ff] hover:bg-[#e6edff]' 
+                          : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className={`text-[10px] uppercase font-medium mb-1 ${
+                      isSelected ? 'text-white/80' : 'text-gray-500'
+                    }`}>
+                      {day.dayShort}
+                    </div>
+                    <div className={`text-sm mb-1 ${
+                      isSelected 
+                        ? 'text-white font-semibold' 
+                        : day.isToday 
+                          ? 'text-[#1e40af] font-semibold' 
+                          : 'text-gray-700'
+                    }`}>
+                      {day.dayNumber}
+                    </div>
+                    {dayEvents.length > 0 && (
+                      <div className="flex justify-center">
+                        <div className={`w-1.5 h-1.5 rounded-full ${
+                          isSelected ? 'bg-white/80' : 'bg-[#1e40af]'
+                        }`}></div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             
-            {/* Events for this week - Desktop app stijl evenementenrooster */}
-            <div>
+            {/* Events for selected day - Desktop app stijl evenementenrooster */}
+            <div className="p-3">
+              <div className="mb-3">
+                <h4 className="text-xs font-medium text-gray-700">
+                  Evenementen voor {format(selectedDate, 'EEEE d MMMM yyyy', { locale: nl })}
+                </h4>
+              </div>
               {isEventsLoading ? (
                 <div className="h-24 flex items-center justify-center">
                   <div className="w-5 h-5 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
                 </div>
-              ) : currentWeekEvents.length === 0 ? (
+              ) : selectedDateEvents.length === 0 ? (
                 <div className="h-24 flex flex-col items-center justify-center py-3">
                   <div className="p-1.5 bg-[#f7f9fc] text-[#1e40af] mb-2 border border-[#e5e7eb] rounded-sm">
                     <Calendar className="h-4 w-4 opacity-70" />
                   </div>
-                  <p className="text-xs text-gray-500">Geen evenementen gepland deze week</p>
+                  <p className="text-xs text-gray-500">Geen evenementen op deze dag</p>
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -409,7 +457,7 @@ export default function Dashboard() {
               ) : (
                 <div>
                   <div className="space-y-2">
-                    {currentWeekEvents.slice(0, 5).map((event, index) => {
+                    {selectedDateEvents.map((event, index) => {
                       const getEventTypeColor = (type: string) => {
                         switch(type) {
                           case 'class': return 'bg-blue-100 text-blue-800 border-blue-200';
@@ -462,15 +510,15 @@ export default function Dashboard() {
                     })}
                   </div>
                   
-                  {currentWeekEvents.length > 5 && (
-                    <div className="px-3 py-2 text-right bg-[#f9fafc] border-t border-[#e5e7eb]">
+                  {selectedDateEvents.length > 3 && (
+                    <div className="pt-2 text-center border-t border-[#e5e7eb]">
                       <Button 
                         variant="ghost" 
                         size="sm" 
                         className="text-[10px] h-6 px-2 rounded-sm text-gray-500 hover:bg-gray-100"
                         onClick={navigateToCalendar}
                       >
-                        {currentWeekEvents.length - 5} meer evenementen
+                        Alle evenementen bekijken
                       </Button>
                     </div>
                   )}

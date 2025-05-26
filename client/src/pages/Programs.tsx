@@ -355,10 +355,26 @@ export default function Programs() {
 
   const handleTeacherSelection = (teacherId: string, selected: boolean) => {
     setProgramFormData(prev => {
-      const updatedTeachers = prev.assignedTeachers.map(t => 
-        t.id === teacherId ? { ...t, selected } : t
-      );
-      return { ...prev, assignedTeachers: updatedTeachers };
+      // Check if teacher is already in assignedTeachers array
+      const existingTeacherIndex = prev.assignedTeachers.findIndex(t => t.id === teacherId);
+      
+      if (existingTeacherIndex >= 0) {
+        // Update existing teacher
+        const updatedTeachers = prev.assignedTeachers.map(t => 
+          t.id === teacherId ? { ...t, selected } : t
+        );
+        return { ...prev, assignedTeachers: updatedTeachers };
+      } else if (selected) {
+        // Add new teacher to the array
+        const newTeacher = { id: teacherId, selected: true };
+        return { 
+          ...prev, 
+          assignedTeachers: [...prev.assignedTeachers, newTeacher] 
+        };
+      }
+      
+      // If not selected and not in array, do nothing
+      return prev;
     });
   };
 

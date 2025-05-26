@@ -1000,7 +1000,8 @@ export default function Calendar() {
             Annuleren
           </Button>
           <Button 
-            type="submit" 
+            type="button" 
+            onClick={handleSubmitEvent}
             className="bg-[#1e40af] hover:bg-[#1e40af]/90 w-full sm:w-auto"
             disabled={createEventMutation.isPending}
           >

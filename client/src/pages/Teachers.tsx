@@ -62,6 +62,7 @@ type TeacherType = {
   teacherId: string;
   firstName: string;
   lastName: string;
+  gender?: string;
   email: string;
   phone?: string;
   specialty?: string;
@@ -70,6 +71,11 @@ type TeacherType = {
   hireDate?: string;
   status: string;
   photoUrl?: string;
+  address?: string;
+  street?: string;
+  houseNumber?: string;
+  postalCode?: string;
+  city?: string;
 };
 
 type SubjectType = {
@@ -320,10 +326,15 @@ export default function Teachers() {
       const eidData = {
         firstName: "Mohammed",
         lastName: "El Hassan",
+        gender: "Man",
         dateOfBirth: "1985-03-12",
         email: "mohammed.elhassan@school.be",
         phone: "0496123456",
-        photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID"
+        photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID",
+        street: "Schoolstraat",
+        houseNumber: "25",
+        postalCode: "2000",
+        city: "Antwerpen"
       };
       
       setNewTeacher(prev => ({
@@ -333,7 +344,7 @@ export default function Teachers() {
       
       toast({
         title: "eID gegevens geladen",
-        description: "De docentgegevens zijn succesvol uitgelezen van de eID kaart.",
+        description: "De docentgegevens inclusief foto zijn succesvol uitgelezen van de eID kaart.",
       });
     }, 2000);
   };
@@ -351,9 +362,15 @@ export default function Teachers() {
       const itsmeData = {
         firstName: "Yasmine",
         lastName: "Alami",
+        gender: "Vrouw",
         dateOfBirth: "1988-07-19",
         email: "yasmine.alami@school.be",
-        phone: "0497654321"
+        phone: "0497654321",
+        photoUrl: "https://placehold.co/400x400/eee/7c3aed?text=Foto+itsme",
+        street: "Mechelsesteenweg",
+        houseNumber: "187",
+        postalCode: "2018",
+        city: "Antwerpen"
       };
       
       setNewTeacher(prev => ({
@@ -363,7 +380,7 @@ export default function Teachers() {
       
       toast({
         title: "itsme gegevens geladen",
-        description: "De docentgegevens zijn succesvol uitgelezen via itsme.",
+        description: "De docentgegevens inclusief foto zijn succesvol opgehaald via itsme.",
       });
     }, 2000);
   };
@@ -1505,6 +1522,58 @@ export default function Teachers() {
 
                 </SectionContainer>
 
+                <SectionContainer title="Adresgegevens">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-1">
+                      <Label htmlFor="street" className="text-xs text-gray-700">
+                        Straat
+                      </Label>
+                      <Input
+                        id="street"
+                        value={newTeacher.street || ''}
+                        onChange={(e) => setNewTeacher(prev => ({ ...prev, street: e.target.value }))}
+                        className="mt-1"
+                        placeholder="Bijv. Kerkstraat"
+                      />
+                    </div>
+                    <div className="md:col-span-1">
+                      <Label htmlFor="houseNumber" className="text-xs text-gray-700">
+                        Huisnummer
+                      </Label>
+                      <Input
+                        id="houseNumber"
+                        value={newTeacher.houseNumber || ''}
+                        onChange={(e) => setNewTeacher(prev => ({ ...prev, houseNumber: e.target.value }))}
+                        className="mt-1"
+                        placeholder="Bijv. 123A"
+                      />
+                    </div>
+                    <div className="md:col-span-1">
+                      <Label htmlFor="postalCode" className="text-xs text-gray-700">
+                        Postcode
+                      </Label>
+                      <Input
+                        id="postalCode"
+                        value={newTeacher.postalCode || ''}
+                        onChange={(e) => setNewTeacher(prev => ({ ...prev, postalCode: e.target.value }))}
+                        className="mt-1"
+                        placeholder="Bijv. 2000"
+                      />
+                    </div>
+                    <div className="md:col-span-1">
+                      <Label htmlFor="city" className="text-xs text-gray-700">
+                        Stad
+                      </Label>
+                      <Input
+                        id="city"
+                        value={newTeacher.city || ''}
+                        onChange={(e) => setNewTeacher(prev => ({ ...prev, city: e.target.value }))}
+                        className="mt-1"
+                        placeholder="Bijv. Antwerpen"
+                      />
+                    </div>
+                  </div>
+                </SectionContainer>
 
               </TabsContent>
               

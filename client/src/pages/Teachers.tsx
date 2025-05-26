@@ -307,6 +307,67 @@ export default function Teachers() {
     }, 1500);
   };
 
+  // BeID authenticatie functie
+  const handleBeIDAuthentication = () => {
+    toast({
+      title: "eID authenticatie gestart",
+      description: "Plaats uw eID kaart in de lezer en volg de instructies...",
+      duration: 5000,
+    });
+    
+    // Simuleer eID authenticatie (in productie zou dit via eID API gaan)
+    setTimeout(() => {
+      const eidData = {
+        firstName: "Mohammed",
+        lastName: "El Hassan",
+        dateOfBirth: "1985-03-12",
+        email: "mohammed.elhassan@school.be",
+        phone: "0496123456",
+        photoUrl: "https://placehold.co/400x400/eee/31316a?text=Foto+eID"
+      };
+      
+      setNewTeacher(prev => ({
+        ...prev,
+        ...eidData
+      }));
+      
+      toast({
+        title: "eID gegevens geladen",
+        description: "De docentgegevens zijn succesvol uitgelezen van de eID kaart.",
+      });
+    }, 2000);
+  };
+
+  // itsme authenticatie functie
+  const handleItsmeAuthentication = () => {
+    toast({
+      title: "itsme authenticatie gestart",
+      description: "Open de itsme app op uw smartphone en bevestig uw identiteit...",
+      duration: 5000,
+    });
+    
+    // Simuleer itsme authenticatie (in productie zou dit via itsme API gaan)
+    setTimeout(() => {
+      const itsmeData = {
+        firstName: "Yasmine",
+        lastName: "Alami",
+        dateOfBirth: "1988-07-19",
+        email: "yasmine.alami@school.be",
+        phone: "0497654321"
+      };
+      
+      setNewTeacher(prev => ({
+        ...prev,
+        ...itsmeData
+      }));
+      
+      toast({
+        title: "itsme gegevens geladen",
+        description: "De docentgegevens zijn succesvol uitgelezen via itsme.",
+      });
+    }, 2000);
+  };
+
   // Valideren van het nieuwe docent formulier
   const validateNewTeacher = () => {
     // Controleren of verplichte velden zijn ingevuld: voornaam, achternaam, email
@@ -1290,9 +1351,7 @@ export default function Teachers() {
                         <button 
                           type="button" 
                           className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                          onClick={() => {
-                            alert("BeID functionaliteit wordt binnenkort toegevoegd.");
-                          }}
+                          onClick={handleBeIDAuthentication}
                         >
                           <img src="/images/beid-logo.png" alt="eID" className="h-5" />
                           <span className="text-xs font-medium text-gray-700">eID</span>
@@ -1300,9 +1359,7 @@ export default function Teachers() {
                         <button 
                           type="button" 
                           className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                          onClick={() => {
-                            alert("itsme® functionaliteit wordt binnenkort toegevoegd.");
-                          }}
+                          onClick={handleItsmeAuthentication}
                         >
                           <img src="/images/itsme-logo.jpeg" alt="itsme" className="h-5" />
                           <span className="text-xs font-medium">itsme</span>

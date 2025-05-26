@@ -1322,7 +1322,7 @@ export default function Teachers() {
 
       {/* Dialoogvenster voor nieuwe docent */}
       <Dialog open={showNewTeacherDialog} onOpenChange={setShowNewTeacherDialog}>
-        <DialogContent className="sm:max-w-[85vw] p-0">
+        <DialogContent className="sm:max-w-[85vw] p-0 min-h-[600px] max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeaderWithIcon
             icon={<GraduationCap className="h-5 w-5" />}
             title="Nieuwe docent toevoegen"
@@ -1330,7 +1330,7 @@ export default function Teachers() {
           />
           
           {/* Tabs met formulier secties */}
-          <DialogFormContainer>
+          <DialogFormContainer className="flex-1 overflow-y-auto">
             <Tabs 
               value={activeTab} 
               onValueChange={setActiveTab} 

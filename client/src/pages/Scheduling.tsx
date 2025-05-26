@@ -202,7 +202,7 @@ export default function Scheduling() {
   ];
 
   // API calls with fallback to mock data
-  const { data: scheduleData, isLoading: schedulesLoading } = useQuery({
+  const { data: scheduleData, isLoading: schedulesLoading, error: schedulesError } = useQuery({
     queryKey: ['/api/schedules'],
     queryFn: () => fetch('/api/schedules').then(res => res.json()),
   });

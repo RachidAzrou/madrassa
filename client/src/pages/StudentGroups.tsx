@@ -150,7 +150,7 @@ export default function StudentGroups() {
       cls.location?.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesClassName = !classNameFilter || cls.name.toLowerCase().includes(classNameFilter.toLowerCase());
-    const matchesAcademicYear = !academicYearFilter || cls.academicYear === academicYearFilter;
+    const matchesAcademicYear = !academicYearFilter || academicYearFilter === 'all' || cls.academicYear === academicYearFilter;
     const matchesLocation = !locationFilter || cls.location?.toLowerCase().includes(locationFilter.toLowerCase());
     const matchesTeacher = !teacherFilter || cls.teacherName?.toLowerCase().includes(teacherFilter.toLowerCase());
     const matchesCapacity = !capacityFilter || (cls.maxCapacity && cls.maxCapacity >= parseInt(capacityFilter));
@@ -384,7 +384,7 @@ export default function StudentGroups() {
                       <SelectValue placeholder="Alle schooljaren" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Alle schooljaren</SelectItem>
+                      <SelectItem value="all">Alle schooljaren</SelectItem>
                       <SelectItem value="2023-2024">2023-2024</SelectItem>
                       <SelectItem value="2024-2025">2024-2025</SelectItem>
                       <SelectItem value="2025-2026">2025-2026</SelectItem>

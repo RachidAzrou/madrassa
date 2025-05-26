@@ -456,7 +456,7 @@ export default function StudentGroups() {
             </div>
           ) : (
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <DataTableHeader>
                 <tr className="border-b border-gray-200">
                   <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">
                     <Checkbox
@@ -478,7 +478,7 @@ export default function StudentGroups() {
                   <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Status</th>
                   <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right">Acties</th>
                 </tr>
-              </thead>
+              </DataTableHeader>
               <tbody>
                 {filteredClasses.map((cls: ClassType) => (
                   <tr 
@@ -522,42 +522,18 @@ export default function StudentGroups() {
                       </Badge>
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleViewClass(cls)}
-                          className="h-8 w-8 p-0 hover:bg-blue-50"
-                          title="Bekijken"
-                        >
-                          <Eye className="h-4 w-4 text-blue-600" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditClass(cls)}
-                          className="h-8 w-8 p-0 hover:bg-blue-50"
-                          title="Bewerken"
-                        >
-                          <Edit className="h-4 w-4 text-blue-600" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteClass(cls)}
-                          className="h-8 w-8 p-0 hover:bg-red-50"
-                          title="Verwijderen"
-                        >
-                          <Trash2 className="h-4 w-4 text-red-600" />
-                        </Button>
-                      </div>
+                      <QuickActions
+                        onView={() => handleViewClass(cls)}
+                        onEdit={() => handleEditClass(cls)}
+                        onDelete={() => handleDeleteClass(cls)}
+                      />
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           )}
-        </div>
+        </TableContainer>
 
         <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
           <div>
@@ -569,7 +545,7 @@ export default function StudentGroups() {
             )}
           </div>
         </div>
-      </div>
+      </DataTableContainer>
 
       {/* Nieuwe klas dialoog */}
       <Dialog open={showNewClassDialog} onOpenChange={setShowNewClassDialog}>

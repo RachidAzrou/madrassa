@@ -432,30 +432,7 @@ export default function Calendar() {
       />
       
       <div className="px-6 py-6 flex-1 space-y-6">
-        {/* Legende */}
-        <Card className="mb-6 border-blue-200 bg-blue-50/30">
-          <CardContent className="p-4">
-            <div className="flex flex-wrap items-center gap-6">
-              <h3 className="text-sm font-medium text-gray-700 mr-2">Legende:</h3>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded border-2" style={{backgroundColor: "#E3F2FD", borderColor: "#1E88E5"}}></div>
-                <span className="text-sm text-gray-600">Les</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded border-2" style={{backgroundColor: "#FFEBEE", borderColor: "#E53935"}}></div>
-                <span className="text-sm text-gray-600">Examen</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded border-2" style={{backgroundColor: "#E8F5E9", borderColor: "#43A047"}}></div>
-                <span className="text-sm text-gray-600">Vakantie</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded border-2" style={{backgroundColor: "#FFF9C4", borderColor: "#FDD835"}}></div>
-                <span className="text-sm text-gray-600">Evenement</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
 
         {/* Zoekbalk - onder de paginatitel geplaatst */}
         <div className="mb-4">
@@ -559,6 +536,29 @@ export default function Calendar() {
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
+          </div>
+
+          {/* Legende */}
+          <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Legende:</span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-sm border" style={{backgroundColor: "#E3F2FD", borderColor: "#1E88E5"}}></div>
+                <span className="text-xs text-gray-700">Les</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-sm border" style={{backgroundColor: "#FFEBEE", borderColor: "#E53935"}}></div>
+                <span className="text-xs text-gray-700">Examen</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-sm border" style={{backgroundColor: "#E8F5E9", borderColor: "#43A047"}}></div>
+                <span className="text-xs text-gray-700">Vakantie</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-sm border" style={{backgroundColor: "#FFF9C4", borderColor: "#FDD835"}}></div>
+                <span className="text-xs text-gray-700">Evenement</span>
+              </div>
+            </div>
           </div>
         </div>
         

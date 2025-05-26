@@ -196,7 +196,10 @@ export default function Calendar() {
       prevMonthDay.setDate(prevMonthLastDay.getDate() - startingDayOfWeek + i + 1);
       
       const dateStr = prevMonthDay.toISOString().split('T')[0];
-      const dayEvents = events.filter(event => event.date.startsWith(dateStr));
+      const dayEvents = events.filter(event => {
+        const eventDate = event.date.split('T')[0];
+        return eventDate === dateStr;
+      });
       
       days.push({ 
         day: prevMonthDay.getDate(), 
@@ -212,7 +215,11 @@ export default function Calendar() {
       const dateStr = date.toISOString().split('T')[0];
       
       // Find events for this day
-      const dayEvents = events.filter(event => event.date.startsWith(dateStr));
+      const dayEvents = events.filter(event => {
+        // Normaliseer beide datums naar YYYY-MM-DD formaat
+        const eventDate = event.date.split('T')[0]; // Voor het geval er een tijd component is
+        return eventDate === dateStr;
+      });
       
       // Check if this is today
       const isToday = new Date().toDateString() === date.toDateString();

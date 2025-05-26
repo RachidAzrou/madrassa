@@ -1464,12 +1464,225 @@ export default function Students() {
 
       {/* Delete Confirmation Dialog */}
       <DeleteDialog
-        isOpen={isDeleteDialogOpen}
+        open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={confirmDeleteStudent}
         title="Student verwijderen"
         description={`Weet je zeker dat je ${studentToDelete?.firstName} ${studentToDelete?.lastName} wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
       />
+
+      {/* Add Guardian Dialog */}
+      <Dialog open={isAddGuardianDialogOpen} onOpenChange={setIsAddGuardianDialogOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="guardian-dialog-description">
+          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between -mx-6 -mt-6 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <UserPlus className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Voogd Toevoegen</DialogTitle>
+                <DialogDescription id="guardian-dialog-description" className="text-white/70 text-sm m-0">
+                  Voeg een nieuwe voogd toe of koppel een bestaande voogd.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+
+          <Tabs value={isAddingNewGuardian ? "new" : "existing"} onValueChange={(value) => setIsAddingNewGuardian(value === "new")}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="new">Nieuwe Voogd</TabsTrigger>
+              <TabsTrigger value="existing">Bestaande Voogd</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="new" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="guardian-firstName">Voornaam *</Label>
+                  <Input
+                    id="guardian-firstName"
+                    value={guardianFormData.firstName}
+                    onChange={(e) => setGuardianFormData(prev => ({...prev, firstName: e.target.value}))}
+                    placeholder="Voornaam"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="guardian-lastName">Achternaam *</Label>
+                  <Input
+                    id="guardian-lastName"
+                    value={guardianFormData.lastName}
+                    onChange={(e) => setGuardianFormData(prev => ({...prev, lastName: e.target.value}))}
+                    placeholder="Achternaam"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="guardian-relationship">Relatie *</Label>
+                  <Select 
+                    value={guardianFormData.relationship} 
+                    onValueChange={(value) => setGuardianFormData(prev => ({...prev, relationship: value}))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer relatie" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ouder">Ouder</SelectItem>
+                      <SelectItem value="voogd">Voogd</SelectItem>
+                      <SelectItem value="grootouder">Grootouder</SelectItem>
+                      <SelectItem value="oom_tante">Oom/Tante</SelectItem>
+                      <SelectItem value="anders">Anders</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="guardian-email">Email</Label>
+                  <Input
+                    id="guardian-email"
+                    type="email"
+                    value={guardianFormData.email}
+                    onChange={(e) => setGuardianFormData(prev => ({...prev, email: e.target.value}))}
+                    placeholder="Email"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="guardian-phone">Telefoon</Label>
+                  <Input
+                    id="guardian-phone"
+                    value={guardianFormData.phone}
+                    onChange={(e) => setGuardianFormData(prev => ({...prev, phone: e.target.value}))}
+                    placeholder="Telefoon"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="guardian-occupation">Beroep</Label>
+                  <Input
+                    id="guardian-occupation"
+                    value={guardianFormData.occupation}
+                    onChange={(e) => setGuardianFormData(prev => ({...prev, occupation: e.target.value}))}
+                    placeholder="Beroep"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="guardian-address">Adres</Label>
+                <Input
+                  id="guardian-address"
+                  value={guardianFormData.address}
+                  onChange={(e) => setGuardianFormData(prev => ({...prev, address: e.target.value}))}
+                  placeholder="Volledig adres"
+                />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="guardian-emergency"
+                  checked={guardianFormData.isEmergencyContact}
+                  onCheckedChange={(checked) => setGuardianFormData(prev => ({...prev, isEmergencyContact: !!checked}))}
+                />
+                <Label htmlFor="guardian-emergency">Noodcontact</Label>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="existing" className="space-y-4">
+              <div>
+                <Label htmlFor="guardian-search">Zoek bestaande voogd</Label>
+                <Input
+                  id="guardian-search"
+                  value={guardianSearchTerm}
+                  onChange={(e) => setGuardianSearchTerm(e.target.value)}
+                  placeholder="Zoek op naam..."
+                />
+              </div>
+              <div className="text-center text-gray-500 py-8">
+                <p>Functionaliteit voor bestaande voogden komt binnenkort beschikbaar</p>
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsAddGuardianDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button 
+              onClick={() => {
+                if (isAddingNewGuardian) {
+                  const newGuardian = {
+                    ...guardianFormData,
+                    id: Date.now(),
+                  };
+                  setSelectedGuardians([...selectedGuardians, newGuardian]);
+                  setGuardianFormData({
+                    firstName: '',
+                    lastName: '',
+                    relationship: 'ouder',
+                    email: '',
+                    phone: '',
+                    address: '',
+                    occupation: '',
+                    isEmergencyContact: true,
+                  });
+                }
+                setIsAddGuardianDialogOpen(false);
+              }}
+              className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+            >
+              Voogd Toevoegen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Link Sibling Dialog */}
+      <Dialog open={isLinkSiblingDialogOpen} onOpenChange={setIsLinkSiblingDialogOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="sibling-dialog-description">
+          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between -mx-6 -mt-6 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Broer/Zus Koppelen</DialogTitle>
+                <DialogDescription id="sibling-dialog-description" className="text-white/70 text-sm m-0">
+                  Koppel een bestaande student als broer of zus.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="sibling-search">Zoek student</Label>
+              <Input
+                id="sibling-search"
+                value={siblingSearchTerm}
+                onChange={(e) => setSiblingSearchTerm(e.target.value)}
+                placeholder="Zoek op naam of student ID..."
+              />
+            </div>
+            
+            <div className="text-center text-gray-500 py-8">
+              <p>Functionaliteit voor broer/zus koppeling komt binnenkort beschikbaar</p>
+            </div>
+          </div>
+
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsLinkSiblingDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button 
+              onClick={() => setIsLinkSiblingDialogOpen(false)}
+              className="bg-[#1e40af] hover:bg-[#1e40af]/90"
+            >
+              Koppelen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

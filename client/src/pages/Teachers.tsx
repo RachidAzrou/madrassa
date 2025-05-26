@@ -20,7 +20,8 @@ import {
   CustomDialog, 
   DialogFormContainer, 
   SectionContainer, 
-  DialogFooterContainer 
+  DialogFooterContainer,
+  DialogHeaderWithIcon
 } from '@/components/ui/custom-dialog';
 import {
   ActionButtonsContainer,

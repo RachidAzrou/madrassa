@@ -43,6 +43,17 @@ import {
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { 
+  CustomDialog,
+  DialogHeaderWithIcon,
+  DialogFormContainer,
+  SectionContainer,
+  DialogFooterContainer,
+  FormLabel,
+  StyledSelect,
+  StyledSelectItem,
+  StyledCheckbox
+} from '@/components/ui/custom-dialog';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -445,16 +456,15 @@ export default function Programs() {
       </div>
       
       {/* Nieuw vak dialoogvenster */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Nieuw vak toevoegen</DialogTitle>
-            <DialogDescription>
-              Vul de onderstaande gegevens in om een nieuw vak toe te voegen.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <form onSubmit={handleSubmitProgram}>
+      <CustomDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} maxWidth="600px">
+        <DialogHeaderWithIcon
+          title="Nieuw Vak Toevoegen"
+          description="Vul de onderstaande gegevens in om een nieuw vak toe te voegen."
+          icon={<BookText className="h-5 w-5" />}
+        />
+        
+        <form onSubmit={handleSubmitProgram}>
+          <div className="p-6">
             <Tabs defaultValue="algemeen" className="mt-2">
               <TabsList className="mb-4">
                 <TabsTrigger value="algemeen">Algemene informatie</TabsTrigger>
@@ -463,284 +473,239 @@ export default function Programs() {
               </TabsList>
               
               <TabsContent value="algemeen" className="mt-0">
-                <div className="p-4 bg-white rounded-lg min-h-[450px]">
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name" className="text-xs font-medium text-gray-700">
-                          Naam vak <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          id="name"
-                          value={programFormData.name}
-                          onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
-                          className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="Voer vaknaam in"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="code" className="text-xs font-medium text-gray-700">
-                          Code <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          id="code"
-                          value={programFormData.code}
-                          onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
-                          className="mt-1 h-9 text-sm bg-white border-gray-200"
-                          placeholder="Voer vakcode in"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="duration" className="text-xs font-medium text-gray-700">
-                          Duur
-                        </Label>
-                        <Select
-                          value={programFormData.duration.toString()}
-                          onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
-                        >
-                          <SelectTrigger id="duration" className="mt-1 h-9 text-sm bg-white border-gray-200">
-                            <SelectValue placeholder="Selecteer duur" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1">Jaar</SelectItem>
-                            <SelectItem value="2">Semester</SelectItem>
-                            <SelectItem value="3">Trimester</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="status" className="text-xs font-medium text-gray-700">
-                          Status
-                        </Label>
-                        <Select
-                          value={programFormData.isActive ? "true" : "false"}
-                          onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
-                        >
-                          <SelectTrigger id="status" className="mt-1 h-9 text-sm bg-white border-gray-200">
-                            <SelectValue placeholder="Selecteer status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="true">Actief</SelectItem>
-                            <SelectItem value="false">Inactief</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-
-                      <div className="col-span-1 md:col-span-2">
-                        <Label htmlFor="description" className="text-xs font-medium text-gray-700">
-                          Beschrijving
-                        </Label>
-                        <Textarea
-                          id="description"
-                          value={programFormData.description || ""}
-                          onChange={(e) => setProgramFormData({ ...programFormData, description: e.target.value })}
-                          className="mt-1 min-h-[100px] resize-none text-sm bg-white border-gray-200"
-                          placeholder="Geef een beschrijving van het vak..."
-                        />
-                      </div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <FormLabel htmlFor="name">
+                        Naam vak <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Input
+                        id="name"
+                        value={programFormData.name}
+                        onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
+                        className="h-9 text-sm"
+                        placeholder="Voer vaknaam in"
+                      />
                     </div>
+                    
+                    <div className="space-y-2">
+                      <FormLabel htmlFor="code">
+                        Code <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Input
+                        id="code"
+                        value={programFormData.code}
+                        onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
+                        className="h-9 text-sm"
+                        placeholder="Voer vakcode in"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <FormLabel htmlFor="duration">Duur</FormLabel>
+                      <StyledSelect
+                        value={programFormData.duration.toString()}
+                        onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
+                        placeholder="Selecteer duur"
+                      >
+                        <StyledSelectItem value="1">Jaar</StyledSelectItem>
+                        <StyledSelectItem value="2">Semester</StyledSelectItem>
+                        <StyledSelectItem value="3">Trimester</StyledSelectItem>
+                      </StyledSelect>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <FormLabel htmlFor="status">Status</FormLabel>
+                      <StyledSelect
+                        value={programFormData.isActive ? "true" : "false"}
+                        onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
+                        placeholder="Selecteer status"
+                      >
+                        <StyledSelectItem value="true">Actief</StyledSelectItem>
+                        <StyledSelectItem value="false">Inactief</StyledSelectItem>
+                      </StyledSelect>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <FormLabel htmlFor="description">Beschrijving</FormLabel>
+                    <Textarea
+                      id="description"
+                      value={programFormData.description || ""}
+                      onChange={(e) => setProgramFormData({ ...programFormData, description: e.target.value })}
+                      className="min-h-[100px] resize-none text-sm"
+                      placeholder="Geef een beschrijving van het vak..."
+                    />
                   </div>
                 </div>
               </TabsContent>
 
-              {/* Curriculum tabblad */}
               <TabsContent value="curriculum" className="mt-0">
-                <div className="p-4 bg-white rounded-lg min-h-[450px]">
-                  <div className="space-y-4">
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="instroomvereisten" className="text-xs font-medium text-gray-700">Instroomvereisten</Label>
-                      <Textarea
-                        id="instroomvereisten"
-                        className="mt-1 min-h-[100px] resize-none text-sm bg-white border-gray-200"
-                        placeholder="Beschrijf de instroomvereisten..."
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="leerdoelen" className="text-xs font-medium text-gray-700">Leerdoelen</Label>
-                      <Textarea
-                        id="leerdoelen"
-                        className="mt-1 min-h-[100px] resize-none text-sm bg-white border-gray-200"
-                        placeholder="Beschrijf de leerdoelen van dit vak..."
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="competenties" className="text-xs font-medium text-gray-700">Competenties</Label>
-                      <Textarea
-                        id="competenties"
-                        className="mt-1 min-h-[100px] resize-none text-sm bg-white border-gray-200"
-                        placeholder="Lijst van competenties die studenten ontwikkelen..."
-                      />
-                    </div>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <FormLabel htmlFor="instroomvereisten">Instroomvereisten</FormLabel>
+                    <Textarea
+                      id="instroomvereisten"
+                      className="min-h-[100px] resize-none text-sm"
+                      placeholder="Beschrijf de instroomvereisten..."
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <FormLabel htmlFor="leerdoelen">Leerdoelen</FormLabel>
+                    <Textarea
+                      id="leerdoelen"
+                      className="min-h-[100px] resize-none text-sm"
+                      placeholder="Beschrijf de leerdoelen van dit vak..."
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <FormLabel htmlFor="competenties">Competenties</FormLabel>
+                    <Textarea
+                      id="competenties"
+                      className="min-h-[100px] resize-none text-sm"
+                      placeholder="Lijst van competenties die studenten ontwikkelen..."
+                    />
                   </div>
                 </div>
               </TabsContent>
               
-              {/* Docenten tabblad */}
               <TabsContent value="docenten" className="mt-0">
-                <div className="p-4 bg-white rounded-lg min-h-[450px]">
-                  <div className="space-y-4">
-                    <Label className="text-xs font-medium text-gray-700">Toegewezen docenten</Label>
-                    <div className="border border-gray-200 rounded-md p-2 max-h-[300px] overflow-auto">
-                      {teachersData?.teachers && teachersData.teachers.length > 0 ? (
-                        <div className="space-y-2">
-                          {teachersData.teachers.map((teacher: any) => (
-                            <div key={teacher.id} className="flex items-center space-x-2 py-1 px-2 hover:bg-gray-50 rounded">
-                              <Checkbox 
-                                id={`teacher-${teacher.id}`}
-                                checked={programFormData.assignedTeachers.find(t => t.id === teacher.id)?.selected || false}
-                                onCheckedChange={(checked) => handleTeacherSelection(teacher.id, checked === true)}
-                              />
-                              <Label 
-                                htmlFor={`teacher-${teacher.id}`}
-                                className="text-sm font-normal text-gray-700 cursor-pointer flex-grow"
-                              >
-                                {teacher.firstName} {teacher.lastName}
-                              </Label>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-4 text-gray-500 italic">
-                          Geen docenten beschikbaar
-                        </div>
-                      )}
-                    </div>
+                <div className="space-y-4">
+                  <FormLabel>Toegewezen docenten</FormLabel>
+                  <div className="border border-gray-200 rounded-md p-4 max-h-[300px] overflow-auto">
+                    {teachersData?.teachers && teachersData.teachers.length > 0 ? (
+                      <div className="space-y-2">
+                        {teachersData.teachers.map((teacher: any) => (
+                          <div key={teacher.id} className="flex items-center space-x-2 py-1 px-2 hover:bg-gray-50 rounded">
+                            <StyledCheckbox 
+                              id={`teacher-${teacher.id}`}
+                              checked={programFormData.assignedTeachers.find(t => t.id === teacher.id)?.selected || false}
+                              onCheckedChange={(checked) => handleTeacherSelection(teacher.id, checked === true)}
+                            />
+                            <Label 
+                              htmlFor={`teacher-${teacher.id}`}
+                              className="text-sm font-normal text-gray-700 cursor-pointer flex-grow"
+                            >
+                              {teacher.firstName} {teacher.lastName}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-4 text-gray-500 italic">
+                        Geen docenten beschikbaar
+                      </div>
+                    )}
                   </div>
                 </div>
               </TabsContent>
             </Tabs>
-            
-            <div className="mt-6 flex justify-end gap-3">
-              <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                Annuleren
-              </Button>
-              <Button type="submit" className="hover:bg-[#1e40af]/90 bg-[#1e40af]">
-                Vak toevoegen
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </form>
+        
+        <DialogFooterContainer
+          onCancel={() => setIsAddDialogOpen(false)}
+          cancelText="Annuleren"
+          submitText="Vak toevoegen"
+        />
+      </CustomDialog>
       
       {/* Vak bewerken dialoogvenster */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Vak bewerken</DialogTitle>
-            <DialogDescription>
-              Bewerk de gegevens van het geselecteerde vak.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="py-4">
-            <form onSubmit={handleSubmitEditProgram} className="space-y-4">
+      <CustomDialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} maxWidth="600px">
+        <DialogHeaderWithIcon
+          title="Vak Bewerken"
+          description="Bewerk de gegevens van het geselecteerde vak."
+          icon={<Pencil className="h-5 w-5" />}
+        />
+        
+        <form onSubmit={handleSubmitEditProgram}>
+          <div className="p-6">
+            <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-name" className="text-xs font-medium text-gray-700">
+                  <FormLabel htmlFor="edit-name">
                     Naam vak <span className="text-red-500">*</span>
-                  </Label>
+                  </FormLabel>
                   <Input
                     id="edit-name"
                     value={programFormData.name}
                     onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
-                    className="mt-1 h-9 text-sm bg-white border-gray-200"
+                    className="h-9 text-sm"
                     placeholder="Voer vaknaam in"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-code" className="text-xs font-medium text-gray-700">
+                  <FormLabel htmlFor="edit-code">
                     Code <span className="text-red-500">*</span>
-                  </Label>
+                  </FormLabel>
                   <Input
                     id="edit-code"
                     value={programFormData.code}
                     onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
-                    className="mt-1 h-9 text-sm bg-white border-gray-200"
+                    className="h-9 text-sm"
                     placeholder="Voer vakcode in"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-duration" className="text-xs font-medium text-gray-700">
-                    Duur
-                  </Label>
-                  <Select
+                  <FormLabel htmlFor="edit-duration">Duur</FormLabel>
+                  <StyledSelect
                     value={programFormData.duration.toString()}
                     onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
+                    placeholder="Selecteer duur"
                   >
-                    <SelectTrigger id="edit-duration" className="mt-1 h-9 text-sm bg-white border-gray-200">
-                      <SelectValue placeholder="Selecteer duur" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">Jaar</SelectItem>
-                      <SelectItem value="2">Semester</SelectItem>
-                      <SelectItem value="3">Trimester</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <StyledSelectItem value="1">Jaar</StyledSelectItem>
+                    <StyledSelectItem value="2">Semester</StyledSelectItem>
+                    <StyledSelectItem value="3">Trimester</StyledSelectItem>
+                  </StyledSelect>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-status" className="text-xs font-medium text-gray-700">
-                    Status
-                  </Label>
-                  <Select
+                  <FormLabel htmlFor="edit-status">Status</FormLabel>
+                  <StyledSelect
                     value={programFormData.isActive ? "true" : "false"}
                     onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
+                    placeholder="Selecteer status"
                   >
-                    <SelectTrigger id="edit-status" className="mt-1 h-9 text-sm bg-white border-gray-200">
-                      <SelectValue placeholder="Selecteer status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Actief</SelectItem>
-                      <SelectItem value="false">Inactief</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <StyledSelectItem value="true">Actief</StyledSelectItem>
+                    <StyledSelectItem value="false">Inactief</StyledSelectItem>
+                  </StyledSelect>
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="edit-description" className="text-xs font-medium text-gray-700">
-                  Beschrijving
-                </Label>
+                <FormLabel htmlFor="edit-description">Beschrijving</FormLabel>
                 <Textarea
                   id="edit-description"
                   value={programFormData.description}
                   onChange={(e) => setProgramFormData({ ...programFormData, description: e.target.value })}
-                  className="mt-1 min-h-[100px] resize-none text-sm bg-white border-gray-200"
+                  className="min-h-[100px] resize-none text-sm"
                   placeholder="Geef een beschrijving van het vak..."
                 />
               </div>
-              
-              <div className="p-4 border-t flex justify-end gap-3 bg-gray-50 -mx-6 -mb-6">
-                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)} className="border-gray-300">
-                  Annuleren
-                </Button>
-                <Button type="submit" className="hover:bg-[#1e40af]/90 bg-[#1e40af]">
-                  Opslaan
-                </Button>
-              </div>
-            </form>
+            </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </form>
+        
+        <DialogFooterContainer
+          onCancel={() => setIsEditDialogOpen(false)}
+          cancelText="Annuleren"
+          submitText="Opslaan"
+        />
+      </CustomDialog>
       {/* Vak verwijderen dialoogvenster */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[450px]">
-          <DialogHeader>
-            <DialogTitle>Vak verwijderen</DialogTitle>
-            <DialogDescription>
-              Weet je zeker dat je dit vak wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+      <CustomDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen} maxWidth="450px">
+        <DialogHeaderWithIcon
+          title="Vak Verwijderen"
+          description="Weet je zeker dat je dit vak wilt verwijderen?"
+          icon={<Trash2 className="h-5 w-5" />}
+        />
+        
+        <div className="p-6">
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-md">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
@@ -752,22 +717,25 @@ export default function Programs() {
                   {selectedProgram && (
                     <>
                       Je staat op het punt om het vak <span className="font-medium">{selectedProgram.name}</span> ({selectedProgram.code}) te verwijderen.
+                      <br />
+                      <span className="text-red-600 font-medium">Deze actie kan niet ongedaan worden gemaakt.</span>
                     </>
                   )}
                 </p>
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Annuleren
-            </Button>
-            <Button variant="destructive" onClick={confirmDeleteProgram}>
-              Verwijderen
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </div>
+        
+        <DialogFooterContainer>
+          <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="w-full sm:w-auto">
+            Annuleren
+          </Button>
+          <Button variant="destructive" onClick={confirmDeleteProgram} className="w-full sm:w-auto">
+            Verwijderen
+          </Button>
+        </DialogFooterContainer>
+      </CustomDialog>
     </div>
   );
 }

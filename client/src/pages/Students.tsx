@@ -353,14 +353,16 @@ export default function Students() {
   };
 
   const handleDeleteStudentClick = (student) => {
-    setSelectedStudent(student);
+    setStudentToDelete(student);
     setIsDeleteDialogOpen(true);
   };
   
-  const handleDeleteStudent = async () => {
+  const confirmDeleteStudent = async () => {
+    if (!studentToDelete) return;
+    
     try {
       // Werkelijke API-aanroep om de student te verwijderen
-      await fetch(`/api/students/${selectedStudent.id}`, {
+      await fetch(`/api/students/${studentToDelete.id}`, {
         method: 'DELETE',
       });
       
@@ -368,7 +370,7 @@ export default function Students() {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
       
       // Update lokale state
-      const updatedStudents = students.filter(student => student.id !== selectedStudent.id);
+      const updatedStudents = students.filter(student => student.id !== studentToDelete.id);
       setStudents(updatedStudents);
       
       // Update localStorage
@@ -376,9 +378,11 @@ export default function Students() {
       
       toast({
         title: "Succes",
-        description: `Student ${selectedStudent.firstName} ${selectedStudent.lastName} is succesvol verwijderd.`,
+        description: `Student ${studentToDelete.firstName} ${studentToDelete.lastName} is succesvol verwijderd.`,
       });
+      
       setIsDeleteDialogOpen(false);
+      setStudentToDelete(null);
     } catch (error) {
       console.error('Fout bij het verwijderen van student:', error);
       toast({
@@ -387,11 +391,6 @@ export default function Students() {
         variant: "destructive"
       });
     }
-  };
-
-  const confirmDeleteStudent = () => {
-    setStudentToDelete(selectedStudent);
-    handleDeleteStudent();
   };
   
   // Functie om edit form input te hanteren

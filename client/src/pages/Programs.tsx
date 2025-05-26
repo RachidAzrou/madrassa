@@ -123,7 +123,13 @@ export default function Programs() {
   console.log('Fetched teachers:', teachersData);
 
   // Als data direct een array is, gebruik het; anders zoek naar data.programs
-  const programs = Array.isArray(data) ? data : data?.programs || [];
+  const apiPrograms = Array.isArray(data) ? data : data?.programs || [];
+  
+  // Haal ook programma's uit localStorage als backup
+  const localStoragePrograms = JSON.parse(localStorage.getItem('programs') || '[]');
+  
+  // Combineer API en localStorage programma's
+  const programs = apiPrograms.length > 0 ? apiPrograms : localStoragePrograms;
 
   // Combineer API docenten met localStorage docenten
   const getAvailableTeachers = () => {

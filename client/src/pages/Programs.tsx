@@ -321,34 +321,27 @@ export default function Programs() {
       
       {/* Main content area */}
       <div className="px-6 py-6 flex-1 space-y-6">
-        {/* Zoek en Voeg toe knoppen - onder de streep */}
-        <div className="space-y-4">
-          <div className="relative w-full">
+        {/* Search and action bar */}
+        <div className="bg-white px-4 py-3 border border-[#e5e7eb] rounded-sm mb-4 flex items-center gap-4">
+          <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
             <Input
-              type="text"
+              type="search"
               placeholder="Zoek vakken..."
+              className="pl-9 h-8 text-xs bg-white rounded-sm border-[#e5e7eb]"
               value={searchTerm}
               onChange={handleSearchChange}
-              className="w-full pl-8 bg-white"
             />
-            {searchTerm && (
-              <XCircle
-                className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer hover:text-gray-600"
-                onClick={() => setSearchTerm("")}
-              />
-            )}
           </div>
           
-          <div className="flex justify-end">
-            <Button 
-              onClick={handleAddProgram} 
-              variant="default"
-              size="default"
-              className="hover:bg-primary/90 flex items-center bg-[#1e40af]"
+          <div className="flex gap-2 items-center">
+            <Button
+              onClick={handleAddProgram}
+              size="sm"
+              className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white"
             >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              <span>Vak Toevoegen</span>
+              <PlusCircle className="h-3.5 w-3.5 mr-1" />
+              Vak Toevoegen
             </Button>
           </div>
         </div>

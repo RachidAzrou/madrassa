@@ -796,11 +796,29 @@ export default function Calendar() {
                   <FormLabel htmlFor="courseId">Vak</FormLabel>
                   <StyledSelect 
                     value={newEvent.courseId || ""} 
-                    onValueChange={(value) => setNewEvent({ 
-                      ...newEvent, 
-                      courseId: value,
-                      courseName: "Vak Naam"
-                    })}
+                    onValueChange={(value) => {
+                      // Auto-select teacher based on course
+                      let autoTeacher = "";
+                      let autoTeacherName = "";
+                      if (value === "1") { // Arabisch
+                        autoTeacher = "1";
+                        autoTeacherName = "Ahmed Al-Mansouri";
+                      } else if (value === "2") { // Islamitische Geschiedenis
+                        autoTeacher = "2"; 
+                        autoTeacherName = "Fatima Hassan";
+                      } else if (value === "3") { // Koran Memorisatie
+                        autoTeacher = "3";
+                        autoTeacherName = "Omar Ibn Khattab";
+                      }
+                      
+                      setNewEvent({ 
+                        ...newEvent, 
+                        courseId: value,
+                        courseName: value === "1" ? "Arabisch" : value === "2" ? "Islamitische Geschiedenis" : "Koran Memorisatie",
+                        teacherId: autoTeacher,
+                        teacherName: autoTeacherName
+                      });
+                    }}
                     placeholder="Selecteer een vak"
                     className="mt-1"
                   >
@@ -817,7 +835,7 @@ export default function Calendar() {
                     onValueChange={(value) => setNewEvent({ 
                       ...newEvent, 
                       classId: value,
-                      className: "Klas Naam"
+                      className: value === "1" ? "Klas 1A" : value === "2" ? "Klas 2B" : "Klas 3C"
                     })}
                     placeholder="Selecteer een klas"
                     className="mt-1"
@@ -828,6 +846,39 @@ export default function Calendar() {
                   </StyledSelect>
                 </div>
               </div>
+              
+              {/* Teacher field - only for lessons */}
+              {activeTab === 'class' && (
+                <div className="mt-4">
+                  <FormLabel htmlFor="teacherId">Docent</FormLabel>
+                  <StyledSelect 
+                    value={newEvent.teacherId || ""} 
+                    onValueChange={(value) => {
+                      let teacherName = "";
+                      if (value === "1") teacherName = "Ahmed Al-Mansouri";
+                      else if (value === "2") teacherName = "Fatima Hassan";
+                      else if (value === "3") teacherName = "Omar Ibn Khattab";
+                      else if (value === "4") teacherName = "Aisha Bint Abu Bakr";
+                      
+                      setNewEvent({ 
+                        ...newEvent, 
+                        teacherId: value,
+                        teacherName: teacherName
+                      });
+                    }}
+                    placeholder="Selecteer een docent"
+                    className="mt-1"
+                  >
+                    <StyledSelectItem value="1">Ahmed Al-Mansouri (Arabisch)</StyledSelectItem>
+                    <StyledSelectItem value="2">Fatima Hassan (Islamitische Geschiedenis)</StyledSelectItem>
+                    <StyledSelectItem value="3">Omar Ibn Khattab (Koran Memorisatie)</StyledSelectItem>
+                    <StyledSelectItem value="4">Aisha Bint Abu Bakr (Fiqh)</StyledSelectItem>
+                  </StyledSelect>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Docent wordt automatisch geselecteerd op basis van het vak, maar kan aangepast worden
+                  </p>
+                </div>
+              )}
             </SectionContainer>
           )}
 

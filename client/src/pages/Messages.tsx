@@ -21,7 +21,7 @@ import { nl } from "date-fns/locale";
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { 
   DataTableContainer, 
-  SearchActionBar, 
+  SearchActionLayout,
   TableContainer,
   DataTableHeader, 
   ActionButtonsContainer,

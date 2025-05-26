@@ -219,13 +219,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   isActive={location.startsWith("/admissions")}
                   onClick={handleLinkClick}
                 />
-                <SidebarLink
-                  href="/student-groups"
-                  icon={<ChalkBoard className="h-4 w-4" />}
-                  label="Klassen"
-                  isActive={location.startsWith("/student-groups")}
-                  onClick={handleLinkClick}
-                />
+
 
               </div>
             </div>
@@ -236,10 +230,10 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
               </p>
               <div className="space-y-1.5">
                 <SidebarLink
-                  href="/courses"
-                  icon={<BookOpen className="h-4 w-4" />}
-                  label="Curriculum"
-                  isActive={location.startsWith("/courses")}
+                  href="/student-groups"
+                  icon={<School className="h-4 w-4" />}
+                  label="Klassen"
+                  isActive={location.startsWith("/student-groups")}
                   onClick={handleLinkClick}
                 />
                 <SidebarLink

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen, Building, BookText, XCircle, GraduationCap, X, Pencil, Info } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 
 // Custom ChalkBoard icoon
 const ChalkBoard = ({ className = "h-4 w-4" }: { className?: string }) => (
@@ -59,7 +60,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+
 
 interface Program {
   id: number;
@@ -92,6 +93,7 @@ export default function Programs() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
+  const [selectedPrograms, setSelectedPrograms] = useState<Set<number>>(new Set());
   const [programFormData, setProgramFormData] = useState({
     name: '',
     code: '',
@@ -384,6 +386,30 @@ export default function Programs() {
     });
   };
 
+  // Selectie handlers voor vakken
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedPrograms(new Set(programs.map((p: any) => p.id)));
+    } else {
+      setSelectedPrograms(new Set());
+    }
+  };
+
+  const handleSelectProgram = (programId: number, checked: boolean) => {
+    setSelectedPrograms(prev => {
+      const newSet = new Set(prev);
+      if (checked) {
+        newSet.add(programId);
+      } else {
+        newSet.delete(programId);
+      }
+      return newSet;
+    });
+  };
+
+  const isAllSelected = programs.length > 0 && selectedPrograms.size === programs.length;
+  const isIndeterminate = selectedPrograms.size > 0 && selectedPrograms.size < programs.length;
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Premium header component */}
@@ -427,6 +453,13 @@ export default function Programs() {
         <StandardTable>
           <StandardTableHeader>
             <tr>
+              <StandardTableHeaderCell className="w-12">
+                <Checkbox
+                  checked={isAllSelected}
+                  onCheckedChange={handleSelectAll}
+                  className="mx-auto"
+                />
+              </StandardTableHeaderCell>
               <StandardTableHeaderCell>Vak</StandardTableHeaderCell>
               <StandardTableHeaderCell>Code</StandardTableHeaderCell>
               <StandardTableHeaderCell>Afdeling</StandardTableHeaderCell>
@@ -437,16 +470,16 @@ export default function Programs() {
           </StandardTableHeader>
           <StandardTableBody>
             {isLoading ? (
-              <TableLoadingState colSpan={6} message="Vakken laden..." />
+              <TableLoadingState colSpan={7} message="Vakken laden..." />
             ) : isError ? (
               <TableErrorState 
-                colSpan={6} 
+                colSpan={7} 
                 message="Er is een fout opgetreden bij het laden van de vakken."
                 onRetry={() => queryClient.invalidateQueries({ queryKey: ['/api/programs'] })}
               />
             ) : programs.length === 0 ? (
               <TableEmptyState
-                colSpan={6}
+                colSpan={7}
                 icon={<BookText className="h-12 w-12 mx-auto text-gray-300" />}
                 title="Geen vakken gevonden"
                 description={searchTerm 
@@ -465,6 +498,13 @@ export default function Programs() {
             ) : (
               programs.map((program: Program) => (
                 <StandardTableRow key={program.id}>
+                  <StandardTableCell className="w-12">
+                    <Checkbox
+                      checked={selectedPrograms.has(program.id)}
+                      onCheckedChange={(checked) => handleSelectProgram(program.id, checked as boolean)}
+                      className="mx-auto"
+                    />
+                  </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap">
                     <div className="flex items-center">
                       <div>

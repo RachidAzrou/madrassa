@@ -172,15 +172,32 @@ interface SearchActionBarProps {
   className?: string;
 }
 
+interface SearchActionLayoutProps {
+  children: ReactNode;
+  className?: string;
+}
+
+/**
+ * A reusable responsive flex layout for search and action content
+ * This div provides the core responsive layout structure used across all search/action bars
+ */
+export function SearchActionLayout({ children, className = "" }: SearchActionLayoutProps) {
+  return (
+    <div className={`px-3 sm:px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
 /**
  * A reusable search and action bar component with consistent styling
  */
 export function SearchActionBar({ children, className = "" }: SearchActionBarProps) {
   return (
     <div className={`bg-white border border-[#e5e7eb] rounded-sm mb-4 shadow-sm ${className}`}>
-      <div className="px-3 sm:px-4 py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+      <SearchActionLayout>
         {children}
-      </div>
+      </SearchActionLayout>
     </div>
   );
 }

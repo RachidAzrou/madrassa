@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, GraduationCap, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, BookOpen, Users, Upload, Edit } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, GraduationCap, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, BookOpen, Users, Upload, Edit, Camera } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -1275,50 +1275,109 @@ export default function Teachers() {
 
       {/* Dialoogvenster voor nieuwe docent */}
       <Dialog open={showNewTeacherDialog} onOpenChange={setShowNewTeacherDialog}>
-        <DialogContent className="sm:max-w-[85vw] p-0">
-          <DialogHeaderWithIcon
-            icon={<GraduationCap className="h-5 w-5" />}
-            title="Nieuwe docent toevoegen"
-            description="Vul de gegevens in om een nieuwe docent toe te voegen."
-            onClose={() => setShowNewTeacherDialog(false)}
-          />
+        <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden max-h-[90vh]" aria-describedby="teacher-dialog-description">
+          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Docent Toevoegen</DialogTitle>
+                <DialogDescription id="teacher-dialog-description" className="text-white/70 text-sm m-0">
+                  Voeg een nieuwe docent toe aan het systeem.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
           
-          {/* Tabs met formulier secties */}
-          <DialogFormContainer>
-            <Tabs 
-              value={activeTab} 
-              onValueChange={setActiveTab} 
-              className="w-full"
-            >
-              <TabsList className="w-full justify-start bg-gray-100 p-1 mb-6">
-                <TabsTrigger value="basic" className="data-[state=active]:bg-white">
-                  Basisgegevens
-                </TabsTrigger>
-                <TabsTrigger value="details" className="data-[state=active]:bg-white">
-                  Details
-                </TabsTrigger>
-                <TabsTrigger value="subjects" className="data-[state=active]:bg-white">
-                  Vakken
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="basic" className="space-y-6 w-full">
-                <SectionContainer title="Persoonlijke informatie">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                    <div>
-                      <Label htmlFor="teacherId" className="text-xs text-gray-700">
-                        Docent ID
-                      </Label>
-                      <Input
-                        id="teacherId"
-                        value={generateTeacherId()}
+          <form onSubmit={handleSaveTeacher} className="overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
+            <div className="px-6 py-4 space-y-4">
+              <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                  <GraduationCap className="h-4 w-4 mr-2" />
+                  Persoonlijke Informatie
+                </h3>
+                
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-gray-700 mb-1">Foto</p>
+                  <div className="flex gap-4 justify-between">
+                    <div 
+                      className="w-32 h-32 rounded-md border border-gray-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative cursor-pointer hover:bg-gray-100 transition-colors"
+                      onClick={() => document.getElementById('teacher-photo-upload')?.click()}
+                    >
+                      {newTeacher.photoUrl ? (
+                        <img src={newTeacher.photoUrl} alt="Docent foto" className="w-full h-full object-cover" />
+                      ) : (
+                        <Camera className="h-12 w-12 text-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-2 justify-center items-end">
+                      <button 
+                        type="button" 
+                        className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 hover:bg-gray-50 transition-colors text-sm"
+                        onClick={() => {
+                          toast({
+                            title: "BeID integratie",
+                            description: "BeID functionaliteit wordt binnenkort toegevoegd.",
+                          });
+                        }}
+                      >
+                        <div className="w-5 h-5 bg-gradient-to-r from-yellow-500 to-red-600 rounded flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">BE</span>
+                        </div>
+                        <span className="text-xs font-medium text-gray-700">eID</span>
+                      </button>
+                      <button 
+                        type="button" 
+                        className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                        onClick={() => {
+                          toast({
+                            title: "itsme® integratie",
+                            description: "itsme® functionaliteit wordt binnenkort toegevoegd.",
+                          });
+                        }}
+                      >
+                        <div className="w-5 h-5 bg-gradient-to-r from-blue-500 to-purple-600 rounded flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">its</span>
+                        </div>
+                        <span className="text-xs font-medium">itsme</span>
+                      </button>
+                    </div>
+                    <input
+                      id="teacher-photo-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setNewTeacher(prev => ({
+                              ...prev,
+                              photoUrl: reader.result as string
+                            }));
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="teacherId" className="text-xs font-medium text-gray-700">Docent ID</Label>
+                    <Input
+                      id="teacherId"
+                      value={generateTeacherId()}
                         disabled
                         className="mt-1 w-full bg-gray-50"
                         placeholder="Wordt automatisch gegenereerd"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="firstName" className="text-xs text-gray-700">
+                      <Label htmlFor="firstName" className="text-xs font-medium text-gray-700">
                         Voornaam <span className="text-red-500">*</span>
                       </Label>
                       <Input

@@ -27,6 +27,7 @@ const ChalkBoard = ({ className = "h-4 w-4" }: { className?: string }) => (
 );
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { DataTableContainer, SearchActionBar, TableContainer, DataTableHeader, QuickActions, EmptyTableState, TableLoadingState } from '@/components/ui/data-table-container';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -322,7 +323,7 @@ export default function Programs() {
       {/* Main content area */}
       <div className="px-6 py-6 flex-1 space-y-6">
         {/* Search and action bar */}
-        <div className="bg-white px-4 py-3 border border-[#e5e7eb] rounded-sm mb-4 flex items-center gap-4">
+        <SearchActionBar>
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
             <Input
@@ -344,166 +345,80 @@ export default function Programs() {
               Vak Toevoegen
             </Button>
           </div>
-        </div>
-        {/* Programs list */}
-        <div className="space-y-4">
-          {isLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : isError ? (
-            <div className="text-center py-8 text-red-500">
-              Fout bij het laden van vakken. Probeer het opnieuw.
-            </div>
-          ) : programs.length === 0 ? (
-            <div className="bg-white rounded-md border shadow-sm overflow-hidden">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr className="border-b border-gray-200">
-                    <th className="py-3 px-2 w-10 font-medium text-xs uppercase text-gray-500 text-center">
-                      <Checkbox 
-                        className="translate-y-[2px]"
-                        onCheckedChange={(checked) => {
-                          // Hier later functionaliteit toevoegen voor 'selecteer alles'
-                        }}
-                      />
-                      <span className="sr-only">Selecteer Alles</span>
-                    </th>
-                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Vak</th>
-                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Code</th>
-                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Duur</th>
-                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Klas</th>
-                    <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right">
-                      <span className="sr-only">Acties</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
-                    <td colSpan={6} className="py-12">
-                      <div className="flex flex-col items-center justify-center text-gray-500">
-                        <div className="text-[#1e3a8a] mb-2">
-                          <BookText className="h-12 w-12 mx-auto opacity-30" />
+        </SearchActionBar>
+        {/* Programs table */}
+        <TableContainer>
+          <table className="w-full text-sm">
+            <DataTableHeader>
+              <tr className="border-b border-gray-200">
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Vak</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Code</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Afdeling</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Duur</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Status</th>
+                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right w-[120px]">
+                  <span className="sr-only">Acties</span>
+                </th>
+              </tr>
+            </DataTableHeader>
+            <tbody>
+              {isLoading ? (
+                <TableLoadingState />
+              ) : programs.length === 0 ? (
+                <EmptyTableState 
+                  icon={<BookText className="h-12 w-12 mx-auto opacity-30" />}
+                  title="Geen vakken beschikbaar"
+                  description="Er zijn nog geen vakken toegevoegd."
+                />
+              ) : (
+                programs.map((program: Program) => (
+                  <tr key={program.id} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
+                    <td className="px-4 py-3 text-left">
+                      <div className="flex items-center">
+                        <div className="h-8 w-8 rounded-full bg-[#1e40af] text-white text-xs font-medium flex items-center justify-center mr-3">
+                          {program.name.charAt(0).toUpperCase()}
                         </div>
-                        <p className="text-sm font-medium">Geen vakken beschikbaar</p>
+                        <div>
+                          <div className="font-medium text-gray-900 text-sm">{program.name}</div>
+                          <div className="text-xs text-gray-500">{program.description}</div>
+                        </div>
                       </div>
                     </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            programs.map((program: Program) => (
-              <div key={program.id} className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-                <div 
-                  className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50"
-                  onClick={() => toggleExpand(program.id)}
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center">
-                      <h3 className="text-lg font-medium text-gray-800">{program.name}</h3>
-                      <span className="ml-3 bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded">{program.code}</span>
-                    </div>
-                    <p className="text-gray-500 text-sm mt-1">{program.description}</p>
-                  </div>
-                  <div className="flex items-center space-x-6">
-                    <div className="text-center hidden md:block">
-                      <span className="text-gray-500 text-xs block">Duur</span>
-                      <span className="text-gray-800 font-medium">
-                        {program.duration === 1 ? 'Jaar' : 
-                         program.duration === 2 ? 'Semester' : 
-                         program.duration === 3 ? 'Trimester' : 
-                         `${program.duration}`}
+                    <td className="px-4 py-3 text-left">
+                      <span className="bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded">
+                        {program.code}
                       </span>
-                    </div>
-                    <div className="text-center hidden md:block">
-                      <span className="text-gray-500 text-xs block">Klas</span>
-                      <span className="text-gray-800 font-medium">{'N/A'}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-gray-500 h-8 w-8 p-0"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditProgram(program.id);
-                        }}
-                      >
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">Bewerken</span>
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-gray-500 h-8 w-8 p-0"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteProgram(program.id);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Verwijderen</span>
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-gray-500 h-8 w-8 p-0"
-                      >
-                        {expandedProgram === program.id ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                        <span className="sr-only">Details</span>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                
-                {expandedProgram === program.id && (
-                  <div className="border-t border-gray-200 p-4 bg-gray-50">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">
-                        <Clock className="h-5 w-5 text-primary mr-3" />
-                        <div>
-                          <span className="text-xs text-gray-500 block">Duur</span>
-                          <span className="text-sm font-medium">
-                            {program.duration === 1 ? 'Jaar' : 
-                             program.duration === 2 ? 'Semester' : 
-                             program.duration === 3 ? 'Trimester' : 
-                             `${program.duration}`}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">
-                        <Users className="h-5 w-5 text-primary mr-3" />
-                        <div>
-                          <span className="text-xs text-gray-500 block">Studenten</span>
-                          <span className="text-sm font-medium">{program.students || 0}</span>
-                        </div>
-                      </div>
-                      <div className="bg-white p-3 rounded-lg border border-gray-200 flex items-center">
-                        <Building className="h-5 w-5 text-primary mr-3" />
-                        <div>
-                          <span className="text-xs text-gray-500 block">Afdeling</span>
-                          <span className="text-sm font-medium">{program.department || 'Algemeen'}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-white rounded-lg border border-gray-200 p-4">
-                      <h4 className="font-medium text-gray-700 mb-3">Programma beschrijving</h4>
-                      <p className="text-sm text-gray-600">{program.description || 'Geen beschrijving beschikbaar'}</p>
-                    </div>
-                    
-                    {/* Later: toevoegen van cursus-informatie, docenten, etc. */}
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-        </div>
+                    </td>
+                    <td className="px-4 py-3 text-left">
+                      <span className="text-sm text-gray-900">{program.department}</span>
+                    </td>
+                    <td className="px-4 py-3 text-left">
+                      <span className="text-sm text-gray-900">
+                        {program.duration === 1 ? '1 Jaar' : 
+                         program.duration === 2 ? '1 Semester' : 
+                         program.duration === 3 ? '1 Trimester' : 
+                         `${program.duration} Maanden`}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-left">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        program.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {program.isActive ? 'Actief' : 'Inactief'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <QuickActions
+                        onEdit={() => handleEditProgram(program.id)}
+                        onDelete={() => handleDeleteProgram(program.id)}
+                      />
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </TableContainer>
       </div>
       
       {/* Nieuw vak dialoogvenster */}

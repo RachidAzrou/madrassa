@@ -1333,105 +1333,114 @@ export default function Students() {
                 </div>
               </div>
               
-              {/* Persoonlijke Informatie */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-3 border-b">
-                  <h3 className="text-lg font-semibold text-[#1e40af] flex items-center">
-                    <User className="h-5 w-5 mr-2" />
-                    Persoonlijke Informatie
-                  </h3>
-                </div>
-                <div className="p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <dt className="text-sm font-medium text-gray-500">Email</dt>
-                      <dd className="text-sm text-gray-900">{selectedStudent.email || "Niet opgegeven"}</dd>
+              {/* Persoonlijke Informatie - alleen velden van het toevoegen formulier */}
+              <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                  <User className="h-4 w-4 mr-2" />
+                  Persoonlijke Informatie
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <User className="h-4 w-4" />
+                      <span className="text-xs font-medium uppercase tracking-wide">Geslacht</span>
                     </div>
-                    <div className="space-y-1">
-                      <dt className="text-sm font-medium text-gray-500">Telefoon</dt>
-                      <dd className="text-sm text-gray-900">{selectedStudent.phone || "Niet opgegeven"}</dd>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.gender || 'Niet opgegeven'}</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <Calendar className="h-4 w-4" />
+                      <span className="text-xs font-medium uppercase tracking-wide">Geboortedatum</span>
                     </div>
-                    <div className="space-y-1">
-                      <dt className="text-sm font-medium text-gray-500">Geboortedatum</dt>
-                      <dd className="text-sm text-gray-900">
-                        {selectedStudent.dateOfBirth ? format(parseISO(selectedStudent.dateOfBirth), 'd MMMM yyyy', { locale: nl }) : "Niet opgegeven"}
-                      </dd>
+                    <p className="text-sm font-medium text-gray-900">
+                      {selectedStudent.dateOfBirth ? format(parseISO(selectedStudent.dateOfBirth), 'd MMMM yyyy', { locale: nl }) : "Niet opgegeven"}
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <Mail className="h-4 w-4" />
+                      <span className="text-xs font-medium uppercase tracking-wide">Email</span>
                     </div>
-                    <div className="space-y-1">
-                      <dt className="text-sm font-medium text-gray-500">Geslacht</dt>
-                      <dd className="text-sm text-gray-900">{selectedStudent.gender || "Niet opgegeven"}</dd>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.email || "Niet opgegeven"}</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <Phone className="h-4 w-4" />
+                      <span className="text-xs font-medium uppercase tracking-wide">Telefoon</span>
                     </div>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.phone || "Niet opgegeven"}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Onderwijs Informatie */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-3 border-b">
-                  <h3 className="text-lg font-semibold text-green-700 flex items-center">
-                    <GraduationCap className="h-5 w-5 mr-2" />
-                    Onderwijs
-                  </h3>
-                </div>
-                <div className="p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <dt className="text-sm font-medium text-gray-500">Klas</dt>
-                      <dd className="text-sm text-gray-900">{selectedStudent.studentGroupName || "Geen klas toegewezen"}</dd>
+              {/* Adresgegevens - alle velden van het toevoegen formulier */}
+              <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  Adresgegevens
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <MapPin className="h-4 w-4" />
+                      <span className="text-xs font-medium uppercase tracking-wide">Straat</span>
                     </div>
-                    <div className="space-y-1">
-                      <dt className="text-sm font-medium text-gray-500">Programma</dt>
-                      <dd className="text-sm text-gray-900">{selectedStudent.programName || "Geen programma toegewezen"}</dd>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.street || "Niet opgegeven"}</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <MapPin className="h-4 w-4" />
+                      <span className="text-xs font-medium uppercase tracking-wide">Huisnummer</span>
                     </div>
-                    <div className="space-y-1">
-                      <dt className="text-sm font-medium text-gray-500">Schooljaar</dt>
-                      <dd className="text-sm text-gray-900">{selectedStudent.academicYear || "Niet opgegeven"}</dd>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.houseNumber || "Niet opgegeven"}</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <MapPin className="h-4 w-4" />
+                      <span className="text-xs font-medium uppercase tracking-wide">Postcode</span>
                     </div>
-                    <div className="space-y-1">
-                      <dt className="text-sm font-medium text-gray-500">Inschrijfdatum</dt>
-                      <dd className="text-sm text-gray-900">
-                        {selectedStudent.enrollmentDate ? format(parseISO(selectedStudent.enrollmentDate), 'd MMMM yyyy', { locale: nl }) : "Niet opgegeven"}
-                      </dd>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.postalCode || "Niet opgegeven"}</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <MapPin className="h-4 w-4" />
+                      <span className="text-xs font-medium uppercase tracking-wide">Plaats</span>
                     </div>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.city || "Niet opgegeven"}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Adres Informatie */}
-              {(selectedStudent.street || selectedStudent.city) && (
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-4 py-3 border-b">
-                    <h3 className="text-lg font-semibold text-purple-700 flex items-center">
-                      <MapPin className="h-5 w-5 mr-2" />
-                      Adres
-                    </h3>
-                  </div>
-                  <div className="p-4">
-                    <div className="space-y-1">
-                      <dt className="text-sm font-medium text-gray-500">Adres</dt>
-                      <dd className="text-sm text-gray-900">
-                        {[selectedStudent.street, selectedStudent.houseNumber].filter(Boolean).join(' ')}<br/>
-                        {[selectedStudent.postalCode, selectedStudent.city].filter(Boolean).join(' ')}
-                      </dd>
+              {/* Onderwijsgegevens - alleen velden van het toevoegen formulier */}
+              <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                  <GraduationCap className="h-4 w-4 mr-2" />
+                  Onderwijsgegevens
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <Calendar className="h-4 w-4" />
+                      <span className="text-xs font-medium uppercase tracking-wide">Schooljaar</span>
                     </div>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.academicYear || "Niet opgegeven"}</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-gray-500">
+                      <Users className="h-4 w-4" />
+                      <span className="text-xs font-medium uppercase tracking-wide">Klas</span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900">{selectedStudent.studentGroupName || "Niet toegewezen"}</p>
                   </div>
                 </div>
-              )}
-
-              {/* Opmerkingen */}
-              {selectedStudent.notes && (
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                  <div className="bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-3 border-b">
-                    <h3 className="text-lg font-semibold text-orange-700 flex items-center">
-                      <FileText className="h-5 w-5 mr-2" />
-                      Opmerkingen
-                    </h3>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-sm text-gray-900">{selectedStudent.notes}</p>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           )}
         </div>

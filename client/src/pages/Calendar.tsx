@@ -88,6 +88,7 @@ export default function Calendar() {
   const [activeTab, setActiveTab] = useState<'exam' | 'class' | 'holiday' | 'event'>('event');
   const [isEventDetailDialogOpen, setIsEventDetailDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
 
   // Functie om alle velden te resetten
   const resetEventForm = () => {
@@ -354,6 +355,35 @@ export default function Calendar() {
     }
   });
 
+  const handleEditEvent = (event: CalendarEvent) => {
+    // Pre-fill the form with the selected event data
+    setNewEvent({
+      title: event.title,
+      date: event.date,
+      startTime: event.startTime,
+      endTime: event.endTime,
+      location: event.location || '',
+      type: event.type,
+      description: event.description || '',
+      courseId: event.courseId || '',
+      courseName: event.courseName || '',
+      classId: event.classId || '',
+      className: event.className || '',
+      teacherId: event.teacherId || '',
+      teacherName: event.teacherName || '',
+      isRecurring: event.isRecurring || false,
+      recurrencePattern: event.recurrencePattern || 'weekly',
+      recurrenceEndDate: event.recurrenceEndDate || ''
+    });
+    
+    // Set edit mode and store the event being edited
+    setEditingEvent(event);
+    
+    // Close detail dialog and open edit dialog
+    setIsEventDetailDialogOpen(false);
+    setIsAddEventDialogOpen(true);
+  };
+
   const handleDeleteEvent = (event: CalendarEvent) => {
     if (event.id) {
       // Remove from localStorage for local events
@@ -375,6 +405,8 @@ export default function Calendar() {
   };
 
   const handleAddEvent = () => {
+    // Reset form for new event
+    resetEventForm();
     // Open dialoogvenster
     setIsAddEventDialogOpen(true);
   };
@@ -1229,8 +1261,17 @@ export default function Calendar() {
                 )}
               </div>
 
-              {/* Delete button */}
-              <div className="absolute bottom-2 right-2">
+              {/* Action buttons */}
+              <div className="absolute bottom-2 right-2 flex gap-1">
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => handleEditEvent(selectedEvent)}
+                  className="h-6 w-6 p-0 text-gray-500 hover:text-blue-600 hover:bg-blue-50/50 transition-colors duration-200"
+                >
+                  <Pencil className="h-3 w-3" />
+                </Button>
                 <Button 
                   type="button" 
                   variant="ghost" 

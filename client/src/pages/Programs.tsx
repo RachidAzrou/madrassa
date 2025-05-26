@@ -312,6 +312,9 @@ export default function Programs() {
         duration: program.duration,
         department: program.department || '',
         isActive: program.isActive,
+        entryRequirements: program.entryRequirements || '',
+        learningObjectives: program.learningObjectives || '',
+        competencies: program.competencies || '',
         assignedClasses: program.assignedClasses || [],
         assignedTeachers: program.assignedTeachers || [],
       });
@@ -1230,14 +1233,16 @@ export default function Programs() {
                     <div className="bg-white border border-gray-200 rounded-md p-4 max-h-60 overflow-y-auto">
                       {selectedProgram.assignedTeachers && selectedProgram.assignedTeachers.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {selectedProgram.assignedTeachers.map((teacher: any) => (
+                          {selectedProgram.assignedTeachers
+                            .filter((teacher: any) => teacher.selected)
+                            .map((teacher: any) => (
                             <div key={teacher.id} className="flex items-center space-x-2 p-2 bg-green-50 rounded-md">
                               <div className="h-4 w-4 rounded-sm bg-green-600 border border-green-600">
                                 <svg className="h-3 w-3 text-white mt-0.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
                               </div>
-                              <span className="text-sm font-medium">{teacher.name || `${teacher.firstName} ${teacher.lastName}`}</span>
+                              <span className="text-sm font-medium">{teacher.name || 'Docent'}</span>
                             </div>
                           ))}
                         </div>

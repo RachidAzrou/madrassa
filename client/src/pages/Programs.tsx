@@ -403,21 +403,21 @@ export default function Programs() {
                   <StandardTableCell className="whitespace-nowrap">
                     <div className="flex items-center">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{program.name}</div>
-                        <div className="text-xs text-gray-500">{program.description}</div>
+                        <div className="font-medium text-gray-900">{program.name}</div>
+                        <div className="text-gray-500">{program.description}</div>
                       </div>
                     </div>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap">
-                    <span className="bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded">
+                    <span className="bg-primary/10 text-primary font-medium px-2.5 py-0.5 rounded">
                       {program.code}
                     </span>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{program.department || '-'}</span>
+                    <span className="text-gray-900">{program.department || '-'}</span>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap">
-                    <span className="text-sm text-gray-900">
+                    <span className="text-gray-900">
                       {program.duration === 1 ? '1 Jaar' : 
                        program.duration === 2 ? '1 Semester' : 
                        program.duration === 3 ? '1 Trimester' : 
@@ -425,7 +425,7 @@ export default function Programs() {
                     </span>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    <span className={`px-2 py-1 font-medium rounded-full ${
                       program.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
                       {program.isActive ? 'Actief' : 'Inactief'}

@@ -108,7 +108,7 @@ export function StandardTableRow({ children, className = "", onClick }: Standard
 // Table cell
 export function StandardTableCell({ children, className = "", colSpan }: StandardTableCellProps) {
   return (
-    <td className={`px-4 py-3 ${className}`} colSpan={colSpan}>
+    <td className={`px-4 py-3 text-xs ${className}`} colSpan={colSpan}>
       {children}
     </td>
   );

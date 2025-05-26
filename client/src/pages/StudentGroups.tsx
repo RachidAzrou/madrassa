@@ -479,23 +479,23 @@ export default function StudentGroups() {
                   <StandardTableCell className="whitespace-nowrap">
                     <div className="flex items-center">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{cls.name}</div>
+                        <div className="font-medium text-gray-900">{cls.name}</div>
                       </div>
                     </div>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{cls.academicYear || '-'}</span>
+                    <span className="text-gray-900">{cls.academicYear || '-'}</span>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{cls.location || '-'}</span>
+                    <span className="text-gray-900">{cls.location || '-'}</span>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap">
-                    <span className="text-sm text-gray-900">
+                    <span className="text-gray-900">
                       {cls.studentCount || 0}/{cls.maxCapacity || 'Onbeperkt'}
                     </span>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{cls.teacherName || '-'}</span>
+                    <span className="text-gray-900">{cls.teacherName || '-'}</span>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap text-right">
                     <QuickActions

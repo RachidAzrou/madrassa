@@ -784,6 +784,59 @@ export default function Programs() {
         
         <DialogFooterContainer
           onCancel={() => setIsAddDialogOpen(false)}
+          onSubmit={(e) => {
+            e.preventDefault();
+            console.log('Vak toevoegen submit clicked', programFormData);
+            
+            // Validatie
+            if (!programFormData.name || !programFormData.code) {
+              toast({
+                title: "Validatiefout",
+                description: "Vul alle verplichte velden in.",
+                variant: "destructive",
+              });
+              return;
+            }
+            
+            // Voeg vak toe aan localStorage
+            const newProgram = {
+              id: Date.now(),
+              name: programFormData.name,
+              code: programFormData.code,
+              description: programFormData.description,
+              duration: programFormData.duration,
+              department: programFormData.department,
+              isActive: programFormData.isActive,
+              assignedTeachers: programFormData.assignedTeachers.filter(t => t.selected),
+              createdAt: new Date().toISOString()
+            };
+            
+            const existingPrograms = JSON.parse(localStorage.getItem('programs') || '[]');
+            existingPrograms.push(newProgram);
+            localStorage.setItem('programs', JSON.stringify(existingPrograms));
+            
+            // Reset form en sluit dialog
+            setProgramFormData({
+              name: '',
+              code: '',
+              description: '',
+              duration: 4,
+              department: '',
+              isActive: true,
+              assignedClasses: [],
+              assignedTeachers: [],
+            });
+            setIsAddDialogOpen(false);
+            
+            toast({
+              title: "Vak toegevoegd",
+              description: `${newProgram.name} is succesvol toegevoegd.`,
+              variant: "default",
+            });
+            
+            // Refresh de data
+            queryClient.invalidateQueries({ queryKey: ['/api/programs'] });
+          }}
           cancelText="Annuleren"
           submitText="Vak toevoegen"
         />

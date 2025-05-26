@@ -1476,22 +1476,23 @@ export default function Students() {
 
       {/* Add Guardian Dialog */}
       <Dialog open={isAddGuardianDialogOpen} onOpenChange={setIsAddGuardianDialogOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="guardian-dialog-description">
-          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between -mx-6 -mt-6 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-white/20 p-2 rounded-full">
-                <UserPlus className="h-5 w-5 text-white" />
+        <DialogContent className="sm:max-w-3xl max-h-[95vh] overflow-hidden p-0" aria-describedby="guardian-dialog-description">
+          <div className="bg-[#1e40af] py-5 px-8 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 p-3 rounded-full">
+                <UserPlus className="h-6 w-6 text-white" />
               </div>
               <div>
-                <DialogTitle className="text-white text-lg font-semibold m-0">Voogd Toevoegen</DialogTitle>
-                <DialogDescription id="guardian-dialog-description" className="text-white/70 text-sm m-0">
-                  Voeg een nieuwe voogd toe of koppel een bestaande voogd.
+                <DialogTitle className="text-white text-xl font-semibold m-0">Voogd Toevoegen</DialogTitle>
+                <DialogDescription id="guardian-dialog-description" className="text-white/80 text-sm m-0 mt-1">
+                  Voeg een nieuwe voogd toe of koppel een bestaande voogd aan de student
                 </DialogDescription>
               </div>
             </div>
           </div>
-
-          <Tabs value={isAddingNewGuardian ? "new" : "existing"} onValueChange={(value) => setIsAddingNewGuardian(value === "new")}>
+          
+          <div className="px-8 py-6 overflow-y-auto" style={{ maxHeight: 'calc(95vh - 200px)' }}>
+            <Tabs value={isAddingNewGuardian ? "new" : "existing"} onValueChange={(value) => setIsAddingNewGuardian(value === "new")}>
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="new" className="flex items-center gap-2">
                 <UserPlus className="h-4 w-4" />
@@ -1739,8 +1740,9 @@ export default function Students() {
               </div>
             </TabsContent>
           </Tabs>
+          </div>
 
-          <DialogFooter className="mt-6">
+          <DialogFooter className="bg-gray-50 px-8 py-4 border-t -mx-8 -mb-6 mt-6">
             <Button variant="outline" onClick={() => setIsAddGuardianDialogOpen(false)}>
               Annuleren
             </Button>

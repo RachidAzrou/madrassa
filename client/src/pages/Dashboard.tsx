@@ -280,8 +280,10 @@ export default function Dashboard() {
               {/* Toon alle klassen met cirkeldiagrammen */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {(studentGroupsData as any[]).map((group: any, index: number) => {
-                  const enrolledStudents = (studentGroupEnrollmentsData as any[]).filter(
-                    (enrollment: any) => enrollment.studentGroupId === group.id
+                  // Tel studenten uit localStorage die aan deze klas zijn toegewezen
+                  const localStudents = JSON.parse(localStorage.getItem('students') || '[]');
+                  const enrolledStudents = localStudents.filter(
+                    (student: any) => student.studentGroupName === group.name || student.studentGroup === group.name
                   ).length;
                   
                   const maxCapacity = group.maxCapacity || 30;

@@ -23,11 +23,13 @@ globalCalendarEventsStore.set("test-1", {
   className: "Klas 1A"
 });
 import { z } from "zod";
+import { createMollieClient } from '@mollie/api-client';
 import { 
   insertStudentSchema, 
   insertProgramSchema, 
   insertCourseSchema, 
   insertEnrollmentSchema,
+  insertPaymentSchema,
   insertAttendanceSchema,
   insertGradeSchema,
   insertEventSchema,

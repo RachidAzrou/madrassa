@@ -399,8 +399,42 @@ export const insertFeeSchema = createInsertSchema(fees).omit({
   updatedAt: true
 });
 
+// Mollie Payments (voor betalingsverwerking)
+export const payments = pgTable("payments", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull(),
+  feeId: integer("fee_id"), // Koppeling naar fee als dit voor collegegeld is
+  molliePaymentId: text("mollie_payment_id").unique(), // Mollie's payment ID
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").default("EUR"),
+  description: text("description").notNull(),
+  status: text("status").notNull().default("pending"), // pending, paid, failed, canceled, expired
+  mollieStatus: text("mollie_status"), // Originele status van Mollie
+  paymentMethod: text("payment_method"), // ideal, creditcard, bancontact, etc.
+  checkoutUrl: text("checkout_url"), // URL waar student naartoe moet om te betalen
+  paidAt: timestamp("paid_at"),
+  expiresAt: timestamp("expires_at"),
+  failureReason: text("failure_reason"), // Reden waarom betaling is mislukt
+  webhookUrl: text("webhook_url"), // URL voor status updates van Mollie
+  redirectUrl: text("redirect_url"), // URL waar student naartoe gaat na betaling
+  academicYear: text("academic_year"),
+  semester: text("semester"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPaymentSchema = createInsertSchema(payments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
 export type InsertFee = z.infer<typeof insertFeeSchema>;
 export type Fee = typeof fees.$inferSelect;
+
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+export type Payment = typeof payments.$inferSelect;
 
 // Insert schema voor kortingen
 export const insertFeeDiscountSchema = createInsertSchema(feeDiscounts).omit({

@@ -69,6 +69,23 @@ export interface IStorage {
   createSchedule(schedule: InsertSchedule): Promise<Schedule>;
   updateSchedule(id: number, schedule: Partial<Schedule>): Promise<Schedule | undefined>;
   deleteSchedule(id: number): Promise<boolean>;
+  
+  // Payment operations (Mollie)
+  getPayments(): Promise<Payment[]>;
+  getPayment(id: number): Promise<Payment | undefined>;
+  getPaymentByMollieId(molliePaymentId: string): Promise<Payment | undefined>;
+  getPaymentsByStudent(studentId: number): Promise<Payment[]>;
+  getPaymentsByStatus(status: string): Promise<Payment[]>;
+  createPayment(payment: InsertPayment): Promise<Payment>;
+  updatePayment(id: number, payment: Partial<Payment>): Promise<Payment | undefined>;
+  updatePaymentByMollieId(molliePaymentId: string, payment: Partial<Payment>): Promise<Payment | undefined>;
+  deletePayment(id: number): Promise<boolean>;
+  getPaymentStats(): Promise<{ 
+    totalPaid: number; 
+    totalPending: number; 
+    totalFailed: number; 
+    successRate: number;
+  } | undefined>;
 }
 
 // DatabaseStorage implementatie die gebruik maakt van de database
@@ -410,6 +427,111 @@ export class DatabaseStorage implements IStorage {
     }
     
     return receivers;
+  }
+
+  // Payment operations (Mollie)
+  async getPayments(): Promise<Payment[]> {
+    const result = await db.select().from(payments).orderBy(desc(payments.createdAt));
+    return result;
+  }
+
+  async getPayment(id: number): Promise<Payment | undefined> {
+    const [payment] = await db.select().from(payments).where(eq(payments.id, id));
+    return payment || undefined;
+  }
+
+  async getPaymentByMollieId(molliePaymentId: string): Promise<Payment | undefined> {
+    const [payment] = await db.select().from(payments).where(eq(payments.molliePaymentId, molliePaymentId));
+    return payment || undefined;
+  }
+
+  async getPaymentsByStudent(studentId: number): Promise<Payment[]> {
+    const result = await db.select().from(payments).where(eq(payments.studentId, studentId));
+    return result;
+  }
+
+  async getPaymentsByStatus(status: string): Promise<Payment[]> {
+    const result = await db.select().from(payments).where(eq(payments.status, status));
+    return result;
+  }
+
+  async createPayment(payment: InsertPayment): Promise<Payment> {
+    const [newPayment] = await db.insert(payments).values(payment).returning();
+    return newPayment;
+  }
+
+  async updatePayment(id: number, payment: Partial<Payment>): Promise<Payment | undefined> {
+    const [updatedPayment] = await db
+      .update(payments)
+      .set({ ...payment, updatedAt: new Date() })
+      .where(eq(payments.id, id))
+      .returning();
+    return updatedPayment || undefined;
+  }
+
+  async updatePaymentByMollieId(molliePaymentId: string, payment: Partial<Payment>): Promise<Payment | undefined> {
+    const [updatedPayment] = await db
+      .update(payments)
+      .set({ ...payment, updatedAt: new Date() })
+      .where(eq(payments.molliePaymentId, molliePaymentId))
+      .returning();
+    return updatedPayment || undefined;
+  }
+
+  async deletePayment(id: number): Promise<boolean> {
+    const [deletedPayment] = await db.delete(payments).where(eq(payments.id, id)).returning();
+    return !!deletedPayment;
+  }
+
+  async getPaymentStats(): Promise<{ 
+    totalPaid: number; 
+    totalPending: number; 
+    totalFailed: number; 
+    successRate: number;
+  } | undefined> {
+    try {
+      const result = await db
+        .select({
+          status: payments.status,
+          amount: payments.amount,
+          count: sql<number>`count(*)`
+        })
+        .from(payments)
+        .groupBy(payments.status);
+
+      let totalPaid = 0;
+      let totalPending = 0;
+      let totalFailed = 0;
+      let totalCount = 0;
+      let paidCount = 0;
+
+      for (const row of result) {
+        const amount = parseFloat(row.amount);
+        const count = row.count;
+        totalCount += count;
+        
+        if (row.status === 'paid') {
+          totalPaid += amount * count;
+          paidCount += count;
+        } else if (row.status === 'pending') {
+          totalPending += amount * count;
+        } else if (row.status === 'failed' || row.status === 'canceled') {
+          totalFailed += amount * count;
+        }
+      }
+
+      const successRate = totalCount > 0 ? (paidCount / totalCount) * 100 : 0;
+
+      return {
+        totalPaid,
+        totalPending,
+        totalFailed,
+        successRate
+      };
+    } catch (error) {
+      console.error('Error getting payment stats:', error);
+      return undefined;
+    }
   }
 }
 

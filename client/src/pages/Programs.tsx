@@ -55,6 +55,7 @@ import {
   StyledSelectItem,
   StyledCheckbox
 } from '@/components/ui/custom-dialog';
+import { DeleteDialog } from '@/components/ui/delete-dialog';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -909,80 +910,20 @@ export default function Programs() {
           icon={<Pencil className="h-5 w-5" />}
         />
         
-        <form onSubmit={handleSubmitEditProgram}>
-          <div className="p-6 pt-4">
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <FormLabel htmlFor="edit-name">
-                    Naam vak <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <Input
-                    id="edit-name"
-                    value={programFormData.name}
-                    onChange={(e) => setProgramFormData({ ...programFormData, name: e.target.value })}
-                    className="h-9 text-sm"
-                    placeholder="Voer vaknaam in"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <FormLabel htmlFor="edit-code">
-                    Code <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <Input
-                    id="edit-code"
-                    value={programFormData.code}
-                    onChange={(e) => setProgramFormData({ ...programFormData, code: e.target.value })}
-                    className="h-9 text-sm"
-                    placeholder="Voer vakcode in"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <FormLabel htmlFor="edit-duration">Duur</FormLabel>
-                  <StyledSelect
-                    value={programFormData.duration.toString()}
-                    onValueChange={(value) => setProgramFormData({ ...programFormData, duration: parseInt(value) })}
-                    placeholder="Selecteer duur"
-                  >
-                    <StyledSelectItem value="1">Jaar</StyledSelectItem>
-                    <StyledSelectItem value="2">Semester</StyledSelectItem>
-                    <StyledSelectItem value="3">Trimester</StyledSelectItem>
-                  </StyledSelect>
-                </div>
-                
-                <div className="space-y-2">
-                  <FormLabel htmlFor="edit-status">Status</FormLabel>
-                  <StyledSelect
-                    value={programFormData.isActive ? "true" : "false"}
-                    onValueChange={(value) => setProgramFormData({ ...programFormData, isActive: value === "true" })}
-                    placeholder="Selecteer status"
-                  >
-                    <StyledSelectItem value="true">Actief</StyledSelectItem>
-                    <StyledSelectItem value="false">Inactief</StyledSelectItem>
-                  </StyledSelect>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <FormLabel htmlFor="edit-description">Beschrijving</FormLabel>
-                <Textarea
-                  id="edit-description"
-                  value={programFormData.description}
-                  onChange={(e) => setProgramFormData({ ...programFormData, description: e.target.value })}
-                  className="min-h-[100px] resize-none text-sm"
-                  placeholder="Geef een beschrijving van het vak..."
-                />
-              </div>
-            </div>
-          </div>
-        </form>
-        
-        <DialogFooterContainer
+        <DialogFormContainer
+          formData={programFormData}
+          onFormChange={setProgramFormData}
+          onSubmit={(updatedFormData) => {
+            if (selectedProgram) {
+              updateProgramMutation.mutate({
+                id: selectedProgram.id,
+                programData: updatedFormData
+              });
+            }
+          }}
           onCancel={() => setIsEditDialogOpen(false)}
           cancelText="Annuleren"
-          submitText="Opslaan"
+          submitText="Vak bijwerken"
         />
       </CustomDialog>
       {/* Vak verwijderen dialoogvenster */}
@@ -1035,45 +976,52 @@ export default function Programs() {
         />
         
         {selectedProgram && (
-          <div className="p-6 space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700">Naam</label>
-                <p className="text-sm text-gray-900 mt-1">{selectedProgram.name}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">Code</label>
-                <p className="text-sm text-gray-900 mt-1">{selectedProgram.code}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">Afdeling</label>
-                <p className="text-sm text-gray-900 mt-1">{selectedProgram.department || '-'}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">Status</label>
-                <p className="text-sm mt-1">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    selectedProgram.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
+          <div className="p-6 pt-4">
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <FormLabel>Naam vak</FormLabel>
+                  <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm">
+                    {selectedProgram.name}
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel>Code</FormLabel>
+                  <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm">
+                    {selectedProgram.code}
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel>Duur</FormLabel>
+                  <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm">
+                    {selectedProgram.duration === 1 ? 'Jaar' : selectedProgram.duration === 2 ? 'Semester' : 'Trimester'}
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel>Status</FormLabel>
+                  <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm">
                     {selectedProgram.isActive ? 'Actief' : 'Inactief'}
-                  </span>
-                </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <FormLabel>Beschrijving</FormLabel>
+                <div className="min-h-[100px] px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm">
+                  {selectedProgram.description || 'Geen beschrijving'}
+                </div>
               </div>
             </div>
-            
-            {selectedProgram.description && (
-              <div>
-                <label className="text-sm font-medium text-gray-700">Beschrijving</label>
-                <p className="text-sm text-gray-900 mt-1">{selectedProgram.description}</p>
-              </div>
-            )}
           </div>
         )}
         
         <DialogFooterContainer
           onCancel={() => setIsViewDialogOpen(false)}
           cancelText="Sluiten"
-          hideSubmitButton={true}
+          showSubmitButton={false}
         />
       </CustomDialog>
     </div>

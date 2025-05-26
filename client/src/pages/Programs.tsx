@@ -96,6 +96,10 @@ export default function Programs() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const [selectedPrograms, setSelectedPrograms] = useState<Set<number>>(new Set());
+  
+  // State voor actieve tabs
+  const [activeTab, setActiveTab] = useState('general');
+  const [editActiveTab, setEditActiveTab] = useState('general');
   const [programFormData, setProgramFormData] = useState({
     name: '',
     code: '',
@@ -910,17 +914,25 @@ export default function Programs() {
           icon={<Pencil className="h-5 w-5" />}
         />
         
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          if (selectedProgram) {
-            updateProgramMutation.mutate({
-              id: selectedProgram.id,
-              programData: programFormData
-            });
-          }
-        }}>
-          <div className="p-6 pt-4 bg-gray-50">
-            <div className="space-y-6">
+        <DialogFormContainer
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (selectedProgram) {
+              updateProgramMutation.mutate({
+                id: selectedProgram.id,
+                programData: programFormData
+              });
+            }
+          }}
+        >
+          <Tabs value={editActiveTab} onValueChange={setEditActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="general">Algemeen</TabsTrigger>
+              <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
+              <TabsTrigger value="teachers">Docenten</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="general" className="space-y-6 bg-gray-50 p-4 rounded-lg">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <FormLabel>Naam vak *</FormLabel>
@@ -990,27 +1002,95 @@ export default function Programs() {
                   placeholder="Voer een beschrijving in..."
                 />
               </div>
-            </div>
-          </div>
-          
-          <div className="flex justify-end gap-3 p-6 pt-4 bg-white border-t border-gray-200">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsEditDialogOpen(false)}
-              disabled={updateProgramMutation.isPending}
-            >
-              Annuleren
-            </Button>
-            <Button
-              type="submit"
-              disabled={updateProgramMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {updateProgramMutation.isPending ? 'Bijwerken...' : 'Vak bijwerken'}
-            </Button>
-          </div>
-        </form>
+            </TabsContent>
+
+            <TabsContent value="curriculum" className="space-y-4 bg-gray-50 p-4 rounded-lg">
+              <div className="space-y-2">
+                <FormLabel className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  Klassen toewijzen
+                </FormLabel>
+                <div className="bg-white border border-gray-200 rounded-md p-4 max-h-60 overflow-y-auto">
+                  {programFormData.assignedClasses && programFormData.assignedClasses.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {programFormData.assignedClasses.map((classItem) => (
+                        <div key={classItem.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`edit-class-${classItem.id}`}
+                            checked={classItem.selected}
+                            onCheckedChange={(checked) => {
+                              setProgramFormData(prev => ({
+                                ...prev,
+                                assignedClasses: prev.assignedClasses.map(c => 
+                                  c.id === classItem.id ? { ...c, selected: checked as boolean } : c
+                                )
+                              }));
+                            }}
+                          />
+                          <FormLabel htmlFor={`edit-class-${classItem.id}`} className="text-sm">
+                            {classItem.name}
+                          </FormLabel>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-sm">Geen klassen beschikbaar</p>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="teachers" className="space-y-4 bg-gray-50 p-4 rounded-lg">
+              <div className="space-y-2">
+                <FormLabel className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Docenten toewijzen
+                </FormLabel>
+                <div className="bg-white border border-gray-200 rounded-md p-4 max-h-60 overflow-y-auto">
+                  {programFormData.assignedTeachers && programFormData.assignedTeachers.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {programFormData.assignedTeachers.map((teacher) => (
+                        <div key={teacher.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`edit-teacher-${teacher.id}`}
+                            checked={teacher.selected}
+                            onCheckedChange={(checked) => {
+                              setProgramFormData(prev => ({
+                                ...prev,
+                                assignedTeachers: prev.assignedTeachers.map(t => 
+                                  t.id === teacher.id ? { ...t, selected: checked as boolean } : t
+                                )
+                              }));
+                            }}
+                          />
+                          <FormLabel htmlFor={`edit-teacher-${teacher.id}`} className="text-sm">
+                            {teacher.name}
+                          </FormLabel>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-sm">Geen docenten beschikbaar</p>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </DialogFormContainer>
+
+        <DialogFooterContainer
+          onCancel={() => setIsEditDialogOpen(false)}
+          onSubmit={() => {
+            if (selectedProgram) {
+              updateProgramMutation.mutate({
+                id: selectedProgram.id,
+                programData: programFormData
+              });
+            }
+          }}
+          cancelText="Annuleren"
+          submitText={updateProgramMutation.isPending ? 'Bijwerken...' : 'Vak bijwerken'}
+        />
       </CustomDialog>
       {/* Vak verwijderen dialoogvenster */}
       <DeleteDialog

@@ -677,18 +677,6 @@ export default function Calendar() {
           <div className="flex border-b mb-6">
             <button
               className={`px-3 py-2 text-sm font-medium border-b-2 ${
-                activeTab === 'event' ? 'border-[#1e40af] text-[#1e40af]' : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-              onClick={() => handleTabChange('event')}
-              type="button"
-            >
-              <div className="flex items-center">
-                <PartyPopper className="mr-2 h-4 w-4" />
-                Activiteit
-              </div>
-            </button>
-            <button
-              className={`px-3 py-2 text-sm font-medium border-b-2 ${
                 activeTab === 'class' ? 'border-[#1e40af] text-[#1e40af]' : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
               onClick={() => handleTabChange('class')}
@@ -721,6 +709,18 @@ export default function Calendar() {
               <div className="flex items-center">
                 <Palmtree className="mr-2 h-4 w-4" />
                 Vakantie
+              </div>
+            </button>
+            <button
+              className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                activeTab === 'event' ? 'border-[#1e40af] text-[#1e40af]' : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => handleTabChange('event')}
+              type="button"
+            >
+              <div className="flex items-center">
+                <PartyPopper className="mr-2 h-4 w-4" />
+                Activiteit
               </div>
             </button>
           </div>

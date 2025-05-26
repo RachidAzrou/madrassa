@@ -1154,96 +1154,107 @@ export default function Students() {
                     <div className="space-y-3">
                       <div>
                         <Label className="text-xs font-medium text-gray-700 mb-2 block">Voogden</Label>
-                        {selectedGuardians.length > 0 ? (
+                        {newStudentGuardians.length > 0 ? (
                           <div className="space-y-2 mb-2">
-                            {selectedGuardians.map((guardian, index) => (
-                              <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
-                                <Avatar className="h-8 w-8">
-                                  <AvatarFallback className="bg-[#1e40af] text-white text-xs">
-                                    {guardian.firstName?.charAt(0)}{guardian.lastName?.charAt(0)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
+                            {newStudentGuardians.map((guardian, index) => (
+                              <div key={index} className="flex items-center gap-3 p-2 bg-white rounded-md border">
+                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                  {guardian.relationship === 'parent' && <span className="text-sm">👨‍👩‍👧‍👦</span>}
+                                  {guardian.relationship === 'guardian' && <span className="text-sm">👨‍⚖️</span>}
+                                  {guardian.relationship === 'grandparent' && <span className="text-sm">👴</span>}
+                                  {guardian.relationship === 'other' && <span className="text-sm">👤</span>}
+                                </div>
+                                <div className="flex-1">
                                   <p className="text-sm font-medium">{guardian.firstName} {guardian.lastName}</p>
-                                  <p className="text-xs text-gray-500">{guardian.relationship}</p>
+                                  <p className="text-xs text-gray-500">
+                                    {guardian.relationship === 'parent' && 'Ouder'}
+                                    {guardian.relationship === 'guardian' && 'Voogd'}
+                                    {guardian.relationship === 'grandparent' && 'Grootouder'}
+                                    {guardian.relationship === 'other' && guardian.relationshipOther}
+                                    {guardian.phone && ` • ${guardian.phone}`}
+                                  </p>
                                 </div>
                                 <Button 
                                   variant="ghost" 
                                   size="sm" 
-                                  className="h-7 w-7 p-0 ml-auto"
+                                  className="h-7 w-7 p-0 text-red-500 hover:text-red-700"
                                   onClick={() => {
-                                    setSelectedGuardians(selectedGuardians.filter((_, i) => i !== index));
+                                    setNewStudentGuardians(newStudentGuardians.filter((_, i) => i !== index));
+                                    toast({
+                                      title: "Voogd verwijderd",
+                                      description: `${guardian.firstName} ${guardian.lastName} is verwijderd.`,
+                                    });
                                   }}
                                 >
-                                  <X className="h-3.5 w-3.5 text-gray-500" />
+                                  <X className="h-3.5 w-3.5" />
                                 </Button>
                               </div>
                             ))}
                           </div>
-                        ) : null}
-                        <div className="p-3 bg-gray-50 rounded-md text-center">
-                          <Button 
-                            type="button"
-                            variant="outline" 
-                            size="sm"
-                            className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50 w-full"
-                            onClick={() => {
-                              setIsAddGuardianDialogOpen(true);
-                            }}
-                          >
-                            <UserPlus className="h-3.5 w-3.5 mr-1" />
-                            Voogd toevoegen
-                          </Button>
-                        </div>
+                        ) : (
+                          <div className="p-3 bg-gray-50 rounded-md text-center mb-2">
+                            <UserPlus className="h-6 w-6 text-gray-400 mx-auto mb-1" />
+                            <p className="text-xs text-gray-500">Nog geen voogden toegevoegd</p>
+                          </div>
+                        )}
+                        <Button 
+                          type="button"
+                          variant="outline" 
+                          size="sm"
+                          className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50 w-full"
+                          onClick={() => setIsAddGuardianDialogOpen(true)}
+                        >
+                          <UserPlus className="h-3.5 w-3.5 mr-1" />
+                          Voogd toevoegen
+                        </Button>
                       </div>
                       
                       <div>
                         <Label className="text-xs font-medium text-gray-700 mb-2 block">Broers/Zussen</Label>
-                        {selectedSiblings.length > 0 ? (
+                        {newStudentSiblings.length > 0 ? (
                           <div className="space-y-2 mb-2">
-                            {selectedSiblings.map((sibling, index) => (
-                              <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
-                                <Avatar className="h-8 w-8">
-                                  {sibling.photoUrl ? (
-                                    <AvatarImage src={sibling.photoUrl} alt={`${sibling.firstName} ${sibling.lastName}`} />
-                                  ) : (
-                                    <AvatarFallback className="bg-[#1e40af] text-white text-xs">
-                                      {sibling.firstName?.charAt(0)}{sibling.lastName?.charAt(0)}
-                                    </AvatarFallback>
-                                  )}
-                                </Avatar>
-                                <div>
-                                  <p className="text-sm">{sibling.firstName} {sibling.lastName}</p>
-                                  <p className="text-xs text-gray-500">{sibling.studentId}</p>
+                            {newStudentSiblings.map((sibling, index) => (
+                              <div key={index} className="flex items-center gap-3 p-2 bg-white rounded-md border">
+                                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                  <span className="text-sm">👫</span>
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium">{sibling.firstName} {sibling.lastName}</p>
+                                  <p className="text-xs text-gray-500">{sibling.studentId} • {sibling.class}</p>
                                 </div>
                                 <Button 
                                   variant="ghost" 
                                   size="sm" 
-                                  className="h-7 w-7 p-0 ml-auto"
+                                  className="h-7 w-7 p-0 text-red-500 hover:text-red-700"
                                   onClick={() => {
-                                    setSelectedSiblings(selectedSiblings.filter((_, i) => i !== index));
+                                    setNewStudentSiblings(newStudentSiblings.filter((_, i) => i !== index));
+                                    toast({
+                                      title: "Broer/zus ontkoppeld",
+                                      description: `${sibling.firstName} ${sibling.lastName} is ontkoppeld.`,
+                                    });
                                   }}
                                 >
-                                  <X className="h-3.5 w-3.5 text-gray-500" />
+                                  <X className="h-3.5 w-3.5" />
                                 </Button>
                               </div>
                             ))}
                           </div>
-                        ) : null}
-                        <div className="p-3 bg-gray-50 rounded-md text-center">
-                          <Button 
-                            type="button"
-                            variant="outline" 
-                            size="sm"
-                            className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50 w-full"
-                            onClick={() => {
-                              setIsLinkSiblingDialogOpen(true);
-                            }}
-                          >
-                            <Users className="h-3.5 w-3.5 mr-1" />
-                            Broer/Zus koppelen
-                          </Button>
-                        </div>
+                        ) : (
+                          <div className="p-3 bg-gray-50 rounded-md text-center mb-2">
+                            <Users className="h-6 w-6 text-gray-400 mx-auto mb-1" />
+                            <p className="text-xs text-gray-500">Nog geen broers/zussen gekoppeld</p>
+                          </div>
+                        )}
+                        <Button 
+                          type="button"
+                          variant="outline" 
+                          size="sm"
+                          className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50 w-full"
+                          onClick={() => setIsLinkSiblingDialogOpen(true)}
+                        >
+                          <Users className="h-3.5 w-3.5 mr-1" />
+                          Broer/Zus koppelen
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -1749,11 +1760,35 @@ export default function Students() {
             <Button 
               onClick={() => {
                 if (isAddingNewGuardian) {
+                  // Valideer verplichte velden
+                  if (!guardianFormData.firstName || !guardianFormData.lastName || !guardianFormData.phone || !guardianFormData.relationship) {
+                    toast({
+                      title: "Incomplete gegevens",
+                      description: "Vul alle verplichte velden in (voornaam, achternaam, telefoon en relatie).",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+
+                  // Valideer relationshipOther als 'other' is geselecteerd
+                  if (guardianFormData.relationship === 'other' && !guardianFormData.relationshipOther) {
+                    toast({
+                      title: "Specificeer relatie",
+                      description: "Geef aan wat de relatie is tot de student.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+
                   const newGuardian = {
                     ...guardianFormData,
                     id: Date.now(),
                   };
+                  
                   setSelectedGuardians([...selectedGuardians, newGuardian]);
+                  setNewStudentGuardians([...newStudentGuardians, newGuardian]);
+                  
+                  // Reset formulier
                   setGuardianFormData({
                     firstName: '',
                     lastName: '',
@@ -1767,11 +1802,17 @@ export default function Students() {
                     emergencyContactPhone: '',
                     emergencyContactRelationship: '',
                   });
+
+                  toast({
+                    title: "Voogd toegevoegd",
+                    description: `${newGuardian.firstName} ${newGuardian.lastName} is toegevoegd aan de familie.`,
+                  });
                 }
                 setIsAddGuardianDialogOpen(false);
               }}
               className="bg-[#1e40af] hover:bg-[#1e40af]/90"
             >
+              <UserPlus className="h-4 w-4 mr-2" />
               Voogd Toevoegen
             </Button>
           </DialogFooter>
@@ -1797,29 +1838,88 @@ export default function Students() {
 
           <div className="space-y-4">
             <div>
-              <Label htmlFor="sibling-search">Zoek student</Label>
+              <Label htmlFor="sibling-search" className="text-sm font-medium text-gray-700">Zoek student om te koppelen als broer/zus</Label>
               <Input
                 id="sibling-search"
                 value={siblingSearchTerm}
                 onChange={(e) => setSiblingSearchTerm(e.target.value)}
-                placeholder="Zoek op naam of student ID..."
+                placeholder="Typ naam of student ID..."
+                className="h-9 text-sm mt-2"
               />
             </div>
             
-            <div className="text-center text-gray-500 py-8">
-              <p>Functionaliteit voor broer/zus koppeling komt binnenkort beschikbaar</p>
-            </div>
+            {/* Mock students voor demonstratie - deze zouden normaal uit de API komen */}
+            {siblingSearchTerm.length > 0 && (
+              <div className="bg-white border rounded-lg divide-y max-h-60 overflow-y-auto">
+                {[
+                  { id: 'STU001', firstName: 'Ahmed', lastName: 'Hassan', class: 'Klas 3A' },
+                  { id: 'STU002', firstName: 'Fatima', lastName: 'Al-Zahra', class: 'Klas 2B' },
+                  { id: 'STU003', firstName: 'Omar', lastName: 'Ibn Khattab', class: 'Klas 4A' },
+                ].filter(student => 
+                  student.firstName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
+                  student.lastName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
+                  student.id.toLowerCase().includes(siblingSearchTerm.toLowerCase())
+                ).map((student) => (
+                  <div key={student.id} className="p-3 hover:bg-gray-50 cursor-pointer" 
+                       onClick={() => {
+                         const newSibling = {
+                           id: Date.now(),
+                           studentId: student.id,
+                           firstName: student.firstName,
+                           lastName: student.lastName,
+                           class: student.class,
+                           relationship: 'broer/zus'
+                         };
+                         setNewStudentSiblings([...newStudentSiblings, newSibling]);
+                         setSiblingSearchTerm('');
+                         toast({
+                           title: "Broer/zus gekoppeld",
+                           description: `${student.firstName} ${student.lastName} is toegevoegd als broer/zus.`,
+                         });
+                         setIsLinkSiblingDialogOpen(false);
+                       }}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-sm">{student.firstName} {student.lastName}</p>
+                        <p className="text-xs text-gray-500">{student.id} • {student.class}</p>
+                      </div>
+                      <Button size="sm" variant="outline" className="h-7 text-xs">
+                        <Users className="h-3 w-3 mr-1" />
+                        Koppelen
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                
+                {[
+                  { id: 'STU001', firstName: 'Ahmed', lastName: 'Hassan', class: 'Klas 3A' },
+                  { id: 'STU002', firstName: 'Fatima', lastName: 'Al-Zahra', class: 'Klas 2B' },
+                  { id: 'STU003', firstName: 'Omar', lastName: 'Ibn Khattab', class: 'Klas 4A' },
+                ].filter(student => 
+                  student.firstName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
+                  student.lastName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
+                  student.id.toLowerCase().includes(siblingSearchTerm.toLowerCase())
+                ).length === 0 && (
+                  <div className="p-4 text-center text-gray-500">
+                    <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                    <p className="text-sm">Geen studenten gevonden voor "{siblingSearchTerm}"</p>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {siblingSearchTerm.length === 0 && (
+              <div className="text-center text-gray-500 py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                <Users className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-sm font-medium">Begin met typen om studenten te zoeken</p>
+                <p className="text-xs text-gray-400 mt-1">Zoek op naam of student ID om een broer/zus te koppelen</p>
+              </div>
+            )}
           </div>
 
           <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setIsLinkSiblingDialogOpen(false)}>
-              Annuleren
-            </Button>
-            <Button 
-              onClick={() => setIsLinkSiblingDialogOpen(false)}
-              className="bg-[#1e40af] hover:bg-[#1e40af]/90"
-            >
-              Koppelen
+              Sluiten
             </Button>
           </DialogFooter>
         </DialogContent>

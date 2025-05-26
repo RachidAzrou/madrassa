@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen, Building, BookText, XCircle, GraduationCap, X, Pencil, Info, Eye } from 'lucide-react';
+import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen, Building, BookText, XCircle, GraduationCap, X, Pencil, Info, Eye, Target, Award } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 
 // Custom ChalkBoard icoon
@@ -1115,7 +1115,7 @@ export default function Programs() {
       />
 
       {/* Vak bekijken dialoogvenster */}
-      <CustomDialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen} maxWidth="600px">
+      <CustomDialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen} maxWidth="800px">
         <DialogHeaderWithIcon
           title="Vak Details"
           description="Bekijk de details van het geselecteerde vak."
@@ -1124,123 +1124,120 @@ export default function Programs() {
         
         {selectedProgram && (
           <DialogFormContainer>
-            <Tabs value={viewActiveTab} onValueChange={setViewActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="general">Algemeen</TabsTrigger>
-                <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
-                <TabsTrigger value="teachers">Docenten</TabsTrigger>
-              </TabsList>
+            <div className="min-h-[400px]">
+              <Tabs value={viewActiveTab} onValueChange={setViewActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-3 mb-6">
+                  <TabsTrigger value="general">Algemeen</TabsTrigger>
+                  <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
+                  <TabsTrigger value="teachers">Docenten</TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="general" className="space-y-6 bg-gray-50 p-4 rounded-lg">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <FormLabel>Naam vak</FormLabel>
-                    <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm">
-                      {selectedProgram.name}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <FormLabel>Code</FormLabel>
-                    <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm">
-                      {selectedProgram.code}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <FormLabel>Duur</FormLabel>
-                    <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm">
-                      {selectedProgram.duration === 1 ? 'Jaar' : selectedProgram.duration === 2 ? 'Semester' : 'Trimester'}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <FormLabel>Departement</FormLabel>
-                    <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm">
-                      {selectedProgram.department || 'Niet opgegeven'}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 md:col-span-2">
-                    <div className="flex items-center space-x-2">
-                      <div className={`h-4 w-4 rounded-sm border ${selectedProgram.isActive ? 'bg-blue-600 border-blue-600' : 'bg-gray-100 border-gray-300'}`}>
-                        {selectedProgram.isActive && (
-                          <svg className="h-3 w-3 text-white mt-0.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        )}
+                <TabsContent value="general" className="space-y-6 bg-gray-50 p-4 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <FormLabel>Naam vak</FormLabel>
+                      <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
+                        {selectedProgram.name}
                       </div>
-                      <FormLabel>Actief programma</FormLabel>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <FormLabel>Code</FormLabel>
+                      <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
+                        {selectedProgram.code}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <FormLabel>Duur</FormLabel>
+                      <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
+                        {selectedProgram.duration === 1 ? 'Jaar' : selectedProgram.duration === 2 ? 'Semester' : 'Trimester'}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <FormLabel>Status</FormLabel>
+                      <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
+                        {selectedProgram.isActive ? 'Actief' : 'Inactief'}
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <FormLabel>Beschrijving</FormLabel>
-                  <div className="min-h-[100px] px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-sm">
-                    {selectedProgram.description || 'Geen beschrijving'}
+                  
+                  <div className="space-y-2">
+                    <FormLabel>Beschrijving</FormLabel>
+                    <div className="min-h-[100px] px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
+                      {selectedProgram.description || 'Geen beschrijving'}
+                    </div>
                   </div>
-                </div>
-              </TabsContent>
+                </TabsContent>
 
-              <TabsContent value="curriculum" className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                <div className="space-y-2">
-                  <FormLabel className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4" />
-                    Toegewezen klassen
-                  </FormLabel>
-                  <div className="bg-white border border-gray-200 rounded-md p-4 max-h-60 overflow-y-auto">
-                    {programFormData.assignedClasses && programFormData.assignedClasses.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {programFormData.assignedClasses
-                          .filter(classItem => classItem.selected)
-                          .map((classItem) => (
-                            <div key={classItem.id} className="flex items-center space-x-2 p-2 bg-blue-50 rounded-md">
-                              <div className="h-4 w-4 rounded-sm bg-blue-600 border border-blue-600">
-                                <svg className="h-3 w-3 text-white mt-0.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
+                <TabsContent value="curriculum" className="space-y-4 bg-gray-50 p-4 rounded-lg">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <FormLabel className="flex items-center gap-2">
+                        <BookOpen className="h-4 w-4" />
+                        Instroomvereisten
+                      </FormLabel>
+                      <div className="min-h-[80px] px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
+                        {/* Dit zou uit de database moeten komen */}
+                        Geen instroomvereisten opgegeven
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <FormLabel className="flex items-center gap-2">
+                        <Target className="h-4 w-4" />
+                        Leerdoelen
+                      </FormLabel>
+                      <div className="min-h-[80px] px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
+                        {/* Dit zou uit de database moeten komen */}
+                        Geen leerdoelen opgegeven
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <FormLabel className="flex items-center gap-2">
+                        <Award className="h-4 w-4" />
+                        Competenties
+                      </FormLabel>
+                      <div className="min-h-[80px] px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
+                        {/* Dit zou uit de database moeten komen */}
+                        Geen competenties opgegeven
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="teachers" className="space-y-4 bg-gray-50 p-4 rounded-lg">
+                  <div className="space-y-2">
+                    <FormLabel className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      Toegewezen docenten
+                    </FormLabel>
+                    <div className="bg-white border border-gray-200 rounded-md p-4 max-h-60 overflow-y-auto">
+                      {programFormData.assignedTeachers && programFormData.assignedTeachers.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {programFormData.assignedTeachers
+                            .filter(teacher => teacher.selected)
+                            .map((teacher) => (
+                              <div key={teacher.id} className="flex items-center space-x-2 p-2 bg-green-50 rounded-md">
+                                <div className="h-4 w-4 rounded-sm bg-green-600 border border-green-600">
+                                  <svg className="h-3 w-3 text-white mt-0.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                                <span className="text-sm font-medium">{teacher.name}</span>
                               </div>
-                              <span className="text-sm font-medium">{classItem.name}</span>
-                            </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-gray-500 text-sm">Geen klassen toegewezen</p>
-                    )}
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-sm">Geen docenten toegewezen</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="teachers" className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                <div className="space-y-2">
-                  <FormLabel className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    Toegewezen docenten
-                  </FormLabel>
-                  <div className="bg-white border border-gray-200 rounded-md p-4 max-h-60 overflow-y-auto">
-                    {programFormData.assignedTeachers && programFormData.assignedTeachers.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {programFormData.assignedTeachers
-                          .filter(teacher => teacher.selected)
-                          .map((teacher) => (
-                            <div key={teacher.id} className="flex items-center space-x-2 p-2 bg-green-50 rounded-md">
-                              <div className="h-4 w-4 rounded-sm bg-green-600 border border-green-600">
-                                <svg className="h-3 w-3 text-white mt-0.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                              <span className="text-sm font-medium">{teacher.name}</span>
-                            </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-gray-500 text-sm">Geen docenten toegewezen</p>
-                    )}
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
+                </TabsContent>
+              </Tabs>
+            </div>
           </DialogFormContainer>
         )}
         

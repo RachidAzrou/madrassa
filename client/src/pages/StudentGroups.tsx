@@ -637,7 +637,7 @@ export default function StudentGroups() {
                 </Label>
                 <Input 
                   id="academicYear" 
-                  placeholder="2024-2025" 
+                  placeholder="2025-2026" 
                   className="h-8 text-sm"
                   value={newClass.academicYear}
                   onChange={(e) => setNewClass({...newClass, academicYear: e.target.value})}
@@ -683,13 +683,18 @@ export default function StudentGroups() {
                       <SelectValue placeholder="Selecteer een vak om toe te voegen" />
                     </SelectTrigger>
                     <SelectContent>
-                      {courses.filter(course => !newClass.subjects.includes(course.id)).map((course: any) => (
-                        <SelectItem key={course.id} value={course.id.toString()}>
-                          {course.name} ({course.code})
+                      {courses.length === 0 ? (
+                        <SelectItem value="none" disabled>
+                          Geen vakken beschikbaar. Voeg eerst vakken toe via de Vakken sectie.
                         </SelectItem>
-                      ))}
-                      {courses.filter(course => !newClass.subjects.includes(course.id)).length === 0 && (
+                      ) : courses.filter(course => !newClass.subjects.includes(course.id)).length === 0 ? (
                         <SelectItem value="none" disabled>Alle vakken zijn al toegevoegd</SelectItem>
+                      ) : (
+                        courses.filter(course => !newClass.subjects.includes(course.id)).map((course: any) => (
+                          <SelectItem key={course.id} value={course.id.toString()}>
+                            {course.name} ({course.code})
+                          </SelectItem>
+                        ))
                       )}
                     </SelectContent>
                   </Select>
@@ -936,7 +941,7 @@ export default function StudentGroups() {
                 </Label>
                 <Input 
                   name="academicYear"
-                  placeholder="2024-2025" 
+                  placeholder="2025-2026" 
                   className="h-8 text-sm"
                   value={editFormData.academicYear || ''}
                   onChange={handleEditInputChange}

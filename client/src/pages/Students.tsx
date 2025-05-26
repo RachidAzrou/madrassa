@@ -119,6 +119,7 @@ export default function Students() {
   };
   
   const [formData, setFormData] = useState(emptyFormData);
+  const [editFormData, setEditFormData] = useState(emptyFormData);
   // Initialiseer students state met data uit localStorage indien beschikbaar
   const [students, setStudents] = useState(() => {
     const savedStudents = localStorage.getItem('students');
@@ -322,7 +323,8 @@ export default function Students() {
 
   const handleEditStudent = (student) => {
     setSelectedStudent(student);
-    setFormData({
+    // Pre-fill the edit form with student data
+    setEditFormData({
       firstName: student.firstName || "",
       lastName: student.lastName || "",
       email: student.email || "",
@@ -338,7 +340,9 @@ export default function Students() {
       notes: student.notes || "",
       studentGroupId: student.studentGroupId?.toString() || "",
       gender: student.gender || "man",
-      photoUrl: student.photoUrl || ""
+      photoUrl: student.photoUrl || "",
+      studentId: student.studentId || "",
+      academicYear: student.academicYear || "2024-2025"
     });
     setIsEditDialogOpen(true);
   };
@@ -385,6 +389,54 @@ export default function Students() {
     handleDeleteStudent();
   };
   
+  // Functie om edit form input te hanteren
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Functie om edit form select te hanteren
+  const handleEditSelectChange = (name, value) => {
+    setEditFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Functie om edit form te submitten
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      if (!selectedStudent) return;
+
+      // Update lokale state
+      const updatedStudents = students.map(student => 
+        student.id === selectedStudent.id 
+          ? { ...student, ...editFormData }
+          : student
+      );
+      setStudents(updatedStudents);
+      
+      // Update localStorage
+      localStorage.setItem('students', JSON.stringify(updatedStudents));
+      console.log('Student geüpdatet in localStorage:', updatedStudents.length);
+      
+      toast({
+        title: "Succes",
+        description: `Student ${editFormData.firstName} ${editFormData.lastName} is succesvol bijgewerkt.`,
+      });
+      
+      setIsEditDialogOpen(false);
+      setEditFormData(emptyFormData);
+      setSelectedStudent(null);
+    } catch (error) {
+      console.error('Fout bij het bijwerken van student:', error);
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het bijwerken van de student.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleUpdateStudent = (e) => {
     e.preventDefault();
     try {
@@ -1576,11 +1628,253 @@ export default function Students() {
 
       {/* Edit Student Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Student bewerken</DialogTitle>
-          </DialogHeader>
-          <p>Edit dialog inhoud komt hier...</p>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="edit-student-description">
+          <DialogHeaderWithIcon 
+            title="Student Bewerken" 
+            description="Pas de studentgegevens aan en sla wijzigingen op"
+            icon={<Edit className="h-5 w-5 text-white" />}
+          />
+          
+          <form onSubmit={handleEditSubmit} className="px-6 py-4 space-y-6">
+            {/* Persoonlijke Informatie */}
+            <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+              <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                <User className="h-4 w-4 mr-2" />
+                Persoonlijke Informatie
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-firstName" className="text-xs font-medium text-gray-700">Voornaam *</Label>
+                  <Input
+                    id="edit-firstName"
+                    name="firstName"
+                    value={editFormData.firstName}
+                    onChange={handleEditInputChange}
+                    placeholder="Voornaam"
+                    className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('firstName') ? 'border-red-500 bg-red-50' : ''}`}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-lastName" className="text-xs font-medium text-gray-700">Achternaam *</Label>
+                  <Input
+                    id="edit-lastName"
+                    name="lastName"
+                    value={editFormData.lastName}
+                    onChange={handleEditInputChange}
+                    placeholder="Achternaam"
+                    className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('lastName') ? 'border-red-500 bg-red-50' : ''}`}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-gender" className="text-xs font-medium text-gray-700">Geslacht</Label>
+                  <Select 
+                    value={editFormData.gender || ''} 
+                    onValueChange={(value) => handleEditSelectChange('gender', value)}
+                  >
+                    <SelectTrigger 
+                      id="edit-gender"
+                      className="mt-1 h-9 w-full border-[#e5e7eb] bg-white"
+                    >
+                      <SelectValue placeholder="Selecteer geslacht" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border-[#e5e7eb]">
+                      <SelectItem value="man" className="focus:bg-blue-200 hover:bg-blue-100">Man</SelectItem>
+                      <SelectItem value="vrouw" className="focus:bg-blue-200 hover:bg-blue-100">Vrouw</SelectItem>
+                      <SelectItem value="anders" className="focus:bg-blue-200 hover:bg-blue-100">Anders</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-dateOfBirth" className="text-xs font-medium text-gray-700">Geboortedatum</Label>
+                  <Input
+                    id="edit-dateOfBirth"
+                    name="dateOfBirth"
+                    type="date"
+                    value={editFormData.dateOfBirth || ''}
+                    onChange={handleEditInputChange}
+                    className="mt-1 h-9 w-full border-[#e5e7eb] bg-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Contactgegevens */}
+            <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+              <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                <Mail className="h-4 w-4 mr-2" />
+                Contactgegevens
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-email" className="text-xs font-medium text-gray-700">Email *</Label>
+                  <Input
+                    id="edit-email"
+                    name="email"
+                    type="email"
+                    value={editFormData.email}
+                    onChange={handleEditInputChange}
+                    placeholder="email@voorbeeld.com"
+                    className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('email') ? 'border-red-500 bg-red-50' : ''}`}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-phone" className="text-xs font-medium text-gray-700">Telefoon</Label>
+                  <Input
+                    id="edit-phone"
+                    name="phone"
+                    value={editFormData.phone}
+                    onChange={handleEditInputChange}
+                    placeholder="04 12 34 56 78"
+                    className="mt-1 h-9 w-full border-[#e5e7eb] bg-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Adresgegevens */}
+            <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+              <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                <MapPin className="h-4 w-4 mr-2" />
+                Adresgegevens
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-street" className="text-xs font-medium text-gray-700">Straat *</Label>
+                  <Input
+                    id="edit-street"
+                    name="street"
+                    value={editFormData.street}
+                    onChange={handleEditInputChange}
+                    placeholder="Straatnaam"
+                    className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('street') ? 'border-red-500 bg-red-50' : ''}`}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-houseNumber" className="text-xs font-medium text-gray-700">Huisnummer *</Label>
+                  <Input
+                    id="edit-houseNumber"
+                    name="houseNumber"
+                    value={editFormData.houseNumber}
+                    onChange={handleEditInputChange}
+                    placeholder="123"
+                    className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('houseNumber') ? 'border-red-500 bg-red-50' : ''}`}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-postalCode" className="text-xs font-medium text-gray-700">Postcode *</Label>
+                  <Input
+                    id="edit-postalCode"
+                    name="postalCode"
+                    value={editFormData.postalCode}
+                    onChange={handleEditInputChange}
+                    placeholder="1000"
+                    className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('postalCode') ? 'border-red-500 bg-red-50' : ''}`}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-city" className="text-xs font-medium text-gray-700">Plaats *</Label>
+                  <Input
+                    id="edit-city"
+                    name="city"
+                    value={editFormData.city}
+                    onChange={handleEditInputChange}
+                    placeholder="Brussel"
+                    className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('city') ? 'border-red-500 bg-red-50' : ''}`}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Onderwijsgegevens */}
+            <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+              <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                <GraduationCap className="h-4 w-4 mr-2" />
+                Onderwijsgegevens
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-academicYear" className="text-xs font-medium text-gray-700">Schooljaar *</Label>
+                  <Input
+                    id="edit-academicYear"
+                    name="academicYear"
+                    value={editFormData.academicYear}
+                    onChange={handleEditInputChange}
+                    placeholder="2024-2025"
+                    className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('academicYear') ? 'border-red-500 bg-red-50' : ''}`}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-status" className="text-xs font-medium text-gray-700">Status</Label>
+                  <Select 
+                    value={editFormData.status || ''} 
+                    onValueChange={(value) => handleEditSelectChange('status', value)}
+                  >
+                    <SelectTrigger 
+                      id="edit-status"
+                      className="mt-1 h-9 w-full border-[#e5e7eb] bg-white"
+                    >
+                      <SelectValue placeholder="Selecteer status" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border-[#e5e7eb]">
+                      <SelectItem value="ingeschreven" className="focus:bg-blue-200 hover:bg-blue-100">Ingeschreven</SelectItem>
+                      <SelectItem value="uitgeschreven" className="focus:bg-blue-200 hover:bg-blue-100">Uitgeschreven</SelectItem>
+                      <SelectItem value="afgestudeerd" className="focus:bg-blue-200 hover:bg-blue-100">Afgestudeerd</SelectItem>
+                      <SelectItem value="geschorst" className="focus:bg-blue-200 hover:bg-blue-100">Geschorst</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Notities - volledige breedte */}
+            <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+              <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                <FileText className="h-4 w-4 mr-2" />
+                Notities
+              </h3>
+              <Textarea
+                id="edit-notes"
+                name="notes"
+                value={editFormData.notes || ''}
+                onChange={handleEditInputChange}
+                placeholder="Voeg hier notities toe over de student..."
+                className="mt-1 min-h-[100px] w-full border-[#e5e7eb] bg-white resize-none"
+                rows={4}
+              />
+            </div>
+
+            <DialogFooterContainer>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="submit"
+                className="bg-[#1e40af] hover:bg-[#1e3a8a] text-white"
+              >
+                Wijzigingen Opslaan
+              </Button>
+            </DialogFooterContainer>
+          </form>
         </DialogContent>
       </Dialog>
 

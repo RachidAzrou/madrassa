@@ -29,7 +29,8 @@ import {
   TableContainer,
   DataTableHeader,
   TableLoadingState,
-  EmptyTableState
+  EmptyTableState,
+  QuickActions
 } from "@/components/ui/data-table-container";
 import {
   CustomDialog,
@@ -790,32 +791,11 @@ export default function Students() {
                       </Badge>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-right">
-                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleViewStudent(student)}
-                          className="h-7 w-7 p-0 text-gray-500"
-                        >
-                          <Eye className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditStudent(student)}
-                          className="h-7 w-7 p-0 text-gray-500"
-                        >
-                          <Edit className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteStudentClick(student)}
-                          className="h-7 w-7 p-0 text-gray-500"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
+                      <QuickActions
+                        onView={() => handleViewStudent(student)}
+                        onEdit={() => handleEditStudent(student)}
+                        onDelete={() => handleDeleteStudentClick(student)}
+                      />
                     </TableCell>
                   </TableRow>
                 ))

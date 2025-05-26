@@ -1230,15 +1230,15 @@ export default function Calendar() {
               </div>
 
               {/* Delete button */}
-              <div className="absolute top-2 right-2">
+              <div className="absolute bottom-2 right-2">
                 <Button 
                   type="button" 
                   variant="ghost" 
                   size="sm"
                   onClick={() => handleDeleteEvent(selectedEvent)}
-                  className="h-8 w-8 p-0 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full"
+                  className="h-6 w-6 p-0 text-gray-500 hover:text-red-600 hover:bg-red-50/50 transition-colors duration-200"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3 w-3" />
                 </Button>
               </div>
             </div>

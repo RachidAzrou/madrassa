@@ -1140,7 +1140,46 @@ export default function Teachers() {
           {selectedTeacher && (
             <div className="flex-1 overflow-y-auto">
               <div className="p-4 sm:p-6 space-y-6">
-                {/* Persoonlijke Informatie Card */}
+                {/* Header met foto en basisgegevens */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="p-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                      <div className="flex-shrink-0 text-center">
+                        <Avatar className="h-24 w-24 mx-auto border-4 border-white shadow-lg">
+                          {selectedTeacher.photoUrl ? (
+                            <img 
+                              src={selectedTeacher.photoUrl} 
+                              alt={`${selectedTeacher.firstName} ${selectedTeacher.lastName}`}
+                              className="w-full h-full rounded-full object-cover"
+                            />
+                          ) : (
+                            <AvatarFallback className="text-xl bg-blue-100 text-blue-600 font-semibold">
+                              {selectedTeacher.firstName.charAt(0)}{selectedTeacher.lastName.charAt(0)}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <h1 className="text-2xl font-bold text-gray-900">
+                              {selectedTeacher.firstName} {selectedTeacher.lastName}
+                            </h1>
+                            <p className="text-sm text-gray-500 font-medium">{selectedTeacher.teacherId}</p>
+                          </div>
+                          <div className="mt-2 sm:mt-0">
+                            <Badge className={`px-3 py-1 text-xs font-medium ${getStatusColor(selectedTeacher.status)}`}>
+                              {getStatusLabel(selectedTeacher.status)}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Persoonlijke Informatie */}
                 <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 sm:px-6 py-4 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
@@ -1149,110 +1188,88 @@ export default function Teachers() {
                     </h3>
                   </div>
                   <div className="p-4 sm:p-6">
-                    <div className="flex flex-col sm:flex-row items-start gap-6">
-                      {/* Foto en basis info */}
-                      <div className="flex flex-col items-center space-y-4">
-                        <div className="relative">
-                          <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
-                            {selectedTeacher.photoUrl ? (
-                              <img 
-                                src={selectedTeacher.photoUrl} 
-                                alt={`${selectedTeacher.firstName} ${selectedTeacher.lastName}`}
-                                className="w-full h-full rounded-full object-cover"
-                              />
-                            ) : (
-                              <AvatarFallback className="text-xl bg-blue-100 text-blue-600 font-semibold">
-                                {selectedTeacher.firstName.charAt(0)}{selectedTeacher.lastName.charAt(0)}
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-gray-500">
+                          <Mail className="h-4 w-4" />
+                          <span className="text-xs font-medium uppercase tracking-wide">Email</span>
                         </div>
-                        <div className="text-center">
-                          <h2 className="text-xl font-bold text-gray-900">
-                            {selectedTeacher.firstName} {selectedTeacher.lastName}
-                          </h2>
-                          <p className="text-sm text-gray-500 font-medium">{selectedTeacher.teacherId}</p>
-                          <Badge className={`mt-2 px-3 py-1 text-xs font-medium ${getStatusColor(selectedTeacher.status)}`}>
-                            {getStatusLabel(selectedTeacher.status)}
-                          </Badge>
-                        </div>
+                        <p className="text-sm font-medium text-gray-900 break-all">{selectedTeacher.email}</p>
                       </div>
                       
-                      {/* Details grid */}
-                      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-4">
-                          <div className="flex items-start space-x-3">
-                            <Mail className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Email</p>
-                              <p className="text-sm font-medium text-gray-900 break-all">{selectedTeacher.email}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-start space-x-3">
-                            <Phone className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Telefoon</p>
-                              <p className="text-sm font-medium text-gray-900">{selectedTeacher.phone || 'Niet opgegeven'}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-start space-x-3">
-                            <Phone className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Geboortedatum</p>
-                              <p className="text-sm font-medium text-gray-900">{selectedTeacher.dateOfBirth || 'Niet opgegeven'}</p>
-                            </div>
-                          </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-gray-500">
+                          <Phone className="h-4 w-4" />
+                          <span className="text-xs font-medium uppercase tracking-wide">Telefoon</span>
                         </div>
-                        
-                        <div className="space-y-4">
-                          <div className="flex items-start space-x-3">
-                            <BookOpen className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Specialisatie</p>
-                              <p className="text-sm font-medium text-gray-900">{selectedTeacher.specialty || 'Niet opgegeven'}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-start space-x-3">
-                            <BookOpen className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">In dienst sinds</p>
-                              <p className="text-sm font-medium text-gray-900">{selectedTeacher.hireDate || 'Niet opgegeven'}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-start space-x-3">
-                            <Users className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Status</p>
-                              <p className="text-sm font-medium text-gray-900">{getStatusLabel(selectedTeacher.status)}</p>
-                            </div>
-                          </div>
+                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.phone || 'Niet opgegeven'}</p>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-gray-500">
+                          <Calendar className="h-4 w-4" />
+                          <span className="text-xs font-medium uppercase tracking-wide">Geboortedatum</span>
                         </div>
+                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.dateOfBirth || 'Niet opgegeven'}</p>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-gray-500">
+                          <Users className="h-4 w-4" />
+                          <span className="text-xs font-medium uppercase tracking-wide">Geslacht</span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.gender || 'Niet opgegeven'}</p>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-gray-500">
+                          <BookOpen className="h-4 w-4" />
+                          <span className="text-xs font-medium uppercase tracking-wide">Specialisatie</span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.specialty || 'Niet opgegeven'}</p>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-gray-500">
+                          <Calendar className="h-4 w-4" />
+                          <span className="text-xs font-medium uppercase tracking-wide">In dienst sinds</span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.hireDate || 'Niet opgegeven'}</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Extra Informatie */}
-                {selectedTeacher.specialty && (
-                  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-4 sm:px-6 py-4 border-b border-gray-200">
-                      <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                        <BookOpen className="h-5 w-5 mr-2 text-green-600" />
-                        Aanvullende Informatie
-                      </h3>
-                    </div>
-                    <div className="p-4 sm:p-6">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Specialisatie</h4>
-                        <p className="text-sm text-gray-700">{selectedTeacher.specialty}</p>
+                {/* Professionele Informatie */}
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                  <div className="bg-gradient-to-r from-purple-50 to-violet-50 px-4 sm:px-6 py-4 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                      <GraduationCap className="h-5 w-5 mr-2 text-purple-600" />
+                      Professionele Informatie
+                    </h3>
+                  </div>
+                  <div className="p-4 sm:p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-gray-500">
+                          <Badge className="h-4 w-4" />
+                          <span className="text-xs font-medium uppercase tracking-wide">Status</span>
+                        </div>
+                        <Badge className={`inline-flex px-3 py-1 text-xs font-medium ${getStatusColor(selectedTeacher.status)}`}>
+                          {getStatusLabel(selectedTeacher.status)}
+                        </Badge>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-gray-500">
+                          <BookOpen className="h-4 w-4" />
+                          <span className="text-xs font-medium uppercase tracking-wide">Vakgebied</span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">{selectedTeacher.specialty || 'Niet gespecificeerd'}</p>
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
             </div>
           )}

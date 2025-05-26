@@ -1111,111 +1111,42 @@ export default function Calendar() {
               <h2 id="dialog-title">Event Details</h2>
               <p id="dialog-description">Details for calendar event</p>
             </div>
-            <div className="bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-300 transform max-w-sm mx-auto">
-              {/* Header with event type color */}
-              <div 
-                className="h-1.5 w-full"
-                style={{ backgroundColor: getEventColors(selectedEvent.type).borderColor }}
-              ></div>
-              
-              <div className="p-6">
-                {/* Event badge and title */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span 
-                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                        style={{
-                          backgroundColor: getEventColors(selectedEvent.type).bgColor,
-                          color: getEventColors(selectedEvent.type).borderColor
-                        }}
-                      >
-                        {selectedEvent.type === 'class' ? '📚 Les' : 
-                         selectedEvent.type === 'exam' ? '📝 Examen' :
-                         selectedEvent.type === 'holiday' ? '🏖️ Vakantie' : '📅 Evenement'}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 leading-tight">{selectedEvent.title}</h3>
-                  </div>
-                </div>
-
-                {/* Event details in a clean grid */}
-                <div className="space-y-3">
-                  <div className="flex items-center text-gray-700">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 mr-3">
-                      <CalendarIcon className="h-4 w-4 text-gray-600" />
-                    </div>
-                    <div>
-                      <div className="font-medium">
-                        {new Date(selectedEvent.date + 'T00:00:00').toLocaleDateString('nl-NL', { 
-                          weekday: 'long', 
-                          day: 'numeric', 
-                          month: 'long'
-                        })}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center text-gray-700">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 mr-3">
-                      <Clock className="h-4 w-4 text-gray-600" />
-                    </div>
-                    <div className="font-medium">
-                      {selectedEvent.startTime} - {selectedEvent.endTime}
-                    </div>
-                  </div>
-
-                  {selectedEvent.location && (
-                    <div className="flex items-center text-gray-700">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 mr-3">
-                        <MapPin className="h-4 w-4 text-gray-600" />
-                      </div>
-                      <div className="font-medium">{selectedEvent.location}</div>
-                    </div>
-                  )}
-
-                  {/* Course and Class info for lessons/exams */}
-                  {(selectedEvent.type === 'class' || selectedEvent.type === 'exam') && (
-                    <>
-                      {selectedEvent.courseName && (
-                        <div className="flex items-center text-gray-700">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 mr-3">
-                            <BookOpen className="h-4 w-4 text-gray-600" />
-                          </div>
-                          <div className="font-medium">{selectedEvent.courseName}</div>
-                        </div>
-                      )}
-                      {selectedEvent.className && (
-                        <div className="flex items-center text-gray-700">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 mr-3">
-                            <GraduationCap className="h-4 w-4 text-gray-600" />
-                          </div>
-                          <div className="font-medium">{selectedEvent.className}</div>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-
-                {/* Description if available */}
-                {selectedEvent.description && (
-                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-700 leading-relaxed">{selectedEvent.description}</p>
-                  </div>
-                )}
-
-                {/* Close button */}
-                <div className="flex justify-center mt-6">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setIsEventDetailDialogOpen(false)}
-                    className="px-6 py-2 text-gray-600 hover:text-gray-800 border-gray-300 hover:border-gray-400"
+            <div 
+              className="bg-white p-4 rounded-lg shadow-lg border-l-4 max-w-xs"
+              style={{ borderLeftColor: getEventColors(selectedEvent.type).borderColor }}
+            >
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-semibold text-gray-900">{selectedEvent.title}</h3>
+                  <span 
+                    className="inline-block px-2 py-1 text-xs rounded mt-1"
+                    style={{
+                      backgroundColor: getEventColors(selectedEvent.type).bgColor,
+                      color: getEventColors(selectedEvent.type).borderColor
+                    }}
                   >
-                    Sluiten
-                  </Button>
+                    {selectedEvent.type === 'class' ? 'Les' : 
+                     selectedEvent.type === 'exam' ? 'Examen' :
+                     selectedEvent.type === 'holiday' ? 'Vakantie' : 'Evenement'}
+                  </span>
                 </div>
+
+                <div className="text-sm text-gray-600 space-y-1">
+                  <div>{new Date(selectedEvent.date + 'T00:00:00').toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' })}</div>
+                  <div>{selectedEvent.startTime} - {selectedEvent.endTime}</div>
+                  {selectedEvent.location && <div>{selectedEvent.location}</div>}
+                  {selectedEvent.courseName && <div>{selectedEvent.courseName}</div>}
+                  {selectedEvent.description && <div className="italic">{selectedEvent.description}</div>}
+                </div>
+
+                <Button 
+                  onClick={() => setIsEventDetailDialogOpen(false)}
+                  variant="ghost" 
+                  size="sm"
+                  className="w-full text-xs"
+                >
+                  Sluiten
+                </Button>
               </div>
             </div>
           </>

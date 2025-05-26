@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Eye, Pencil, Trash2, MoreHorizontal } from "lucide-react";
 
 interface DataTableContainerProps {
   children: ReactNode;
@@ -103,6 +105,65 @@ export function EmptyActionHeader({
     <th scope="col" className={`px-4 py-3 text-right w-[120px] ${className}`}>
       <span className="text-xs font-medium text-gray-700"></span>
     </th>
+  );
+}
+
+/**
+ * Standard action buttons with consistent styling from the Guardians page
+ */
+interface ActionButtonProps {
+  onClick: () => void;
+  icon: 'view' | 'edit' | 'delete' | 'more';
+  className?: string;
+  disabled?: boolean;
+}
+
+export function ActionButton({ onClick, icon, className = "", disabled = false }: ActionButtonProps) {
+  const getIcon = () => {
+    switch (icon) {
+      case 'view':
+        return <Eye className="h-3.5 w-3.5" />;
+      case 'edit':
+        return <Pencil className="h-3.5 w-3.5" />;
+      case 'delete':
+        return <Trash2 className="h-3.5 w-3.5" />;
+      case 'more':
+        return <MoreHorizontal className="h-3.5 w-3.5" />;
+      default:
+        return <Eye className="h-3.5 w-3.5" />;
+    }
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={onClick}
+      disabled={disabled}
+      className={`h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100 ${className}`}
+    >
+      {getIcon()}
+    </Button>
+  );
+}
+
+/**
+ * Quick action buttons for common table actions (view, edit, delete)
+ */
+interface QuickActionsProps {
+  onView?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  className?: string;
+}
+
+export function QuickActions({ onView, onEdit, onDelete, className = "" }: QuickActionsProps) {
+  return (
+    <ActionButtonsContainer className={className}>
+      {onView && <ActionButton onClick={onView} icon="view" />}
+      {onEdit && <ActionButton onClick={onEdit} icon="edit" />}
+      {onDelete && <ActionButton onClick={onDelete} icon="delete" />}
+    </ActionButtonsContainer>
   );
 }
 

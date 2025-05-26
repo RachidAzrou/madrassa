@@ -28,6 +28,7 @@ import { ExportButton } from '@/components/ui/export-button';
 import { ExportDialog } from '@/components/ui/export-dialog';
 import {
   ActionButtonsContainer,
+  QuickActions,
   EmptyActionHeader
 } from '@/components/ui/data-table-container';
 import { Textarea } from '@/components/ui/textarea';
@@ -646,35 +647,11 @@ export default function Teachers() {
                         </Badge>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-right">
-                        <div className="flex justify-end space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          <Button 
-                            size="icon" 
-                            variant="ghost" 
-                            onClick={() => handleViewTeacher(teacher)}
-                            className="h-7 w-7 text-gray-500 hover:text-gray-700"
-                          >
-                            <Eye className="h-3.5 w-3.5" />
-                            <span className="sr-only">Bekijken</span>
-                          </Button>
-                          <Button 
-                            size="icon" 
-                            variant="ghost" 
-                            onClick={() => handleEditTeacher(teacher)}
-                            className="h-7 w-7 text-gray-500 hover:text-gray-700"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                            <span className="sr-only">Bewerken</span>
-                          </Button>
-                          <Button 
-                            size="icon" 
-                            variant="ghost" 
-                            onClick={() => handleDeleteTeacher(teacher)}
-                            className="h-7 w-7 text-red-500 hover:text-red-700"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                            <span className="sr-only">Verwijderen</span>
-                          </Button>
-                        </div>
+                        <QuickActions
+                          onView={() => handleViewTeacher(teacher)}
+                          onEdit={() => handleEditTeacher(teacher)}
+                          onDelete={() => handleDeleteTeacher(teacher)}
+                        />
                       </td>
                     </tr>
                   ))

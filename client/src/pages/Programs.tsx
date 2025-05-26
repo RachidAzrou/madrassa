@@ -481,7 +481,7 @@ export default function Programs() {
                 <Checkbox
                   checked={isAllSelected}
                   onCheckedChange={handleSelectAll}
-                  className="mx-auto"
+                  className="mx-auto data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 border-gray-300"
                 />
               </StandardTableHeaderCell>
               <StandardTableHeaderCell>Vak</StandardTableHeaderCell>
@@ -526,7 +526,7 @@ export default function Programs() {
                     <Checkbox
                       checked={selectedPrograms.has(program.id)}
                       onCheckedChange={(checked) => handleSelectProgram(program.id, checked as boolean)}
-                      className="mx-auto"
+                      className="mx-auto data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 border-gray-300"
                     />
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap">

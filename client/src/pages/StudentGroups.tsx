@@ -139,20 +139,16 @@ export default function StudentGroups() {
 
   const courses = Array.isArray(coursesData) ? coursesData : (coursesData?.courses || []);
 
-  // Filter function
+  // Filter function - exact same structure as Students page
   const filteredClasses = classes.filter((cls: ClassType) => {
-    const matchesSearch = !searchQuery || 
-      cls.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      cls.teacherName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      cls.location?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = !searchTerm || 
+      cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cls.teacherName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cls.location?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesClassName = !classNameFilter || cls.name.toLowerCase().includes(classNameFilter.toLowerCase());
-    const matchesAcademicYear = !academicYearFilter || academicYearFilter === 'all' || cls.academicYear === academicYearFilter;
-    const matchesLocation = !locationFilter || cls.location?.toLowerCase().includes(locationFilter.toLowerCase());
-    const matchesTeacher = !teacherFilter || cls.teacherName?.toLowerCase().includes(teacherFilter.toLowerCase());
-    const matchesCapacity = !capacityFilter || (cls.maxCapacity && cls.maxCapacity >= parseInt(capacityFilter));
+    const matchesAcademicYear = filterAcademicYear === 'all' || cls.academicYear === filterAcademicYear;
 
-    return matchesSearch && matchesClassName && matchesAcademicYear && matchesLocation && matchesTeacher && matchesCapacity;
+    return matchesSearch && matchesAcademicYear;
   });
 
   // Mutations
@@ -303,12 +299,8 @@ export default function StudentGroups() {
   };
 
   const clearFilters = () => {
-    setSearchQuery('');
-    setClassNameFilter('');
-    setAcademicYearFilter('');
-    setLocationFilter('');
-    setTeacherFilter('');
-    setCapacityFilter('');
+    setSearchTerm('');
+    setFilterAcademicYear('all');
   };
 
   return (
@@ -339,6 +331,16 @@ export default function StudentGroups() {
             
             <div className="flex flex-wrap gap-2 items-center">
               <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilterOptions(!showFilterOptions)}
+                className="h-8 text-xs rounded-sm border-[#e5e7eb]"
+              >
+                <Search className="h-3.5 w-3.5 mr-1" />
+                Filters
+              </Button>
+              
+              <Button
                 onClick={() => setShowNewClassDialog(true)}
                 size="sm"
                 className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white"
@@ -349,14 +351,17 @@ export default function StudentGroups() {
             </div>
           </div>
 
-          {/* Inline filters in studentenpagina stijl */}
-          <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200 mt-4">
+        {/* Filter opties - exact copy from Students page */}
+        {showFilterOptions && (
+          <div className="px-4 py-3 border-t border-[#e5e7eb] flex flex-wrap gap-3 items-center">
             <div className="flex items-center">
-              {(classNameFilter || academicYearFilter !== 'all' || locationFilter) && (
+              {(filterAcademicYear !== 'all') && (
                 <Button
                   variant="link"
                   size="sm"
-                  onClick={clearFilters}
+                  onClick={() => {
+                    setFilterAcademicYear('all');
+                  }}
                   className="h-7 text-xs text-blue-600 p-0 mr-3"
                 >
                   Filters wissen
@@ -365,33 +370,24 @@ export default function StudentGroups() {
             </div>
             
             <div className="flex flex-wrap gap-3">
-              <Input
-                placeholder="Klas"
-                value={classNameFilter}
-                onChange={(e) => setClassNameFilter(e.target.value)}
-                className="w-32 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white"
-              />
-              
-              <Select value={academicYearFilter} onValueChange={setAcademicYearFilter}>
+              <Select 
+                value={filterAcademicYear} 
+                onValueChange={setFilterAcademicYear}
+              >
                 <SelectTrigger className="w-40 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white">
                   <SelectValue placeholder="Schooljaar" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#e5e7eb]">
                   <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">Alle schooljaren</SelectItem>
-                  <SelectItem value="2023-2024" className="focus:bg-blue-200 hover:bg-blue-100">2023-2024</SelectItem>
-                  <SelectItem value="2024-2025" className="focus:bg-blue-200 hover:bg-blue-100">2024-2025</SelectItem>
                   <SelectItem value="2025-2026" className="focus:bg-blue-200 hover:bg-blue-100">2025-2026</SelectItem>
+                  <SelectItem value="2024-2025" className="focus:bg-blue-200 hover:bg-blue-100">2024-2025</SelectItem>
+                  <SelectItem value="2023-2024" className="focus:bg-blue-200 hover:bg-blue-100">2023-2024</SelectItem>
+                  <SelectItem value="2022-2023" className="focus:bg-blue-200 hover:bg-blue-100">2022-2023</SelectItem>
                 </SelectContent>
               </Select>
-              
-              <Input
-                placeholder="Locatie"
-                value={locationFilter}
-                onChange={(e) => setLocationFilter(e.target.value)}
-                className="w-32 h-7 text-xs rounded-sm border-[#e5e7eb] bg-white"
-              />
             </div>
           </div>
+        )}
         </SearchActionBar>
 
         {/* Classes table */}

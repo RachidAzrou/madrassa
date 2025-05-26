@@ -48,7 +48,7 @@ export function FormLabel({ children, htmlFor, className = "" }: { children: Rea
 }
 
 /**
- * Styled select with consistent styling matching the filter dropdowns
+ * Styled select with consistent blue styling matching the main form dropdowns
  */
 export function StyledSelect({ 
   value, 
@@ -56,7 +56,9 @@ export function StyledSelect({
   placeholder = "Selecteer...", 
   children, 
   className = "",
-  triggerClassName = ""
+  triggerClassName = "",
+  required = false,
+  error = false
 }: { 
   value: string; 
   onValueChange: (value: string) => void; 
@@ -64,13 +66,15 @@ export function StyledSelect({
   children: ReactNode;
   className?: string;
   triggerClassName?: string;
+  required?: boolean;
+  error?: boolean;
 }) {
   return (
-    <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger id="relationship" className={`h-8 text-sm border-gray-300 ${triggerClassName}`}>
+    <Select value={value} onValueChange={onValueChange} required={required}>
+      <SelectTrigger className={`h-9 w-full border-[#e5e7eb] bg-white ${error ? 'border-red-500 bg-red-50' : ''} ${triggerClassName}`}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent className={`bg-white ${className}`}>
+      <SelectContent className={`bg-white border-[#e5e7eb] ${className}`}>
         {children}
       </SelectContent>
     </Select>
@@ -78,11 +82,11 @@ export function StyledSelect({
 }
 
 /**
- * Styled select item with consistent styling
+ * Styled select item with consistent blue hover/focus styling
  */
 export function StyledSelectItem({ value, children, className = "" }: { value: string; children: ReactNode; className?: string }) {
   return (
-    <SelectItem value={value} className={`text-black hover:bg-blue-100 focus:bg-blue-200 ${className}`}>
+    <SelectItem value={value} className={`focus:bg-blue-200 hover:bg-blue-100 ${className}`}>
       {children}
     </SelectItem>
   );

@@ -229,9 +229,9 @@ export default function Scheduling() {
   const rooms = roomsData?.rooms || [];
 
   // Get unique values for filters
-  const uniqueClasses = [...new Set(schedules.map((s: ScheduleEntry) => s.className))];
-  const uniqueTeachers = [...new Set(schedules.map((s: ScheduleEntry) => s.teacherName))];
-  const uniqueSubjects = [...new Set(schedules.map((s: ScheduleEntry) => s.subjectName))];
+  const uniqueClasses = Array.from(new Set(schedules.map((s: ScheduleEntry) => s.className)));
+  const uniqueTeachers = Array.from(new Set(schedules.map((s: ScheduleEntry) => s.teacherName)));
+  const uniqueSubjects = Array.from(new Set(schedules.map((s: ScheduleEntry) => s.subjectName)));
   const uniqueDays = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag'];
 
   // Filter schedules based on search and filter criteria
@@ -308,7 +308,25 @@ export default function Scheduling() {
           breadcrumbs={{ parent: "Onderwijs", current: "Rooster" }}
         />
         <div className="p-6">
-          <TableLoadingState />
+          <div className="bg-white border border-gray-200 rounded-sm overflow-hidden">
+            <StandardTable>
+              <StandardTableHeader>
+                <StandardTableRow>
+                  <StandardTableHeaderCell>Dag</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Tijdslot</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Klas</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Vak</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Docent</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Lokaal</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Status</StandardTableHeaderCell>
+                  <EmptyActionHeader />
+                </StandardTableRow>
+              </StandardTableHeader>
+              <StandardTableBody>
+                <TableLoadingState colSpan={8} />
+              </StandardTableBody>
+            </StandardTable>
+          </div>
         </div>
       </div>
     );
@@ -324,7 +342,25 @@ export default function Scheduling() {
           breadcrumbs={{ parent: "Onderwijs", current: "Rooster" }}
         />
         <div className="p-6">
-          <TableErrorState />
+          <div className="bg-white border border-gray-200 rounded-sm overflow-hidden">
+            <StandardTable>
+              <StandardTableHeader>
+                <StandardTableRow>
+                  <StandardTableHeaderCell>Dag</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Tijdslot</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Klas</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Vak</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Docent</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Lokaal</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Status</StandardTableHeaderCell>
+                  <EmptyActionHeader />
+                </StandardTableRow>
+              </StandardTableHeader>
+              <StandardTableBody>
+                <TableErrorState colSpan={8} message="Er ging iets mis bij het laden van het rooster." />
+              </StandardTableBody>
+            </StandardTable>
+          </div>
         </div>
       </div>
     );
@@ -462,7 +498,11 @@ export default function Scheduling() {
               {filteredSchedules.length === 0 ? (
                 <StandardTableRow>
                   <StandardTableCell colSpan={8}>
-                    <TableEmptyState />
+                    <TableEmptyState 
+                      colSpan={8}
+                      title="Geen lessen gevonden"
+                      description="Er zijn geen lessen die voldoen aan de geselecteerde filters."
+                    />
                   </StandardTableCell>
                 </StandardTableRow>
               ) : (

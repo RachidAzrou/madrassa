@@ -813,27 +813,12 @@ export default function Teachers() {
       {/* Dialoogvenster voor nieuwe docent */}
       <Dialog open={showNewTeacherDialog} onOpenChange={setShowNewTeacherDialog}>
         <DialogContent className="sm:max-w-[85vw] p-0">
-          {/* Dialog Header */}
-          <div className="bg-blue-600 py-4 px-6 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-white/20 p-2 rounded-full">
-                <GraduationCap className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <DialogTitle className="text-white text-lg font-semibold m-0">Nieuwe docent toevoegen</DialogTitle>
-                <DialogDescription className="text-white/70 text-sm m-0">
-                  Vul de gegevens in om een nieuwe docent toe te voegen.
-                </DialogDescription>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0 text-white/70 hover:text-white"
-              onClick={() => setShowNewTeacherDialog(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <DialogHeaderWithIcon
+            icon={<GraduationCap className="h-5 w-5" />}
+            title="Nieuwe docent toevoegen"
+            description="Vul de gegevens in om een nieuwe docent toe te voegen."
+            onClose={() => setShowNewTeacherDialog(false)}
+          />
           
           {/* Tabs met formulier secties */}
           <DialogFormContainer>

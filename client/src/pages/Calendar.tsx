@@ -369,10 +369,10 @@ export default function Calendar() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Premium header component */}
       <PremiumHeader 
-        title="Kalender" 
-        path="Evaluatie > Kalender" 
+        title="Rooster" 
+        path="Evaluatie > Rooster" 
         icon={CalendarIcon}
-        description="Beheer schoolevenementen, bekijk lessen en belangrijke data in een overzichtelijke kalenderweergave"
+        description="Beheer schoolevenementen, bekijk lessen en belangrijke data in een overzichtelijke roosterweergave"
       />
       
       <div className="px-6 py-6 flex-1 space-y-6">

@@ -24,6 +24,8 @@ import {
   DialogHeaderWithIcon
 } from '@/components/ui/custom-dialog';
 import { DeleteDialog } from '@/components/ui/delete-dialog';
+import { ExportButton } from '@/components/ui/export-button';
+import { ExportDialog } from '@/components/ui/export-dialog';
 import {
   ActionButtonsContainer,
   EmptyActionHeader
@@ -449,15 +451,10 @@ export default function Teachers() {
                 </>
               ) : (
                 <>
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <ExportButton
                     onClick={() => setIsExportDialogOpen(true)}
-                    className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
                     title="Exporteer docenten"
-                  >
-                    <Upload className="h-3.5 w-3.5" />
-                  </Button>
+                  />
                   <Button
                     size="sm"
                     onClick={handleAddNewTeacher}
@@ -1629,70 +1626,17 @@ export default function Teachers() {
         </DialogContent>
       </Dialog>
 
-      {/* Exporteer dialoog */}
-      <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden">
-          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-white/20 p-2 rounded-full">
-                <Upload className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <DialogTitle className="text-white text-lg font-semibold m-0">Docenten Exporteren</DialogTitle>
-                <DialogDescription className="text-white/70 text-sm m-0">
-                  Kies een formaat om de docenten te exporteren
-                </DialogDescription>
-              </div>
-            </div>
-          </div>
-          
-          <div className="p-6 space-y-5">
-            <div className="grid grid-cols-3 gap-4">
-              <Card className="border rounded-md p-4 hover:border-blue-500 cursor-pointer transition-all" onClick={() => handleExportTeachers('excel')}>
-                <CardContent className="p-0 flex flex-col items-center">
-                  <FileDown className="h-8 w-8 mb-2 text-green-600" />
-                  <h3 className="text-sm font-medium">Excel</h3>
-                </CardContent>
-              </Card>
-              
-              <Card className="border rounded-md p-4 hover:border-blue-500 cursor-pointer transition-all" onClick={() => handleExportTeachers('csv')}>
-                <CardContent className="p-0 flex flex-col items-center">
-                  <FileDown className="h-8 w-8 mb-2 text-blue-600" />
-                  <h3 className="text-sm font-medium">CSV</h3>
-                </CardContent>
-              </Card>
-              
-              <Card className="border rounded-md p-4 hover:border-blue-500 cursor-pointer transition-all" onClick={() => handleExportTeachers('pdf')}>
-                <CardContent className="p-0 flex flex-col items-center">
-                  <FileDown className="h-8 w-8 mb-2 text-red-600" />
-                  <h3 className="text-sm font-medium">PDF</h3>
-                </CardContent>
-              </Card>
-            </div>
-            
-            <div className="bg-blue-50 p-3 rounded-md">
-              <p className="text-xs text-blue-700 flex items-start">
-                <AlertTriangle className="h-4 w-4 mr-2 flex-shrink-0 mt-0.5 text-blue-700" />
-                <span>
-                  {selectedTeachers.length > 0
-                    ? `Je hebt ${selectedTeachers.length} docent(en) geselecteerd om te exporteren.`
-                    : "Je hebt geen docenten geselecteerd. Alle docenten worden geëxporteerd."}
-                </span>
-              </p>
-            </div>
-          </div>
-          
-          <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setIsExportDialogOpen(false)}
-              className="h-8 text-xs rounded-sm border-[#e5e7eb]"
-            >
-              Annuleren
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Export dialoog */}
+      <ExportDialog
+        open={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+        title="Docenten Exporteren"
+        description="Kies een formaat om de docenten te exporteren"
+        selectedCount={selectedTeachers.length}
+        totalCount={teachers.length}
+        entityName="docenten"
+        onExport={handleExportTeachers}
+      />
     </div>
   );
 }

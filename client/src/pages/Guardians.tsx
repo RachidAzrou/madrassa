@@ -1388,62 +1388,133 @@ export default function Guardians() {
                   <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                     <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
                       <Users className="h-4 w-4 mr-2" />
-                      Gekoppelde studenten
+                      Studentenbeheer
                     </h3>
                     
-                    <div className="space-y-3">
-                      {selectedGuardian && students.filter(student => 
-                        student.guardians && student.guardians.some(g => g.id === selectedGuardian.id)
-                      ).length > 0 ? (
-                        students
-                          .filter(student => 
-                            student.guardians && student.guardians.some(g => g.id === selectedGuardian.id)
-                          )
-                          .map(student => (
-                            <div key={student.id} className="flex items-center gap-3 p-3 bg-white rounded-md border">
-                              <div className="w-10 h-10 rounded-full bg-[#1e40af] flex items-center justify-center text-white font-medium text-sm">
-                                {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                    <div className="space-y-4">
+                      <div className="text-sm text-gray-600 mb-4">
+                        Beheer welke studenten aan deze voogd gekoppeld zijn.
+                      </div>
+                      
+                      {/* Search for students to add */}
+                      <div className="relative">
+                        <Input 
+                          placeholder="Zoek studenten om te koppelen..." 
+                          className="h-8 text-sm pl-8"
+                          value={studentSearchTerm}
+                          onChange={(e) => setStudentSearchTerm(e.target.value)}
+                        />
+                        <Search className="h-4 w-4 absolute left-2.5 top-2 text-gray-400" />
+                      </div>
+                      
+                      {/* Available students to link */}
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-medium text-gray-700">Beschikbare studenten</h4>
+                        <div className="max-h-40 overflow-y-auto space-y-2">
+                          {students
+                            .filter(student => 
+                              // Filter students that are not already linked and match search
+                              (!student.guardians || !student.guardians.some(g => g.id === selectedGuardian?.id)) &&
+                              (student.firstName + ' ' + student.lastName + ' ' + student.studentId)
+                                .toLowerCase()
+                                .includes(studentSearchTerm.toLowerCase())
+                            )
+                            .map(student => (
+                              <div key={student.id} className="flex items-center gap-3 p-3 bg-white rounded-md border hover:border-blue-300">
+                                <div className="w-10 h-10 rounded-full bg-[#1e40af] flex items-center justify-center text-white font-medium text-sm">
+                                  {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {student.firstName} {student.lastName}
+                                  </p>
+                                  <p className="text-xs text-gray-600">Student ID: {student.studentId}</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                    student.status === 'Ingeschreven' ? 'bg-green-100 text-green-800' :
+                                    student.status === 'Uitgeschreven' ? 'bg-red-100 text-red-800' :
+                                    student.status === 'Afgestudeerd' ? 'bg-gray-100 text-gray-800' :
+                                    student.status === 'Geschorst' ? 'bg-yellow-100 text-yellow-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }`}>
+                                    {student.status}
+                                  </span>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      toast({
+                                        title: "Student koppelen",
+                                        description: "Deze functionaliteit wordt binnenkort toegevoegd."
+                                      });
+                                    }}
+                                    className="h-7 w-7 p-0 border-green-300 text-green-600 hover:bg-green-50"
+                                  >
+                                    <Plus className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
                               </div>
-                              <div className="flex-1">
-                                <p className="text-sm font-medium text-gray-900">
-                                  {student.firstName} {student.lastName}
-                                </p>
-                                <p className="text-xs text-gray-600">Student ID: {student.studentId}</p>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                  student.status === 'Ingeschreven' ? 'bg-green-100 text-green-800' :
-                                  student.status === 'Uitgeschreven' ? 'bg-red-100 text-red-800' :
-                                  student.status === 'Afgestudeerd' ? 'bg-gray-100 text-gray-800' :
-                                  student.status === 'Geschorst' ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-gray-100 text-gray-800'
-                                }`}>
-                                  {student.status}
-                                </span>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    // Hier kun je functionaliteit toevoegen om de koppeling te verwijderen
-                                    toast({
-                                      title: "Koppeling verwijderen",
-                                      description: "Deze functionaliteit kan later worden geïmplementeerd."
-                                    });
-                                  }}
-                                  className="h-7 w-7 p-0 border-red-300 text-red-600 hover:bg-red-50"
-                                >
-                                  <XCircle className="h-3.5 w-3.5" />
-                                </Button>
-                              </div>
-                            </div>
-                          ))
-                      ) : (
-                        <div className="text-center py-6 text-gray-500 text-sm">
-                          <Users className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                          <p>Geen studenten gekoppeld aan deze voogd</p>
-                          <p className="text-xs mt-1">Voeg studenten toe via de studentenpagina</p>
+                            ))}
                         </div>
-                      )}
+                      </div>
+                      
+                      {/* Currently linked students */}
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-medium text-gray-700">Gekoppelde studenten</h4>
+                        <div className="space-y-2">
+                          {selectedGuardian && students.filter(student => 
+                            student.guardians && student.guardians.some(g => g.id === selectedGuardian.id)
+                          ).length > 0 ? (
+                            students
+                              .filter(student => 
+                                student.guardians && student.guardians.some(g => g.id === selectedGuardian.id)
+                              )
+                              .map(student => (
+                                <div key={student.id} className="flex items-center gap-3 p-3 bg-white rounded-md border">
+                                  <div className="w-10 h-10 rounded-full bg-[#1e40af] flex items-center justify-center text-white font-medium text-sm">
+                                    {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                                  </div>
+                                  <div className="flex-1">
+                                    <p className="text-sm font-medium text-gray-900">
+                                      {student.firstName} {student.lastName}
+                                    </p>
+                                    <p className="text-xs text-gray-600">Student ID: {student.studentId}</p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                      student.status === 'Ingeschreven' ? 'bg-green-100 text-green-800' :
+                                      student.status === 'Uitgeschreven' ? 'bg-red-100 text-red-800' :
+                                      student.status === 'Afgestudeerd' ? 'bg-gray-100 text-gray-800' :
+                                      student.status === 'Geschorst' ? 'bg-yellow-100 text-yellow-800' :
+                                      'bg-gray-100 text-gray-800'
+                                    }`}>
+                                      {student.status}
+                                    </span>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        toast({
+                                          title: "Koppeling verwijderen",
+                                          description: "Deze functionaliteit wordt binnenkort toegevoegd."
+                                        });
+                                      }}
+                                      className="h-7 w-7 p-0 border-red-300 text-red-600 hover:bg-red-50"
+                                    >
+                                      <XCircle className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))
+                          ) : (
+                            <div className="text-center py-4 text-gray-500 text-sm bg-gray-50 rounded-md">
+                              <Users className="h-6 w-6 mx-auto mb-2 text-gray-400" />
+                              <p>Geen studenten gekoppeld</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </TabsContent>

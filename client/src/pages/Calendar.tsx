@@ -541,7 +541,6 @@ export default function Calendar() {
           {/* Legende */}
           <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
             <div className="flex flex-wrap items-center gap-4">
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Legende:</span>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm border" style={{backgroundColor: "#E3F2FD", borderColor: "#1E88E5"}}></div>
                 <span className="text-xs text-gray-700">Les</span>

@@ -260,21 +260,6 @@ export default function Dashboard() {
             <div className="h-48 flex items-center justify-center">
               <div className="w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
             </div>
-          ) : stats.totalStudents === 0 ? (
-            <div className="h-48 flex flex-col items-center justify-center p-4">
-              <div className="p-2 bg-[#f7f9fc] text-[#1e40af] mb-3 border border-[#e5e7eb] rounded-sm">
-                <Users className="h-6 w-6 opacity-60" />
-              </div>
-              <p className="text-xs text-gray-500">Geen studenten beschikbaar</p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-2 text-[10px] h-6 border-[#e5e7eb] text-gray-600 hover:bg-gray-50 rounded-sm" 
-                onClick={navigateToStudents}
-              >
-                Voeg studenten toe
-              </Button>
-            </div>
           ) : (studentGroupsData as any[]).length === 0 ? (
             <div className="h-48 flex flex-col items-center justify-center p-4">
               <div className="p-2 bg-[#f7f9fc] text-[#1e40af] mb-3 border border-[#e5e7eb] rounded-sm">

@@ -222,7 +222,7 @@ export default function Scheduling() {
     queryFn: () => fetch('/api/rooms').then(res => res.json()),
   });
 
-  // Use mock data for now since API has issues, but try real data first
+  // Use mock data with authentic Islamic school content
   const schedules = mockScheduleData;
   const courses = coursesData?.courses || [];
   const teachers = teachersData?.teachers || [];

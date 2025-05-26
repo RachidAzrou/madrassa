@@ -816,8 +816,8 @@ export default function Students() {
                         variant="outline" 
                         className={`text-xs rounded-sm ${
                           student.status === 'active' || student.status === 'ingeschreven' ? "bg-green-50 text-green-700 border-green-200" : 
-                          student.status === 'inactive' || student.status === 'uitgeschreven' ? "bg-gray-50 text-gray-700 border-gray-200" : 
-                          student.status === 'afgestudeerd' ? "bg-blue-50 text-blue-700 border-blue-200" :
+                          student.status === 'inactive' || student.status === 'uitgeschreven' ? "bg-red-50 text-red-700 border-red-200" : 
+                          student.status === 'afgestudeerd' ? "bg-gray-50 text-gray-700 border-gray-200" :
                           student.status === 'geschorst' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
                           "bg-yellow-50 text-yellow-700 border-yellow-200"
                         }`}
@@ -1357,8 +1357,8 @@ export default function Students() {
                     variant="outline" 
                     className={`text-sm rounded-full px-3 py-1 font-medium ${
                       selectedStudent.status === 'active' || selectedStudent.status === 'ingeschreven' ? "bg-green-50 text-green-700 border-green-200" : 
-                      selectedStudent.status === 'inactive' || selectedStudent.status === 'uitgeschreven' ? "bg-gray-50 text-gray-700 border-gray-200" : 
-                      selectedStudent.status === 'afgestudeerd' ? "bg-blue-50 text-blue-700 border-blue-200" :
+                      selectedStudent.status === 'inactive' || selectedStudent.status === 'uitgeschreven' ? "bg-red-50 text-red-700 border-red-200" : 
+                      selectedStudent.status === 'afgestudeerd' ? "bg-gray-50 text-gray-700 border-gray-200" :
                       selectedStudent.status === 'geschorst' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
                       "bg-yellow-50 text-yellow-700 border-yellow-200"
                     }`}

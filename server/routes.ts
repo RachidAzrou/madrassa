@@ -3793,7 +3793,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Schedule routes
   app.get("/api/schedules", async (req, res) => {
     try {
-      const schedules = await db.select().from(schema.schedules);
+      const schedules = await storage.getSchedules();
       res.json({ schedules });
     } catch (error) {
       console.error("Error fetching schedules:", error);

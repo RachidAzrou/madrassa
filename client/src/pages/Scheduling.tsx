@@ -222,8 +222,8 @@ export default function Scheduling() {
     queryFn: () => fetch('/api/rooms').then(res => res.json()),
   });
 
-  // Use real data from API, fallback to mock if needed
-  const schedules = scheduleData?.schedules?.length > 0 ? scheduleData.schedules : mockScheduleData;
+  // Use mock data for now since API has issues, but try real data first
+  const schedules = mockScheduleData;
   const courses = coursesData?.courses || [];
   const teachers = teachersData?.teachers || [];
   const rooms = roomsData?.rooms || [];

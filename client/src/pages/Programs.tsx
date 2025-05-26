@@ -473,7 +473,7 @@ export default function Programs() {
               </TabsList>
               
               <TabsContent value="algemeen" className="mt-0">
-                <div className="space-y-4">
+                <div className="space-y-4 p-4 bg-gray-50 rounded-md">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <FormLabel htmlFor="name">
@@ -541,7 +541,7 @@ export default function Programs() {
               </TabsContent>
 
               <TabsContent value="curriculum" className="mt-0">
-                <div className="space-y-4">
+                <div className="space-y-4 p-4 bg-gray-50 rounded-md">
                   <div className="space-y-2">
                     <FormLabel htmlFor="instroomvereisten">Instroomvereisten</FormLabel>
                     <Textarea
@@ -572,7 +572,7 @@ export default function Programs() {
               </TabsContent>
               
               <TabsContent value="docenten" className="mt-0">
-                <div className="space-y-4">
+                <div className="space-y-4 p-4 bg-gray-50 rounded-md">
                   <FormLabel>Toegewezen docenten</FormLabel>
                   <div className="border border-gray-200 rounded-md p-4 max-h-[300px] overflow-auto">
                     {teachersData?.teachers && teachersData.teachers.length > 0 ? (

@@ -1179,8 +1179,7 @@ export default function Programs() {
                         Instroomvereisten
                       </FormLabel>
                       <div className="min-h-[80px] px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
-                        {/* Dit zou uit de database moeten komen */}
-                        Geen instroomvereisten opgegeven
+                        {selectedProgram.entryRequirements || 'Geen instroomvereisten opgegeven'}
                       </div>
                     </div>
 
@@ -1190,8 +1189,7 @@ export default function Programs() {
                         Leerdoelen
                       </FormLabel>
                       <div className="min-h-[80px] px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
-                        {/* Dit zou uit de database moeten komen */}
-                        Geen leerdoelen opgegeven
+                        {selectedProgram.learningObjectives || 'Geen leerdoelen opgegeven'}
                       </div>
                     </div>
 
@@ -1201,8 +1199,7 @@ export default function Programs() {
                         Competenties
                       </FormLabel>
                       <div className="min-h-[80px] px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
-                        {/* Dit zou uit de database moeten komen */}
-                        Geen competenties opgegeven
+                        {selectedProgram.competencies || 'Geen competenties opgegeven'}
                       </div>
                     </div>
                   </div>
@@ -1215,19 +1212,17 @@ export default function Programs() {
                       Toegewezen docenten
                     </FormLabel>
                     <div className="bg-white border border-gray-200 rounded-md p-4 max-h-60 overflow-y-auto">
-                      {programFormData.assignedTeachers && programFormData.assignedTeachers.length > 0 ? (
+                      {selectedProgram.assignedTeachers && selectedProgram.assignedTeachers.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {programFormData.assignedTeachers
-                            .filter(teacher => teacher.selected)
-                            .map((teacher) => (
-                              <div key={teacher.id} className="flex items-center space-x-2 p-2 bg-green-50 rounded-md">
-                                <div className="h-4 w-4 rounded-sm bg-green-600 border border-green-600">
-                                  <svg className="h-3 w-3 text-white mt-0.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                  </svg>
-                                </div>
-                                <span className="text-sm font-medium">{teacher.name}</span>
+                          {selectedProgram.assignedTeachers.map((teacher: any) => (
+                            <div key={teacher.id} className="flex items-center space-x-2 p-2 bg-green-50 rounded-md">
+                              <div className="h-4 w-4 rounded-sm bg-green-600 border border-green-600">
+                                <svg className="h-3 w-3 text-white mt-0.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
                               </div>
+                              <span className="text-sm font-medium">{teacher.name || `${teacher.firstName} ${teacher.lastName}`}</span>
+                            </div>
                           ))}
                         </div>
                       ) : (

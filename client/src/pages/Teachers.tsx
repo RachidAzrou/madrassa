@@ -1290,7 +1290,7 @@ export default function Teachers() {
             </div>
           </div>
           
-          <form onSubmit={handleSaveTeacher} className="overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
+          <div className="overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
             <div className="px-6 py-4 space-y-4">
               <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
                 <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
@@ -1385,10 +1385,11 @@ export default function Teachers() {
                         value={newTeacher.firstName}
                         onChange={(e) => setNewTeacher(prev => ({ ...prev, firstName: e.target.value }))}
                         className={`mt-1 w-full ${hasValidationAttempt && !newTeacher.firstName ? 'border-red-500' : ''}`}
+                        placeholder="Voornaam"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="lastName" className="text-xs text-gray-700">
+                      <Label htmlFor="lastName" className="text-xs font-medium text-gray-700">
                         Achternaam <span className="text-red-500">*</span>
                       </Label>
                       <Input
@@ -1396,31 +1397,181 @@ export default function Teachers() {
                         value={newTeacher.lastName}
                         onChange={(e) => setNewTeacher(prev => ({ ...prev, lastName: e.target.value }))}
                         className={`mt-1 w-full ${hasValidationAttempt && !newTeacher.lastName ? 'border-red-500' : ''}`}
+                        placeholder="Achternaam"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="email" className="text-xs text-gray-700">
-                        Email <span className="text-red-500">*</span>
+                      <Label htmlFor="email" className="text-xs font-medium text-gray-700">
+                        E-mail <span className="text-red-500">*</span>
                       </Label>
                       <Input
                         id="email"
                         type="email"
                         value={newTeacher.email}
                         onChange={(e) => setNewTeacher(prev => ({ ...prev, email: e.target.value }))}
-                        className={`mt-1 w-full ${hasValidationAttempt && !newTeacher.email ? 'border-red-500' : ''}`}
+                        className={`mt-1 w-full ${hasValidationAttempt && (!newTeacher.email || !newTeacher.email.includes('@')) ? 'border-red-500' : ''}`}
+                        placeholder="email@example.com"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="phone" className="text-xs text-gray-700">
-                        Telefoonnummer
+                      <Label htmlFor="phone" className="text-xs font-medium text-gray-700">
+                        Telefoon <span className="text-red-500">*</span>
                       </Label>
                       <Input
                         id="phone"
-                        value={newTeacher.phone}
+                        value={newTeacher.phone || ''}
                         onChange={(e) => setNewTeacher(prev => ({ ...prev, phone: e.target.value }))}
+                        className={`mt-1 w-full ${hasValidationAttempt && !newTeacher.phone ? 'border-red-500' : ''}`}
+                        placeholder="Telefoon"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="dateOfBirth" className="text-xs font-medium text-gray-700">
+                        Geboortedatum
+                      </Label>
+                      <Input
+                        id="dateOfBirth"
+                        type="date"
+                        value={newTeacher.dateOfBirth || ''}
+                        onChange={(e) => setNewTeacher(prev => ({ ...prev, dateOfBirth: e.target.value }))}
                         className="mt-1 w-full"
                       />
                     </div>
+                    <div>
+                      <Label htmlFor="hireDate" className="text-xs font-medium text-gray-700">
+                        Startdatum <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="hireDate"
+                        type="date"
+                        value={newTeacher.hireDate || getCurrentDate()}
+                        onChange={(e) => setNewTeacher(prev => ({ ...prev, hireDate: e.target.value }))}
+                        className={`mt-1 w-full ${hasValidationAttempt && !newTeacher.hireDate ? 'border-red-500' : ''}`}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="specialty" className="text-xs font-medium text-gray-700">
+                        Specialisatie
+                      </Label>
+                      <Input
+                        id="specialty"
+                        value={newTeacher.specialty || ''}
+                        onChange={(e) => setNewTeacher(prev => ({ ...prev, specialty: e.target.value }))}
+                        className="mt-1 w-full"
+                        placeholder="Specialisatie"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="status" className="text-xs font-medium text-gray-700">
+                        Status <span className="text-red-500">*</span>
+                      </Label>
+                      <Select value={newTeacher.status} onValueChange={(value) => setNewTeacher(prev => ({ ...prev, status: value }))}>
+                        <SelectTrigger className={`mt-1 ${hasValidationAttempt && !newTeacher.status ? 'border-red-500' : ''}`}>
+                          <SelectValue placeholder="Selecteer status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Actief">Actief</SelectItem>
+                          <SelectItem value="Niet actief">Niet actief</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Vakken
+                  </h3>
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-600">Selecteer de vakken die deze docent onderwijst.</p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {subjects.map((subject) => (
+                        <div key={subject.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`subject-${subject.id}`}
+                            checked={selectedSubjects.includes(subject.id)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedSubjects(prev => [...prev, subject.id]);
+                              } else {
+                                setSelectedSubjects(prev => prev.filter(id => id !== subject.id));
+                              }
+                            }}
+                          />
+                          <Label 
+                            htmlFor={`subject-${subject.id}`} 
+                            className="text-sm font-normal cursor-pointer"
+                          >
+                            {subject.name}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-2 px-6 py-4 border-t bg-gray-50">
+            <Button type="button" variant="outline" onClick={() => setShowNewTeacherDialog(false)}>
+              Annuleren
+            </Button>
+            <Button type="submit" onClick={handleSaveTeacher}>
+              Docent Toevoegen
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Exporteer dialoog */}
+      <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden">
+          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <FileDown className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Docenten Exporteren</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Selecteer het formaat om de docentenlijst te exporteren.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6 space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Exportformaat</label>
+              <div className="grid grid-cols-1 gap-2">
+                <Button variant="outline" className="justify-start" onClick={() => handleExport('excel')}>
+                  <FileDown className="h-4 w-4 mr-2" />
+                  Excel (.xlsx)
+                </Button>
+                <Button variant="outline" className="justify-start" onClick={() => handleExport('csv')}>
+                  <FileDown className="h-4 w-4 mr-2" />
+                  CSV (.csv)
+                </Button>
+                <Button variant="outline" className="justify-start" onClick={() => handleExport('pdf')}>
+                  <FileDown className="h-4 w-4 mr-2" />
+                  PDF (.pdf)
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-2 px-6 py-4 border-t bg-gray-50">
+            <Button variant="outline" onClick={() => setIsExportDialogOpen(false)}>
+              Annuleren
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
                     <div>
                       <Label htmlFor="dateOfBirth" className="text-xs text-gray-700">
                         Geboortedatum

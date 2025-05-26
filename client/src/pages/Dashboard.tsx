@@ -111,11 +111,13 @@ export default function Dashboard() {
     staleTime: 60000,
   });
   
-  // Fetch lessons data
-  const { data: lessonsData = [], isLoading: isLessonsLoading } = useQuery({
-    queryKey: ['/api/lessons'],
+  // Fetch calendar events data
+  const { data: calendarData, isLoading: isEventsLoading } = useQuery<{ events: any[] }>({
+    queryKey: ['/api/calendar/events'],
     staleTime: 60000,
   });
+
+  const events = calendarData?.events || [];
 
   // Bereid data voor met veilige defaults als de data nog niet geladen is
   const stats = {
@@ -147,13 +149,13 @@ export default function Dashboard() {
     { name: "Klas 3", count: 0, maxCapacity: 25, percentageFilled: 0 }
   ];
   
-  // Filter lessons for the current week
-  const currentWeekLessons = (lessonsData as Lesson[]).filter((lesson) => {
-    if (!lesson.date) return false;
-    const lessonDate = parseISO(lesson.date);
+  // Filter events for the current week
+  const currentWeekEvents = events.filter((event) => {
+    if (!event.date) return false;
+    const eventDate = parseISO(event.date);
     const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
     const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });
-    return isWithinInterval(lessonDate, { start: weekStart, end: weekEnd });
+    return isWithinInterval(eventDate, { start: weekStart, end: weekEnd });
   });
   
   // Navigatiefuncties
@@ -383,51 +385,51 @@ export default function Dashboard() {
               ))}
             </div>
             
-            {/* Lessons for this week - Desktop app stijl lesrooster */}
+            {/* Events for this week - Desktop app stijl evenementenrooster */}
             <div>
-              {isLessonsLoading ? (
+              {isEventsLoading ? (
                 <div className="h-24 flex items-center justify-center">
                   <div className="w-5 h-5 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
                 </div>
-              ) : currentWeekLessons.length === 0 ? (
+              ) : currentWeekEvents.length === 0 ? (
                 <div className="h-24 flex flex-col items-center justify-center py-3">
                   <div className="p-1.5 bg-[#f7f9fc] text-[#1e40af] mb-2 border border-[#e5e7eb] rounded-sm">
                     <Calendar className="h-4 w-4 opacity-70" />
                   </div>
-                  <p className="text-xs text-gray-500">Geen lessen gepland deze week</p>
+                  <p className="text-xs text-gray-500">Geen evenementen gepland deze week</p>
                   <Button 
                     variant="outline" 
                     size="sm" 
                     className="mt-2 text-[10px] h-6 border-[#e5e7eb] text-gray-600 hover:bg-gray-50 rounded-sm" 
                     onClick={navigateToCalendar}
                   >
-                    Les plannen
+                    Evenement plannen
                   </Button>
                 </div>
               ) : (
                 <div>
                   <table className="w-full text-xs border-collapse">
                     <tbody>
-                      {currentWeekLessons.slice(0, 5).map((lesson, index) => (
+                      {currentWeekEvents.slice(0, 5).map((event, index) => (
                         <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#f9fafc]'} hover:bg-gray-50 border-b border-[#e5e7eb] last:border-b-0`}>
                           <td className="py-2 px-3 text-left">
                             <div className="flex items-center">
                               <Clock className="h-3 w-3 text-[#1e40af] mr-2 flex-shrink-0" />
-                              <span className="font-medium text-gray-700">{lesson.title || lesson.courseName}</span>
+                              <span className="font-medium text-gray-700">{event.title || event.courseName}</span>
                             </div>
                           </td>
                           <td className="py-2 px-3 text-left text-gray-500">
-                            {format(parseISO(lesson.date), 'EEE d MMM', { locale: nl })}
+                            {format(parseISO(event.date), 'EEE d MMM', { locale: nl })}
                           </td>
                           <td className="py-2 px-3 text-right whitespace-nowrap text-gray-500">
-                            {lesson.startTime} - {lesson.endTime}
+                            {event.startTime} - {event.endTime}
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                   
-                  {currentWeekLessons.length > 5 && (
+                  {currentWeekEvents.length > 5 && (
                     <div className="px-3 py-2 text-right bg-[#f9fafc] border-t border-[#e5e7eb]">
                       <Button 
                         variant="ghost" 
@@ -435,7 +437,7 @@ export default function Dashboard() {
                         className="text-[10px] h-6 px-2 rounded-sm text-gray-500 hover:bg-gray-100"
                         onClick={navigateToCalendar}
                       >
-                        {currentWeekLessons.length - 5} meer lessen
+                        {currentWeekEvents.length - 5} meer evenementen
                       </Button>
                     </div>
                   )}

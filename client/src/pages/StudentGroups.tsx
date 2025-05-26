@@ -447,11 +447,11 @@ export default function StudentGroups() {
                     <td colSpan={7} className="px-6 py-4 text-center">
                       <div className="h-48 flex flex-col items-center justify-center text-gray-500">
                         <div className="text-[#1e3a8a] mb-2">
-                          <ChalkBoard className="h-12 w-12" />
+                          <School className="h-12 w-12" />
                         </div>
                         <p className="text-sm font-medium">Geen klassen gevonden</p>
                         <p className="text-sm text-gray-400 mb-4">
-                          {searchQuery || Object.values({locationFilter, teacherFilter, academicYearFilter, capacityFilter}).some(f => f) 
+                          {searchTerm || filterAcademicYear !== 'all' 
                             ? "Geen klassen komen overeen met uw zoekcriteria."
                             : "Er zijn nog geen klassen aangemaakt."}
                         </p>

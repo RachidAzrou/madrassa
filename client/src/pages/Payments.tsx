@@ -7,6 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { 
+  CustomDialog, 
+  DialogHeaderWithIcon, 
+  DialogFormContainer, 
+  SectionContainer, 
+  DialogFooterContainer,
+  FormLabel,
+  StyledSelect,
+  StyledSelectItem 
+} from "@/components/ui/custom-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreditCard, Euro, Users, TrendingUp, ExternalLink, RefreshCw } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
@@ -170,76 +180,101 @@ export default function Payments() {
           <p className="text-gray-500">Beheer student betalingen via Mollie</p>
         </div>
         
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-[#1e40af] hover:bg-[#1e3a8a]">
-              <CreditCard className="w-4 h-4 mr-2" />
-              Nieuwe betaling
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Nieuwe betaling aanmaken</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="student">Student</Label>
-                <Select value={selectedStudentId} onValueChange={setSelectedStudentId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer student..." />
-                  </SelectTrigger>
-                  <SelectContent>
+        <Button 
+          onClick={() => setIsCreateDialogOpen(true)}
+          className="bg-[#1e40af] hover:bg-[#1e3a8a]"
+        >
+          <CreditCard className="w-4 h-4 mr-2" />
+          Nieuwe betaling
+        </Button>
+        
+        <CustomDialog 
+          open={isCreateDialogOpen} 
+          onOpenChange={setIsCreateDialogOpen}
+          maxWidth="600px"
+        >
+          <DialogHeaderWithIcon
+            title="Nieuwe betaling aanmaken"
+            description="Maak een nieuwe Mollie betaling aan voor een student"
+            icon={<CreditCard className="h-5 w-5" />}
+          />
+          
+          <DialogFormContainer>
+            <SectionContainer title="Betalingsgegevens" icon={<CreditCard className="h-4 w-4" />}>
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <FormLabel htmlFor="student">Student</FormLabel>
+                  <StyledSelect 
+                    value={selectedStudentId} 
+                    onValueChange={setSelectedStudentId}
+                    placeholder="Selecteer een student..."
+                  >
                     {students?.map((student) => (
-                      <SelectItem key={student.id} value={student.id.toString()}>
+                      <StyledSelectItem key={student.id} value={student.id.toString()}>
                         {student.firstName} {student.lastName} ({student.studentId})
-                      </SelectItem>
+                      </StyledSelectItem>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </StyledSelect>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <FormLabel htmlFor="amount">Bedrag (EUR)</FormLabel>
+                    <Input
+                      id="amount"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={paymentAmount}
+                      onChange={(e) => setPaymentAmount(e.target.value)}
+                      className="h-9"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <FormLabel htmlFor="description">Beschrijving</FormLabel>
+                    <Input
+                      id="description"
+                      placeholder="Bijv. Collegegeld semester 1"
+                      value={paymentDescription}
+                      onChange={(e) => setPaymentDescription(e.target.value)}
+                      className="h-9"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel htmlFor="notes">Notities (optioneel)</FormLabel>
+                  <Textarea
+                    id="notes"
+                    placeholder="Extra informatie..."
+                    value={paymentNotes}
+                    onChange={(e) => setPaymentNotes(e.target.value)}
+                    className="min-h-[80px]"
+                  />
+                </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="amount">Bedrag (EUR)</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={paymentAmount}
-                  onChange={(e) => setPaymentAmount(e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="description">Beschrijving</Label>
-                <Input
-                  id="description"
-                  placeholder="Bijv. Collegegeld semester 1"
-                  value={paymentDescription}
-                  onChange={(e) => setPaymentDescription(e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="notes">Notities (optioneel)</Label>
-                <Textarea
-                  id="notes"
-                  placeholder="Extra informatie..."
-                  value={paymentNotes}
-                  onChange={(e) => setPaymentNotes(e.target.value)}
-                />
-              </div>
-              
-              <Button 
-                onClick={handleCreatePayment}
-                disabled={createPaymentMutation.isPending || !selectedStudentId || !paymentAmount || !paymentDescription}
-                className="w-full bg-[#1e40af] hover:bg-[#1e3a8a]"
-              >
-                {createPaymentMutation.isPending ? "Bezig..." : "Betaling aanmaken"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </SectionContainer>
+          </DialogFormContainer>
+          
+          <DialogFooterContainer>
+            <Button 
+              type="button" 
+              variant="outline"
+              onClick={() => setIsCreateDialogOpen(false)}
+              className="w-full sm:w-auto mt-2 sm:mt-0"
+            >
+              Annuleren
+            </Button>
+            <Button 
+              onClick={handleCreatePayment}
+              disabled={createPaymentMutation.isPending || !selectedStudentId || !paymentAmount || !paymentDescription}
+              className="bg-[#1e40af] hover:bg-[#1e3a8a] w-full sm:w-auto"
+            >
+              {createPaymentMutation.isPending ? "Bezig..." : "Betaling aanmaken"}
+            </Button>
+          </DialogFooterContainer>
+        </CustomDialog>
       </div>
 
       {/* Stats Cards */}

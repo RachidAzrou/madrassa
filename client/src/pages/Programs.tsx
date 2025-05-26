@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen, Building, BookText, XCircle, GraduationCap, X, Pencil, Info } from 'lucide-react';
+import { Search, PlusCircle, Filter, ChevronDown, ChevronUp, Edit, Trash2, Clock, Users, Calendar, BookOpen, Building, BookText, XCircle, GraduationCap, X, Pencil, Info, Eye } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 
 // Custom ChalkBoard icoon
@@ -91,6 +91,7 @@ export default function Programs() {
   // State voor vak dialogen
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const [selectedPrograms, setSelectedPrograms] = useState<Set<number>>(new Set());
@@ -230,23 +231,7 @@ export default function Programs() {
     createProgramMutation.mutate(programFormData);
   };
   
-  const handleEditProgram = (id: number) => {
-    const program = programs.find(p => p.id === id);
-    if (program) {
-      setSelectedProgram(program);
-      setProgramFormData({
-        name: program.name || '',
-        code: program.code || '',
-        description: program.description || '',
-        duration: program.duration || 4,
-        department: program.department || '',
-        isActive: program.isActive,
-        assignedClasses: [],
-        assignedTeachers: [],
-      });
-      setIsEditDialogOpen(true);
-    }
-  };
+
   
   // Verbeterde mutatie voor het bijwerken van een programma
   const updateProgramMutation = useMutation({
@@ -295,6 +280,33 @@ export default function Programs() {
         id: selectedProgram.id,
         programData: programFormData
       });
+    }
+  };
+
+  const handleViewProgram = (id: number) => {
+    const program = programs.find(p => p.id === id);
+    if (program) {
+      setSelectedProgram(program);
+      setIsViewDialogOpen(true);
+    }
+  };
+
+  const handleEditProgram = (id: number) => {
+    const program = programs.find(p => p.id === id);
+    if (program) {
+      setSelectedProgram(program);
+      // Vul het formulier met de geselecteerde programma gegevens
+      setProgramFormData({
+        name: program.name,
+        code: program.code,
+        description: program.description || '',
+        duration: program.duration,
+        department: program.department || '',
+        isActive: program.isActive,
+        assignedClasses: program.assignedClasses || [],
+        assignedTeachers: program.assignedTeachers || [],
+      });
+      setIsEditDialogOpen(true);
     }
   };
 
@@ -538,6 +550,7 @@ export default function Programs() {
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap text-right">
                     <QuickActions
+                      onView={() => handleViewProgram(program.id)}
                       onEdit={() => handleEditProgram(program.id)}
                       onDelete={() => handleDeleteProgram(program.id)}
                     />
@@ -1011,6 +1024,57 @@ export default function Programs() {
             Verwijderen
           </Button>
         </DialogFooterContainer>
+      </CustomDialog>
+
+      {/* Vak bekijken dialoogvenster */}
+      <CustomDialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen} maxWidth="600px">
+        <DialogHeaderWithIcon
+          title="Vak Details"
+          description="Bekijk de details van het geselecteerde vak."
+          icon={<Eye className="h-5 w-5" />}
+        />
+        
+        {selectedProgram && (
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">Naam</label>
+                <p className="text-sm text-gray-900 mt-1">{selectedProgram.name}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Code</label>
+                <p className="text-sm text-gray-900 mt-1">{selectedProgram.code}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Afdeling</label>
+                <p className="text-sm text-gray-900 mt-1">{selectedProgram.department || '-'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Status</label>
+                <p className="text-sm mt-1">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    selectedProgram.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}>
+                    {selectedProgram.isActive ? 'Actief' : 'Inactief'}
+                  </span>
+                </p>
+              </div>
+            </div>
+            
+            {selectedProgram.description && (
+              <div>
+                <label className="text-sm font-medium text-gray-700">Beschrijving</label>
+                <p className="text-sm text-gray-900 mt-1">{selectedProgram.description}</p>
+              </div>
+            )}
+          </div>
+        )}
+        
+        <DialogFooterContainer
+          onCancel={() => setIsViewDialogOpen(false)}
+          cancelText="Sluiten"
+          hideSubmitButton={true}
+        />
       </CustomDialog>
     </div>
   );

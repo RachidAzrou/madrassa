@@ -1099,148 +1099,92 @@ export default function Calendar() {
         </DialogFooterContainer>
       </CustomDialog>
 
-      {/* Event Detail Dialog */}
+      {/* Event Detail Popup */}
       <CustomDialog 
         open={isEventDetailDialogOpen} 
         onOpenChange={setIsEventDetailDialogOpen} 
-        maxWidth="500px"
+        maxWidth="400px"
       >
         {selectedEvent && (
-          <>
-            <DialogHeaderWithIcon 
-              title="Evenement Details"
-              description="Bekijk de details van dit evenement"
-              icon={selectedEvent.type === 'class' ? <BookOpen className="h-5 w-5" /> : 
-                    selectedEvent.type === 'exam' ? <FilePlus className="h-5 w-5" /> :
-                    selectedEvent.type === 'holiday' ? <Palmtree className="h-5 w-5" /> :
-                    <PartyPopper className="h-5 w-5" />}
-            />
+          <div 
+            className="p-4 rounded-lg border-l-4"
+            style={{
+              backgroundColor: getEventColors(selectedEvent.type).bgColor,
+              borderLeftColor: getEventColors(selectedEvent.type).borderColor
+            }}
+          >
+            {/* Event Title */}
+            <div className="mb-3">
+              <h3 className="text-lg font-semibold text-gray-900">{selectedEvent.title}</h3>
+              <span className="text-xs font-medium uppercase tracking-wide text-gray-600">
+                {selectedEvent.type === 'class' ? 'Les' : 
+                 selectedEvent.type === 'exam' ? 'Examen' :
+                 selectedEvent.type === 'holiday' ? 'Vakantie' : 'Evenement'}
+              </span>
+            </div>
             
-            <div className="p-6 space-y-6">
-              {/* Event Type Badge */}
-              <div className="flex items-center gap-2">
-                <div 
-                  className="w-3 h-3 rounded-sm border" 
-                  style={{
-                    backgroundColor: getEventColors(selectedEvent.type).bgColor,
-                    borderColor: getEventColors(selectedEvent.type).borderColor
-                  }}
-                ></div>
-                <span className="text-sm font-medium capitalize text-gray-600">
-                  {selectedEvent.type === 'class' ? 'Les' : 
-                   selectedEvent.type === 'exam' ? 'Examen' :
-                   selectedEvent.type === 'holiday' ? 'Vakantie' : 'Evenement'}
-                </span>
+            {/* Basic Info */}
+            <div className="space-y-2 text-sm text-gray-700">
+              <div className="flex items-center">
+                <CalendarIcon className="h-4 w-4 mr-2 text-gray-500" />
+                {new Date(selectedEvent.date + 'T00:00:00').toLocaleDateString('nl-NL', { 
+                  weekday: 'short', 
+                  day: 'numeric', 
+                  month: 'short' 
+                })}
               </div>
-
-              {/* Basic Info */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{selectedEvent.title}</h3>
+              
+              <div className="flex items-center">
+                <Clock className="h-4 w-4 mr-2 text-gray-500" />
+                {selectedEvent.startTime} - {selectedEvent.endTime}
+              </div>
+              
+              {selectedEvent.location && (
+                <div className="flex items-center">
+                  <MapPin className="h-4 w-4 mr-2 text-gray-500" />
+                  {selectedEvent.location}
                 </div>
-                
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <CalendarIcon className="h-4 w-4 mr-2 text-gray-400" />
-                    {new Date(selectedEvent.date + 'T00:00:00').toLocaleDateString('nl-NL', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
-                  </div>
-                  
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Clock className="h-4 w-4 mr-2 text-gray-400" />
-                    {selectedEvent.startTime} - {selectedEvent.endTime}
-                  </div>
-                  
-                  {selectedEvent.location && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-                      {selectedEvent.location}
+              )}
+
+              {/* Course and Class info for lessons/exams */}
+              {(selectedEvent.type === 'class' || selectedEvent.type === 'exam') && (
+                <>
+                  {selectedEvent.courseName && (
+                    <div className="flex items-center">
+                      <BookOpen className="h-4 w-4 mr-2 text-gray-500" />
+                      {selectedEvent.courseName}
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* Educational Details */}
-              {(selectedEvent.type === 'class' || selectedEvent.type === 'exam') && (
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-gray-900 flex items-center">
-                    <GraduationCap className="h-4 w-4 mr-2 text-gray-400" />
-                    Onderwijs Details
-                  </h4>
-                  <div className="bg-gray-50 p-3 rounded-md space-y-2">
-                    {selectedEvent.courseName && (
-                      <div className="text-sm">
-                        <span className="text-gray-500">Vak:</span>
-                        <span className="ml-2 text-gray-900">{selectedEvent.courseName}</span>
-                      </div>
-                    )}
-                    {selectedEvent.className && (
-                      <div className="text-sm">
-                        <span className="text-gray-500">Klas:</span>
-                        <span className="ml-2 text-gray-900">{selectedEvent.className}</span>
-                      </div>
-                    )}
-                    {(selectedEvent as any).teacherName && selectedEvent.type === 'class' && (
-                      <div className="text-sm">
-                        <span className="text-gray-500">Docent:</span>
-                        <span className="ml-2 text-gray-900">{(selectedEvent as any).teacherName}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Description */}
-              {selectedEvent.description && (
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-900 flex items-center">
-                    <FileText className="h-4 w-4 mr-2 text-gray-400" />
-                    Beschrijving
-                  </h4>
-                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
-                    {selectedEvent.description}
-                  </p>
-                </div>
-              )}
-
-              {/* Recurring Info */}
-              {selectedEvent.isRecurring && (
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-900 flex items-center">
-                    <RotateCcw className="h-4 w-4 mr-2 text-gray-400" />
-                    Herhaling
-                  </h4>
-                  <div className="bg-blue-50 p-3 rounded-md">
-                    <div className="text-sm text-blue-800">
-                      Dit evenement herhaalt zich {
-                        selectedEvent.recurrencePattern === 'daily' ? 'dagelijks' :
-                        selectedEvent.recurrencePattern === 'weekly' ? 'wekelijks' :
-                        selectedEvent.recurrencePattern === 'monthly' ? 'maandelijks' : 'jaarlijks'
-                      }
-                      {selectedEvent.recurrenceEndDate && (
-                        <> tot {new Date(selectedEvent.recurrenceEndDate + 'T00:00:00').toLocaleDateString('nl-NL')}</>
-                      )}
+                  {selectedEvent.className && (
+                    <div className="flex items-center">
+                      <GraduationCap className="h-4 w-4 mr-2 text-gray-500" />
+                      {selectedEvent.className}
                     </div>
-                  </div>
+                  )}
+                </>
+              )}
+              
+              {/* Description if available */}
+              {selectedEvent.description && (
+                <div className="mt-3 pt-2 border-t border-gray-300">
+                  <p className="text-sm text-gray-600">{selectedEvent.description}</p>
                 </div>
               )}
             </div>
 
-            <div className="flex justify-end p-6 pt-0">
+            {/* Close button */}
+            <div className="flex justify-end mt-4">
               <Button 
                 type="button" 
-                variant="outline" 
+                variant="ghost" 
+                size="sm"
                 onClick={() => setIsEventDetailDialogOpen(false)}
-                className="w-full sm:w-auto"
+                className="text-gray-600 hover:text-gray-800"
               >
                 Sluiten
               </Button>
             </div>
-          </>
+          </div>
         )}
       </CustomDialog>
     </div>

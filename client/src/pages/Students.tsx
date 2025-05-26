@@ -8,7 +8,7 @@ import {
   Fingerprint, ChevronRight, Edit, Trash2, Eye, Home, X,
   GraduationCap, NotebookText, MapPin, FileEdit, Upload, FileDown,
   ArrowDownToLine, ArrowUpToLine, Info, UserPlus, UserCheck, HeartPulse,
-  Mail, Save, FileText
+  Mail, Save, FileText, Calendar, Phone
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

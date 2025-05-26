@@ -334,9 +334,14 @@ export default function Programs() {
   const deleteProgramMutation = useMutation({
     mutationFn: async (id: string | number) => {
       try {
-        return await apiRequest(`/api/programs/${id}`, {
-          method: 'DELETE'
-        });
+        // Client-side delete met localStorage
+        const storedPrograms = localStorage.getItem('programs');
+        if (storedPrograms) {
+          const programs = JSON.parse(storedPrograms);
+          const updatedPrograms = programs.filter((p: any) => p.id !== id);
+          localStorage.setItem('programs', JSON.stringify(updatedPrograms));
+        }
+        return { success: true };
       } catch (error: any) {
         console.error('Error deleting program:', error);
         throw new Error(error?.message || 'Fout bij het verwijderen van het programma');

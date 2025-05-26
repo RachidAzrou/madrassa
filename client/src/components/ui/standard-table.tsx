@@ -170,7 +170,7 @@ export function TableEmptyState({ colSpan, icon, title, description, action }: E
           {icon && <div className="mb-2">{icon}</div>}
           <p className="text-sm font-medium text-gray-900">{title}</p>
           <p className="text-sm text-gray-500 mt-1">{description}</p>
-          {action && <div className="mt-4">{action}</div>}
+          {action && action}
         </div>
       </td>
     </tr>

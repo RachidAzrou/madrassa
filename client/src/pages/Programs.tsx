@@ -573,32 +573,86 @@ export default function Programs() {
               
               <TabsContent value="docenten" className="mt-0">
                 <div className="space-y-4 p-4 bg-gray-50 rounded-md">
-                  <FormLabel>Toegewezen docenten</FormLabel>
-                  <div className="border border-gray-200 rounded-md p-4 max-h-[300px] overflow-auto">
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Toegewezen docenten</FormLabel>
+                    <span className="text-xs text-gray-500">
+                      {programFormData.assignedTeachers.filter(t => t.selected).length} geselecteerd
+                    </span>
+                  </div>
+                  
+                  <div className="border border-gray-200 bg-white rounded-md p-4 max-h-[300px] overflow-auto">
                     {teachersData?.teachers && teachersData.teachers.length > 0 ? (
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {teachersData.teachers.map((teacher: any) => (
-                          <div key={teacher.id} className="flex items-center space-x-2 py-1 px-2 hover:bg-gray-50 rounded">
+                          <div key={teacher.id} className="flex items-center space-x-3 py-2 px-3 hover:bg-blue-50 rounded-md border border-transparent hover:border-blue-200 transition-colors">
                             <StyledCheckbox 
                               id={`teacher-${teacher.id}`}
                               checked={programFormData.assignedTeachers.find(t => t.id === teacher.id)?.selected || false}
                               onCheckedChange={(checked) => handleTeacherSelection(teacher.id, checked === true)}
                             />
-                            <Label 
-                              htmlFor={`teacher-${teacher.id}`}
-                              className="text-sm font-normal text-gray-700 cursor-pointer flex-grow"
-                            >
-                              {teacher.firstName} {teacher.lastName}
-                            </Label>
+                            <div className="flex-grow min-w-0">
+                              <Label 
+                                htmlFor={`teacher-${teacher.id}`}
+                                className="text-sm font-medium text-gray-900 cursor-pointer block"
+                              >
+                                {teacher.firstName} {teacher.lastName}
+                              </Label>
+                              <p className="text-xs text-gray-500 mt-0.5">
+                                {teacher.email || 'Geen email beschikbaar'}
+                              </p>
+                            </div>
+                            {teacher.subjects && teacher.subjects.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {teacher.subjects.slice(0, 2).map((subject: string, index: number) => (
+                                  <span key={index} className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                    {subject}
+                                  </span>
+                                ))}
+                                {teacher.subjects.length > 2 && (
+                                  <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                                    +{teacher.subjects.length - 2}
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-4 text-gray-500 italic">
-                        Geen docenten beschikbaar
+                      <div className="text-center py-8 text-gray-500">
+                        <Users className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                        <p className="text-sm font-medium">Geen docenten beschikbaar</p>
+                        <p className="text-xs mt-1">Voeg eerst docenten toe aan het systeem</p>
                       </div>
                     )}
                   </div>
+                  
+                  {programFormData.assignedTeachers.filter(t => t.selected).length > 0 && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                      <h4 className="text-sm font-medium text-blue-900 mb-2">Geselecteerde docenten:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {programFormData.assignedTeachers
+                          .filter(t => t.selected)
+                          .map(assignedTeacher => {
+                            const teacher = teachersData?.teachers.find((t: any) => t.id === assignedTeacher.id);
+                            return teacher ? (
+                              <div key={teacher.id} className="flex items-center gap-1 bg-white border border-blue-300 rounded-md px-2 py-1">
+                                <span className="text-xs font-medium text-blue-900">
+                                  {teacher.firstName} {teacher.lastName}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleTeacherSelection(teacher.id, false)}
+                                  className="text-blue-600 hover:text-blue-800"
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </div>
+                            ) : null;
+                          })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>

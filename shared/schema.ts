@@ -396,6 +396,7 @@ export const studentGroups = pgTable("student_groups", {
   description: text("description"),
   courseId: integer("course_id"), // Optioneel gekoppeld aan een specifieke cursus
   instructor: text("instructor"), // Verantwoordelijke docent
+  location: text("location"), // Locatie waar de klas plaatsvindt
   startDate: date("start_date"), 
   endDate: date("end_date"),
   maxCapacity: integer("max_capacity"),

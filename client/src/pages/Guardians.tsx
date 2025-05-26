@@ -95,6 +95,15 @@ export default function Guardians() {
     }
   });
 
+  // Studenten data ophalen voor gekoppelde studenten sectie
+  const { data: students = [] } = useQuery({
+    queryKey: ['/api/students'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/students');
+      return response;
+    }
+  });
+
   // URL parameters controleren bij het laden van de pagina
   useEffect(() => {
     // URL parameters uitlezen

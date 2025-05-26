@@ -319,10 +319,7 @@ export default function Dashboard() {
                       
                       <div className="text-center">
                         <h4 className="text-sm font-semibold text-gray-900 mb-1">{group.name}</h4>
-                        <p className="text-xs text-gray-500 mb-2">{enrolledStudents}/{maxCapacity}</p>
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                          {percentageFilled < 0.5 ? 'Laag' : percentageFilled < 0.75 ? 'Gemiddeld' : percentageFilled < 0.9 ? 'Goed' : 'Vol'}
-                        </span>
+                        <p className="text-xs text-gray-500">{enrolledStudents}/{maxCapacity}</p>
                       </div>
                     </div>
                   );

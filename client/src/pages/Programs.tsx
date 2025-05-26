@@ -347,78 +347,138 @@ export default function Programs() {
           </div>
         </SearchActionBar>
         {/* Programs table */}
-        <TableContainer>
-          <table className="w-full text-sm">
-            <DataTableHeader>
-              <tr className="border-b border-gray-200">
-                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Vak</th>
-                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Code</th>
-                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Afdeling</th>
-                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Duur</th>
-                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-left">Status</th>
-                <th className="py-3 px-4 font-medium text-xs uppercase text-gray-500 text-right w-[120px]">
-                  <span className="sr-only">Acties</span>
-                </th>
-              </tr>
-            </DataTableHeader>
-            <tbody>
-              {isLoading ? (
-                <TableLoadingState />
-              ) : programs.length === 0 ? (
-                <EmptyTableState 
-                  icon={<BookText className="h-12 w-12 mx-auto opacity-30" />}
-                  title="Geen vakken beschikbaar"
-                  description="Er zijn nog geen vakken toegevoegd."
-                />
-              ) : (
-                programs.map((program: Program) => (
-                  <tr key={program.id} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-200">
-                    <td className="px-4 py-3 text-left">
-                      <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-[#1e40af] text-white text-xs font-medium flex items-center justify-center mr-3">
-                          {program.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900 text-sm">{program.name}</div>
-                          <div className="text-xs text-gray-500">{program.description}</div>
-                        </div>
+        <div className="bg-white border border-[#e5e7eb] rounded-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-[#e5e7eb]">
+              <thead className="bg-[#f9fafc]">
+                <tr>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Vak</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Code</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Afdeling</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Duur</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-left">
+                    <span className="text-xs font-medium text-gray-700">Status</span>
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-right w-[120px]">
+                    <span className="text-xs font-medium text-gray-700"></span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-[#e5e7eb]">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center">
+                      <div className="flex justify-center items-center">
+                        <div className="w-6 h-6 border-2 border-[#1e40af] border-t-transparent rounded-full animate-spin"></div>
+                        <span className="ml-2 text-sm text-gray-500">Vakken laden...</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-left">
-                      <span className="bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded">
-                        {program.code}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-left">
-                      <span className="text-sm text-gray-900">{program.department}</span>
-                    </td>
-                    <td className="px-4 py-3 text-left">
-                      <span className="text-sm text-gray-900">
-                        {program.duration === 1 ? '1 Jaar' : 
-                         program.duration === 2 ? '1 Semester' : 
-                         program.duration === 3 ? '1 Trimester' : 
-                         `${program.duration} Maanden`}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-left">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        program.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {program.isActive ? 'Actief' : 'Inactief'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <QuickActions
-                        onEdit={() => handleEditProgram(program.id)}
-                        onDelete={() => handleDeleteProgram(program.id)}
-                      />
+                  </tr>
+                ) : isError ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center">
+                      <div className="flex flex-col items-center justify-center py-6">
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="24" 
+                          height="24" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          className="h-8 w-8 text-red-500 mb-2"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="15" y1="9" x2="9" y2="15" />
+                          <line x1="9" y1="9" x2="15" y2="15" />
+                        </svg>
+                        <p className="text-sm text-red-500">Er is een fout opgetreden bij het laden van de vakken.</p>
+                      </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </TableContainer>
+                ) : programs.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center">
+                      <div className="h-48 flex flex-col items-center justify-center text-gray-500">
+                        <div className="text-[#1e3a8a] mb-2">
+                          <BookText className="h-12 w-12" />
+                        </div>
+                        <p className="text-sm font-medium">Geen vakken gevonden</p>
+                        <p className="text-sm text-gray-400 mb-4">
+                          {searchTerm 
+                            ? "Geen vakken komen overeen met uw zoekcriteria."
+                            : "Er zijn nog geen vakken aangemaakt."}
+                        </p>
+                        <Button
+                          onClick={handleAddProgram}
+                          className="bg-[#1e40af] hover:bg-[#1e3a8a]"
+                        >
+                          <PlusCircle className="h-4 w-4 mr-2" />
+                          Eerste Vak Aanmaken
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  programs.map((program: Program) => (
+                    <tr 
+                      key={program.id} 
+                      className="hover:bg-gray-50 group transition-colors"
+                    >
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{program.name}</div>
+                            <div className="text-xs text-gray-500">{program.description}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded">
+                          {program.code}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="text-sm text-gray-900">{program.department || '-'}</span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="text-sm text-gray-900">
+                          {program.duration === 1 ? '1 Jaar' : 
+                           program.duration === 2 ? '1 Semester' : 
+                           program.duration === 3 ? '1 Trimester' : 
+                           `${program.duration} Maanden`}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          program.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {program.isActive ? 'Actief' : 'Inactief'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-right">
+                        <QuickActions
+                          onEdit={() => handleEditProgram(program.id)}
+                          onDelete={() => handleDeleteProgram(program.id)}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
       
       {/* Nieuw vak dialoogvenster */}

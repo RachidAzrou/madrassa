@@ -178,7 +178,7 @@ export default function Dashboard() {
       />
       
       {/* Main content area */}
-      <div className="px-6 py-6 max-w-7xl mx-auto">
+      <div className="px-6 py-6 max-w-7xl mx-auto">{/* Start main content wrapper */}
 
       {/* Stats Overview - Desktop-applicatie stijl */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -277,70 +277,57 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="p-4 space-y-4">
-              {/* Toon alle klassen, ook lege klassen */}
-              {(studentGroupsData as any[]).map((group, index) => {
-                // Zoek hoeveel studenten er in deze klas zitten
-                const enrolledStudents = (studentGroupEnrollmentsData as any[]).filter(
-                  enrollment => enrollment.studentGroupId === group.id
-                ).length;
-                
-                // Gebruik een standaard capaciteit als er geen is ingesteld
-                const maxCapacity = group.maxCapacity || 30;
-                const percentageFilled = maxCapacity > 0 ? enrolledStudents / maxCapacity : 0;
-                
-                // Gebruik de huisstijl kleuren
-                const getStatusColor = (percentage: number) => {
-                  if (percentage < 0.5) return { bg: 'bg-yellow-100', border: 'border-yellow-200', text: 'text-yellow-800', bar: 'bg-yellow-500' };
-                  if (percentage < 0.75) return { bg: 'bg-blue-100', border: 'border-blue-200', text: 'text-blue-800', bar: 'bg-blue-500' };
-                  if (percentage < 0.9) return { bg: 'bg-green-100', border: 'border-green-200', text: 'text-green-800', bar: 'bg-green-500' };
-                  return { bg: 'bg-red-100', border: 'border-red-200', text: 'text-red-800', bar: 'bg-red-500' };
-                };
-
-                const getStatusLabel = (percentage: number) => {
-                  if (percentage < 0.5) return 'Lage bezetting';
-                  if (percentage < 0.75) return 'Gemiddelde bezetting';
-                  if (percentage < 0.9) return 'Goede bezetting';
-                  return 'Vol';
-                };
-
-                const colors = getStatusColor(percentageFilled);
-                const statusLabel = getStatusLabel(percentageFilled);
-                const barWidth = `${Math.max(3, Math.min(100, percentageFilled * 100))}%`;
-                
-                return (
-                  <div key={index} className="bg-white border border-[#e5e7eb] rounded-lg p-4 hover:shadow-sm transition-shadow">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-10 h-10 bg-[#f0f4ff] border border-[#e5e7eb] rounded-lg">
-                          <ChalkBoard className="h-5 w-5 text-[#1e40af]" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-semibold text-gray-900">{group.name}</h4>
-                          <p className="text-xs text-gray-500">{enrolledStudents} van {maxCapacity} studenten</p>
+              {/* Toon alle klassen met cirkeldiagrammen */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {(studentGroupsData as any[]).map((group: any, index: number) => {
+                  const enrolledStudents = (studentGroupEnrollmentsData as any[]).filter(
+                    (enrollment: any) => enrollment.studentGroupId === group.id
+                  ).length;
+                  
+                  const maxCapacity = group.maxCapacity || 30;
+                  const percentageFilled = maxCapacity > 0 ? enrolledStudents / maxCapacity : 0;
+                  
+                  return (
+                    <div key={index} className="bg-white border border-[#e5e7eb] rounded-lg p-4 hover:shadow-sm transition-shadow flex flex-col items-center text-center">
+                      <div className="w-16 h-16 mb-3 relative">
+                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                          <path
+                            d="M18 2.0845
+                              a 15.9155 15.9155 0 0 1 0 31.831
+                              a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="#e5e7eb"
+                            strokeWidth="3"
+                          />
+                          <path
+                            d="M18 2.0845
+                              a 15.9155 15.9155 0 0 1 0 31.831
+                              a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke={percentageFilled < 0.5 ? '#f59e0b' : percentageFilled < 0.75 ? '#3b82f6' : percentageFilled < 0.9 ? '#10b981' : '#ef4444'}
+                            strokeWidth="3"
+                            strokeDasharray={`${percentageFilled * 100}, 100`}
+                            className="transition-all duration-1000 ease-out"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-xs font-bold text-gray-900">
+                            {Math.round(percentageFilled * 100)}%
+                          </span>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${colors.bg} ${colors.border} ${colors.text}`}>
-                          {statusLabel}
+                      
+                      <div className="text-center">
+                        <h4 className="text-sm font-semibold text-gray-900 mb-1">{group.name}</h4>
+                        <p className="text-xs text-gray-500 mb-2">{enrolledStudents}/{maxCapacity}</p>
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                          {percentageFilled < 0.5 ? 'Laag' : percentageFilled < 0.75 ? 'Gemiddeld' : percentageFilled < 0.9 ? 'Goed' : 'Vol'}
                         </span>
                       </div>
                     </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-500">Bezetting</span>
-                        <span className="font-medium text-gray-700">{Math.round(percentageFilled * 100)}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                        <div 
-                          className={`h-full ${colors.bar} rounded-full transition-all duration-500 ease-out`}
-                          style={{ width: barWidth }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
               
               {/* Samenvatting */}
               <div className="bg-[#f9fafc] border border-[#e5e7eb] rounded-lg p-4 mt-4">

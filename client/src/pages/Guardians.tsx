@@ -55,8 +55,23 @@ export default function Guardians() {
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showNewGuardianDialog, setShowNewGuardianDialog] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [hasValidationAttempt, setHasValidationAttempt] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState<Partial<GuardianType>>({
+    firstName: '',
+    lastName: '',
+    relationship: 'parent',
+    relationshipOther: '',
+    email: '',
+    phone: '',
+    isEmergencyContact: false,
+    emergencyContactFirstName: '',
+    emergencyContactLastName: '',
+    emergencyContactPhone: '',
+    emergencyContactRelationship: ''
+  });
   const [newGuardian, setNewGuardian] = useState<Partial<GuardianType>>({
     firstName: '',
     lastName: '',
@@ -146,17 +161,85 @@ export default function Guardians() {
     }
   };
 
-  // CRUD functies
-  const handleShowGuardianDetails = (guardian: GuardianType) => {
+  // CRUD functies - Bekijk functie (read-only)
+  const handleViewGuardian = (guardian: GuardianType) => {
     setSelectedGuardian(guardian);
+    setIsViewDialogOpen(true);
   };
 
+  // Bewerk functie met formulier voorinvullen
   const handleEditGuardian = (guardian: GuardianType) => {
-    // Implementatie voor bewerken
-    toast({
-      title: "Niet geïmplementeerd",
-      description: "Deze functie is nog niet beschikbaar.",
+    setSelectedGuardian(guardian);
+    // Pre-fill the edit form with guardian data
+    setEditFormData({
+      firstName: guardian.firstName || "",
+      lastName: guardian.lastName || "",
+      relationship: guardian.relationship || "parent",
+      relationshipOther: guardian.relationshipOther || "",
+      email: guardian.email || "",
+      phone: guardian.phone || "",
+      isEmergencyContact: guardian.isEmergencyContact || false,
+      emergencyContactFirstName: guardian.emergencyContactFirstName || "",
+      emergencyContactLastName: guardian.emergencyContactLastName || "",
+      emergencyContactPhone: guardian.emergencyContactPhone || "",
+      emergencyContactRelationship: guardian.emergencyContactRelationship || ""
     });
+    setIsEditDialogOpen(true);
+  };
+
+  // Edit form handlers
+  const handleEditInputChange = (e: any) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditSelectChange = (name: string, value: string) => {
+    setEditFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditSubmit = async (e: any) => {
+    e.preventDefault();
+    
+    try {
+      if (!selectedGuardian) return;
+
+      // Update via API
+      await apiRequest(`/api/guardians/${selectedGuardian.id}`, {
+        method: 'PUT',
+        body: editFormData
+      });
+      
+      toast({
+        title: "Succes",
+        description: `Voogd ${editFormData.firstName} ${editFormData.lastName} is succesvol bijgewerkt.`,
+      });
+      
+      setIsEditDialogOpen(false);
+      setEditFormData({
+        firstName: '',
+        lastName: '',
+        relationship: 'parent',
+        relationshipOther: '',
+        email: '',
+        phone: '',
+        isEmergencyContact: false,
+        emergencyContactFirstName: '',
+        emergencyContactLastName: '',
+        emergencyContactPhone: '',
+        emergencyContactRelationship: ''
+      });
+      setSelectedGuardian(null);
+      
+      // Refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+    } catch (error) {
+      console.error('Fout bij het bijwerken van voogd:', error);
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het bijwerken van de voogd.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleDeleteGuardian = (guardian: GuardianType) => {
@@ -501,7 +584,7 @@ export default function Guardians() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleShowGuardianDetails(guardian)}
+                            onClick={() => handleViewGuardian(guardian)}
                             className="h-7 w-7 p-0 text-gray-500"
                           >
                             <Eye className="h-3.5 w-3.5" />
@@ -912,6 +995,368 @@ export default function Guardians() {
               </>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bekijk dialoog (read-only) */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden">
+          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <Eye className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Voogd bekijken</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Bekijk de details van de geselecteerde voogd.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+          
+          {selectedGuardian && (
+            <div className="p-6 overflow-y-auto max-h-[70vh]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <UserCheck className="h-4 w-4 mr-2" />
+                      Persoonlijke informatie
+                    </h3>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs font-medium text-gray-700">Voornaam</label>
+                        <p className="text-sm text-gray-900">{selectedGuardian.firstName}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-700">Achternaam</label>
+                        <p className="text-sm text-gray-900">{selectedGuardian.lastName}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-700">Relatie</label>
+                        <p className="text-sm text-gray-900">{getRelationshipLabel(selectedGuardian.relationship)}</p>
+                      </div>
+                      {selectedGuardian.relationshipOther && (
+                        <div>
+                          <label className="text-xs font-medium text-gray-700">Specifieke relatie</label>
+                          <p className="text-sm text-gray-900">{selectedGuardian.relationshipOther}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <Mail className="h-4 w-4 mr-2" />
+                      Contactgegevens
+                    </h3>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs font-medium text-gray-700">E-mailadres</label>
+                        <p className="text-sm text-gray-900">{selectedGuardian.email}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-700">Telefoonnummer</label>
+                        <p className="text-sm text-gray-900">{selectedGuardian.phone || "-"}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-700">Noodcontact</label>
+                        <p className="text-sm text-gray-900">
+                          {selectedGuardian.isEmergencyContact ? "Ja" : "Nee"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {(selectedGuardian.emergencyContactFirstName || selectedGuardian.emergencyContactLastName || selectedGuardian.emergencyContactPhone) && (
+                    <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                      <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                        <Phone className="h-4 w-4 mr-2" />
+                        Secundair noodcontact
+                      </h3>
+                      <div className="space-y-3">
+                        {selectedGuardian.emergencyContactFirstName && (
+                          <div>
+                            <label className="text-xs font-medium text-gray-700">Voornaam</label>
+                            <p className="text-sm text-gray-900">{selectedGuardian.emergencyContactFirstName}</p>
+                          </div>
+                        )}
+                        {selectedGuardian.emergencyContactLastName && (
+                          <div>
+                            <label className="text-xs font-medium text-gray-700">Achternaam</label>
+                            <p className="text-sm text-gray-900">{selectedGuardian.emergencyContactLastName}</p>
+                          </div>
+                        )}
+                        {selectedGuardian.emergencyContactPhone && (
+                          <div>
+                            <label className="text-xs font-medium text-gray-700">Telefoon</label>
+                            <p className="text-sm text-gray-900">{selectedGuardian.emergencyContactPhone}</p>
+                          </div>
+                        )}
+                        {selectedGuardian.emergencyContactRelationship && (
+                          <div>
+                            <label className="text-xs font-medium text-gray-700">Relatie</label>
+                            <p className="text-sm text-gray-900">{getRelationshipLabel(selectedGuardian.emergencyContactRelationship)}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
+            <Button
+              variant="outline"
+              onClick={() => setIsViewDialogOpen(false)}
+              className="h-8 text-xs rounded-sm"
+            >
+              Sluiten
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bewerk dialoog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+          <div className="bg-[#1e40af] py-4 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-full">
+                <Pencil className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-white text-lg font-semibold m-0">Voogd bewerken</DialogTitle>
+                <DialogDescription className="text-white/70 text-sm m-0">
+                  Bewerk de gegevens van de geselecteerde voogd.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
+          
+          <form onSubmit={handleEditSubmit} className="flex flex-col h-full">
+            <div className="flex-1 p-6 overflow-y-auto max-h-[70vh]">
+              <Tabs defaultValue="general" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="general">Algemeen</TabsTrigger>
+                  <TabsTrigger value="contact">Noodcontact</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="general" className="space-y-4 min-h-[300px]">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <UserCheck className="h-4 w-4 mr-2" />
+                      Persoonlijke informatie
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-firstName" className="text-xs font-medium text-gray-700">
+                          Voornaam <span className="text-red-500">*</span>
+                        </Label>
+                        <Input 
+                          id="edit-firstName" 
+                          name="firstName"
+                          placeholder="Voornaam" 
+                          className="h-8 text-sm"
+                          value={editFormData.firstName}
+                          onChange={handleEditInputChange}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-lastName" className="text-xs font-medium text-gray-700">
+                          Achternaam <span className="text-red-500">*</span>
+                        </Label>
+                        <Input 
+                          id="edit-lastName" 
+                          name="lastName"
+                          placeholder="Achternaam" 
+                          className="h-8 text-sm"
+                          value={editFormData.lastName}
+                          onChange={handleEditInputChange}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-phone" className="text-xs font-medium text-gray-700">
+                          Telefoonnummer <span className="text-red-500">*</span>
+                        </Label>
+                        <Input 
+                          id="edit-phone" 
+                          name="phone"
+                          placeholder="Telefoonnummer" 
+                          className="h-8 text-sm"
+                          value={editFormData.phone || ''}
+                          onChange={handleEditInputChange}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-email" className="text-xs font-medium text-gray-700">
+                          E-mailadres
+                        </Label>
+                        <Input 
+                          id="edit-email" 
+                          name="email"
+                          type="email"
+                          placeholder="E-mailadres" 
+                          className="h-8 text-sm"
+                          value={editFormData.email || ''}
+                          onChange={handleEditInputChange}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-relationship" className="text-xs font-medium text-gray-700">
+                          Relatie tot Student <span className="text-red-500">*</span>
+                        </Label>
+                        <Select 
+                          value={editFormData.relationship} 
+                          onValueChange={(value) => handleEditSelectChange('relationship', value)}
+                          required
+                        >
+                          <SelectTrigger id="edit-relationship" className="h-8 text-sm border-gray-300">
+                            <SelectValue placeholder="Selecteer een relatie" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            <SelectItem value="parent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Ouder</SelectItem>
+                            <SelectItem value="guardian" className="text-black hover:bg-blue-100 focus:bg-blue-200">Voogd</SelectItem>
+                            <SelectItem value="grandparent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Grootouder</SelectItem>
+                            <SelectItem value="sibling" className="text-black hover:bg-blue-100 focus:bg-blue-200">Broer/Zus</SelectItem>
+                            <SelectItem value="other" className="text-black hover:bg-blue-100 focus:bg-blue-200">Anders</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {editFormData.relationship === 'other' && (
+                        <div className="space-y-2">
+                          <Label htmlFor="edit-relationshipOther">
+                            Specificeer relatie <span className="text-red-500">*</span>
+                          </Label>
+                          <Input 
+                            id="edit-relationshipOther" 
+                            name="relationshipOther"
+                            placeholder="Beschrijf de relatie" 
+                            className="h-8 text-sm"
+                            value={editFormData.relationshipOther || ''}
+                            onChange={handleEditInputChange}
+                            required
+                          />
+                        </div>
+                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-isEmergencyContact" className="text-xs font-medium text-gray-700">Noodcontact</Label>
+                        <div className="flex items-center gap-2 h-8 py-0.5">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="edit-isEmergencyContact" 
+                              checked={editFormData.isEmergencyContact}
+                              onCheckedChange={(checked) => 
+                                handleEditSelectChange('isEmergencyContact', checked === true ? 'true' : 'false')
+                              }
+                              className="peer shrink-0 border ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:text-primary-foreground h-4 w-4 rounded-sm border-gray-300 data-[state=checked]:bg-[#1e40af] bg-[#fff]"
+                            />
+                            <label
+                              htmlFor="edit-isEmergencyContact"
+                              className="text-sm text-gray-700 leading-none"
+                            >
+                              Deze persoon is een primair noodcontact
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="contact" className="space-y-4 min-h-[300px]">
+                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                      <Mail className="h-4 w-4 mr-2" />
+                      Secundair noodcontact
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-emergencyContactFirstName" className="text-xs font-medium text-gray-700">Voornaam</Label>
+                        <Input 
+                          id="edit-emergencyContactFirstName" 
+                          name="emergencyContactFirstName"
+                          placeholder="Voornaam" 
+                          className="h-8 text-sm"
+                          value={editFormData.emergencyContactFirstName || ''}
+                          onChange={handleEditInputChange}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-emergencyContactLastName" className="text-xs font-medium text-gray-700">Achternaam</Label>
+                        <Input 
+                          id="edit-emergencyContactLastName" 
+                          name="emergencyContactLastName"
+                          placeholder="Achternaam" 
+                          className="h-8 text-sm"
+                          value={editFormData.emergencyContactLastName || ''}
+                          onChange={handleEditInputChange}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-emergencyContactPhone" className="text-xs font-medium text-gray-700">Telefoonnummer</Label>
+                        <Input 
+                          id="edit-emergencyContactPhone" 
+                          name="emergencyContactPhone"
+                          placeholder="Telefoonnummer" 
+                          className="h-8 text-sm"
+                          value={editFormData.emergencyContactPhone || ''}
+                          onChange={handleEditInputChange}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-emergencyContactRelationship" className="text-xs font-medium text-gray-700">Relatie tot student</Label>
+                        <Select 
+                          value={editFormData.emergencyContactRelationship || ''} 
+                          onValueChange={(value) => handleEditSelectChange('emergencyContactRelationship', value)}
+                        >
+                          <SelectTrigger id="edit-emergencyContactRelationship" className="h-8 text-sm border-gray-300">
+                            <SelectValue placeholder="Selecteer een relatie" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white">
+                            <SelectItem value="parent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Ouder</SelectItem>
+                            <SelectItem value="guardian" className="text-black hover:bg-blue-100 focus:bg-blue-200">Voogd</SelectItem>
+                            <SelectItem value="grandparent" className="text-black hover:bg-blue-100 focus:bg-blue-200">Grootouder</SelectItem>
+                            <SelectItem value="sibling" className="text-black hover:bg-blue-100 focus:bg-blue-200">Broer/Zus</SelectItem>
+                            <SelectItem value="other" className="text-black hover:bg-blue-100 focus:bg-blue-200">Anders</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+            
+            <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditDialogOpen(false)}
+                className="h-8 text-xs rounded-sm"
+              >
+                Annuleren
+              </Button>
+              <Button
+                type="submit"
+                className="h-8 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
+              >
+                <Save className="h-3.5 w-3.5 mr-1" />
+                Opslaan
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

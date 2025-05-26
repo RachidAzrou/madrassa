@@ -27,8 +27,6 @@ import {
   EmptyActionHeader
 } from '@/components/ui/data-table-container';
 import { DeleteDialog } from '@/components/ui/delete-dialog';
-import { ImportButton } from '@/components/ui/import-button';
-import { ImportDialog } from '@/components/ui/import-dialog';
 
 // Type definities
 type GuardianType = {
@@ -55,7 +53,6 @@ export default function Guardians() {
   const [selectedGuardian, setSelectedGuardian] = useState<GuardianType | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showNewGuardianDialog, setShowNewGuardianDialog] = useState(false);
-  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [hasValidationAttempt, setHasValidationAttempt] = useState(false);
   const [newGuardian, setNewGuardian] = useState<Partial<GuardianType>>({
     firstName: '',
@@ -358,10 +355,6 @@ export default function Guardians() {
                 </>
               ) : (
                 <>
-                  <ImportButton
-                    onClick={() => setIsImportDialogOpen(true)}
-                    title="Importeer voogden"
-                  />
                   <Button
                     variant="outline"
                     size="sm"
@@ -907,28 +900,6 @@ export default function Guardians() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Import Dialog */}
-      <ImportDialog
-        open={isImportDialogOpen}
-        onOpenChange={setIsImportDialogOpen}
-        title="Voogden Importeren"
-        description="Upload een CSV of Excel bestand met voogdgegevens"
-        fields={[
-          { label: "firstName - Voornaam", required: true },
-          { label: "lastName - Achternaam", required: true },
-          { label: "email - E-mailadres", required: true },
-          { label: "phone - Telefoonnummer", required: true },
-          { label: "relationship - Relatie tot student", required: true },
-          { label: "isEmergencyContact - Noodcontact (true/false)" },
-          { label: "emergencyContactFirstName - Noodcontact voornaam" },
-          { label: "emergencyContactLastName - Noodcontact achternaam" },
-          { label: "emergencyContactPhone - Noodcontact telefoon" },
-          { label: "emergencyContactRelationship - Noodcontact relatie" }
-        ]}
-        apiEndpoint="/api/guardians/import"
-        queryKey={['/api/guardians']}
-      />
     </div>
   );
 }

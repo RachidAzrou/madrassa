@@ -533,7 +533,12 @@ export default function Guardians() {
       {/* Verwijder dialoog */}
       <DeleteDialog
         open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
+        onOpenChange={(open) => {
+          setShowDeleteDialog(open);
+          if (!open) {
+            setSelectedGuardian(null);
+          }
+        }}
         title="Voogd Verwijderen"
         description="Weet je zeker dat je deze voogd wilt verwijderen?"
         onConfirm={confirmDeleteGuardian}

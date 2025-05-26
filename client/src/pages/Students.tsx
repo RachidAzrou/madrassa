@@ -1296,56 +1296,40 @@ export default function Students() {
           icon={<Eye className="h-5 w-5 text-white" />}
         />
         
-        <div className="flex-1 overflow-y-auto">
+        <div className="px-6 py-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 150px)' }}>
           {selectedStudent && (
-            <div className="p-4 sm:p-6 space-y-6">
-              {/* Header met foto en basisgegevens */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-6">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
-                    <div className="flex-shrink-0 text-center">
-                      <Avatar className="h-24 w-24 mx-auto border-4 border-white shadow-lg">
-                        {selectedStudent.photoUrl ? (
-                          <img 
-                            src={selectedStudent.photoUrl} 
-                            alt={`${selectedStudent.firstName} ${selectedStudent.lastName}`}
-                            className="w-full h-full rounded-full object-cover"
-                          />
-                        ) : (
-                          <AvatarFallback className="text-xl bg-blue-100 text-blue-600 font-semibold">
-                            {selectedStudent.firstName?.charAt(0)}{selectedStudent.lastName?.charAt(0)}
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                          <h1 className="text-2xl font-bold text-gray-900">
-                            {selectedStudent.firstName} {selectedStudent.lastName}
-                          </h1>
-                          <p className="text-sm text-gray-500 font-medium">{selectedStudent.studentId}</p>
-                        </div>
-                        <div className="mt-2 sm:mt-0">
-                          <Badge className={`px-3 py-1 text-xs font-medium ${
-                            selectedStudent.status === 'active' || selectedStudent.status === 'ingeschreven' ? "bg-green-50 text-green-700 border-green-200" : 
-                            selectedStudent.status === 'inactive' || selectedStudent.status === 'uitgeschreven' ? "bg-gray-50 text-gray-700 border-gray-200" : 
-                            selectedStudent.status === 'afgestudeerd' ? "bg-blue-50 text-blue-700 border-blue-200" :
-                            selectedStudent.status === 'geschorst' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
-                            "bg-yellow-50 text-yellow-700 border-yellow-200"
-                          }`}>
-                            {selectedStudent.status === 'active' ? 'Ingeschreven' : 
-                             selectedStudent.status === 'inactive' ? 'Uitgeschreven' : 
-                             selectedStudent.status === 'enrolled' ? 'Ingeschreven' :
-                             selectedStudent.status === 'graduated' ? 'Afgestudeerd' :
-                             selectedStudent.status === 'suspended' ? 'Geschorst' :
-                             selectedStudent.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <div className="space-y-6">
+              {/* Student Header */}
+              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                <Avatar className="h-20 w-20 border-4 border-white shadow-md">
+                  {selectedStudent.photoUrl ? (
+                    <AvatarImage src={selectedStudent.photoUrl} alt={`${selectedStudent.firstName} ${selectedStudent.lastName}`} />
+                  ) : (
+                    <AvatarFallback className="bg-[#1e40af] text-white text-xl">
+                      {selectedStudent.firstName?.charAt(0)}{selectedStudent.lastName?.charAt(0)}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-gray-900">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
+                  <p className="text-lg text-gray-600 font-medium">{selectedStudent.studentId}</p>
+                  <Badge 
+                    variant="outline" 
+                    className={`text-sm rounded-full px-3 py-1 font-medium ${
+                      selectedStudent.status === 'active' || selectedStudent.status === 'ingeschreven' ? "bg-green-50 text-green-700 border-green-200" : 
+                      selectedStudent.status === 'inactive' || selectedStudent.status === 'uitgeschreven' ? "bg-gray-50 text-gray-700 border-gray-200" : 
+                      selectedStudent.status === 'afgestudeerd' ? "bg-blue-50 text-blue-700 border-blue-200" :
+                      selectedStudent.status === 'geschorst' ? "bg-yellow-50 text-yellow-700 border-yellow-200" :
+                      "bg-yellow-50 text-yellow-700 border-yellow-200"
+                    }`}
+                  >
+                    {selectedStudent.status === 'active' ? 'Ingeschreven' : 
+                     selectedStudent.status === 'inactive' ? 'Uitgeschreven' : 
+                     selectedStudent.status === 'enrolled' ? 'Ingeschreven' :
+                     selectedStudent.status === 'graduated' ? 'Afgestudeerd' :
+                     selectedStudent.status === 'suspended' ? 'Geschorst' :
+                     selectedStudent.status}
+                  </Badge>
                 </div>
               </div>
               

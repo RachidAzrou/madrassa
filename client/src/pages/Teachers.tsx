@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, GraduationCap, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, BookOpen, Users, Upload, Edit, Camera } from 'lucide-react';
+import { Search, PlusCircle, Filter, Download, Eye, Pencil, Trash2, GraduationCap, X, XCircle, FileDown, AlertTriangle, Phone, Save, Mail, BookOpen, Users, Upload, Edit, Camera, User, Calendar, Clock, Briefcase } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -1144,7 +1144,7 @@ export default function Teachers() {
                 <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 sm:px-6 py-4 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                      <User className="h-5 w-5 mr-2 text-blue-600" />
+                      <Users className="h-5 w-5 mr-2 text-blue-600" />
                       Persoonlijke Informatie
                     </h3>
                   </div>
@@ -1198,7 +1198,7 @@ export default function Teachers() {
                           </div>
                           
                           <div className="flex items-start space-x-3">
-                            <Calendar className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
+                            <Phone className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
                             <div className="min-w-0 flex-1">
                               <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Geboortedatum</p>
                               <p className="text-sm font-medium text-gray-900">{selectedTeacher.dateOfBirth || 'Niet opgegeven'}</p>
@@ -1216,7 +1216,7 @@ export default function Teachers() {
                           </div>
                           
                           <div className="flex items-start space-x-3">
-                            <Briefcase className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
+                            <BookOpen className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
                             <div className="min-w-0 flex-1">
                               <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">In dienst sinds</p>
                               <p className="text-sm font-medium text-gray-900">{selectedTeacher.hireDate || 'Niet opgegeven'}</p>
@@ -1226,8 +1226,8 @@ export default function Teachers() {
                           <div className="flex items-start space-x-3">
                             <Users className="h-4 w-4 mt-1 text-gray-400 flex-shrink-0" />
                             <div className="min-w-0 flex-1">
-                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Geslacht</p>
-                              <p className="text-sm font-medium text-gray-900">{selectedTeacher.gender || 'Niet opgegeven'}</p>
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Status</p>
+                              <p className="text-sm font-medium text-gray-900">{getStatusLabel(selectedTeacher.status)}</p>
                             </div>
                           </div>
                         </div>
@@ -1282,7 +1282,7 @@ export default function Teachers() {
                 <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                   <div className="bg-gradient-to-r from-orange-50 to-amber-50 px-4 sm:px-6 py-4 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                      <Clock className="h-5 w-5 mr-2 text-orange-600" />
+                      <BookOpen className="h-5 w-5 mr-2 text-orange-600" />
                       Wekelijks Rooster
                     </h3>
                   </div>

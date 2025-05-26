@@ -26,6 +26,7 @@ import Login from "@/pages/Login";
 import Messages from "@/pages/Messages";
 
 import Scheduling from "@/pages/Scheduling";
+import Planning from "@/pages/Planning";
 import Fees from "@/pages/Fees";
 import Settings from "@/pages/Settings";
 
@@ -58,6 +59,7 @@ function AuthenticatedRouter() {
         <Route path="/courses" component={() => <AuthenticatedRoute component={Courses} />} />
         <Route path="/programs" component={() => <AuthenticatedRoute component={Programs} />} />
         <Route path="/scheduling" component={() => <AuthenticatedRoute component={Scheduling} />} />
+        <Route path="/planning" component={() => <AuthenticatedRoute component={Planning} />} />
         <Route path="/rooms" component={() => <AuthenticatedRoute component={Rooms} />} />
         <Route path="/calendar" component={() => <AuthenticatedRoute component={Calendar} />} />
         <Route path="/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />

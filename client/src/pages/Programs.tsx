@@ -125,6 +125,33 @@ export default function Programs() {
   // Als data direct een array is, gebruik het; anders zoek naar data.programs
   const programs = Array.isArray(data) ? data : data?.programs || [];
 
+  // Combineer API docenten met localStorage docenten
+  const getAvailableTeachers = () => {
+    const apiTeachers = teachersData?.teachers || [];
+    
+    // Haal docenten uit localStorage als backup
+    const localStorageTeachers = JSON.parse(localStorage.getItem('teachers') || '[]');
+    console.log('Docenten opgeslagen in localStorage:', localStorageTeachers.length);
+    
+    // Als er geen API docenten zijn maar wel localStorage docenten, gebruik localStorage
+    if (apiTeachers.length === 0 && localStorageTeachers.length > 0) {
+      return localStorageTeachers.filter((teacher: any) => 
+        teacher.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        teacher.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        teacher.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // Filter API docenten op zoekterm
+    return apiTeachers.filter((teacher: any) => 
+      teacher.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      teacher.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      teacher.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
+
+  const availableTeachers = getAvailableTeachers();
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
@@ -582,10 +609,35 @@ export default function Programs() {
                     </span>
                   </div>
                   
+                  {/* Zoekbalk voor docenten */}
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Input
+                        placeholder="Zoek docenten..."
+                        className="pl-10 h-9 text-sm"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        // Refresh docenten data
+                        queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+                      }}
+                      className="h-9 px-3"
+                    >
+                      <Users className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
                   <div className="border border-gray-200 bg-white rounded-md p-4 max-h-[300px] overflow-auto">
-                    {teachersData?.teachers && teachersData.teachers.length > 0 ? (
+                    {availableTeachers && availableTeachers.length > 0 ? (
                       <div className="space-y-3">
-                        {teachersData.teachers.map((teacher: any) => (
+                        {availableTeachers.map((teacher: any) => (
                           <div key={teacher.id} className="flex items-center space-x-3 py-2 px-3 hover:bg-blue-50 rounded-md border border-transparent hover:border-blue-200 transition-colors">
                             <StyledCheckbox 
                               id={`teacher-${teacher.id}`}
@@ -636,7 +688,7 @@ export default function Programs() {
                         {programFormData.assignedTeachers
                           .filter(t => t.selected)
                           .map(assignedTeacher => {
-                            const teacher = teachersData?.teachers.find((t: any) => t.id === assignedTeacher.id);
+                            const teacher = availableTeachers.find((t: any) => t.id === assignedTeacher.id);
                             return teacher ? (
                               <div key={teacher.id} className="flex items-center gap-1 bg-white border border-blue-300 rounded-md px-2 py-1">
                                 <span className="text-xs font-medium text-blue-900">

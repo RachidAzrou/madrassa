@@ -26,6 +26,7 @@ import {
   ActionButtonsContainer,
   EmptyActionHeader
 } from '@/components/ui/data-table-container';
+import { DeleteDialog } from '@/components/ui/delete-dialog';
 
 // Type definities
 type GuardianType = {
@@ -530,47 +531,19 @@ export default function Guardians() {
       </div>
       {/* Dialogen */}
       {/* Verwijder dialoog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Voogd verwijderen</DialogTitle>
-            <DialogDescription>
-              Weet je zeker dat je deze voogd wilt verwijderen? Dit kan niet ongedaan worden gemaakt.
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedGuardian && (
-            <div className="flex items-center space-x-4 py-4">
-              <Avatar className="h-10 w-10">
-                <AvatarFallback className="bg-[#e5e7eb] text-gray-600">
-                  {selectedGuardian.firstName.charAt(0)}{selectedGuardian.lastName.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">{selectedGuardian.firstName} {selectedGuardian.lastName}</p>
-                <p className="text-sm text-gray-500">{selectedGuardian.email}</p>
-              </div>
-            </div>
-          )}
-          
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowDeleteDialog(false)}
-              className="h-8 text-xs rounded-sm"
-            >
-              Annuleren
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDeleteGuardian}
-              className="h-8 text-xs rounded-sm"
-            >
-              Verwijderen
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Voogd Verwijderen"
+        description="Weet je zeker dat je deze voogd wilt verwijderen?"
+        onConfirm={confirmDeleteGuardian}
+        item={selectedGuardian ? {
+          name: `${selectedGuardian.firstName} ${selectedGuardian.lastName}`,
+          id: selectedGuardian.email,
+          initials: `${selectedGuardian.firstName.charAt(0)}${selectedGuardian.lastName.charAt(0)}`
+        } : undefined}
+        warningText="Deze actie kan niet ongedaan worden gemaakt. De voogd wordt permanent verwijderd uit het systeem."
+      />
       {/* Nieuwe voogd dialoog */}
       <Dialog 
         open={showNewGuardianDialog} 

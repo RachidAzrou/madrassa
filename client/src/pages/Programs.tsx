@@ -990,6 +990,50 @@ export default function Programs() {
                   {selectedProgram.description || 'Geen beschrijving'}
                 </div>
               </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <FormLabel className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" />
+                    Curriculum
+                  </FormLabel>
+                  <div className="border border-gray-200 rounded-md bg-gray-50 p-3">
+                    {selectedProgram.assignedClasses && selectedProgram.assignedClasses.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {selectedProgram.assignedClasses.map((classItem: any) => (
+                          <div key={classItem.id} className="flex items-center gap-2 text-sm">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+                            <span>{classItem.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-gray-500 text-sm">Geen klassen toegewezen</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <FormLabel className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Docenten
+                  </FormLabel>
+                  <div className="border border-gray-200 rounded-md bg-gray-50 p-3">
+                    {selectedProgram.assignedTeachers && selectedProgram.assignedTeachers.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {selectedProgram.assignedTeachers.map((teacher: any) => (
+                          <div key={teacher.id} className="flex items-center gap-2 text-sm">
+                            <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
+                            <span>{teacher.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-gray-500 text-sm">Geen docenten toegewezen</span>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

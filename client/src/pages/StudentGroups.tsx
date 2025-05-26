@@ -80,23 +80,20 @@ export default function StudentGroups() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // State management
-  const [searchQuery, setSearchQuery] = useState('');
+  // State management - exact same structure as Students page
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [filterProgram, setFilterProgram] = useState("all");
+  const [filterAcademicYear, setFilterAcademicYear] = useState("all");
+  const [filterStudentGroup, setFilterStudentGroup] = useState("all");
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
+  
   const [selectedClasses, setSelectedClasses] = useState<number[]>([]);
   const [selectedClass, setSelectedClass] = useState<ClassType | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showNewClassDialog, setShowNewClassDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
-
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-
-  // Filter states
-  const [classNameFilter, setClassNameFilter] = useState('');
-  const [academicYearFilter, setAcademicYearFilter] = useState('');
-  const [locationFilter, setLocationFilter] = useState('');
-  const [teacherFilter, setTeacherFilter] = useState('');
-  const [capacityFilter, setCapacityFilter] = useState('');
 
   // Form data for new/edit class
   const [newClass, setNewClass] = useState({
@@ -334,8 +331,8 @@ export default function StudentGroups() {
                   type="search"
                   placeholder="Zoek klassen op naam, docent of locatie..."
                   className="pl-9 h-8 text-xs bg-white rounded-sm border-[#e5e7eb]"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>

@@ -1460,7 +1460,21 @@ export default function Teachers() {
                         value={newTeacher.gender}
                         onValueChange={(value) => setNewTeacher(prev => ({ ...prev, gender: value }))}
                       >
-                        <SelectTrigger className="mt-1 w-full focus:!border-blue-500 focus:!ring-2 focus:!ring-blue-500/20 focus:!ring-offset-0 data-[state=open]:!border-blue-500 data-[state=open]:!ring-2 data-[state=open]:!ring-blue-500/20">
+                        <SelectTrigger 
+                          className="mt-1 w-full" 
+                          style={{
+                            borderColor: '#d1d5db',
+                            transition: 'all 0.2s',
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = '#3b82f6';
+                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = '#d1d5db';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
                           <SelectValue placeholder="Selecteer geslacht" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1512,7 +1526,21 @@ export default function Teachers() {
                         value={newTeacher.status}
                         onValueChange={(value) => setNewTeacher(prev => ({ ...prev, status: value }))}
                       >
-                        <SelectTrigger className="mt-1 w-full focus:!border-blue-500 focus:!ring-2 focus:!ring-blue-500/20 focus:!ring-offset-0 data-[state=open]:!border-blue-500 data-[state=open]:!ring-2 data-[state=open]:!ring-blue-500/20">
+                        <SelectTrigger 
+                          className="mt-1 w-full" 
+                          style={{
+                            borderColor: '#d1d5db',
+                            transition: 'all 0.2s',
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = '#3b82f6';
+                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = '#d1d5db';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
                           <SelectValue placeholder="Selecteer status" />
                         </SelectTrigger>
                         <SelectContent>

@@ -226,8 +226,8 @@ export default function Messages() {
 
       <DataTableContainer>
         {/* Zoek- en actiesbalk */}
-        <SearchActionBar>
-          <div className="flex flex-col sm:flex-row items-center gap-3">
+        <div className="bg-white border border-[#e5e7eb] rounded-sm mb-4 shadow-sm">
+          <SearchActionLayout>
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
               <Input 
@@ -237,7 +237,7 @@ export default function Messages() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -246,36 +246,26 @@ export default function Messages() {
                 <Filter className="h-3.5 w-3.5 mr-1 text-gray-500" />
                 <span>Filter</span>
               </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="h-7 text-xs rounded-sm border-[#e5e7eb] bg-white hover:bg-blue-50"
+              <Button
+                size="sm"
+                className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
+                onClick={() => {
+                  setSelectedMessage(null);
+                  setNewMessage({
+                    title: "",
+                    content: "",
+                    receiverId: 0,
+                    receiverRole: ""
+                  });
+                  setIsComposeOpen(true);
+                }}
               >
-                <Download className="h-3.5 w-3.5 mr-1 text-gray-500" />
-                <span>Exporteren</span>
+                <PlusCircle className="h-3.5 w-3.5 mr-1" />
+                <span>Nieuw bericht</span>
               </Button>
             </div>
-          </div>
-          <div className="flex items-center justify-end">
-            <Button
-              size="sm"
-              className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a]"
-              onClick={() => {
-                setSelectedMessage(null);
-                setNewMessage({
-                  title: "",
-                  content: "",
-                  receiverId: 0,
-                  receiverRole: ""
-                });
-                setIsComposeOpen(true);
-              }}
-            >
-              <PlusCircle className="h-3.5 w-3.5 mr-1" />
-              <span>Nieuw bericht</span>
-            </Button>
-          </div>
-        </SearchActionBar>
+          </SearchActionLayout>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Berichtenlijst */}

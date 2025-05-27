@@ -18,21 +18,7 @@ function getUserRole() {
 
 // Get navigation items based on user role
 function getNavigationItems(userRole: string) {
-  const baseItems = [
-    {
-      section: "Communicatie",
-      items: [
-        { href: "/messages", icon: <MessageSquare className="h-4 w-4" />, label: "Berichten" },
-        { href: "/notifications", icon: <Clock className="h-4 w-4" />, label: "Meldingen" }
-      ]
-    },
-    {
-      section: "Account",
-      items: [
-        { href: "/mijn-account", icon: <UserRound className="h-4 w-4" />, label: "Mijn Account" }
-      ]
-    }
-  ];
+  const baseItems = [];
 
   switch (userRole) {
     case 'superadmin':

@@ -22,27 +22,10 @@ export default function Login() {
   const loginMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
       console.log("Login data:", data);
-      // Simuleer een succesvolle login voor nu - in een echte implementatie zou je apiRequest gebruiken
-      // return await apiRequest("/api/login", {
-      //   method: 'POST',
-      //   body: data
-      // });
-      
-      // Voor demo doeleinden - verschillende rollen testen
-      const users = [
-        { email: "superadmin@mymadrassa.be", password: "admin123", name: "Super Admin", role: "superadmin" },
-        { email: "directeur@mymadrassa.be", password: "directeur123", name: "Ahmed Hassan", role: "directeur" },
-        { email: "docent@mymadrassa.be", password: "docent123", name: "Fatima Al-Zahra", role: "docent" },
-        { email: "student@mymadrassa.be", password: "student123", name: "Omar Ibn Khattab", role: "student" },
-        { email: "ouder@mymadrassa.be", password: "ouder123", name: "Aisha Bint Abu Bakr", role: "ouder" }
-      ];
-      
-      const user = users.find(u => u.email === data.email && u.password === data.password);
-      if (user) {
-        return { success: true, user: { name: user.name, role: user.role } };
-      } else {
-        throw new Error("Ongeldige inloggegevens");
-      }
+      return await apiRequest("/api/login", {
+        method: 'POST',
+        body: data
+      });
     },
     onSuccess: (data) => {
       toast({

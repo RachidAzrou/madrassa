@@ -485,7 +485,7 @@ export default function Scholen() {
           searchPlaceholder="Zoek scholen..."
           onSearchChange={() => {}}
           actions={
-            <Button onClick={handleAddSchool} className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
+            <Button onClick={handleAddSchool} className="flex items-center gap-2 hover:bg-green-700 bg-[#1e41af]">
               <Plus className="h-4 w-4" />
               School Toevoegen
             </Button>

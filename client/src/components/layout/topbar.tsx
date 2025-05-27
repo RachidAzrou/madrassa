@@ -113,6 +113,139 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
           <Search className="h-5 w-5 text-gray-600" />
         </Button>
 
+        {/* Berichten knop */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative">
+              <Mail className="h-5 w-5 text-gray-600" />
+              <Badge 
+                className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af]"
+                variant="default"
+              >
+                2
+              </Badge>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-80 p-0">
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium text-sm">Berichten</h3>
+                <button 
+                  className="text-xs text-[#1e40af] hover:underline"
+                  onClick={() => window.location.href = "/messages"}
+                >
+                  Alle berichten
+                </button>
+              </div>
+            </div>
+            <div className="max-h-72 overflow-y-auto">
+              <div className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
+                <div className="flex items-start gap-3">
+                  <Avatar className="h-8 w-8 mt-1">
+                    <AvatarFallback className="bg-amber-100 text-amber-800">KS</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium text-sm">Karim Salhi</p>
+                      <span className="text-xs text-gray-500">Vandaag, 10:42</span>
+                    </div>
+                    <p className="text-xs text-gray-600 line-clamp-2">Vraag over het huiswerk voor morgen, kunnen we bespreken?</p>
+                  </div>
+                </div>
+              </div>
+              <div className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
+                <div className="flex items-start gap-3">
+                  <Avatar className="h-8 w-8 mt-1">
+                    <AvatarFallback className="bg-green-100 text-green-800">FE</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium text-sm">Fatima El Amrani</p>
+                      <span className="text-xs text-gray-500">Gisteren, 15:20</span>
+                    </div>
+                    <p className="text-xs text-gray-600 line-clamp-2">Goed nieuws! Het project is goedgekeurd. Laten we volgende week een vergadering plannen.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-3 border-t border-gray-200 bg-gray-50">
+              <Button 
+                className="w-full bg-[#1e40af] hover:bg-[#1e40af]/90 text-white text-xs h-8"
+                onClick={() => window.location.href = "/messages"}
+              >
+                <Mail className="h-4 w-4 mr-2" /> Naar Berichten
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Notificaties */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="h-5 w-5 text-gray-600" />
+              {unreadCount > 0 && (
+                <Badge 
+                  className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af]"
+                  variant="default"
+                >
+                  {unreadCount}
+                </Badge>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-80 p-0">
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium text-sm">Notificaties</h3>
+                <Link href="/notificaties">
+                  <a className="text-xs text-[#1e40af] hover:underline">Alle notificaties</a>
+                </Link>
+              </div>
+            </div>
+            <div className="max-h-72 overflow-y-auto">
+              {notifications.length === 0 ? (
+                <div className="py-6 text-center">
+                  <p className="text-sm text-gray-500">Geen notificaties</p>
+                </div>
+              ) : (
+                notifications.slice(0, 5).map((notification: Notification) => (
+                  <div 
+                    key={notification.id} 
+                    className={`py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 ${!notification.isRead ? 'bg-blue-50' : ''}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`h-2 w-2 mt-2 rounded-full ${
+                        notification.type === 'info' ? 'bg-blue-500' : 
+                        notification.type === 'warning' ? 'bg-amber-500' : 
+                        notification.type === 'success' ? 'bg-green-500' : 
+                        'bg-red-500'
+                      }`}></div>
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium text-sm">{notification.title}</p>
+                          <span className="text-xs text-gray-500">
+                            {new Date(notification.timestamp).toLocaleTimeString([], {
+                              hour: '2-digit', 
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-600">{notification.message}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="p-3 border-t border-gray-200 bg-gray-50">
+              <Button variant="outline" className="w-full text-xs h-8">
+                Markeer alles als gelezen
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+
         {/* Gebruiker profiel */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -141,10 +274,7 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
               <span>Instellingen</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => {
-              localStorage.removeItem('user');
-              window.location.href = '/login';
-            }}>
+            <DropdownMenuItem>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Uitloggen</span>
             </DropdownMenuItem>

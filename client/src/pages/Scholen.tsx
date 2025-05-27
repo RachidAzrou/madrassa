@@ -507,7 +507,7 @@ export default function Scholen() {
           searchPlaceholder="Zoek directeuren..."
           onSearchChange={() => {}}
           actions={
-            <Button onClick={handleAddDirector} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handleAddDirector} className="flex items-center gap-2 hover:bg-blue-700 bg-[#1e41af]">
               <UserPlus className="h-4 w-4" />
               Directeur Toevoegen
             </Button>

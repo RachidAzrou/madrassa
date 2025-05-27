@@ -1,86 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-
-// Get user role from localStorage
-function getUserRole() {
-  const user = localStorage.getItem("user");
-  if (user) {
-    try {
-      const userData = JSON.parse(user);
-      return userData.role || 'directeur';
-    } catch {
-      return 'directeur';
-    }
-  }
-  return 'directeur';
-}
-
-// Get navigation items based on user role
-function getNavigationItems(userRole: string) {
-  const baseItems = [];
-
-  switch (userRole) {
-    case 'superadmin':
-      return [
-        {
-          section: "Systeembeheer",
-          items: [
-            { href: "/superadmin", icon: <LayoutDashboard className="h-4 w-4" />, label: "Dashboard" },
-            { href: "/scholen", icon: <Building className="h-4 w-4" />, label: "Scholen" }
-          ]
-        },
-        ...baseItems
-      ];
-
-    case 'directeur':
-      return [
-        {
-          section: "School Management",
-          items: [
-            { href: "/dashboard", icon: <LayoutDashboard className="h-4 w-4" />, label: "Dashboard" }
-          ]
-        },
-        ...baseItems
-      ];
-
-    case 'docent':
-      return [
-        {
-          section: "Docent Dashboard",
-          items: [
-            { href: "/teacher-dashboard", icon: <LayoutDashboard className="h-4 w-4" />, label: "Dashboard" }
-          ]
-        },
-        ...baseItems
-      ];
-
-    case 'student':
-      return [
-        {
-          section: "Student Dashboard",
-          items: [
-            { href: "/student-dashboard", icon: <LayoutDashboard className="h-4 w-4" />, label: "Mijn Dashboard" }
-          ]
-        },
-        ...baseItems
-      ];
-
-    case 'ouder':
-      return [
-        {
-          section: "Ouder Dashboard",
-          items: [
-            { href: "/parent-dashboard", icon: <LayoutDashboard className="h-4 w-4" />, label: "Mijn Dashboard" }
-          ]
-        },
-        ...baseItems
-      ];
-
-    default:
-      return baseItems;
-  }
-}
 // Import nieuw logo
 import myMadrassaLogo from "../../assets/mymadrassa-new.png";
 import {
@@ -108,9 +28,6 @@ import {
   Clock,
   Coins,
   BookMarked,
-  MessageCircle,
-  Bell,
-  User,
   MessageSquare,
 } from "lucide-react";
 
@@ -178,7 +95,6 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
   const [location] = useLocation();
   const [expanded, setExpanded] = useState(!isMobile);
   const [userData, setUserData] = useState<any>(null);
-  const userRole = getUserRole();
   
   // Gebruiker data uit localStorage ophalen of standaard data gebruiken
   useEffect(() => {
@@ -242,31 +158,151 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
       )}
 
-
       
-      {/* Role-based Navigation links */}
+      {/* Dashboard link */}
+      <div className="px-3 pt-3 pb-2 border-b border-gray-100">
+        <div className="bg-gray-50 rounded-md overflow-hidden">
+          <Link href="/">
+            <div
+              onClick={handleLinkClick}
+              className={cn(
+                "flex items-center gap-2 px-2 py-1.5 text-xs rounded-md transition-colors cursor-pointer",
+                location === "/"
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "text-gray-700 hover:text-primary hover:bg-gray-100"
+              )}
+            >
+              <div className="flex-shrink-0">
+                <LayoutDashboard className="h-4 w-4" />
+              </div>
+              <span className="truncate whitespace-nowrap">Dashboard</span>
+            </div>
+          </Link>
+        </div>
+      </div>
+      
+      {/* Navigation links */}
       <nav className="flex flex-col flex-1">
         <div className="flex-1 py-2 px-3 overflow-y-auto">
           <div className="space-y-4">
-            {getNavigationItems(userRole).map((section, sectionIndex) => (
-              <div key={sectionIndex} className="pt-2">
-                <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  {section.section}
-                </p>
-                <div className="space-y-1.5">
-                  {section.items.map((item, itemIndex) => (
-                    <SidebarLink
-                      key={itemIndex}
-                      href={item.href}
-                      icon={item.icon}
-                      label={item.label}
-                      isActive={location.startsWith(item.href)}
-                      onClick={handleLinkClick}
-                    />
-                  ))}
-                </div>
+            <div className="pt-2">
+              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Beheer
+              </p>
+              <div className="space-y-1.5">
+                <SidebarLink
+                  href="/students"
+                  icon={<Users className="h-4 w-4" />}
+                  label="Studenten"
+                  isActive={location.startsWith("/students")}
+                  onClick={handleLinkClick}
+                />
+                <SidebarLink
+                  href="/guardians"
+                  icon={<UserCheck className="h-4 w-4" />}
+                  label="Voogden"
+                  isActive={location.startsWith("/guardians")}
+                  onClick={handleLinkClick}
+                />
+                <SidebarLink
+                  href="/teachers"
+                  icon={<GraduationCap className="h-4 w-4" />}
+                  label="Docenten"
+                  isActive={location.startsWith("/teachers")}
+                  onClick={handleLinkClick}
+                />
+
+                <SidebarLink
+                  href="/admissions"
+                  icon={<FileText className="h-4 w-4" />}
+                  label="Aanmeldingen"
+                  isActive={location.startsWith("/admissions")}
+                  onClick={handleLinkClick}
+                />
+
               </div>
-            ))}
+            </div>
+
+            <div className="pt-2">
+              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Onderwijs
+              </p>
+              <div className="space-y-1.5">
+                <SidebarLink
+                  href="/student-groups"
+                  icon={<School className="h-4 w-4" />}
+                  label="Klassen"
+                  isActive={location.startsWith("/student-groups")}
+                  onClick={handleLinkClick}
+                />
+                <SidebarLink
+                  href="/programs"
+                  icon={<BookText className="h-4 w-4" />}
+                  label="Vakken"
+                  isActive={location.startsWith("/programs")}
+                  onClick={handleLinkClick}
+                />
+
+                <SidebarLink
+                  href="/calendar"
+                  icon={<Calendar className="h-4 w-4" />}
+                  label="Rooster"
+                  isActive={location.startsWith("/calendar")}
+                  onClick={handleLinkClick}
+                />
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Evaluatie
+              </p>
+              <div className="space-y-1.5">
+                <SidebarLink
+                  href="/attendance"
+                  icon={<ClipboardCheck className="h-4 w-4" />}
+                  label="Aanwezigheid"
+                  isActive={location.startsWith("/attendance")}
+                  onClick={handleLinkClick}
+                />
+                <SidebarLink
+                  href="/grading"
+                  icon={<Percent className="h-4 w-4" />}
+                  label="Cijfers"
+                  isActive={location.startsWith("/grading")}
+                  onClick={handleLinkClick}
+                />
+                <SidebarLink
+                  href="/reports"
+                  icon={<BookMarked className="h-4 w-4" />}
+                  label="Rapport"
+                  isActive={location.startsWith("/reports")}
+                  onClick={handleLinkClick}
+                />
+                <SidebarLink
+                  href="/student-dossier"
+                  icon={<UserRound className="h-4 w-4" />}
+                  label="Leerlingendossier"
+                  isActive={location.startsWith("/student-dossier")}
+                  onClick={handleLinkClick}
+                />
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Financiën
+              </p>
+              <div className="space-y-1.5">
+                <SidebarLink
+                  href="/fees"
+                  icon={<Coins className="h-4 w-4" />}
+                  label="Betalingsbeheer"
+                  isActive={location.startsWith("/fees")}
+                  onClick={handleLinkClick}
+                />
+              </div>
+            </div>
           </div>
         </div>
         

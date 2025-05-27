@@ -30,8 +30,6 @@ export function CustomDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={`p-0 overflow-hidden max-h-[90vh] w-[95vw] sm:max-w-[${maxWidth}] ${className}`}>
-        <DialogTitle className="sr-only">Dialog</DialogTitle>
-        <DialogDescription className="sr-only">Dialog content</DialogDescription>
         {children}
       </DialogContent>
     </Dialog>

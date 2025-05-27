@@ -97,44 +97,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ********************
   // Authentication endpoints
   // ********************
-  apiRouter.post("/api/login", async (req, res) => {
-    try {
-      console.log("Login attempt:", req.body);
-      const { email, password } = req.body;
-      
-      if (!email || !password) {
-        return res.status(400).json({ message: "Email en wachtwoord zijn verplicht" });
-      }
-      
-      // Zoek gebruiker in database
-      const user = await storage.getUserByEmail(email);
-      
-      if (!user) {
-        return res.status(401).json({ message: "Ongeldige inloggegevens" });
-      }
-      
-      // Controleer wachtwoord (in dit geval plain text vergelijking)
-      if (user.passwordHash !== password) {
-        return res.status(401).json({ message: "Ongeldige inloggegevens" });
-      }
-      
-      // Login succesvol
-      res.json({
-        success: true,
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          firstName: user.firstName,
-          lastName: user.lastName
-        }
-      });
-    } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({ message: "Server fout bij inloggen" });
-    }
-  });
-
   apiRouter.get("/api/logout", (_req, res) => {
     res.redirect("/login");
   });

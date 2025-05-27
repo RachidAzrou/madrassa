@@ -364,14 +364,14 @@ export default function Fees() {
           {/* Betalingen tabel */}
           <StandardTable>
             <StandardTableHeader>
-              <div className="grid grid-cols-6 gap-4 p-4">
-                <div className="font-medium text-xs text-gray-600 uppercase tracking-wide">STUDENT</div>
-                <div className="font-medium text-xs text-gray-600 uppercase tracking-wide">BESCHRIJVING</div>
-                <div className="font-medium text-xs text-gray-600 uppercase tracking-wide">BEDRAG</div>
-                <div className="font-medium text-xs text-gray-600 uppercase tracking-wide">VERVALDATUM</div>
-                <div className="font-medium text-xs text-gray-600 uppercase tracking-wide">STATUS</div>
-                <div className="font-medium text-xs text-gray-600 uppercase tracking-wide">ACTIES</div>
-              </div>
+              <StandardTableRow>
+                <StandardTableHeaderCell>Student</StandardTableHeaderCell>
+                <StandardTableHeaderCell>Beschrijving</StandardTableHeaderCell>
+                <StandardTableHeaderCell>Bedrag</StandardTableHeaderCell>
+                <StandardTableHeaderCell>Vervaldatum</StandardTableHeaderCell>
+                <StandardTableHeaderCell>Status</StandardTableHeaderCell>
+                <StandardTableHeaderCell>Acties</StandardTableHeaderCell>
+              </StandardTableRow>
             </StandardTableHeader>
             
             {isLoadingFees ? (

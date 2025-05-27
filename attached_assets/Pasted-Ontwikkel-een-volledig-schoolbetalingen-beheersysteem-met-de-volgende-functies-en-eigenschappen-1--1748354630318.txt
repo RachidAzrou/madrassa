@@ -1,0 +1,58 @@
+Ontwikkel een volledig schoolbetalingen-beheersysteem met de volgende functies en eigenschappen:
+
+1. **Collegegeld & Kortingen instellen (Admin):**
+- Admin kan per schooljaar het standaard collegegeld instellen.
+- Admin kan kortingsregels aanmaken en beheren (zoals broers/zussen korting, minderbedeelden korting).
+- Kortingen bevatten naam, type (percentage/vast bedrag), voorwaarden en status (actief/inactief).
+- Kortingen worden automatisch toegepast bij het genereren van facturen.
+
+2. **Factuurgeneratie en Betalingen uitsturen:**
+- Admin kan facturen maken voor individuele studenten of hele klassen.
+- Factuurnummers zijn uniek en hebben een prefix per type factuur (INS voor inschrijving, MTR voor lesmateriaal, TRP voor uitstap, etc.).
+- Kortingen worden per student automatisch verwerkt.
+- Facturen kunnen bekeken, aangepast, geannuleerd en verstuurd worden.
+- Betalingen worden aangemaakt via Mollie API, waarbij metadata wordt meegegeven met factuurnummer, factuurtype en leerling_id.
+
+3. **Realtime betalingsstatus via Mollie webhook:**
+- Implementeer een webhook endpoint dat Mollie aanroept na succesvolle betaling.
+- Verifieer het webhook-verzoek.
+- Update direct de status van de factuur naar "betaald" in de database op basis van factuurnummer uit metadata.
+- Zorg voor realtime update in frontend (via WebSocket, polling of andere methode) zodat admins en studenten meteen zien dat de betaling is verwerkt.
+
+4. **Zoeken en Filteren:**
+- Zoekfunctie op studentnaam, leerlingnummer en factuurnummer.
+- Filters op schooljaar, factuurstatus (open, betaald, te laat), factuurtype en klas.
+- Sorteeropties op bedrag, datum en status.
+
+5. **Rapportages:**
+- Maak rapportages per klas, student, schooljaar en factuurtype.
+- Toon openstaande, betaalde en late betalingen.
+- Exporteer rapporten naar PDF of Excel.
+- Visualiseer data met grafieken en tabellen.
+
+6. **Factuur- en Betalingsbeheer:**
+- Beheer overzicht van alle facturen met zoek- en filtermogelijkheden.
+- Toon betaalstatus met kleurcodes/badges.
+- Verstuur herinneringen.
+- Download facturen als PDF.
+
+7. **Frontend UI:**
+- Gebruik een moderne frontend (React of Vue) met responsief design.
+- Overzichtspagina voor betalingen met filters en zoekfunctie.
+- Detailpagina per factuur met betaalstatus en mogelijkheid tot betaling.
+- Formulieren voor instellen collegegeld en kortingsregels.
+- Interface voor het maken en versturen van facturen naar studenten of klassen.
+- Rapportagedashboard met exportopties.
+
+8. **Technische stack & best practices:**
+- Backend in Node.js met Express.
+- Database kan SQLite of JSON zijn voor eenvoud.
+- Veilige verwerking van Mollie webhooks met authenticatie.
+- Schaalbaar en onderhoudbaar ontwerp.
+- Duidelijke commentaren in code.
+
+Schrijf het systeem zo dat het makkelijk uitbreidbaar is voor nieuwe soorten facturen en kortingsregels.
+
+---
+
+Wil je dat ik hierbij ook voorbeeldcode genereer voor backend webhook verwerking, factuurnummer generatie, of frontend componenten?

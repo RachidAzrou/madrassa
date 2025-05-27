@@ -994,182 +994,254 @@ export default function Fees() {
       </Tabs>
 
       {/* Nieuwe Betaling Dialog */}
-      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-        <DialogContent className="sm:max-w-[700px] p-0 max-h-[90vh] overflow-y-auto">
-          <VisuallyHidden>
-            <DialogTitle>Nieuwe Betaling</DialogTitle>
-            <DialogDescription>Voeg een nieuwe betaling toe aan het systeem</DialogDescription>
-          </VisuallyHidden>
-          
-          <div className="bg-[#1e40af] text-white p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full text-[#f5f6f7] bg-[#ffffff33]">
-                <CreditCard className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold m-0">Nieuwe Betaling</h2>
-                <p className="text-white/70 text-sm m-0">Voeg een nieuwe betaling toe aan het systeem</p>
-              </div>
-            </div>
-          </div>
-          
-          <Form {...paymentForm}>
-            <form onSubmit={paymentForm.handleSubmit(handleCreatePayment)} className="px-6 py-4 space-y-4" style={{ maxHeight: 'calc(90vh - 150px)', overflowY: 'auto' }}>
-                
-                {/* Payment Mode Selection */}
+      <CustomDialog 
+        open={showPaymentDialog} 
+        onOpenChange={setShowPaymentDialog}
+        className="max-w-4xl"
+      >
+        <DialogHeaderWithIcon 
+          icon={<CreditCard className="h-5 w-5" />}
+          title="Nieuwe Betaling Aanmaken"
+          description="Maak een nieuwe betaling aan voor een of meerdere studenten"
+        />
+        
+        <Form {...paymentForm}>
+          <form onSubmit={paymentForm.handleSubmit(handleCreatePayment)} className="flex-1 overflow-hidden">
+            <div className="px-6 py-6 space-y-6" style={{ maxHeight: 'calc(90vh - 150px)', overflowY: 'auto' }}>
+              
+              {/* Step 1: Payment Mode Selection */}
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h3 className="text-sm font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                  <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
+                  Selecteer Betalingsmodus
+                </h3>
                 <FormField
                   control={paymentForm.control}
                   name="paymentMode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Betalingsmodus</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer betalingsmodus" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="single">Enkele Student</SelectItem>
-                          <SelectItem value="multiple">Meerdere Studenten</SelectItem>
-                          <SelectItem value="bulk">Hele Klas</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <div className="grid grid-cols-3 gap-3">
+                          {[
+                            { value: 'single', label: 'Enkele Student', desc: 'Voor één student', icon: '👤' },
+                            { value: 'multiple', label: 'Meerdere Studenten', desc: 'Selecteer handmatig', icon: '👥' },
+                            { value: 'bulk', label: 'Hele Klas', desc: 'Alle studenten in klas', icon: '🏫' }
+                          ].map((option) => (
+                            <div
+                              key={option.value}
+                              className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                field.value === option.value 
+                                  ? 'border-blue-500 bg-blue-50 shadow-md' 
+                                  : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                              }`}
+                              onClick={() => field.onChange(option.value)}
+                            >
+                              <div className="text-center">
+                                <div className="text-2xl mb-2">{option.icon}</div>
+                                <div className="font-medium text-sm">{option.label}</div>
+                                <div className="text-xs text-gray-500 mt-1">{option.desc}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              </div>
 
-                {/* Payment Type Selection */}
+              {/* Step 2: Payment Type Selection */}
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <h3 className="text-sm font-semibold text-green-900 mb-3 flex items-center gap-2">
+                  <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
+                  Kies Betalingstype
+                </h3>
                 <FormField
                   control={paymentForm.control}
                   name="type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Betalingstype</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer type betaling" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
+                      <FormControl>
+                        <div className="grid grid-cols-2 gap-3">
                           {paymentTypes.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.label} ({type.prefix})
-                            </SelectItem>
+                            <div
+                              key={type.value}
+                              className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                field.value === type.value 
+                                  ? 'border-green-500 bg-green-50 shadow-md' 
+                                  : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                              }`}
+                              onClick={() => field.onChange(type.value)}
+                            >
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <div className="font-medium text-sm">{type.label}</div>
+                                  <div className="text-xs text-gray-500">{type.prefix}</div>
+                                </div>
+                                <div className="text-sm font-bold text-green-600">€{type.amount}</div>
+                              </div>
+                            </div>
                           ))}
-                        </SelectContent>
-                      </Select>
+                        </div>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              </div>
 
-                {/* Conditional Student/Class Selection */}
-                {paymentMode === 'bulk' ? (
-                  <FormField
-                    control={paymentForm.control}
-                    name="classId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Klas</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+              {/* Step 3: Student/Class Selection */}
+              {paymentMode && (
+                <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                  <h3 className="text-sm font-semibold text-purple-900 mb-3 flex items-center gap-2">
+                    <div className="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
+                    {paymentMode === 'bulk' ? 'Selecteer Klas' : 'Selecteer Student(en)'}
+                  </h3>
+                  
+                  {paymentMode === 'bulk' ? (
+                    <FormField
+                      control={paymentForm.control}
+                      name="classId"
+                      render={({ field }) => (
+                        <FormItem>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecteer klas" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="klas-1">Arabisch Beginners (2024-2025)</SelectItem>
-                            <SelectItem value="klas-2">Quran Memorisatie (2024-2025)</SelectItem>
-                            <SelectItem value="klas-3">Islamitische Studies (2024-2025)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                ) : (
-                  <FormField
-                    control={paymentForm.control}
-                    name="studentIds"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          {paymentMode === 'single' ? 'Student' : 'Studenten'}
-                        </FormLabel>
-                        {paymentMode === 'single' ? (
-                          <Select 
-                            onValueChange={(value) => field.onChange([value])} 
-                            defaultValue={field.value?.[0]}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecteer student" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="STU-001">Ahmed Hassan (STU-001)</SelectItem>
-                              <SelectItem value="STU-002">Fatima Al-Zahra (STU-002)</SelectItem>
-                              <SelectItem value="STU-003">Omar Ibn Khattab (STU-003)</SelectItem>
-                              <SelectItem value="STU-004">Yusuf Ibrahim (STU-004)</SelectItem>
-                              <SelectItem value="STU-005">Aisha Mohammed (STU-005)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <div className="space-y-2">
-                            <div className="text-sm text-muted-foreground">
-                              Selecteer meerdere studenten voor deze betaling
-                            </div>
-                            <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto border rounded p-2">
+                            <div className="grid grid-cols-1 gap-3">
                               {[
-                                { id: 'STU-001', name: 'Ahmed Hassan' },
-                                { id: 'STU-002', name: 'Fatima Al-Zahra' },
-                                { id: 'STU-003', name: 'Omar Ibn Khattab' },
-                                { id: 'STU-004', name: 'Yusuf Ibrahim' },
-                                { id: 'STU-005', name: 'Aisha Mohammed' },
-                              ].map((student) => (
-                                <div key={student.id} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={student.id}
-                                    checked={field.value?.includes(student.id)}
-                                    onCheckedChange={(checked) => {
-                                      const currentValue = field.value || [];
-                                      if (checked) {
-                                        field.onChange([...currentValue, student.id]);
-                                      } else {
-                                        field.onChange(currentValue.filter(id => id !== student.id));
-                                      }
-                                    }}
-                                  />
-                                  <label htmlFor={student.id} className="text-sm">
-                                    {student.name} ({student.id})
-                                  </label>
+                                { value: 'klas-1', name: 'Arabisch Beginners', year: '2024-2025', students: 15 },
+                                { value: 'klas-2', name: 'Quran Memorisatie', year: '2024-2025', students: 12 },
+                                { value: 'klas-3', name: 'Islamitische Studies', year: '2024-2025', students: 18 }
+                              ].map((klas) => (
+                                <div
+                                  key={klas.value}
+                                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                    field.value === klas.value 
+                                      ? 'border-purple-500 bg-purple-50 shadow-md' 
+                                      : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                                  }`}
+                                  onClick={() => field.onChange(klas.value)}
+                                >
+                                  <div className="flex justify-between items-center">
+                                    <div>
+                                      <div className="font-medium text-sm">{klas.name}</div>
+                                      <div className="text-xs text-gray-500">{klas.year}</div>
+                                    </div>
+                                    <div className="text-sm font-bold text-purple-600">{klas.students} studenten</div>
+                                  </div>
                                 </div>
                               ))}
                             </div>
-                          </div>
-                        )}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ) : (
+                    <FormField
+                      control={paymentForm.control}
+                      name="studentIds"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            {paymentMode === 'single' ? (
+                              <div className="grid grid-cols-1 gap-2">
+                                {[
+                                  { id: 'STU-001', name: 'Ahmed Hassan', klas: 'Arabisch Beginners' },
+                                  { id: 'STU-002', name: 'Fatima Al-Zahra', klas: 'Quran Memorisatie' },
+                                  { id: 'STU-003', name: 'Omar Ibn Khattab', klas: 'Islamitische Studies' },
+                                  { id: 'STU-004', name: 'Yusuf Ibrahim', klas: 'Arabisch Beginners' },
+                                  { id: 'STU-005', name: 'Aisha Mohammed', klas: 'Quran Memorisatie' }
+                                ].map((student) => (
+                                  <div
+                                    key={student.id}
+                                    className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                                      field.value?.includes(student.id) 
+                                        ? 'border-purple-500 bg-purple-50 shadow-md' 
+                                        : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                                    }`}
+                                    onClick={() => field.onChange([student.id])}
+                                  >
+                                    <div className="flex justify-between items-center">
+                                      <div>
+                                        <div className="font-medium text-sm">{student.name}</div>
+                                        <div className="text-xs text-gray-500">{student.klas}</div>
+                                      </div>
+                                      <div className="text-xs text-purple-600 font-mono">{student.id}</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
+                                  💡 Tip: Selecteer meerdere studenten door op de checkboxes te klikken
+                                </div>
+                                <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
+                                  {[
+                                    { id: 'STU-001', name: 'Ahmed Hassan', klas: 'Arabisch Beginners' },
+                                    { id: 'STU-002', name: 'Fatima Al-Zahra', klas: 'Quran Memorisatie' },
+                                    { id: 'STU-003', name: 'Omar Ibn Khattab', klas: 'Islamitische Studies' },
+                                    { id: 'STU-004', name: 'Yusuf Ibrahim', klas: 'Arabisch Beginners' },
+                                    { id: 'STU-005', name: 'Aisha Mohammed', klas: 'Quran Memorisatie' }
+                                  ].map((student) => (
+                                    <div key={student.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                                      <Checkbox
+                                        id={student.id}
+                                        checked={field.value?.includes(student.id)}
+                                        onCheckedChange={(checked) => {
+                                          const currentValue = field.value || [];
+                                          if (checked) {
+                                            field.onChange([...currentValue, student.id]);
+                                          } else {
+                                            field.onChange(currentValue.filter(id => id !== student.id));
+                                          }
+                                        }}
+                                        className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+                                      />
+                                      <label htmlFor={student.id} className="flex-1 cursor-pointer">
+                                        <div className="font-medium text-sm">{student.name}</div>
+                                        <div className="text-xs text-gray-500">{student.klas} • {student.id}</div>
+                                      </label>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </div>
+              )}
 
+              {/* Step 4: Payment Details */}
+              <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                <h3 className="text-sm font-semibold text-orange-900 mb-3 flex items-center gap-2">
+                  <div className="w-6 h-6 bg-orange-600 text-white rounded-full flex items-center justify-center text-xs font-bold">4</div>
+                  Betalingsdetails
+                </h3>
+                
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={paymentForm.control}
-                    name="amount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Bedrag (€)</FormLabel>
-                        <FormControl>
-                          <Input type="number" step="0.01" placeholder="0.00" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bedrag (€)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01" 
+                          placeholder="0.00" 
+                          {...field}
+                          className="bg-white border-orange-300 focus:border-orange-500"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                   />
 
                   <FormField
@@ -1179,7 +1251,11 @@ export default function Fees() {
                       <FormItem>
                         <FormLabel>Vervaldatum</FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} />
+                          <Input 
+                            type="date" 
+                            {...field}
+                            className="bg-white border-orange-300 focus:border-orange-500"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -1194,65 +1270,92 @@ export default function Fees() {
                     <FormItem>
                       <FormLabel>Beschrijving</FormLabel>
                       <FormControl>
-                        <Input placeholder="Beschrijving van de betaling" {...field} />
+                        <Input 
+                          placeholder="Beschrijving van de betaling" 
+                          {...field}
+                          className="bg-white border-orange-300 focus:border-orange-500"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              </div>
 
-                {/* Applicable Discounts Preview */}
-                {selectedStudentIds.length > 0 && (
-                  <div className="space-y-3">
-                    {selectedStudentIds.map(studentId => {
-                      const discounts = getApplicableDiscounts(studentId);
-                      if (discounts.length > 0) {
-                        return (
-                          <div key={studentId} className="bg-green-50 p-3 rounded border border-green-200">
-                            <div className="text-sm font-medium text-green-800 mb-2">
-                              Kortingen voor {studentId}:
-                            </div>
-                            <div className="space-y-1">
-                              {discounts.map(discount => (
-                                <div key={discount.name} className="text-sm text-green-700">
-                                  • {discount.name}: {discount.percentage}% korting
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    })}
-                  </div>
-                )}
-
-                {/* Payment Reference Preview */}
-                {selectedType && selectedStudentIds.length > 0 && (
-                  <div className="bg-gray-50 p-3 rounded border">
+              {/* Step 5: Preview & Summary */}
+              {selectedStudentIds.length > 0 && selectedType && (
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <div className="w-6 h-6 bg-gray-600 text-white rounded-full flex items-center justify-center text-xs font-bold">5</div>
+                    Overzicht & Bevestiging
+                  </h3>
+                  
+                  {/* Payment References */}
+                  <div className="bg-white p-4 rounded-lg border mb-4">
                     <div className="text-sm font-medium mb-2">Betalingskenmerk(en):</div>
                     <div className="space-y-1">
                       {selectedStudentIds.map(studentId => (
-                        <div key={studentId} className="text-sm text-blue-600 font-mono">
+                        <div key={studentId} className="text-sm text-blue-600 font-mono bg-blue-50 px-2 py-1 rounded">
                           {generatePaymentReference(selectedType, studentId)}
                         </div>
                       ))}
                     </div>
                   </div>
-                )}
 
-              <div className="bg-gray-50 px-6 py-3 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t">
-                <Button type="button" variant="outline" onClick={() => setShowPaymentDialog(false)} className="w-full sm:w-auto mt-2 sm:mt-0">
-                  Annuleren
-                </Button>
-                <Button type="submit" disabled={createPaymentMutation.isPending} className="bg-[#1e40af] hover:bg-[#1e40af]/90 w-full sm:w-auto">
-                  {createPaymentMutation.isPending ? 'Bezig...' : 'Betaling Aanmaken'}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+                  {/* Applicable Discounts */}
+                  {selectedStudentIds.some(id => getApplicableDiscounts(id).length > 0) && (
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                      <div className="text-sm font-medium text-green-800 mb-2">🎉 Beschikbare Kortingen:</div>
+                      {selectedStudentIds.map(studentId => {
+                        const discounts = getApplicableDiscounts(studentId);
+                        if (discounts.length > 0) {
+                          return (
+                            <div key={studentId} className="mb-2">
+                              <div className="text-sm font-medium text-green-700">{studentId}:</div>
+                              {discounts.map(discount => (
+                                <div key={discount.name} className="text-sm text-green-600 ml-4">
+                                  • {discount.name}: {discount.percentage}% korting
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        }
+                        return null;
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Footer with Actions */}
+            <DialogFooter className="border-t bg-gray-50 px-6 py-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setShowPaymentDialog(false)} 
+                className="w-full sm:w-auto"
+              >
+                Annuleren
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={createPaymentMutation.isPending} 
+                className="bg-[#1e40af] hover:bg-[#1e40af]/90 w-full sm:w-auto"
+              >
+                {createPaymentMutation.isPending ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Bezig...
+                  </div>
+                ) : (
+                  'Betaling Aanmaken'
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </CustomDialog>
 
       {/* Nieuw Tarief Dialog */}
       <Dialog open={showTuitionRateDialog} onOpenChange={setShowTuitionRateDialog}>

@@ -33,22 +33,195 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
+import { toast } from '@/hooks/use-toast';
 
 // Import custom components
 import { PremiumHeader } from '@/components/layout/premium-header';
-// import { SearchActionLayout } from '@/components/ui/search-action-layout';
 import { StandardTable } from '@/components/ui/standard-table';
 
+// Form schemas
+const paymentFormSchema = z.object({
+  studentId: z.string().min(1, "Student is verplicht"),
+  amount: z.string().min(1, "Bedrag is verplicht"),
+  description: z.string().min(1, "Beschrijving is verplicht"),
+  dueDate: z.string().min(1, "Vervaldatum is verplicht"),
+});
+
+const tuitionRateFormSchema = z.object({
+  type: z.string().min(1, "Type is verplicht"),
+  amount: z.string().min(1, "Bedrag is verplicht"),
+  academicYear: z.string().min(1, "Academisch jaar is verplicht"),
+  description: z.string().optional(),
+});
+
+const discountFormSchema = z.object({
+  name: z.string().min(1, "Naam is verplicht"),
+  type: z.enum(["percentage", "fixed"]),
+  value: z.string().min(1, "Waarde is verplicht"),
+  academicYear: z.string().min(1, "Academisch jaar is verplicht"),
+});
+
 export default function Fees() {
+  // State management
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showTuitionRateDialog, setShowTuitionRateDialog] = useState(false);
+  const [showDiscountDialog, setShowDiscountDialog] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Form instances
+  const paymentForm = useForm({
+    resolver: zodResolver(paymentFormSchema),
+    defaultValues: {
+      studentId: '',
+      amount: '',
+      description: '',
+      dueDate: '',
+    },
+  });
+
+  const tuitionRateForm = useForm({
+    resolver: zodResolver(tuitionRateFormSchema),
+    defaultValues: {
+      type: '',
+      amount: '',
+      academicYear: '',
+      description: '',
+    },
+  });
+
+  const discountForm = useForm({
+    resolver: zodResolver(discountFormSchema),
+    defaultValues: {
+      name: '',
+      type: 'percentage' as const,
+      value: '',
+      academicYear: '',
+    },
+  });
+
+  // Query client for cache invalidation
+  const queryClient = useQueryClient();
+
+  // API queries
+  const { data: paymentsData, isLoading: paymentsLoading } = useQuery({
+    queryKey: ['/api/payments'],
+  });
+
+  const { data: studentsData } = useQuery({
+    queryKey: ['/api/students'],
+  });
+
+  const { data: statsData } = useQuery({
+    queryKey: ['/api/fees/stats'],
+  });
+
+  // Mutations
+  const createPaymentMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch('/api/payments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Failed to create payment');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/payments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/fees/stats'] });
+      toast({ title: "Betaling aangemaakt", description: "De betaling is succesvol aangemaakt." });
+      setShowPaymentDialog(false);
+      paymentForm.reset();
+    },
+    onError: () => {
+      toast({ title: "Fout", description: "Er is een fout opgetreden bij het aanmaken van de betaling.", variant: "destructive" });
+    },
+  });
+
+  const createTuitionRateMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch('/api/tuition-rates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Failed to create tuition rate');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tuition-rates'] });
+      toast({ title: "Tarief toegevoegd", description: "Het nieuwe tarief is succesvol toegevoegd." });
+      setShowTuitionRateDialog(false);
+      tuitionRateForm.reset();
+    },
+    onError: () => {
+      toast({ title: "Fout", description: "Er is een fout opgetreden bij het toevoegen van het tarief.", variant: "destructive" });
+    },
+  });
+
+  const createDiscountMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch('/api/discounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Failed to create discount');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/discounts'] });
+      toast({ title: "Korting toegevoegd", description: "De nieuwe korting is succesvol toegevoegd." });
+      setShowDiscountDialog(false);
+      discountForm.reset();
+    },
+    onError: () => {
+      toast({ title: "Fout", description: "Er is een fout opgetreden bij het toevoegen van de korting.", variant: "destructive" });
+    },
+  });
+
+  // Form handlers
+  const handleCreatePayment = (data: any) => {
+    createPaymentMutation.mutate(data);
+  };
+
+  const handleCreateTuitionRate = (data: any) => {
+    createTuitionRateMutation.mutate(data);
+  };
+
+  const handleCreateDiscount = (data: any) => {
+    createDiscountMutation.mutate(data);
+  };
+
+  // Export handlers
+  const handleExportPDF = () => {
+    toast({ title: "Export gestart", description: "Het PDF rapport wordt gegenereerd..." });
+    // Implement PDF export logic
+  };
+
+  const handleExportExcel = () => {
+    toast({ title: "Export gestart", description: "Het Excel bestand wordt gegenereerd..." });
+    // Implement Excel export logic
+  };
+
+  const handleExportCSV = () => {
+    toast({ title: "Export gestart", description: "Het CSV bestand wordt gegenereerd..." });
+    // Implement CSV export logic
+  };
+
+  // Filter payments based on search
+  const filteredPayments = Array.isArray(paymentsData) ? paymentsData.filter((payment: any) =>
+    payment.studentName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    payment.invoiceNumber?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) : [];
   return (
     <div className="space-y-6 p-6">
       <PremiumHeader
         title="Betalingsbeheer"
         description="Beheer alle betalingen, facturen en tarieven van uw onderwijsinstelling"
         icon={Euro}
-        breadcrumbs="Financiën > Betalingen"
+        breadcrumbs={[{ label: "Financiën", href: "/fees" }]}
       />
 
       <Tabs defaultValue="overview" className="space-y-4">
@@ -67,7 +240,7 @@ export default function Fees() {
                 <Euro className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">€45,231.89</div>
+                <div className="text-2xl font-bold">€{statsData?.totalCollected?.toLocaleString() || '0,00'}</div>
                 <p className="text-xs text-muted-foreground">
                   +20.1% van vorige maand
                 </p>
@@ -80,9 +253,9 @@ export default function Fees() {
                 <Clock className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">€12,234.00</div>
+                <div className="text-2xl font-bold">€{statsData?.pendingAmount?.toLocaleString() || '0,00'}</div>
                 <p className="text-xs text-muted-foreground">
-                  142 openstaande facturen
+                  {statsData?.pendingInvoices || 0} openstaande facturen
                 </p>
               </CardContent>
             </Card>
@@ -93,7 +266,7 @@ export default function Fees() {
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">78.9%</div>
+                <div className="text-2xl font-bold">{statsData?.completionRate?.toFixed(1) || '0.0'}%</div>
                 <p className="text-xs text-muted-foreground">
                   +2.1% van vorige maand
                 </p>
@@ -106,7 +279,7 @@ export default function Fees() {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">573</div>
+                <div className="text-2xl font-bold">{statsData?.totalStudents || 0}</div>
                 <p className="text-xs text-muted-foreground">
                   +12 nieuwe inschrijvingen
                 </p>
@@ -119,9 +292,14 @@ export default function Fees() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Search className="h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Zoek betalingen..." className="w-[300px]" />
+              <Input 
+                placeholder="Zoek betalingen..." 
+                className="w-[300px]"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            <Button>
+            <Button onClick={() => setShowPaymentDialog(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Nieuwe Betaling
             </Button>
@@ -139,23 +317,54 @@ export default function Fees() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="text-xs">
-                  <div className="font-medium">Ahmed Hassan</div>
-                  <div className="text-muted-foreground">2024-STU-001</div>
-                </TableCell>
-                <TableCell className="text-xs">INV-2024-001</TableCell>
-                <TableCell className="text-xs">€450.00</TableCell>
-                <TableCell className="text-xs">
-                  <Badge variant="default" className="bg-green-100 text-green-800">Betaald</Badge>
-                </TableCell>
-                <TableCell className="text-xs">15-12-2024</TableCell>
-                <TableCell className="text-xs">
-                  <div className="opacity-0 group-hover:opacity-100 flex gap-2">
-                    <Button variant="ghost" size="sm">Bekijken</Button>
-                  </div>
-                </TableCell>
-              </TableRow>
+              {paymentsLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8">
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      <span>Betalingen laden...</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : filteredPayments.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    Geen betalingen gevonden
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredPayments.map((payment: any) => (
+                  <TableRow key={payment.id} className="group">
+                    <TableCell className="text-xs">
+                      <div className="font-medium">{payment.studentName || 'Onbekend'}</div>
+                      <div className="text-muted-foreground">{payment.studentId || '-'}</div>
+                    </TableCell>
+                    <TableCell className="text-xs">{payment.invoiceNumber || '-'}</TableCell>
+                    <TableCell className="text-xs">€{payment.amount || '0,00'}</TableCell>
+                    <TableCell className="text-xs">
+                      <Badge 
+                        variant={payment.status === 'paid' ? 'default' : payment.status === 'pending' ? 'secondary' : 'destructive'}
+                        className={
+                          payment.status === 'paid' ? 'bg-green-100 text-green-800' :
+                          payment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }
+                      >
+                        {payment.status === 'paid' ? 'Betaald' : 
+                         payment.status === 'pending' ? 'In behandeling' : 
+                         'Gefaald'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs">{payment.date || '-'}</TableCell>
+                    <TableCell className="text-xs">
+                      <div className="opacity-0 group-hover:opacity-100 flex gap-2">
+                        <Button variant="ghost" size="sm">Bekijken</Button>
+                        <Button variant="ghost" size="sm">Bewerken</Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </StandardTable>
         </TabsContent>
@@ -173,7 +382,7 @@ export default function Fees() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Button className="w-full">
+                <Button className="w-full" onClick={() => setShowTuitionRateDialog(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Nieuw Tarief Toevoegen
                 </Button>
@@ -191,7 +400,7 @@ export default function Fees() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Button className="w-full">
+                <Button className="w-full" onClick={() => setShowDiscountDialog(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Nieuwe Korting Toevoegen
                 </Button>
@@ -207,7 +416,7 @@ export default function Fees() {
                 <CardTitle className="text-sm">Betalingsrapport</CardTitle>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={handleExportPDF}>
                   <Download className="h-4 w-4 mr-2" />
                   Export PDF
                 </Button>
@@ -219,7 +428,7 @@ export default function Fees() {
                 <CardTitle className="text-sm">Openstaande Posten</CardTitle>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={handleExportExcel}>
                   <Download className="h-4 w-4 mr-2" />
                   Export Excel
                 </Button>
@@ -231,7 +440,7 @@ export default function Fees() {
                 <CardTitle className="text-sm">Financieel Overzicht</CardTitle>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" onClick={handleExportCSV}>
                   <Download className="h-4 w-4 mr-2" />
                   Export CSV
                 </Button>
@@ -240,6 +449,288 @@ export default function Fees() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Nieuwe Betaling Dialog */}
+      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+        <DialogContent className="sm:max-w-[600px] p-0">
+          <div className="bg-blue-600 text-white p-6 rounded-t-lg">
+            <div className="flex items-center gap-3">
+              <CreditCard className="h-5 w-5" />
+              <div>
+                <h2 className="text-lg font-semibold">Nieuwe Betaling</h2>
+                <p className="text-blue-100 text-sm">Voeg een nieuwe betaling toe aan het systeem</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <Form {...paymentForm}>
+              <form onSubmit={paymentForm.handleSubmit(handleCreatePayment)} className="space-y-4">
+                <FormField
+                  control={paymentForm.control}
+                  name="studentId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Student</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer student" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="STU-001">Ahmed Hassan (STU-001)</SelectItem>
+                          <SelectItem value="STU-002">Fatima Al-Zahra (STU-002)</SelectItem>
+                          <SelectItem value="STU-003">Omar Ibn Khattab (STU-003)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={paymentForm.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bedrag (€)</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={paymentForm.control}
+                    name="dueDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vervaldatum</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={paymentForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Beschrijving</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Beschrijving van de betaling" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-end gap-3 pt-6 border-t">
+                  <Button type="button" variant="outline" onClick={() => setShowPaymentDialog(false)}>
+                    Annuleren
+                  </Button>
+                  <Button type="submit" disabled={createPaymentMutation.isPending}>
+                    {createPaymentMutation.isPending ? 'Bezig...' : 'Betaling Aanmaken'}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Nieuw Tarief Dialog */}
+      <Dialog open={showTuitionRateDialog} onOpenChange={setShowTuitionRateDialog}>
+        <DialogContent className="sm:max-w-[600px] p-0">
+          <div className="bg-green-600 text-white p-6 rounded-t-lg">
+            <div className="flex items-center gap-3">
+              <Euro className="h-5 w-5" />
+              <div>
+                <h2 className="text-lg font-semibold">Nieuw Tarief</h2>
+                <p className="text-green-100 text-sm">Voeg een nieuw tarief toe aan het systeem</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <Form {...tuitionRateForm}>
+              <form onSubmit={tuitionRateForm.handleSubmit(handleCreateTuitionRate)} className="space-y-4">
+                <FormField
+                  control={tuitionRateForm.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Collegegeld, Inschrijving, etc." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={tuitionRateForm.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bedrag (€)</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={tuitionRateForm.control}
+                    name="academicYear"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Academisch Jaar</FormLabel>
+                        <FormControl>
+                          <Input placeholder="2024-2025" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={tuitionRateForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Beschrijving (optioneel)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Beschrijving van het tarief" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-end gap-3 pt-6 border-t">
+                  <Button type="button" variant="outline" onClick={() => setShowTuitionRateDialog(false)}>
+                    Annuleren
+                  </Button>
+                  <Button type="submit" disabled={createTuitionRateMutation.isPending}>
+                    {createTuitionRateMutation.isPending ? 'Bezig...' : 'Tarief Toevoegen'}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Nieuwe Korting Dialog */}
+      <Dialog open={showDiscountDialog} onOpenChange={setShowDiscountDialog}>
+        <DialogContent className="sm:max-w-[600px] p-0">
+          <div className="bg-purple-600 text-white p-6 rounded-t-lg">
+            <div className="flex items-center gap-3">
+              <Percent className="h-5 w-5" />
+              <div>
+                <h2 className="text-lg font-semibold">Nieuwe Korting</h2>
+                <p className="text-purple-100 text-sm">Voeg een nieuwe korting toe aan het systeem</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <Form {...discountForm}>
+              <form onSubmit={discountForm.handleSubmit(handleCreateDiscount)} className="space-y-4">
+                <FormField
+                  control={discountForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Naam</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Naam van de korting" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={discountForm.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="percentage">Percentage</SelectItem>
+                            <SelectItem value="fixed">Vast bedrag</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={discountForm.control}
+                    name="value"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Waarde</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={discountForm.control}
+                  name="academicYear"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Academisch Jaar</FormLabel>
+                      <FormControl>
+                        <Input placeholder="2024-2025" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-end gap-3 pt-6 border-t">
+                  <Button type="button" variant="outline" onClick={() => setShowDiscountDialog(false)}>
+                    Annuleren
+                  </Button>
+                  <Button type="submit" disabled={createDiscountMutation.isPending}>
+                    {createDiscountMutation.isPending ? 'Bezig...' : 'Korting Toevoegen'}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }

@@ -418,37 +418,49 @@ export default function Attendance() {
         icon={CalendarCheck}
         description="Registreer en beheer aanwezigheid van studenten, bekijk absentiegeschiedenis en identificeer trends"
       />
-      {/* Search and Action Layout */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      {/* Modern Control Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
         {/* Date Navigation */}
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => handleDateChange(-1)}
-            className="h-8 w-8 p-0"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          
-          <div className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-center min-w-[140px]">
-            <span className="text-sm font-medium text-gray-900">{formatDate(selectedDate)}</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => handleDateChange(-1)}
+              className="h-9 w-9 p-0 hover:bg-gray-50"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            
+            <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-md text-center min-w-[160px]">
+              <span className="text-sm font-semibold text-gray-900">{formatDate(selectedDate)}</span>
+            </div>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => handleDateChange(1)}
+              className="h-9 w-9 p-0 hover:bg-gray-50"
+            >
+              <ArrowRight className="h-4 w-4" />
+            </Button>
           </div>
           
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={() => handleDateChange(1)}
-            className="h-8 w-8 p-0"
+            onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+            className="text-blue-600 border-blue-600 hover:bg-blue-50"
           >
-            <ArrowRight className="h-4 w-4" />
+            <CalendarCheck className="h-4 w-4 mr-2" />
+            Vandaag
           </Button>
         </div>
 
         {/* Filters */}
         <div className="flex items-center gap-3">
           <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
-            <SelectTrigger className="w-[120px] h-8">
+            <SelectTrigger className="w-[140px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -469,7 +481,7 @@ export default function Attendance() {
 
           {selectedType === 'vak' ? (
             <Select value={selectedCourse} onValueChange={handleCourseChange}>
-              <SelectTrigger className="w-[200px] h-8">
+              <SelectTrigger className="w-[240px]">
                 <SelectValue placeholder="Selecteer vak" />
               </SelectTrigger>
               <SelectContent>
@@ -493,7 +505,7 @@ export default function Attendance() {
             </Select>
           ) : (
             <Select value={selectedClass} onValueChange={handleClassChange}>
-              <SelectTrigger className="w-[200px] h-8">
+              <SelectTrigger className="w-[240px]">
                 <SelectValue placeholder="Selecteer klas" />
               </SelectTrigger>
               <SelectContent>
@@ -516,15 +528,6 @@ export default function Attendance() {
               </SelectContent>
             </Select>
           )}
-
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-            className="h-8 text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
-          >
-            Vandaag
-          </Button>
         </div>
       </div>
 

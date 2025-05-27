@@ -479,10 +479,16 @@ export default function Fees() {
 
           {/* Bestaande Tarieven Tabel */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Euro className="h-5 w-5" />
-              Bestaande Tarieven
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Euro className="h-5 w-5" />
+                Bestaande Tarieven
+              </h3>
+              <Button onClick={() => setShowTuitionRateDialog(true)} className="bg-[#1e40af] hover:bg-[#1e40af]/90">
+                <Plus className="h-4 w-4 mr-2" />
+                Nieuw Tarief
+              </Button>
+            </div>
             <StandardTable>
               <TableHeader>
                 <TableRow>
@@ -542,10 +548,16 @@ export default function Fees() {
 
           {/* Bestaande Kortingen Tabel */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Percent className="h-5 w-5" />
-              Bestaande Kortingen
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Percent className="h-5 w-5" />
+                Bestaande Kortingen
+              </h3>
+              <Button onClick={() => setShowDiscountDialog(true)} className="bg-[#1e40af] hover:bg-[#1e40af]/90">
+                <Plus className="h-4 w-4 mr-2" />
+                Nieuwe Korting
+              </Button>
+            </div>
             <StandardTable>
               <TableHeader>
                 <TableRow>

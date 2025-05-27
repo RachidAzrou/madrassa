@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { 
   Bell, 
@@ -50,16 +50,43 @@ interface TopbarProps {
 export function Topbar({ onMenuClick }: TopbarProps = {}) {
   const isMobile = useMobile();
   const [, setLocation] = useLocation();
+  const [readMessages, setReadMessages] = useState<Set<number>>(new Set());
   
   // Haal de notificaties op
   const { data: notificationsData } = useQuery({
     queryKey: ['/api/notifications/user/1'],
   });
 
+  // Hardcoded berichten voor demo (later vervangen door echte API data)
+  const allMessages = [
+    {
+      id: 1,
+      sender: "Karim Salhi",
+      initials: "KS",
+      time: "Vandaag, 10:42",
+      preview: "Vraag over het huiswerk voor morgen, kunnen we bespreken?",
+      bgColor: "bg-amber-100",
+      textColor: "text-amber-800"
+    },
+    {
+      id: 2,
+      sender: "Fatima El Amrani", 
+      initials: "FE",
+      time: "Gisteren, 15:20",
+      preview: "Goed nieuws! Het project is goedgekeurd. Laten we volgende week een vergadering plannen.",
+      bgColor: "bg-green-100",
+      textColor: "text-green-800"
+    }
+  ];
+
+  // Filter uit gelezen berichten
+  const unreadMessages = allMessages.filter(msg => !readMessages.has(msg.id));
+
   const handleMessageClick = (messageId: number) => {
+    // Markeer bericht als gelezen
+    setReadMessages(prev => new Set([...prev, messageId]));
     // Navigeer naar de berichtenpagina met het specifieke bericht
     setLocation(`/messages?messageId=${messageId}`);
-    // Het bericht wordt automatisch als gelezen gemarkeerd en verdwijnt uit de popup
   };
 
   // Gebruiker informatie (hardcoded voor nu)
@@ -147,40 +174,34 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
               </div>
             </div>
             <div className="max-h-72 overflow-y-auto">
-              <div 
-                className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
-                onClick={() => handleMessageClick(1)}
-              >
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-8 w-8 mt-1">
-                    <AvatarFallback className="bg-amber-100 text-amber-800">KS</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium text-sm">Karim Salhi</p>
-                      <span className="text-xs text-gray-500">Vandaag, 10:42</span>
-                    </div>
-                    <p className="text-xs text-gray-600 line-clamp-2">Vraag over het huiswerk voor morgen, kunnen we bespreken?</p>
-                  </div>
+              {unreadMessages.length === 0 ? (
+                <div className="py-6 text-center">
+                  <p className="text-sm text-gray-500">Geen nieuwe berichten</p>
                 </div>
-              </div>
-              <div 
-                className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
-                onClick={() => handleMessageClick(2)}
-              >
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-8 w-8 mt-1">
-                    <AvatarFallback className="bg-green-100 text-green-800">FE</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium text-sm">Fatima El Amrani</p>
-                      <span className="text-xs text-gray-500">Gisteren, 15:20</span>
+              ) : (
+                unreadMessages.map((message) => (
+                  <div 
+                    key={message.id}
+                    className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
+                    onClick={() => handleMessageClick(message.id)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <Avatar className="h-8 w-8 mt-1">
+                        <AvatarFallback className={`${message.bgColor} ${message.textColor}`}>
+                          {message.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium text-sm">{message.sender}</p>
+                          <span className="text-xs text-gray-500">{message.time}</span>
+                        </div>
+                        <p className="text-xs text-gray-600 line-clamp-2">{message.preview}</p>
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-600 line-clamp-2">Goed nieuws! Het project is goedgekeurd. Laten we volgende week een vergadering plannen.</p>
                   </div>
-                </div>
-              </div>
+                ))
+              )}
             </div>
             <div className="p-3 border-t border-gray-200 bg-gray-50">
               <Button 

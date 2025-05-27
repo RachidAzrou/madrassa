@@ -280,6 +280,21 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   isActive={location.startsWith("/reports")}
                   onClick={handleLinkClick}
                 />
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Financiën
+              </p>
+              <div className="space-y-1.5">
+                <SidebarLink
+                  href="/payments"
+                  icon={<CreditCard className="h-4 w-4" />}
+                  label="Betalingen"
+                  isActive={location.startsWith("/payments")}
+                  onClick={handleLinkClick}
+                />
                 <SidebarLink
                   href="/fees"
                   icon={<Coins className="h-4 w-4" />}

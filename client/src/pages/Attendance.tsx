@@ -418,125 +418,147 @@ export default function Attendance() {
         icon={CalendarCheck}
         description="Registreer en beheer aanwezigheid van studenten, bekijk absentiegeschiedenis en identificeer trends"
       />
-      {/* Sleek Control Bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
-        {/* Date Navigation */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden shadow-sm">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => handleDateChange(-1)}
-              className="h-10 w-10 p-0 rounded-none border-r border-gray-200 hover:bg-gray-50"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            
-            <div className="px-4 py-2.5 bg-white text-center min-w-[180px] border-r border-gray-200">
-              <span className="text-sm font-medium text-gray-900">{formatDate(selectedDate)}</span>
+      {/* Ultra Modern Controls */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+        {/* Date Selector Card */}
+        <div className="xl:col-span-2 bg-gradient-to-br from-slate-50 to-blue-50/50 border border-slate-200/70 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <CalendarCheck className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-800">Datum selectie</h3>
+                <p className="text-sm text-slate-500">Kies de gewenste dag</p>
+              </div>
             </div>
-            
             <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => handleDateChange(1)}
-              className="h-10 w-10 p-0 rounded-none hover:bg-gray-50"
+              onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-xl px-4 py-2"
             >
-              <ArrowRight className="h-4 w-4" />
+              <CalendarCheck className="h-4 w-4 mr-2" />
+              Vandaag
             </Button>
           </div>
           
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-            className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 shadow-sm font-medium"
-          >
-            <CalendarCheck className="h-4 w-4 mr-2" />
-            Vandaag
-          </Button>
+          <div className="flex items-center justify-center">
+            <div className="flex items-center bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+              <Button 
+                variant="ghost" 
+                onClick={() => handleDateChange(-1)}
+                className="h-14 w-14 p-0 rounded-none hover:bg-slate-100 transition-all duration-200"
+              >
+                <ArrowLeft className="h-5 w-5 text-slate-600" />
+              </Button>
+              
+              <div className="px-8 py-4 bg-white text-center min-w-[220px] border-x border-slate-200">
+                <div className="text-lg font-bold text-slate-800">{formatDate(selectedDate)}</div>
+                <div className="text-xs text-slate-500 mt-1">Geselecteerde datum</div>
+              </div>
+              
+              <Button 
+                variant="ghost" 
+                onClick={() => handleDateChange(1)}
+                className="h-14 w-14 p-0 rounded-none hover:bg-slate-100 transition-all duration-200"
+              >
+                <ArrowRight className="h-5 w-5 text-slate-600" />
+              </Button>
+            </div>
+          </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex items-center gap-3">
-          <div className="text-sm font-medium text-gray-600">Filter:</div>
+        {/* Filter Card */}
+        <div className="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-200/70 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+              <Filter className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-800">Filters</h3>
+              <p className="text-sm text-slate-500">Selecteer vak of klas</p>
+            </div>
+          </div>
           
-          <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
-            <SelectTrigger className="w-[120px] bg-white border-gray-300 shadow-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="vak">
-                <div className="flex items-center">
-                  <GraduationCap className="h-4 w-4 mr-2 text-blue-600" />
-                  Vak
-                </div>
-              </SelectItem>
-              <SelectItem value="klas">
-                <div className="flex items-center">
-                  <Users className="h-4 w-4 mr-2 text-blue-600" />
-                  Klas
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="space-y-4">
+            <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
+              <SelectTrigger className="w-full bg-white/80 backdrop-blur-sm border-emerald-200 rounded-xl h-12 shadow-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="vak">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                    <GraduationCap className="h-4 w-4 mr-2" />
+                    Vak
+                  </div>
+                </SelectItem>
+                <SelectItem value="klas">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 bg-emerald-500 rounded-full mr-3"></div>
+                    <Users className="h-4 w-4 mr-2" />
+                    Klas
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
 
-          {selectedType === 'vak' ? (
-            <Select value={selectedCourse} onValueChange={handleCourseChange}>
-              <SelectTrigger className="w-[280px] bg-white border-gray-300 shadow-sm">
-                <SelectValue placeholder="Selecteer een vak" />
-              </SelectTrigger>
-              <SelectContent>
-                {isLoadingCourses ? (
-                  <SelectItem value="loading" disabled>
-                    <div className="flex items-center">
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600" />
-                      Vakken laden...
-                    </div>
-                  </SelectItem>
-                ) : coursesData && Array.isArray(coursesData) ? (
-                  coursesData.map((course: Program) => (
-                    <SelectItem key={course.id} value={course.id.toString()}>
+            {selectedType === 'vak' ? (
+              <Select value={selectedCourse} onValueChange={handleCourseChange}>
+                <SelectTrigger className="w-full bg-white/80 backdrop-blur-sm border-blue-200 rounded-xl h-12 shadow-sm">
+                  <SelectValue placeholder="Kies een vak" />
+                </SelectTrigger>
+                <SelectContent>
+                  {isLoadingCourses ? (
+                    <SelectItem value="loading" disabled>
                       <div className="flex items-center">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                        <span className="font-medium">{course.code}</span> 
-                        <span className="ml-2 text-gray-500">- {course.name}</span>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600" />
+                        Vakken laden...
                       </div>
                     </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="none" disabled>Geen vakken gevonden</SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-          ) : (
-            <Select value={selectedClass} onValueChange={handleClassChange}>
-              <SelectTrigger className="w-[280px] bg-white border-gray-300 shadow-sm">
-                <SelectValue placeholder="Selecteer een klas" />
-              </SelectTrigger>
-              <SelectContent>
-                {isLoadingClasses ? (
-                  <SelectItem value="loading" disabled>
-                    <div className="flex items-center">
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600" />
-                      Klassen laden...
-                    </div>
-                  </SelectItem>
-                ) : classesData && Array.isArray(classesData) ? (
-                  classesData.map((classroom: StudentGroup) => (
-                    <SelectItem key={classroom.id} value={classroom.id.toString()}>
+                  ) : coursesData && Array.isArray(coursesData) ? (
+                    coursesData.map((course: Program) => (
+                      <SelectItem key={course.id} value={course.id.toString()}>
+                        <div className="flex items-center">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                          <span className="font-medium">{course.code}</span> 
+                          <span className="ml-2 text-slate-500">- {course.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>Geen vakken gevonden</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Select value={selectedClass} onValueChange={handleClassChange}>
+                <SelectTrigger className="w-full bg-white/80 backdrop-blur-sm border-emerald-200 rounded-xl h-12 shadow-sm">
+                  <SelectValue placeholder="Kies een klas" />
+                </SelectTrigger>
+                <SelectContent>
+                  {isLoadingClasses ? (
+                    <SelectItem value="loading" disabled>
                       <div className="flex items-center">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                        <span className="font-medium">{classroom.name}</span>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin text-emerald-600" />
+                        Klassen laden...
                       </div>
                     </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="none" disabled>Geen klassen gevonden</SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-          )}
+                  ) : classesData && Array.isArray(classesData) ? (
+                    classesData.map((classroom: StudentGroup) => (
+                      <SelectItem key={classroom.id} value={classroom.id.toString()}>
+                        <div className="flex items-center">
+                          <div className="w-2 h-2 bg-emerald-500 rounded-full mr-3"></div>
+                          <span className="font-medium">{classroom.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>Geen klassen gevonden</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
         </div>
       </div>
 

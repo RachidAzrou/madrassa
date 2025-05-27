@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PremiumHeader } from "@/components/layout/premium-header";
 import { StandardTable } from "@/components/ui/standard-table";
+import { SearchActionLayout } from "@/components/ui/search-action-layout";
 import { CustomDialog } from "@/components/ui/custom-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Building, Plus, Users, MapPin, Phone, Mail, Globe, Edit, Trash2, UserPlus } from "lucide-react";
@@ -480,52 +481,46 @@ export default function Scholen() {
 
       {/* Schools Tab */}
       {activeTab === "schools" && (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Building className="h-5 w-5" />
-              Scholen Overzicht
-            </CardTitle>
-            <Button onClick={handleAddSchool} className="flex items-center gap-2">
+        <SearchActionLayout
+          searchPlaceholder="Zoek scholen..."
+          onSearchChange={() => {}}
+          actions={
+            <Button onClick={handleAddSchool} className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
               <Plus className="h-4 w-4" />
               School Toevoegen
             </Button>
-          </CardHeader>
-          <CardContent>
-            <StandardTable
-              data={schools}
-              columns={schoolColumns}
-              onEdit={handleEditSchool}
-              onDelete={handleDeleteSchool}
-              searchPlaceholder="Zoek scholen..."
-            />
-          </CardContent>
-        </Card>
+          }
+        >
+          <StandardTable
+            data={schools}
+            columns={schoolColumns}
+            onEdit={handleEditSchool}
+            onDelete={handleDeleteSchool}
+            searchPlaceholder="Zoek scholen..."
+          />
+        </SearchActionLayout>
       )}
 
       {/* Directors Tab */}
       {activeTab === "directors" && (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Directeuren Overzicht
-            </CardTitle>
-            <Button onClick={handleAddDirector} className="flex items-center gap-2">
+        <SearchActionLayout
+          searchPlaceholder="Zoek directeuren..."
+          onSearchChange={() => {}}
+          actions={
+            <Button onClick={handleAddDirector} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
               <UserPlus className="h-4 w-4" />
               Directeur Toevoegen
             </Button>
-          </CardHeader>
-          <CardContent>
-            <StandardTable
-              data={directors}
-              columns={directorColumns}
-              onEdit={handleEditDirector}
-              onDelete={handleDeleteDirector}
-              searchPlaceholder="Zoek directeuren..."
-            />
-          </CardContent>
-        </Card>
+          }
+        >
+          <StandardTable
+            data={directors}
+            columns={directorColumns}
+            onEdit={handleEditDirector}
+            onDelete={handleDeleteDirector}
+            searchPlaceholder="Zoek directeuren..."
+          />
+        </SearchActionLayout>
       )}
 
       {/* School Dialog */}

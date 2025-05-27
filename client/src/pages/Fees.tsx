@@ -108,6 +108,38 @@ export default function Fees() {
     return `${prefix}-${studentId}-${Date.now().toString().slice(-6)}`;
   };
 
+  // Get default amount for selected payment type
+  const getDefaultAmountForType = (type: string) => {
+    const defaultAmounts = {
+      'inschrijvingsgeld': '150.00',
+      'activiteit': '25.00',
+      'lesmateriaal': '45.00',
+      'collegegeld': '350.00',
+      'examen': '75.00',
+    };
+    return defaultAmounts[type as keyof typeof defaultAmounts] || '';
+  };
+
+  // Check for applicable discounts
+  const getApplicableDiscounts = (studentId: string) => {
+    // Mock discount logic - in real app this would check database
+    const discounts = [
+      { name: 'Familiekorting', percentage: 10, applicable: true },
+      { name: 'Vroegboeker', percentage: 5, applicable: false },
+    ];
+    return discounts.filter(d => d.applicable);
+  };
+
+  // Auto-fill amount when type changes
+  React.useEffect(() => {
+    if (selectedType) {
+      const defaultAmount = getDefaultAmountForType(selectedType);
+      if (defaultAmount) {
+        paymentForm.setValue('amount', defaultAmount);
+      }
+    }
+  }, [selectedType, paymentForm]);
+
   const tuitionRateForm = useForm({
     resolver: zodResolver(tuitionRateFormSchema),
     defaultValues: {
@@ -685,6 +717,32 @@ export default function Fees() {
                   )}
                 />
 
+                {/* Applicable Discounts Preview */}
+                {selectedStudentIds.length > 0 && (
+                  <div className="space-y-3">
+                    {selectedStudentIds.map(studentId => {
+                      const discounts = getApplicableDiscounts(studentId);
+                      if (discounts.length > 0) {
+                        return (
+                          <div key={studentId} className="bg-green-50 p-3 rounded border border-green-200">
+                            <div className="text-sm font-medium text-green-800 mb-2">
+                              Kortingen voor {studentId}:
+                            </div>
+                            <div className="space-y-1">
+                              {discounts.map(discount => (
+                                <div key={discount.name} className="text-sm text-green-700">
+                                  • {discount.name}: {discount.percentage}% korting
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+                )}
+
                 {/* Payment Reference Preview */}
                 {selectedType && selectedStudentIds.length > 0 && (
                   <div className="bg-gray-50 p-3 rounded border">
@@ -716,6 +774,10 @@ export default function Fees() {
       {/* Nieuw Tarief Dialog */}
       <Dialog open={showTuitionRateDialog} onOpenChange={setShowTuitionRateDialog}>
         <DialogContent className="sm:max-w-[600px] p-0">
+          <VisuallyHidden>
+            <DialogTitle>Nieuw Tarief</DialogTitle>
+            <DialogDescription>Voeg een nieuw tarief toe aan het systeem</DialogDescription>
+          </VisuallyHidden>
           <div className="bg-green-600 text-white p-6 rounded-t-lg">
             <div className="flex items-center gap-3">
               <Euro className="h-5 w-5" />

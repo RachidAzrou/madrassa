@@ -368,7 +368,7 @@ export default function Payments() {
         </StandardTableHeader>
         
         {paymentsLoading ? (
-          <TableLoadingState />
+          <TableLoadingState colSpan={6} />
         ) : payments && payments.length > 0 ? (
           <StandardTableBody>
             <StandardTableRow className="bg-gray-50">
@@ -425,6 +425,7 @@ export default function Payments() {
           </StandardTableBody>
         ) : (
           <TableEmptyState 
+            colSpan={6}
             icon={<CreditCard className="w-12 h-12 text-gray-300" />}
             title="Geen betalingen gevonden"
             description="Er zijn nog geen betalingen aangemaakt."

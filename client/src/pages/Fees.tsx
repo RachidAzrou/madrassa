@@ -6,6 +6,7 @@ import {
   Mail, Phone, Home, CalendarIcon, Plus, User, X, MapPin, School, XCircle, Receipt
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
+import { SearchActionLayout } from '@/components/ui/data-table-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -406,8 +407,8 @@ export default function Fees() {
       </div>
 
       {/* Zoek en acties */}
-      <div className="space-y-4">
-        <div className="relative w-full">
+      <SearchActionLayout>
+        <div className="relative w-full sm:w-64">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             type="search"
@@ -418,61 +419,59 @@ export default function Fees() {
           />
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-2 justify-between">
-          <div className="flex flex-wrap gap-2">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Status filter" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle statussen</SelectItem>
-                <SelectItem value="paid">Betaald</SelectItem>
-                <SelectItem value="pending">In behandeling</SelectItem>
-                <SelectItem value="overdue">Te laat</SelectItem>
-                <SelectItem value="cancelled">Geannuleerd</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Select value={yearFilter} onValueChange={setYearFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Academisch jaar" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle jaren</SelectItem>
-                <SelectItem value="2023-2024">2023-2024</SelectItem>
-                <SelectItem value="2024-2025">2024-2025</SelectItem>
-                <SelectItem value="2025-2026">2025-2026</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="flex gap-2 w-[160px] justify-start">
-                  <CalendarIcon className="h-4 w-4" />
-                  {selectedDate ? (
-                    format(selectedDate, "dd-MM-yyyy", { locale: nl })
-                  ) : (
-                    <span>Filter op datum</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  locale={nl}
-                />
-                {selectedDate && (
-                  <div className="p-3 border-t border-border">
-                    <Button variant="ghost" size="sm" onClick={() => setSelectedDate(undefined)}>
-                      Filter wissen
-                    </Button>
-                  </div>
+        <div className="flex flex-wrap gap-2 items-center">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Status filter" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Alle statussen</SelectItem>
+              <SelectItem value="paid">Betaald</SelectItem>
+              <SelectItem value="pending">In behandeling</SelectItem>
+              <SelectItem value="overdue">Te laat</SelectItem>
+              <SelectItem value="cancelled">Geannuleerd</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={yearFilter} onValueChange={setYearFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Academisch jaar" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Alle jaren</SelectItem>
+              <SelectItem value="2023-2024">2023-2024</SelectItem>
+              <SelectItem value="2024-2025">2024-2025</SelectItem>
+              <SelectItem value="2025-2026">2025-2026</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="flex gap-2 w-[160px] justify-start">
+                <CalendarIcon className="h-4 w-4" />
+                {selectedDate ? (
+                  format(selectedDate, "dd-MM-yyyy", { locale: nl })
+                ) : (
+                  <span>Filter op datum</span>
                 )}
-              </PopoverContent>
-            </Popover>
-          </div>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                locale={nl}
+              />
+              {selectedDate && (
+                <div className="p-3 border-t border-border">
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedDate(undefined)}>
+                    Filter wissen
+                  </Button>
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
           
           <Button 
             onClick={() => setShowAddOptionsDialog(true)} 
@@ -482,7 +481,7 @@ export default function Fees() {
             <span>Toevoegen</span>
           </Button>
         </div>
-      </div>
+      </SearchActionLayout>
 
       {/* Dialog voor "Toevoegen" in studentformulier stijl */}
       <Dialog open={showAddOptionsDialog} onOpenChange={setShowAddOptionsDialog}>

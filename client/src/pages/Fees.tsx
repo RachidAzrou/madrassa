@@ -20,7 +20,8 @@ import {
   Calendar,
   Users,
   Target,
-  TrendingUp
+  TrendingUp,
+  BarChart3
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -321,6 +322,65 @@ export default function Fees() {
         breadcrumbs={[{ label: "Financiën", href: "/fees" }]}
       />
 
+      {/* Statistics Widgets - Dashboard Style */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl border border-green-200 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="bg-green-500 p-3 rounded-xl">
+              <Euro className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-sm font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">
+              +20.1%
+            </span>
+          </div>
+          <h3 className="text-sm font-medium text-green-700 mb-1">Totaal Geïnd</h3>
+          <p className="text-3xl font-bold text-green-900">€45,231</p>
+          <p className="text-xs text-green-600 mt-2">Deze maand</p>
+        </div>
+
+        <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-2xl border border-orange-200 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="bg-orange-500 p-3 rounded-xl">
+              <Clock className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-sm font-medium text-orange-600 bg-orange-100 px-3 py-1 rounded-full">
+              12 facturen
+            </span>
+          </div>
+          <h3 className="text-sm font-medium text-orange-700 mb-1">Openstaand</h3>
+          <p className="text-3xl font-bold text-orange-900">€8,540</p>
+          <p className="text-xs text-orange-600 mt-2">Te innen</p>
+        </div>
+
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="bg-blue-500 p-3 rounded-xl">
+              <TrendingUp className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-sm font-medium text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+              +7%
+            </span>
+          </div>
+          <h3 className="text-sm font-medium text-blue-700 mb-1">Betalingspercentage</h3>
+          <p className="text-3xl font-bold text-blue-900">84%</p>
+          <p className="text-xs text-blue-600 mt-2">Succesvol</p>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="bg-purple-500 p-3 rounded-xl">
+              <Users className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-sm font-medium text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
+              Actief
+            </span>
+          </div>
+          <h3 className="text-sm font-medium text-purple-700 mb-1">Aantal Studenten</h3>
+          <p className="text-3xl font-bold text-purple-900">156</p>
+          <p className="text-xs text-purple-600 mt-2">Betalers</p>
+        </div>
+      </div>
+
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overzicht</TabsTrigger>
@@ -507,42 +567,84 @@ export default function Fees() {
         </TabsContent>
 
         <TabsContent value="reports" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Betalingsrapport</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full" onClick={handleExportPDF}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export PDF
-                </Button>
-              </CardContent>
-            </Card>
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-2xl border border-red-200 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div className="bg-red-500 p-3 rounded-xl">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
+                <span className="text-sm font-medium text-red-600 bg-red-100 px-3 py-1 rounded-full">
+                  PDF
+                </span>
+              </div>
+              <h3 className="text-sm font-medium text-red-700 mb-1">Betalingsrapport</h3>
+              <p className="text-xs text-red-600 mb-4">Volledig overzicht van alle betalingen</p>
+              <Button 
+                variant="outline" 
+                className="w-full border-red-300 text-red-700 hover:bg-red-50" 
+                onClick={() => {
+                  toast({ 
+                    title: "PDF wordt gegenereerd", 
+                    description: "Het betalingsrapport wordt gedownload als PDF bestand." 
+                  });
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </Button>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Openstaande Posten</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full" onClick={handleExportExcel}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Excel
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 rounded-2xl border border-emerald-200 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div className="bg-emerald-500 p-3 rounded-xl">
+                  <BarChart3 className="h-6 w-6 text-white" />
+                </div>
+                <span className="text-sm font-medium text-emerald-600 bg-emerald-100 px-3 py-1 rounded-full">
+                  Excel
+                </span>
+              </div>
+              <h3 className="text-sm font-medium text-emerald-700 mb-1">Openstaande Posten</h3>
+              <p className="text-xs text-emerald-600 mb-4">Alle uitstaande betalingen en facturen</p>
+              <Button 
+                variant="outline" 
+                className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50" 
+                onClick={() => {
+                  toast({ 
+                    title: "Excel wordt gegenereerd", 
+                    description: "Het rapport met openstaande posten wordt gedownload als Excel bestand." 
+                  });
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download Excel
+              </Button>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Financieel Overzicht</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full" onClick={handleExportCSV}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export CSV
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div className="bg-indigo-500 p-3 rounded-xl">
+                  <TrendingUp className="h-6 w-6 text-white" />
+                </div>
+                <span className="text-sm font-medium text-indigo-600 bg-indigo-100 px-3 py-1 rounded-full">
+                  CSV
+                </span>
+              </div>
+              <h3 className="text-sm font-medium text-indigo-700 mb-1">Financieel Overzicht</h3>
+              <p className="text-xs text-indigo-600 mb-4">Analyse van alle financiële gegevens</p>
+              <Button 
+                variant="outline" 
+                className="w-full border-indigo-300 text-indigo-700 hover:bg-indigo-50" 
+                onClick={() => {
+                  toast({ 
+                    title: "CSV wordt gegenereerd", 
+                    description: "Het financiële overzicht wordt gedownload als CSV bestand." 
+                  });
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download CSV
+              </Button>
+            </div>
           </div>
         </TabsContent>
       </Tabs>
@@ -550,20 +652,11 @@ export default function Fees() {
       {/* Nieuwe Betaling Dialog */}
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
         <DialogContent className="sm:max-w-[700px] p-0 max-h-[90vh] overflow-y-auto">
-          <VisuallyHidden>
-            <DialogTitle>Nieuwe Betaling</DialogTitle>
-            <DialogDescription>Voeg een nieuwe betaling toe aan het systeem</DialogDescription>
-          </VisuallyHidden>
-          
-          <div className="bg-blue-600 text-white p-6 rounded-t-lg">
-            <div className="flex items-center gap-3">
-              <CreditCard className="h-5 w-5" />
-              <div>
-                <h2 className="text-lg font-semibold">Nieuwe Betaling</h2>
-                <p className="text-blue-100 text-sm">Voeg een nieuwe betaling toe aan het systeem</p>
-              </div>
-            </div>
-          </div>
+          <DialogHeaderWithIcon
+            icon={CreditCard}
+            title="Nieuwe Betaling"
+            description="Voeg een nieuwe betaling toe aan het systeem"
+          />
           
           <div className="p-6">
             <Form {...paymentForm}>

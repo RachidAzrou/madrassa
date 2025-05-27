@@ -44,7 +44,7 @@ import { toast } from '@/hooks/use-toast';
 
 // Import custom components
 import { PremiumHeader } from '@/components/layout/premium-header';
-import { DialogHeaderWithIcon } from '@/components/ui/dialog-header-with-icon';
+import { CustomDialog, DialogHeaderWithIcon, ConfirmationDialog } from '@/components/ui/custom-dialog';
 import { 
   StandardTable, 
   StandardTableHeader, 
@@ -1415,278 +1415,274 @@ export default function Fees() {
       </Dialog>
 
       {/* View Payment Dialog */}
-      <Dialog open={isViewPaymentDialogOpen} onOpenChange={setIsViewPaymentDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Eye className="h-5 w-5 text-blue-600" />
-              Betaling Details
-            </DialogTitle>
-            <DialogDescription>
-              Bekijk de details van deze betaling
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            {selectedPayment && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Student</label>
-                  <p className="text-sm">{selectedPayment.studentName || '-'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Bedrag</label>
-                  <p className="text-sm">€{selectedPayment.amount || '0,00'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Type</label>
-                  <p className="text-sm">{selectedPayment.type || '-'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Status</label>
-                  <p className="text-sm">{selectedPayment.status || '-'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Datum</label>
-                  <p className="text-sm">{selectedPayment.date || '-'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Referentie</label>
-                  <p className="text-sm">{selectedPayment.reference || '-'}</p>
-                </div>
+      <CustomDialog 
+        open={isViewPaymentDialogOpen} 
+        onOpenChange={setIsViewPaymentDialogOpen}
+        className="max-w-2xl"
+      >
+        <DialogHeaderWithIcon 
+          icon={<Eye className="h-5 w-5" />}
+          title="Betaling Details"
+          description="Bekijk de details van deze betaling"
+        />
+        <div className="flex-1 space-y-4 p-6">
+          {selectedPayment && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-600">Student</label>
+                <p className="text-sm">{selectedPayment.studentName || '-'}</p>
               </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsViewPaymentDialogOpen(false)}
-            >
-              Sluiten
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Bedrag</label>
+                <p className="text-sm">€{selectedPayment.amount || '0,00'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Type</label>
+                <p className="text-sm">{selectedPayment.type || '-'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Status</label>
+                <p className="text-sm">{selectedPayment.status || '-'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Datum</label>
+                <p className="text-sm">{selectedPayment.date || '-'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Referentie</label>
+                <p className="text-sm">{selectedPayment.reference || '-'}</p>
+              </div>
+            </div>
+          )}
+        </div>
+        <DialogFooter className="border-t bg-gray-50 px-6 py-3">
+          <Button
+            variant="outline"
+            onClick={() => setIsViewPaymentDialogOpen(false)}
+            className="w-full sm:w-auto"
+          >
+            Sluiten
+          </Button>
+        </DialogFooter>
+      </CustomDialog>
 
       {/* View Rate Dialog */}
-      <Dialog open={isViewRateDialogOpen} onOpenChange={setIsViewRateDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Euro className="h-5 w-5 text-blue-600" />
-              Tarief Details
-            </DialogTitle>
-            <DialogDescription>
-              Bekijk de details van dit tarief
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            {selectedRate && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Naam</label>
-                  <p className="text-sm">{selectedRate.name || '-'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Bedrag</label>
-                  <p className="text-sm">€{selectedRate.amount || '0,00'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Academisch Jaar</label>
-                  <p className="text-sm">{selectedRate.year || '-'}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Status</label>
-                  <p className="text-sm">{selectedRate.status || '-'}</p>
-                </div>
+      <CustomDialog 
+        open={isViewRateDialogOpen} 
+        onOpenChange={setIsViewRateDialogOpen}
+        className="max-w-2xl"
+      >
+        <DialogHeaderWithIcon 
+          icon={<Euro className="h-5 w-5" />}
+          title="Tarief Details"
+          description="Bekijk de details van dit tarief"
+        />
+        <div className="flex-1 space-y-4 p-6">
+          {selectedRate && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-600">Naam</label>
+                <p className="text-sm">{selectedRate.name || '-'}</p>
               </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsViewRateDialogOpen(false)}
-            >
-              Sluiten
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Bedrag</label>
+                <p className="text-sm">€{selectedRate.amount || '0,00'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Academisch Jaar</label>
+                <p className="text-sm">{selectedRate.year || '-'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Status</label>
+                <p className="text-sm">{selectedRate.status || '-'}</p>
+              </div>
+            </div>
+          )}
+        </div>
+        <DialogFooter className="border-t bg-gray-50 px-6 py-3">
+          <Button
+            variant="outline"
+            onClick={() => setIsViewRateDialogOpen(false)}
+            className="w-full sm:w-auto"
+          >
+            Sluiten
+          </Button>
+        </DialogFooter>
+      </CustomDialog>
 
       {/* Edit Payment Dialog */}
-      <Dialog open={isEditPaymentDialogOpen} onOpenChange={setIsEditPaymentDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Edit3 className="h-5 w-5 text-blue-600" />
-              Betaling Bewerken
-            </DialogTitle>
-            <DialogDescription>
-              Wijzig de details van deze betaling
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            {selectedPayment && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Student</label>
-                  <input 
-                    type="text" 
-                    defaultValue={selectedPayment.studentName || ''} 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Bedrag (€)</label>
-                  <input 
-                    type="number" 
-                    step="0.01"
-                    defaultValue={selectedPayment.amount || '0.00'} 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Type</label>
-                  <select 
-                    defaultValue={selectedPayment.type || ''} 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  >
-                    <option value="inschrijvingsgeld">Inschrijvingsgeld</option>
-                    <option value="activiteit">Activiteit</option>
-                    <option value="lesmateriaal">Lesmateriaal</option>
-                    <option value="transport">Transport</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Status</label>
-                  <select 
-                    defaultValue={selectedPayment.status || ''} 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  >
-                    <option value="betaald">Betaald</option>
-                    <option value="openstaand">Openstaand</option>
-                    <option value="verwerkt">Verwerkt</option>
-                    <option value="gefaald">Gefaald</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Datum</label>
-                  <input 
-                    type="date" 
-                    defaultValue={selectedPayment.date || ''} 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Referentie</label>
-                  <input 
-                    type="text" 
-                    defaultValue={selectedPayment.reference || ''} 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  />
-                </div>
+      <CustomDialog 
+        open={isEditPaymentDialogOpen} 
+        onOpenChange={setIsEditPaymentDialogOpen}
+        className="max-w-2xl"
+      >
+        <DialogHeaderWithIcon 
+          icon={<Edit3 className="h-5 w-5" />}
+          title="Betaling Bewerken"
+          description="Wijzig de details van deze betaling"
+        />
+        <div className="flex-1 space-y-4 p-6">
+          {selectedPayment && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Student</label>
+                <input 
+                  type="text" 
+                  defaultValue={selectedPayment.studentName || ''} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
               </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsEditPaymentDialogOpen(false)}
-            >
-              Annuleren
-            </Button>
-            <Button
-              onClick={() => {
-                toast({
-                  title: "Betaling bijgewerkt",
-                  description: "De betalingsgegevens zijn succesvol gewijzigd.",
-                });
-                setIsEditPaymentDialogOpen(false);
-              }}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Opslaan
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Bedrag (€)</label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  defaultValue={selectedPayment.amount || '0.00'} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Type</label>
+                <select 
+                  defaultValue={selectedPayment.type || ''} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="inschrijvingsgeld">Inschrijvingsgeld</option>
+                  <option value="activiteit">Activiteit</option>
+                  <option value="lesmateriaal">Lesmateriaal</option>
+                  <option value="transport">Transport</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Status</label>
+                <select 
+                  defaultValue={selectedPayment.status || ''} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="betaald">Betaald</option>
+                  <option value="openstaand">Openstaand</option>
+                  <option value="verwerkt">Verwerkt</option>
+                  <option value="gefaald">Gefaald</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Datum</label>
+                <input 
+                  type="date" 
+                  defaultValue={selectedPayment.date || ''} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Referentie</label>
+                <input 
+                  type="text" 
+                  defaultValue={selectedPayment.reference || ''} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+        <DialogFooter className="border-t bg-gray-50 px-6 py-3">
+          <Button
+            variant="outline"
+            onClick={() => setIsEditPaymentDialogOpen(false)}
+            className="w-full sm:w-auto"
+          >
+            Annuleren
+          </Button>
+          <Button
+            onClick={() => {
+              toast({
+                title: "Betaling bijgewerkt",
+                description: "De betalingsgegevens zijn succesvol gewijzigd.",
+              });
+              setIsEditPaymentDialogOpen(false);
+            }}
+            className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+          >
+            Opslaan
+          </Button>
+        </DialogFooter>
+      </CustomDialog>
 
       {/* Edit Rate Dialog */}
-      <Dialog open={isEditRateDialogOpen} onOpenChange={setIsEditRateDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Edit3 className="h-5 w-5 text-blue-600" />
-              Tarief Bewerken
-            </DialogTitle>
-            <DialogDescription>
-              Wijzig de details van dit tarief
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            {selectedRate && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Naam</label>
-                  <input 
-                    type="text" 
-                    defaultValue={selectedRate.name || ''} 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Bedrag (€)</label>
-                  <input 
-                    type="number" 
-                    step="0.01"
-                    defaultValue={selectedRate.amount || '0.00'} 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Academisch Jaar</label>
-                  <input 
-                    type="text" 
-                    defaultValue={selectedRate.year || ''} 
-                    placeholder="2024-2025"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">Status</label>
-                  <select 
-                    defaultValue={selectedRate.status || ''} 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  >
-                    <option value="Actief">Actief</option>
-                    <option value="Inactief">Inactief</option>
-                    <option value="Concept">Concept</option>
-                  </select>
-                </div>
+      <CustomDialog 
+        open={isEditRateDialogOpen} 
+        onOpenChange={setIsEditRateDialogOpen}
+        className="max-w-2xl"
+      >
+        <DialogHeaderWithIcon 
+          icon={<Edit3 className="h-5 w-5" />}
+          title="Tarief Bewerken"
+          description="Wijzig de details van dit tarief"
+        />
+        <div className="flex-1 space-y-4 p-6">
+          {selectedRate && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Naam</label>
+                <input 
+                  type="text" 
+                  defaultValue={selectedRate.name || ''} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
               </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsEditRateDialogOpen(false)}
-            >
-              Annuleren
-            </Button>
-            <Button
-              onClick={() => {
-                toast({
-                  title: "Tarief bijgewerkt",
-                  description: "Het tarief is succesvol gewijzigd.",
-                });
-                setIsEditRateDialogOpen(false);
-              }}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Opslaan
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Bedrag (€)</label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  defaultValue={selectedRate.amount || '0.00'} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Academisch Jaar</label>
+                <input 
+                  type="text" 
+                  defaultValue={selectedRate.year || ''} 
+                  placeholder="2024-2025"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Status</label>
+                <select 
+                  defaultValue={selectedRate.status || ''} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="Actief">Actief</option>
+                  <option value="Inactief">Inactief</option>
+                  <option value="Concept">Concept</option>
+                </select>
+              </div>
+            </div>
+          )}
+        </div>
+        <DialogFooter className="border-t bg-gray-50 px-6 py-3">
+          <Button
+            variant="outline"
+            onClick={() => setIsEditRateDialogOpen(false)}
+            className="w-full sm:w-auto"
+          >
+            Annuleren
+          </Button>
+          <Button
+            onClick={() => {
+              toast({
+                title: "Tarief bijgewerkt",
+                description: "Het tarief is succesvol gewijzigd.",
+              });
+              setIsEditRateDialogOpen(false);
+            }}
+            className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+          >
+            Opslaan
+          </Button>
+        </DialogFooter>
+      </CustomDialog>
 
       {/* Delete Confirmation Dialogs */}
       <AlertDialog open={isDeletePaymentDialogOpen} onOpenChange={setIsDeletePaymentDialogOpen}>

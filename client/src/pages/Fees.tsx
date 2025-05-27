@@ -1413,19 +1413,9 @@ export default function Fees() {
         </DialogContent>
       </Dialog>
 
-      {/* Tarief Management Dialog */}
-      <Dialog open={showTuitionRateDialog} onOpenChange={setShowTuitionRateDialog}>
-        <DialogContent className="sm:max-w-[600px] p-0">
-          <div className="bg-blue-600 text-white p-6 rounded-t-lg">
-            <div className="flex items-center gap-3">
-              <Euro className="h-5 w-5" />
-              <div>
-                <h2 className="text-lg font-semibold">
-                  {editingTuitionRate ? 'Tarief Bewerken' : 'Nieuw Tarief'}
-                </h2>
-                <p className="text-blue-100 text-sm">
-                  {editingTuitionRate ? 'Bewerk de tariefinstellingen' : 'Voeg een nieuw tarief toe'}
-                </p>
+    </div>
+  );
+}
               </div>
             </div>
           </div>

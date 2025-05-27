@@ -44,7 +44,8 @@ import { toast } from '@/hooks/use-toast';
 
 // Import custom components
 import { PremiumHeader } from '@/components/layout/premium-header';
-import { CustomDialog, DialogHeaderWithIcon, ConfirmationDialog } from '@/components/ui/custom-dialog';
+import { CustomDialog, DialogHeaderWithIcon } from '@/components/ui/custom-dialog';
+import { DeleteDialog } from '@/components/ui/delete-dialog';
 import { 
   StandardTable, 
   StandardTableHeader, 
@@ -1685,47 +1686,53 @@ export default function Fees() {
       </CustomDialog>
 
       {/* Delete Payment Confirmation Dialog */}
-      <ConfirmationDialog
+      <DeleteDialog
         open={isDeletePaymentDialogOpen}
         onOpenChange={setIsDeletePaymentDialogOpen}
         title="Betaling verwijderen"
-        description={`Weet je zeker dat je de betaling van ${selectedPayment?.studentName} voor €${selectedPayment?.amount} wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
-        icon={<Trash2 className="h-6 w-6" />}
-        iconBackground="bg-red-100"
-        iconColor="text-red-600"
-        confirmText="Definitief verwijderen"
-        confirmVariant="destructive"
+        description={`Weet je zeker dat je deze betaling wilt verwijderen?`}
         onConfirm={() => {
           console.log('Verwijder betaling:', selectedPayment?.id);
           toast({
             title: "Betaling verwijderd",
             description: `De betaling van ${selectedPayment?.studentName} is succesvol verwijderd.`,
           });
+          setIsDeletePaymentDialogOpen(false);
           setSelectedPayment(null);
         }}
-        onCancel={() => setSelectedPayment(null)}
+        item={selectedPayment ? {
+          name: `${selectedPayment.studentName} - €${selectedPayment.amount}`,
+          id: selectedPayment.reference || `Type: ${selectedPayment.type}`,
+          initials: selectedPayment.studentName?.split(' ').map(n => n.charAt(0)).join('').slice(0, 2) || 'BT'
+        } : undefined}
+        warningText="Deze actie kan niet ongedaan worden gemaakt. Alle betalingsgegevens worden permanent verwijderd."
+        confirmButtonText="Verwijderen"
+        cancelButtonText="Annuleren"
       />
 
       {/* Delete Rate Confirmation Dialog */}
-      <ConfirmationDialog
+      <DeleteDialog
         open={isDeleteRateDialogOpen}
         onOpenChange={setIsDeleteRateDialogOpen}
         title="Tarief verwijderen"
-        description={`Weet je zeker dat je het tarief "${selectedRate?.name}" (€${selectedRate?.amount}) wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
-        icon={<Trash2 className="h-6 w-6" />}
-        iconBackground="bg-red-100"
-        iconColor="text-red-600"
-        confirmText="Definitief verwijderen"
-        confirmVariant="destructive"
+        description={`Weet je zeker dat je dit tarief wilt verwijderen?`}
         onConfirm={() => {
           console.log('Verwijder tarief:', selectedRate?.id);
           toast({
             title: "Tarief verwijderd",
             description: `Het tarief "${selectedRate?.name}" is succesvol verwijderd.`,
           });
+          setIsDeleteRateDialogOpen(false);
           setSelectedRate(null);
         }}
-        onCancel={() => setSelectedRate(null)}
+        item={selectedRate ? {
+          name: `${selectedRate.name} - €${selectedRate.amount}`,
+          id: selectedRate.year || 'Geen academisch jaar',
+          initials: selectedRate.name?.split(' ').map(n => n.charAt(0)).join('').slice(0, 2) || 'TR'
+        } : undefined}
+        warningText="Deze actie kan niet ongedaan worden gemaakt. Alle gerelateerde betalingen blijven behouden maar verwijzen naar een niet-bestaand tarief."
+        confirmButtonText="Verwijderen"
+        cancelButtonText="Annuleren"
       />
 
     </div>

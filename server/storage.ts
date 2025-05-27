@@ -5,6 +5,8 @@ import {
   fees, type Fee, type InsertFee,
   messages, type Message, type InsertMessage,
   payments, type Payment, type InsertPayment,
+  invoices, type Invoice, type InsertInvoice,
+  tuitionRates, type TuitionRate, type InsertTuitionRate,
   students, teachers, guardians, studentGuardians
 } from "@shared/schema";
 import { db } from "./db";
@@ -64,18 +66,42 @@ export interface IStorage {
   deleteMessage(id: number): Promise<boolean>;
   getAuthorizedReceivers(senderId: number, senderRole: string): Promise<{id: number, role: string, name: string}[]>;
   
-  // Schedule operations
-  getSchedules(): Promise<Schedule[]>;
-  getSchedule(id: number): Promise<Schedule | undefined>;
-  createSchedule(schedule: InsertSchedule): Promise<Schedule>;
-  updateSchedule(id: number, schedule: Partial<Schedule>): Promise<Schedule | undefined>;
-  deleteSchedule(id: number): Promise<boolean>;
+  // Schedule operations (temporarily disabled)
+  // getSchedules(): Promise<Schedule[]>;
+  // getSchedule(id: number): Promise<Schedule | undefined>;
+  // createSchedule(schedule: InsertSchedule): Promise<Schedule>;
+  // updateSchedule(id: number, schedule: Partial<Schedule>): Promise<Schedule | undefined>;
+  // deleteSchedule(id: number): Promise<boolean>;
   
+  // Invoice operations (Facturen)
+  getInvoices(): Promise<Invoice[]>;
+  getInvoice(id: number): Promise<Invoice | undefined>;
+  getInvoiceByNumber(invoiceNumber: string): Promise<Invoice | undefined>;
+  getInvoicesByStudent(studentId: number): Promise<Invoice[]>;
+  getInvoicesByClass(classId: number): Promise<Invoice[]>;
+  getInvoicesByStatus(status: string): Promise<Invoice[]>;
+  getInvoicesByType(type: string): Promise<Invoice[]>;
+  getInvoicesByAcademicYear(academicYear: string): Promise<Invoice[]>;
+  createInvoice(invoice: InsertInvoice): Promise<Invoice>;
+  updateInvoice(id: number, invoice: Partial<Invoice>): Promise<Invoice | undefined>;
+  deleteInvoice(id: number): Promise<boolean>;
+  generateInvoiceNumber(type: string): Promise<string>;
+  calculateInvoiceAmount(baseAmount: number, studentId: number, academicYear: string): Promise<{ finalAmount: number; discountAmount: number; appliedDiscounts: string[] }>;
+  
+  // Tuition Rate operations (Tarieven)
+  getTuitionRates(): Promise<TuitionRate[]>;
+  getTuitionRate(id: number): Promise<TuitionRate | undefined>;
+  getTuitionRateByTypeAndYear(type: string, academicYear: string): Promise<TuitionRate | undefined>;
+  createTuitionRate(rate: InsertTuitionRate): Promise<TuitionRate>;
+  updateTuitionRate(id: number, rate: Partial<TuitionRate>): Promise<TuitionRate | undefined>;
+  deleteTuitionRate(id: number): Promise<boolean>;
+
   // Payment operations (Mollie)
   getPayments(): Promise<Payment[]>;
   getPayment(id: number): Promise<Payment | undefined>;
   getPaymentByMollieId(molliePaymentId: string): Promise<Payment | undefined>;
   getPaymentsByStudent(studentId: number): Promise<Payment[]>;
+  getPaymentsByInvoice(invoiceId: number): Promise<Payment[]>;
   getPaymentsByStatus(status: string): Promise<Payment[]>;
   createPayment(payment: InsertPayment): Promise<Payment>;
   updatePayment(id: number, payment: Partial<Payment>): Promise<Payment | undefined>;
@@ -164,20 +190,260 @@ export class DatabaseStorage implements IStorage {
     overdueAmount: number;
     pendingInvoices: number;
   } | undefined> {
-    // Placeholder implementation - real implementation would calculate these values
-    return {
-      totalCollected: 0,
-      pendingAmount: 0,
-      totalStudents: 0,
-      completionRate: 0,
-      overdueAmount: 0,
-      pendingInvoices: 0
-    };
+    try {
+      // Bereken echte statistieken van facturen en betalingen
+      const currentYear = new Date().getFullYear();
+      const academicYear = `${currentYear}-${currentYear + 1}`;
+      
+      const totalCollectedResult = await db.select({ 
+        total: sql`COALESCE(SUM(${invoices.finalAmount}), 0)` 
+      })
+      .from(invoices)
+      .where(and(
+        eq(invoices.status, 'paid'),
+        eq(invoices.academicYear, academicYear)
+      ));
+
+      const pendingAmountResult = await db.select({ 
+        total: sql`COALESCE(SUM(${invoices.finalAmount}), 0)` 
+      })
+      .from(invoices)
+      .where(and(
+        eq(invoices.status, 'open'),
+        eq(invoices.academicYear, academicYear)
+      ));
+
+      const overdueAmountResult = await db.select({ 
+        total: sql`COALESCE(SUM(${invoices.finalAmount}), 0)` 
+      })
+      .from(invoices)
+      .where(and(
+        eq(invoices.status, 'overdue'),
+        eq(invoices.academicYear, academicYear)
+      ));
+
+      const totalStudentsResult = await db.select({ 
+        count: sql`COUNT(DISTINCT ${students.id})` 
+      })
+      .from(students)
+      .where(eq(students.status, 'active'));
+
+      const pendingInvoicesResult = await db.select({ 
+        count: sql`COUNT(*)` 
+      })
+      .from(invoices)
+      .where(and(
+        eq(invoices.status, 'open'),
+        eq(invoices.academicYear, academicYear)
+      ));
+
+      const totalCollected = Number(totalCollectedResult[0]?.total) || 0;
+      const pendingAmount = Number(pendingAmountResult[0]?.total) || 0;
+      const overdueAmount = Number(overdueAmountResult[0]?.total) || 0;
+      const totalStudents = Number(totalStudentsResult[0]?.count) || 0;
+      const pendingInvoices = Number(pendingInvoicesResult[0]?.count) || 0;
+      
+      const totalAmount = totalCollected + pendingAmount + overdueAmount;
+      const completionRate = totalAmount > 0 ? (totalCollected / totalAmount) * 100 : 0;
+
+      return {
+        totalCollected,
+        pendingAmount,
+        totalStudents,
+        completionRate,
+        overdueAmount,
+        pendingInvoices
+      };
+    } catch (error) {
+      console.error('Error calculating fee stats:', error);
+      return {
+        totalCollected: 0,
+        pendingAmount: 0,
+        totalStudents: 0,
+        completionRate: 0,
+        overdueAmount: 0,
+        pendingInvoices: 0
+      };
+    }
   }
   
   async getOutstandingDebts(): Promise<any[]> {
-    // Placeholder implementation
-    return [];
+    try {
+      return await db.select({
+        studentId: invoices.studentId,
+        studentName: sql`CONCAT(${students.firstName}, ' ', ${students.lastName})`,
+        totalAmount: sql`SUM(${invoices.finalAmount})`,
+        oldestDueDate: sql`MIN(${invoices.dueDate})`,
+        invoiceCount: sql`COUNT(*)`
+      })
+      .from(invoices)
+      .leftJoin(students, eq(invoices.studentId, students.id))
+      .where(eq(invoices.status, 'overdue'))
+      .groupBy(invoices.studentId, students.firstName, students.lastName)
+      .orderBy(sql`MIN(${invoices.dueDate})`);
+    } catch (error) {
+      console.error('Error fetching outstanding debts:', error);
+      return [];
+    }
+  }
+
+  // Invoice operations implementatie
+  async getInvoices(): Promise<Invoice[]> {
+    return await db.select().from(invoices).orderBy(desc(invoices.createdAt));
+  }
+
+  async getInvoice(id: number): Promise<Invoice | undefined> {
+    const [invoice] = await db.select().from(invoices).where(eq(invoices.id, id));
+    return invoice || undefined;
+  }
+
+  async getInvoiceByNumber(invoiceNumber: string): Promise<Invoice | undefined> {
+    const [invoice] = await db.select().from(invoices).where(eq(invoices.invoiceNumber, invoiceNumber));
+    return invoice || undefined;
+  }
+
+  async getInvoicesByStudent(studentId: number): Promise<Invoice[]> {
+    return await db.select().from(invoices)
+      .where(eq(invoices.studentId, studentId))
+      .orderBy(desc(invoices.createdAt));
+  }
+
+  async getInvoicesByClass(classId: number): Promise<Invoice[]> {
+    return await db.select().from(invoices)
+      .where(eq(invoices.classId, classId))
+      .orderBy(desc(invoices.createdAt));
+  }
+
+  async getInvoicesByStatus(status: string): Promise<Invoice[]> {
+    return await db.select().from(invoices)
+      .where(eq(invoices.status, status))
+      .orderBy(desc(invoices.createdAt));
+  }
+
+  async getInvoicesByType(type: string): Promise<Invoice[]> {
+    return await db.select().from(invoices)
+      .where(eq(invoices.type, type))
+      .orderBy(desc(invoices.createdAt));
+  }
+
+  async getInvoicesByAcademicYear(academicYear: string): Promise<Invoice[]> {
+    return await db.select().from(invoices)
+      .where(eq(invoices.academicYear, academicYear))
+      .orderBy(desc(invoices.createdAt));
+  }
+
+  async createInvoice(invoice: InsertInvoice): Promise<Invoice> {
+    const [newInvoice] = await db.insert(invoices).values(invoice).returning();
+    return newInvoice;
+  }
+
+  async updateInvoice(id: number, invoice: Partial<Invoice>): Promise<Invoice | undefined> {
+    const [updatedInvoice] = await db
+      .update(invoices)
+      .set({ ...invoice, updatedAt: new Date() })
+      .where(eq(invoices.id, id))
+      .returning();
+    return updatedInvoice || undefined;
+  }
+
+  async deleteInvoice(id: number): Promise<boolean> {
+    const result = await db.delete(invoices).where(eq(invoices.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  async generateInvoiceNumber(type: string): Promise<string> {
+    // Genereer uniek factuurnummer met prefix
+    const year = new Date().getFullYear();
+    const prefix = type.toUpperCase();
+    
+    // Zoek het hoogste nummer voor dit type in dit jaar
+    const lastInvoice = await db.select({ invoiceNumber: invoices.invoiceNumber })
+      .from(invoices)
+      .where(sql`${invoices.invoiceNumber} LIKE ${`${prefix}${year}%`}`)
+      .orderBy(desc(invoices.invoiceNumber))
+      .limit(1);
+
+    let nextNumber = 1;
+    if (lastInvoice.length > 0) {
+      const lastNumber = parseInt(lastInvoice[0].invoiceNumber.slice(-4));
+      nextNumber = lastNumber + 1;
+    }
+
+    return `${prefix}${year}${nextNumber.toString().padStart(4, '0')}`;
+  }
+
+  async calculateInvoiceAmount(baseAmount: number, studentId: number, academicYear: string): Promise<{ finalAmount: number; discountAmount: number; appliedDiscounts: string[] }> {
+    // Zoek alle actieve kortingen voor dit academisch jaar
+    const applicableDiscounts = await db.select()
+      .from(feeDiscounts)
+      .where(and(
+        eq(feeDiscounts.academicYear, academicYear),
+        eq(feeDiscounts.isActive, true)
+      ));
+
+    let totalDiscountAmount = 0;
+    const appliedDiscounts: string[] = [];
+
+    for (const discount of applicableDiscounts) {
+      // Hier kun je logica toevoegen om te controleren of korting van toepassing is
+      // Voor nu passen we alle kortingen toe (kan uitgebreid worden)
+      
+      if (discount.type === 'percentage') {
+        const discountAmount = (baseAmount * (discount.value || 0)) / 100;
+        totalDiscountAmount += discountAmount;
+        appliedDiscounts.push(`${discount.name} (${discount.value}%)`);
+      } else if (discount.type === 'fixed') {
+        totalDiscountAmount += discount.value || 0;
+        appliedDiscounts.push(`${discount.name} (€${discount.value})`);
+      }
+    }
+
+    const finalAmount = Math.max(0, baseAmount - totalDiscountAmount);
+
+    return {
+      finalAmount,
+      discountAmount: totalDiscountAmount,
+      appliedDiscounts
+    };
+  }
+
+  // Tuition Rate operations implementatie
+  async getTuitionRates(): Promise<TuitionRate[]> {
+    return await db.select().from(tuitionRates).orderBy(desc(tuitionRates.academicYear));
+  }
+
+  async getTuitionRate(id: number): Promise<TuitionRate | undefined> {
+    const [rate] = await db.select().from(tuitionRates).where(eq(tuitionRates.id, id));
+    return rate || undefined;
+  }
+
+  async getTuitionRateByTypeAndYear(type: string, academicYear: string): Promise<TuitionRate | undefined> {
+    const [rate] = await db.select().from(tuitionRates)
+      .where(and(
+        eq(tuitionRates.type, type),
+        eq(tuitionRates.academicYear, academicYear),
+        eq(tuitionRates.isActive, true)
+      ));
+    return rate || undefined;
+  }
+
+  async createTuitionRate(rate: InsertTuitionRate): Promise<TuitionRate> {
+    const [newRate] = await db.insert(tuitionRates).values(rate).returning();
+    return newRate;
+  }
+
+  async updateTuitionRate(id: number, rate: Partial<TuitionRate>): Promise<TuitionRate | undefined> {
+    const [updatedRate] = await db
+      .update(tuitionRates)
+      .set(rate)
+      .where(eq(tuitionRates.id, id))
+      .returning();
+    return updatedRate || undefined;
+  }
+
+  async deleteTuitionRate(id: number): Promise<boolean> {
+    const result = await db.delete(tuitionRates).where(eq(tuitionRates.id, id));
+    return (result.rowCount || 0) > 0;
   }
   
   // Fee Settings operations

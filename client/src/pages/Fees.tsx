@@ -182,7 +182,7 @@ export default function Fees() {
       <PremiumHeader
         title="Betalingsbeheer"
         description="Beheer schoolgelden, betalingen en financiële instellingen"
-        icon={<Coins className="h-6 w-6" />}
+        icon={Coins}
         breadcrumb="Financiën > Betalingsbeheer"
       />
 

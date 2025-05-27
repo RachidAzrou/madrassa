@@ -501,13 +501,31 @@ export default function Fees() {
                     <StandardTableCell>{payment.date || '-'}</StandardTableCell>
                     <TableActionCell>
                       <div className="opacity-0 group-hover:opacity-100 flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm"
+                          onClick={() => console.log('Bekijk betaling:', payment.id)}
+                          title="Bekijk betaling"
+                        >
                           <Eye className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7 text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-sm"
+                          onClick={() => console.log('Bewerk betaling:', payment.id)}
+                          title="Bewerk betaling"
+                        >
                           <Edit3 className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:text-red-700">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm"
+                          onClick={() => console.log('Verwijder betaling:', payment.id)}
+                          title="Verwijder betaling"
+                        >
                           <Trash2 className="h-3 w-3" />
                         </Button>
                       </div>

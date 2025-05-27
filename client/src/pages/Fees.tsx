@@ -323,62 +323,66 @@ export default function Fees() {
         breadcrumbs={[{ label: "Financiën", href: "/fees" }]}
       />
 
-      {/* Statistics Widgets - Dashboard Style */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl border border-green-200 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="bg-green-500 p-3 rounded-xl">
-              <Euro className="h-6 w-6 text-white" />
+      {/* Statistics Widgets - Desktop Application Style */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Totaal Geïnd kaart */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="flex h-full">
+            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
+              <Euro className="h-5 w-5 text-[#1e40af]" />
             </div>
-            <span className="text-sm font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">
-              +20.1%
-            </span>
+            <div className="flex-1 p-3">
+              <div className="flex flex-col">
+                <h3 className="text-xs font-medium text-gray-500">Totaal Geïnd</h3>
+                <p className="text-lg font-medium text-gray-800 mt-1">€45,231</p>
+              </div>
+            </div>
           </div>
-          <h3 className="text-sm font-medium text-green-700 mb-1">Totaal Geïnd</h3>
-          <p className="text-3xl font-bold text-green-900">€45,231</p>
-          <p className="text-xs text-green-600 mt-2">Deze maand</p>
         </div>
-
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-2xl border border-orange-200 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="bg-orange-500 p-3 rounded-xl">
-              <Clock className="h-6 w-6 text-white" />
+        
+        {/* Openstaand kaart */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="flex h-full">
+            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
+              <Clock className="h-5 w-5 text-[#1e40af]" />
             </div>
-            <span className="text-sm font-medium text-orange-600 bg-orange-100 px-3 py-1 rounded-full">
-              12 facturen
-            </span>
+            <div className="flex-1 p-3">
+              <div className="flex flex-col">
+                <h3 className="text-xs font-medium text-gray-500">Openstaand</h3>
+                <p className="text-lg font-medium text-gray-800 mt-1">€8,540</p>
+              </div>
+            </div>
           </div>
-          <h3 className="text-sm font-medium text-orange-700 mb-1">Openstaand</h3>
-          <p className="text-3xl font-bold text-orange-900">€8,540</p>
-          <p className="text-xs text-orange-600 mt-2">Te innen</p>
         </div>
-
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="bg-blue-500 p-3 rounded-xl">
-              <TrendingUp className="h-6 w-6 text-white" />
+        
+        {/* Betalingspercentage kaart */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="flex h-full">
+            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
+              <TrendingUp className="h-5 w-5 text-[#1e40af]" />
             </div>
-            <span className="text-sm font-medium text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
-              +7%
-            </span>
+            <div className="flex-1 p-3">
+              <div className="flex flex-col">
+                <h3 className="text-xs font-medium text-gray-500">Slagingspercentage</h3>
+                <p className="text-lg font-medium text-gray-800 mt-1">84%</p>
+              </div>
+            </div>
           </div>
-          <h3 className="text-sm font-medium text-blue-700 mb-1">Betalingspercentage</h3>
-          <p className="text-3xl font-bold text-blue-900">84%</p>
-          <p className="text-xs text-blue-600 mt-2">Succesvol</p>
         </div>
-
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="bg-purple-500 p-3 rounded-xl">
-              <Users className="h-6 w-6 text-white" />
+        
+        {/* Aantal Studenten kaart */}
+        <div className="bg-white border border-[#e5e7eb] rounded-sm">
+          <div className="flex h-full">
+            <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
+              <Users className="h-5 w-5 text-[#1e40af]" />
             </div>
-            <span className="text-sm font-medium text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
-              Actief
-            </span>
+            <div className="flex-1 p-3">
+              <div className="flex flex-col">
+                <h3 className="text-xs font-medium text-gray-500">Betalende Studenten</h3>
+                <p className="text-lg font-medium text-gray-800 mt-1">156</p>
+              </div>
+            </div>
           </div>
-          <h3 className="text-sm font-medium text-purple-700 mb-1">Aantal Studenten</h3>
-          <p className="text-3xl font-bold text-purple-900">156</p>
-          <p className="text-xs text-purple-600 mt-2">Betalers</p>
         </div>
       </div>
 
@@ -527,7 +531,7 @@ export default function Fees() {
           </StandardTable>
         </TabsContent>
 
-        <TabsContent value="settings" className="space-y-4">
+        <TabsContent value="settings" className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
@@ -564,6 +568,136 @@ export default function Fees() {
                 </Button>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Bestaande Tarieven Tabel */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Euro className="h-5 w-5" />
+              Bestaande Tarieven
+            </h3>
+            <StandardTable>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs">Type</TableHead>
+                  <TableHead className="text-xs">Bedrag</TableHead>
+                  <TableHead className="text-xs">Academisch Jaar</TableHead>
+                  <TableHead className="text-xs">Status</TableHead>
+                  <TableHead className="text-xs text-right">Acties</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow className="group">
+                  <TableCell className="text-xs font-medium">Collegegeld</TableCell>
+                  <TableCell className="text-xs">€2.500,00</TableCell>
+                  <TableCell className="text-xs">2024-2025</TableCell>
+                  <TableCell className="text-xs">
+                    <Badge variant="secondary" className="text-xs">Actief</Badge>
+                  </TableCell>
+                  <TableCell className="text-xs text-right">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
+                      <Button variant="ghost" size="sm" className="text-xs">Bewerken</Button>
+                      <Button variant="ghost" size="sm" className="text-xs text-red-600">Verwijderen</Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+                <TableRow className="group">
+                  <TableCell className="text-xs font-medium">Inschrijfgeld</TableCell>
+                  <TableCell className="text-xs">€150,00</TableCell>
+                  <TableCell className="text-xs">2024-2025</TableCell>
+                  <TableCell className="text-xs">
+                    <Badge variant="secondary" className="text-xs">Actief</Badge>
+                  </TableCell>
+                  <TableCell className="text-xs text-right">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
+                      <Button variant="ghost" size="sm" className="text-xs">Bewerken</Button>
+                      <Button variant="ghost" size="sm" className="text-xs text-red-600">Verwijderen</Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+                <TableRow className="group">
+                  <TableCell className="text-xs font-medium">Lesmateriaal</TableCell>
+                  <TableCell className="text-xs">€85,00</TableCell>
+                  <TableCell className="text-xs">2024-2025</TableCell>
+                  <TableCell className="text-xs">
+                    <Badge variant="secondary" className="text-xs">Actief</Badge>
+                  </TableCell>
+                  <TableCell className="text-xs text-right">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
+                      <Button variant="ghost" size="sm" className="text-xs">Bewerken</Button>
+                      <Button variant="ghost" size="sm" className="text-xs text-red-600">Verwijderen</Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </StandardTable>
+          </div>
+
+          {/* Bestaande Kortingen Tabel */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Percent className="h-5 w-5" />
+              Bestaande Kortingen
+            </h3>
+            <StandardTable>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs">Naam</TableHead>
+                  <TableHead className="text-xs">Type</TableHead>
+                  <TableHead className="text-xs">Korting</TableHead>
+                  <TableHead className="text-xs">Academisch Jaar</TableHead>
+                  <TableHead className="text-xs">Status</TableHead>
+                  <TableHead className="text-xs text-right">Acties</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow className="group">
+                  <TableCell className="text-xs font-medium">Meerkinderen Korting</TableCell>
+                  <TableCell className="text-xs">Familie</TableCell>
+                  <TableCell className="text-xs">15%</TableCell>
+                  <TableCell className="text-xs">2024-2025</TableCell>
+                  <TableCell className="text-xs">
+                    <Badge variant="secondary" className="text-xs">Actief</Badge>
+                  </TableCell>
+                  <TableCell className="text-xs text-right">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
+                      <Button variant="ghost" size="sm" className="text-xs">Bewerken</Button>
+                      <Button variant="ghost" size="sm" className="text-xs text-red-600">Verwijderen</Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+                <TableRow className="group">
+                  <TableCell className="text-xs font-medium">Vroegboek Korting</TableCell>
+                  <TableCell className="text-xs">Tijdelijk</TableCell>
+                  <TableCell className="text-xs">10%</TableCell>
+                  <TableCell className="text-xs">2024-2025</TableCell>
+                  <TableCell className="text-xs">
+                    <Badge variant="secondary" className="text-xs">Actief</Badge>
+                  </TableCell>
+                  <TableCell className="text-xs text-right">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
+                      <Button variant="ghost" size="sm" className="text-xs">Bewerken</Button>
+                      <Button variant="ghost" size="sm" className="text-xs text-red-600">Verwijderen</Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+                <TableRow className="group">
+                  <TableCell className="text-xs font-medium">Sociaal Tarief</TableCell>
+                  <TableCell className="text-xs">Inkomen</TableCell>
+                  <TableCell className="text-xs">25%</TableCell>
+                  <TableCell className="text-xs">2024-2025</TableCell>
+                  <TableCell className="text-xs">
+                    <Badge variant="secondary" className="text-xs">Actief</Badge>
+                  </TableCell>
+                  <TableCell className="text-xs text-right">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
+                      <Button variant="ghost" size="sm" className="text-xs">Bewerken</Button>
+                      <Button variant="ghost" size="sm" className="text-xs text-red-600">Verwijderen</Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </StandardTable>
           </div>
         </TabsContent>
 

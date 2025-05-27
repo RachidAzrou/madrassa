@@ -1512,29 +1512,216 @@ export default function Fees() {
         </DialogContent>
       </Dialog>
 
+      {/* Edit Payment Dialog */}
+      <Dialog open={isEditPaymentDialogOpen} onOpenChange={setIsEditPaymentDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit3 className="h-5 w-5 text-blue-600" />
+              Betaling Bewerken
+            </DialogTitle>
+            <DialogDescription>
+              Wijzig de details van deze betaling
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedPayment && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Student</label>
+                  <input 
+                    type="text" 
+                    defaultValue={selectedPayment.studentName || ''} 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Bedrag (€)</label>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    defaultValue={selectedPayment.amount || '0.00'} 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Type</label>
+                  <select 
+                    defaultValue={selectedPayment.type || ''} 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  >
+                    <option value="inschrijvingsgeld">Inschrijvingsgeld</option>
+                    <option value="activiteit">Activiteit</option>
+                    <option value="lesmateriaal">Lesmateriaal</option>
+                    <option value="transport">Transport</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Status</label>
+                  <select 
+                    defaultValue={selectedPayment.status || ''} 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  >
+                    <option value="betaald">Betaald</option>
+                    <option value="openstaand">Openstaand</option>
+                    <option value="verwerkt">Verwerkt</option>
+                    <option value="gefaald">Gefaald</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Datum</label>
+                  <input 
+                    type="date" 
+                    defaultValue={selectedPayment.date || ''} 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Referentie</label>
+                  <input 
+                    type="text" 
+                    defaultValue={selectedPayment.reference || ''} 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditPaymentDialogOpen(false)}
+            >
+              Annuleren
+            </Button>
+            <Button
+              onClick={() => {
+                toast({
+                  title: "Betaling bijgewerkt",
+                  description: "De betalingsgegevens zijn succesvol gewijzigd.",
+                });
+                setIsEditPaymentDialogOpen(false);
+              }}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Opslaan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Rate Dialog */}
+      <Dialog open={isEditRateDialogOpen} onOpenChange={setIsEditRateDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit3 className="h-5 w-5 text-blue-600" />
+              Tarief Bewerken
+            </DialogTitle>
+            <DialogDescription>
+              Wijzig de details van dit tarief
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedRate && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Naam</label>
+                  <input 
+                    type="text" 
+                    defaultValue={selectedRate.name || ''} 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Bedrag (€)</label>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    defaultValue={selectedRate.amount || '0.00'} 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Academisch Jaar</label>
+                  <input 
+                    type="text" 
+                    defaultValue={selectedRate.year || ''} 
+                    placeholder="2024-2025"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Status</label>
+                  <select 
+                    defaultValue={selectedRate.status || ''} 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  >
+                    <option value="Actief">Actief</option>
+                    <option value="Inactief">Inactief</option>
+                    <option value="Concept">Concept</option>
+                  </select>
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditRateDialogOpen(false)}
+            >
+              Annuleren
+            </Button>
+            <Button
+              onClick={() => {
+                toast({
+                  title: "Tarief bijgewerkt",
+                  description: "Het tarief is succesvol gewijzigd.",
+                });
+                setIsEditRateDialogOpen(false);
+              }}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Opslaan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Delete Confirmation Dialogs */}
       <AlertDialog open={isDeletePaymentDialogOpen} onOpenChange={setIsDeletePaymentDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Betaling verwijderen</AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-red-600" />
+              Betaling verwijderen
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Weet je zeker dat je deze betaling wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+              Weet je zeker dat je de betaling van <strong>{selectedPayment?.studentName}</strong> voor <strong>€{selectedPayment?.amount}</strong> wilt verwijderen? 
+              <br /><br />
+              Deze actie kan niet ongedaan worden gemaakt en alle gerelateerde gegevens gaan verloren.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuleren</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
+                // Here you would normally make an API call to delete
                 console.log('Verwijder betaling:', selectedPayment?.id);
+                
+                // Show success message
                 toast({
                   title: "Betaling verwijderd",
-                  description: "De betaling is succesvol verwijderd.",
+                  description: `De betaling van ${selectedPayment?.studentName} is succesvol verwijderd.`,
                 });
+                
+                // Close dialog and clear selection
                 setIsDeletePaymentDialogOpen(false);
+                setSelectedPayment(null);
               }}
               className="bg-red-600 hover:bg-red-700"
             >
-              Verwijderen
+              Definitief verwijderen
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1543,25 +1730,36 @@ export default function Fees() {
       <AlertDialog open={isDeleteRateDialogOpen} onOpenChange={setIsDeleteRateDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Tarief verwijderen</AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-red-600" />
+              Tarief verwijderen
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Weet je zeker dat je dit tarief wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+              Weet je zeker dat je het tarief <strong>{selectedRate?.name}</strong> (€{selectedRate?.amount}) wilt verwijderen?
+              <br /><br />
+              Deze actie kan niet ongedaan worden gemaakt en alle gerelateerde betalingen en kortingen blijven behouden maar zullen verwijzen naar een niet-bestaand tarief.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuleren</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
+                // Here you would normally make an API call to delete
                 console.log('Verwijder tarief:', selectedRate?.id);
+                
+                // Show success message
                 toast({
                   title: "Tarief verwijderd",
-                  description: "Het tarief is succesvol verwijderd.",
+                  description: `Het tarief "${selectedRate?.name}" is succesvol verwijderd.`,
                 });
+                
+                // Close dialog and clear selection
                 setIsDeleteRateDialogOpen(false);
+                setSelectedRate(null);
               }}
               className="bg-red-600 hover:bg-red-700"
             >
-              Verwijderen
+              Definitief verwijderen
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

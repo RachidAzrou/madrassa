@@ -532,43 +532,6 @@ export default function Fees() {
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Euro className="h-5 w-5" />
-                  Tarieven Beheer
-                </CardTitle>
-                <CardDescription>
-                  Beheer de verschillende tarieven voor uw onderwijsinstelling
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button className="w-full" onClick={() => setShowTuitionRateDialog(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nieuw Tarief Toevoegen
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Percent className="h-5 w-5" />
-                  Kortingen Beheer
-                </CardTitle>
-                <CardDescription>
-                  Configureer kortingen en speciale tarieven
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button className="w-full" onClick={() => setShowDiscountDialog(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nieuwe Korting Toevoegen
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
 
           {/* Bestaande Tarieven Tabel */}
           <div className="space-y-4">

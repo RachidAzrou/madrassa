@@ -1276,56 +1276,55 @@ export default function Fees() {
             <Form {...bulkInvoiceForm}>
               <form onSubmit={bulkInvoiceForm.handleSubmit(handleCreateBulkInvoices)} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={bulkInvoiceForm.control}
-                  name="classId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Klas</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer klas" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {studentGroupsData && Array.isArray(studentGroupsData) && studentGroupsData.map((group: any) => (
-                            <SelectItem key={group.id} value={group.id.toString()}>
-                              {group.name} ({group.academicYear})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                </div>
+                  <FormField
+                    control={bulkInvoiceForm.control}
+                    name="classId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Klas</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer klas" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {studentGroupsData && Array.isArray(studentGroupsData) && studentGroupsData.map((group: any) => (
+                              <SelectItem key={group.id} value={group.id.toString()}>
+                                {group.name} ({group.academicYear})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={bulkInvoiceForm.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Factuurtype</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {invoiceTypes.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={bulkInvoiceForm.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Factuurtype</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {invoiceTypes.map((type) => (
+                              <SelectItem key={type.value} value={type.value}>
+                                {type.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
                 <FormField
@@ -1342,22 +1341,100 @@ export default function Fees() {
                   )}
                 />
 
-                <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={bulkInvoiceForm.control}
-                  name="baseAmount"
+                  name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bedrag (€)</FormLabel>
+                      <FormLabel>Beschrijving</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                        <Input placeholder="Beschrijving van de factuur" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={bulkInvoiceForm.control}
+                    name="baseAmount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bedrag (€)</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={bulkInvoiceForm.control}
+                    name="dueDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vervaldatum</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <FormField
+                  control={bulkInvoiceForm.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notities (optioneel)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Extra notities bij deze facturen" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-end gap-3 pt-6 border-t">
+                  <Button type="button" variant="outline" onClick={() => setShowBulkInvoiceDialog(false)}>
+                    Annuleren
+                  </Button>
+                  <Button type="submit">
+                    Bulk Facturen Aanmaken
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Tarief Management Dialog */}
+      <Dialog open={showTuitionRateDialog} onOpenChange={setShowTuitionRateDialog}>
+        <DialogContent className="sm:max-w-[600px] p-0">
+          <div className="bg-blue-600 text-white p-6 rounded-t-lg">
+            <div className="flex items-center gap-3">
+              <Euro className="h-5 w-5" />
+              <div>
+                <h2 className="text-lg font-semibold">
+                  {editingTuitionRate ? 'Tarief Bewerken' : 'Nieuw Tarief'}
+                </h2>
+                <p className="text-blue-100 text-sm">
+                  {editingTuitionRate ? 'Bewerk de tariefinstellingen' : 'Voeg een nieuw tarief toe'}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <Form {...tuitionRateForm}>
+              <form onSubmit={tuitionRateForm.handleSubmit(handleCreateTuitionRate)} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
                   control={bulkInvoiceForm.control}
                   name="academicYear"
                   render={({ field }) => (

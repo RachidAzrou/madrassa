@@ -220,6 +220,13 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   onClick={handleLinkClick}
                 />
 
+                <SidebarLink
+                  href="/student-dossier"
+                  icon={<UserRound className="h-4 w-4" />}
+                  label="Leerlingendossier"
+                  isActive={location.startsWith("/student-dossier")}
+                  onClick={handleLinkClick}
+                />
 
               </div>
             </div>

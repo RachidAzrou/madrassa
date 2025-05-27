@@ -354,98 +354,93 @@ export default function Payments() {
       )}
 
       {/* Betalingen tabel */}
-      <div className="bg-white overflow-hidden rounded-lg border border-gray-200">
-        <div className="flex justify-between items-center p-4 border-b">
-          <h3 className="font-medium">Betalingen</h3>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="text-sm flex items-center gap-1">
-              <Download className="h-4 w-4" />
-              Export
-            </Button>
+      <StandardTable>
+        <StandardTableHeader>
+          <div className="flex justify-between items-center">
+            <h3 className="font-medium">Betalingen</h3>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="text-sm flex items-center gap-1">
+                <Download className="h-4 w-4" />
+                Export
+              </Button>
+            </div>
           </div>
-        </div>
+        </StandardTableHeader>
         
         {paymentsLoading ? (
-          <div className="p-8 flex justify-center">
-            <div className="h-8 w-8 rounded-full border-2 border-blue-600 border-t-transparent animate-spin"></div>
-          </div>
+          <TableLoadingState />
         ) : payments && payments.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50 text-xs text-gray-500 font-medium">
-                  <th className="py-3 px-4 text-left">STUDENT</th>
-                  <th className="py-3 px-4 text-left">BESCHRIJVING</th>
-                  <th className="py-3 px-4 text-left">BEDRAG</th>
-                  <th className="py-3 px-4 text-left">STATUS</th>
-                  <th className="py-3 px-4 text-left">DATUM</th>
-                  <th className="py-3 px-4 text-right">ACTIES</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {payments.map((payment: Payment) => (
-                  <tr key={payment.id} className="text-sm hover:bg-gray-50">
-                    <td className="py-3 px-4">
-                      <div className="font-medium">Student #{payment.studentId}</div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="max-w-[200px] truncate" title={payment.description}>
-                        {payment.description}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 font-medium">
-                      {formatCurrency(payment.amount)}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(payment.status)}`}>
-                        {getStatusText(payment.status)}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      {formatDate(payment.createdAt)}
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex justify-end gap-2">
-                        {payment.checkoutUrl && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => window.open(payment.checkoutUrl, '_blank')}
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => refreshStatusMutation.mutate(payment.id)}
-                          disabled={refreshStatusMutation.isPending}
-                        >
-                          <RefreshCw className={`w-4 h-4 ${refreshStatusMutation.isPending ? 'animate-spin' : ''}`} />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <StandardTableBody>
+            <StandardTableRow className="bg-gray-50">
+              <StandardTableHeaderCell>STUDENT</StandardTableHeaderCell>
+              <StandardTableHeaderCell>BESCHRIJVING</StandardTableHeaderCell>
+              <StandardTableHeaderCell>BEDRAG</StandardTableHeaderCell>
+              <StandardTableHeaderCell>STATUS</StandardTableHeaderCell>
+              <StandardTableHeaderCell>DATUM</StandardTableHeaderCell>
+              <StandardTableHeaderCell className="text-right">ACTIES</StandardTableHeaderCell>
+            </StandardTableRow>
+            
+            {payments.map((payment: Payment) => (
+              <StandardTableRow key={payment.id}>
+                <StandardTableCell>
+                  <div className="font-medium">Student #{payment.studentId}</div>
+                </StandardTableCell>
+                <StandardTableCell>
+                  <div className="max-w-[200px] truncate" title={payment.description}>
+                    {payment.description}
+                  </div>
+                </StandardTableCell>
+                <StandardTableCell className="font-medium">
+                  {formatCurrency(payment.amount)}
+                </StandardTableCell>
+                <StandardTableCell>
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(payment.status)}`}>
+                    {getStatusText(payment.status)}
+                  </span>
+                </StandardTableCell>
+                <StandardTableCell>
+                  {formatDate(payment.createdAt)}
+                </StandardTableCell>
+                <TableActionCell>
+                  {payment.checkoutUrl && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => window.open(payment.checkoutUrl, '_blank')}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => refreshStatusMutation.mutate(payment.id)}
+                    disabled={refreshStatusMutation.isPending}
+                  >
+                    <RefreshCw className={`w-4 h-4 ${refreshStatusMutation.isPending ? 'animate-spin' : ''}`} />
+                  </Button>
+                </TableActionCell>
+              </StandardTableRow>
+            ))}
+          </StandardTableBody>
         ) : (
-          <div className="text-center p-8">
-            <CreditCard className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-gray-900 mb-1">Geen betalingen gevonden</h3>
-            <p className="text-gray-500 mb-4">Er zijn nog geen betalingen aangemaakt.</p>
-            <Button
-              variant="outline"
-              onClick={() => setIsCreateDialogOpen(true)}
-              className="flex items-center gap-1"
-            >
-              <PlusCircle className="h-4 w-4" />
-              <span>Nieuwe betaling toevoegen</span>
-            </Button>
-          </div>
+          <TableEmptyState 
+            icon={<CreditCard className="w-12 h-12 text-gray-300" />}
+            title="Geen betalingen gevonden"
+            description="Er zijn nog geen betalingen aangemaakt."
+            action={
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateDialogOpen(true)}
+                className="flex items-center gap-1"
+              >
+                <PlusCircle className="h-4 w-4" />
+                <span>Nieuwe betaling toevoegen</span>
+              </Button>
+            }
+          />
         )}
-      </div>
+      </StandardTable>
 
       {/* Dialog voor nieuwe betaling */}
       <CustomDialog 

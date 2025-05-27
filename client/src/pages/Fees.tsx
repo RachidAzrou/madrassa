@@ -1326,23 +1326,23 @@ export default function Fees() {
                     </FormItem>
                   )}
                 />
-              </div>
+                </div>
 
-              <FormField
-                control={bulkInvoiceForm.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Beschrijving</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Beschrijving van de factuur" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={bulkInvoiceForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Beschrijving</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Beschrijving van de factuur" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={bulkInvoiceForm.control}
                   name="baseAmount"
@@ -1381,12 +1381,12 @@ export default function Fees() {
                     </FormItem>
                   )}
                 />
-              </div>
+                </div>
 
-              <FormField
-                control={bulkInvoiceForm.control}
-                name="dueDate"
-                render={({ field }) => (
+                <FormField
+                  control={bulkInvoiceForm.control}
+                  name="dueDate"
+                  render={({ field }) => (
                   <FormItem>
                     <FormLabel>Vervaldatum</FormLabel>
                     <Popover>

@@ -220,14 +220,6 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   onClick={handleLinkClick}
                 />
 
-                <SidebarLink
-                  href="/student-dossier"
-                  icon={<UserRound className="h-4 w-4" />}
-                  label="Leerlingendossier"
-                  isActive={location.startsWith("/student-dossier")}
-                  onClick={handleLinkClick}
-                />
-
               </div>
             </div>
 
@@ -287,6 +279,13 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   isActive={location.startsWith("/reports")}
                   onClick={handleLinkClick}
                 />
+                <SidebarLink
+                  href="/student-dossier"
+                  icon={<UserRound className="h-4 w-4" />}
+                  label="Leerlingendossier"
+                  isActive={location.startsWith("/student-dossier")}
+                  onClick={handleLinkClick}
+                />
               </div>
             </div>
 
@@ -295,13 +294,6 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                 Financiën
               </p>
               <div className="space-y-1.5">
-                <SidebarLink
-                  href="/payments"
-                  icon={<CreditCard className="h-4 w-4" />}
-                  label="Betalingen"
-                  isActive={location.startsWith("/payments")}
-                  onClick={handleLinkClick}
-                />
                 <SidebarLink
                   href="/fees"
                   icon={<Coins className="h-4 w-4" />}

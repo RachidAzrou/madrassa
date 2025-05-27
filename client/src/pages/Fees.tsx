@@ -41,13 +41,20 @@ import { toast } from '@/hooks/use-toast';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { StandardTable } from '@/components/ui/standard-table';
 
-// Payment types
-const paymentTypes = [
-  { value: 'inschrijvingsgeld', label: 'Inschrijvingsgeld', prefix: 'INS' },
-  { value: 'activiteit', label: 'Activiteit', prefix: 'ACT' },
-  { value: 'lesmateriaal', label: 'Lesmateriaal', prefix: 'LES' },
-  { value: 'collegegeld', label: 'Collegegeld', prefix: 'COL' },
-  { value: 'examen', label: 'Examen', prefix: 'EXA' },
+// Payment types - these will be managed dynamically
+const defaultPaymentTypes = [
+  { id: 1, value: 'inschrijvingsgeld', label: 'Inschrijvingsgeld', prefix: 'INS', amount: 150.00 },
+  { id: 2, value: 'activiteit', label: 'Activiteit', prefix: 'ACT', amount: 25.00 },
+  { id: 3, value: 'lesmateriaal', label: 'Lesmateriaal', prefix: 'LES', amount: 45.00 },
+  { id: 4, value: 'collegegeld', label: 'Collegegeld', prefix: 'COL', amount: 350.00 },
+  { id: 5, value: 'examen', label: 'Examen', prefix: 'EXA', amount: 75.00 },
+];
+
+// Default discounts
+const defaultDiscounts = [
+  { id: 1, name: 'Familiekorting', percentage: 10, description: 'Korting voor families met meerdere kinderen', active: true },
+  { id: 2, name: 'Vroegboeker', percentage: 5, description: 'Korting bij vroege inschrijving', active: true },
+  { id: 3, name: 'Studentenkorting', percentage: 15, description: 'Korting voor studenten', active: false },
 ];
 
 // Form schemas
@@ -82,6 +89,10 @@ export default function Fees() {
   const [showDiscountDialog, setShowDiscountDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
+  // Dynamic data state
+  const [paymentTypes, setPaymentTypes] = useState(defaultPaymentTypes);
+  const [discounts, setDiscounts] = useState(defaultDiscounts);
+  
   // Form instances
   const paymentForm = useForm({
     resolver: zodResolver(paymentFormSchema),
@@ -110,14 +121,8 @@ export default function Fees() {
 
   // Get default amount for selected payment type
   const getDefaultAmountForType = (type: string) => {
-    const defaultAmounts = {
-      'inschrijvingsgeld': '150.00',
-      'activiteit': '25.00',
-      'lesmateriaal': '45.00',
-      'collegegeld': '350.00',
-      'examen': '75.00',
-    };
-    return defaultAmounts[type as keyof typeof defaultAmounts] || '';
+    const paymentType = paymentTypes.find(pt => pt.value === type);
+    return paymentType ? paymentType.amount.toString() : '';
   };
 
   // Check for applicable discounts

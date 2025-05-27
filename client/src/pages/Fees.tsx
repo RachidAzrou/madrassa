@@ -31,6 +31,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
@@ -40,9 +41,21 @@ import { toast } from '@/hooks/use-toast';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { StandardTable } from '@/components/ui/standard-table';
 
+// Payment types
+const paymentTypes = [
+  { value: 'inschrijvingsgeld', label: 'Inschrijvingsgeld', prefix: 'INS' },
+  { value: 'activiteit', label: 'Activiteit', prefix: 'ACT' },
+  { value: 'lesmateriaal', label: 'Lesmateriaal', prefix: 'LES' },
+  { value: 'collegegeld', label: 'Collegegeld', prefix: 'COL' },
+  { value: 'examen', label: 'Examen', prefix: 'EXA' },
+];
+
 // Form schemas
 const paymentFormSchema = z.object({
-  studentId: z.string().min(1, "Student is verplicht"),
+  paymentMode: z.enum(['single', 'multiple', 'bulk']),
+  studentIds: z.array(z.string()).min(1, "Minimaal één student selecteren"),
+  classId: z.string().optional(),
+  type: z.string().min(1, "Type is verplicht"),
   amount: z.string().min(1, "Bedrag is verplicht"),
   description: z.string().min(1, "Beschrijving is verplicht"),
   dueDate: z.string().min(1, "Vervaldatum is verplicht"),
@@ -73,12 +86,27 @@ export default function Fees() {
   const paymentForm = useForm({
     resolver: zodResolver(paymentFormSchema),
     defaultValues: {
-      studentId: '',
+      paymentMode: 'single' as const,
+      studentIds: [],
+      classId: '',
+      type: '',
       amount: '',
       description: '',
       dueDate: '',
     },
   });
+
+  // Watch payment mode and type to generate payment reference
+  const paymentMode = paymentForm.watch('paymentMode');
+  const selectedType = paymentForm.watch('type');
+  const selectedStudentIds = paymentForm.watch('studentIds');
+
+  // Generate unique payment reference
+  const generatePaymentReference = (type: string, studentId: string) => {
+    const typeData = paymentTypes.find(t => t.value === type);
+    const prefix = typeData?.prefix || 'PAY';
+    return `${prefix}-${studentId}-${Date.now().toString().slice(-6)}`;
+  };
 
   const tuitionRateForm = useForm({
     resolver: zodResolver(tuitionRateFormSchema),
@@ -452,7 +480,12 @@ export default function Fees() {
 
       {/* Nieuwe Betaling Dialog */}
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-        <DialogContent className="sm:max-w-[600px] p-0">
+        <DialogContent className="sm:max-w-[700px] p-0 max-h-[90vh] overflow-y-auto">
+          <VisuallyHidden>
+            <DialogTitle>Nieuwe Betaling</DialogTitle>
+            <DialogDescription>Voeg een nieuwe betaling toe aan het systeem</DialogDescription>
+          </VisuallyHidden>
+          
           <div className="bg-blue-600 text-white p-6 rounded-t-lg">
             <div className="flex items-center gap-3">
               <CreditCard className="h-5 w-5" />
@@ -466,28 +499,147 @@ export default function Fees() {
           <div className="p-6">
             <Form {...paymentForm}>
               <form onSubmit={paymentForm.handleSubmit(handleCreatePayment)} className="space-y-4">
+                
+                {/* Payment Mode Selection */}
                 <FormField
                   control={paymentForm.control}
-                  name="studentId"
+                  name="paymentMode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Student</FormLabel>
+                      <FormLabel>Betalingsmodus</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecteer student" />
+                            <SelectValue placeholder="Selecteer betalingsmodus" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="STU-001">Ahmed Hassan (STU-001)</SelectItem>
-                          <SelectItem value="STU-002">Fatima Al-Zahra (STU-002)</SelectItem>
-                          <SelectItem value="STU-003">Omar Ibn Khattab (STU-003)</SelectItem>
+                          <SelectItem value="single">Enkele Student</SelectItem>
+                          <SelectItem value="multiple">Meerdere Studenten</SelectItem>
+                          <SelectItem value="bulk">Hele Klas</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                {/* Payment Type Selection */}
+                <FormField
+                  control={paymentForm.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Betalingstype</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer type betaling" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {paymentTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label} ({type.prefix})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Conditional Student/Class Selection */}
+                {paymentMode === 'bulk' ? (
+                  <FormField
+                    control={paymentForm.control}
+                    name="classId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Klas</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecteer klas" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="klas-1">Arabisch Beginners (2024-2025)</SelectItem>
+                            <SelectItem value="klas-2">Quran Memorisatie (2024-2025)</SelectItem>
+                            <SelectItem value="klas-3">Islamitische Studies (2024-2025)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : (
+                  <FormField
+                    control={paymentForm.control}
+                    name="studentIds"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {paymentMode === 'single' ? 'Student' : 'Studenten'}
+                        </FormLabel>
+                        {paymentMode === 'single' ? (
+                          <Select 
+                            onValueChange={(value) => field.onChange([value])} 
+                            defaultValue={field.value?.[0]}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecteer student" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="STU-001">Ahmed Hassan (STU-001)</SelectItem>
+                              <SelectItem value="STU-002">Fatima Al-Zahra (STU-002)</SelectItem>
+                              <SelectItem value="STU-003">Omar Ibn Khattab (STU-003)</SelectItem>
+                              <SelectItem value="STU-004">Yusuf Ibrahim (STU-004)</SelectItem>
+                              <SelectItem value="STU-005">Aisha Mohammed (STU-005)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <div className="space-y-2">
+                            <div className="text-sm text-muted-foreground">
+                              Selecteer meerdere studenten voor deze betaling
+                            </div>
+                            <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto border rounded p-2">
+                              {[
+                                { id: 'STU-001', name: 'Ahmed Hassan' },
+                                { id: 'STU-002', name: 'Fatima Al-Zahra' },
+                                { id: 'STU-003', name: 'Omar Ibn Khattab' },
+                                { id: 'STU-004', name: 'Yusuf Ibrahim' },
+                                { id: 'STU-005', name: 'Aisha Mohammed' },
+                              ].map((student) => (
+                                <div key={student.id} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={student.id}
+                                    checked={field.value?.includes(student.id)}
+                                    onCheckedChange={(checked) => {
+                                      const currentValue = field.value || [];
+                                      if (checked) {
+                                        field.onChange([...currentValue, student.id]);
+                                      } else {
+                                        field.onChange(currentValue.filter(id => id !== student.id));
+                                      }
+                                    }}
+                                  />
+                                  <label htmlFor={student.id} className="text-sm">
+                                    {student.name} ({student.id})
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
@@ -532,6 +684,20 @@ export default function Fees() {
                     </FormItem>
                   )}
                 />
+
+                {/* Payment Reference Preview */}
+                {selectedType && selectedStudentIds.length > 0 && (
+                  <div className="bg-gray-50 p-3 rounded border">
+                    <div className="text-sm font-medium mb-2">Betalingskenmerk(en):</div>
+                    <div className="space-y-1">
+                      {selectedStudentIds.map(studentId => (
+                        <div key={studentId} className="text-sm text-blue-600 font-mono">
+                          {generatePaymentReference(selectedType, studentId)}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex justify-end gap-3 pt-6 border-t">
                   <Button type="button" variant="outline" onClick={() => setShowPaymentDialog(false)}>

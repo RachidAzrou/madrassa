@@ -40,6 +40,7 @@ import { toast } from '@/hooks/use-toast';
 
 // Import custom components
 import { PremiumHeader } from '@/components/layout/premium-header';
+import { DialogHeaderWithIcon } from '@/components/ui/dialog-header-with-icon';
 import { StandardTable } from '@/components/ui/standard-table';
 
 // Payment types - these will be managed dynamically
@@ -904,19 +905,11 @@ export default function Fees() {
       {/* Nieuw Tarief Dialog */}
       <Dialog open={showTuitionRateDialog} onOpenChange={setShowTuitionRateDialog}>
         <DialogContent className="sm:max-w-[600px] p-0">
-          <VisuallyHidden>
-            <DialogTitle>Nieuw Tarief</DialogTitle>
-            <DialogDescription>Voeg een nieuw tarief toe aan het systeem</DialogDescription>
-          </VisuallyHidden>
-          <div className="bg-green-600 text-white p-6 rounded-t-lg">
-            <div className="flex items-center gap-3">
-              <Euro className="h-5 w-5" />
-              <div>
-                <h2 className="text-lg font-semibold">Nieuw Tarief</h2>
-                <p className="text-green-100 text-sm">Voeg een nieuw tarief toe aan het systeem</p>
-              </div>
-            </div>
-          </div>
+          <DialogHeaderWithIcon
+            icon={Euro}
+            title="Nieuw Tarief"
+            description="Voeg een nieuw tarief toe aan het systeem"
+          />
           
           <div className="p-6">
             <Form {...tuitionRateForm}>
@@ -996,15 +989,11 @@ export default function Fees() {
       {/* Nieuwe Korting Dialog */}
       <Dialog open={showDiscountDialog} onOpenChange={setShowDiscountDialog}>
         <DialogContent className="sm:max-w-[600px] p-0">
-          <div className="bg-purple-600 text-white p-6 rounded-t-lg">
-            <div className="flex items-center gap-3">
-              <Percent className="h-5 w-5" />
-              <div>
-                <h2 className="text-lg font-semibold">Nieuwe Korting</h2>
-                <p className="text-purple-100 text-sm">Voeg een nieuwe korting toe aan het systeem</p>
-              </div>
-            </div>
-          </div>
+          <DialogHeaderWithIcon
+            icon={Percent}
+            title="Nieuwe Korting"
+            description="Voeg een nieuwe korting toe aan het systeem"
+          />
           
           <div className="p-6">
             <Form {...discountForm}>

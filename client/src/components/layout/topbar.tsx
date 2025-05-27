@@ -56,7 +56,9 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
     queryKey: ['/api/notifications/user/1'],
   });
 
-  const handleMessageClick = (messageId: number) => {
+  const handleMessageClick = (messageId: number, event: React.MouseEvent) => {
+    // Voorkom dat de popup sluit
+    event.stopPropagation();
     // Navigeer naar de berichtenpagina met het specifieke bericht
     setLocation(`/messages?messageId=${messageId}`);
   };
@@ -148,7 +150,7 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
             <div className="max-h-72 overflow-y-auto">
               <div 
                 className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
-                onClick={() => handleMessageClick(1)}
+                onClick={(e) => handleMessageClick(1, e)}
               >
                 <div className="flex items-start gap-3">
                   <Avatar className="h-8 w-8 mt-1">
@@ -165,7 +167,7 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
               </div>
               <div 
                 className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
-                onClick={() => handleMessageClick(2)}
+                onClick={(e) => handleMessageClick(2, e)}
               >
                 <div className="flex items-start gap-3">
                   <Avatar className="h-8 w-8 mt-1">

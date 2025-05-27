@@ -395,58 +395,9 @@ export default function Fees() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Totaal Geïnd</CardTitle>
-                <Euro className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">€{statsData?.totalCollected?.toLocaleString() || '0,00'}</div>
-                <p className="text-xs text-muted-foreground">
-                  +20.1% van vorige maand
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Openstaand</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">€{statsData?.pendingAmount?.toLocaleString() || '0,00'}</div>
-                <p className="text-xs text-muted-foreground">
-                  {statsData?.pendingInvoices || 0} openstaande facturen
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Betalingspercentage</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{statsData?.completionRate?.toFixed(1) || '0.0'}%</div>
-                <p className="text-xs text-muted-foreground">
-                  +2.1% van vorige maand
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Actieve Studenten</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{statsData?.totalStudents || 0}</div>
-                <p className="text-xs text-muted-foreground">
-                  +12 nieuwe inschrijvingen
-                </p>
-              </CardContent>
-            </Card>
+          <div className="text-center py-12 text-gray-500">
+            <h3 className="text-lg font-medium mb-2">Betalingsoverzicht</h3>
+            <p className="text-sm">Bekijk de financiële statistieken bovenaan deze pagina voor een volledig overzicht van alle betalingen en uitstaande bedragen.</p>
           </div>
         </TabsContent>
 

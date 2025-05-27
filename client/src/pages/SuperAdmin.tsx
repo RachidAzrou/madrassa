@@ -289,41 +289,7 @@ export default function SuperAdmin() {
 
 
 
-        {/* Directors Management */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg font-medium leading-tight tracking-tight flex items-center gap-2 text-[#0b4ca4]">
-                  <UserPlus className="h-5 w-5" />
-                  Directeuren Beheer
-                </CardTitle>
-                <CardDescription>
-                  Overzicht van alle schooldirecteuren
-                </CardDescription>
-              </div>
-              <Button 
-                onClick={() => {
-                  setEditingDirector(null);
-                  setShowDirectorDialog(true);
-                }}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nieuwe Directeur
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <StandardTable
-              data={directors}
-              columns={directorColumns}
-              onEdit={handleEditDirector}
-              onDelete={handleDeleteDirector}
-              searchPlaceholder="Zoek directeuren..."
-            />
-          </CardContent>
-        </Card>
+
       </div>
 
       {/* School Dialog */}

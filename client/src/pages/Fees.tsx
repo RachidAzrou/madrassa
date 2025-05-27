@@ -31,6 +31,13 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
 import {
+  CustomDialog,
+  DialogHeaderWithIcon,
+  DialogFormContainer,
+  DialogFooterContainer,
+  FormLabel as CustomFormLabel
+} from "@/components/ui/custom-dialog";
+import {
   Form,
   FormControl,
   FormDescription,
@@ -1058,20 +1065,25 @@ export default function Fees() {
 
       {/* Dialog voor nieuwe factuur */}
       <Dialog open={showAddInvoiceDialog} onOpenChange={setShowAddInvoiceDialog}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Receipt className="h-5 w-5" />
-              Nieuwe Factuur Aanmaken
-            </DialogTitle>
-            <DialogDescription>
-              Maak een nieuwe factuur aan voor een specifieke student met automatische kortingsberekening.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+          <div className="bg-blue-600 text-white p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 bg-opacity-20 rounded-lg">
+                <Receipt className="h-6 w-6" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-semibold">Nieuwe Factuur Aanmaken</DialogTitle>
+                <DialogDescription className="text-blue-100 mt-1">
+                  Maak een nieuwe factuur aan voor een specifieke student met automatische kortingsberekening.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
           
-          <Form {...invoiceForm}>
-            <form onSubmit={invoiceForm.handleSubmit(handleCreateInvoice)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+          <div className="p-6">
+            <Form {...invoiceForm}>
+              <form onSubmit={invoiceForm.handleSubmit(handleCreateInvoice)} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={invoiceForm.control}
                   name="studentId"
@@ -1229,16 +1241,17 @@ export default function Fees() {
                 )}
               />
 
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setShowAddInvoiceDialog(false)}>
-                  Annuleren
-                </Button>
-                <Button type="submit">
-                  Factuur Aanmaken
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
+                <div className="flex justify-end gap-3 pt-6 border-t">
+                  <Button type="button" variant="outline" onClick={() => setShowAddInvoiceDialog(false)}>
+                    Annuleren
+                  </Button>
+                  <Button type="submit">
+                    Factuur Aanmaken
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
         </DialogContent>
       </Dialog>
 

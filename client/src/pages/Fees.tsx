@@ -503,30 +503,30 @@ export default function Fees() {
                       <div className="opacity-0 group-hover:opacity-100 flex gap-1">
                         <Button 
                           variant="ghost" 
-                          size="icon" 
-                          className="h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm"
+                          size="sm" 
+                          className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                           onClick={() => console.log('Bekijk betaling:', payment.id)}
                           title="Bekijk betaling"
                         >
-                          <Eye className="h-3 w-3" />
+                          <Eye className="h-3.5 w-3.5" />
                         </Button>
                         <Button 
                           variant="ghost" 
-                          size="icon" 
-                          className="h-7 w-7 text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-sm"
+                          size="sm" 
+                          className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                           onClick={() => console.log('Bewerk betaling:', payment.id)}
                           title="Bewerk betaling"
                         >
-                          <Edit3 className="h-3 w-3" />
+                          <Edit3 className="h-3.5 w-3.5" />
                         </Button>
                         <Button 
                           variant="ghost" 
-                          size="icon" 
-                          className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm"
+                          size="sm" 
+                          className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                           onClick={() => console.log('Verwijder betaling:', payment.id)}
                           title="Verwijder betaling"
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </div>
                     </TableActionCell>
@@ -593,30 +593,30 @@ export default function Fees() {
                     <div className="opacity-0 group-hover:opacity-100 flex gap-1">
                       <Button 
                         variant="ghost" 
-                        size="icon" 
-                        className="h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm"
+                        size="sm" 
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                         onClick={() => console.log('Bekijk tarief:', 1)}
                         title="Bekijk tarief"
                       >
-                        <Eye className="h-3 w-3" />
+                        <Eye className="h-3.5 w-3.5" />
                       </Button>
                       <Button 
                         variant="ghost" 
-                        size="icon" 
-                        className="h-7 w-7 text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-sm"
+                        size="sm" 
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                         onClick={() => console.log('Bewerk tarief:', 1)}
                         title="Bewerk tarief"
                       >
-                        <Edit3 className="h-3 w-3" />
+                        <Edit3 className="h-3.5 w-3.5" />
                       </Button>
                       <Button 
                         variant="ghost" 
-                        size="icon" 
-                        className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm"
+                        size="sm" 
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                         onClick={() => console.log('Verwijder tarief:', 1)}
                         title="Verwijder tarief"
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </TableActionCell>
@@ -642,30 +642,30 @@ export default function Fees() {
                     <div className="opacity-0 group-hover:opacity-100 flex gap-1">
                       <Button 
                         variant="ghost" 
-                        size="icon" 
-                        className="h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm"
+                        size="sm" 
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                         onClick={() => console.log('Bekijk tarief:', 2)}
                         title="Bekijk tarief"
                       >
-                        <Eye className="h-3 w-3" />
+                        <Eye className="h-3.5 w-3.5" />
                       </Button>
                       <Button 
                         variant="ghost" 
-                        size="icon" 
-                        className="h-7 w-7 text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-sm"
+                        size="sm" 
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                         onClick={() => console.log('Bewerk tarief:', 2)}
                         title="Bewerk tarief"
                       >
-                        <Edit3 className="h-3 w-3" />
+                        <Edit3 className="h-3.5 w-3.5" />
                       </Button>
                       <Button 
                         variant="ghost" 
-                        size="icon" 
-                        className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm"
+                        size="sm" 
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                         onClick={() => console.log('Verwijder tarief:', 2)}
                         title="Verwijder tarief"
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </TableActionCell>
@@ -691,30 +691,30 @@ export default function Fees() {
                     <div className="opacity-0 group-hover:opacity-100 flex gap-1">
                       <Button 
                         variant="ghost" 
-                        size="icon" 
-                        className="h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm"
+                        size="sm" 
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                         onClick={() => console.log('Bekijk tarief:', 3)}
                         title="Bekijk tarief"
                       >
-                        <Eye className="h-3 w-3" />
+                        <Eye className="h-3.5 w-3.5" />
                       </Button>
                       <Button 
                         variant="ghost" 
-                        size="icon" 
-                        className="h-7 w-7 text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-sm"
+                        size="sm" 
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                         onClick={() => console.log('Bewerk tarief:', 3)}
                         title="Bewerk tarief"
                       >
-                        <Edit3 className="h-3 w-3" />
+                        <Edit3 className="h-3.5 w-3.5" />
                       </Button>
                       <Button 
                         variant="ghost" 
-                        size="icon" 
-                        className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm"
+                        size="sm" 
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                         onClick={() => console.log('Verwijder tarief:', 3)}
                         title="Verwijder tarief"
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </TableActionCell>

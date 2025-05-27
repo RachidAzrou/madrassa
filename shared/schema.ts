@@ -3,6 +3,21 @@ import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Schools
+export const schools = pgTable("schools", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  address: text("address"),
+  phone: text("phone"),
+  email: text("email"),
+  website: text("website"),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User roles enum
+export const userRoles = ["superadmin", "directeur", "docent", "student", "ouder"] as const;
+
 // Students
 export const students = pgTable("students", {
   id: serial("id").primaryKey(),
@@ -24,6 +39,8 @@ export const students = pgTable("students", {
   notes: text("notes"), // Notities over de student
   gender: text("gender"), // man of vrouw
   photoUrl: text("photo_url"), // URL naar de foto van de student
+  schoolId: integer("school_id").notNull(), // Koppeling naar school
+  userId: integer("user_id"), // Koppeling naar user account (optioneel)
 });
 
 // Maak een standaard schema maar omit ID (wordt gegenereerd door database)
@@ -330,8 +347,11 @@ export const users = pgTable("users", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   email: text("email").notNull().unique(),
-  role: text("role").notNull(), // admin, teacher, staff
+  role: text("role").notNull(), // superadmin, directeur, docent, student, ouder
+  schoolId: integer("school_id"), // null for superadmin
   isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  lastLoginAt: timestamp("last_login_at"),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({

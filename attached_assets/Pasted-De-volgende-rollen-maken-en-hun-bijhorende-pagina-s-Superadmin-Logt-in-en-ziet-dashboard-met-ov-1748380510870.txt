@@ -1,0 +1,43 @@
+De volgende rollen maken en hun bijhorende pagina’s:
+
+-> Superadmin
+Logt in en ziet dashboard met overzicht van alle scholen en hun bijhorend personeel (directeur, docenten, aantal studenten). Kan scholen toevoegen, directeuren aanmaken. 
+
+-> Directeur
+Logt in en ziet alles wat er nu is aangemaakt in de app maar enkel voor zijn school. Hij kan alles aanmaken en bewerken alsook verwijderen. Behalve cijfers van de studenten. Berichten -> kan naar ouders, docenten en studenten sturen en ontvangen.
+
+-> Docenten
+Logt in en :
+- Mijn rooster = ziet zijn kalenderrooster met alle evenementen maar kan enkel zijn bewerken. Kan ook nieuwe aanmaken
+- Mijn studenten = ziet een lijst met zijn studenten van zijn klas of aan wie hij een vak geeft
+- Mijn vakken = ziet de vakken die hij geeft, kan deze bewerken
+- Rapport = kan rapportmaken voor zijn studenten
+- Cijfers = kan cijfers ingeven voor zijn studenten
+- Aanwezigheid: kan aanwezigheden doorgeven van zijn studenten
+- Voogden = ziet de voogden van zijn studenten
+- Leerlingendossier = kan specifieke leerlingendossier zien van elke student van zijn klas/vak (behalve betalingen).
+- 
+Kunnen berichten sturen naar directeur, docenten en studenten van zijn klas of vak en naar de ouders van studenten van zijn klas/vak.
+
+-> Studenten
+Logt in en ziet:
+- Mijn rooster = ziet zijn kalenderrooster met alle evenementen van zijn klas en kan niets aanmaken of bewerken
+- Mijn klas = ziet zijn klasgenoten in de lijst maar informatie is beperkt (kan geen details zien)
+- Mijn aanwezigheid = ziet hier zijn aanwezigheden
+- Mijn rapport = ziet hier zijn rapporten
+- Mijn cijfers = ziet hier zijn cijfers
+- Mijn docenten = ziet hier de docenten bij wie hij les volgt
+
+Kunnen berichten sturen naar hun docenten.
+
+-> Ouders
+Logt in en ziet:
+- Scherm met al zijn kinderen/studenten. Kan er eentje kiezen dan ziet hij:
+- Kalenderrooster van de student (enkel lezen)
+- Rapport = rapporten van het kind
+- Cijfers = cijfers van het kind
+- Aanwezigheid = aanwezigheden van het kind
+- Betalingen = alle betalingen (openstaand, vereffend etc)
+
+Kunnen berichten sturen naar directeur en docenten
+

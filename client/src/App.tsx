@@ -29,6 +29,10 @@ import Messages from "@/pages/Messages";
 import Planning from "@/pages/Planning";
 import Fees from "@/pages/Fees";
 import StudentDossier from "@/pages/StudentDossier";
+import SuperAdmin from "@/pages/SuperAdmin";
+import TeacherDashboard from "@/pages/TeacherDashboard";
+import StudentDashboard from "@/pages/StudentDashboard";
+import ParentDashboard from "@/pages/ParentDashboard";
 
 import Settings from "@/pages/Settings";
 

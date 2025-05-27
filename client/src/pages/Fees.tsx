@@ -765,37 +765,93 @@ export default function Fees() {
 
         {/* Tarieven & Kortingen Tab */}
         <TabsContent value="instellingen" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Tarieven sectie */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+          {/* Snelle acties */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="border-blue-200 bg-blue-50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2 text-blue-800">
                   <Banknote className="h-5 w-5" />
-                  Schoolgeld Tarieven
+                  Tarieven Beheer
                 </CardTitle>
-                <CardDescription>Stel de standaard tarieven in per academisch jaar</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <Button onClick={() => setShowAddTuitionRateDialog(true)} className="w-full">
+              <CardContent className="space-y-3">
+                <p className="text-sm text-blue-700">Stel standaard schoolgelden in per academisch jaar en factuurtype</p>
+                <Button 
+                  onClick={() => setShowAddTuitionRateDialog(true)} 
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
                   <Plus className="mr-2 h-4 w-4" />
                   Nieuw Tarief Toevoegen
                 </Button>
-                
-                <div className="space-y-2">
-                  {tuitionRatesData && tuitionRatesData.length > 0 ? (
-                    tuitionRatesData.map((rate: any) => (
-                      <div key={rate.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <div className="font-medium text-sm">{rate.name}</div>
-                          <div className="text-xs text-gray-500">{rate.academicYear} • {rate.type}</div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-green-200 bg-green-50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2 text-green-800">
+                  <Target className="h-5 w-5" />
+                  Kortingen Beheer
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-green-700">Maak kortingsregels die automatisch worden toegepast bij facturatie</p>
+                <Button 
+                  onClick={() => setShowAddDiscountDialog(true)} 
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Nieuwe Korting Toevoegen
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Tarieven widget */}
+            <Card>
+              <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Banknote className="h-5 w-5" />
+                    Actieve Tarieven
+                  </div>
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                    {tuitionRatesData && Array.isArray(tuitionRatesData) ? tuitionRatesData.length : 0}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="max-h-80 overflow-y-auto">
+                  {tuitionRatesData && Array.isArray(tuitionRatesData) && tuitionRatesData.length > 0 ? (
+                    tuitionRatesData.map((rate: any, index: number) => (
+                      <div 
+                        key={rate.id} 
+                        className={`flex items-center justify-between p-4 hover:bg-blue-50 transition-colors ${
+                          index !== tuitionRatesData.length - 1 ? 'border-b border-gray-100' : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <Euro className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <div className="font-semibold text-sm text-gray-900">{rate.name}</div>
+                            <div className="text-xs text-gray-500 flex items-center gap-2">
+                              <span>{rate.academicYear}</span>
+                              <span>•</span>
+                              <TypeBadge type={rate.type} />
+                            </div>
+                          </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-medium">{formatCurrency(parseFloat(rate.baseAmount))}</div>
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="sm">
+                          <div className="font-bold text-lg text-blue-600">
+                            {formatCurrency(parseFloat(rate.baseAmount || '0'))}
+                          </div>
+                          <div className="flex items-center gap-1 justify-end mt-1">
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                               <Edit className="h-3 w-3" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                               <Trash2 className="h-3 w-3" />
                             </Button>
                           </div>
@@ -803,47 +859,68 @@ export default function Fees() {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-4 text-gray-500">
-                      <Banknote className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                      <p>Geen tarieven ingesteld</p>
+                    <div className="text-center py-12 text-gray-500">
+                      <Banknote className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                      <p className="font-medium">Geen tarieven ingesteld</p>
+                      <p className="text-sm">Voeg je eerste tarief toe om te beginnen</p>
                     </div>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Kortingen sectie */}
+            {/* Kortingen widget */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Kortingsregels
+              <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Target className="h-5 w-5" />
+                    Actieve Kortingen
+                  </div>
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                    {feeDiscountsData && Array.isArray(feeDiscountsData) ? feeDiscountsData.length : 0}
+                  </Badge>
                 </CardTitle>
-                <CardDescription>Beheer automatische kortingen en voorwaarden</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <Button onClick={() => setShowAddDiscountDialog(true)} className="w-full">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nieuwe Korting Toevoegen
-                </Button>
-                
-                <div className="space-y-2">
-                  {feeDiscountsData && feeDiscountsData.length > 0 ? (
-                    feeDiscountsData.map((discount: any) => (
-                      <div key={discount.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <div className="font-medium text-sm">{discount.name}</div>
-                          <div className="text-xs text-gray-500">{discount.academicYear}</div>
+              <CardContent className="p-0">
+                <div className="max-h-80 overflow-y-auto">
+                  {feeDiscountsData && Array.isArray(feeDiscountsData) && feeDiscountsData.length > 0 ? (
+                    feeDiscountsData.map((discount: any, index: number) => (
+                      <div 
+                        key={discount.id} 
+                        className={`flex items-center justify-between p-4 hover:bg-green-50 transition-colors ${
+                          index !== feeDiscountsData.length - 1 ? 'border-b border-gray-100' : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                            <Percent className="h-5 w-5 text-green-600" />
+                          </div>
+                          <div>
+                            <div className="font-semibold text-sm text-gray-900">{discount.name}</div>
+                            <div className="text-xs text-gray-500 flex items-center gap-2">
+                              <span>{discount.academicYear}</span>
+                              {discount.description && (
+                                <>
+                                  <span>•</span>
+                                  <span className="truncate max-w-32">{discount.description}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-medium">
-                            {discount.discountType === 'percentage' ? `${discount.discountValue}%` : formatCurrency(parseFloat(discount.discountValue))}
+                          <div className="font-bold text-lg text-green-600">
+                            {discount.discountType === 'percentage' ? 
+                              `${discount.discountValue}%` : 
+                              formatCurrency(parseFloat(discount.discountValue || '0'))
+                            }
                           </div>
-                          <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="sm">
+                          <div className="flex items-center gap-1 justify-end mt-1">
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                               <Edit className="h-3 w-3" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                               <Trash2 className="h-3 w-3" />
                             </Button>
                           </div>
@@ -851,9 +928,10 @@ export default function Fees() {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-4 text-gray-500">
-                      <Target className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                      <p>Geen kortingen ingesteld</p>
+                    <div className="text-center py-12 text-gray-500">
+                      <Target className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                      <p className="font-medium">Geen kortingen ingesteld</p>
+                      <p className="text-sm">Voeg je eerste korting toe om te beginnen</p>
                     </div>
                   )}
                 </div>
@@ -865,41 +943,85 @@ export default function Fees() {
         {/* Rapporten Tab */}
         <TabsContent value="rapporten" className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Financieel Overzicht</CardTitle>
+            <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100">
+              <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-t-lg">
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Financieel Overzicht
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-xs text-gray-600 mb-4">Overzicht van alle inkomsten en openstaande bedragen</p>
-                <Button size="sm" className="w-full">
+              <CardContent className="p-4">
+                <p className="text-sm text-purple-700 mb-4">Compleet overzicht van alle inkomsten, openstaande bedragen en betalingstrends</p>
+                <Button className="w-full bg-purple-600 hover:bg-purple-700">
                   <Download className="mr-2 h-4 w-4" />
-                  Download PDF
+                  Download PDF Rapport
                 </Button>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Openstaande Schulden</CardTitle>
+            <Card className="border-red-200 bg-gradient-to-br from-red-50 to-red-100">
+              <CardHeader className="bg-gradient-to-r from-red-600 to-red-700 text-white rounded-t-lg">
+                <CardTitle className="flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5" />
+                  Openstaande Schulden
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-xs text-gray-600 mb-4">Lijst van studenten met openstaande betalingen</p>
-                <Button size="sm" className="w-full">
+              <CardContent className="p-4">
+                <p className="text-sm text-red-700 mb-4">Gedetailleerde lijst van studenten met openstaande betalingen en vervaldatums</p>
+                <Button className="w-full bg-red-600 hover:bg-red-700">
                   <Download className="mr-2 h-4 w-4" />
-                  Download Excel
+                  Download Excel Lijst
                 </Button>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Betalingshistorie</CardTitle>
+            <Card className="border-indigo-200 bg-gradient-to-br from-indigo-50 to-indigo-100">
+              <CardHeader className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-t-lg">
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Betalingshistorie
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-xs text-gray-600 mb-4">Overzicht van alle uitgevoerde betalingen</p>
-                <Button size="sm" className="w-full">
+              <CardContent className="p-4">
+                <p className="text-sm text-indigo-700 mb-4">Chronologisch overzicht van alle uitgevoerde betalingen en transacties</p>
+                <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
                   <Download className="mr-2 h-4 w-4" />
-                  Download CSV
+                  Download CSV Export
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Extra rapportage opties */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100">
+              <CardHeader className="bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-t-lg">
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Trend Analyse
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <p className="text-sm text-amber-700 mb-4">Analyse van betalingstrends, seizoenspatronen en voorspellingen</p>
+                <Button className="w-full bg-amber-600 hover:bg-amber-700">
+                  <Calculator className="mr-2 h-4 w-4" />
+                  Genereer Analyse
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="border-teal-200 bg-gradient-to-br from-teal-50 to-teal-100">
+              <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-t-lg">
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="h-5 w-5" />
+                  Herinneringen
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <p className="text-sm text-teal-700 mb-4">Automatische herinneringen versturen naar studenten met openstaande betalingen</p>
+                <Button className="w-full bg-teal-600 hover:bg-teal-700">
+                  <Mail className="mr-2 h-4 w-4" />
+                  Verstuur Herinneringen
                 </Button>
               </CardContent>
             </Card>

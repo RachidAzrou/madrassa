@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PremiumHeader } from "@/components/layout/premium-header";
 import { StandardTable } from "@/components/ui/standard-table";
 import { SearchActionLayout } from "@/components/ui/search-action-layout";
-import { CustomDialog } from "@/components/ui/custom-dialog";
+import { CustomDialog, DialogHeaderWithIcon, DialogFormContainer, DialogFooterContainer } from "@/components/ui/custom-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Building, Plus, Users, MapPin, Phone, Mail, Globe, Edit, Trash2, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -524,190 +524,184 @@ export default function Scholen() {
       )}
 
       {/* School Dialog */}
-      <CustomDialog 
-        open={isSchoolDialogOpen} 
-        onOpenChange={setIsSchoolDialogOpen}
-        title={editingSchool ? "School Bewerken" : "Nieuwe School Toevoegen"}
-        description={editingSchool ? "Wijzig de schoolgegevens" : "Voeg een nieuwe school toe aan het systeem"}
-        icon={Building}
-      >
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="name">Schoolnaam *</Label>
-            <Input
-              id="name"
-              value={schoolForm.name}
-              onChange={(e) => setSchoolForm({...schoolForm, name: e.target.value})}
-              placeholder="Bijv. Madrassa Al-Noor"
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor="email">Email *</Label>
-            <Input
-              id="email"
-              type="email"
-              value={schoolForm.email}
-              onChange={(e) => setSchoolForm({...schoolForm, email: e.target.value})}
-              placeholder="info@school.nl"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="address">Adres</Label>
-            <Input
-              id="address"
-              value={schoolForm.address}
-              onChange={(e) => setSchoolForm({...schoolForm, address: e.target.value})}
-              placeholder="Straat 123, 1234 AB Stad"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+      <CustomDialog open={isSchoolDialogOpen} onOpenChange={setIsSchoolDialogOpen}>
+        <DialogHeaderWithIcon
+          title={editingSchool ? "School Bewerken" : "Nieuwe School Toevoegen"}
+          description={editingSchool ? "Wijzig de schoolgegevens" : "Voeg een nieuwe school toe aan het systeem"}
+          icon={<Building className="h-5 w-5" />}
+        />
+        
+        <DialogFormContainer>
+          <div className="space-y-4">
             <div>
-              <Label htmlFor="phone">Telefoon</Label>
+              <Label htmlFor="name">Schoolnaam *</Label>
               <Input
-                id="phone"
-                value={schoolForm.phone}
-                onChange={(e) => setSchoolForm({...schoolForm, phone: e.target.value})}
-                placeholder="020-1234567"
+                id="name"
+                value={schoolForm.name}
+                onChange={(e) => setSchoolForm({...schoolForm, name: e.target.value})}
+                placeholder="Bijv. Madrassa Al-Noor"
               />
             </div>
             
             <div>
-              <Label htmlFor="website">Website</Label>
+              <Label htmlFor="email">Email *</Label>
               <Input
-                id="website"
-                value={schoolForm.website}
-                onChange={(e) => setSchoolForm({...schoolForm, website: e.target.value})}
-                placeholder="www.school.nl"
+                id="email"
+                type="email"
+                value={schoolForm.email}
+                onChange={(e) => setSchoolForm({...schoolForm, email: e.target.value})}
+                placeholder="info@school.nl"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="address">Adres</Label>
+              <Input
+                id="address"
+                value={schoolForm.address}
+                onChange={(e) => setSchoolForm({...schoolForm, address: e.target.value})}
+                placeholder="Straat 123, 1234 AB Stad"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="phone">Telefoon</Label>
+                <Input
+                  id="phone"
+                  value={schoolForm.phone}
+                  onChange={(e) => setSchoolForm({...schoolForm, phone: e.target.value})}
+                  placeholder="020-1234567"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="website">Website</Label>
+                <Input
+                  id="website"
+                  value={schoolForm.website}
+                  onChange={(e) => setSchoolForm({...schoolForm, website: e.target.value})}
+                  placeholder="www.school.nl"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="description">Beschrijving</Label>
+              <Textarea
+                id="description"
+                value={schoolForm.description}
+                onChange={(e) => setSchoolForm({...schoolForm, description: e.target.value})}
+                placeholder="Korte beschrijving van de school..."
+                rows={3}
               />
             </div>
           </div>
+        </DialogFormContainer>
 
-          <div>
-            <Label htmlFor="description">Beschrijving</Label>
-            <Textarea
-              id="description"
-              value={schoolForm.description}
-              onChange={(e) => setSchoolForm({...schoolForm, description: e.target.value})}
-              placeholder="Korte beschrijving van de school..."
-              rows={3}
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setIsSchoolDialogOpen(false);
-                resetSchoolForm();
-              }}
-            >
-              Annuleren
-            </Button>
-            <Button onClick={handleSaveSchool}>
-              {editingSchool ? "Bijwerken" : "Toevoegen"}
-            </Button>
-          </div>
-        </div>
+        <DialogFooterContainer
+          onCancel={() => {
+            setIsSchoolDialogOpen(false);
+            resetSchoolForm();
+          }}
+          onSubmit={handleSaveSchool}
+          cancelText="Annuleren"
+          submitText={editingSchool ? "Bijwerken" : "Toevoegen"}
+        />
       </CustomDialog>
 
       {/* Director Dialog */}
-      <CustomDialog 
-        open={isDirectorDialogOpen} 
-        onOpenChange={setIsDirectorDialogOpen}
-        title={editingDirector ? "Directeur Bewerken" : "Nieuwe Directeur Toevoegen"}
-        description={editingDirector ? "Wijzig de directeurgegevens" : "Voeg een nieuwe directeur toe aan een school"}
-        icon={UserPlus}
-      >
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="schoolId">School *</Label>
-            <Select value={directorForm.schoolId} onValueChange={(value) => setDirectorForm({...directorForm, schoolId: value})}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecteer een school" />
-              </SelectTrigger>
-              <SelectContent>
-                {schools.map((school) => (
-                  <SelectItem key={school.id} value={school.id.toString()}>
-                    {school.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+      <CustomDialog open={isDirectorDialogOpen} onOpenChange={setIsDirectorDialogOpen}>
+        <DialogHeaderWithIcon
+          title={editingDirector ? "Directeur Bewerken" : "Nieuwe Directeur Toevoegen"}
+          description={editingDirector ? "Wijzig de directeurgegevens" : "Voeg een nieuwe directeur toe aan een school"}
+          icon={<UserPlus className="h-5 w-5" />}
+        />
+        
+        <DialogFormContainer>
+          <div className="space-y-4">
             <div>
-              <Label htmlFor="firstName">Voornaam *</Label>
+              <Label htmlFor="schoolId">School *</Label>
+              <Select value={directorForm.schoolId} onValueChange={(value) => setDirectorForm({...directorForm, schoolId: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecteer een school" />
+                </SelectTrigger>
+                <SelectContent>
+                  {schools.map((school) => (
+                    <SelectItem key={school.id} value={school.id.toString()}>
+                      {school.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="firstName">Voornaam *</Label>
+                <Input
+                  id="firstName"
+                  value={directorForm.firstName}
+                  onChange={(e) => setDirectorForm({...directorForm, firstName: e.target.value})}
+                  placeholder="Ahmed"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="lastName">Achternaam *</Label>
+                <Input
+                  id="lastName"
+                  value={directorForm.lastName}
+                  onChange={(e) => setDirectorForm({...directorForm, lastName: e.target.value})}
+                  placeholder="Hassan"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="directorEmail">Email *</Label>
               <Input
-                id="firstName"
-                value={directorForm.firstName}
-                onChange={(e) => setDirectorForm({...directorForm, firstName: e.target.value})}
-                placeholder="Ahmed"
+                id="directorEmail"
+                type="email"
+                value={directorForm.email}
+                onChange={(e) => setDirectorForm({...directorForm, email: e.target.value})}
+                placeholder="directeur@school.nl"
               />
             </div>
-            
-            <div>
-              <Label htmlFor="lastName">Achternaam *</Label>
-              <Input
-                id="lastName"
-                value={directorForm.lastName}
-                onChange={(e) => setDirectorForm({...directorForm, lastName: e.target.value})}
-                placeholder="Hassan"
-              />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="directorPhone">Telefoon</Label>
+                <Input
+                  id="directorPhone"
+                  value={directorForm.phone}
+                  onChange={(e) => setDirectorForm({...directorForm, phone: e.target.value})}
+                  placeholder="020-1234567"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="startDate">Startdatum</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={directorForm.startDate}
+                  onChange={(e) => setDirectorForm({...directorForm, startDate: e.target.value})}
+                />
+              </div>
             </div>
           </div>
+        </DialogFormContainer>
 
-          <div>
-            <Label htmlFor="directorEmail">Email *</Label>
-            <Input
-              id="directorEmail"
-              type="email"
-              value={directorForm.email}
-              onChange={(e) => setDirectorForm({...directorForm, email: e.target.value})}
-              placeholder="directeur@school.nl"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="directorPhone">Telefoon</Label>
-              <Input
-                id="directorPhone"
-                value={directorForm.phone}
-                onChange={(e) => setDirectorForm({...directorForm, phone: e.target.value})}
-                placeholder="020-1234567"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="startDate">Startdatum</Label>
-              <Input
-                id="startDate"
-                type="date"
-                value={directorForm.startDate}
-                onChange={(e) => setDirectorForm({...directorForm, startDate: e.target.value})}
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setIsDirectorDialogOpen(false);
-                resetDirectorForm();
-              }}
-            >
-              Annuleren
-            </Button>
-            <Button onClick={handleSaveDirector}>
-              {editingDirector ? "Bijwerken" : "Toevoegen"}
-            </Button>
-          </div>
-        </div>
+        <DialogFooterContainer
+          onCancel={() => {
+            setIsDirectorDialogOpen(false);
+            resetDirectorForm();
+          }}
+          onSubmit={handleSaveDirector}
+          cancelText="Annuleren"
+          submitText={editingDirector ? "Bijwerken" : "Toevoegen"}
+        />
       </CustomDialog>
     </div>
   );

@@ -287,41 +287,7 @@ export default function SuperAdmin() {
           </Card>
         </div>
 
-        {/* Schools Management */}
-        <Card className="mb-8">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg font-medium leading-tight tracking-tight flex items-center gap-2 text-[#0b4ca4]">
-                  <School className="h-5 w-5" />
-                  Scholen Beheer
-                </CardTitle>
-                <CardDescription>
-                  Overzicht van alle geregistreerde scholen
-                </CardDescription>
-              </div>
-              <Button 
-                onClick={() => {
-                  setEditingSchool(null);
-                  setShowSchoolDialog(true);
-                }}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nieuwe School
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <StandardTable
-              data={schools}
-              columns={schoolColumns}
-              onEdit={handleEditSchool}
-              onDelete={handleDeleteSchool}
-              searchPlaceholder="Zoek scholen..."
-            />
-          </CardContent>
-        </Card>
+
 
         {/* Directors Management */}
         <Card>

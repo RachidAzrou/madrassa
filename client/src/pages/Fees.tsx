@@ -591,13 +591,31 @@ export default function Fees() {
                   </StandardTableCell>
                   <TableActionCell>
                     <div className="opacity-0 group-hover:opacity-100 flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm"
+                        onClick={() => console.log('Bekijk tarief:', 1)}
+                        title="Bekijk tarief"
+                      >
                         <Eye className="h-3 w-3" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-sm"
+                        onClick={() => console.log('Bewerk tarief:', 1)}
+                        title="Bewerk tarief"
+                      >
                         <Edit3 className="h-3 w-3" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:text-red-700">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm"
+                        onClick={() => console.log('Verwijder tarief:', 1)}
+                        title="Verwijder tarief"
+                      >
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
@@ -622,13 +640,31 @@ export default function Fees() {
                   </StandardTableCell>
                   <TableActionCell>
                     <div className="opacity-0 group-hover:opacity-100 flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm"
+                        onClick={() => console.log('Bekijk tarief:', 2)}
+                        title="Bekijk tarief"
+                      >
                         <Eye className="h-3 w-3" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-sm"
+                        onClick={() => console.log('Bewerk tarief:', 2)}
+                        title="Bewerk tarief"
+                      >
                         <Edit3 className="h-3 w-3" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:text-red-700">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm"
+                        onClick={() => console.log('Verwijder tarief:', 2)}
+                        title="Verwijder tarief"
+                      >
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
@@ -653,13 +689,31 @@ export default function Fees() {
                   </StandardTableCell>
                   <TableActionCell>
                     <div className="opacity-0 group-hover:opacity-100 flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-sm"
+                        onClick={() => console.log('Bekijk tarief:', 3)}
+                        title="Bekijk tarief"
+                      >
                         <Eye className="h-3 w-3" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-sm"
+                        onClick={() => console.log('Bewerk tarief:', 3)}
+                        title="Bewerk tarief"
+                      >
                         <Edit3 className="h-3 w-3" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:text-red-700">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-sm"
+                        onClick={() => console.log('Verwijder tarief:', 3)}
+                        title="Verwijder tarief"
+                      >
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>

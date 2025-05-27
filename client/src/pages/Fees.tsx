@@ -971,19 +971,21 @@ export default function Fees() {
             <DialogTitle>Nieuw Tarief</DialogTitle>
             <DialogDescription>Voeg een nieuw tarief toe aan het systeem</DialogDescription>
           </VisuallyHidden>
-          <div className="bg-green-600 text-white p-6 rounded-t-lg">
+          <div className="bg-[#1e40af] text-white p-6">
             <div className="flex items-center gap-3">
-              <Euro className="h-5 w-5" />
+              <div className="p-2 rounded-full text-[#f5f6f7] bg-[#ffffff33]">
+                <Euro className="h-5 w-5" />
+              </div>
               <div>
-                <h2 className="text-lg font-semibold">Nieuw Tarief</h2>
-                <p className="text-green-100 text-sm">Voeg een nieuw tarief toe aan het systeem</p>
+                <h2 className="text-lg font-semibold m-0">Nieuw Tarief</h2>
+                <p className="text-white/70 text-sm m-0">Voeg een nieuw tarief toe aan het systeem</p>
               </div>
             </div>
           </div>
           
-          <div className="p-6">
+          <div className="px-6 py-4 space-y-4" style={{ maxHeight: 'calc(90vh - 150px)', overflowY: 'auto' }}>
             <Form {...tuitionRateForm}>
-              <form onSubmit={tuitionRateForm.handleSubmit(handleCreateTuitionRate)} className="space-y-4">
+              <form id="tuition-rate-form" onSubmit={tuitionRateForm.handleSubmit(handleCreateTuitionRate)} className="space-y-4">
                 <FormField
                   control={tuitionRateForm.control}
                   name="type"
@@ -1042,16 +1044,17 @@ export default function Fees() {
                   )}
                 />
 
-                <div className="flex justify-end gap-3 pt-6 border-t">
-                  <Button type="button" variant="outline" onClick={() => setShowTuitionRateDialog(false)}>
-                    Annuleren
-                  </Button>
-                  <Button type="submit" disabled={createTuitionRateMutation.isPending}>
-                    {createTuitionRateMutation.isPending ? 'Bezig...' : 'Tarief Toevoegen'}
-                  </Button>
-                </div>
               </form>
             </Form>
+          </div>
+          
+          <div className="bg-gray-50 px-6 py-3 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t">
+            <Button type="button" variant="outline" onClick={() => setShowTuitionRateDialog(false)} className="w-full sm:w-auto mt-2 sm:mt-0">
+              Annuleren
+            </Button>
+            <Button type="submit" disabled={createTuitionRateMutation.isPending} className="bg-[#1e40af] hover:bg-[#1e40af]/90 w-full sm:w-auto" form="tuition-rate-form">
+              {createTuitionRateMutation.isPending ? 'Bezig...' : 'Tarief Toevoegen'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -1063,19 +1066,21 @@ export default function Fees() {
             <DialogTitle>Nieuwe Korting</DialogTitle>
             <DialogDescription>Voeg een nieuwe korting toe aan het systeem</DialogDescription>
           </VisuallyHidden>
-          <div className="bg-purple-600 text-white p-6 rounded-t-lg">
+          <div className="bg-[#1e40af] text-white p-6">
             <div className="flex items-center gap-3">
-              <Percent className="h-5 w-5" />
+              <div className="p-2 rounded-full text-[#f5f6f7] bg-[#ffffff33]">
+                <Percent className="h-5 w-5" />
+              </div>
               <div>
-                <h2 className="text-lg font-semibold">Nieuwe Korting</h2>
-                <p className="text-purple-100 text-sm">Voeg een nieuwe korting toe aan het systeem</p>
+                <h2 className="text-lg font-semibold m-0">Nieuwe Korting</h2>
+                <p className="text-white/70 text-sm m-0">Voeg een nieuwe korting toe aan het systeem</p>
               </div>
             </div>
           </div>
           
-          <div className="p-6">
+          <div className="px-6 py-4 space-y-4" style={{ maxHeight: 'calc(90vh - 150px)', overflowY: 'auto' }}>
             <Form {...discountForm}>
-              <form onSubmit={discountForm.handleSubmit(handleCreateDiscount)} className="space-y-4">
+              <form id="discount-form" onSubmit={discountForm.handleSubmit(handleCreateDiscount)} className="space-y-4">
                 <FormField
                   control={discountForm.control}
                   name="name"
@@ -1142,16 +1147,17 @@ export default function Fees() {
                   )}
                 />
 
-                <div className="flex justify-end gap-3 pt-6 border-t">
-                  <Button type="button" variant="outline" onClick={() => setShowDiscountDialog(false)}>
-                    Annuleren
-                  </Button>
-                  <Button type="submit" disabled={createDiscountMutation.isPending}>
-                    {createDiscountMutation.isPending ? 'Bezig...' : 'Korting Toevoegen'}
-                  </Button>
-                </div>
               </form>
             </Form>
+          </div>
+          
+          <div className="bg-gray-50 px-6 py-3 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t">
+            <Button type="button" variant="outline" onClick={() => setShowDiscountDialog(false)} className="w-full sm:w-auto mt-2 sm:mt-0">
+              Annuleren
+            </Button>
+            <Button type="submit" disabled={createDiscountMutation.isPending} className="bg-[#1e40af] hover:bg-[#1e40af]/90 w-full sm:w-auto" form="discount-form">
+              {createDiscountMutation.isPending ? 'Bezig...' : 'Korting Toevoegen'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

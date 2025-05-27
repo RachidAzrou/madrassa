@@ -1416,17 +1416,6 @@ export default function Fees() {
     </div>
   );
 }
-              </div>
-            </div>
-          </div>
-          
-          <div className="p-6">
-            <Form {...tuitionRateForm}>
-              <form onSubmit={tuitionRateForm.handleSubmit(handleCreateTuitionRate)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                  control={bulkInvoiceForm.control}
-                  name="academicYear"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Academisch Jaar</FormLabel>
@@ -1758,6 +1747,7 @@ export default function Fees() {
           </Form>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }

@@ -653,11 +653,20 @@ export default function Fees() {
       {/* Nieuwe Betaling Dialog */}
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
         <DialogContent className="sm:max-w-[700px] p-0 max-h-[90vh] overflow-y-auto">
-          <DialogHeaderWithIcon
-            icon={CreditCard}
-            title="Nieuwe Betaling"
-            description="Voeg een nieuwe betaling toe aan het systeem"
-          />
+          <VisuallyHidden>
+            <DialogTitle>Nieuwe Betaling</DialogTitle>
+            <DialogDescription>Voeg een nieuwe betaling toe aan het systeem</DialogDescription>
+          </VisuallyHidden>
+          
+          <div className="bg-blue-600 text-white p-6 rounded-t-lg">
+            <div className="flex items-center gap-3">
+              <CreditCard className="h-5 w-5" />
+              <div>
+                <h2 className="text-lg font-semibold">Nieuwe Betaling</h2>
+                <p className="text-blue-100 text-sm">Voeg een nieuwe betaling toe aan het systeem</p>
+              </div>
+            </div>
+          </div>
           
           <div className="p-6">
             <Form {...paymentForm}>
@@ -905,11 +914,19 @@ export default function Fees() {
       {/* Nieuw Tarief Dialog */}
       <Dialog open={showTuitionRateDialog} onOpenChange={setShowTuitionRateDialog}>
         <DialogContent className="sm:max-w-[600px] p-0">
-          <DialogHeaderWithIcon
-            icon={Euro}
-            title="Nieuw Tarief"
-            description="Voeg een nieuw tarief toe aan het systeem"
-          />
+          <VisuallyHidden>
+            <DialogTitle>Nieuw Tarief</DialogTitle>
+            <DialogDescription>Voeg een nieuw tarief toe aan het systeem</DialogDescription>
+          </VisuallyHidden>
+          <div className="bg-green-600 text-white p-6 rounded-t-lg">
+            <div className="flex items-center gap-3">
+              <Euro className="h-5 w-5" />
+              <div>
+                <h2 className="text-lg font-semibold">Nieuw Tarief</h2>
+                <p className="text-green-100 text-sm">Voeg een nieuw tarief toe aan het systeem</p>
+              </div>
+            </div>
+          </div>
           
           <div className="p-6">
             <Form {...tuitionRateForm}>
@@ -989,11 +1006,19 @@ export default function Fees() {
       {/* Nieuwe Korting Dialog */}
       <Dialog open={showDiscountDialog} onOpenChange={setShowDiscountDialog}>
         <DialogContent className="sm:max-w-[600px] p-0">
-          <DialogHeaderWithIcon
-            icon={Percent}
-            title="Nieuwe Korting"
-            description="Voeg een nieuwe korting toe aan het systeem"
-          />
+          <VisuallyHidden>
+            <DialogTitle>Nieuwe Korting</DialogTitle>
+            <DialogDescription>Voeg een nieuwe korting toe aan het systeem</DialogDescription>
+          </VisuallyHidden>
+          <div className="bg-purple-600 text-white p-6 rounded-t-lg">
+            <div className="flex items-center gap-3">
+              <Percent className="h-5 w-5" />
+              <div>
+                <h2 className="text-lg font-semibold">Nieuwe Korting</h2>
+                <p className="text-purple-100 text-sm">Voeg een nieuwe korting toe aan het systeem</p>
+              </div>
+            </div>
+          </div>
           
           <div className="p-6">
             <Form {...discountForm}>

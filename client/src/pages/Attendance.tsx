@@ -418,29 +418,29 @@ export default function Attendance() {
         icon={CalendarCheck}
         description="Registreer en beheer aanwezigheid van studenten, bekijk absentiegeschiedenis en identificeer trends"
       />
-      {/* Modern Control Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+      {/* Sleek Control Bar */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
         {/* Date Navigation */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden shadow-sm">
             <Button 
-              variant="outline" 
+              variant="ghost" 
               size="sm" 
               onClick={() => handleDateChange(-1)}
-              className="h-9 w-9 p-0 hover:bg-gray-50"
+              className="h-10 w-10 p-0 rounded-none border-r border-gray-200 hover:bg-gray-50"
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
             
-            <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-md text-center min-w-[160px]">
-              <span className="text-sm font-semibold text-gray-900">{formatDate(selectedDate)}</span>
+            <div className="px-4 py-2.5 bg-white text-center min-w-[180px] border-r border-gray-200">
+              <span className="text-sm font-medium text-gray-900">{formatDate(selectedDate)}</span>
             </div>
             
             <Button 
-              variant="outline" 
+              variant="ghost" 
               size="sm" 
               onClick={() => handleDateChange(1)}
-              className="h-9 w-9 p-0 hover:bg-gray-50"
+              className="h-10 w-10 p-0 rounded-none hover:bg-gray-50"
             >
               <ArrowRight className="h-4 w-4" />
             </Button>
@@ -450,7 +450,7 @@ export default function Attendance() {
             variant="outline" 
             size="sm" 
             onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-            className="text-blue-600 border-blue-600 hover:bg-blue-50"
+            className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 shadow-sm font-medium"
           >
             <CalendarCheck className="h-4 w-4 mr-2" />
             Vandaag
@@ -459,20 +459,22 @@ export default function Attendance() {
 
         {/* Filters */}
         <div className="flex items-center gap-3">
+          <div className="text-sm font-medium text-gray-600">Filter:</div>
+          
           <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[120px] bg-white border-gray-300 shadow-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="vak">
                 <div className="flex items-center">
-                  <GraduationCap className="h-4 w-4 mr-2" />
+                  <GraduationCap className="h-4 w-4 mr-2 text-blue-600" />
                   Vak
                 </div>
               </SelectItem>
               <SelectItem value="klas">
                 <div className="flex items-center">
-                  <Users className="h-4 w-4 mr-2" />
+                  <Users className="h-4 w-4 mr-2 text-blue-600" />
                   Klas
                 </div>
               </SelectItem>
@@ -481,21 +483,25 @@ export default function Attendance() {
 
           {selectedType === 'vak' ? (
             <Select value={selectedCourse} onValueChange={handleCourseChange}>
-              <SelectTrigger className="w-[240px]">
-                <SelectValue placeholder="Selecteer vak" />
+              <SelectTrigger className="w-[280px] bg-white border-gray-300 shadow-sm">
+                <SelectValue placeholder="Selecteer een vak" />
               </SelectTrigger>
               <SelectContent>
                 {isLoadingCourses ? (
                   <SelectItem value="loading" disabled>
                     <div className="flex items-center">
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600" />
                       Vakken laden...
                     </div>
                   </SelectItem>
                 ) : coursesData && Array.isArray(coursesData) ? (
                   coursesData.map((course: Program) => (
                     <SelectItem key={course.id} value={course.id.toString()}>
-                      <span className="font-medium">{course.code}</span> - {course.name}
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                        <span className="font-medium">{course.code}</span> 
+                        <span className="ml-2 text-gray-500">- {course.name}</span>
+                      </div>
                     </SelectItem>
                   ))
                 ) : (
@@ -505,21 +511,24 @@ export default function Attendance() {
             </Select>
           ) : (
             <Select value={selectedClass} onValueChange={handleClassChange}>
-              <SelectTrigger className="w-[240px]">
-                <SelectValue placeholder="Selecteer klas" />
+              <SelectTrigger className="w-[280px] bg-white border-gray-300 shadow-sm">
+                <SelectValue placeholder="Selecteer een klas" />
               </SelectTrigger>
               <SelectContent>
                 {isLoadingClasses ? (
                   <SelectItem value="loading" disabled>
                     <div className="flex items-center">
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin text-blue-600" />
                       Klassen laden...
                     </div>
                   </SelectItem>
                 ) : classesData && Array.isArray(classesData) ? (
                   classesData.map((classroom: StudentGroup) => (
                     <SelectItem key={classroom.id} value={classroom.id.toString()}>
-                      {classroom.name}
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        <span className="font-medium">{classroom.name}</span>
+                      </div>
                     </SelectItem>
                   ))
                 ) : (

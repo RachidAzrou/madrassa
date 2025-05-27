@@ -1772,6 +1772,168 @@ export default function Fees() {
         cancelButtonText="Annuleren"
       />
 
+      {/* View Discount Dialog */}
+      <CustomDialog 
+        open={isViewDiscountDialogOpen} 
+        onOpenChange={setIsViewDiscountDialogOpen}
+        className="max-w-2xl"
+      >
+        <DialogHeaderWithIcon 
+          icon={<Percent className="h-5 w-5" />}
+          title="Korting Details"
+          description="Bekijk de details van deze korting"
+        />
+        <div className="flex-1 space-y-4 p-6">
+          {selectedDiscount && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-600">Naam</label>
+                <p className="text-sm">{selectedDiscount.name || '-'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Type</label>
+                <p className="text-sm">{selectedDiscount.type || '-'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Korting</label>
+                <p className="text-sm">{selectedDiscount.percentage || '-'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Academisch Jaar</label>
+                <p className="text-sm">{selectedDiscount.year || '-'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Status</label>
+                <p className="text-sm">{selectedDiscount.status || '-'}</p>
+              </div>
+            </div>
+          )}
+        </div>
+        <DialogFooter className="border-t bg-gray-50 px-6 py-3">
+          <Button
+            variant="outline"
+            onClick={() => setIsViewDiscountDialogOpen(false)}
+            className="w-full sm:w-auto"
+          >
+            Sluiten
+          </Button>
+        </DialogFooter>
+      </CustomDialog>
+
+      {/* Edit Discount Dialog */}
+      <CustomDialog 
+        open={isEditDiscountDialogOpen} 
+        onOpenChange={setIsEditDiscountDialogOpen}
+        className="max-w-2xl"
+      >
+        <DialogHeaderWithIcon 
+          icon={<Edit3 className="h-5 w-5" />}
+          title="Korting Bewerken"
+          description="Wijzig de details van deze korting"
+        />
+        <div className="flex-1 space-y-4 p-6">
+          {selectedDiscount && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Naam</label>
+                <input 
+                  type="text" 
+                  defaultValue={selectedDiscount.name || ''} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Type</label>
+                <select 
+                  defaultValue={selectedDiscount.type || ''} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="Familie">Familie</option>
+                  <option value="Tijdelijk">Tijdelijk</option>
+                  <option value="Inkomen">Inkomen</option>
+                  <option value="Student">Student</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Korting (%)</label>
+                <input 
+                  type="number" 
+                  min="0"
+                  max="100"
+                  defaultValue={selectedDiscount.percentage?.replace('%', '') || ''} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Academisch Jaar</label>
+                <select 
+                  defaultValue={selectedDiscount.year || ''} 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="2024-2025">2024-2025</option>
+                  <option value="2025-2026">2025-2026</option>
+                </select>
+              </div>
+              <div className="col-span-2">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Beschrijving</label>
+                <textarea 
+                  rows={3}
+                  placeholder="Optionele beschrijving van de korting..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+        <DialogFooter className="border-t bg-gray-50 px-6 py-3">
+          <Button
+            variant="outline"
+            onClick={() => setIsEditDiscountDialogOpen(false)}
+            className="w-full sm:w-auto"
+          >
+            Annuleren
+          </Button>
+          <Button
+            onClick={() => {
+              console.log('Wijzig korting:', selectedDiscount?.id);
+              toast({
+                title: "Korting bijgewerkt",
+                description: `De korting "${selectedDiscount?.name}" is succesvol bijgewerkt.`,
+              });
+              setIsEditDiscountDialogOpen(false);
+            }}
+            className="w-full sm:w-auto bg-[#1e40af] hover:bg-[#1e40af]/90"
+          >
+            Opslaan
+          </Button>
+        </DialogFooter>
+      </CustomDialog>
+
+      {/* Delete Discount Confirmation Dialog */}
+      <DeleteDialog
+        open={isDeleteDiscountDialogOpen}
+        onOpenChange={setIsDeleteDiscountDialogOpen}
+        title="Korting verwijderen"
+        description={`Weet je zeker dat je deze korting wilt verwijderen?`}
+        onConfirm={() => {
+          console.log('Verwijder korting:', selectedDiscount?.id);
+          toast({
+            title: "Korting verwijderd",
+            description: `De korting "${selectedDiscount?.name}" is succesvol verwijderd.`,
+          });
+          setIsDeleteDiscountDialogOpen(false);
+          setSelectedDiscount(null);
+        }}
+        item={selectedDiscount ? {
+          name: `${selectedDiscount.name} - ${selectedDiscount.percentage}`,
+          id: selectedDiscount.type || 'Geen type',
+          initials: selectedDiscount.name?.split(' ').map(n => n.charAt(0)).join('').slice(0, 2) || 'KT'
+        } : undefined}
+        warningText="Deze actie kan niet ongedaan worden gemaakt. Alle gerelateerde betalingen blijven behouden maar verwijzen naar een niet-bestaande korting."
+        confirmButtonText="Verwijderen"
+        cancelButtonText="Annuleren"
+      />
+
     </div>
   );
 }

@@ -1257,20 +1257,25 @@ export default function Fees() {
 
       {/* Dialog voor bulk facturen */}
       <Dialog open={showBulkInvoiceDialog} onOpenChange={setShowBulkInvoiceDialog}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
-              Bulk Facturen Aanmaken
-            </DialogTitle>
-            <DialogDescription>
-              Maak facturen aan voor alle studenten in een specifieke klas met automatische kortingsberekening.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+          <div className="bg-green-600 text-white p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 bg-opacity-20 rounded-lg">
+                <Building2 className="h-6 w-6" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-semibold">Bulk Facturen Aanmaken</DialogTitle>
+                <DialogDescription className="text-green-100 mt-1">
+                  Maak facturen aan voor alle studenten in een specifieke klas met automatische kortingsberekening.
+                </DialogDescription>
+              </div>
+            </div>
+          </div>
           
-          <Form {...bulkInvoiceForm}>
-            <form onSubmit={bulkInvoiceForm.handleSubmit(handleCreateBulkInvoices)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+          <div className="p-6">
+            <Form {...bulkInvoiceForm}>
+              <form onSubmit={bulkInvoiceForm.handleSubmit(handleCreateBulkInvoices)} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={bulkInvoiceForm.control}
                   name="classId"
@@ -1295,6 +1300,7 @@ export default function Fees() {
                     </FormItem>
                   )}
                 />
+                </div>
 
                 <FormField
                   control={bulkInvoiceForm.control}
@@ -1428,16 +1434,17 @@ export default function Fees() {
                 )}
               />
 
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setShowBulkInvoiceDialog(false)}>
-                  Annuleren
-                </Button>
-                <Button type="submit">
-                  Bulk Facturen Aanmaken
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
+                <div className="flex justify-end gap-3 pt-6 border-t">
+                  <Button type="button" variant="outline" onClick={() => setShowBulkInvoiceDialog(false)}>
+                    Annuleren
+                  </Button>
+                  <Button type="submit">
+                    Bulk Facturen Aanmaken
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
         </DialogContent>
       </Dialog>
 

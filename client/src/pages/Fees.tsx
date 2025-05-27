@@ -1684,82 +1684,49 @@ export default function Fees() {
         </DialogFooter>
       </CustomDialog>
 
-      {/* Delete Confirmation Dialogs */}
-      <AlertDialog open={isDeletePaymentDialogOpen} onOpenChange={setIsDeletePaymentDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <Trash2 className="h-5 w-5 text-red-600" />
-              Betaling verwijderen
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              Weet je zeker dat je de betaling van <strong>{selectedPayment?.studentName}</strong> voor <strong>€{selectedPayment?.amount}</strong> wilt verwijderen? 
-              <br /><br />
-              Deze actie kan niet ongedaan worden gemaakt en alle gerelateerde gegevens gaan verloren.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuleren</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                // Here you would normally make an API call to delete
-                console.log('Verwijder betaling:', selectedPayment?.id);
-                
-                // Show success message
-                toast({
-                  title: "Betaling verwijderd",
-                  description: `De betaling van ${selectedPayment?.studentName} is succesvol verwijderd.`,
-                });
-                
-                // Close dialog and clear selection
-                setIsDeletePaymentDialogOpen(false);
-                setSelectedPayment(null);
-              }}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Definitief verwijderen
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Delete Payment Confirmation Dialog */}
+      <ConfirmationDialog
+        open={isDeletePaymentDialogOpen}
+        onOpenChange={setIsDeletePaymentDialogOpen}
+        title="Betaling verwijderen"
+        description={`Weet je zeker dat je de betaling van ${selectedPayment?.studentName} voor €${selectedPayment?.amount} wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
+        icon={<Trash2 className="h-6 w-6" />}
+        iconBackground="bg-red-100"
+        iconColor="text-red-600"
+        confirmText="Definitief verwijderen"
+        confirmVariant="destructive"
+        onConfirm={() => {
+          console.log('Verwijder betaling:', selectedPayment?.id);
+          toast({
+            title: "Betaling verwijderd",
+            description: `De betaling van ${selectedPayment?.studentName} is succesvol verwijderd.`,
+          });
+          setSelectedPayment(null);
+        }}
+        onCancel={() => setSelectedPayment(null)}
+      />
 
-      <AlertDialog open={isDeleteRateDialogOpen} onOpenChange={setIsDeleteRateDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <Trash2 className="h-5 w-5 text-red-600" />
-              Tarief verwijderen
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              Weet je zeker dat je het tarief <strong>{selectedRate?.name}</strong> (€{selectedRate?.amount}) wilt verwijderen?
-              <br /><br />
-              Deze actie kan niet ongedaan worden gemaakt en alle gerelateerde betalingen en kortingen blijven behouden maar zullen verwijzen naar een niet-bestaand tarief.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuleren</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                // Here you would normally make an API call to delete
-                console.log('Verwijder tarief:', selectedRate?.id);
-                
-                // Show success message
-                toast({
-                  title: "Tarief verwijderd",
-                  description: `Het tarief "${selectedRate?.name}" is succesvol verwijderd.`,
-                });
-                
-                // Close dialog and clear selection
-                setIsDeleteRateDialogOpen(false);
-                setSelectedRate(null);
-              }}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Definitief verwijderen
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Delete Rate Confirmation Dialog */}
+      <ConfirmationDialog
+        open={isDeleteRateDialogOpen}
+        onOpenChange={setIsDeleteRateDialogOpen}
+        title="Tarief verwijderen"
+        description={`Weet je zeker dat je het tarief "${selectedRate?.name}" (€${selectedRate?.amount}) wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
+        icon={<Trash2 className="h-6 w-6" />}
+        iconBackground="bg-red-100"
+        iconColor="text-red-600"
+        confirmText="Definitief verwijderen"
+        confirmVariant="destructive"
+        onConfirm={() => {
+          console.log('Verwijder tarief:', selectedRate?.id);
+          toast({
+            title: "Tarief verwijderd",
+            description: `Het tarief "${selectedRate?.name}" is succesvol verwijderd.`,
+          });
+          setSelectedRate(null);
+        }}
+        onCancel={() => setSelectedRate(null)}
+      />
 
     </div>
   );

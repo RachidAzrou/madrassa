@@ -240,7 +240,7 @@ export default function StudentDossier() {
   const gradeAverage = getGradeAverage();
 
   return (
-    <div className="min-h-screen bg-[#f1f5f9]">
+    <div className="min-h-screen">
       <PremiumHeader 
         title="Leerlingendossier"
         description="Bekijk uitgebreide leerlinggegevens en voortgang"

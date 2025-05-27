@@ -502,8 +502,8 @@ export default function Payments() {
         </CustomDialog>
 
         {/* Stats Cards */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {stats && (
+          <div className="px-4 py-3 grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Totaal betaald</CardTitle>
@@ -628,6 +628,7 @@ export default function Payments() {
           )}
         </CardContent>
       </Card>
+      </DataTableContainer>
     </div>
   );
 }

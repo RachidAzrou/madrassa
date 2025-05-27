@@ -40,8 +40,8 @@ function getNavigationItems(userRole: string) {
         {
           section: "Systeembeheer",
           items: [
-            { href: "/superadmin", icon: <Settings className="h-4 w-4" />, label: "SuperAdmin Dashboard" },
-            { href: "/settings", icon: <Settings className="h-4 w-4" />, label: "Systeeminstellingen" }
+            { href: "/superadmin", icon: <LayoutDashboard className="h-4 w-4" />, label: "Dashboard" },
+            { href: "/scholen", icon: <Building className="h-4 w-4" />, label: "Scholen" }
           ]
         },
         ...baseItems
@@ -50,45 +50,9 @@ function getNavigationItems(userRole: string) {
     case 'directeur':
       return [
         {
-          section: "Beheer",
+          section: "School Management",
           items: [
-            { href: "/", icon: <LayoutDashboard className="h-4 w-4" />, label: "Dashboard" },
-            { href: "/students", icon: <Users className="h-4 w-4" />, label: "Studenten" },
-            { href: "/guardians", icon: <UserRound className="h-4 w-4" />, label: "Voogden" },
-            { href: "/teachers", icon: <UserCheck className="h-4 w-4" />, label: "Docenten" },
-            { href: "/admissions", icon: <UserPlus className="h-4 w-4" />, label: "Aanmeldingen" }
-          ]
-        },
-        {
-          section: "Onderwijs",
-          items: [
-            { href: "/student-groups", icon: <Users className="h-4 w-4" />, label: "Klassen" },
-            { href: "/courses", icon: <BookOpen className="h-4 w-4" />, label: "Cursussen" },
-            { href: "/programs", icon: <GraduationCap className="h-4 w-4" />, label: "Programma's" },
-            { href: "/planning", icon: <Calendar className="h-4 w-4" />, label: "Planning" },
-            { href: "/rooms", icon: <Building className="h-4 w-4" />, label: "Lokalen" },
-            { href: "/calendar", icon: <Calendar className="h-4 w-4" />, label: "Kalender" }
-          ]
-        },
-        {
-          section: "Evaluatie",
-          items: [
-            { href: "/attendance", icon: <ClipboardCheck className="h-4 w-4" />, label: "Aanwezigheid" },
-            { href: "/grading", icon: <Percent className="h-4 w-4" />, label: "Cijfers" },
-            { href: "/student-dossier", icon: <FileText className="h-4 w-4" />, label: "Student Dossier" },
-            { href: "/reports", icon: <BarChart3 className="h-4 w-4" />, label: "Rapporten" }
-          ]
-        },
-        {
-          section: "Financiën",
-          items: [
-            { href: "/fees", icon: <CreditCard className="h-4 w-4" />, label: "Betalingsbeheer" }
-          ]
-        },
-        {
-          section: "Instellingen",
-          items: [
-            { href: "/settings", icon: <Settings className="h-4 w-4" />, label: "Instellingen" }
+            { href: "/dashboard", icon: <LayoutDashboard className="h-4 w-4" />, label: "Dashboard" }
           ]
         },
         ...baseItems
@@ -99,17 +63,7 @@ function getNavigationItems(userRole: string) {
         {
           section: "Docent Dashboard",
           items: [
-            { href: "/teacher-dashboard", icon: <LayoutDashboard className="h-4 w-4" />, label: "Mijn Dashboard" },
-            { href: "/calendar", icon: <Calendar className="h-4 w-4" />, label: "Kalender" }
-          ]
-        },
-        {
-          section: "Evaluatie",
-          items: [
-            { href: "/attendance", icon: <ClipboardCheck className="h-4 w-4" />, label: "Aanwezigheid" },
-            { href: "/grading", icon: <Percent className="h-4 w-4" />, label: "Cijfers" },
-            { href: "/student-dossier", icon: <FileText className="h-4 w-4" />, label: "Student Dossier" },
-            { href: "/reports", icon: <BarChart3 className="h-4 w-4" />, label: "Rapporten" }
+            { href: "/teacher-dashboard", icon: <LayoutDashboard className="h-4 w-4" />, label: "Dashboard" }
           ]
         },
         ...baseItems

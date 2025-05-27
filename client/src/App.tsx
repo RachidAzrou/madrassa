@@ -33,6 +33,7 @@ import SuperAdmin from "@/pages/SuperAdmin";
 import TeacherDashboard from "@/pages/TeacherDashboard";
 import StudentDashboard from "@/pages/StudentDashboard";
 import ParentDashboard from "@/pages/ParentDashboard";
+import Scholen from "@/pages/Scholen";
 
 import Settings from "@/pages/Settings";
 

@@ -38,7 +38,7 @@ import { Progress } from '@/components/ui/progress';
 
 // Import custom components
 import { PremiumHeader } from '@/components/layout/premium-header';
-import { SearchActionLayout } from '@/components/ui/search-action-layout';
+// import { SearchActionLayout } from '@/components/ui/search-action-layout';
 import { StandardTable } from '@/components/ui/standard-table';
 
 export default function Fees() {
@@ -48,7 +48,7 @@ export default function Fees() {
         title="Betalingsbeheer"
         description="Beheer alle betalingen, facturen en tarieven van uw onderwijsinstelling"
         icon={Euro}
-        breadcrumb={{ parent: "Financiën", current: "Betalingen" }}
+        breadcrumbs={[{ label: "Financiën", href: "/fees" }, { label: "Betalingen" }]}
       />
 
       <Tabs defaultValue="overview" className="space-y-4">
@@ -116,11 +116,16 @@ export default function Fees() {
         </TabsContent>
 
         <TabsContent value="payments" className="space-y-4">
-          <SearchActionLayout
-            searchPlaceholder="Zoek betalingen..."
-            buttonText="Nieuwe Betaling"
-            onButtonClick={() => {}}
-          />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Zoek betalingen..." className="w-[300px]" />
+            </div>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Nieuwe Betaling
+            </Button>
+          </div>
           
           <StandardTable>
             <TableHeader>

@@ -534,59 +534,120 @@ export default function Fees() {
               </Button>
             </div>
             <StandardTable>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-xs">Type</TableHead>
-                  <TableHead className="text-xs">Bedrag</TableHead>
-                  <TableHead className="text-xs">Academisch Jaar</TableHead>
-                  <TableHead className="text-xs">Status</TableHead>
-                  <TableHead className="text-xs text-right">Acties</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow className="group">
-                  <TableCell className="text-xs font-medium">Collegegeld</TableCell>
-                  <TableCell className="text-xs">€2.500,00</TableCell>
-                  <TableCell className="text-xs">2024-2025</TableCell>
-                  <TableCell className="text-xs">
+              <StandardTableHeader>
+                <StandardTableRow>
+                  <TableCheckboxHeader
+                    checked={selectedRates.length === 3}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedRates([1, 2, 3]);
+                      } else {
+                        setSelectedRates([]);
+                      }
+                    }}
+                  />
+                  <StandardTableHeaderCell>Type</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Bedrag</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Academisch Jaar</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Status</StandardTableHeaderCell>
+                  <EmptyActionHeader />
+                </StandardTableRow>
+              </StandardTableHeader>
+              <StandardTableBody>
+                <StandardTableRow className="group">
+                  <TableCheckboxCell
+                    checked={selectedRates.includes(1)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedRates([...selectedRates, 1]);
+                      } else {
+                        setSelectedRates(selectedRates.filter(id => id !== 1));
+                      }
+                    }}
+                  />
+                  <StandardTableCell className="font-medium">Collegegeld</StandardTableCell>
+                  <StandardTableCell>€2.500,00</StandardTableCell>
+                  <StandardTableCell>2024-2025</StandardTableCell>
+                  <StandardTableCell>
                     <Badge variant="secondary" className="text-xs">Actief</Badge>
-                  </TableCell>
-                  <TableCell className="text-xs text-right">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" className="text-xs">Bewerken</Button>
-                      <Button variant="ghost" size="sm" className="text-xs text-red-600">Verwijderen</Button>
+                  </StandardTableCell>
+                  <TableActionCell>
+                    <div className="opacity-0 group-hover:opacity-100 flex gap-1">
+                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <Eye className="h-3 w-3" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <Edit3 className="h-3 w-3" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:text-red-700">
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
                     </div>
-                  </TableCell>
-                </TableRow>
-                <TableRow className="group">
-                  <TableCell className="text-xs font-medium">Inschrijfgeld</TableCell>
-                  <TableCell className="text-xs">€150,00</TableCell>
-                  <TableCell className="text-xs">2024-2025</TableCell>
-                  <TableCell className="text-xs">
+                  </TableActionCell>
+                </StandardTableRow>
+                <StandardTableRow className="group">
+                  <TableCheckboxCell
+                    checked={selectedRates.includes(2)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedRates([...selectedRates, 2]);
+                      } else {
+                        setSelectedRates(selectedRates.filter(id => id !== 2));
+                      }
+                    }}
+                  />
+                  <StandardTableCell className="font-medium">Inschrijfgeld</StandardTableCell>
+                  <StandardTableCell>€150,00</StandardTableCell>
+                  <StandardTableCell>2024-2025</StandardTableCell>
+                  <StandardTableCell>
                     <Badge variant="secondary" className="text-xs">Actief</Badge>
-                  </TableCell>
-                  <TableCell className="text-xs text-right">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" className="text-xs">Bewerken</Button>
-                      <Button variant="ghost" size="sm" className="text-xs text-red-600">Verwijderen</Button>
+                  </StandardTableCell>
+                  <TableActionCell>
+                    <div className="opacity-0 group-hover:opacity-100 flex gap-1">
+                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <Eye className="h-3 w-3" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <Edit3 className="h-3 w-3" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:text-red-700">
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
                     </div>
-                  </TableCell>
-                </TableRow>
-                <TableRow className="group">
-                  <TableCell className="text-xs font-medium">Lesmateriaal</TableCell>
-                  <TableCell className="text-xs">€85,00</TableCell>
-                  <TableCell className="text-xs">2024-2025</TableCell>
-                  <TableCell className="text-xs">
+                  </TableActionCell>
+                </StandardTableRow>
+                <StandardTableRow className="group">
+                  <TableCheckboxCell
+                    checked={selectedRates.includes(3)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedRates([...selectedRates, 3]);
+                      } else {
+                        setSelectedRates(selectedRates.filter(id => id !== 3));
+                      }
+                    }}
+                  />
+                  <StandardTableCell className="font-medium">Lesmateriaal</StandardTableCell>
+                  <StandardTableCell>€85,00</StandardTableCell>
+                  <StandardTableCell>2024-2025</StandardTableCell>
+                  <StandardTableCell>
                     <Badge variant="secondary" className="text-xs">Actief</Badge>
-                  </TableCell>
-                  <TableCell className="text-xs text-right">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" className="text-xs">Bewerken</Button>
-                      <Button variant="ghost" size="sm" className="text-xs text-red-600">Verwijderen</Button>
+                  </StandardTableCell>
+                  <TableActionCell>
+                    <div className="opacity-0 group-hover:opacity-100 flex gap-1">
+                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <Eye className="h-3 w-3" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <Edit3 className="h-3 w-3" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:text-red-700">
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
                     </div>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
+                  </TableActionCell>
+                </StandardTableRow>
+              </StandardTableBody>
             </StandardTable>
           </div>
 
@@ -603,16 +664,26 @@ export default function Fees() {
               </Button>
             </div>
             <StandardTable>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-xs">Naam</TableHead>
-                  <TableHead className="text-xs">Type</TableHead>
-                  <TableHead className="text-xs">Korting</TableHead>
-                  <TableHead className="text-xs">Academisch Jaar</TableHead>
-                  <TableHead className="text-xs">Status</TableHead>
-                  <TableHead className="text-xs text-right">Acties</TableHead>
-                </TableRow>
-              </TableHeader>
+              <StandardTableHeader>
+                <StandardTableRow>
+                  <TableCheckboxHeader
+                    checked={selectedDiscounts.length === 2}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedDiscounts([1, 2]);
+                      } else {
+                        setSelectedDiscounts([]);
+                      }
+                    }}
+                  />
+                  <StandardTableHeaderCell>Naam</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Type</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Korting</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Academisch Jaar</StandardTableHeaderCell>
+                  <StandardTableHeaderCell>Status</StandardTableHeaderCell>
+                  <EmptyActionHeader />
+                </StandardTableRow>
+              </StandardTableHeader>
               <TableBody>
                 <TableRow className="group">
                   <TableCell className="text-xs font-medium">Meerkinderen Korting</TableCell>

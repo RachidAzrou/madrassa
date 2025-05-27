@@ -57,7 +57,7 @@ import {
   TableActionCell,
   EmptyActionHeader
 } from '@/components/ui/standard-table';
-import { CustomDialog, DialogFormContainer, DialogFooterContainer } from '@/components/ui/custom-dialog';
+
 
 // Payment types - these will be managed dynamically
 const defaultPaymentTypes = [

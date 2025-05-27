@@ -386,20 +386,12 @@ export default function Fees() {
         </div>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overzicht</TabsTrigger>
+      <Tabs defaultValue="payments" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="payments">Betalingen</TabsTrigger>
           <TabsTrigger value="settings">Instellingen</TabsTrigger>
           <TabsTrigger value="reports">Rapporten</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
-          <div className="text-center py-12 text-gray-500">
-            <h3 className="text-lg font-medium mb-2">Betalingsoverzicht</h3>
-            <p className="text-sm">Bekijk de financiële statistieken bovenaan deze pagina voor een volledig overzicht van alle betalingen en uitstaande bedragen.</p>
-          </div>
-        </TabsContent>
 
         <TabsContent value="payments" className="space-y-4">
           <div className="flex items-center justify-between">

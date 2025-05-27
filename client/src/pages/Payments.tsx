@@ -1,25 +1,14 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { 
-  CustomDialog, 
-  DialogHeaderWithIcon, 
-  DialogFormContainer, 
-  SectionContainer, 
-  DialogFooterContainer,
-  FormLabel,
-  StyledSelect,
-  StyledSelectItem 
-} from "@/components/ui/custom-dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CustomDialog } from "@/components/ui/custom-dialog";
+import { DialogHeaderWithIcon, DialogFormContainer, DialogFooterContainer, SectionContainer, FormLabel, StyledSelect, StyledSelectItem } from "@/components/ui/custom-dialog";
 import { CreditCard, Euro, Users, TrendingUp, ExternalLink, RefreshCw, User, GraduationCap, Search, Filter, Download, Upload, PlusCircle } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
+
 // Import PremiumHeader component that matches Fees page style
 const PremiumHeader = ({ title, path, icon: Icon, description }: any) => (
   <div className="space-y-6">
@@ -48,18 +37,6 @@ const PremiumHeader = ({ title, path, icon: Icon, description }: any) => (
         </div>
       </div>
     </div>
-  </div>
-);
-
-const DataTableContainer = ({ children }: any) => (
-  <div className="bg-white mx-6 mt-6 rounded-lg border border-gray-200 shadow-sm">
-    {children}
-  </div>
-);
-
-const SearchActionBar = ({ children }: any) => (
-  <div className="px-4 py-3 border-b border-gray-200 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-    {children}
   </div>
 );
 
@@ -214,12 +191,11 @@ export default function Payments() {
       if (!selectedClassId) return;
       
       // Haal studenten van geselecteerde klas op
-      const selectedClass = classes?.find(cls => cls.id.toString() === selectedClassId);
+      const selectedClass = classes?.find((cls: any) => cls.id.toString() === selectedClassId);
       if (!selectedClass) return;
       
       // Filter studenten die in deze klas zitten
-      // Controleer verschillende mogelijke veldnamen voor klasassociatie
-      const classStudents = students?.filter(student => 
+      const classStudents = students?.filter((student: any) => 
         student.studentGroupId === selectedClass.id || 
         student.classId === selectedClass.id ||
         student.klas === selectedClass.name ||
@@ -296,226 +272,53 @@ export default function Payments() {
   }
 
   return (
-    <div className="bg-[#f7f9fc] min-h-screen">
+    <div className="space-y-6">
       <PremiumHeader
         title="Betalingen"
         path="Financiën > Betalingen"
         icon={CreditCard}
         description="Beheer student betalingen via Mollie en bekijk betalingsstatistieken"
       />
-      
-      <DataTableContainer>
-        <SearchActionBar>
-          {/* Zoekbalk */}
-          <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="text"
-              placeholder="Zoek op student, bedrag of beschrijving..."
-              className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          {/* Acties */}
-          <div className="flex flex-wrap items-center gap-2">
+
+      {/* Zoek en acties */}
+      <div className="space-y-4">
+        <div className="relative w-full">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Zoeken naar betalingen..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-2 justify-between">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowFilterOptions(!showFilterOptions)}
-              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
-              title="Filters"
+              className="flex gap-2"
             >
-              <Filter className="h-3.5 w-3.5" />
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {/* Export functionaliteit */}}
-              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
-              title="Exporteer betalingen"
-            >
-              <Upload className="h-3.5 w-3.5" />
-            </Button>
-
-            <Button
-              size="sm"
-              onClick={() => setIsCreateDialogOpen(true)}
-              className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white ml-auto"
-            >
-              <PlusCircle className="h-3.5 w-3.5 mr-1" />
-              Nieuwe Betaling
+              <Filter className="h-4 w-4" />
+              Filters
             </Button>
           </div>
-        </SearchActionBar>
-        
-        <CustomDialog 
-          open={isCreateDialogOpen} 
-          onOpenChange={setIsCreateDialogOpen}
-          maxWidth="600px"
-        >
-          <DialogHeaderWithIcon
-            title="Nieuwe betaling aanmaken"
-            description="Maak een nieuwe Mollie betaling aan voor een student"
-            icon={<CreditCard className="h-5 w-5" />}
-          />
           
-          <DialogFormContainer>
-            <SectionContainer title="Betalingsmethode" icon={<Users className="h-4 w-4" />}>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div 
-                  onClick={() => setPaymentMethod("individual")}
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                    paymentMethod === "individual" 
-                      ? "border-[#1e40af] bg-blue-50" 
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <User className="h-5 w-5 text-[#1e40af]" />
-                    <div>
-                      <h3 className="font-medium">Individuele student</h3>
-                      <p className="text-sm text-gray-500">Selecteer één student</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div 
-                  onClick={() => setPaymentMethod("class")}
-                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                    paymentMethod === "class" 
-                      ? "border-[#1e40af] bg-blue-50" 
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <GraduationCap className="h-5 w-5 text-[#1e40af]" />
-                    <div>
-                      <h3 className="font-medium">Hele klas</h3>
-                      <p className="text-sm text-gray-500">Alle studenten van een klas</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </SectionContainer>
+          <Button 
+            onClick={() => setIsCreateDialogOpen(true)} 
+            className="flex items-center bg-[#1e40af] hover:bg-blue-800"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            <span>Toevoegen</span>
+          </Button>
+        </div>
+      </div>
 
-            <SectionContainer title="Betalingsgegevens" icon={<CreditCard className="h-4 w-4" />}>
-              <div className="grid grid-cols-1 gap-4">
-                {paymentMethod === "individual" ? (
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="student">Student</FormLabel>
-                    <StyledSelect 
-                      value={selectedStudentId} 
-                      onValueChange={setSelectedStudentId}
-                      placeholder="Selecteer een student..."
-                    >
-                      {students?.map((student) => (
-                        <StyledSelectItem key={student.id} value={student.id.toString()}>
-                          {student.firstName} {student.lastName} ({student.studentId})
-                        </StyledSelectItem>
-                      ))}
-                    </StyledSelect>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="class">Klas</FormLabel>
-                    <StyledSelect 
-                      value={selectedClassId} 
-                      onValueChange={setSelectedClassId}
-                      placeholder="Selecteer een klas..."
-                    >
-                      {classes?.map((cls) => (
-                        <StyledSelectItem key={cls.id} value={cls.id.toString()}>
-                          {cls.name} ({cls.academicYear})
-                        </StyledSelectItem>
-                      ))}
-                    </StyledSelect>
-                    {selectedClassId && (
-                      <p className="text-sm text-gray-500">
-                        {students?.filter(s => {
-                          const selectedClass = classes?.find(cls => cls.id.toString() === selectedClassId);
-                          if (!selectedClass) return false;
-                          return s.studentGroupId === selectedClass.id || 
-                                 s.classId === selectedClass.id ||
-                                 s.klas === selectedClass.name ||
-                                 s.studentGroup === selectedClass.name;
-                        }).length || 0} studenten in deze klas
-                      </p>
-                    )}
-                  </div>
-                )}
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="amount">Bedrag (EUR)</FormLabel>
-                    <Input
-                      id="amount"
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      value={paymentAmount}
-                      onChange={(e) => setPaymentAmount(e.target.value)}
-                      className="h-9"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="description">Beschrijving</FormLabel>
-                    <Input
-                      id="description"
-                      placeholder="Bijv. Collegegeld semester 1"
-                      value={paymentDescription}
-                      onChange={(e) => setPaymentDescription(e.target.value)}
-                      className="h-9"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <FormLabel htmlFor="notes">Notities (optioneel)</FormLabel>
-                  <Textarea
-                    id="notes"
-                    placeholder="Extra informatie..."
-                    value={paymentNotes}
-                    onChange={(e) => setPaymentNotes(e.target.value)}
-                    className="min-h-[80px]"
-                  />
-                </div>
-              </div>
-            </SectionContainer>
-          </DialogFormContainer>
-          
-          <DialogFooterContainer>
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={() => setIsCreateDialogOpen(false)}
-              className="w-full sm:w-auto mt-2 sm:mt-0"
-            >
-              Annuleren
-            </Button>
-            <Button 
-              onClick={handleCreatePayment}
-              disabled={
-                createPaymentMutation.isPending || 
-                !paymentAmount || 
-                !paymentDescription ||
-                (paymentMethod === "individual" && !selectedStudentId) ||
-                (paymentMethod === "class" && !selectedClassId)
-              }
-              className="bg-[#1e40af] hover:bg-[#1e3a8a] w-full sm:w-auto"
-            >
-              {createPaymentMutation.isPending ? "Bezig..." : 
-               paymentMethod === "class" ? "Betalingen aanmaken voor klas" : "Betaling aanmaken"}
-            </Button>
-          </DialogFooterContainer>
-        </CustomDialog>
-
-        {/* Stats Cards */}
-        {stats && (
-          <div className="px-4 py-3 grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Stats Cards */}
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Totaal betaald</CardTitle>
@@ -531,7 +334,7 @@ export default function Payments() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">In afwachting</CardTitle>
-              <Euro className="h-4 w-4 text-yellow-600" />
+              <TrendingUp className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-yellow-600">
@@ -543,7 +346,7 @@ export default function Payments() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Mislukt</CardTitle>
-              <Euro className="h-4 w-4 text-red-600" />
+              <Users className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-600">
@@ -554,93 +357,274 @@ export default function Payments() {
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Slagingspercentage</CardTitle>
+              <CardTitle className="text-sm font-medium">Succesvol</CardTitle>
               <TrendingUp className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-600">
-                {stats.successRate.toFixed(1)}%
+                {stats.successRate}%
               </div>
             </CardContent>
           </Card>
         </div>
       )}
 
-      {/* Payments List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Betalingen overzicht</CardTitle>
-          <CardDescription>
-            Alle student betalingen en hun status
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!payments || payments.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>Nog geen betalingen aangemaakt</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {payments.map((payment) => {
-                const student = students?.find(s => s.id === payment.studentId);
-                return (
-                  <div
-                    key={payment.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-medium">
-                          {student ? `${student.firstName} ${student.lastName}` : `Student ID: ${payment.studentId}`}
-                        </h3>
-                        <Badge className={getStatusColor(payment.status)}>
-                          {getStatusText(payment.status)}
-                        </Badge>
-                        {payment.paymentMethod && (
-                          <Badge variant="outline" className="text-xs">
-                            {payment.paymentMethod}
-                          </Badge>
-                        )}
+      {/* Betalingen tabel */}
+      <div className="bg-white overflow-hidden rounded-lg border border-gray-200">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h3 className="font-medium">Betalingen</h3>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="text-sm flex items-center gap-1">
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
+          </div>
+        </div>
+        
+        {paymentsLoading ? (
+          <div className="p-8 flex justify-center">
+            <div className="h-8 w-8 rounded-full border-2 border-blue-600 border-t-transparent animate-spin"></div>
+          </div>
+        ) : payments && payments.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50 text-xs text-gray-500 font-medium">
+                  <th className="py-3 px-4 text-left">STUDENT</th>
+                  <th className="py-3 px-4 text-left">BESCHRIJVING</th>
+                  <th className="py-3 px-4 text-left">BEDRAG</th>
+                  <th className="py-3 px-4 text-left">STATUS</th>
+                  <th className="py-3 px-4 text-left">DATUM</th>
+                  <th className="py-3 px-4 text-right">ACTIES</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {payments.map((payment: Payment) => (
+                  <tr key={payment.id} className="text-sm hover:bg-gray-50">
+                    <td className="py-3 px-4">
+                      <div className="font-medium">Student #{payment.studentId}</div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="max-w-[200px] truncate" title={payment.description}>
+                        {payment.description}
                       </div>
-                      <p className="text-sm text-gray-600 mb-1">{payment.description}</p>
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span>Bedrag: {formatCurrency(payment.amount)}</span>
-                        <span>Aangemaakt: {formatDate(payment.createdAt)}</span>
-                        {payment.paidAt && (
-                          <span>Betaald: {formatDate(payment.paidAt)}</span>
+                    </td>
+                    <td className="py-3 px-4 font-medium">
+                      {formatCurrency(payment.amount)}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(payment.status)}`}>
+                        {getStatusText(payment.status)}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      {formatDate(payment.createdAt)}
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex justify-end gap-2">
+                        {payment.checkoutUrl && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => window.open(payment.checkoutUrl, '_blank')}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
                         )}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      {payment.checkoutUrl && payment.status === 'pending' && (
                         <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(payment.checkoutUrl, '_blank')}
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => refreshStatusMutation.mutate(payment.id)}
+                          disabled={refreshStatusMutation.isPending}
                         >
-                          <ExternalLink className="w-4 h-4 mr-1" />
-                          Betalen
+                          <RefreshCw className={`w-4 h-4 ${refreshStatusMutation.isPending ? 'animate-spin' : ''}`} />
                         </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => refreshStatusMutation.mutate(payment.id)}
-                        disabled={refreshStatusMutation.isPending}
-                      >
-                        <RefreshCw className={`w-4 h-4 ${refreshStatusMutation.isPending ? 'animate-spin' : ''}`} />
-                      </Button>
-                    </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center p-8">
+            <CreditCard className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <h3 className="text-lg font-medium text-gray-900 mb-1">Geen betalingen gevonden</h3>
+            <p className="text-gray-500 mb-4">Er zijn nog geen betalingen aangemaakt.</p>
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateDialogOpen(true)}
+              className="flex items-center gap-1"
+            >
+              <PlusCircle className="h-4 w-4" />
+              <span>Nieuwe betaling toevoegen</span>
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Dialog voor nieuwe betaling */}
+      <CustomDialog 
+        open={isCreateDialogOpen} 
+        onOpenChange={setIsCreateDialogOpen}
+        maxWidth="600px"
+      >
+        <DialogHeaderWithIcon
+          title="Nieuwe betaling aanmaken"
+          description="Maak een nieuwe Mollie betaling aan voor een student"
+          icon={<CreditCard className="h-5 w-5" />}
+        />
+        
+        <DialogFormContainer>
+          <SectionContainer title="Betalingsmethode" icon={<Users className="h-4 w-4" />}>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div 
+                onClick={() => setPaymentMethod("individual")}
+                className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                  paymentMethod === "individual" 
+                    ? "border-[#1e40af] bg-blue-50" 
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <User className="h-5 w-5 text-[#1e40af]" />
+                  <div>
+                    <h3 className="font-medium">Individuele student</h3>
+                    <p className="text-sm text-gray-500">Selecteer één student</p>
                   </div>
-                );
-              })}
+                </div>
+              </div>
+              
+              <div 
+                onClick={() => setPaymentMethod("class")}
+                className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                  paymentMethod === "class" 
+                    ? "border-[#1e40af] bg-blue-50" 
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <GraduationCap className="h-5 w-5 text-[#1e40af]" />
+                  <div>
+                    <h3 className="font-medium">Hele klas</h3>
+                    <p className="text-sm text-gray-500">Alle studenten van een klas</p>
+                  </div>
+                </div>
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
-      </DataTableContainer>
+          </SectionContainer>
+
+          <SectionContainer title="Betalingsgegevens" icon={<CreditCard className="h-4 w-4" />}>
+            <div className="grid grid-cols-1 gap-4">
+              {paymentMethod === "individual" ? (
+                <div className="space-y-2">
+                  <FormLabel htmlFor="student">Student</FormLabel>
+                  <StyledSelect 
+                    value={selectedStudentId} 
+                    onValueChange={setSelectedStudentId}
+                    placeholder="Selecteer een student..."
+                  >
+                    {students?.map((student: any) => (
+                      <StyledSelectItem key={student.id} value={student.id.toString()}>
+                        {student.firstName} {student.lastName} ({student.studentId})
+                      </StyledSelectItem>
+                    ))}
+                  </StyledSelect>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <FormLabel htmlFor="class">Klas</FormLabel>
+                  <StyledSelect 
+                    value={selectedClassId} 
+                    onValueChange={setSelectedClassId}
+                    placeholder="Selecteer een klas..."
+                  >
+                    {classes?.map((cls: any) => (
+                      <StyledSelectItem key={cls.id} value={cls.id.toString()}>
+                        {cls.name} ({cls.academicYear})
+                      </StyledSelectItem>
+                    ))}
+                  </StyledSelect>
+                  {selectedClassId && (
+                    <p className="text-sm text-gray-500">
+                      {students?.filter((s: any) => {
+                        const selectedClass = classes?.find((cls: any) => cls.id.toString() === selectedClassId);
+                        if (!selectedClass) return false;
+                        return s.studentGroupId === selectedClass.id || 
+                               s.classId === selectedClass.id ||
+                               s.klas === selectedClass.name ||
+                               s.studentGroup === selectedClass.name;
+                      }).length || 0} studenten in deze klas
+                    </p>
+                  )}
+                </div>
+              )}
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <FormLabel htmlFor="amount">Bedrag (EUR)</FormLabel>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={paymentAmount}
+                    onChange={(e) => setPaymentAmount(e.target.value)}
+                    className="h-9"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel htmlFor="description">Beschrijving</FormLabel>
+                  <Input
+                    id="description"
+                    placeholder="Bijv. Collegegeld semester 1"
+                    value={paymentDescription}
+                    onChange={(e) => setPaymentDescription(e.target.value)}
+                    className="h-9"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <FormLabel htmlFor="notes">Notities (optioneel)</FormLabel>
+                <Textarea
+                  id="notes"
+                  placeholder="Extra informatie..."
+                  value={paymentNotes}
+                  onChange={(e) => setPaymentNotes(e.target.value)}
+                  className="min-h-[80px]"
+                />
+              </div>
+            </div>
+          </SectionContainer>
+        </DialogFormContainer>
+        
+        <DialogFooterContainer>
+          <Button 
+            type="button" 
+            variant="outline"
+            onClick={() => setIsCreateDialogOpen(false)}
+            className="w-full sm:w-auto mt-2 sm:mt-0"
+          >
+            Annuleren
+          </Button>
+          <Button 
+            onClick={handleCreatePayment}
+            disabled={
+              createPaymentMutation.isPending || 
+              !paymentAmount || 
+              !paymentDescription ||
+              (paymentMethod === "individual" && !selectedStudentId) ||
+              (paymentMethod === "class" && !selectedClassId)
+            }
+            className="bg-[#1e40af] hover:bg-[#1e3a8a] w-full sm:w-auto"
+          >
+            {createPaymentMutation.isPending ? "Bezig..." : 
+             paymentMethod === "class" ? "Betalingen aanmaken voor klas" : "Betaling aanmaken"}
+          </Button>
+        </DialogFooterContainer>
+      </CustomDialog>
     </div>
   );
 }

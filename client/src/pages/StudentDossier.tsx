@@ -244,7 +244,7 @@ export default function StudentDossier() {
       <PremiumHeader 
         title="Leerlingendossier"
         description="Bekijk uitgebreide leerlinggegevens en voortgang"
-        icon={<User className="h-6 w-6" />}
+        icon={User}
         breadcrumb={{
           items: [
             { label: "Dashboard", href: "/" },

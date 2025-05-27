@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Mail, Phone, MapPin, Calendar, Edit2, Save, X } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Edit2, Save, X, Lock, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,9 +7,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { PremiumHeader } from '@/components/layout/premium-header';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+  const { toast } = useToast();
+  
   const [formData, setFormData] = useState({
     firstName: 'Admin',
     lastName: 'Gebruiker',
@@ -21,8 +30,18 @@ export default function Profile() {
     bio: 'Beheerder van het myMadrassa systeem. Verantwoordelijk voor het dagelijks beheer van de school en ondersteuning van docenten en studenten.'
   });
 
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
   const handleSave = () => {
     // Hier zou je de gegevens opslaan naar de backend
+    toast({
+      title: "Profiel bijgewerkt",
+      description: "Je profielgegevens zijn succesvol opgeslagen.",
+    });
     setIsEditing(false);
   };
 
@@ -31,10 +50,76 @@ export default function Profile() {
     setIsEditing(false);
   };
 
+  const handlePasswordSave = () => {
+    // Validatie
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      toast({
+        title: "Velden ontbreken",
+        description: "Vul alle wachtwoord velden in.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: "Wachtwoorden komen niet overeen",
+        description: "Het nieuwe wachtwoord en bevestiging komen niet overeen.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      toast({
+        title: "Wachtwoord te kort",
+        description: "Het nieuwe wachtwoord moet minimaal 6 karakters lang zijn.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Hier zou je het wachtwoord wijzigen naar de backend
+    toast({
+      title: "Wachtwoord gewijzigd",
+      description: "Je wachtwoord is succesvol bijgewerkt.",
+    });
+    
+    setPasswordData({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setIsChangingPassword(false);
+  };
+
+  const handlePasswordCancel = () => {
+    setPasswordData({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setIsChangingPassword(false);
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
+    }));
+  };
+
+  const handlePasswordChange = (field: string, value: string) => {
+    setPasswordData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const togglePasswordVisibility = (field: 'current' | 'new' | 'confirm') => {
+    setShowPasswords(prev => ({
+      ...prev,
+      [field]: !prev[field]
     }));
   };
 
@@ -244,6 +329,126 @@ export default function Profile() {
                 <p className="text-sm bg-gray-50 p-3 rounded">{formData.bio}</p>
               )}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Wachtwoord wijzigen */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-[#1e40af]" />
+              Wachtwoord wijzigen
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!isChangingPassword ? (
+              <Button
+                onClick={() => setIsChangingPassword(true)}
+                variant="outline"
+                className="w-full"
+              >
+                <Lock className="h-4 w-4 mr-2" />
+                Wachtwoord wijzigen
+              </Button>
+            ) : (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">Huidig wachtwoord</Label>
+                  <div className="relative">
+                    <Input
+                      id="currentPassword"
+                      type={showPasswords.current ? "text" : "password"}
+                      value={passwordData.currentPassword}
+                      onChange={(e) => handlePasswordChange('currentPassword', e.target.value)}
+                      placeholder="Voer je huidige wachtwoord in"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => togglePasswordVisibility('current')}
+                    >
+                      {showPasswords.current ? (
+                        <EyeOff className="h-4 w-4 text-gray-500" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-500" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">Nieuw wachtwoord</Label>
+                  <div className="relative">
+                    <Input
+                      id="newPassword"
+                      type={showPasswords.new ? "text" : "password"}
+                      value={passwordData.newPassword}
+                      onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
+                      placeholder="Voer je nieuwe wachtwoord in"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => togglePasswordVisibility('new')}
+                    >
+                      {showPasswords.new ? (
+                        <EyeOff className="h-4 w-4 text-gray-500" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-500" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Bevestig nieuw wachtwoord</Label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showPasswords.confirm ? "text" : "password"}
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
+                      placeholder="Bevestig je nieuwe wachtwoord"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => togglePasswordVisibility('confirm')}
+                    >
+                      {showPasswords.confirm ? (
+                        <EyeOff className="h-4 w-4 text-gray-500" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-500" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    onClick={handlePasswordSave}
+                    className="bg-green-600 hover:bg-green-700 flex-1"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Wachtwoord opslaan
+                  </Button>
+                  <Button
+                    onClick={handlePasswordCancel}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Annuleren
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

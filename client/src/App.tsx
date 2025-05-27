@@ -31,8 +31,6 @@ import Fees from "@/pages/Fees";
 import StudentDossier from "@/pages/StudentDossier";
 import Profile from "@/pages/Profile";
 
-import Settings from "@/pages/Settings";
-
 // Authentication check route component
 function AuthenticatedRoute({ component: Component, ...rest }: any) {
   const [, setLocation] = useLocation();
@@ -71,7 +69,6 @@ function AuthenticatedRouter() {
 
         <Route path="/reports" component={() => <AuthenticatedRoute component={Reports} />} />
         <Route path="/profiel" component={() => <AuthenticatedRoute component={Profile} />} />
-        <Route path="/instellingen" component={() => <AuthenticatedRoute component={Settings} />} />
         <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
         <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
         <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />

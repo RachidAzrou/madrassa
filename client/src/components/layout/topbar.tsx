@@ -306,10 +306,6 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
               <User className="mr-2 h-4 w-4" />
               <span>Mijn Profiel</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setLocation('/instellingen')}>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Instellingen</span>
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => {
               // Wis alle gebruikersgegevens en navigeer naar login

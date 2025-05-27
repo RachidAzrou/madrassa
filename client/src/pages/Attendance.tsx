@@ -418,115 +418,113 @@ export default function Attendance() {
         icon={CalendarCheck}
         description="Registreer en beheer aanwezigheid van studenten, bekijk absentiegeschiedenis en identificeer trends"
       />
-      {/* Controls and Filters using SearchActionLayout pattern */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
-        <div className="p-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            {/* Date Navigation */}
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handleDateChange(-1)}
-                className="h-9 w-9 p-0"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              
-              <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md min-w-[160px] text-center">
-                <span className="text-sm font-medium text-gray-900">{formatDate(selectedDate)}</span>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handleDateChange(1)}
-                className="h-9 w-9 p-0"
-              >
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-                className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
-              >
-                Vandaag
-              </Button>
-            </div>
-
-            {/* Filter Controls */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Filter:</span>
-              </div>
-              
-              <Tabs defaultValue="vak" onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')} className="w-auto">
-                <TabsList className="h-9">
-                  <TabsTrigger value="vak" className="text-xs">Vak</TabsTrigger>
-                  <TabsTrigger value="klas" className="text-xs">Klas</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="vak" className="mt-0 absolute z-10">
-                  <div className="mt-2">
-                    <Select value={selectedCourse} onValueChange={handleCourseChange}>
-                      <SelectTrigger className="w-[200px] h-9">
-                        <SelectValue placeholder="Selecteer vak" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {isLoadingCourses ? (
-                          <SelectItem value="loading" disabled>
-                            <div className="flex items-center">
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Vakken laden...
-                            </div>
-                          </SelectItem>
-                        ) : coursesData && Array.isArray(coursesData) ? (
-                          coursesData.map((course: Program) => (
-                            <SelectItem key={course.id} value={course.id.toString()}>
-                              <span className="font-medium">{course.code}</span> - {course.name}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="none" disabled>Geen vakken gevonden</SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="klas" className="mt-0 absolute z-10">
-                  <div className="mt-2">
-                    <Select value={selectedClass} onValueChange={handleClassChange}>
-                      <SelectTrigger className="w-[200px] h-9">
-                        <SelectValue placeholder="Selecteer klas" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {isLoadingClasses ? (
-                          <SelectItem value="loading" disabled>
-                            <div className="flex items-center">
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Klassen laden...
-                            </div>
-                          </SelectItem>
-                        ) : classesData && Array.isArray(classesData) ? (
-                          classesData.map((classroom: StudentGroup) => (
-                            <SelectItem key={classroom.id} value={classroom.id.toString()}>
-                              {classroom.name}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="none" disabled>Geen klassen gevonden</SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
+      {/* Search and Action Layout */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        {/* Date Navigation */}
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => handleDateChange(-1)}
+            className="h-8 w-8 p-0"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          
+          <div className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-center min-w-[140px]">
+            <span className="text-sm font-medium text-gray-900">{formatDate(selectedDate)}</span>
           </div>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => handleDateChange(1)}
+            className="h-8 w-8 p-0"
+          >
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Filters */}
+        <div className="flex items-center gap-3">
+          <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
+            <SelectTrigger className="w-[120px] h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="vak">
+                <div className="flex items-center">
+                  <GraduationCap className="h-4 w-4 mr-2" />
+                  Vak
+                </div>
+              </SelectItem>
+              <SelectItem value="klas">
+                <div className="flex items-center">
+                  <Users className="h-4 w-4 mr-2" />
+                  Klas
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+
+          {selectedType === 'vak' ? (
+            <Select value={selectedCourse} onValueChange={handleCourseChange}>
+              <SelectTrigger className="w-[200px] h-8">
+                <SelectValue placeholder="Selecteer vak" />
+              </SelectTrigger>
+              <SelectContent>
+                {isLoadingCourses ? (
+                  <SelectItem value="loading" disabled>
+                    <div className="flex items-center">
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Vakken laden...
+                    </div>
+                  </SelectItem>
+                ) : coursesData && Array.isArray(coursesData) ? (
+                  coursesData.map((course: Program) => (
+                    <SelectItem key={course.id} value={course.id.toString()}>
+                      <span className="font-medium">{course.code}</span> - {course.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="none" disabled>Geen vakken gevonden</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          ) : (
+            <Select value={selectedClass} onValueChange={handleClassChange}>
+              <SelectTrigger className="w-[200px] h-8">
+                <SelectValue placeholder="Selecteer klas" />
+              </SelectTrigger>
+              <SelectContent>
+                {isLoadingClasses ? (
+                  <SelectItem value="loading" disabled>
+                    <div className="flex items-center">
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Klassen laden...
+                    </div>
+                  </SelectItem>
+                ) : classesData && Array.isArray(classesData) ? (
+                  classesData.map((classroom: StudentGroup) => (
+                    <SelectItem key={classroom.id} value={classroom.id.toString()}>
+                      {classroom.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="none" disabled>Geen klassen gevonden</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          )}
+
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+            className="h-8 text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
+          >
+            Vandaag
+          </Button>
         </div>
       </div>
 

@@ -109,6 +109,70 @@ export default function Fees() {
   const [selectedRates, setSelectedRates] = useState<number[]>([]);
   const [selectedDiscounts, setSelectedDiscounts] = useState<number[]>([]);
   
+  // Dialog states for action buttons
+  const [isViewPaymentDialogOpen, setIsViewPaymentDialogOpen] = useState(false);
+  const [isEditPaymentDialogOpen, setIsEditPaymentDialogOpen] = useState(false);
+  const [isDeletePaymentDialogOpen, setIsDeletePaymentDialogOpen] = useState(false);
+  const [isViewRateDialogOpen, setIsViewRateDialogOpen] = useState(false);
+  const [isEditRateDialogOpen, setIsEditRateDialogOpen] = useState(false);
+  const [isDeleteRateDialogOpen, setIsDeleteRateDialogOpen] = useState(false);
+  const [isViewDiscountDialogOpen, setIsViewDiscountDialogOpen] = useState(false);
+  const [isEditDiscountDialogOpen, setIsEditDiscountDialogOpen] = useState(false);
+  const [isDeleteDiscountDialogOpen, setIsDeleteDiscountDialogOpen] = useState(false);
+  
+  // Selected items for actions
+  const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [selectedRate, setSelectedRate] = useState<any>(null);
+  const [selectedDiscount, setSelectedDiscount] = useState<any>(null);
+
+  // Handler functions for payment actions
+  const handleViewPayment = (payment: any) => {
+    setSelectedPayment(payment);
+    setIsViewPaymentDialogOpen(true);
+  };
+
+  const handleEditPayment = (payment: any) => {
+    setSelectedPayment(payment);
+    setIsEditPaymentDialogOpen(true);
+  };
+
+  const handleDeletePayment = (payment: any) => {
+    setSelectedPayment(payment);
+    setIsDeletePaymentDialogOpen(true);
+  };
+
+  // Handler functions for rate actions
+  const handleViewRate = (rate: any) => {
+    setSelectedRate(rate);
+    setIsViewRateDialogOpen(true);
+  };
+
+  const handleEditRate = (rate: any) => {
+    setSelectedRate(rate);
+    setIsEditRateDialogOpen(true);
+  };
+
+  const handleDeleteRate = (rate: any) => {
+    setSelectedRate(rate);
+    setIsDeleteRateDialogOpen(true);
+  };
+
+  // Handler functions for discount actions
+  const handleViewDiscount = (discount: any) => {
+    setSelectedDiscount(discount);
+    setIsViewDiscountDialogOpen(true);
+  };
+
+  const handleEditDiscount = (discount: any) => {
+    setSelectedDiscount(discount);
+    setIsEditDiscountDialogOpen(true);
+  };
+
+  const handleDeleteDiscount = (discount: any) => {
+    setSelectedDiscount(discount);
+    setIsDeleteDiscountDialogOpen(true);
+  };
+  
   // Dynamic data state
   const [paymentTypes, setPaymentTypes] = useState(defaultPaymentTypes);
   const [discounts, setDiscounts] = useState(defaultDiscounts);
@@ -505,7 +569,7 @@ export default function Fees() {
                           variant="ghost" 
                           size="sm" 
                           className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                          onClick={() => console.log('Bekijk betaling:', payment.id)}
+                          onClick={() => handleViewPayment(payment)}
                           title="Bekijk betaling"
                         >
                           <Eye className="h-3.5 w-3.5" />
@@ -514,7 +578,7 @@ export default function Fees() {
                           variant="ghost" 
                           size="sm" 
                           className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                          onClick={() => console.log('Bewerk betaling:', payment.id)}
+                          onClick={() => handleEditPayment(payment)}
                           title="Bewerk betaling"
                         >
                           <Edit3 className="h-3.5 w-3.5" />
@@ -523,7 +587,7 @@ export default function Fees() {
                           variant="ghost" 
                           size="sm" 
                           className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                          onClick={() => console.log('Verwijder betaling:', payment.id)}
+                          onClick={() => handleDeletePayment(payment)}
                           title="Verwijder betaling"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -595,7 +659,7 @@ export default function Fees() {
                         variant="ghost" 
                         size="sm" 
                         className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                        onClick={() => console.log('Bekijk tarief:', 1)}
+                        onClick={() => handleViewRate({id: 1, name: 'Collegegeld', amount: 2500, year: '2024-2025', status: 'Actief'})}
                         title="Bekijk tarief"
                       >
                         <Eye className="h-3.5 w-3.5" />
@@ -604,7 +668,7 @@ export default function Fees() {
                         variant="ghost" 
                         size="sm" 
                         className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                        onClick={() => console.log('Bewerk tarief:', 1)}
+                        onClick={() => handleEditRate({id: 1, name: 'Collegegeld', amount: 2500, year: '2024-2025', status: 'Actief'})}
                         title="Bewerk tarief"
                       >
                         <Edit3 className="h-3.5 w-3.5" />
@@ -613,7 +677,7 @@ export default function Fees() {
                         variant="ghost" 
                         size="sm" 
                         className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                        onClick={() => console.log('Verwijder tarief:', 1)}
+                        onClick={() => handleDeleteRate({id: 1, name: 'Collegegeld', amount: 2500, year: '2024-2025', status: 'Actief'})}
                         title="Verwijder tarief"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -644,7 +708,7 @@ export default function Fees() {
                         variant="ghost" 
                         size="sm" 
                         className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                        onClick={() => console.log('Bekijk tarief:', 2)}
+                        onClick={() => handleViewRate({id: 2, name: 'Inschrijfgeld', amount: 150, year: '2024-2025', status: 'Actief'})}
                         title="Bekijk tarief"
                       >
                         <Eye className="h-3.5 w-3.5" />
@@ -653,7 +717,7 @@ export default function Fees() {
                         variant="ghost" 
                         size="sm" 
                         className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                        onClick={() => console.log('Bewerk tarief:', 2)}
+                        onClick={() => handleEditRate({id: 2, name: 'Inschrijfgeld', amount: 150, year: '2024-2025', status: 'Actief'})}
                         title="Bewerk tarief"
                       >
                         <Edit3 className="h-3.5 w-3.5" />
@@ -662,7 +726,7 @@ export default function Fees() {
                         variant="ghost" 
                         size="sm" 
                         className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                        onClick={() => console.log('Verwijder tarief:', 2)}
+                        onClick={() => handleDeleteRate({id: 2, name: 'Inschrijfgeld', amount: 150, year: '2024-2025', status: 'Actief'})}
                         title="Verwijder tarief"
                       >
                         <Trash2 className="h-3.5 w-3.5" />

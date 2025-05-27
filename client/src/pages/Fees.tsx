@@ -82,6 +82,17 @@ const discountFormSchema = z.object({
   description: z.string().optional(),
 });
 
+// Schema voor bulk facturen
+const bulkInvoiceFormSchema = z.object({
+  classId: z.string().min(1, { message: "Selecteer een klas" }),
+  type: z.string().min(1, { message: "Selecteer factuurtype" }),
+  description: z.string().min(3, { message: "Omschrijving is verplicht" }),
+  baseAmount: z.coerce.number().min(0.01, { message: "Bedrag moet groter zijn dan 0" }),
+  dueDate: z.date({ required_error: "Selecteer een vervaldatum" }),
+  academicYear: z.string().min(1, { message: "Selecteer een academisch jaar" }),
+  notes: z.string().optional(),
+});
+
 // Hulpfunctie voor valutaformattering
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('nl-NL', {
@@ -201,6 +212,18 @@ export default function Fees() {
     },
   });
 
+  const bulkInvoiceForm = useForm<z.infer<typeof bulkInvoiceFormSchema>>({
+    resolver: zodResolver(bulkInvoiceFormSchema),
+    defaultValues: {
+      classId: "",
+      type: "COL",
+      description: "",
+      baseAmount: 0,
+      academicYear: "2024-2025",
+      notes: "",
+    },
+  });
+
   // Filter facturen op zoektermen en filters
   const filteredInvoices = invoicesData.filter((invoice: any) => {
     const matchesSearch = !searchQuery || 
@@ -277,6 +300,89 @@ export default function Fees() {
       toast({
         title: "Fout",
         description: "Er is een fout opgetreden bij het starten van de betaling.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handel bulk facturen aanmaak af
+  const handleCreateBulkInvoices = async (values: z.infer<typeof bulkInvoiceFormSchema>) => {
+    try {
+      const response = await apiRequest('/api/invoices/bulk', {
+        method: 'POST',
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast({
+          title: "Bulk facturen aangemaakt",
+          description: data.message,
+        });
+        
+        queryClient.invalidateQueries({ queryKey: ['/api/invoices'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/fees/stats'] });
+        setShowBulkInvoiceDialog(false);
+        bulkInvoiceForm.reset();
+      }
+    } catch (error) {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het aanmaken van de bulk facturen.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handel tariefaanmaak af
+  const handleCreateTuitionRate = async (values: z.infer<typeof tuitionRateFormSchema>) => {
+    try {
+      const response = await apiRequest('/api/tuition-rates', {
+        method: 'POST',
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Tarief aangemaakt",
+          description: "Het nieuwe tarief is succesvol aangemaakt.",
+        });
+        
+        queryClient.invalidateQueries({ queryKey: ['/api/tuition-rates'] });
+        setShowAddTuitionRateDialog(false);
+        tuitionRateForm.reset();
+      }
+    } catch (error) {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het aanmaken van het tarief.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handel kortingsaanmaak af
+  const handleCreateDiscount = async (values: z.infer<typeof discountFormSchema>) => {
+    try {
+      const response = await apiRequest('/api/fee-discounts', {
+        method: 'POST',
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Korting aangemaakt",
+          description: "De nieuwe korting is succesvol aangemaakt.",
+        });
+        
+        queryClient.invalidateQueries({ queryKey: ['/api/fee-discounts'] });
+        setShowAddDiscountDialog(false);
+        discountForm.reset();
+      }
+    } catch (error) {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het aanmaken van de korting.",
         variant: "destructive",
       });
     }
@@ -980,6 +1086,436 @@ export default function Fees() {
                 </Button>
                 <Button type="submit">
                   Factuur Aanmaken
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog voor bulk facturen */}
+      <Dialog open={showBulkInvoiceDialog} onOpenChange={setShowBulkInvoiceDialog}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5" />
+              Bulk Facturen Aanmaken
+            </DialogTitle>
+            <DialogDescription>
+              Maak facturen aan voor alle studenten in een specifieke klas met automatische kortingsberekening.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...bulkInvoiceForm}>
+            <form onSubmit={bulkInvoiceForm.handleSubmit(handleCreateBulkInvoices)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={bulkInvoiceForm.control}
+                  name="classId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Klas</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer klas" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {studentGroupsData && Array.isArray(studentGroupsData) && studentGroupsData.map((group: any) => (
+                            <SelectItem key={group.id} value={group.id.toString()}>
+                              {group.name} ({group.academicYear})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={bulkInvoiceForm.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Factuurtype</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {invoiceTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={bulkInvoiceForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Beschrijving</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Beschrijving van de factuur" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={bulkInvoiceForm.control}
+                  name="baseAmount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bedrag (€)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={bulkInvoiceForm.control}
+                  name="academicYear"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Academisch Jaar</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer jaar" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {academicYears.map((year) => (
+                            <SelectItem key={year} value={year}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={bulkInvoiceForm.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Vervaldatum</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
+                          >
+                            {field.value ? (
+                              format(field.value, "dd-MM-yyyy", { locale: nl })
+                            ) : (
+                              <span>Selecteer datum</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          locale={nl}
+                          disabled={(date) => date < new Date()}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={bulkInvoiceForm.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notities (optioneel)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Extra notities bij deze facturen" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setShowBulkInvoiceDialog(false)}>
+                  Annuleren
+                </Button>
+                <Button type="submit">
+                  Bulk Facturen Aanmaken
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog voor nieuw tarief */}
+      <Dialog open={showAddTuitionRateDialog} onOpenChange={setShowAddTuitionRateDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Banknote className="h-5 w-5" />
+              Nieuw Tarief Toevoegen
+            </DialogTitle>
+            <DialogDescription>
+              Stel een nieuw standaard tarief in voor het geselecteerde academische jaar.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...tuitionRateForm}>
+            <form onSubmit={tuitionRateForm.handleSubmit(handleCreateTuitionRate)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={tuitionRateForm.control}
+                  name="academicYear"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Academisch Jaar</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer jaar" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {academicYears.map((year) => (
+                            <SelectItem key={year} value={year}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={tuitionRateForm.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {invoiceTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={tuitionRateForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Naam</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Bijv. Standaard collegegeld" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={tuitionRateForm.control}
+                name="baseAmount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bedrag (€)</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={tuitionRateForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Beschrijving (optioneel)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Extra uitleg over dit tarief" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setShowAddTuitionRateDialog(false)}>
+                  Annuleren
+                </Button>
+                <Button type="submit">
+                  Tarief Toevoegen
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog voor nieuwe korting */}
+      <Dialog open={showAddDiscountDialog} onOpenChange={setShowAddDiscountDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Nieuwe Korting Toevoegen
+            </DialogTitle>
+            <DialogDescription>
+              Maak een nieuwe kortingsregel aan die automatisch wordt toegepast bij facturatie.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...discountForm}>
+            <form onSubmit={discountForm.handleSubmit(handleCreateDiscount)} className="space-y-4">
+              <FormField
+                control={discountForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Naam</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Bijv. Gezinskorting" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={discountForm.control}
+                  name="discountType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type Korting</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="percentage">Percentage</SelectItem>
+                          <SelectItem value="fixed">Vast bedrag</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={discountForm.control}
+                  name="discountValue"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Waarde</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder={discountForm.watch('discountType') === 'percentage' ? "10" : "50.00"} 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={discountForm.control}
+                name="academicYear"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Academisch Jaar</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecteer jaar" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {academicYears.map((year) => (
+                          <SelectItem key={year} value={year}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={discountForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Beschrijving (optioneel)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Voorwaarden en uitleg" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setShowAddDiscountDialog(false)}>
+                  Annuleren
+                </Button>
+                <Button type="submit">
+                  Korting Toevoegen
                 </Button>
               </DialogFooter>
             </form>

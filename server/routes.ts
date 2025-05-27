@@ -1729,10 +1729,195 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!stats) {
         return res.status(404).json({ message: "Fee stats not available" });
       }
-      res.json({ stats });
+      res.json(stats);
     } catch (error) {
       console.error("Error fetching fee stats:", error);
       res.status(500).json({ message: "Error fetching fee statistics" });
+    }
+  });
+
+  // ********************
+  // Invoice API endpoints (Facturen)
+  // ********************
+  
+  apiRouter.get("/api/invoices", async (_req, res) => {
+    try {
+      const invoices = await storage.getInvoices();
+      res.json(invoices);
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      res.status(500).json({ message: "Error fetching invoices" });
+    }
+  });
+
+  apiRouter.post("/api/invoices", async (req, res) => {
+    try {
+      const { studentId, type, description, baseAmount, dueDate, academicYear, classId, notes } = req.body;
+      
+      // Genereer uniek factuurnummer
+      const invoiceNumber = await storage.generateInvoiceNumber(type);
+      
+      // Bereken kortingen
+      const { finalAmount, discountAmount, appliedDiscounts } = await storage.calculateInvoiceAmount(
+        parseFloat(baseAmount), 
+        parseInt(studentId), 
+        academicYear
+      );
+      
+      const invoice = await storage.createInvoice({
+        invoiceNumber,
+        studentId: parseInt(studentId),
+        type,
+        description,
+        baseAmount: baseAmount.toString(),
+        discountAmount: discountAmount.toString(),
+        finalAmount: finalAmount.toString(),
+        status: 'open',
+        dueDate: new Date(dueDate),
+        academicYear,
+        classId: classId ? parseInt(classId) : undefined,
+        appliedDiscounts,
+        notes
+      });
+      
+      res.status(201).json(invoice);
+    } catch (error) {
+      console.error("Error creating invoice:", error);
+      res.status(500).json({ message: "Error creating invoice" });
+    }
+  });
+
+  // Bulk facturen voor hele klas
+  apiRouter.post("/api/invoices/bulk", async (req, res) => {
+    try {
+      const { classId, type, description, baseAmount, dueDate, academicYear, notes } = req.body;
+      
+      if (!classId) {
+        return res.status(400).json({ message: "Class ID is required for bulk invoices" });
+      }
+      
+      // Haal alle studenten van de klas op
+      const students = await db.select({ id: students.id })
+        .from(studentGroupEnrollments)
+        .leftJoin(students, eq(studentGroupEnrollments.studentId, students.id))
+        .where(and(
+          eq(studentGroupEnrollments.groupId, parseInt(classId)),
+          eq(studentGroupEnrollments.status, 'active')
+        ));
+      
+      const createdInvoices = [];
+      
+      // Maak factuur voor elke student
+      for (const student of students) {
+        const invoiceNumber = await storage.generateInvoiceNumber(type);
+        
+        const { finalAmount, discountAmount, appliedDiscounts } = await storage.calculateInvoiceAmount(
+          parseFloat(baseAmount), 
+          student.id, 
+          academicYear
+        );
+        
+        const invoice = await storage.createInvoice({
+          invoiceNumber,
+          studentId: student.id,
+          type,
+          description,
+          baseAmount: baseAmount.toString(),
+          discountAmount: discountAmount.toString(),
+          finalAmount: finalAmount.toString(),
+          status: 'open',
+          dueDate: new Date(dueDate),
+          academicYear,
+          classId: parseInt(classId),
+          appliedDiscounts,
+          notes
+        });
+        
+        createdInvoices.push(invoice);
+      }
+      
+      res.status(201).json({ 
+        message: `${createdInvoices.length} facturen aangemaakt`,
+        invoices: createdInvoices 
+      });
+    } catch (error) {
+      console.error("Error creating bulk invoices:", error);
+      res.status(500).json({ message: "Error creating bulk invoices" });
+    }
+  });
+
+  // ********************
+  // Tuition Rates API endpoints (Tarieven)
+  // ********************
+  
+  apiRouter.get("/api/tuition-rates", async (_req, res) => {
+    try {
+      const rates = await storage.getTuitionRates();
+      res.json(rates);
+    } catch (error) {
+      console.error("Error fetching tuition rates:", error);
+      res.status(500).json({ message: "Error fetching tuition rates" });
+    }
+  });
+
+  apiRouter.post("/api/tuition-rates", async (req, res) => {
+    try {
+      const { academicYear, type, name, baseAmount, description } = req.body;
+      
+      const rate = await storage.createTuitionRate({
+        academicYear,
+        type,
+        name,
+        baseAmount: baseAmount.toString(),
+        description,
+        isActive: true
+      });
+      
+      res.status(201).json(rate);
+    } catch (error) {
+      console.error("Error creating tuition rate:", error);
+      res.status(500).json({ message: "Error creating tuition rate" });
+    }
+  });
+
+  apiRouter.put("/api/tuition-rates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { academicYear, type, name, baseAmount, description, isActive } = req.body;
+      
+      const rate = await storage.updateTuitionRate(id, {
+        academicYear,
+        type,
+        name,
+        baseAmount: baseAmount?.toString(),
+        description,
+        isActive
+      });
+      
+      if (!rate) {
+        return res.status(404).json({ message: "Tuition rate not found" });
+      }
+      
+      res.json(rate);
+    } catch (error) {
+      console.error("Error updating tuition rate:", error);
+      res.status(500).json({ message: "Error updating tuition rate" });
+    }
+  });
+
+  apiRouter.delete("/api/tuition-rates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteTuitionRate(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Tuition rate not found" });
+      }
+      
+      res.json({ message: "Tuition rate deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting tuition rate:", error);
+      res.status(500).json({ message: "Error deleting tuition rate" });
     }
   });
   

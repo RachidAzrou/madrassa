@@ -6,7 +6,7 @@ import {
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
-import EmptyState from '@/components/ui/empty-state';
+import { EmptyTableState } from '@/components/ui/data-table-container';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNotifications, type Notification } from '@/contexts/NotificationContext';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
+import { PremiumHeader } from '@/components/layout/premium-header';
 import { 
   Search, BellOff, CheckCircle, Trash2, Check, Bell, Info, 
   AlertTriangle, AlertCircle, X, Eye, EyeOff, XCircle, Briefcase, 
@@ -165,17 +166,17 @@ const NotificationsPage: React.FC = () => {
   const renderNotificationList = (notificationList: Notification[]) => {
     if (notificationList.length === 0) {
       return (
-        <EmptyState 
-          icon={<BellOff className="h-6 w-6" />}
-          title="Geen notificaties"
-          description={
-            activeTab === 'unread' 
+        <div className="text-center py-12">
+          <BellOff className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Geen notificaties</h3>
+          <p className="text-gray-500">
+            {activeTab === 'unread' 
               ? 'U heeft momenteel geen ongelezen notificaties.' 
               : activeTab === 'read' 
                 ? 'U heeft momenteel geen gelezen notificaties.' 
-                : 'U heeft momenteel geen notificaties.'
-          }
-        />
+                : 'U heeft momenteel geen notificaties.'}
+          </p>
+        </div>
       );
     }
 
@@ -306,37 +307,25 @@ const NotificationsPage: React.FC = () => {
 
   return (
     <div className="container max-w-6xl p-6">
-      {/* Page header */}
-      <div className="mb-8">
-        <div className="rounded-lg overflow-hidden shadow-sm">
-          <div className="bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Bell className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-white">Notificaties</h1>
-                  <p className="text-base text-blue-100 mt-1">Beheer hier al uw notificaties</p>
-                </div>
-              </div>
-              <div className="md:flex-shrink-0">
-                {unreadNotifications.length > 0 && (
-                  <Button
-                    variant="outline"
-                    onClick={handleMarkAllAsRead}
-                    className="h-9 p-2 flex items-center gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
-                    title="Markeer alles als gelezen"
-                  >
-                    <CheckCircle className="h-4 w-4" />
-                    <span>Markeer alles als gelezen</span>
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PremiumHeader 
+        title="Notificaties"
+        description="Beheer hier al uw notificaties"
+        icon={Bell}
+        breadcrumbs={{ current: "Notificaties" }}
+        actions={
+          unreadNotifications.length > 0 ? (
+            <Button
+              variant="outline"
+              onClick={handleMarkAllAsRead}
+              className="h-9 p-2 flex items-center gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
+              title="Markeer alles als gelezen"
+            >
+              <CheckCircle className="h-4 w-4" />
+              <span>Markeer alles als gelezen</span>
+            </Button>
+          ) : undefined
+        }
+      />
 
       <div className="mt-6 mb-6">
         <div className="flex gap-3 items-center">

@@ -302,16 +302,21 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
               <span className="text-xs text-gray-500">{user.role}</span>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocation('/profiel')}>
               <User className="mr-2 h-4 w-4" />
               <span>Mijn Profiel</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocation('/instellingen')}>
               <Settings className="mr-2 h-4 w-4" />
               <span>Instellingen</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {
+              // Wis alle gebruikersgegevens en navigeer naar login
+              localStorage.clear();
+              sessionStorage.clear();
+              setLocation('/login');
+            }}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Uitloggen</span>
             </DropdownMenuItem>

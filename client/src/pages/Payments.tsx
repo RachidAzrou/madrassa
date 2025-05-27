@@ -18,8 +18,35 @@ import {
   StyledSelectItem 
 } from "@/components/ui/custom-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CreditCard, Euro, Users, TrendingUp, ExternalLink, RefreshCw, User, GraduationCap } from "lucide-react";
+import { CreditCard, Euro, Users, TrendingUp, ExternalLink, RefreshCw, User, GraduationCap, Search, Filter, Download, Upload, PlusCircle } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
+// Import custom UI components that match Students page style
+const PremiumHeader = ({ title, description, icon: Icon, breadcrumbs }: any) => (
+  <div className="bg-white border-b border-gray-200 px-6 py-4">
+    <div className="flex items-center space-x-3 mb-2">
+      <Icon className="h-6 w-6 text-[#1e40af]" />
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+        <p className="text-sm text-gray-500">{description}</p>
+      </div>
+    </div>
+    <div className="text-xs text-gray-400">
+      {breadcrumbs.parent} / {breadcrumbs.current}
+    </div>
+  </div>
+);
+
+const DataTableContainer = ({ children }: any) => (
+  <div className="bg-white mx-6 mt-6 rounded-lg border border-gray-200 shadow-sm">
+    {children}
+  </div>
+);
+
+const SearchActionBar = ({ children }: any) => (
+  <div className="px-4 py-3 border-b border-gray-200 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+    {children}
+  </div>
+);
 
 interface Payment {
   id: number;
@@ -58,6 +85,8 @@ export default function Payments() {
   const [paymentDescription, setPaymentDescription] = useState<string>("");
   const [paymentNotes, setPaymentNotes] = useState<string>("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
 
   // Fetch payments
   const { data: payments, isLoading: paymentsLoading } = useQuery<Payment[]>({
@@ -252,21 +281,63 @@ export default function Payments() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Betalingen</h1>
-          <p className="text-gray-500">Beheer student betalingen via Mollie</p>
-        </div>
-        
-        <Button 
-          onClick={() => setIsCreateDialogOpen(true)}
-          className="bg-[#1e40af] hover:bg-[#1e3a8a]"
-        >
-          <CreditCard className="w-4 h-4 mr-2" />
-          Nieuwe betaling
-        </Button>
+    <div className="bg-[#f7f9fc] min-h-screen">
+      <PremiumHeader 
+        title="Betalingen" 
+        description="Beheer student betalingen via Mollie en bekijk betalingsstatistieken"
+        icon={CreditCard}
+        breadcrumbs={{
+          parent: "Financiën",
+          current: "Betalingen"
+        }}
+      />
+      
+      <DataTableContainer>
+        <SearchActionBar>
+          {/* Zoekbalk */}
+          <div className="relative w-full sm:max-w-md">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="text"
+              placeholder="Zoek op student, bedrag of beschrijving..."
+              className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          {/* Acties */}
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFilterOptions(!showFilterOptions)}
+              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
+              title="Filters"
+            >
+              <Filter className="h-3.5 w-3.5" />
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {/* Export functionaliteit */}}
+              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
+              title="Exporteer betalingen"
+            >
+              <Upload className="h-3.5 w-3.5" />
+            </Button>
+
+            <Button
+              size="sm"
+              onClick={() => setIsCreateDialogOpen(true)}
+              className="h-7 text-xs rounded-sm bg-[#1e40af] hover:bg-[#1e3a8a] text-white ml-auto"
+            >
+              <PlusCircle className="h-3.5 w-3.5 mr-1" />
+              Nieuwe Betaling
+            </Button>
+          </div>
+        </SearchActionBar>
         
         <CustomDialog 
           open={isCreateDialogOpen} 
@@ -429,9 +500,8 @@ export default function Payments() {
             </Button>
           </DialogFooterContainer>
         </CustomDialog>
-      </div>
 
-      {/* Stats Cards */}
+        {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>

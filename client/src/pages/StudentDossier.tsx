@@ -259,7 +259,7 @@ export default function StudentDossier() {
           <div className="max-w-4xl mx-auto space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="text-lg font-medium leading-tight tracking-tight flex items-center gap-2 text-[#0b4ca4]">
                   <GraduationCap className="h-5 w-5" />
                   Student Selecteren
                 </CardTitle>

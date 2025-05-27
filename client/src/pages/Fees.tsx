@@ -765,266 +765,293 @@ export default function Fees() {
 
         {/* Tarieven & Kortingen Tab */}
         <TabsContent value="instellingen" className="space-y-6">
-          {/* Snelle acties */}
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card className="border-blue-200 bg-blue-50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2 text-blue-800">
-                  <Banknote className="h-5 w-5" />
-                  Tarieven Beheer
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-blue-700">Stel standaard schoolgelden in per academisch jaar en factuurtype</p>
-                <Button 
-                  onClick={() => setShowAddTuitionRateDialog(true)} 
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nieuw Tarief Toevoegen
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-green-200 bg-green-50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2 text-green-800">
-                  <Target className="h-5 w-5" />
-                  Kortingen Beheer
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-green-700">Maak kortingsregels die automatisch worden toegepast bij facturatie</p>
-                <Button 
-                  onClick={() => setShowAddDiscountDialog(true)} 
-                  className="w-full bg-green-600 hover:bg-green-700"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nieuwe Korting Toevoegen
-                </Button>
-              </CardContent>
-            </Card>
+          {/* Action buttons like in students page */}
+          <div className="flex justify-between items-center">
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => setShowAddTuitionRateDialog(true)}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Nieuw Tarief
+              </Button>
+              <Button 
+                onClick={() => setShowAddDiscountDialog(true)}
+                variant="outline"
+              >
+                <Target className="mr-2 h-4 w-4" />
+                Nieuwe Korting
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+            </div>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            {/* Tarieven widget */}
-            <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Banknote className="h-5 w-5" />
-                    Actieve Tarieven
+            {/* Tarieven section */}
+            <div className="bg-white rounded-lg border">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <Banknote className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">Schoolgeld Tarieven</h3>
+                      <p className="text-sm text-gray-500">Standaard tarieven per academisch jaar</p>
+                    </div>
                   </div>
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                  <Badge variant="secondary">
                     {tuitionRatesData && Array.isArray(tuitionRatesData) ? tuitionRatesData.length : 0}
                   </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="max-h-80 overflow-y-auto">
-                  {tuitionRatesData && Array.isArray(tuitionRatesData) && tuitionRatesData.length > 0 ? (
-                    tuitionRatesData.map((rate: any, index: number) => (
-                      <div 
-                        key={rate.id} 
-                        className={`flex items-center justify-between p-4 hover:bg-blue-50 transition-colors ${
-                          index !== tuitionRatesData.length - 1 ? 'border-b border-gray-100' : ''
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                            <Euro className="h-5 w-5 text-blue-600" />
+                </div>
+              </div>
+              
+              <div className="max-h-96 overflow-y-auto">
+                {tuitionRatesData && Array.isArray(tuitionRatesData) && tuitionRatesData.length > 0 ? (
+                  <div className="divide-y divide-gray-100">
+                    {tuitionRatesData.map((rate: any) => (
+                      <div key={rate.id} className="p-4 hover:bg-gray-50 transition-colors group">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                              <Euro className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900">{rate.name}</div>
+                              <div className="text-sm text-gray-500 flex items-center gap-2">
+                                <span>{rate.academicYear}</span>
+                                <span>•</span>
+                                <TypeBadge type={rate.type} />
+                              </div>
+                            </div>
                           </div>
-                          <div>
-                            <div className="font-semibold text-sm text-gray-900">{rate.name}</div>
-                            <div className="text-xs text-gray-500 flex items-center gap-2">
-                              <span>{rate.academicYear}</span>
-                              <span>•</span>
-                              <TypeBadge type={rate.type} />
+                          <div className="flex items-center gap-2">
+                            <div className="text-right">
+                              <div className="font-semibold text-lg text-gray-900">
+                                {formatCurrency(parseFloat(rate.baseAmount || '0'))}
+                              </div>
+                            </div>
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="font-bold text-lg text-blue-600">
-                            {formatCurrency(parseFloat(rate.baseAmount || '0'))}
-                          </div>
-                          <div className="flex items-center gap-1 justify-end mt-1">
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                              <Edit className="h-3 w-3" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-12 text-gray-500">
-                      <Banknote className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                      <p className="font-medium">Geen tarieven ingesteld</p>
-                      <p className="text-sm">Voeg je eerste tarief toe om te beginnen</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Kortingen widget */}
-            <Card>
-              <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Target className="h-5 w-5" />
-                    Actieve Kortingen
+                    ))}
                   </div>
-                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                ) : (
+                  <div className="p-8 text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Banknote className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Geen tarieven</h3>
+                    <p className="text-gray-500 mb-4">Je hebt nog geen schoolgeld tarieven ingesteld.</p>
+                    <Button onClick={() => setShowAddTuitionRateDialog(true)} size="sm">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Eerste tarief toevoegen
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Kortingen section */}
+            <div className="bg-white rounded-lg border">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <Target className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">Kortingsregels</h3>
+                      <p className="text-sm text-gray-500">Automatische kortingen bij facturatie</p>
+                    </div>
+                  </div>
+                  <Badge variant="secondary">
                     {feeDiscountsData && Array.isArray(feeDiscountsData) ? feeDiscountsData.length : 0}
                   </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="max-h-80 overflow-y-auto">
-                  {feeDiscountsData && Array.isArray(feeDiscountsData) && feeDiscountsData.length > 0 ? (
-                    feeDiscountsData.map((discount: any, index: number) => (
-                      <div 
-                        key={discount.id} 
-                        className={`flex items-center justify-between p-4 hover:bg-green-50 transition-colors ${
-                          index !== feeDiscountsData.length - 1 ? 'border-b border-gray-100' : ''
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                            <Percent className="h-5 w-5 text-green-600" />
+                </div>
+              </div>
+              
+              <div className="max-h-96 overflow-y-auto">
+                {feeDiscountsData && Array.isArray(feeDiscountsData) && feeDiscountsData.length > 0 ? (
+                  <div className="divide-y divide-gray-100">
+                    {feeDiscountsData.map((discount: any) => (
+                      <div key={discount.id} className="p-4 hover:bg-gray-50 transition-colors group">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                              <Percent className="h-4 w-4 text-green-600" />
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900">{discount.name}</div>
+                              <div className="text-sm text-gray-500">
+                                <span>{discount.academicYear}</span>
+                                {discount.description && (
+                                  <>
+                                    <span> • </span>
+                                    <span className="truncate max-w-32">{discount.description}</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                          <div>
-                            <div className="font-semibold text-sm text-gray-900">{discount.name}</div>
-                            <div className="text-xs text-gray-500 flex items-center gap-2">
-                              <span>{discount.academicYear}</span>
-                              {discount.description && (
-                                <>
-                                  <span>•</span>
-                                  <span className="truncate max-w-32">{discount.description}</span>
-                                </>
-                              )}
+                          <div className="flex items-center gap-2">
+                            <div className="text-right">
+                              <div className="font-semibold text-lg text-gray-900">
+                                {discount.discountType === 'percentage' ? 
+                                  `${discount.discountValue}%` : 
+                                  formatCurrency(parseFloat(discount.discountValue || '0'))
+                                }
+                              </div>
+                            </div>
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="font-bold text-lg text-green-600">
-                            {discount.discountType === 'percentage' ? 
-                              `${discount.discountValue}%` : 
-                              formatCurrency(parseFloat(discount.discountValue || '0'))
-                            }
-                          </div>
-                          <div className="flex items-center gap-1 justify-end mt-1">
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                              <Edit className="h-3 w-3" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-12 text-gray-500">
-                      <Target className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                      <p className="font-medium">Geen kortingen ingesteld</p>
-                      <p className="text-sm">Voeg je eerste korting toe om te beginnen</p>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Target className="h-8 w-8 text-gray-400" />
                     </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Geen kortingen</h3>
+                    <p className="text-gray-500 mb-4">Je hebt nog geen kortingsregels ingesteld.</p>
+                    <Button onClick={() => setShowAddDiscountDialog(true)} size="sm">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Eerste korting toevoegen
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </TabsContent>
 
         {/* Rapporten Tab */}
         <TabsContent value="rapporten" className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100">
-              <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Financieel Overzicht
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <p className="text-sm text-purple-700 mb-4">Compleet overzicht van alle inkomsten, openstaande bedragen en betalingstrends</p>
-                <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download PDF Rapport
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-red-200 bg-gradient-to-br from-red-50 to-red-100">
-              <CardHeader className="bg-gradient-to-r from-red-600 to-red-700 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5" />
-                  Openstaande Schulden
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <p className="text-sm text-red-700 mb-4">Gedetailleerde lijst van studenten met openstaande betalingen en vervaldatums</p>
-                <Button className="w-full bg-red-600 hover:bg-red-700">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Excel Lijst
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-indigo-200 bg-gradient-to-br from-indigo-50 to-indigo-100">
-              <CardHeader className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Betalingshistorie
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <p className="text-sm text-indigo-700 mb-4">Chronologisch overzicht van alle uitgevoerde betalingen en transacties</p>
-                <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download CSV Export
-                </Button>
-              </CardContent>
-            </Card>
+          {/* Action buttons */}
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Rapporten & Analyses</h2>
+              <p className="text-sm text-gray-600">Exporteer en analyseer betalingsgegevens</p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <Calendar className="mr-2 h-4 w-4" />
+                Periode instellen
+              </Button>
+            </div>
           </div>
 
-          {/* Extra rapportage opties */}
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card className="border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100">
-              <CardHeader className="bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Trend Analyse
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <p className="text-sm text-amber-700 mb-4">Analyse van betalingstrends, seizoenspatronen en voorspellingen</p>
-                <Button className="w-full bg-amber-600 hover:bg-amber-700">
-                  <Calculator className="mr-2 h-4 w-4" />
-                  Genereer Analyse
-                </Button>
-              </CardContent>
-            </Card>
+          {/* Basic reports */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="bg-white rounded-lg border p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <FileText className="h-5 w-5 text-purple-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Financieel Overzicht</h3>
+                  <p className="text-sm text-gray-500">Compleet inkomsten rapport</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">Overzicht van alle inkomsten, openstaande bedragen en betalingstrends</p>
+              <Button className="w-full" variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF
+              </Button>
+            </div>
 
-            <Card className="border-teal-200 bg-gradient-to-br from-teal-50 to-teal-100">
-              <CardHeader className="bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2">
-                  <Send className="h-5 w-5" />
-                  Herinneringen
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <p className="text-sm text-teal-700 mb-4">Automatische herinneringen versturen naar studenten met openstaande betalingen</p>
-                <Button className="w-full bg-teal-600 hover:bg-teal-700">
-                  <Mail className="mr-2 h-4 w-4" />
-                  Verstuur Herinneringen
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="bg-white rounded-lg border p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <AlertCircle className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Openstaande Schulden</h3>
+                  <p className="text-sm text-gray-500">Debiteuren overzicht</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">Lijst van studenten met openstaande betalingen en vervaldatums</p>
+              <Button className="w-full" variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Download Excel
+              </Button>
+            </div>
+
+            <div className="bg-white rounded-lg border p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Clock className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Betalingshistorie</h3>
+                  <p className="text-sm text-gray-500">Transactie overzicht</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">Chronologisch overzicht van alle uitgevoerde betalingen</p>
+              <Button className="w-full" variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Download CSV
+              </Button>
+            </div>
+          </div>
+
+          {/* Advanced analytics */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="bg-white rounded-lg border p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-amber-100 rounded-lg">
+                  <TrendingUp className="h-5 w-5 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Trend Analyse</h3>
+                  <p className="text-sm text-gray-500">Betalingspatronen & voorspellingen</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">Analyse van betalingstrends, seizoenspatronen en voorspellingen voor komende periodes</p>
+              <Button className="w-full" variant="outline">
+                <Calculator className="mr-2 h-4 w-4" />
+                Genereer Analyse
+              </Button>
+            </div>
+
+            <div className="bg-white rounded-lg border p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Send className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Betalingsherinneringen</h3>
+                  <p className="text-sm text-gray-500">Automatische notificaties</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">Verstuur automatische herinneringen naar studenten met openstaande betalingen</p>
+              <Button className="w-full" variant="outline">
+                <Mail className="mr-2 h-4 w-4" />
+                Verstuur Herinneringen
+              </Button>
+            </div>
           </div>
         </TabsContent>
       </Tabs>

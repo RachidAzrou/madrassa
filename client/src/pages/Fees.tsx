@@ -34,7 +34,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -1412,6 +1413,159 @@ export default function Fees() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* View Payment Dialog */}
+      <Dialog open={isViewPaymentDialogOpen} onOpenChange={setIsViewPaymentDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5 text-blue-600" />
+              Betaling Details
+            </DialogTitle>
+            <DialogDescription>
+              Bekijk de details van deze betaling
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedPayment && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Student</label>
+                  <p className="text-sm">{selectedPayment.studentName || '-'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Bedrag</label>
+                  <p className="text-sm">€{selectedPayment.amount || '0,00'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Type</label>
+                  <p className="text-sm">{selectedPayment.type || '-'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Status</label>
+                  <p className="text-sm">{selectedPayment.status || '-'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Datum</label>
+                  <p className="text-sm">{selectedPayment.date || '-'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Referentie</label>
+                  <p className="text-sm">{selectedPayment.reference || '-'}</p>
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsViewPaymentDialogOpen(false)}
+            >
+              Sluiten
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Rate Dialog */}
+      <Dialog open={isViewRateDialogOpen} onOpenChange={setIsViewRateDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Euro className="h-5 w-5 text-blue-600" />
+              Tarief Details
+            </DialogTitle>
+            <DialogDescription>
+              Bekijk de details van dit tarief
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedRate && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Naam</label>
+                  <p className="text-sm">{selectedRate.name || '-'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Bedrag</label>
+                  <p className="text-sm">€{selectedRate.amount || '0,00'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Academisch Jaar</label>
+                  <p className="text-sm">{selectedRate.year || '-'}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Status</label>
+                  <p className="text-sm">{selectedRate.status || '-'}</p>
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsViewRateDialogOpen(false)}
+            >
+              Sluiten
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialogs */}
+      <AlertDialog open={isDeletePaymentDialogOpen} onOpenChange={setIsDeletePaymentDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Betaling verwijderen</AlertDialogTitle>
+            <AlertDialogDescription>
+              Weet je zeker dat je deze betaling wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                console.log('Verwijder betaling:', selectedPayment?.id);
+                toast({
+                  title: "Betaling verwijderd",
+                  description: "De betaling is succesvol verwijderd.",
+                });
+                setIsDeletePaymentDialogOpen(false);
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Verwijderen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isDeleteRateDialogOpen} onOpenChange={setIsDeleteRateDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tarief verwijderen</AlertDialogTitle>
+            <AlertDialogDescription>
+              Weet je zeker dat je dit tarief wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                console.log('Verwijder tarief:', selectedRate?.id);
+                toast({
+                  title: "Tarief verwijderd",
+                  description: "Het tarief is succesvol verwijderd.",
+                });
+                setIsDeleteRateDialogOpen(false);
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Verwijderen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </div>
   );

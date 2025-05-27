@@ -39,6 +39,16 @@
   --ring: 214 89% 34%;
   --radius: 0.25rem;
   }
+
+/* Fix voor kalender popover z-index problemen */
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+}
+
+/* Specifieke fix voor Calendar popovers */
+.calendar-popover {
+  z-index: 9999 !important;
+}
   .dark {
   /* Neutrale kleuren voor zakelijke dark mode */
   --background: 222 18% 12%;

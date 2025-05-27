@@ -230,58 +230,166 @@ export default function SuperAdmin() {
       />
 
       <div className="container mx-auto px-6 py-8">
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Statistics with Circle Charts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Schools Circle Chart */}
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex flex-col items-center space-y-4">
+                <div className="relative w-24 h-24">
+                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
+                    {/* Background circle */}
+                    <path
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#e5e7eb"
+                      strokeWidth="2"
+                    />
+                    {/* Progress circle */}
+                    <path
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#2563eb"
+                      strokeWidth="2"
+                      strokeDasharray={`${(stats.activeSchools / stats.totalSchools) * 100}, 100`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <School className="h-6 w-6 text-blue-600" />
+                  </div>
+                </div>
+                <div className="text-center">
                   <p className="text-sm text-gray-600">Totaal Scholen</p>
-                  <p className="text-3xl font-bold text-blue-600">{stats.totalSchools}</p>
-                  <p className="text-sm text-green-600">{stats.activeSchools} actief</p>
+                  <p className="text-2xl font-bold text-blue-600">{stats.totalSchools}</p>
+                  <p className="text-xs text-green-600">{stats.activeSchools} actief</p>
                 </div>
-                <School className="h-8 w-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
 
+          {/* Students Circle Chart */}
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex flex-col items-center space-y-4">
+                <div className="relative w-24 h-24">
+                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
+                    {/* Background circle */}
+                    <path
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#e5e7eb"
+                      strokeWidth="2"
+                    />
+                    {/* Progress circle - 85% filled for visual appeal */}
+                    <path
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#16a34a"
+                      strokeWidth="2"
+                      strokeDasharray="85, 100"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Users className="h-6 w-6 text-green-600" />
+                  </div>
+                </div>
+                <div className="text-center">
                   <p className="text-sm text-gray-600">Totaal Studenten</p>
-                  <p className="text-3xl font-bold text-green-600">{stats.totalStudents}</p>
-                  <p className="text-sm text-gray-500">Alle scholen</p>
+                  <p className="text-2xl font-bold text-green-600">{stats.totalStudents}</p>
+                  <p className="text-xs text-gray-500">Alle scholen</p>
                 </div>
-                <Users className="h-8 w-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
 
+          {/* Teachers Circle Chart */}
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex flex-col items-center space-y-4">
+                <div className="relative w-24 h-24">
+                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
+                    {/* Background circle */}
+                    <path
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#e5e7eb"
+                      strokeWidth="2"
+                    />
+                    {/* Progress circle - 65% filled for visual appeal */}
+                    <path
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#9333ea"
+                      strokeWidth="2"
+                      strokeDasharray="65, 100"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <UserPlus className="h-6 w-6 text-purple-600" />
+                  </div>
+                </div>
+                <div className="text-center">
                   <p className="text-sm text-gray-600">Totaal Docenten</p>
-                  <p className="text-3xl font-bold text-purple-600">{stats.totalTeachers}</p>
-                  <p className="text-sm text-gray-500">Alle scholen</p>
+                  <p className="text-2xl font-bold text-purple-600">{stats.totalTeachers}</p>
+                  <p className="text-xs text-gray-500">Alle scholen</p>
                 </div>
-                <UserPlus className="h-8 w-8 text-purple-600" />
               </div>
             </CardContent>
           </Card>
 
+          {/* Average Students Circle Chart */}
           <Card>
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex flex-col items-center space-y-4">
+                <div className="relative w-24 h-24">
+                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
+                    {/* Background circle */}
+                    <path
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#e5e7eb"
+                      strokeWidth="2"
+                    />
+                    {/* Progress circle - 75% filled for visual appeal */}
+                    <path
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="#ea580c"
+                      strokeWidth="2"
+                      strokeDasharray="75, 100"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Building2 className="h-6 w-6 text-orange-600" />
+                  </div>
+                </div>
+                <div className="text-center">
                   <p className="text-sm text-gray-600">Gemiddeld per School</p>
-                  <p className="text-3xl font-bold text-orange-600">
+                  <p className="text-2xl font-bold text-orange-600">
                     {Math.round(stats.totalStudents / stats.totalSchools)}
                   </p>
-                  <p className="text-sm text-gray-500">Studenten</p>
+                  <p className="text-xs text-gray-500">Studenten</p>
                 </div>
-                <Building2 className="h-8 w-8 text-orange-600" />
               </div>
             </CardContent>
           </Card>

@@ -7,26 +7,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { CustomDialog } from "@/components/ui/custom-dialog";
 import { DialogHeaderWithIcon, DialogFormContainer, DialogFooterContainer, SectionContainer, FormLabel, StyledSelect, StyledSelectItem } from "@/components/ui/custom-dialog";
 import { CreditCard, Euro, Users, TrendingUp, ExternalLink, RefreshCw, User, GraduationCap, Search, Filter, Download, Upload, PlusCircle } from "lucide-react";
+import { PremiumHeader } from '@/components/layout/premium-header';
+import { StandardTable, StandardTableHeader, StandardTableBody, StandardTableRow, StandardTableCell, StandardTableHeaderCell, TableLoadingState, TableEmptyState, EmptyActionHeader, TableActionCell } from "@/components/ui/standard-table";
+
 import { queryClient } from "@/lib/queryClient";
 
-// Standard page header used across all pages
-const PageHeader = () => (
-  <div className="p-4 md:p-6 space-y-6">
-    <div className="flex items-center justify-between mb-8">
-      <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
-        <div className="flex items-center gap-4 mb-2 md:mb-0">
-          <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
-            <CreditCard className="h-7 w-7" />
-          </div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Betalingen</h1>
-            <p className="text-base text-gray-500 mt-1">Beheer student betalingen via Mollie en bekijk betalingsstatistieken</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
+
 
 interface Payment {
   id: number;
@@ -261,7 +247,22 @@ export default function Payments() {
 
   return (
     <div className="space-y-6">
-      <PageHeader />
+      <PremiumHeader
+        title="Betalingen"
+        path="Financiën > Betalingen"
+        icon={CreditCard}
+        description="Beheer student betalingen via Mollie en bekijk betalingsstatistieken"
+      />
+      
+      <div className="p-4 md:p-6">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-2 ml-auto">
+            <span className="text-sm text-gray-500 font-medium">
+              {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
+          </div>
+        </div>
+      </div>
 
       {/* Zoek en acties */}
       <div className="space-y-4">

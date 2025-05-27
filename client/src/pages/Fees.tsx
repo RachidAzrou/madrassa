@@ -42,6 +42,7 @@ import { toast } from '@/hooks/use-toast';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { DialogHeaderWithIcon } from '@/components/ui/dialog-header-with-icon';
 import { StandardTable } from '@/components/ui/standard-table';
+import { CustomDialog, DialogFormContainer, DialogFooterContainer } from '@/components/ui/custom-dialog';
 
 // Payment types - these will be managed dynamically
 const defaultPaymentTypes = [
@@ -698,19 +699,20 @@ export default function Fees() {
             <DialogDescription>Voeg een nieuwe betaling toe aan het systeem</DialogDescription>
           </VisuallyHidden>
           
-          <div className="bg-blue-600 text-white p-6 rounded-t-lg">
+          <div className="bg-[#1e40af] text-white p-6">
             <div className="flex items-center gap-3">
-              <CreditCard className="h-5 w-5" />
+              <div className="p-2 rounded-full text-[#f5f6f7] bg-[#ffffff33]">
+                <CreditCard className="h-5 w-5" />
+              </div>
               <div>
-                <h2 className="text-lg font-semibold">Nieuwe Betaling</h2>
-                <p className="text-blue-100 text-sm">Voeg een nieuwe betaling toe aan het systeem</p>
+                <h2 className="text-lg font-semibold m-0">Nieuwe Betaling</h2>
+                <p className="text-white/70 text-sm m-0">Voeg een nieuwe betaling toe aan het systeem</p>
               </div>
             </div>
           </div>
           
-          <div className="p-6">
-            <Form {...paymentForm}>
-              <form onSubmit={paymentForm.handleSubmit(handleCreatePayment)} className="space-y-4">
+          <Form {...paymentForm}>
+            <form onSubmit={paymentForm.handleSubmit(handleCreatePayment)} className="px-6 py-4 space-y-4" style={{ maxHeight: 'calc(90vh - 150px)', overflowY: 'auto' }}>
                 
                 {/* Payment Mode Selection */}
                 <FormField
@@ -937,17 +939,16 @@ export default function Fees() {
                   </div>
                 )}
 
-                <div className="flex justify-end gap-3 pt-6 border-t">
-                  <Button type="button" variant="outline" onClick={() => setShowPaymentDialog(false)}>
-                    Annuleren
-                  </Button>
-                  <Button type="submit" disabled={createPaymentMutation.isPending}>
-                    {createPaymentMutation.isPending ? 'Bezig...' : 'Betaling Aanmaken'}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </div>
+              <div className="bg-gray-50 px-6 py-3 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t">
+                <Button type="button" variant="outline" onClick={() => setShowPaymentDialog(false)} className="w-full sm:w-auto mt-2 sm:mt-0">
+                  Annuleren
+                </Button>
+                <Button type="submit" disabled={createPaymentMutation.isPending} className="bg-[#1e40af] hover:bg-[#1e40af]/90 w-full sm:w-auto">
+                  {createPaymentMutation.isPending ? 'Bezig...' : 'Betaling Aanmaken'}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 

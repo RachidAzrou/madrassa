@@ -77,6 +77,16 @@ const defaultDiscounts = [
   { id: 3, name: 'Studentenkorting', percentage: 15, description: 'Korting voor studenten', active: false },
 ];
 
+// Mock students data for the interface
+const mockStudents = [
+  { id: 'STU-001', name: 'Ahmed Hassan', klas: 'Arabisch Beginners' },
+  { id: 'STU-002', name: 'Fatima Al-Zahra', klas: 'Quran Memorisatie' },
+  { id: 'STU-003', name: 'Omar Ibn Khattab', klas: 'Islamitische Studies' },
+  { id: 'STU-004', name: 'Yusuf Ibrahim', klas: 'Arabisch Beginners' },
+  { id: 'STU-005', name: 'Aisha Mohammed', klas: 'Quran Memorisatie' },
+  { id: 'STU-006', name: 'Hassan Ali', klas: 'Arabisch Beginners' }
+];
+
 // Form schemas
 const paymentFormSchema = z.object({
   paymentMode: z.enum(['single', 'multiple', 'bulk']),
@@ -127,6 +137,19 @@ export default function Fees() {
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
   const [selectedRate, setSelectedRate] = useState<any>(null);
   const [selectedDiscount, setSelectedDiscount] = useState<any>(null);
+  
+  // Student selection states
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
+  const [selectedClassFilter, setSelectedClassFilter] = useState('all');
+  
+  // Filtered students based on search and class filter
+  const filteredStudents = mockStudents.filter(student => {
+    const matchesSearch = student.name.toLowerCase().includes(studentSearchTerm.toLowerCase()) ||
+                         student.id.toLowerCase().includes(studentSearchTerm.toLowerCase());
+    const matchesClass = selectedClassFilter === 'all' || 
+                        student.klas.toLowerCase().replace(' ', '-') === selectedClassFilter;
+    return matchesSearch && matchesClass;
+  });
 
   // Handler functions for payment actions
   const handleViewPayment = (payment: any) => {
@@ -1083,67 +1106,178 @@ export default function Fees() {
                     </FormItem>
                   )}
                 />
-              ) : (
+              ) : paymentMode === 'single' ? (
                 <FormField
                   control={paymentForm.control}
                   name="studentIds"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
-                        {paymentMode === 'single' ? 'Student' : 'Studenten'}
-                      </FormLabel>
-                      {paymentMode === 'single' ? (
-                        <Select 
-                          onValueChange={(value) => field.onChange([value])} 
-                          defaultValue={field.value?.[0]}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecteer student" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="STU-001">Ahmed Hassan (STU-001)</SelectItem>
-                            <SelectItem value="STU-002">Fatima Al-Zahra (STU-002)</SelectItem>
-                            <SelectItem value="STU-003">Omar Ibn Khattab (STU-003)</SelectItem>
-                            <SelectItem value="STU-004">Yusuf Ibrahim (STU-004)</SelectItem>
-                            <SelectItem value="STU-005">Aisha Mohammed (STU-005)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <div className="space-y-2">
-                          <div className="text-sm text-muted-foreground">
-                            Selecteer meerdere studenten voor deze betaling
+                      <FormLabel>Student</FormLabel>
+                      <Select 
+                        onValueChange={(value) => field.onChange([value])} 
+                        defaultValue={field.value?.[0]}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer student" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="STU-001">Ahmed Hassan (STU-001)</SelectItem>
+                          <SelectItem value="STU-002">Fatima Al-Zahra (STU-002)</SelectItem>
+                          <SelectItem value="STU-003">Omar Ibn Khattab (STU-003)</SelectItem>
+                          <SelectItem value="STU-004">Yusuf Ibrahim (STU-004)</SelectItem>
+                          <SelectItem value="STU-005">Aisha Mohammed (STU-005)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
+                // Multiple student selection interface
+                <FormField
+                  control={paymentForm.control}
+                  name="studentIds"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Studenten selecteren</FormLabel>
+                      <div className="space-y-4">
+                        {/* Search and filter controls */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Input
+                              placeholder="Zoek student..."
+                              value={studentSearchTerm}
+                              onChange={(e) => setStudentSearchTerm(e.target.value)}
+                              className="w-full"
+                            />
                           </div>
-                          <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto border rounded p-2">
-                            {[
-                              { id: 'STU-001', name: 'Ahmed Hassan' },
-                              { id: 'STU-002', name: 'Fatima Al-Zahra' },
-                              { id: 'STU-003', name: 'Omar Ibn Khattab' },
-                              { id: 'STU-004', name: 'Yusuf Ibrahim' },
-                              { id: 'STU-005', name: 'Aisha Mohammed' },
-                            ].map((student) => (
-                              <div key={student.id} className="flex items-center space-x-2">
+                          <div>
+                            <Select value={selectedClassFilter} onValueChange={setSelectedClassFilter}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Filter op klas" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">Alle klassen</SelectItem>
+                                <SelectItem value="arabisch-beginners">Arabisch Beginners</SelectItem>
+                                <SelectItem value="quran-memorisatie">Quran Memorisatie</SelectItem>
+                                <SelectItem value="islamitische-studies">Islamitische Studies</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
+                        {/* Selected students display */}
+                        {field.value && field.value.length > 0 && (
+                          <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                            <div className="text-sm font-medium text-blue-800 mb-2">
+                              Geselecteerde studenten ({field.value.length}):
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {field.value.map(studentId => {
+                                const student = mockStudents.find(s => s.id === studentId);
+                                return (
+                                  <div key={studentId} className="flex items-center bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm">
+                                    <span>{student?.name} ({studentId})</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const newValue = field.value.filter(id => id !== studentId);
+                                        field.onChange(newValue);
+                                      }}
+                                      className="ml-1 text-blue-600 hover:text-blue-800"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Student selection list */}
+                        <div className="border rounded-lg max-h-64 overflow-y-auto">
+                          <div className="p-3 border-b bg-gray-50">
+                            <div className="text-sm font-medium text-gray-700">
+                              Beschikbare studenten
+                            </div>
+                          </div>
+                          <div className="p-2 space-y-1">
+                            {filteredStudents.map((student) => (
+                              <div 
+                                key={student.id} 
+                                className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                                onClick={() => {
+                                  const currentValue = field.value || [];
+                                  const isSelected = currentValue.includes(student.id);
+                                  if (isSelected) {
+                                    field.onChange(currentValue.filter(id => id !== student.id));
+                                  } else {
+                                    field.onChange([...currentValue, student.id]);
+                                  }
+                                }}
+                              >
                                 <Checkbox
-                                  id={student.id}
                                   checked={field.value?.includes(student.id)}
-                                  onCheckedChange={(checked) => {
-                                    const currentValue = field.value || [];
-                                    if (checked) {
-                                      field.onChange([...currentValue, student.id]);
-                                    } else {
-                                      field.onChange(currentValue.filter(id => id !== student.id));
-                                    }
-                                  }}
+                                  readOnly
+                                  className="pointer-events-none"
                                 />
-                                <label htmlFor={student.id} className="text-sm">
-                                  {student.name} ({student.id})
-                                </label>
+                                <div className="flex-1">
+                                  <div className="text-sm font-medium">{student.name}</div>
+                                  <div className="text-xs text-gray-500">{student.klas} • {student.id}</div>
+                                </div>
                               </div>
+                            ))}
+                            {filteredStudents.length === 0 && (
+                              <div className="text-center py-4 text-gray-500 text-sm">
+                                Geen studenten gevonden
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Quick select by class */}
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                          <div className="text-sm font-medium text-gray-700 mb-2">
+                            Snelle selectie per klas:
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {[
+                              { id: 'arabisch-beginners', name: 'Arabisch Beginners', count: 3 },
+                              { id: 'quran-memorisatie', name: 'Quran Memorisatie', count: 2 },
+                              { id: 'islamitische-studies', name: 'Islamitische Studies', count: 1 }
+                            ].map((klas) => (
+                              <Button
+                                key={klas.id}
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const classStudents = mockStudents
+                                    .filter(s => s.klas.toLowerCase().replace(' ', '-') === klas.id)
+                                    .map(s => s.id);
+                                  const currentValue = field.value || [];
+                                  const allSelected = classStudents.every(id => currentValue.includes(id));
+                                  
+                                  if (allSelected) {
+                                    // Deselect all students from this class
+                                    field.onChange(currentValue.filter(id => !classStudents.includes(id)));
+                                  } else {
+                                    // Select all students from this class
+                                    const newValue = [...new Set([...currentValue, ...classStudents])];
+                                    field.onChange(newValue);
+                                  }
+                                }}
+                                className="text-xs"
+                              >
+                                {klas.name} ({klas.count})
+                              </Button>
                             ))}
                           </div>
                         </div>
-                      )}
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}

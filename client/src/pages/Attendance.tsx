@@ -418,76 +418,62 @@ export default function Attendance() {
         icon={CalendarCheck}
         description="Registreer en beheer aanwezigheid van studenten, bekijk absentiegeschiedenis en identificeer trends"
       />
-      {/* Improved Controls Section */}
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
-        <div className="p-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            {/* Date Selection */}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-[#1e40af] text-white rounded-lg">
-                  <Clock className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Datum</h3>
-                  <p className="text-sm text-gray-500">Selecteer datum voor aanwezigheidsregistratie</p>
-                </div>
+      {/* Controls and Filters using SearchActionLayout pattern */}
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm mb-6">
+        <div className="p-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* Date Navigation */}
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleDateChange(-1)}
+                className="h-9 w-9 p-0"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              
+              <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md min-w-[160px] text-center">
+                <span className="text-sm font-medium text-gray-900">{formatDate(selectedDate)}</span>
               </div>
               
-              <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleDateChange(-1)} 
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-                
-                <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-md min-w-[200px] text-center">
-                  <span className="text-sm font-medium text-gray-900">{formatDate(selectedDate)}</span>
-                </div>
-                
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleDateChange(1)} 
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                >
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleDateChange(1)}
+                className="h-9 w-9 p-0"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+                className="text-[#1e40af] border-[#1e40af] hover:bg-blue-50"
+              >
+                Vandaag
+              </Button>
             </div>
 
-            {/* Filter Selection */}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-[#1e40af] text-white rounded-lg">
-                  <Filter className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Filter</h3>
-                  <p className="text-sm text-gray-500">Kies vak of klas voor aanwezigheid</p>
-                </div>
+            {/* Filter Controls */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Filter:</span>
               </div>
               
-              <div className="flex flex-col gap-3">
-                <Tabs defaultValue="vak" onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
-                  <TabsList className="grid w-full grid-cols-2 bg-gray-100">
-                    <TabsTrigger value="vak" className="data-[state=active]:bg-white data-[state=active]:text-[#1e40af]">
-                      <GraduationCap className="h-4 w-4 mr-2" />
-                      Vak
-                    </TabsTrigger>
-                    <TabsTrigger value="klas" className="data-[state=active]:bg-white data-[state=active]:text-[#1e40af]">
-                      <Users className="h-4 w-4 mr-2" />
-                      Klas
-                    </TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="vak" className="mt-3">
+              <Tabs defaultValue="vak" onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')} className="w-auto">
+                <TabsList className="h-9">
+                  <TabsTrigger value="vak" className="text-xs">Vak</TabsTrigger>
+                  <TabsTrigger value="klas" className="text-xs">Klas</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="vak" className="mt-0 absolute z-10">
+                  <div className="mt-2">
                     <Select value={selectedCourse} onValueChange={handleCourseChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecteer een vak" />
+                      <SelectTrigger className="w-[200px] h-9">
+                        <SelectValue placeholder="Selecteer vak" />
                       </SelectTrigger>
                       <SelectContent>
                         {isLoadingCourses ? (
@@ -508,12 +494,14 @@ export default function Attendance() {
                         )}
                       </SelectContent>
                     </Select>
-                  </TabsContent>
-                  
-                  <TabsContent value="klas" className="mt-3">
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="klas" className="mt-0 absolute z-10">
+                  <div className="mt-2">
                     <Select value={selectedClass} onValueChange={handleClassChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecteer een klas" />
+                      <SelectTrigger className="w-[200px] h-9">
+                        <SelectValue placeholder="Selecteer klas" />
                       </SelectTrigger>
                       <SelectContent>
                         {isLoadingClasses ? (
@@ -534,31 +522,9 @@ export default function Attendance() {
                         )}
                       </SelectContent>
                     </Select>
-                  </TabsContent>
-                </Tabs>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="flex-shrink-0">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-[#1e40af] text-white rounded-lg">
-                  <Building className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Vandaag</h3>
-                  <p className="text-sm text-gray-500">Snelle datum selectie</p>
-                </div>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-                className="w-full border-[#1e40af] text-[#1e40af] hover:bg-blue-50"
-              >
-                Naar vandaag
-              </Button>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
         </div>

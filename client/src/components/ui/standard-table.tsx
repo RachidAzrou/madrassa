@@ -1,7 +1,7 @@
 import React from 'react';
 import { Checkbox } from './checkbox';
 import { Button } from './button';
-import { XCircle } from 'lucide-react';
+import { XCircle, Eye, Edit3, Trash2 } from 'lucide-react';
 
 interface StandardTableProps {
   children: React.ReactNode;
@@ -60,6 +60,21 @@ interface CheckboxHeaderProps {
 
 interface ActionHeaderProps {
   className?: string;
+}
+
+interface ActionButtonProps {
+  onClick: () => void;
+  title?: string;
+  className?: string;
+}
+
+interface TableActionButtonsProps {
+  onView?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  viewTitle?: string;
+  editTitle?: string;
+  deleteTitle?: string;
 }
 
 // Main table container
@@ -218,5 +233,74 @@ export function TableActionCell({ children }: { children: React.ReactNode }) {
     <StandardTableCell className="text-right">
       {children}
     </StandardTableCell>
+  );
+}
+
+// Individual action buttons with consistent styling
+export function ViewActionButton({ onClick, title = "Bekijken", className = "" }: ActionButtonProps) {
+  return (
+    <Button 
+      variant="ghost" 
+      size="sm" 
+      className={`h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100 ${className}`}
+      onClick={onClick}
+      title={title}
+    >
+      <Eye className="h-3.5 w-3.5" />
+    </Button>
+  );
+}
+
+export function EditActionButton({ onClick, title = "Bewerken", className = "" }: ActionButtonProps) {
+  return (
+    <Button 
+      variant="ghost" 
+      size="sm" 
+      className={`h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100 ${className}`}
+      onClick={onClick}
+      title={title}
+    >
+      <Edit3 className="h-3.5 w-3.5" />
+    </Button>
+  );
+}
+
+export function DeleteActionButton({ onClick, title = "Verwijderen", className = "" }: ActionButtonProps) {
+  return (
+    <Button 
+      variant="ghost" 
+      size="sm" 
+      className={`h-7 w-7 p-0 text-gray-500 hover:text-red-600 hover:bg-red-50 ${className}`}
+      onClick={onClick}
+      title={title}
+    >
+      <Trash2 className="h-3.5 w-3.5" />
+    </Button>
+  );
+}
+
+// Combined action buttons with consistent layout
+export function TableActionButtons({ 
+  onView, 
+  onEdit, 
+  onDelete, 
+  viewTitle = "Bekijken",
+  editTitle = "Bewerken", 
+  deleteTitle = "Verwijderen" 
+}: TableActionButtonsProps) {
+  return (
+    <TableActionCell>
+      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        {onView && (
+          <ViewActionButton onClick={onView} title={viewTitle} />
+        )}
+        {onEdit && (
+          <EditActionButton onClick={onEdit} title={editTitle} />
+        )}
+        {onDelete && (
+          <DeleteActionButton onClick={onDelete} title={deleteTitle} />
+        )}
+      </div>
+    </TableActionCell>
   );
 }

@@ -55,6 +55,7 @@ import {
   StandardTableHeaderCell,
   TableCheckboxHeader,
   TableCheckboxCell,
+  TableActionButtons,
   TableActionCell,
   EmptyActionHeader
 } from '@/components/ui/standard-table';
@@ -822,53 +823,89 @@ export default function Fees() {
                   <EmptyActionHeader />
                 </StandardTableRow>
               </StandardTableHeader>
-              <TableBody>
-                <TableRow className="group">
-                  <TableCell className="text-xs font-medium">Meerkinderen Korting</TableCell>
-                  <TableCell className="text-xs">Familie</TableCell>
-                  <TableCell className="text-xs">15%</TableCell>
-                  <TableCell className="text-xs">2024-2025</TableCell>
-                  <TableCell className="text-xs">
+              <StandardTableBody>
+                <StandardTableRow>
+                  <TableCheckboxCell
+                    checked={selectedDiscounts.includes(1)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedDiscounts([...selectedDiscounts, 1]);
+                      } else {
+                        setSelectedDiscounts(selectedDiscounts.filter(id => id !== 1));
+                      }
+                    }}
+                  />
+                  <StandardTableCell className="font-medium">Meerkinderen Korting</StandardTableCell>
+                  <StandardTableCell>Familie</StandardTableCell>
+                  <StandardTableCell>15%</StandardTableCell>
+                  <StandardTableCell>2024-2025</StandardTableCell>
+                  <StandardTableCell>
                     <Badge variant="secondary" className="text-xs">Actief</Badge>
-                  </TableCell>
-                  <TableCell className="text-xs text-right">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" className="text-xs">Bewerken</Button>
-                      <Button variant="ghost" size="sm" className="text-xs text-red-600">Verwijderen</Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-                <TableRow className="group">
-                  <TableCell className="text-xs font-medium">Vroegboek Korting</TableCell>
-                  <TableCell className="text-xs">Tijdelijk</TableCell>
-                  <TableCell className="text-xs">10%</TableCell>
-                  <TableCell className="text-xs">2024-2025</TableCell>
-                  <TableCell className="text-xs">
+                  </StandardTableCell>
+                  <TableActionButtons
+                    onView={() => handleViewDiscount({ id: 1, name: 'Meerkinderen Korting', type: 'Familie', percentage: '15%', year: '2024-2025', status: 'Actief' })}
+                    onEdit={() => handleEditDiscount({ id: 1, name: 'Meerkinderen Korting', type: 'Familie', percentage: '15%', year: '2024-2025', status: 'Actief' })}
+                    onDelete={() => handleDeleteDiscount({ id: 1, name: 'Meerkinderen Korting', type: 'Familie', percentage: '15%', year: '2024-2025', status: 'Actief' })}
+                    viewTitle="Bekijk korting"
+                    editTitle="Bewerk korting"
+                    deleteTitle="Verwijder korting"
+                  />
+                </StandardTableRow>
+                <StandardTableRow>
+                  <TableCheckboxCell
+                    checked={selectedDiscounts.includes(2)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedDiscounts([...selectedDiscounts, 2]);
+                      } else {
+                        setSelectedDiscounts(selectedDiscounts.filter(id => id !== 2));
+                      }
+                    }}
+                  />
+                  <StandardTableCell className="font-medium">Vroegboek Korting</StandardTableCell>
+                  <StandardTableCell>Tijdelijk</StandardTableCell>
+                  <StandardTableCell>10%</StandardTableCell>
+                  <StandardTableCell>2024-2025</StandardTableCell>
+                  <StandardTableCell>
                     <Badge variant="secondary" className="text-xs">Actief</Badge>
-                  </TableCell>
-                  <TableCell className="text-xs text-right">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" className="text-xs">Bewerken</Button>
-                      <Button variant="ghost" size="sm" className="text-xs text-red-600">Verwijderen</Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-                <TableRow className="group">
-                  <TableCell className="text-xs font-medium">Sociaal Tarief</TableCell>
-                  <TableCell className="text-xs">Inkomen</TableCell>
-                  <TableCell className="text-xs">25%</TableCell>
-                  <TableCell className="text-xs">2024-2025</TableCell>
-                  <TableCell className="text-xs">
+                  </StandardTableCell>
+                  <TableActionButtons
+                    onView={() => handleViewDiscount({ id: 2, name: 'Vroegboek Korting', type: 'Tijdelijk', percentage: '10%', year: '2024-2025', status: 'Actief' })}
+                    onEdit={() => handleEditDiscount({ id: 2, name: 'Vroegboek Korting', type: 'Tijdelijk', percentage: '10%', year: '2024-2025', status: 'Actief' })}
+                    onDelete={() => handleDeleteDiscount({ id: 2, name: 'Vroegboek Korting', type: 'Tijdelijk', percentage: '10%', year: '2024-2025', status: 'Actief' })}
+                    viewTitle="Bekijk korting"
+                    editTitle="Bewerk korting"
+                    deleteTitle="Verwijder korting"
+                  />
+                </StandardTableRow>
+                <StandardTableRow>
+                  <TableCheckboxCell
+                    checked={selectedDiscounts.includes(3)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedDiscounts([...selectedDiscounts, 3]);
+                      } else {
+                        setSelectedDiscounts(selectedDiscounts.filter(id => id !== 3));
+                      }
+                    }}
+                  />
+                  <StandardTableCell className="font-medium">Sociaal Tarief</StandardTableCell>
+                  <StandardTableCell>Inkomen</StandardTableCell>
+                  <StandardTableCell>25%</StandardTableCell>
+                  <StandardTableCell>2024-2025</StandardTableCell>
+                  <StandardTableCell>
                     <Badge variant="secondary" className="text-xs">Actief</Badge>
-                  </TableCell>
-                  <TableCell className="text-xs text-right">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" className="text-xs">Bewerken</Button>
-                      <Button variant="ghost" size="sm" className="text-xs text-red-600">Verwijderen</Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
+                  </StandardTableCell>
+                  <TableActionButtons
+                    onView={() => handleViewDiscount({ id: 3, name: 'Sociaal Tarief', type: 'Inkomen', percentage: '25%', year: '2024-2025', status: 'Actief' })}
+                    onEdit={() => handleEditDiscount({ id: 3, name: 'Sociaal Tarief', type: 'Inkomen', percentage: '25%', year: '2024-2025', status: 'Actief' })}
+                    onDelete={() => handleDeleteDiscount({ id: 3, name: 'Sociaal Tarief', type: 'Inkomen', percentage: '25%', year: '2024-2025', status: 'Actief' })}
+                    viewTitle="Bekijk korting"
+                    editTitle="Bewerk korting"
+                    deleteTitle="Verwijder korting"
+                  />
+                </StandardTableRow>
+              </StandardTableBody>
             </StandardTable>
           </div>
         </TabsContent>

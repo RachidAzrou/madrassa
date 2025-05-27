@@ -9,31 +9,19 @@ import { DialogHeaderWithIcon, DialogFormContainer, DialogFooterContainer, Secti
 import { CreditCard, Euro, Users, TrendingUp, ExternalLink, RefreshCw, User, GraduationCap, Search, Filter, Download, Upload, PlusCircle } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 
-// Import PremiumHeader component that matches Fees page style
-const PremiumHeader = ({ title, path, icon: Icon, description }: any) => (
-  <div className="space-y-6">
-    <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-8 px-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
-              <Icon className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <div className="text-blue-100 text-sm mb-1">{path}</div>
-              <h1 className="text-3xl font-bold text-white mb-2">{title}</h1>
-              <p className="text-blue-100 text-lg">{description}</p>
-            </div>
+// Standard page header used across all pages
+const PageHeader = () => (
+  <div className="p-4 md:p-6 space-y-6">
+    <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row md:items-center border-b border-gray-200 pb-4 w-full">
+        <div className="flex items-center gap-4 mb-2 md:mb-0">
+          <div className="p-3 rounded-md bg-[#1e3a8a] text-white">
+            <CreditCard className="h-7 w-7" />
           </div>
-        </div>
-      </div>
-    </div>
-    <div className="p-4 md:p-6">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-2 ml-auto">
-          <span className="text-sm text-gray-500 font-medium">
-            {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-          </span>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Betalingen</h1>
+            <p className="text-base text-gray-500 mt-1">Beheer student betalingen via Mollie en bekijk betalingsstatistieken</p>
+          </div>
         </div>
       </div>
     </div>
@@ -273,12 +261,7 @@ export default function Payments() {
 
   return (
     <div className="space-y-6">
-      <PremiumHeader
-        title="Betalingen"
-        path="Financiën > Betalingen"
-        icon={CreditCard}
-        description="Beheer student betalingen via Mollie en bekijk betalingsstatistieken"
-      />
+      <PageHeader />
 
       {/* Zoek en acties */}
       <div className="space-y-4">

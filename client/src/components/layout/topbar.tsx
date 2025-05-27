@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { 
   Bell, 
   MessageSquare, 
@@ -49,10 +49,17 @@ interface TopbarProps {
 
 export function Topbar({ onMenuClick }: TopbarProps = {}) {
   const isMobile = useMobile();
+  const [, setLocation] = useLocation();
+  
   // Haal de notificaties op
   const { data: notificationsData } = useQuery({
     queryKey: ['/api/notifications/user/1'],
   });
+
+  const handleMessageClick = (messageId: number) => {
+    // Navigeer naar de berichtenpagina met het specifieke bericht
+    setLocation(`/messages?messageId=${messageId}`);
+  };
 
   // Gebruiker informatie (hardcoded voor nu)
   const user = {
@@ -139,7 +146,10 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
               </div>
             </div>
             <div className="max-h-72 overflow-y-auto">
-              <div className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
+              <div 
+                className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
+                onClick={() => handleMessageClick(1)}
+              >
                 <div className="flex items-start gap-3">
                   <Avatar className="h-8 w-8 mt-1">
                     <AvatarFallback className="bg-amber-100 text-amber-800">KS</AvatarFallback>
@@ -153,7 +163,10 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
                   </div>
                 </div>
               </div>
-              <div className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
+              <div 
+                className="py-2 px-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
+                onClick={() => handleMessageClick(2)}
+              >
                 <div className="flex items-start gap-3">
                   <Avatar className="h-8 w-8 mt-1">
                     <AvatarFallback className="bg-green-100 text-green-800">FE</AvatarFallback>

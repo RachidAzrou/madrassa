@@ -252,11 +252,43 @@ export default function Fees() {
   };
 
   const handleCreateTuitionRate = (data: any) => {
-    createTuitionRateMutation.mutate(data);
+    // Handle locally instead of API call
+    if (data.type && data.description && data.amount) {
+      const newType = {
+        id: Date.now(),
+        value: data.type.toLowerCase().replace(/\s+/g, '_'),
+        label: data.type,
+        prefix: data.description.substring(0, 3).toUpperCase(),
+        amount: parseFloat(data.amount)
+      };
+      setPaymentTypes([...paymentTypes, newType]);
+      tuitionRateForm.reset();
+      setShowTuitionRateDialog(false);
+      toast({ 
+        title: "Betalingstype toegevoegd", 
+        description: `${newType.label} is succesvol toegevoegd.` 
+      });
+    }
   };
 
   const handleCreateDiscount = (data: any) => {
-    createDiscountMutation.mutate(data);
+    // Handle locally instead of API call
+    if (data.name && data.value) {
+      const newDiscount = {
+        id: Date.now(),
+        name: data.name,
+        percentage: parseInt(data.value),
+        description: data.academicYear || 'Geen beschrijving',
+        active: data.type === 'percentage'
+      };
+      setDiscounts([...discounts, newDiscount]);
+      discountForm.reset();
+      setShowDiscountDialog(false);
+      toast({ 
+        title: "Korting toegevoegd", 
+        description: `${newDiscount.name} is succesvol toegevoegd.` 
+      });
+    }
   };
 
   // Export handlers

@@ -21,7 +21,10 @@ import {
   Users,
   Target,
   TrendingUp,
-  BarChart3
+  BarChart3,
+  Eye,
+  Edit3,
+  Trash2
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -41,7 +44,18 @@ import { toast } from '@/hooks/use-toast';
 // Import custom components
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { DialogHeaderWithIcon } from '@/components/ui/dialog-header-with-icon';
-import { StandardTable } from '@/components/ui/standard-table';
+import { 
+  StandardTable, 
+  StandardTableHeader, 
+  StandardTableBody, 
+  StandardTableRow, 
+  StandardTableCell, 
+  StandardTableHeaderCell,
+  TableCheckboxHeader,
+  TableCheckboxCell,
+  TableActionCell,
+  EmptyActionHeader
+} from '@/components/ui/standard-table';
 import { CustomDialog, DialogFormContainer, DialogFooterContainer } from '@/components/ui/custom-dialog';
 
 // Payment types - these will be managed dynamically
@@ -91,6 +105,9 @@ export default function Fees() {
   const [showTuitionRateDialog, setShowTuitionRateDialog] = useState(false);
   const [showDiscountDialog, setShowDiscountDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPayments, setSelectedPayments] = useState<number[]>([]);
+  const [selectedRates, setSelectedRates] = useState<number[]>([]);
+  const [selectedDiscounts, setSelectedDiscounts] = useState<number[]>([]);
   
   // Dynamic data state
   const [paymentTypes, setPaymentTypes] = useState(defaultPaymentTypes);
@@ -412,42 +429,62 @@ export default function Fees() {
           </div>
           
           <StandardTable>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Student</TableHead>
-                <TableHead>Factuur</TableHead>
-                <TableHead>Bedrag</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Datum</TableHead>
-                <TableHead>Acties</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+            <StandardTableHeader>
+              <StandardTableRow>
+                <TableCheckboxHeader
+                  checked={filteredPayments.length > 0 && selectedPayments.length === filteredPayments.length}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelectedPayments(filteredPayments.map((p: any) => p.id));
+                    } else {
+                      setSelectedPayments([]);
+                    }
+                  }}
+                />
+                <StandardTableHeaderCell>Student</StandardTableHeaderCell>
+                <StandardTableHeaderCell>Factuur</StandardTableHeaderCell>
+                <StandardTableHeaderCell>Bedrag</StandardTableHeaderCell>
+                <StandardTableHeaderCell>Status</StandardTableHeaderCell>
+                <StandardTableHeaderCell>Datum</StandardTableHeaderCell>
+                <EmptyActionHeader />
+              </StandardTableRow>
+            </StandardTableHeader>
+            <StandardTableBody>
               {paymentsLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
+                <StandardTableRow>
+                  <StandardTableCell colSpan={7} className="text-center py-8">
                     <div className="flex items-center justify-center space-x-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
                       <span>Betalingen laden...</span>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </StandardTableCell>
+                </StandardTableRow>
               ) : filteredPayments.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <StandardTableRow>
+                  <StandardTableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     Geen betalingen gevonden
-                  </TableCell>
-                </TableRow>
+                  </StandardTableCell>
+                </StandardTableRow>
               ) : (
                 filteredPayments.map((payment: any) => (
-                  <TableRow key={payment.id} className="group">
-                    <TableCell className="text-xs">
+                  <StandardTableRow key={payment.id} className="group">
+                    <TableCheckboxCell
+                      checked={selectedPayments.includes(payment.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedPayments([...selectedPayments, payment.id]);
+                        } else {
+                          setSelectedPayments(selectedPayments.filter(id => id !== payment.id));
+                        }
+                      }}
+                    />
+                    <StandardTableCell>
                       <div className="font-medium">{payment.studentName || 'Onbekend'}</div>
                       <div className="text-muted-foreground">{payment.studentId || '-'}</div>
-                    </TableCell>
-                    <TableCell className="text-xs">{payment.invoiceNumber || '-'}</TableCell>
-                    <TableCell className="text-xs">€{payment.amount || '0,00'}</TableCell>
-                    <TableCell className="text-xs">
+                    </StandardTableCell>
+                    <StandardTableCell>{payment.invoiceNumber || '-'}</StandardTableCell>
+                    <StandardTableCell>€{payment.amount || '0,00'}</StandardTableCell>
+                    <StandardTableCell>
                       <Badge 
                         variant={payment.status === 'paid' ? 'default' : payment.status === 'pending' ? 'secondary' : 'destructive'}
                         className={
@@ -460,18 +497,25 @@ export default function Fees() {
                          payment.status === 'pending' ? 'In behandeling' : 
                          'Gefaald'}
                       </Badge>
-                    </TableCell>
-                    <TableCell className="text-xs">{payment.date || '-'}</TableCell>
-                    <TableCell className="text-xs">
-                      <div className="opacity-0 group-hover:opacity-100 flex gap-2">
-                        <Button variant="ghost" size="sm">Bekijken</Button>
-                        <Button variant="ghost" size="sm">Bewerken</Button>
+                    </StandardTableCell>
+                    <StandardTableCell>{payment.date || '-'}</StandardTableCell>
+                    <TableActionCell>
+                      <div className="opacity-0 group-hover:opacity-100 flex gap-1">
+                        <Button variant="ghost" size="icon" className="h-7 w-7">
+                          <Eye className="h-3 w-3" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7">
+                          <Edit3 className="h-3 w-3" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:text-red-700">
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </TableActionCell>
+                  </StandardTableRow>
                 ))
               )}
-            </TableBody>
+            </StandardTableBody>
           </StandardTable>
         </TabsContent>
 

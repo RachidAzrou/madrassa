@@ -153,12 +153,14 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
           <PopoverTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
               <Mail className="h-5 w-5 text-gray-600" />
-              <Badge 
-                className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af]"
-                variant="default"
-              >
-                2
-              </Badge>
+              {unreadMessages.length > 0 && (
+                <Badge 
+                  className="absolute -top-1 -right-1 w-4 h-4 p-0 flex items-center justify-center bg-[#1e40af]"
+                  variant="default"
+                >
+                  {unreadMessages.length}
+                </Badge>
+              )}
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-80 p-0">

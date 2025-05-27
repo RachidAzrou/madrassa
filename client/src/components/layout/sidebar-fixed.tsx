@@ -343,13 +343,6 @@ const Sidebar = ({ isMobile = false, onClose, className = "", defaultCollapsed =
                   isActive={location.startsWith("/fees")}
                   onClick={handleLinkClick}
                 />
-                <SidebarLink
-                  href="/payments"
-                  icon={<CreditCard className="h-4.5 w-4.5" />}
-                  label="Mollie Betalingen"
-                  isActive={location.startsWith("/payments")}
-                  onClick={handleLinkClick}
-                />
               </div>
             </div>
           </div>

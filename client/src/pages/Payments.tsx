@@ -20,24 +20,31 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreditCard, Euro, Users, TrendingUp, ExternalLink, RefreshCw, User, GraduationCap, Search, Filter, Download, Upload, PlusCircle } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
-// Import custom UI components that match Students page style
-const PremiumHeader = ({ title, description, icon: Icon, breadcrumbs }: any) => (
-  <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-8 px-6">
-    <div className="max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
-            <Icon className="h-8 w-8 text-white" />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2 text-blue-100 text-sm mb-1">
-              <span>{breadcrumbs.parent}</span>
-              <span>/</span>
-              <span className="text-white font-medium">{breadcrumbs.current}</span>
+// Import PremiumHeader component that matches Fees page style
+const PremiumHeader = ({ title, path, icon: Icon, description }: any) => (
+  <div className="space-y-6">
+    <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-8 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+              <Icon className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">{title}</h1>
-            <p className="text-blue-100 text-lg">{description}</p>
+            <div>
+              <div className="text-blue-100 text-sm mb-1">{path}</div>
+              <h1 className="text-3xl font-bold text-white mb-2">{title}</h1>
+              <p className="text-blue-100 text-lg">{description}</p>
+            </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <div className="p-4 md:p-6">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-2 ml-auto">
+          <span className="text-sm text-gray-500 font-medium">
+            {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </span>
         </div>
       </div>
     </div>
@@ -290,14 +297,11 @@ export default function Payments() {
 
   return (
     <div className="bg-[#f7f9fc] min-h-screen">
-      <PremiumHeader 
-        title="Betalingen" 
-        description="Beheer student betalingen via Mollie en bekijk betalingsstatistieken"
+      <PremiumHeader
+        title="Betalingen"
+        path="Financiën > Betalingen"
         icon={CreditCard}
-        breadcrumbs={{
-          parent: "Financiën",
-          current: "Betalingen"
-        }}
+        description="Beheer student betalingen via Mollie en bekijk betalingsstatistieken"
       />
       
       <DataTableContainer>

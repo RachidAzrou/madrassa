@@ -141,7 +141,10 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
               <span>Instellingen</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {
+              localStorage.removeItem('user');
+              window.location.href = '/login';
+            }}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Uitloggen</span>
             </DropdownMenuItem>

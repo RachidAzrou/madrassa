@@ -101,6 +101,7 @@ function AuthenticatedRouter() {
       <Switch>
         {/* Role-specific dashboards */}
         <Route path="/superadmin" component={() => <RoleBasedRoute component={SuperAdmin} allowedRoles={['superadmin']} />} />
+        <Route path="/scholen" component={() => <RoleBasedRoute component={Scholen} allowedRoles={['superadmin']} />} />
         <Route path="/teacher-dashboard" component={() => <RoleBasedRoute component={TeacherDashboard} allowedRoles={['docent']} />} />
         <Route path="/student-dashboard" component={() => <RoleBasedRoute component={StudentDashboard} allowedRoles={['student']} />} />
         <Route path="/parent-dashboard" component={() => <RoleBasedRoute component={ParentDashboard} allowedRoles={['ouder']} />} />

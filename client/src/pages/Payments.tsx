@@ -22,16 +22,24 @@ import { CreditCard, Euro, Users, TrendingUp, ExternalLink, RefreshCw, User, Gra
 import { queryClient } from "@/lib/queryClient";
 // Import custom UI components that match Students page style
 const PremiumHeader = ({ title, description, icon: Icon, breadcrumbs }: any) => (
-  <div className="bg-white border-b border-gray-200 px-6 py-4">
-    <div className="flex items-center space-x-3 mb-2">
-      <Icon className="h-6 w-6 text-[#1e40af]" />
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-        <p className="text-sm text-gray-500">{description}</p>
+  <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-8 px-6">
+    <div className="max-w-7xl mx-auto">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+            <Icon className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <div className="flex items-center space-x-2 text-blue-100 text-sm mb-1">
+              <span>{breadcrumbs.parent}</span>
+              <span>/</span>
+              <span className="text-white font-medium">{breadcrumbs.current}</span>
+            </div>
+            <h1 className="text-3xl font-bold text-white mb-2">{title}</h1>
+            <p className="text-blue-100 text-lg">{description}</p>
+          </div>
+        </div>
       </div>
-    </div>
-    <div className="text-xs text-gray-400">
-      {breadcrumbs.parent} / {breadcrumbs.current}
     </div>
   </div>
 );

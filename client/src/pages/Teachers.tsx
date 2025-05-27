@@ -972,14 +972,7 @@ export default function Teachers() {
                         <img src="/images/beid-logo.png" alt="eID" className="h-5" />
                         <span className="text-xs font-medium text-gray-700">eID</span>
                       </button>
-                      <button 
-                        type="button" 
-                        className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                        onClick={handleItsmeAuthentication}
-                      >
-                        <img src="/images/itsme-logo.jpeg" alt="itsme" className="h-5" />
-                        <span className="text-xs font-medium">itsme</span>
-                      </button>
+
                     </div>
                     <input
                       id="edit-photo-upload"
@@ -1472,14 +1465,7 @@ export default function Teachers() {
                           <img src="/images/beid-logo.png" alt="eID" className="h-5" />
                           <span className="text-xs font-medium text-gray-700">eID</span>
                         </button>
-                        <button 
-                          type="button" 
-                          className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                          onClick={handleItsmeAuthentication}
-                        >
-                          <img src="/images/itsme-logo.jpeg" alt="itsme" className="h-5" />
-                          <span className="text-xs font-medium">itsme</span>
-                        </button>
+
                       </div>
                       <input
                         id="new-photo-upload"

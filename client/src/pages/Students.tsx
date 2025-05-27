@@ -584,44 +584,7 @@ export default function Students() {
     }, 1500);
   };
   
-  // Functie voor het ophalen van gegevens via itsme
-  const handleItsmeAuthentication = () => {
-    // Toon een bericht dat het systeem wacht op itsme authenticatie
-    toast({
-      title: "itsme authenticatie gestart",
-      description: "Open de itsme app op uw smartphone en bevestig uw identiteit...",
-      duration: 5000,
-    });
-    
-    // Simuleer een succesvol authenticeren via itsme (in productie zou dit via de itsme API gaan)
-    setTimeout(() => {
-      // Dit zijn voorbeeldgegevens die automatisch zouden worden ingevuld na authenticatie via itsme
-      const itsmeData = {
-        firstName: "Fatima",
-        lastName: "Benali",
-        dateOfBirth: "2011-08-22",
-        gender: "vrouw",
-        email: "fatima.benali@example.com",
-        phone: "0470123456",
-        street: "Kerkstraat",
-        houseNumber: "15",
-        postalCode: "1000",
-        city: "Brussel"
-      };
-      
-      // Vul het formulier in met de data van itsme
-      setFormData(prev => ({
-        ...prev,
-        ...itsmeData
-      }));
-      
-      toast({
-        title: "itsme gegevens geladen",
-        description: "De gegevens zijn succesvol uitgelezen en ingevuld.",
-        variant: "success",
-      });
-    }, 2000);
-  };
+
 
   // Update studenten wanneer data wordt geladen
   useEffect(() => {
@@ -973,14 +936,7 @@ export default function Students() {
                             <img src="/images/beid-logo.png" alt="eID" className="h-5" />
                             <span className="text-xs font-medium text-gray-700">eID</span>
                           </button>
-                          <button 
-                            type="button" 
-                            className="flex items-center justify-center gap-1 border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 hover:bg-gray-50 transition-colors text-sm"
-                            onClick={handleItsmeAuthentication}
-                          >
-                            <img src="/images/itsme-logo.jpeg" alt="itsme" className="h-5" />
-                            <span className="text-xs font-medium">itsme</span>
-                          </button>
+
                         </div>
                         <input
                           id="photo-upload"

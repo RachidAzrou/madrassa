@@ -1,6 +1,146 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
+
+// Get user role from localStorage
+function getUserRole() {
+  const user = localStorage.getItem("user");
+  if (user) {
+    try {
+      const userData = JSON.parse(user);
+      return userData.role || 'directeur';
+    } catch {
+      return 'directeur';
+    }
+  }
+  return 'directeur';
+}
+
+// Get navigation items based on user role
+function getNavigationItems(userRole: string) {
+  const baseItems = [
+    {
+      section: "Communicatie",
+      items: [
+        { href: "/messages", icon: <MessageSquare className="h-4 w-4" />, label: "Berichten" },
+        { href: "/notifications", icon: <Clock className="h-4 w-4" />, label: "Meldingen" }
+      ]
+    },
+    {
+      section: "Account",
+      items: [
+        { href: "/mijn-account", icon: <UserRound className="h-4 w-4" />, label: "Mijn Account" }
+      ]
+    }
+  ];
+
+  switch (userRole) {
+    case 'superadmin':
+      return [
+        {
+          section: "Systeembeheer",
+          items: [
+            { href: "/superadmin", icon: <Settings className="h-4 w-4" />, label: "SuperAdmin Dashboard" },
+            { href: "/settings", icon: <Settings className="h-4 w-4" />, label: "Systeeminstellingen" }
+          ]
+        },
+        ...baseItems
+      ];
+
+    case 'directeur':
+      return [
+        {
+          section: "Beheer",
+          items: [
+            { href: "/", icon: <LayoutDashboard className="h-4 w-4" />, label: "Dashboard" },
+            { href: "/students", icon: <Users className="h-4 w-4" />, label: "Studenten" },
+            { href: "/guardians", icon: <UserRound className="h-4 w-4" />, label: "Voogden" },
+            { href: "/teachers", icon: <UserCheck className="h-4 w-4" />, label: "Docenten" },
+            { href: "/admissions", icon: <UserPlus className="h-4 w-4" />, label: "Aanmeldingen" }
+          ]
+        },
+        {
+          section: "Onderwijs",
+          items: [
+            { href: "/student-groups", icon: <Users className="h-4 w-4" />, label: "Klassen" },
+            { href: "/courses", icon: <BookOpen className="h-4 w-4" />, label: "Cursussen" },
+            { href: "/programs", icon: <GraduationCap className="h-4 w-4" />, label: "Programma's" },
+            { href: "/planning", icon: <Calendar className="h-4 w-4" />, label: "Planning" },
+            { href: "/rooms", icon: <Building className="h-4 w-4" />, label: "Lokalen" },
+            { href: "/calendar", icon: <Calendar className="h-4 w-4" />, label: "Kalender" }
+          ]
+        },
+        {
+          section: "Evaluatie",
+          items: [
+            { href: "/attendance", icon: <ClipboardCheck className="h-4 w-4" />, label: "Aanwezigheid" },
+            { href: "/grading", icon: <Percent className="h-4 w-4" />, label: "Cijfers" },
+            { href: "/student-dossier", icon: <FileText className="h-4 w-4" />, label: "Student Dossier" },
+            { href: "/reports", icon: <BarChart3 className="h-4 w-4" />, label: "Rapporten" }
+          ]
+        },
+        {
+          section: "Financiën",
+          items: [
+            { href: "/fees", icon: <CreditCard className="h-4 w-4" />, label: "Betalingsbeheer" }
+          ]
+        },
+        {
+          section: "Instellingen",
+          items: [
+            { href: "/settings", icon: <Settings className="h-4 w-4" />, label: "Instellingen" }
+          ]
+        },
+        ...baseItems
+      ];
+
+    case 'docent':
+      return [
+        {
+          section: "Docent Dashboard",
+          items: [
+            { href: "/teacher-dashboard", icon: <LayoutDashboard className="h-4 w-4" />, label: "Mijn Dashboard" },
+            { href: "/calendar", icon: <Calendar className="h-4 w-4" />, label: "Kalender" }
+          ]
+        },
+        {
+          section: "Evaluatie",
+          items: [
+            { href: "/attendance", icon: <ClipboardCheck className="h-4 w-4" />, label: "Aanwezigheid" },
+            { href: "/grading", icon: <Percent className="h-4 w-4" />, label: "Cijfers" },
+            { href: "/student-dossier", icon: <FileText className="h-4 w-4" />, label: "Student Dossier" },
+            { href: "/reports", icon: <BarChart3 className="h-4 w-4" />, label: "Rapporten" }
+          ]
+        },
+        ...baseItems
+      ];
+
+    case 'student':
+      return [
+        {
+          section: "Student Dashboard",
+          items: [
+            { href: "/student-dashboard", icon: <LayoutDashboard className="h-4 w-4" />, label: "Mijn Dashboard" }
+          ]
+        },
+        ...baseItems
+      ];
+
+    case 'ouder':
+      return [
+        {
+          section: "Ouder Dashboard",
+          items: [
+            { href: "/parent-dashboard", icon: <LayoutDashboard className="h-4 w-4" />, label: "Mijn Dashboard" }
+          ]
+        },
+        ...baseItems
+      ];
+
+    default:
+      return baseItems;
+  }
+}
 // Import nieuw logo
 import myMadrassaLogo from "../../assets/mymadrassa-new.png";
 import {
@@ -28,6 +168,9 @@ import {
   Clock,
   Coins,
   BookMarked,
+  MessageCircle,
+  Bell,
+  User,
   MessageSquare,
 } from "lucide-react";
 
@@ -95,6 +238,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
   const [location] = useLocation();
   const [expanded, setExpanded] = useState(!isMobile);
   const [userData, setUserData] = useState<any>(null);
+  const userRole = getUserRole();
   
   // Gebruiker data uit localStorage ophalen of standaard data gebruiken
   useEffect(() => {
@@ -181,10 +325,29 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
         </div>
       </div>
       
-      {/* Navigation links */}
+      {/* Role-based Navigation links */}
       <nav className="flex flex-col flex-1">
         <div className="flex-1 py-2 px-3 overflow-y-auto">
           <div className="space-y-4">
+            {getNavigationItems(userRole).map((section, sectionIndex) => (
+              <div key={sectionIndex} className="pt-2">
+                <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  {section.section}
+                </p>
+                <div className="space-y-1.5">
+                  {section.items.map((item, itemIndex) => (
+                    <SidebarLink
+                      key={itemIndex}
+                      href={item.href}
+                      icon={item.icon}
+                      label={item.label}
+                      isActive={location.startsWith(item.href)}
+                      onClick={handleLinkClick}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
             <div className="pt-2">
               <p className="mb-2 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Beheer

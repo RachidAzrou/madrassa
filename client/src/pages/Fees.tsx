@@ -4,7 +4,7 @@ import {
   Search, PlusCircle, Filter, Download, Eye, Edit, Trash2, DollarSign, CreditCard, CheckCircle, 
   Users, Settings, Percent, AlertCircle, ChevronDown, FileText, UserPlus, Euro, Coins, 
   Mail, Phone, Home, CalendarIcon, Plus, User, X, MapPin, School, XCircle, Receipt, Calculator,
-  Clock, TrendingUp, FileSpreadsheet
+  Clock, TrendingUp, FileSpreadsheet, Building2, Banknote, Target, Send
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { SearchActionLayout } from '@/components/ui/data-table-container';
@@ -43,16 +43,43 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-// Schema voor betaling toevoegen
-const feeFormSchema = z.object({
+// Schema voor factuur toevoegen
+const invoiceFormSchema = z.object({
   studentId: z.string().min(1, { message: "Selecteer een student" }),
-  amount: z.coerce.number().min(0.01, { message: "Bedrag moet groter zijn dan 0" }),
+  type: z.string().min(1, { message: "Selecteer factuurtype" }),
   description: z.string().min(3, { message: "Omschrijving is verplicht" }),
+  baseAmount: z.coerce.number().min(0.01, { message: "Bedrag moet groter zijn dan 0" }),
   dueDate: z.date({ required_error: "Selecteer een vervaldatum" }),
-  status: z.string().min(1, { message: "Selecteer een status" }),
   academicYear: z.string().min(1, { message: "Selecteer een academisch jaar" }),
-  feeType: z.string().min(1, { message: "Selecteer een type betaling" }),
+  classId: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+// Schema voor tariefbeheer
+const tuitionRateFormSchema = z.object({
+  academicYear: z.string().min(1, { message: "Academisch jaar is verplicht" }),
+  type: z.string().min(1, { message: "Type is verplicht" }),
+  name: z.string().min(1, { message: "Naam is verplicht" }),
+  baseAmount: z.coerce.number().min(0.01, { message: "Bedrag moet groter zijn dan 0" }),
+  description: z.string().optional(),
+});
+
+// Schema voor kortingsbeheer
+const discountFormSchema = z.object({
+  name: z.string().min(1, { message: "Naam is verplicht" }),
+  discountType: z.string().min(1, { message: "Type korting is verplicht" }),
+  discountValue: z.string().min(1, { message: "Waarde is verplicht" }),
+  academicYear: z.string().min(1, { message: "Academisch jaar is verplicht" }),
+  description: z.string().optional(),
 });
 
 // Hulpfunctie voor valutaformattering
@@ -63,6 +90,22 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+// Factuurtype configuratie
+const invoiceTypes = [
+  { value: 'COL', label: 'Collegegeld', prefix: 'COL' },
+  { value: 'INS', label: 'Inschrijfgeld', prefix: 'INS' },
+  { value: 'MTR', label: 'Lesmateriaal', prefix: 'MTR' },
+  { value: 'TRP', label: 'Uitstap/Trip', prefix: 'TRP' },
+  { value: 'EXM', label: 'Examengeld', prefix: 'EXM' },
+  { value: 'CRT', label: 'Certificaat', prefix: 'CRT' },
+];
+
+const academicYears = [
+  '2023-2024',
+  '2024-2025',
+  '2025-2026'
+];
+
 export default function Fees() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -71,19 +114,26 @@ export default function Fees() {
   const [activeTab, setActiveTab] = useState("overzicht");
   
   // Dialog states
-  const [showAddFeeDialog, setShowAddFeeDialog] = useState(false);
-  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
-  const [selectedFee, setSelectedFee] = useState<any>(null);
+  const [showAddInvoiceDialog, setShowAddInvoiceDialog] = useState(false);
+  const [showBulkInvoiceDialog, setShowBulkInvoiceDialog] = useState(false);
+  const [showAddTuitionRateDialog, setShowAddTuitionRateDialog] = useState(false);
+  const [showAddDiscountDialog, setShowAddDiscountDialog] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   
+  // Bulk actions
+  const [selectedInvoices, setSelectedInvoices] = useState<number[]>([]);
+  
   // Fetch data
-  const { data: feesData = [], isLoading: isLoadingFees } = useQuery({
-    queryKey: ['/api/fees'],
+  const { data: invoicesData = [], isLoading: isLoadingInvoices } = useQuery({
+    queryKey: ['/api/invoices'],
     enabled: activeTab === 'betalingen'
   });
 
@@ -96,63 +146,137 @@ export default function Fees() {
     queryKey: ['/api/students']
   });
 
-  const { data: academicYearsData = [], isLoading: isLoadingAcademicYears } = useQuery({
-    queryKey: ['/api/academic-years']
+  const { data: studentGroupsData = [], isLoading: isLoadingStudentGroups } = useQuery({
+    queryKey: ['/api/student-groups']
   });
 
-  const { data: feeTypesData = [], isLoading: isLoadingFeeTypes } = useQuery({
-    queryKey: ['/api/fee-types']
+  const { data: tuitionRatesData = [], isLoading: isLoadingTuitionRates } = useQuery({
+    queryKey: ['/api/tuition-rates'],
+    enabled: activeTab === 'instellingen'
   });
 
-  // Form for adding fees
-  const feeForm = useForm<z.infer<typeof feeFormSchema>>({
-    resolver: zodResolver(feeFormSchema),
+  const { data: feeDiscountsData = [], isLoading: isLoadingFeeDiscounts } = useQuery({
+    queryKey: ['/api/fee-discounts'],
+    enabled: activeTab === 'instellingen'
+  });
+
+  const { data: paymentsData = [], isLoading: isLoadingPayments } = useQuery({
+    queryKey: ['/api/payments'],
+    enabled: activeTab === 'betalingen'
+  });
+
+  // Forms voor verschillende items
+  const invoiceForm = useForm<z.infer<typeof invoiceFormSchema>>({
+    resolver: zodResolver(invoiceFormSchema),
     defaultValues: {
       studentId: "",
-      amount: 0,
+      type: "COL",
       description: "",
-      status: "pending",
+      baseAmount: 0,
       academicYear: "2024-2025",
-      feeType: "",
+      classId: "",
+      notes: "",
     },
   });
 
-  // Filter fees based on search and filters
-  const filteredFees = feesData.filter((fee: any) => {
-    const matchesSearch = !searchQuery || 
-      fee.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      fee.student?.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      fee.student?.lastName?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || fee.status === statusFilter;
-    const matchesYear = yearFilter === "all" || fee.academicYear === yearFilter;
-    
-    return matchesSearch && matchesStatus && matchesYear;
+  const tuitionRateForm = useForm<z.infer<typeof tuitionRateFormSchema>>({
+    resolver: zodResolver(tuitionRateFormSchema),
+    defaultValues: {
+      academicYear: "2024-2025",
+      type: "COL",
+      name: "",
+      baseAmount: 0,
+      description: "",
+    },
   });
 
-  // Handle fee creation
-  const handleCreateFee = async (values: z.infer<typeof feeFormSchema>) => {
+  const discountForm = useForm<z.infer<typeof discountFormSchema>>({
+    resolver: zodResolver(discountFormSchema),
+    defaultValues: {
+      name: "",
+      discountType: "percentage",
+      discountValue: "",
+      academicYear: "2024-2025",
+      description: "",
+    },
+  });
+
+  // Filter facturen op zoektermen en filters
+  const filteredInvoices = invoicesData.filter((invoice: any) => {
+    const matchesSearch = !searchQuery || 
+      invoice.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      invoice.invoiceNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      invoice.student?.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      invoice.student?.lastName?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesStatus = statusFilter === "all" || invoice.status === statusFilter;
+    const matchesType = typeFilter === "all" || invoice.type === typeFilter;
+    const matchesYear = yearFilter === "all" || invoice.academicYear === yearFilter;
+    
+    return matchesSearch && matchesStatus && matchesType && matchesYear;
+  });
+
+  // Handel factuur aanmaak af
+  const handleCreateInvoice = async (values: z.infer<typeof invoiceFormSchema>) => {
     try {
-      const response = await apiRequest('/api/fees', {
+      const response = await apiRequest('/api/invoices', {
         method: 'POST',
         body: JSON.stringify(values),
       });
 
       if (response.ok) {
         toast({
-          title: "Betaling toegevoegd",
-          description: "De betaling is succesvol toegevoegd.",
+          title: "Factuur aangemaakt",
+          description: "De factuur is succesvol aangemaakt.",
         });
         
-        queryClient.invalidateQueries({ queryKey: ['/api/fees'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/invoices'] });
         queryClient.invalidateQueries({ queryKey: ['/api/fees/stats'] });
-        setShowAddFeeDialog(false);
-        feeForm.reset();
+        setShowAddInvoiceDialog(false);
+        invoiceForm.reset();
       }
     } catch (error) {
       toast({
         title: "Fout",
-        description: "Er is een fout opgetreden bij het toevoegen van de betaling.",
+        description: "Er is een fout opgetreden bij het aanmaken van de factuur.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handel betaling via Mollie af
+  const handleCreatePayment = async (invoice: any) => {
+    try {
+      const response = await apiRequest('/api/payments/mollie', {
+        method: 'POST',
+        body: JSON.stringify({
+          invoiceId: invoice.id,
+          amount: invoice.finalAmount,
+          description: `Betaling factuur ${invoice.invoiceNumber}`,
+          redirectUrl: `${window.location.origin}/fees?payment=success`,
+          webhookUrl: `${window.location.origin}/api/webhooks/mollie`,
+          metadata: {
+            invoiceNumber: invoice.invoiceNumber,
+            invoiceType: invoice.type,
+            studentId: invoice.studentId,
+          }
+        }),
+      });
+
+      if (response.ok) {
+        const { checkoutUrl } = await response.json();
+        // Open Mollie checkout in nieuwe tab
+        window.open(checkoutUrl, '_blank');
+        
+        toast({
+          title: "Betaling gestart",
+          description: "De betalingspagina is geopend in een nieuwe tab.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het starten van de betaling.",
         variant: "destructive",
       });
     }
@@ -161,17 +285,27 @@ export default function Fees() {
   // Status badge component
   const StatusBadge = ({ status }: { status: string }) => {
     const statusConfig = {
-      paid: { label: "Betaald", variant: "default" as const, color: "bg-green-100 text-green-800" },
-      pending: { label: "In behandeling", variant: "secondary" as const, color: "bg-yellow-100 text-yellow-800" },
-      overdue: { label: "Te laat", variant: "destructive" as const, color: "bg-red-100 text-red-800" },
-      cancelled: { label: "Geannuleerd", variant: "outline" as const, color: "bg-gray-100 text-gray-800" },
+      open: { label: "Open", color: "bg-blue-100 text-blue-800" },
+      paid: { label: "Betaald", color: "bg-green-100 text-green-800" },
+      overdue: { label: "Te laat", color: "bg-red-100 text-red-800" },
+      cancelled: { label: "Geannuleerd", color: "bg-gray-100 text-gray-800" },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.open;
     
     return (
       <Badge className={config.color}>
         {config.label}
+      </Badge>
+    );
+  };
+
+  // Type badge component
+  const TypeBadge = ({ type }: { type: string }) => {
+    const typeConfig = invoiceTypes.find(t => t.value === type);
+    return (
+      <Badge variant="outline">
+        {typeConfig?.label || type}
       </Badge>
     );
   };
@@ -181,9 +315,9 @@ export default function Fees() {
       {/* Header */}
       <PremiumHeader
         title="Betalingsbeheer"
-        description="Beheer schoolgelden, betalingen en financiële instellingen"
+        description="Volledig schoolbetalingen-beheersysteem met facturatie, Mollie integratie en rapportage"
         icon={Coins}
-        breadcrumb="Financiën > Betalingsbeheer"
+        breadcrumbs="Financiën > Betalingsbeheer"
       />
 
       {/* Tabs */}
@@ -195,11 +329,11 @@ export default function Fees() {
           </TabsTrigger>
           <TabsTrigger value="betalingen" className="flex items-center gap-2">
             <Receipt className="h-4 w-4" />
-            Betalingen
+            Facturen & Betalingen
           </TabsTrigger>
           <TabsTrigger value="instellingen" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
-            Instellingen
+            Tarieven & Kortingen
           </TabsTrigger>
           <TabsTrigger value="rapporten" className="flex items-center gap-2">
             <FileSpreadsheet className="h-4 w-4" />
@@ -238,13 +372,13 @@ export default function Fees() {
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Studenten</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">Te Laat</CardTitle>
+                <AlertCircle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{statsData.totalStudents || 0}</div>
+                <div className="text-2xl font-bold">{formatCurrency(statsData.overdueAmount || 0)}</div>
                 <p className="text-xs text-muted-foreground">
-                  Actieve studenten
+                  Openstaande schulden
                 </p>
               </CardContent>
             </Card>
@@ -263,7 +397,7 @@ export default function Fees() {
             </Card>
           </div>
 
-          {/* Quick Actions */}
+          {/* Snelle Acties */}
           <Card>
             <CardHeader>
               <CardTitle>Snelle Acties</CardTitle>
@@ -271,44 +405,45 @@ export default function Fees() {
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-3">
               <Button 
-                onClick={() => setShowAddFeeDialog(true)}
+                onClick={() => setShowAddInvoiceDialog(true)}
                 className="flex items-center gap-2 h-20"
                 variant="outline"
               >
-                <PlusCircle className="h-5 w-5" />
+                <Receipt className="h-5 w-5" />
                 <div className="text-left">
-                  <div className="font-medium">Nieuwe Betaling</div>
-                  <div className="text-sm text-muted-foreground">Voeg betalingsverplichting toe</div>
+                  <div className="font-medium">Nieuwe Factuur</div>
+                  <div className="text-sm text-muted-foreground">Maak factuur voor student</div>
                 </div>
               </Button>
               
               <Button 
-                onClick={() => setShowSettingsDialog(true)}
+                onClick={() => setShowBulkInvoiceDialog(true)}
+                className="flex items-center gap-2 h-20"
+                variant="outline"
+              >
+                <Building2 className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="font-medium">Bulk Facturen</div>
+                  <div className="text-sm text-muted-foreground">Facturen voor hele klas</div>
+                </div>
+              </Button>
+              
+              <Button 
+                onClick={() => setShowAddTuitionRateDialog(true)}
                 className="flex items-center gap-2 h-20"
                 variant="outline"
               >
                 <Settings className="h-5 w-5" />
                 <div className="text-left">
-                  <div className="font-medium">Instellingen</div>
-                  <div className="text-sm text-muted-foreground">Configureer tarieven</div>
-                </div>
-              </Button>
-              
-              <Button 
-                className="flex items-center gap-2 h-20"
-                variant="outline"
-              >
-                <Download className="h-5 w-5" />
-                <div className="text-left">
-                  <div className="font-medium">Export</div>
-                  <div className="text-sm text-muted-foreground">Download rapporten</div>
+                  <div className="font-medium">Tarieven Beheren</div>
+                  <div className="text-sm text-muted-foreground">Stel schoolgelden in</div>
                 </div>
               </Button>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Betalingen Tab */}
+        {/* Facturen & Betalingen Tab */}
         <TabsContent value="betalingen" className="space-y-6">
           {/* Zoek en acties */}
           <SearchActionLayout>
@@ -316,7 +451,7 @@ export default function Fees() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
               <Input
                 type="search"
-                placeholder="Zoeken naar betalingen..."
+                placeholder="Zoeken naar facturen..."
                 className="pl-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -330,10 +465,24 @@ export default function Fees() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Alle statussen</SelectItem>
+                  <SelectItem value="open">Open</SelectItem>
                   <SelectItem value="paid">Betaald</SelectItem>
-                  <SelectItem value="pending">In behandeling</SelectItem>
                   <SelectItem value="overdue">Te laat</SelectItem>
                   <SelectItem value="cancelled">Geannuleerd</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Type filter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle types</SelectItem>
+                  {invoiceTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               
@@ -343,29 +492,48 @@ export default function Fees() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Alle jaren</SelectItem>
-                  {academicYearsData.map((year: any) => (
-                    <SelectItem key={year.id} value={year.name}>
-                      {year.name}
+                  {academicYears.map((year) => (
+                    <SelectItem key={year} value={year}>
+                      {year}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               
-              <Button 
-                onClick={() => setShowAddFeeDialog(true)} 
-                className="flex items-center bg-[#1e40af] hover:bg-blue-800"
-              >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                <span>Nieuwe Betaling</span>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="flex items-center bg-[#1e40af] hover:bg-blue-800">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    <span>Nieuwe Factuur</span>
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>Factuur opties</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setShowAddInvoiceDialog(true)}>
+                    <User className="mr-2 h-4 w-4" />
+                    Individuele Factuur
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowBulkInvoiceDialog(true)}>
+                    <Building2 className="mr-2 h-4 w-4" />
+                    Bulk Facturen
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </SearchActionLayout>
 
-          {/* Betalingen tabel */}
+          {/* Facturen tabel */}
           <StandardTable>
             <StandardTableHeader>
               <StandardTableRow>
+                <StandardTableHeaderCell>
+                  <Checkbox />
+                </StandardTableHeaderCell>
+                <StandardTableHeaderCell>Factuurnummer</StandardTableHeaderCell>
                 <StandardTableHeaderCell>Student</StandardTableHeaderCell>
+                <StandardTableHeaderCell>Type</StandardTableHeaderCell>
                 <StandardTableHeaderCell>Beschrijving</StandardTableHeaderCell>
                 <StandardTableHeaderCell>Bedrag</StandardTableHeaderCell>
                 <StandardTableHeaderCell>Vervaldatum</StandardTableHeaderCell>
@@ -374,57 +542,95 @@ export default function Fees() {
               </StandardTableRow>
             </StandardTableHeader>
             
-            {isLoadingFees ? (
-              <TableLoadingState colSpan={6} />
-            ) : filteredFees && filteredFees.length > 0 ? (
+            {isLoadingInvoices ? (
+              <TableLoadingState colSpan={9} />
+            ) : filteredInvoices && filteredInvoices.length > 0 ? (
               <StandardTableBody>
-                {filteredFees.map((fee: any) => (
-                  <StandardTableRow key={fee.id} className="hover:bg-gray-50">
+                {filteredInvoices.map((invoice: any) => (
+                  <StandardTableRow key={invoice.id} className="hover:bg-gray-50">
+                    <StandardTableCell>
+                      <Checkbox 
+                        checked={selectedInvoices.includes(invoice.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedInvoices([...selectedInvoices, invoice.id]);
+                          } else {
+                            setSelectedInvoices(selectedInvoices.filter(id => id !== invoice.id));
+                          }
+                        }}
+                      />
+                    </StandardTableCell>
+                    <StandardTableCell>
+                      <div className="text-xs font-mono">
+                        {invoice.invoiceNumber}
+                      </div>
+                    </StandardTableCell>
                     <StandardTableCell>
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="text-xs">
-                            {fee.student?.firstName?.[0]}{fee.student?.lastName?.[0]}
+                            {invoice.student?.firstName?.[0]}{invoice.student?.lastName?.[0]}
                           </AvatarFallback>
                         </Avatar>
                         <div>
                           <div className="font-medium text-xs">
-                            {fee.student?.firstName} {fee.student?.lastName}
+                            {invoice.student?.firstName} {invoice.student?.lastName}
                           </div>
                           <div className="text-xs text-gray-500">
-                            {fee.student?.studentId}
+                            {invoice.student?.studentId}
                           </div>
                         </div>
                       </div>
                     </StandardTableCell>
                     <StandardTableCell>
-                      <div className="text-xs">
-                        <div className="font-medium">{fee.description}</div>
-                        <div className="text-gray-500">{fee.feeType}</div>
-                      </div>
-                    </StandardTableCell>
-                    <StandardTableCell>
-                      <div className="text-xs font-medium">
-                        {formatCurrency(parseFloat(fee.amount || '0'))}
-                      </div>
+                      <TypeBadge type={invoice.type} />
                     </StandardTableCell>
                     <StandardTableCell>
                       <div className="text-xs">
-                        {fee.dueDate ? format(new Date(fee.dueDate), 'dd-MM-yyyy', { locale: nl }) : '-'}
+                        <div className="font-medium">{invoice.description}</div>
+                        {invoice.notes && (
+                          <div className="text-gray-500 mt-1">{invoice.notes}</div>
+                        )}
                       </div>
                     </StandardTableCell>
                     <StandardTableCell>
-                      <StatusBadge status={fee.status} />
+                      <div className="text-xs">
+                        <div className="font-medium">
+                          {formatCurrency(parseFloat(invoice.finalAmount || '0'))}
+                        </div>
+                        {invoice.discountAmount > 0 && (
+                          <div className="text-gray-500 line-through">
+                            {formatCurrency(parseFloat(invoice.baseAmount || '0'))}
+                          </div>
+                        )}
+                      </div>
+                    </StandardTableCell>
+                    <StandardTableCell>
+                      <div className="text-xs">
+                        {invoice.dueDate ? format(new Date(invoice.dueDate), 'dd-MM-yyyy', { locale: nl }) : '-'}
+                      </div>
+                    </StandardTableCell>
+                    <StandardTableCell>
+                      <StatusBadge status={invoice.status} />
                     </StandardTableCell>
                     <TableActionCell>
                       <Button variant="ghost" size="sm">
                         <Eye className="h-4 w-4" />
                       </Button>
+                      {invoice.status === 'open' && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleCreatePayment(invoice)}
+                        >
+                          <CreditCard className="h-4 w-4" />
+                        </Button>
+                      )}
                       <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
+                        <Download className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4" />
+                        <Edit className="h-4 w-4" />
                       </Button>
                     </TableActionCell>
                   </StandardTableRow>
@@ -432,18 +638,18 @@ export default function Fees() {
               </StandardTableBody>
             ) : (
               <TableEmptyState 
-                colSpan={6}
+                colSpan={9}
                 icon={<Receipt className="w-12 h-12 text-gray-300" />}
-                title="Geen betalingen gevonden"
-                description="Er zijn nog geen betalingen aangemaakt of er zijn geen betalingen die voldoen aan je filters."
+                title="Geen facturen gevonden"
+                description="Er zijn nog geen facturen aangemaakt of er zijn geen facturen die voldoen aan je filters."
                 action={
                   <Button
                     variant="outline"
-                    onClick={() => setShowAddFeeDialog(true)}
+                    onClick={() => setShowAddInvoiceDialog(true)}
                     className="flex items-center gap-1"
                   >
                     <PlusCircle className="h-4 w-4" />
-                    <span>Nieuwe betaling toevoegen</span>
+                    <span>Nieuwe factuur aanmaken</span>
                   </Button>
                 }
               />
@@ -451,55 +657,168 @@ export default function Fees() {
           </StandardTable>
         </TabsContent>
 
-        {/* Instellingen Tab */}
+        {/* Tarieven & Kortingen Tab */}
         <TabsContent value="instellingen" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Betalingsinstellingen</CardTitle>
-              <CardDescription>Configureer tarieven en betalingsopties</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                Instellingen worden hier weergegeven...
-              </div>
-            </CardContent>
-          </Card>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Tarieven sectie */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Banknote className="h-5 w-5" />
+                  Schoolgeld Tarieven
+                </CardTitle>
+                <CardDescription>Stel de standaard tarieven in per academisch jaar</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Button onClick={() => setShowAddTuitionRateDialog(true)} className="w-full">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Nieuw Tarief Toevoegen
+                </Button>
+                
+                <div className="space-y-2">
+                  {tuitionRatesData && tuitionRatesData.length > 0 ? (
+                    tuitionRatesData.map((rate: any) => (
+                      <div key={rate.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <div className="font-medium text-sm">{rate.name}</div>
+                          <div className="text-xs text-gray-500">{rate.academicYear} • {rate.type}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium">{formatCurrency(parseFloat(rate.baseAmount))}</div>
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="sm">
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-4 text-gray-500">
+                      <Banknote className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                      <p>Geen tarieven ingesteld</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Kortingen sectie */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Kortingsregels
+                </CardTitle>
+                <CardDescription>Beheer automatische kortingen en voorwaarden</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Button onClick={() => setShowAddDiscountDialog(true)} className="w-full">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Nieuwe Korting Toevoegen
+                </Button>
+                
+                <div className="space-y-2">
+                  {feeDiscountsData && feeDiscountsData.length > 0 ? (
+                    feeDiscountsData.map((discount: any) => (
+                      <div key={discount.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <div className="font-medium text-sm">{discount.name}</div>
+                          <div className="text-xs text-gray-500">{discount.academicYear}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-medium">
+                            {discount.discountType === 'percentage' ? `${discount.discountValue}%` : formatCurrency(parseFloat(discount.discountValue))}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="sm">
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-4 text-gray-500">
+                      <Target className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                      <p>Geen kortingen ingesteld</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Rapporten Tab */}
         <TabsContent value="rapporten" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Financiële Rapporten</CardTitle>
-              <CardDescription>Genereer en download betalingsrapporten</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-gray-500">
-                Rapporten worden hier weergegeven...
-              </div>
-            </CardContent>
-          </Card>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Financieel Overzicht</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-gray-600 mb-4">Overzicht van alle inkomsten en openstaande bedragen</p>
+                <Button size="sm" className="w-full">
+                  <Download className="mr-2 h-4 w-4" />
+                  Download PDF
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Openstaande Schulden</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-gray-600 mb-4">Lijst van studenten met openstaande betalingen</p>
+                <Button size="sm" className="w-full">
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Excel
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Betalingshistorie</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-gray-600 mb-4">Overzicht van alle uitgevoerde betalingen</p>
+                <Button size="sm" className="w-full">
+                  <Download className="mr-2 h-4 w-4" />
+                  Download CSV
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
 
-      {/* Dialog voor nieuwe betaling */}
-      <Dialog open={showAddFeeDialog} onOpenChange={setShowAddFeeDialog}>
+      {/* Dialog voor nieuwe factuur */}
+      <Dialog open={showAddInvoiceDialog} onOpenChange={setShowAddInvoiceDialog}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <PlusCircle className="h-5 w-5" />
-              Nieuwe Betaling Toevoegen
+              <Receipt className="h-5 w-5" />
+              Nieuwe Factuur Aanmaken
             </DialogTitle>
             <DialogDescription>
-              Voeg een nieuwe betalingsverplichting toe voor een student.
+              Maak een nieuwe factuur aan voor een specifieke student met automatische kortingsberekening.
             </DialogDescription>
           </DialogHeader>
           
-          <Form {...feeForm}>
-            <form onSubmit={feeForm.handleSubmit(handleCreateFee)} className="space-y-4">
+          <Form {...invoiceForm}>
+            <form onSubmit={invoiceForm.handleSubmit(handleCreateInvoice)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={feeForm.control}
+                  control={invoiceForm.control}
                   name="studentId"
                   render={({ field }) => (
                     <FormItem>
@@ -511,7 +830,7 @@ export default function Fees() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {studentsData.map((student: any) => (
+                          {studentsData && Array.isArray(studentsData) && studentsData.map((student: any) => (
                             <SelectItem key={student.id} value={student.id.toString()}>
                               {student.firstName} {student.lastName}
                             </SelectItem>
@@ -524,8 +843,49 @@ export default function Fees() {
                 />
 
                 <FormField
-                  control={feeForm.control}
-                  name="amount"
+                  control={invoiceForm.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Factuurtype</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecteer type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {invoiceTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={invoiceForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Beschrijving</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Beschrijving van de factuur" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={invoiceForm.control}
+                  name="baseAmount"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Bedrag (€)</FormLabel>
@@ -536,50 +896,9 @@ export default function Fees() {
                     </FormItem>
                   )}
                 />
-              </div>
-
-              <FormField
-                control={feeForm.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Beschrijving</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Beschrijving van de betaling" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={feeForm.control}
-                  name="feeType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Type Betaling</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {feeTypesData.map((type: any) => (
-                            <SelectItem key={type.id} value={type.name}>
-                              {type.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
                 <FormField
-                  control={feeForm.control}
+                  control={invoiceForm.control}
                   name="academicYear"
                   render={({ field }) => (
                     <FormItem>
@@ -591,9 +910,9 @@ export default function Fees() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {academicYearsData.map((year: any) => (
-                            <SelectItem key={year.id} value={year.name}>
-                              {year.name}
+                          {academicYears.map((year) => (
+                            <SelectItem key={year} value={year}>
+                              {year}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -604,75 +923,63 @@ export default function Fees() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={feeForm.control}
-                  name="dueDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Vervaldatum</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                            >
-                              {field.value ? (
-                                format(field.value, "dd-MM-yyyy", { locale: nl })
-                              ) : (
-                                <span>Selecteer datum</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            locale={nl}
-                            disabled={(date) => date < new Date()}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={feeForm.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormField
+                control={invoiceForm.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Vervaldatum</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecteer status" />
-                          </SelectTrigger>
+                          <Button
+                            variant="outline"
+                            className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
+                          >
+                            {field.value ? (
+                              format(field.value, "dd-MM-yyyy", { locale: nl })
+                            ) : (
+                              <span>Selecteer datum</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="pending">In behandeling</SelectItem>
-                          <SelectItem value="paid">Betaald</SelectItem>
-                          <SelectItem value="overdue">Te laat</SelectItem>
-                          <SelectItem value="cancelled">Geannuleerd</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          locale={nl}
+                          disabled={(date) => date < new Date()}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={invoiceForm.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notities (optioneel)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Extra notities bij deze factuur" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setShowAddFeeDialog(false)}>
+                <Button type="button" variant="outline" onClick={() => setShowAddInvoiceDialog(false)}>
                   Annuleren
                 </Button>
                 <Button type="submit">
-                  Betaling Toevoegen
+                  Factuur Aanmaken
                 </Button>
               </DialogFooter>
             </form>

@@ -23,6 +23,10 @@ app.use(session({
 // Authentication routes
 app.use('/api/auth', authRoutes);
 
+// Dashboard routes
+import dashboardRoutes from "./routes/dashboard";
+app.use('/', dashboardRoutes);
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;

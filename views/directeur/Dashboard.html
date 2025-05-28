@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directeur Dashboard - Schoolbeheer Systeem</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo h1 {
+            color: #1e40af;
+            font-size: 1.5rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .badge {
+            background: #059669;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .welcome-section {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-section h2 {
+            color: #1e40af;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #059669;
+        }
+
+        .stat-card h3 {
+            color: #374151;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            color: #059669;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .quick-actions {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .quick-actions h3 {
+            color: #1e40af;
+            margin-bottom: 1.5rem;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: #374151;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #059669;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .recent-section {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .recent-section h3 {
+            color: #1e40af;
+            margin-bottom: 1.5rem;
+        }
+
+        .recent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+
+        .school-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .school-info h4 {
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <span>🕌</span>
+            <h1>Schoolbeheer Systeem</h1>
+        </div>
+        <div class="user-info">
+            <span class="badge">DIRECTEUR</span>
+            <button class="logout-btn" onclick="logout()">Uitloggen</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="school-info" id="schoolInfo">
+            <!-- School info will be loaded dynamically -->
+        </div>
+
+        <div class="welcome-section">
+            <h2>👋 Welkom Directeur</h2>
+            <p>Beheer uw school effectief met overzichtelijke tools en rapporten.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Totaal Studenten</h3>
+                <div class="value" id="totalStudents">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Actieve Docenten</h3>
+                <div class="value" id="totalTeachers">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Lopende Klassen</h3>
+                <div class="value" id="totalClasses">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Deze Maand Inschrijvingen</h3>
+                <div class="value" id="monthlyEnrollments">-</div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <h3>⚡ Snelle Acties</h3>
+            <div class="actions-grid">
+                <a href="/students" class="action-btn">
+                    <span>👥</span>
+                    <span>Studentenbeheer</span>
+                </a>
+                <a href="/teachers" class="action-btn">
+                    <span>👨‍🏫</span>
+                    <span>Docentenbeheer</span>
+                </a>
+                <a href="/classes" class="action-btn">
+                    <span>📚</span>
+                    <span>Klassenbeheer</span>
+                </a>
+                <a href="/fees" class="action-btn">
+                    <span>💰</span>
+                    <span>Betalingsbeheer</span>
+                </a>
+                <a href="/reports" class="action-btn">
+                    <span>📊</span>
+                    <span>Rapporten</span>
+                </a>
+                <a href="/admissions" class="action-btn">
+                    <span>📝</span>
+                    <span>Aanmeldingen</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="recent-section">
+            <h3>📋 Recente Activiteiten</h3>
+            <div id="recentActivities">
+                <div class="recent-item">
+                    <div>
+                        <strong>Nieuwe student aangemeld</strong>
+                        <p style="color: #6b7280; font-size: 0.875rem;">Zaina El Mouden - Klas 3A</p>
+                    </div>
+                    <span style="color: #6b7280; font-size: 0.875rem;">2 uur geleden</span>
+                </div>
+                <div class="recent-item">
+                    <div>
+                        <strong>Betaling ontvangen</strong>
+                        <p style="color: #6b7280; font-size: 0.875rem;">€245,00 - Inschrijvingsgeld Q1</p>
+                    </div>
+                    <span style="color: #6b7280; font-size: 0.875rem;">4 uur geleden</span>
+                </div>
+                <div class="recent-item">
+                    <div>
+                        <strong>Nieuwe docent toegevoegd</strong>
+                        <p style="color: #6b7280; font-size: 0.875rem;">Ahmed Hassan - Arabisch & Islamstudies</p>
+                    </div>
+                    <span style="color: #6b7280; font-size: 0.875rem;">1 dag geleden</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadDashboardData() {
+            try {
+                // Load school information
+                const schoolResponse = await fetch('/api/school/current');
+                if (schoolResponse.ok) {
+                    const school = await schoolResponse.json();
+                    document.getElementById('schoolInfo').innerHTML = `
+                        <h4>🏫 ${school.name}</h4>
+                        <p><strong>Code:</strong> ${school.code} | <strong>Locatie:</strong> ${school.location}</p>
+                    `;
+                }
+
+                // Load statistics (placeholder data for now)
+                document.getElementById('totalStudents').textContent = '142';
+                document.getElementById('totalTeachers').textContent = '18';
+                document.getElementById('totalClasses').textContent = '12';
+                document.getElementById('monthlyEnrollments').textContent = '8';
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                window.location.href = '/login';
+            } catch (error) {
+                console.error('Error logging out:', error);
+                window.location.href = '/login';
+            }
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+</html>

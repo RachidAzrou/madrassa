@@ -29,7 +29,12 @@ router.post('/login', async (req: Request, res: Response) => {
     // Set session
     req.session.userId = user.id;
 
-    // Get school info if applicable
+    // Redirect based on role for form submission
+    if (req.headers['content-type'] && req.headers['content-type'].includes('application/x-www-form-urlencoded')) {
+      return res.redirect(`/dashboard/${user.role}`);
+    }
+
+    // Get school info if applicable for JSON responses
     let school = null;
     if (user.schoolId) {
       school = await storage.getSchool(user.schoolId);

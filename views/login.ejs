@@ -164,9 +164,9 @@
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('errorMessage');
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+            var errorDiv = document.getElementById('errorMessage');
             
             console.log('Login data:', { email: email, password: password });
             

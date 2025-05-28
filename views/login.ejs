@@ -169,6 +169,8 @@
             const errorDiv = document.getElementById('errorMessage');
             
             try {
+                console.log('Login data:', { email, password });
+                
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
@@ -177,13 +179,17 @@
                     body: JSON.stringify({ email, password })
                 });
                 
+                console.log('Response status:', response.status);
                 const data = await response.json();
+                console.log('Response data:', data);
                 
                 if (response.ok) {
                     // Redirect based on role
                     const role = data.user.role;
+                    console.log('Redirect to:', `/dashboard/${role}`);
                     window.location.href = `/dashboard/${role}`;
                 } else {
+                    console.log('Login failed:', data.message);
                     errorDiv.textContent = data.message;
                     errorDiv.style.display = 'block';
                 }

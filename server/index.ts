@@ -61,8 +61,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Initialisatie functie
+// Initialisatie functie  
 async function initApp() {
+  // Zorg ervoor dat API routes VOOR registerRoutes worden geregistreerd
+  // zodat ze niet door Vite worden onderschept
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

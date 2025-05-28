@@ -1,8 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { db } from '../db';
-import { systemUsers, schools } from '../../shared/schema';
-import { eq } from 'drizzle-orm';
-import bcrypt from 'bcrypt';
+import { storage } from '../storage';
+import { hashPassword, verifyPassword } from '../middleware/auth';
 
 const router = Router();
 
@@ -15,28 +13,26 @@ router.post('/login', async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Email en wachtwoord zijn verplicht' });
     }
 
-    // Find user by email
-    const [user] = await db.select().from(systemUsers).where(eq(systemUsers.email, email));
-    
-    if (!user) {
+    const user = await storage.getSystemUserByEmail(email);
+    if (!user || !user.isActive) {
       return res.status(401).json({ message: 'Ongeldige inloggegevens' });
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    const isValidPassword = await verifyPassword(password, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Ongeldige inloggegevens' });
     }
 
+    // Update last login
+    await storage.updateSystemUser(user.id, { lastLogin: new Date() });
+
     // Set session
     req.session.userId = user.id;
-    req.session.userRole = user.role;
-    req.session.schoolId = user.schoolId || undefined;
 
     // Get school info if applicable
     let school = null;
     if (user.schoolId) {
-      const [schoolData] = await db.select().from(schools).where(eq(schools.id, user.schoolId));
-      school = schoolData;
+      school = await storage.getSchool(user.schoolId);
     }
 
     res.json({
@@ -75,16 +71,15 @@ router.get('/me', async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Niet ingelogd' });
     }
 
-    const [user] = await db.select().from(systemUsers).where(eq(systemUsers.id, userId));
-    if (!user) {
+    const user = await storage.getSystemUser(userId);
+    if (!user || !user.isActive) {
       return res.status(401).json({ message: 'Ongeldige sessie' });
     }
 
     // Get school info if applicable
     let school = null;
     if (user.schoolId) {
-      const [schoolData] = await db.select().from(schools).where(eq(schools.id, user.schoolId));
-      school = schoolData;
+      school = await storage.getSchool(user.schoolId);
     }
 
     res.json({

@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
-import { db } from '../db';
-import { systemUsers, schools } from '../../shared/schema';
-import { eq } from 'drizzle-orm';
+import { storage } from '../storage';
 
 // Extend Express Request to include user
 declare global {
@@ -32,16 +30,15 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
       return res.status(401).json({ message: 'Authentication required' });
     }
 
-    const [user] = await db.select().from(systemUsers).where(eq(systemUsers.id, userId));
-    if (!user) {
+    const user = await storage.getSystemUser(userId);
+    if (!user || !user.isActive) {
       return res.status(401).json({ message: 'Invalid user session' });
     }
 
     // Get school information if user has a school
     let school = null;
     if (user.schoolId) {
-      const [schoolData] = await db.select().from(schools).where(eq(schools.id, user.schoolId));
-      school = schoolData;
+      school = await storage.getSchool(user.schoolId);
     }
 
     req.user = {

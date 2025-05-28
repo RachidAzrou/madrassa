@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
 import { db } from "./db";
 import * as schema from "@shared/schema";
-import { eq } from "drizzle-orm";
 
 // Global storage voor calendar events met een startwaarde
 const globalCalendarEventsStore = new Map();
@@ -67,70 +66,6 @@ import {
 } from "./handlers/rooms";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
-  // Direct auth routes om Vite onderschepping te vermijden
-  app.post('/api/auth/login', async (req, res) => {
-    try {
-      const { email, password } = req.body;
-      console.log('Login attempt:', { email });
-
-      if (!email || !password) {
-        return res.status(400).json({ message: 'Email en wachtwoord zijn verplicht' });
-      }
-
-      // Find user by email
-      const [user] = await db.select().from(schema.systemUsers).where(eq(schema.systemUsers.email, email));
-      
-      if (!user) {
-        return res.status(401).json({ message: 'Ongeldige inloggegevens' });
-      }
-
-      const bcrypt = require('bcrypt');
-      const isValidPassword = await bcrypt.compare(password, user.password);
-      if (!isValidPassword) {
-        return res.status(401).json({ message: 'Ongeldige inloggegevens' });
-      }
-
-      // Set session
-      req.session.userId = user.id;
-      req.session.userRole = user.role;
-      req.session.schoolId = user.schoolId || undefined;
-
-      // Get school info if applicable
-      let school = null;
-      if (user.schoolId) {
-        const [schoolData] = await db.select().from(schema.schools).where(eq(schema.schools.id, user.schoolId));
-        school = schoolData;
-      }
-
-      res.json({
-        message: 'Succesvol ingelogd',
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          schoolId: user.schoolId,
-          school
-        }
-      });
-    } catch (error) {
-      console.error('Login error:', error);
-      res.status(500).json({ message: 'Server fout bij inloggen' });
-    }
-  });
-
-  // Dashboard routes
-  app.get('/dashboard/:role', (req, res) => {
-    const { role } = req.params;
-    const validRoles = ['superadmin', 'directeur', 'docent', 'student', 'ouder'];
-    
-    if (!validRoles.includes(role)) {
-      return res.status(404).send('Invalid role');
-    }
-    
-    res.render(`${role}/Dashboard`);
-  });
-
   // prefix all routes with /api
   const apiRouter = app;
   

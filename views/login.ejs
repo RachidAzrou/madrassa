@@ -168,37 +168,29 @@
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('errorMessage');
             
-            console.log('Login data:', { email, password });
-            
-            // Hardcoded login voor nu om het probleem met Vite te omzeilen
-            if (email === 'superadmin@example.com' && password === 'admin123') {
-                console.log('Superadmin login detected, redirecting...');
-                // Redirect naar superadmin dashboard
-                window.location.href = '/dashboard/superadmin';
-                console.log('Redirect issued to:', '/dashboard/superadmin');
-                return;
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Redirect based on role
+                    const role = data.user.role;
+                    window.location.href = `/dashboard/${role}`;
+                } else {
+                    errorDiv.textContent = data.message;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Er is een fout opgetreden bij het inloggen.';
+                errorDiv.style.display = 'block';
             }
-            
-            // Probeer andere test accounts
-            const testAccounts = {
-                'directeur.schoola@example.com': 'directeur',
-                'docent.schoola@example.com': 'docent', 
-                'student.schoola@example.com': 'student',
-                'ouder.schoola@example.com': 'ouder',
-                'directeur.schoolb@example.com': 'directeur',
-                'docent.schoolb@example.com': 'docent',
-                'student.schoolb@example.com': 'student',
-                'ouder.schoolb@example.com': 'ouder'
-            };
-            
-            if (testAccounts[email] && password === 'pass123') {
-                window.location.href = `/dashboard/${testAccounts[email]}`;
-                return;
-            }
-            
-            // Als geen match, toon foutmelding
-            errorDiv.textContent = 'Ongeldige inloggegevens. Gebruik een van de testaccounts.';
-            errorDiv.style.display = 'block';
         });
     </script>
 </body>

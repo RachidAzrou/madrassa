@@ -170,36 +170,55 @@
             
             console.log('Login data:', { email: email, password: password });
             
-            fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email: email, password: password })
-            })
-            .then(function(response) {
-                console.log('Response status:', response.status);
-                return response.json();
-            })
-            .then(function(data) {
-                console.log('Response data:', data);
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/auth/login', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            
+            xhr.onreadystatechange = function() {
+                console.log('XHR readyState:', xhr.readyState, 'status:', xhr.status);
                 
-                if (data.user) {
-                    // Redirect based on role
-                    const role = data.user.role;
-                    console.log('Redirect to:', '/dashboard/' + role);
-                    window.location.href = '/dashboard/' + role;
-                } else {
-                    console.log('Login failed:', data.message);
-                    errorDiv.textContent = data.message;
-                    errorDiv.style.display = 'block';
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var data = JSON.parse(xhr.responseText);
+                            console.log('Response data:', data);
+                            
+                            if (data.user) {
+                                var role = data.user.role;
+                                console.log('Redirect to:', '/dashboard/' + role);
+                                window.location.href = '/dashboard/' + role;
+                            } else {
+                                console.log('Login failed:', data.message);
+                                errorDiv.textContent = data.message;
+                                errorDiv.style.display = 'block';
+                            }
+                        } catch (e) {
+                            console.error('JSON parse error:', e);
+                            errorDiv.textContent = 'Server response kon niet worden gelezen';
+                            errorDiv.style.display = 'block';
+                        }
+                    } else {
+                        console.log('HTTP error status:', xhr.status);
+                        try {
+                            var errorData = JSON.parse(xhr.responseText);
+                            errorDiv.textContent = errorData.message || 'Login mislukt';
+                        } catch (e) {
+                            errorDiv.textContent = 'Server fout: ' + xhr.status;
+                        }
+                        errorDiv.style.display = 'block';
+                    }
                 }
-            })
-            .catch(function(error) {
-                console.error('Login error:', error);
-                errorDiv.textContent = 'Er is een fout opgetreden bij het inloggen: ' + error.message;
+            };
+            
+            xhr.onerror = function() {
+                console.error('XHR network error');
+                errorDiv.textContent = 'Netwerkfout bij inloggen';
                 errorDiv.style.display = 'block';
-            });
+            };
+            
+            var requestData = JSON.stringify({ email: email, password: password });
+            console.log('Sending request:', requestData);
+            xhr.send(requestData);
         });
     </script>
 </body>

@@ -155,8 +155,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSystemUserByEmail(email: string): Promise<any> {
-    const [user] = await db.select().from(systemUsers).where(eq(systemUsers.email, email));
-    return user || undefined;
+    try {
+      const [user] = await db.select().from(systemUsers).where(eq(systemUsers.email, email));
+      console.log('Found user for email', email, ':', user);
+      return user || undefined;
+    } catch (error) {
+      console.error('Error finding user by email:', error);
+      return undefined;
+    }
   }
 
   async createSystemUser(user: any): Promise<any> {

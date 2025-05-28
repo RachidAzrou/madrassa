@@ -1,49 +1,29 @@
-import { pgTable, text, serial, integer, boolean, date, timestamp, unique, decimal, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, date, timestamp, unique, decimal } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Schools (Multi-tenant basis)
-export const schools = pgTable("schools", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  location: text("location"),
-  features: json("features").$type<{
-    allowDeletion?: boolean;
-    enablePayments?: boolean;
-    enableMessaging?: boolean;
-    enableReports?: boolean;
-  }>().default({}),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-// Roles enum
-export const userRoles = ['superadmin', 'directeur', 'docent', 'student', 'ouder'] as const;
-export type UserRole = typeof userRoles[number];
-
-// Students - Nu met school_id voor multi-tenancy
+// Students
 export const students = pgTable("students", {
   id: serial("id").primaryKey(),
   studentId: text("student_id").notNull().unique(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
-  email: text("email").unique(), 
+  email: text("email").unique(), // Maak email optioneel maar wel uniek
   phone: text("phone"),
-  dateOfBirth: date("date_of_birth"),
-  address: text("address"), 
-  street: text("street"),  
+  dateOfBirth: date("date_of_birth"), // Terugzetten naar date type
+  address: text("address"), // Oude adresveld (behouden voor compatibiliteit)
+  street: text("street"),  // Nieuwe adresvelden
   houseNumber: text("house_number"),
   postalCode: text("postal_code"),
   city: text("city"),
-  programId: integer("program_id"), 
+  programId: integer("program_id"), // Behouden voor backward compatibiliteit
   yearLevel: integer("year_level"),
-  status: text("status").default("active"), 
+  status: text("status").default("active"), // active, inactive, pending, graduated
   enrollmentDate: timestamp("enrollment_date").defaultNow(),
-  notes: text("notes"), 
-  gender: text("gender"), 
-  photoUrl: text("photo_url"), 
-  schoolId: integer("school_id").references(() => schools.id).notNull(),
+  notes: text("notes"), // Notities over de student
+  gender: text("gender"), // man of vrouw
+  photoUrl: text("photo_url"), // URL naar de foto van de student
 });
 
 // Maak een standaard schema maar omit ID (wordt gegenereerd door database)
@@ -342,7 +322,7 @@ export const insertEventSchema = createInsertSchema(events).omit({
 export type InsertEvent = z.infer<typeof insertEventSchema>;
 export type Event = typeof events.$inferSelect;
 
-// Users (RBAC met multi-tenancy)
+// Users (for authentication)
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
@@ -350,17 +330,12 @@ export const users = pgTable("users", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   email: text("email").notNull().unique(),
-  role: text("role", { enum: userRoles }).notNull(),
-  schoolId: integer("school_id").references(() => schools.id), // null voor superadmin
+  role: text("role").notNull(), // admin, teacher, staff
   isActive: boolean("is_active").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
+  id: true
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -762,7 +737,7 @@ export const messagesRelations = relations(messages, ({ one }) => ({
   })
 }));
 
-// Teachers - Met schoolId
+// Teachers
 export const teachers = pgTable("teachers", {
   id: serial("id").primaryKey(),
   teacherId: text("teacher_id").notNull().unique(),
@@ -780,7 +755,6 @@ export const teachers = pgTable("teachers", {
   isActive: boolean("is_active").default(true),
   hireDate: date("hire_date"),
   notes: text("notes"),
-  schoolId: integer("school_id").references(() => schools.id).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

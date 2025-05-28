@@ -170,6 +170,7 @@
             
             try {
                 console.log('Login data:', { email, password });
+                console.log('About to make fetch request...');
                 
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',

@@ -172,8 +172,10 @@
             
             // Hardcoded login voor nu om het probleem met Vite te omzeilen
             if (email === 'superadmin@example.com' && password === 'admin123') {
+                console.log('Superadmin login detected, redirecting...');
                 // Redirect naar superadmin dashboard
                 window.location.href = '/dashboard/superadmin';
+                console.log('Redirect issued to:', '/dashboard/superadmin');
                 return;
             }
             

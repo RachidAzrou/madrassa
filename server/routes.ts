@@ -118,6 +118,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Server fout bij inloggen' });
     }
   });
+
+  // Dashboard routes
+  app.get('/dashboard/:role', (req, res) => {
+    const { role } = req.params;
+    const validRoles = ['superadmin', 'directeur', 'docent', 'student', 'ouder'];
+    
+    if (!validRoles.includes(role)) {
+      return res.status(404).send('Invalid role');
+    }
+    
+    res.render(`${role}/Dashboard`);
+  });
+
   // prefix all routes with /api
   const apiRouter = app;
   

@@ -194,7 +194,8 @@
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
-                errorDiv.textContent = 'Er is een fout opgetreden bij het inloggen.';
+                console.error('Login error:', error);
+                errorDiv.textContent = 'Er is een fout opgetreden bij het inloggen: ' + error.message;
                 errorDiv.style.display = 'block';
             }
         });

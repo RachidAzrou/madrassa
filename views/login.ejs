@@ -128,7 +128,9 @@
             <p>Multitenancy Systeem</p>
         </div>
 
-        <form method="POST" action="/api/auth/login">
+        <form id="loginForm">
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            
             <div class="form-group">
                 <label for="email">E-mailadres</label>
                 <input type="email" id="email" name="email" required>

@@ -14,7 +14,10 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 
     const user = await storage.getSystemUserByEmail(email);
+    console.log('Login attempt for:', email, 'Found user:', !!user, 'Active:', user?.isActive);
+    
     if (!user || !user.isActive) {
+      console.log('User not found or inactive for:', email);
       return res.status(401).json({ message: 'Ongeldige inloggegevens' });
     }
 

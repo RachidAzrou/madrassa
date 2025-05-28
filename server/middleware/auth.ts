@@ -31,7 +31,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
     }
 
     const user = await storage.getSystemUser(userId);
-    if (!user || !user.isActive) {
+    if (!user) {
       return res.status(401).json({ message: 'Invalid user session' });
     }
 

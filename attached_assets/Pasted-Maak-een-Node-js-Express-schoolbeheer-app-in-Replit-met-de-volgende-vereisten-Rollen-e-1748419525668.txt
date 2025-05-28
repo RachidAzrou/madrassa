@@ -1,0 +1,119 @@
+Maak een Node.js + Express schoolbeheer-app in Replit met de volgende vereisten:
+
+---
+
+🔐 **Rollen en RBAC-structuur**:
+
+Implementeer Role-Based Access Control met deze rollen:
+- superadmin
+- directeur
+- docent
+- student
+- ouder
+
+Elke gebruiker is gekoppeld aan een `school_id`.
+
+---
+
+🏫 **Multitenancy**:
+
+Elke school is een tenant. Data moet volledig gefilterd zijn op `school_id` (tenzij de gebruiker superadmin is).  
+
+Het model `School` moet bevatten:
+- id
+- naam
+- locatie
+- features (als JSON object)
+
+Het model `User` bevat:
+- id
+- naam
+- email
+- wachtwoord (versleuteld)
+- rol (één van de 5 bovengenoemde)
+- school_id (nullable bij superadmin)
+
+---
+
+🖥 **Functionaliteit per rol**:
+
+**1. Superadmin**
+- Dashboard: overzicht van alle scholen + statistieken (aantal gebruikers)
+- Kan scholen toevoegen
+- Kan directeuren aanmaken en aan een school koppelen
+
+**2. Directeur**
+- Ziet alles binnen zijn school
+- Kan docenten, studenten en ouders aanmaken/beheren
+- Kan berichten sturen naar ouders, studenten, docenten
+- Kan niet de cijfers bewerken
+
+**3. Docent**
+- Mijn rooster: eigen lesrooster beheren
+- Mijn studenten: enkel studenten van zijn vakken/klas zien
+- Mijn vakken: vakken beheren
+- Rapporten en cijfers invoeren voor eigen studenten
+- Aanwezigheden doorgeven voor zijn klas
+- Leerlingendossier bekijken behalve betalingen
+- Berichten sturen naar directeur, ouders en zijn studenten
+
+**4. Student**
+- Mijn rooster (alleen-lezen)
+- Mijn klas (beperkte info)
+- Mijn aanwezigheid
+- Mijn rapport
+- Mijn cijfers
+- Mijn docenten
+- Berichten naar docenten
+
+**5. Ouder**
+- Dashboard met overzicht van zijn kinderen
+- Kalender, rapport, cijfers, aanwezigheden en betalingen van elk kind
+- Berichten sturen naar directeur en docenten
+
+---
+
+🛠 **Technische eisen**:
+
+- Gebruik `views/` folder met submappen per rol: `/views/superadmin`, `/views/directeur`, enz.
+- Maak routes per rol in `/routes/` met middleware `authorize(allowedRoles)` die gebruikers per route valideert
+- Gebruik een `features.js` bestand om per school extra functionaliteiten te togglen (zoals "verwijderknop tonen")
+
+---
+
+🧪 **Testaccounts (automatisch toevoegen bij app-start)**:
+
+1. **Superadmin**
+   - email: superadmin@example.com
+   - password: admin123
+
+2. **School A**:
+   - Directeur: directeur.schoola@example.com / pass123
+   - Docent: docent.schoola@example.com / pass123
+   - Student: student.schoola@example.com / pass123
+   - Ouder: ouder.schoola@example.com / pass123
+
+3. **School B**:
+   - Directeur: directeur.schoolb@example.com / pass123
+   - Docent: docent.schoolb@example.com / pass123
+   - Student: student.schoolb@example.com / pass123
+   - Ouder: ouder.schoolb@example.com / pass123
+
+De app moet bij eerste keer opstarten automatisch deze testdata aanmaken (tenzij het al bestaat).
+
+---
+
+📦 **Database**:
+
+Gebruik een eenvoudige in-memory database (zoals een JSON store of array) óf SQLite als persistentie nodig is.
+
+---
+
+💡 **Belangrijk**:
+- Alle data is geïsoleerd per school
+- De UI per rol zit in aparte templates (zodat wijzigen aan 1 rol geen andere rollen beïnvloedt)
+- De superadmin beheert ALLES, de rest enkel hun eigen school
+
+---
+
+Zorg dat de basisapp volledig werkt in Replit, met login/logout, dashboard per rol, en toegang tot relevante functionaliteit en testaccounts.

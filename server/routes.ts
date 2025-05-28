@@ -24,6 +24,9 @@ globalCalendarEventsStore.set("test-1", {
 });
 import { z } from "zod";
 import { createMollieClient } from '@mollie/api-client';
+import bcrypt from "bcrypt";
+import { users, schools } from "../shared/schema";
+import { eq } from "drizzle-orm";
 import { 
   insertStudentSchema, 
   insertProgramSchema, 
@@ -4247,6 +4250,188 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch payment stats" });
     }
   });
+
+  // =====================================================
+  // MULTI-TENANT RBAC AUTHENTICATION ROUTES
+  // =====================================================
+
+  // Login endpoint
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ message: 'Email en wachtwoord zijn verplicht' });
+      }
+
+      // Find user by email
+      const [user] = await db.select().from(users).where(eq(users.email, email));
+
+      if (!user || !user.isActive) {
+        return res.status(401).json({ message: 'Ongeldige inloggegevens' });
+      }
+
+      // Check password
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        return res.status(401).json({ message: 'Ongeldige inloggegevens' });
+      }
+
+      // Get school info if user has a school
+      let school = null;
+      if (user.schoolId) {
+        const [schoolData] = await db.select().from(schools).where(eq(schools.id, user.schoolId));
+        school = schoolData;
+      }
+
+      // Set session (simple session management)
+      if (!req.session) {
+        req.session = {} as any;
+      }
+      req.session.userId = user.id;
+
+      // Return user data (excluding password)
+      const userData = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        schoolId: user.schoolId,
+        school: school,
+      };
+
+      res.json({
+        message: 'Login succesvol',
+        user: userData,
+      });
+
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ message: 'Server error tijdens login' });
+    }
+  });
+
+  // Logout endpoint
+  app.post('/api/auth/logout', (req, res) => {
+    if (req.session) {
+      req.session.destroy((err: any) => {
+        if (err) {
+          return res.status(500).json({ message: 'Logout error' });
+        }
+        res.json({ message: 'Logout succesvol' });
+      });
+    } else {
+      res.json({ message: 'Geen actieve sessie' });
+    }
+  });
+
+  // Get current user endpoint
+  app.get('/api/auth/me', async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      
+      if (!userId) {
+        return res.status(401).json({ message: 'Niet ingelogd' });
+      }
+
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      
+      if (!user || !user.isActive) {
+        return res.status(401).json({ message: 'Invalid user' });
+      }
+
+      // Get school info if user has a school
+      let school = null;
+      if (user.schoolId) {
+        const [schoolData] = await db.select().from(schools).where(eq(schools.id, user.schoolId));
+        school = schoolData;
+      }
+
+      const userData = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        schoolId: user.schoolId,
+        school: school,
+      };
+
+      res.json({ user: userData });
+
+    } catch (error) {
+      console.error('Get user error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Get all schools (superadmin only)
+  app.get('/api/schools', async (req, res) => {
+    try {
+      const allSchools = await db.select().from(schools);
+      res.json(allSchools);
+    } catch (error) {
+      console.error('Error fetching schools:', error);
+      res.status(500).json({ message: 'Failed to fetch schools' });
+    }
+  });
+
+  // Test endpoint to switch user (development only)
+  app.post('/api/auth/switch-user', async (req, res) => {
+    try {
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID required' });
+      }
+
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Set session
+      if (!req.session) {
+        req.session = {} as any;
+      }
+      req.session.userId = user.id;
+
+      // Get school info
+      let school = null;
+      if (user.schoolId) {
+        const [schoolData] = await db.select().from(schools).where(eq(schools.id, user.schoolId));
+        school = schoolData;
+      }
+
+      const userData = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        schoolId: user.schoolId,
+        school: school,
+      };
+
+      res.json({
+        message: 'User switched successfully',
+        user: userData,
+      });
+
+    } catch (error) {
+      console.error('Switch user error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // =====================================================
+  // END AUTHENTICATION ROUTES
+  // =====================================================
 
   // creëer HTTP server
   const server = createServer(app);

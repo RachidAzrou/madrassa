@@ -8,6 +8,10 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// EJS configuration
+app.set('view engine', 'ejs');
+app.set('views', './views');
+
 // Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key-here',

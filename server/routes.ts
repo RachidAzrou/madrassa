@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
 import { db } from "./db";
 import * as schema from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 // Global storage voor calendar events met een startwaarde
 const globalCalendarEventsStore = new Map();

@@ -7,7 +7,8 @@ import {
   payments, type Payment, type InsertPayment,
   invoices, type Invoice, type InsertInvoice,
   tuitionRates, type TuitionRate, type InsertTuitionRate,
-  students, teachers, guardians, studentGuardians
+  students, teachers, guardians, studentGuardians,
+  schools, systemUsers
 } from "@shared/schema";
 import { db } from "./db";
 import { and, eq, sql, count, desc } from "drizzle-orm";

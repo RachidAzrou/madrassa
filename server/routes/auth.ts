@@ -21,8 +21,14 @@ router.post('/login', async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Ongeldige inloggegevens' });
     }
 
+    console.log('About to verify password for user:', user.email);
+    console.log('Stored password hash:', user.password ? 'EXISTS' : 'MISSING');
+    
     const isValidPassword = await verifyPassword(password, user.password);
+    console.log('Password verification result:', isValidPassword);
+    
     if (!isValidPassword) {
+      console.log('Password verification failed for:', email);
       return res.status(401).json({ message: 'Ongeldige inloggegevens' });
     }
 

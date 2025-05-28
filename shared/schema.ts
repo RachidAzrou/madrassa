@@ -3,45 +3,6 @@ import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Schools (Multitenancy)
-export const schools = pgTable("schools", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  code: text("code").notNull().unique(), // Bijvoorbeeld "SCHOOL_A", "SCHOOL_B" 
-  address: text("address"),
-  phone: text("phone"),
-  email: text("email"),
-  website: text("website"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// System Users (Authentication & Roles)
-export const systemUsers = pgTable("system_users", {
-  id: serial("id").primaryKey(),
-  email: text("email").notNull().unique(),
-  password: text("password").notNull(), // Hashed
-  role: text("role").notNull(), // superadmin, directeur, docent, student, ouder
-  schoolId: integer("school_id"), // NULL voor superadmin
-  isActive: boolean("is_active").default(true),
-  lastLogin: timestamp("last_login"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Relations voor system users
-export const systemUsersRelations = relations(systemUsers, ({ one }) => ({
-  school: one(schools, {
-    fields: [systemUsers.schoolId],
-    references: [schools.id],
-  }),
-}));
-
-export const schoolsRelations = relations(schools, ({ many }) => ({
-  users: many(systemUsers),
-  students: many(students),
-  teachers: many(teachers),
-  guardians: many(guardians),
-}));
-
 // Students
 export const students = pgTable("students", {
   id: serial("id").primaryKey(),
@@ -63,7 +24,6 @@ export const students = pgTable("students", {
   notes: text("notes"), // Notities over de student
   gender: text("gender"), // man of vrouw
   photoUrl: text("photo_url"), // URL naar de foto van de student
-  schoolId: integer("school_id").notNull(), // Multitenancy
 });
 
 // Maak een standaard schema maar omit ID (wordt gegenereerd door database)

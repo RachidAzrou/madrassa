@@ -4248,37 +4248,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // School API endpoints
-  app.get("/api/schools", async (req, res) => {
-    try {
-      const schools = await storage.getSchools();
-      res.json(schools);
-    } catch (error) {
-      console.error("Error fetching schools:", error);
-      res.status(500).json({ message: "Failed to fetch schools" });
-    }
-  });
-
-  app.get("/api/school/current", async (req, res) => {
-    try {
-      // Get school from session or user context
-      const user = (req as any).user;
-      if (!user || !user.schoolId) {
-        return res.status(400).json({ message: "No school context found" });
-      }
-      
-      const school = await storage.getSchool(user.schoolId);
-      if (!school) {
-        return res.status(404).json({ message: "School not found" });
-      }
-      
-      res.json(school);
-    } catch (error) {
-      console.error("Error fetching current school:", error);
-      res.status(500).json({ message: "Failed to fetch school" });
-    }
-  });
-
   // creëer HTTP server
   const server = createServer(app);
 

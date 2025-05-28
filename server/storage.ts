@@ -7,8 +7,7 @@ import {
   payments, type Payment, type InsertPayment,
   invoices, type Invoice, type InsertInvoice,
   tuitionRates, type TuitionRate, type InsertTuitionRate,
-  students, teachers, guardians, studentGuardians,
-  schools, systemUsers
+  students, teachers, guardians, studentGuardians
 } from "@shared/schema";
 import { db } from "./db";
 import { and, eq, sql, count, desc } from "drizzle-orm";
@@ -19,17 +18,6 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(insertUser: InsertUser): Promise<User>;
-  
-  // System users (authentication)
-  getSystemUser(id: number): Promise<any>;
-  getSystemUserByEmail(email: string): Promise<any>;
-  createSystemUser(user: any): Promise<any>;
-  updateSystemUser(id: number, updates: any): Promise<any>;
-  
-  // Schools
-  getSchool(id: number): Promise<any>;
-  getSchools(): Promise<any[]>;
-  createSchool(school: any): Promise<any>;
   
   // Fee operations
   getFees(): Promise<Fee[]>;
@@ -146,58 +134,6 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
-  }
-
-  // System Users (Authentication)
-  async getSystemUser(id: number): Promise<any> {
-    const [user] = await db.select().from(systemUsers).where(eq(systemUsers.id, id));
-    return user || undefined;
-  }
-
-  async getSystemUserByEmail(email: string): Promise<any> {
-    try {
-      const [user] = await db.select().from(systemUsers).where(eq(systemUsers.email, email));
-      console.log('Found user for email', email, ':', user);
-      return user || undefined;
-    } catch (error) {
-      console.error('Error finding user by email:', error);
-      return undefined;
-    }
-  }
-
-  async createSystemUser(user: any): Promise<any> {
-    const [newUser] = await db
-      .insert(systemUsers)
-      .values(user)
-      .returning();
-    return newUser;
-  }
-
-  async updateSystemUser(id: number, updates: any): Promise<any> {
-    const [user] = await db
-      .update(systemUsers)
-      .set(updates)
-      .where(eq(systemUsers.id, id))
-      .returning();
-    return user || undefined;
-  }
-
-  // Schools
-  async getSchool(id: number): Promise<any> {
-    const [school] = await db.select().from(schools).where(eq(schools.id, id));
-    return school || undefined;
-  }
-
-  async getSchools(): Promise<any[]> {
-    return await db.select().from(schools);
-  }
-
-  async createSchool(school: any): Promise<any> {
-    const [newSchool] = await db
-      .insert(schools)
-      .values(school)
-      .returning();
-    return newSchool;
   }
   
   // Fee operations

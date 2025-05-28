@@ -24,7 +24,7 @@ app.use(session({
   }
 }));
 
-// Authentication routes
+// Authentication routes - MUST come before dashboard routes
 app.use('/api/auth', authRoutes);
 
 // Dashboard routes

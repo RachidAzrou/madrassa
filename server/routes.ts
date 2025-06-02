@@ -1276,15 +1276,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.post("/api/teacher-attendance", async (req, res) => {
     try {
-      const validatedData = insertTeacherAttendanceSchema.parse(req.body);
-      const newAttendanceRecord = await storage.createTeacherAttendance(validatedData);
-      res.status(201).json(newAttendanceRecord);
+      console.log('=== TEACHER ATTENDANCE SAVE ===');
+      console.log('Received data:', JSON.stringify(req.body, null, 2));
+      
+      const { tempAttendanceStorage } = await import('./temp-attendance-storage');
+      
+      const data = req.body;
+      const processedRecord = {
+        teacherId: parseInt(data.teacherId),
+        courseId: parseInt(data.courseId || data.classId || 31),
+        date: data.date,
+        status: data.status,
+        notes: data.notes || ''
+      };
+      
+      console.log('Processing teacher record:', processedRecord);
+      const saved = tempAttendanceStorage.createTeacherAttendance(processedRecord);
+      
+      console.log('Teacher record saved successfully');
+      res.status(201).json(saved);
     } catch (error) {
       console.error("Error creating teacher attendance record:", error);
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
-      }
-      res.status(500).json({ message: "Error creating teacher attendance record" });
+      res.status(500).json({ message: "Error creating teacher attendance record", error: error.message });
     }
   });
 

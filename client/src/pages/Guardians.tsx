@@ -1124,37 +1124,38 @@ export default function Guardians() {
                     Gekoppelde studenten
                   </h3>
                   <div className="space-y-3">
-                    {students.filter(student => 
-                      student.guardians && student.guardians.some(g => g.id === selectedGuardian.id)
-                    ).length > 0 ? (
-                      students
-                        .filter(student => 
-                          student.guardians && student.guardians.some(g => g.id === selectedGuardian.id)
-                        )
-                        .map(student => (
-                          <div key={student.id} className="flex items-center gap-3 p-3 bg-white rounded-md border">
-                            <div className="w-10 h-10 rounded-full bg-[#1e40af] flex items-center justify-center text-white font-medium text-sm">
-                              {student.firstName.charAt(0)}{student.lastName.charAt(0)}
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-900">
-                                {student.firstName} {student.lastName}
-                              </p>
-                              <p className="text-xs text-gray-600">Student ID: {student.studentId}</p>
-                            </div>
-                            <div className="text-right">
+                    {guardianStudents && guardianStudents.length > 0 ? (
+                      guardianStudents.map((studentRelation: any) => (
+                        <div key={studentRelation.id} className="flex items-center gap-3 p-3 bg-white rounded-md border">
+                          <div className="w-10 h-10 rounded-full bg-[#1e40af] flex items-center justify-center text-white font-medium text-sm">
+                            {studentRelation.student?.firstName?.charAt(0)}{studentRelation.student?.lastName?.charAt(0)}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">
+                              {studentRelation.student?.firstName} {studentRelation.student?.lastName}
+                            </p>
+                            <p className="text-xs text-gray-600">Student ID: {studentRelation.student?.studentId}</p>
+                          </div>
+                          <div className="text-right">
+                            <div className="flex items-center gap-2">
                               <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                student.status === 'Ingeschreven' ? 'bg-green-100 text-green-800' :
-                                student.status === 'Uitgeschreven' ? 'bg-red-100 text-red-800' :
-                                student.status === 'Afgestudeerd' ? 'bg-gray-100 text-gray-800' :
-                                student.status === 'Geschorst' ? 'bg-yellow-100 text-yellow-800' :
+                                studentRelation.student?.status === 'ingeschreven' ? 'bg-green-100 text-green-800' :
+                                studentRelation.student?.status === 'uitgeschreven' ? 'bg-red-100 text-red-800' :
+                                studentRelation.student?.status === 'afgestudeerd' ? 'bg-gray-100 text-gray-800' :
+                                studentRelation.student?.status === 'geschorst' ? 'bg-yellow-100 text-yellow-800' :
                                 'bg-gray-100 text-gray-800'
                               }`}>
-                                {student.status}
+                                {studentRelation.student?.status || 'Onbekend'}
                               </span>
+                              {studentRelation.isEmergencyContact && (
+                                <div className="flex items-center" title="Noodcontact">
+                                  <AlertTriangle className="h-3.5 w-3.5 text-orange-600" />
+                                </div>
+                              )}
                             </div>
                           </div>
-                        ))
+                        </div>
+                      ))
                     ) : (
                       <div className="text-center py-4 text-gray-500 text-sm">
                         Geen studenten gekoppeld aan deze voogd

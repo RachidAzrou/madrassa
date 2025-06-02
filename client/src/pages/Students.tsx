@@ -2511,9 +2511,10 @@ export default function Students() {
             {siblingSearchTerm.length > 0 && (
               <div className="bg-white border rounded-lg divide-y max-h-60 overflow-y-auto">
                 {students.filter(student => 
-                  student.firstName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
+                  (student.firstName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
                   student.lastName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
-                  student.studentId.toLowerCase().includes(siblingSearchTerm.toLowerCase())
+                  student.studentId.toLowerCase().includes(siblingSearchTerm.toLowerCase())) &&
+                  student.id !== selectedStudent?.id // Voorkom dat student zichzelf selecteert
                 ).map((student) => (
                   <div key={student.id} className="p-3 hover:bg-gray-50 cursor-pointer" 
                        onClick={async () => {

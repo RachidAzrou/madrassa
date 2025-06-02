@@ -2491,14 +2491,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.post("/api/student-group-enrollments", async (req, res) => {
     try {
+      console.log("Creating enrollment with data:", req.body);
       const validatedData = insertStudentGroupEnrollmentSchema.parse(req.body);
+      console.log("Validated enrollment data:", validatedData);
       const newEnrollment = await storage.createStudentGroupEnrollment(validatedData);
       res.status(201).json(newEnrollment);
     } catch (error) {
+      console.error("Error creating student group enrollment:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
-      res.status(500).json({ message: "Error creating student group enrollment" });
+      res.status(500).json({ message: "Error creating student group enrollment", detail: error.message });
     }
   });
 

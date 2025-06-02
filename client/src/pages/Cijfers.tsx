@@ -115,6 +115,11 @@ export default function Cijfers() {
   
   const students = classStudentsData || [];
   
+  // Debug logging
+  console.log('classStudentsData:', classStudentsData);
+  console.log('students:', students);
+  console.log('Array.isArray(students):', Array.isArray(students));
+  
   // Filter studenten op naam/id als er een filter is ingesteld
   const filteredStudents = Array.isArray(students) ? students.filter(student => {
     if (!studentFilter) return true;

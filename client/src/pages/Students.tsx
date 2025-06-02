@@ -398,7 +398,7 @@ export default function Students() {
       status: student.status || "active",
       notes: student.notes || "",
       studentGroupId: student.studentGroupId?.toString() || "",
-      studentGroup: student.studentGroupName || "", // Laad bestaande klasnaam
+      studentGroup: student.studentGroupName && student.academicYear ? `${student.studentGroupName} (${student.academicYear})` : "", // Laad bestaande klasnaam met schooljaar
       studentGroupName: student.studentGroupName || "", // Voor tabelweergave
       gender: student.gender || "man",
       photoUrl: student.photoUrl || "",
@@ -460,12 +460,14 @@ export default function Students() {
   const handleEditSelectChange = (name, value) => {
     if (name === 'studentGroup') {
       // Als klas wordt gewijzigd, zoek het groep ID en sla de klasnaam op
-      const selectedGroup = studentGroupsData?.find(group => group.name === value);
+      // De waarde is nu in het formaat "Klas 1A (2024-2025)", dus we matchen op de volledige string
+      const selectedGroup = studentGroupsData?.find(group => `${group.name} (${group.academicYear})` === value);
       setEditFormData(prev => ({ 
         ...prev, 
         [name]: value,
         studentGroupId: selectedGroup ? selectedGroup.id.toString() : '', // Sla groep ID op
-        studentGroupName: value // Zorg dat klasnaam wordt opgeslagen voor tabelweergave
+        studentGroupName: selectedGroup ? selectedGroup.name : '', // Alleen de klasnaam zonder schooljaar
+        academicYear: selectedGroup ? selectedGroup.academicYear : '' // Sla het schooljaar apart op
       }));
     } else {
       setEditFormData(prev => ({ ...prev, [name]: value }));
@@ -1920,25 +1922,15 @@ export default function Students() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="edit-academicYear" className="text-xs font-medium text-gray-700">Schooljaar *</Label>
-                  <Select 
-                    value={editFormData.academicYear || ''} 
-                    onValueChange={(value) => handleEditSelectChange('academicYear', value)}
-                  >
-                    <SelectTrigger 
-                      id="edit-academicYear"
-                      className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('academicYear') ? 'border-red-500 bg-red-50' : ''}`}
-                    >
-                      <SelectValue placeholder="Selecteer schooljaar" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white border-[#e5e7eb]">
-                      <SelectItem value="2023-2024">2023-2024</SelectItem>
-                      <SelectItem value="2024-2025">2024-2025</SelectItem>
-                      <SelectItem value="2025-2026">2025-2026</SelectItem>
-                      <SelectItem value="2026-2027">2026-2027</SelectItem>
-                      <SelectItem value="2027-2028">2027-2028</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="edit-academicYear" className="text-xs font-medium text-gray-700">Schooljaar</Label>
+                  <Input
+                    id="edit-academicYear"
+                    value={editFormData.academicYear || 'Niet toegewezen'}
+                    className="mt-1 h-9 w-full border-[#e5e7eb] bg-gray-100 text-gray-600 cursor-not-allowed"
+                    disabled
+                    readOnly
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Schooljaar wordt bepaald door klasindeling</p>
                 </div>
                 
                 <div>
@@ -1959,8 +1951,8 @@ export default function Students() {
                       ) : studentGroupsData && studentGroupsData.length > 0 ? (
                         studentGroupsData.map((group: any) => (
                           <SelectItem 
-                            key={group.id} 
-                            value={group.name}
+                            key={`${group.id}-${group.name}-${group.academicYear}`} 
+                            value={`${group.name} (${group.academicYear})`}
                             className="focus:bg-blue-200 hover:bg-blue-100"
                           >
                             {group.name} ({group.academicYear})

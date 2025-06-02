@@ -615,16 +615,6 @@ export default function Teachers() {
                         icon={<GraduationCap className="h-8 w-8 text-gray-400" />}
                         title="Geen docenten gevonden"
                         description={searchQuery ? "Er zijn geen docenten die overeenkomen met je zoekopdracht." : "Er zijn nog geen docenten toegevoegd."}
-                        action={
-                          <Button 
-                            size="sm"
-                            onClick={handleAddNewTeacher}
-                            className="mt-2 bg-[#1e40af] hover:bg-[#1e3a8a]"
-                          >
-                            <PlusCircle className="h-3.5 w-3.5 mr-1" />
-                            Nieuwe Docent
-                          </Button>
-                        }
                       />
                     </td>
                   </tr>

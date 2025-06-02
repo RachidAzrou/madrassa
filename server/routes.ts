@@ -1446,7 +1446,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: req.body.name,
         type: req.body.type,
         maxScore: req.body.maxPoints,
-        weight: req.body.weight,
+        weight: req.body.weight ? parseInt(req.body.weight) : 0,
         description: req.body.description || null,
         dueDate: req.body.dueDate || null
       };

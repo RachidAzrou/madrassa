@@ -600,25 +600,15 @@ export default function Cijfers() {
                               {subjects.map((subject) => (
                                 <TableCell key={subject.id}>
                                   {editGrade && editGrade.studentId === student.id && editGrade.subject === subject.name ? (
-                                    <div className="flex flex-col items-center gap-3 p-4 bg-white border-2 border-blue-300 rounded-lg shadow-lg min-w-[200px]">
-                                      <div className="text-sm font-medium text-gray-600 mb-1">Voer cijfer in</div>
-                                      
-                                      {/* Tekst invoerveld */}
+                                    <div className="flex flex-col items-center gap-2 p-3 bg-white border border-blue-300 rounded shadow-sm">
                                       <Input
                                         type="number"
                                         min="1"
                                         max="10"
                                         step="0.1"
-                                        placeholder="Bijv. 7.5"
-                                        className="w-24 h-12 text-center text-xl font-bold border-2 border-blue-400 focus:border-blue-600 rounded-lg"
+                                        placeholder="7.5"
+                                        className="w-20 h-8 text-center text-sm font-medium border border-blue-300 focus:border-blue-500"
                                         defaultValue={editGrade.grade?.toString() || ''}
-                                        onChange={(e) => {
-                                          const value = parseFloat(e.target.value);
-                                          if (!isNaN(value) && value >= 1 && value <= 10) {
-                                            // Live preview - update grade in state without saving
-                                            setEditGrade(prev => prev ? {...prev, grade: value} : null);
-                                          }
-                                        }}
                                         onBlur={(e) => {
                                           const value = parseFloat(e.target.value);
                                           if (!isNaN(value) && value >= 1 && value <= 10) {
@@ -641,56 +631,7 @@ export default function Cijfers() {
                                         }}
                                         autoFocus
                                       />
-                                      
-                                      {/* Snelkoppeling knoppen */}
-                                      <div className="flex gap-1 justify-center flex-wrap">
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          className="h-8 px-2 text-xs bg-red-50 hover:bg-red-100 text-red-700 border-red-300"
-                                          onClick={() => handleSaveGrade(3.0)}
-                                        >
-                                          3.0
-                                        </Button>
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          className="h-8 px-2 text-xs bg-yellow-50 hover:bg-yellow-100 text-yellow-700 border-yellow-300"
-                                          onClick={() => handleSaveGrade(5.5)}
-                                        >
-                                          5.5
-                                        </Button>
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          className="h-8 px-2 text-xs bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
-                                          onClick={() => handleSaveGrade(7.0)}
-                                        >
-                                          7.0
-                                        </Button>
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          className="h-8 px-2 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300"
-                                          onClick={() => handleSaveGrade(9.0)}
-                                        >
-                                          9.0
-                                        </Button>
-                                      </div>
-                                      
-                                      <div className="text-xs text-gray-500 text-center">
-                                        Enter = opslaan • Esc = annuleren
-                                      </div>
-                                      
-                                      <Button 
-                                        variant="ghost" 
-                                        size="sm" 
-                                        className="h-6 text-xs text-gray-500 hover:text-gray-700"
-                                        onClick={handleCancelEditGrade}
-                                      >
-                                        <X className="h-3 w-3 mr-1" />
-                                        Annuleren
-                                      </Button>
+                                      <div className="text-xs text-gray-500">Enter/Tab = opslaan</div>
                                     </div>
                                   ) : (
                                     <div 

@@ -246,226 +246,287 @@ export default function Reports() {
     const pageWidth = pdf.internal.pageSize.width;
     const pageHeight = pdf.internal.pageSize.height;
 
+    // Madrassa app kleuren
+    const primaryBlue = [33, 107, 169];
+    const accentBlue = [52, 152, 219];
+    const lightBlue = [233, 243, 250];
+    const warmGray = [248, 249, 250];
+    const darkGray = [64, 75, 105];
+    const successGreen = [34, 139, 34];
+    const warningOrange = [255, 152, 0];
+    const dangerRed = [220, 53, 69];
+
     reportData.forEach((report, index) => {
       if (index > 0) pdf.addPage();
 
-      let yPos = 30;
+      let yPos = 20;
 
-      // Logo centered at top
+      // Modern header with gradient-like effect
+      pdf.setFillColor(...lightBlue);
+      pdf.rect(0, 0, pageWidth, 50, 'F');
+      
+      // Top accent line
+      pdf.setFillColor(...primaryBlue);
+      pdf.rect(0, 0, pageWidth, 3, 'F');
+
+      // Logo and title section
       if (schoolLogo) {
         try {
-          pdf.addImage(schoolLogo, 'JPEG', (pageWidth - 60) / 2, 15, 60, 30);
-          yPos = 60;
+          pdf.addImage(schoolLogo, 'JPEG', 20, 12, 40, 25);
         } catch (error) {
           console.warn('Could not add logo to PDF:', error);
         }
       }
 
-      // Title "RAPPORT" centered
-      pdf.setFontSize(20);
+      // School name and title with modern typography
+      pdf.setFontSize(24);
       pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(0, 0, 0);
-      pdf.text('RAPPORT', pageWidth / 2, yPos, { align: 'center' });
-      yPos += 30;
-
-      // Student Information - simple layout like template
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(`Naam        : ${report.student.firstName} ${report.student.lastName}`, 30, yPos);
-      yPos += 10;
-      pdf.text(`StudentID   : ${report.student.studentId}`, 30, yPos);
-      yPos += 10;
-      pdf.text(`Klas        : 1A`, 30, yPos);
-      yPos += 10;
-      pdf.text(`Schooljaar  : ${report.student.academicYear || '2024-2025'}`, 30, yPos);
-      yPos += 25;
-
-      // Subjects Table Header
-      pdf.setDrawColor(0, 0, 0);
-      pdf.setLineWidth(0.5);
+      pdf.setTextColor(...primaryBlue);
+      pdf.text('RAPPORT', pageWidth - 20, 25, { align: 'right' });
       
-      // Table dimensions - optimized for landscape A4 with better spacing
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(...darkGray);
+      pdf.text(`Schooljaar ${report.student.academicYear || '2024-2025'}`, pageWidth - 20, 35, { align: 'right' });
+
+      yPos = 65;
+
+      // Student info card with modern styling
+      pdf.setFillColor(...warmGray);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 35, 3, 3, 'F');
+      
+      pdf.setDrawColor(...primaryBlue);
+      pdf.setLineWidth(0.5);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 35, 3, 3, 'D');
+
+      // Student info with icons (represented as Unicode symbols)
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...primaryBlue);
+      
+      // Left column
+      pdf.text('👤 ' + `${report.student.firstName} ${report.student.lastName}`, 30, yPos + 12);
+      pdf.text('🆔 ' + report.student.studentId, 30, yPos + 22);
+      
+      // Right column
+      pdf.text('🏫 Klas 1A', pageWidth - 120, yPos + 12);
+      pdf.text('📅 ' + new Date().toLocaleDateString('nl-NL'), pageWidth - 120, yPos + 22);
+
+      yPos += 50;
+
+      // Modern table with rounded corners and better colors
       const tableStartX = 20;
       const tableWidth = pageWidth - 40;
-      const colWidths = [70, 30, 30, 30, 110]; // Auto-sizing: Vak, Testen, Taken, Examen, Opmerkingen
+      const colWidths = [70, 35, 35, 35, 95];
       
-      // Header row with better formatting
+      // Table header with gradient effect
+      pdf.setFillColor(...primaryBlue);
+      pdf.roundedRect(tableStartX, yPos, tableWidth, 18, 2, 2, 'F');
+      
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(255, 255, 255);
       
       let xPos = tableStartX;
-      pdf.text('Vak', xPos + 4, yPos + 8);
-      pdf.rect(xPos, yPos, colWidths[0], 15, 'D');
+      pdf.text('📚 Vak', xPos + 5, yPos + 12);
       xPos += colWidths[0];
-      
-      pdf.text('Testen', xPos + 8, yPos + 8);
-      pdf.rect(xPos, yPos, colWidths[1], 15, 'D');
+      pdf.text('📝 Testen', xPos + 8, yPos + 12);
       xPos += colWidths[1];
-      
-      pdf.text('Taken', xPos + 8, yPos + 8);
-      pdf.rect(xPos, yPos, colWidths[2], 15, 'D');
+      pdf.text('📋 Taken', xPos + 8, yPos + 12);
       xPos += colWidths[2];
-      
-      pdf.text('Examen', xPos + 6, yPos + 8);
-      pdf.rect(xPos, yPos, colWidths[3], 15, 'D');
+      pdf.text('🎯 Examen', xPos + 6, yPos + 12);
       xPos += colWidths[3];
+      pdf.text('💬 Opmerkingen', xPos + 5, yPos + 12);
       
-      pdf.text('Opmerkingen', xPos + 5, yPos + 8);
-      pdf.rect(xPos, yPos, colWidths[4], 15, 'D');
-      
-      yPos += 15;
+      yPos += 18;
 
-      // Subject rows
+      // Subject rows with alternating colors and modern styling
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
+      pdf.setFontSize(9);
       
-      Object.entries(report.grades).forEach(([subject, grades]) => {
+      Object.entries(report.grades).forEach(([subject, grades], rowIndex) => {
         const testAvg = grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-';
         const taskAvg = grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : '-';
-        const examAvg = testAvg; // Using test average for exam (can be adjusted)
         
+        // Alternating row colors
+        if (rowIndex % 2 === 0) {
+          pdf.setFillColor(250, 251, 252);
+          pdf.rect(tableStartX, yPos, tableWidth, 15, 'F');
+        }
+        
+        // Row border
+        pdf.setDrawColor(220, 226, 235);
+        pdf.setLineWidth(0.3);
+        pdf.rect(tableStartX, yPos, tableWidth, 15, 'D');
+
+        pdf.setTextColor(...darkGray);
         xPos = tableStartX;
         
         // Subject name
-        pdf.text(subject, xPos + 3, yPos + 8);
-        pdf.rect(xPos, yPos, colWidths[0], 15, 'D');
+        pdf.text(subject, xPos + 5, yPos + 10);
         xPos += colWidths[0];
         
-        // Tests
-        pdf.text(testAvg, xPos + 12, yPos + 8, { align: 'center' });
-        pdf.rect(xPos, yPos, colWidths[1], 15, 'D');
+        // Grade with color coding
+        const testScore = parseFloat(testAvg);
+        if (testAvg !== '-') {
+          if (testScore >= 6.5) pdf.setTextColor(...successGreen);
+          else if (testScore >= 5.5) pdf.setTextColor(...warningOrange);
+          else pdf.setTextColor(...dangerRed);
+        } else {
+          pdf.setTextColor(...darkGray);
+        }
+        pdf.text(testAvg, xPos + 15, yPos + 10, { align: 'center' });
         xPos += colWidths[1];
         
-        // Tasks
-        pdf.text(taskAvg, xPos + 12, yPos + 8, { align: 'center' });
-        pdf.rect(xPos, yPos, colWidths[2], 15, 'D');
+        // Task grade
+        const taskScore = parseFloat(taskAvg);
+        if (taskAvg !== '-') {
+          if (taskScore >= 6.5) pdf.setTextColor(...successGreen);
+          else if (taskScore >= 5.5) pdf.setTextColor(...warningOrange);
+          else pdf.setTextColor(...dangerRed);
+        } else {
+          pdf.setTextColor(...darkGray);
+        }
+        pdf.text(taskAvg, xPos + 15, yPos + 10, { align: 'center' });
         xPos += colWidths[2];
         
-        // Exam
-        pdf.text(examAvg, xPos + 12, yPos + 8, { align: 'center' });
-        pdf.rect(xPos, yPos, colWidths[3], 15, 'D');
+        // Exam grade
+        pdf.text(testAvg, xPos + 15, yPos + 10, { align: 'center' });
         xPos += colWidths[3];
         
         // Comments
-        pdf.text('Goede vooruitgang', xPos + 3, yPos + 8);
-        pdf.rect(xPos, yPos, colWidths[4], 15, 'D');
+        pdf.setTextColor(...darkGray);
+        pdf.text('Uitstekende vooruitgang getoond', xPos + 5, yPos + 10);
         
         yPos += 15;
       });
 
-      // Add empty rows to match template
-      for (let i = 0; i < 3; i++) {
-        xPos = tableStartX;
-        for (let j = 0; j < colWidths.length; j++) {
-          pdf.rect(xPos, yPos, colWidths[j], 15, 'D');
-          xPos += colWidths[j];
+      // Add styled empty rows
+      for (let i = 0; i < 2; i++) {
+        if (i % 2 === 0) {
+          pdf.setFillColor(250, 251, 252);
+          pdf.rect(tableStartX, yPos, tableWidth, 15, 'F');
         }
+        pdf.setDrawColor(220, 226, 235);
+        pdf.rect(tableStartX, yPos, tableWidth, 15, 'D');
         yPos += 15;
       }
 
       yPos += 20;
 
-      // General Comments Section
+      // Modern comment section
+      pdf.setFillColor(...lightBlue);
+      pdf.roundedRect(20, yPos, tableWidth, 50, 3, 3, 'F');
+      
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Algemene opmerkingen:', 30, yPos);
-      yPos += 10;
-
-      // Comments box
+      pdf.setTextColor(...primaryBlue);
+      pdf.text('💭 Algemene opmerkingen', 30, yPos + 15);
+      
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(10);
-      const commentsHeight = 40;
-      pdf.rect(30, yPos, tableWidth, commentsHeight, 'D');
+      pdf.setTextColor(...darkGray);
       
       if (generalComments[report.student.id]) {
-        const commentLines = pdf.splitTextToSize(generalComments[report.student.id], tableWidth - 10);
-        pdf.text(commentLines, 35, yPos + 10);
-      }
-      
-      yPos += commentsHeight + 30;
-
-      // Signature section - exactly like template
-      const sigLineLength = 70;
-      const sigSpacing = (pageWidth - 60 - (2 * sigLineLength)) / 3;
-      
-      // Parent signature
-      pdf.line(30, yPos, 30 + sigLineLength, yPos);
-      pdf.text('Handtekening ouders', 30 + (sigLineLength / 2), yPos + 10, { align: 'center' });
-      
-      // Teacher signature
-      const teacherSigStart = 30 + sigLineLength + sigSpacing;
-      pdf.line(teacherSigStart, yPos, teacherSigStart + sigLineLength, yPos);
-      pdf.text('Handtekening leraar', teacherSigStart + (sigLineLength / 2), yPos + 10, { align: 'center' });
-
-      // Start new page for behavior and attendance if needed
-      if (yPos > pageHeight - 150) {
-        pdf.addPage();
-        yPos = 30;
+        const commentLines = pdf.splitTextToSize(generalComments[report.student.id], tableWidth - 20);
+        pdf.text(commentLines, 30, yPos + 28);
       } else {
-        yPos += 40;
+        pdf.text('Leerling toont goede vooruitgang in alle aspecten.', 30, yPos + 28);
       }
+      
+      yPos += 70;
 
-      // Second section header
-      pdf.setFontSize(16);
+      // Modern signature section
+      const cardWidth = (pageWidth - 60) / 2;
+      
+      // Parent signature card
+      pdf.setFillColor(248, 250, 252);
+      pdf.roundedRect(20, yPos, cardWidth, 40, 3, 3, 'F');
+      pdf.setDrawColor(...accentBlue);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(20, yPos, cardWidth, 40, 3, 3, 'D');
+      
+      pdf.setFontSize(10);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('GEDRAG & AANWEZIGHEID', pageWidth / 2, yPos, { align: 'center' });
-      yPos += 30;
+      pdf.setTextColor(...primaryBlue);
+      pdf.text('✍️ Handtekening ouders/verzorgers', 30, yPos + 15);
+      
+      pdf.setDrawColor(...primaryBlue);
+      pdf.setLineWidth(1);
+      pdf.line(30, yPos + 25, 30 + cardWidth - 20, yPos + 25);
+      
+      // Teacher signature card
+      pdf.setFillColor(248, 250, 252);
+      pdf.roundedRect(30 + cardWidth, yPos, cardWidth, 40, 3, 3, 'F');
+      pdf.setDrawColor(...accentBlue);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(30 + cardWidth, yPos, cardWidth, 40, 3, 3, 'D');
+      
+      pdf.text('👨‍🏫 Handtekening klassenmentor', 40 + cardWidth, yPos + 15);
+      pdf.line(40 + cardWidth, yPos + 25, 40 + cardWidth + cardWidth - 20, yPos + 25);
 
+      yPos += 60;
+
+      // Second page sections side by side
+      const sectionWidth = (pageWidth - 60) / 2;
+      
       // Behavior section
+      pdf.setFillColor(240, 253, 244);
+      pdf.roundedRect(20, yPos, sectionWidth, 60, 3, 3, 'F');
+      pdf.setDrawColor(...successGreen);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(20, yPos, sectionWidth, 60, 3, 3, 'D');
+      
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('GEDRAG', 30, yPos);
-      yPos += 15;
-
-      const behaviorBoxHeight = 60;
-      pdf.rect(30, yPos, tableWidth, behaviorBoxHeight, 'D');
+      pdf.setTextColor(...successGreen);
+      pdf.text('😊 GEDRAG', 30, yPos + 15);
       
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(11);
-      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 35, yPos + 15);
+      pdf.setTextColor(...darkGray);
+      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 30, yPos + 30);
       
       if (behaviorGrades[report.student.id]?.comments) {
-        const behaviorComments = pdf.splitTextToSize(behaviorGrades[report.student.id]?.comments, tableWidth - 10);
-        pdf.text(behaviorComments, 35, yPos + 30);
+        const behaviorComments = pdf.splitTextToSize(behaviorGrades[report.student.id]?.comments, sectionWidth - 20);
+        pdf.text(behaviorComments, 30, yPos + 42);
       }
       
-      yPos += behaviorBoxHeight + 20;
-
       // Attendance section
+      pdf.setFillColor(240, 248, 255);
+      pdf.roundedRect(30 + sectionWidth, yPos, sectionWidth, 60, 3, 3, 'F');
+      pdf.setDrawColor(...accentBlue);
+      pdf.setLineWidth(1);
+      pdf.roundedRect(30 + sectionWidth, yPos, sectionWidth, 60, 3, 3, 'D');
+      
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('AANWEZIGHEID', 30, yPos);
-      yPos += 15;
-
-      const attendanceBoxHeight = 60;
-      pdf.rect(30, yPos, tableWidth, attendanceBoxHeight, 'D');
+      pdf.setTextColor(...accentBlue);
+      pdf.text('📅 AANWEZIGHEID', 40 + sectionWidth, yPos + 15);
       
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(11);
-      pdf.text(`Aantal keer afwezig: ${report.attendance.absent}`, 35, yPos + 15);
-      pdf.text(`Aantal keer te laat: ${report.attendance.late}`, 35, yPos + 30);
-      pdf.text('Opmerkingen: Goede aanwezigheid getoond', 35, yPos + 45);
-      
-      yPos += attendanceBoxHeight + 40;
+      pdf.setFontSize(10);
+      pdf.setTextColor(...darkGray);
+      pdf.text(`❌ Afwezig: ${report.attendance.absent} keer`, 40 + sectionWidth, yPos + 30);
+      pdf.text(`⏰ Te laat: ${report.attendance.late} keer`, 40 + sectionWidth, yPos + 42);
+      pdf.text('📈 Uitstekende aanwezigheid', 40 + sectionWidth, yPos + 54);
 
-      // Bottom signatures
-      pdf.line(30, yPos, 30 + sigLineLength, yPos);
-      pdf.text('Handtekening ouders', 30 + (sigLineLength / 2), yPos + 10, { align: 'center' });
-      
-      pdf.line(teacherSigStart, yPos, teacherSigStart + sigLineLength, yPos);
-      pdf.text('Handtekening leraar', teacherSigStart + (sigLineLength / 2), yPos + 10, { align: 'center' });
+      // Footer with timestamp
+      pdf.setFontSize(8);
+      pdf.setTextColor(150, 150, 150);
+      pdf.text(`Gegenereerd op ${new Date().toLocaleDateString('nl-NL')} om ${new Date().toLocaleTimeString('nl-NL')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
     });
 
     // Save PDF
     const className = selectedReportType === 'class' ? classesData?.find((c: StudentGroup) => c.id.toString() === selectedClass)?.name : '';
     const studentName = selectedReportType === 'individual' ? reportData[0]?.student.firstName + '_' + reportData[0]?.student.lastName : '';
-    const filename = `rapport_${className || studentName}_${new Date().toISOString().split('T')[0]}.pdf`;
+    const filename = `moderne_rapport_${className || studentName}_${new Date().toISOString().split('T')[0]}.pdf`;
     
     pdf.save(filename);
 
     toast({
-      title: "Rapport gegenereerd",
-      description: `Rapport gebaseerd op template opgeslagen als ${filename}`,
+      title: "Modern rapport gegenereerd",
+      description: `Professioneel rapport met Madrassa styling opgeslagen als ${filename}`,
     });
   };
 
@@ -720,56 +781,95 @@ export default function Reports() {
                 {reportData.map((report, index) => (
                   <Card key={index} className="border-2 border-gray-300 shadow-lg">
                     <CardContent className="p-0">
-                      {/* PDF Preview - Professional landscape A4 format */}
-                      <div className="bg-white min-h-[600px] w-full mx-auto shadow-lg border border-gray-200 p-8 font-sans text-sm" style={{ aspectRatio: '297/210' }}>
-                        {/* Header with logo and title */}
-                        <div className="text-center mb-8 border-b-2 border-gray-300 pb-6">
-                          {schoolLogo ? (
-                            <img src={schoolLogo} alt="School logo" className="h-16 w-auto mx-auto mb-4" />
-                          ) : (
-                            <div className="h-16 w-24 mx-auto bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center text-blue-600 text-xs mb-4 border border-blue-200">
-                              <span>Logo uploaden</span>
-                            </div>
-                          )}
-                          <h1 className="text-3xl font-bold text-gray-800 tracking-wide">RAPPORT</h1>
-                        </div>
-
-                        {/* Student Info - Clean card layout */}
-                        <div className="mb-8 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="space-y-2">
-                              <div className="flex items-center">
-                                <span className="font-semibold text-gray-700 w-24">Naam:</span>
-                                <span className="text-gray-900">{report.student.firstName} {report.student.lastName}</span>
+                      {/* PDF Preview - Modern Madrassa styling */}
+                      <div className="bg-white min-h-[600px] w-full mx-auto shadow-xl border border-blue-100 p-6 font-sans text-sm rounded-lg" style={{ aspectRatio: '297/210' }}>
+                        {/* Modern header with Madrassa colors */}
+                        <div className="relative mb-6">
+                          <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-lg p-4 -m-6 mb-6">
+                            <div className="h-1 bg-blue-400 rounded mb-4"></div>
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center space-x-4">
+                                {schoolLogo ? (
+                                  <img src={schoolLogo} alt="School logo" className="h-12 w-auto" />
+                                ) : (
+                                  <div className="h-12 w-16 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center text-white text-xs border border-white/30">
+                                    <span>📚 Logo</span>
+                                  </div>
+                                )}
                               </div>
-                              <div className="flex items-center">
-                                <span className="font-semibold text-gray-700 w-24">StudentID:</span>
-                                <span className="text-gray-900">{report.student.studentId}</span>
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <div className="flex items-center">
-                                <span className="font-semibold text-gray-700 w-24">Klas:</span>
-                                <span className="text-gray-900">1A</span>
-                              </div>
-                              <div className="flex items-center">
-                                <span className="font-semibold text-gray-700 w-24">Schooljaar:</span>
-                                <span className="text-gray-900">{report.student.academicYear || '2024-2025'}</span>
+                              <div className="text-right">
+                                <h1 className="text-2xl font-bold text-white tracking-wide">RAPPORT</h1>
+                                <p className="text-blue-100 text-sm">{report.student.academicYear || '2024-2025'}</p>
                               </div>
                             </div>
                           </div>
                         </div>
 
-                        {/* Grades Table - Modern professional design */}
-                        <div className="mb-8">
-                          <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
+                        {/* Student Info - Modern card with icons */}
+                        <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200">
+                          <div className="grid grid-cols-2 gap-6 text-sm">
+                            <div className="space-y-3">
+                              <div className="flex items-center space-x-3">
+                                <span className="text-blue-600">👤</span>
+                                <span className="font-semibold text-blue-800">Naam:</span>
+                                <span className="text-gray-800">{report.student.firstName} {report.student.lastName}</span>
+                              </div>
+                              <div className="flex items-center space-x-3">
+                                <span className="text-blue-600">🆔</span>
+                                <span className="font-semibold text-blue-800">StudentID:</span>
+                                <span className="text-gray-800">{report.student.studentId}</span>
+                              </div>
+                            </div>
+                            <div className="space-y-3">
+                              <div className="flex items-center space-x-3">
+                                <span className="text-blue-600">🏫</span>
+                                <span className="font-semibold text-blue-800">Klas:</span>
+                                <span className="text-gray-800">1A</span>
+                              </div>
+                              <div className="flex items-center space-x-3">
+                                <span className="text-blue-600">📅</span>
+                                <span className="font-semibold text-blue-800">Datum:</span>
+                                <span className="text-gray-800">{new Date().toLocaleDateString('nl-NL')}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Grades Table - Modern design with icons */}
+                        <div className="mb-6">
+                          <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-md border border-blue-100">
                             <thead>
-                              <tr className="bg-gray-100 border-b border-gray-300">
-                                <th className="border-r border-gray-300 p-3 text-left font-bold text-gray-800" style={{ width: '30%' }}>Vak</th>
-                                <th className="border-r border-gray-300 p-3 text-center font-bold text-gray-800" style={{ width: '15%' }}>Testen</th>
-                                <th className="border-r border-gray-300 p-3 text-center font-bold text-gray-800" style={{ width: '15%' }}>Taken</th>
-                                <th className="border-r border-gray-300 p-3 text-center font-bold text-gray-800" style={{ width: '15%' }}>Examen</th>
-                                <th className="p-3 text-left font-bold text-gray-800" style={{ width: '25%' }}>Opmerkingen</th>
+                              <tr className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+                                <th className="border-r border-blue-500 p-2 text-left font-semibold text-sm" style={{ width: '28%' }}>
+                                  <span className="flex items-center space-x-2">
+                                    <span>📚</span>
+                                    <span>Vak</span>
+                                  </span>
+                                </th>
+                                <th className="border-r border-blue-500 p-2 text-center font-semibold text-sm" style={{ width: '18%' }}>
+                                  <span className="flex items-center justify-center space-x-1">
+                                    <span>📝</span>
+                                    <span>Testen</span>
+                                  </span>
+                                </th>
+                                <th className="border-r border-blue-500 p-2 text-center font-semibold text-sm" style={{ width: '18%' }}>
+                                  <span className="flex items-center justify-center space-x-1">
+                                    <span>📋</span>
+                                    <span>Taken</span>
+                                  </span>
+                                </th>
+                                <th className="border-r border-blue-500 p-2 text-center font-semibold text-sm" style={{ width: '18%' }}>
+                                  <span className="flex items-center justify-center space-x-1">
+                                    <span>🎯</span>
+                                    <span>Examen</span>
+                                  </span>
+                                </th>
+                                <th className="p-2 text-left font-semibold text-sm" style={{ width: '18%' }}>
+                                  <span className="flex items-center space-x-2">
+                                    <span>💬</span>
+                                    <span>Opmerkingen</span>
+                                  </span>
+                                </th>
                               </tr>
                             </thead>
                             <tbody>
@@ -779,96 +879,111 @@ export default function Reports() {
                                 const isEven = index % 2 === 0;
                                 
                                 return (
-                                  <tr key={subject} className={`border-b border-gray-200 h-12 ${isEven ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors`}>
-                                    <td className="border-r border-gray-200 p-3 font-medium text-gray-800">{subject}</td>
-                                    <td className="border-r border-gray-200 p-3 text-center">
-                                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                                        parseFloat(testAvg) >= 6.5 ? 'bg-green-100 text-green-800' : 
-                                        parseFloat(testAvg) >= 5.5 ? 'bg-yellow-100 text-yellow-800' : 
-                                        'bg-red-100 text-red-800'
+                                  <tr key={subject} className={`border-b border-blue-100 h-10 ${isEven ? 'bg-blue-25' : 'bg-white'} hover:bg-blue-50 transition-colors`}>
+                                    <td className="border-r border-blue-100 p-2 font-medium text-gray-800 text-sm">{subject}</td>
+                                    <td className="border-r border-blue-100 p-2 text-center">
+                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold min-w-[40px] justify-center ${
+                                        parseFloat(testAvg) >= 6.5 ? 'bg-green-100 text-green-700 border border-green-200' : 
+                                        parseFloat(testAvg) >= 5.5 ? 'bg-orange-100 text-orange-700 border border-orange-200' : 
+                                        parseFloat(testAvg) < 5.5 && testAvg !== '-' ? 'bg-red-100 text-red-700 border border-red-200' :
+                                        'bg-gray-100 text-gray-500 border border-gray-200'
                                       }`}>
                                         {testAvg}
                                       </span>
                                     </td>
-                                    <td className="border-r border-gray-200 p-3 text-center">
-                                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                                        parseFloat(taskAvg) >= 6.5 ? 'bg-green-100 text-green-800' : 
-                                        parseFloat(taskAvg) >= 5.5 ? 'bg-yellow-100 text-yellow-800' : 
-                                        'bg-red-100 text-red-800'
+                                    <td className="border-r border-blue-100 p-2 text-center">
+                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold min-w-[40px] justify-center ${
+                                        parseFloat(taskAvg) >= 6.5 ? 'bg-green-100 text-green-700 border border-green-200' : 
+                                        parseFloat(taskAvg) >= 5.5 ? 'bg-orange-100 text-orange-700 border border-orange-200' : 
+                                        parseFloat(taskAvg) < 5.5 && taskAvg !== '-' ? 'bg-red-100 text-red-700 border border-red-200' :
+                                        'bg-gray-100 text-gray-500 border border-gray-200'
                                       }`}>
                                         {taskAvg}
                                       </span>
                                     </td>
-                                    <td className="border-r border-gray-200 p-3 text-center">
-                                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                                        parseFloat(testAvg) >= 6.5 ? 'bg-green-100 text-green-800' : 
-                                        parseFloat(testAvg) >= 5.5 ? 'bg-yellow-100 text-yellow-800' : 
-                                        'bg-red-100 text-red-800'
+                                    <td className="border-r border-blue-100 p-2 text-center">
+                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold min-w-[40px] justify-center ${
+                                        parseFloat(testAvg) >= 6.5 ? 'bg-green-100 text-green-700 border border-green-200' : 
+                                        parseFloat(testAvg) >= 5.5 ? 'bg-orange-100 text-orange-700 border border-orange-200' : 
+                                        parseFloat(testAvg) < 5.5 && testAvg !== '-' ? 'bg-red-100 text-red-700 border border-red-200' :
+                                        'bg-gray-100 text-gray-500 border border-gray-200'
                                       }`}>
                                         {testAvg}
                                       </span>
                                     </td>
-                                    <td className="p-3 text-gray-700 text-sm">Uitstekende vooruitgang getoond</td>
+                                    <td className="p-2 text-gray-600 text-xs">Goede vooruitgang</td>
                                   </tr>
                                 );
                               })}
                               {/* Empty rows with subtle styling */}
-                              {Array.from({ length: 2 }).map((_, i) => (
-                                <tr key={`empty-${i}`} className="border-b border-gray-200 h-12 bg-gray-25">
-                                  <td className="border-r border-gray-200 p-3"></td>
-                                  <td className="border-r border-gray-200 p-3"></td>
-                                  <td className="border-r border-gray-200 p-3"></td>
-                                  <td className="border-r border-gray-200 p-3"></td>
-                                  <td className="p-3"></td>
+                              {Array.from({ length: 1 }).map((_, i) => (
+                                <tr key={`empty-${i}`} className="border-b border-blue-100 h-10 bg-blue-25">
+                                  <td className="border-r border-blue-100 p-2"></td>
+                                  <td className="border-r border-blue-100 p-2"></td>
+                                  <td className="border-r border-blue-100 p-2"></td>
+                                  <td className="border-r border-blue-100 p-2"></td>
+                                  <td className="p-2"></td>
                                 </tr>
                               ))}
                             </tbody>
                           </table>
                         </div>
 
-                        {/* Layout for remaining sections */}
-                        <div className="grid grid-cols-2 gap-8">
+                        {/* Modern layout for remaining sections */}
+                        <div className="grid grid-cols-2 gap-6">
                           {/* Left column - Comments and signatures */}
-                          <div className="space-y-6">
+                          <div className="space-y-4">
                             {/* General Comments */}
                             <div>
-                              <h3 className="font-bold mb-3 text-gray-800 text-lg">Algemene opmerkingen</h3>
-                              <div className="border border-gray-300 rounded-lg p-4 bg-gray-50 min-h-[80px]">
+                              <h3 className="flex items-center space-x-2 font-bold mb-2 text-blue-800 text-sm">
+                                <span>💭</span>
+                                <span>Algemene opmerkingen</span>
+                              </h3>
+                              <div className="border border-blue-200 rounded-lg p-3 bg-gradient-to-br from-blue-50 to-indigo-50 min-h-[60px]">
                                 {generalComments[report.student.id] ? (
-                                  <div className="text-gray-700 text-sm leading-relaxed">
+                                  <div className="text-gray-700 text-xs leading-relaxed">
                                     {generalComments[report.student.id]}
                                   </div>
                                 ) : (
-                                  <div className="text-gray-400 text-sm italic">Geen opmerkingen toegevoegd</div>
+                                  <div className="text-blue-400 text-xs italic">Leerling toont goede vooruitgang</div>
                                 )}
                               </div>
                             </div>
 
                             {/* Signatures */}
-                            <div className="space-y-4">
-                              <div className="text-center">
-                                <div className="border-b-2 border-gray-400 h-12 mb-2"></div>
-                                <div className="text-sm font-medium text-gray-700">Handtekening ouders/verzorgers</div>
+                            <div className="space-y-3">
+                              <div className="bg-white border border-blue-200 rounded-lg p-3">
+                                <div className="flex items-center space-x-2 mb-2">
+                                  <span>✍️</span>
+                                  <span className="text-xs font-medium text-blue-700">Handtekening ouders</span>
+                                </div>
+                                <div className="border-b-2 border-blue-300 h-6 mb-1"></div>
                               </div>
-                              <div className="text-center">
-                                <div className="border-b-2 border-gray-400 h-12 mb-2"></div>
-                                <div className="text-sm font-medium text-gray-700">Handtekening klassenmentor</div>
+                              <div className="bg-white border border-blue-200 rounded-lg p-3">
+                                <div className="flex items-center space-x-2 mb-2">
+                                  <span>👨‍🏫</span>
+                                  <span className="text-xs font-medium text-blue-700">Handtekening mentor</span>
+                                </div>
+                                <div className="border-b-2 border-blue-300 h-6 mb-1"></div>
                               </div>
                             </div>
                           </div>
 
                           {/* Right column - Behavior and Attendance */}
-                          <div className="space-y-6">
+                          <div className="space-y-4">
                             {/* Behavior section */}
                             <div>
-                              <h3 className="font-bold mb-3 text-gray-800 text-lg">Gedrag</h3>
-                              <div className="border border-gray-300 rounded-lg p-4 bg-gradient-to-br from-green-50 to-green-100">
+                              <h3 className="flex items-center space-x-2 font-bold mb-2 text-green-700 text-sm">
+                                <span>😊</span>
+                                <span>Gedrag</span>
+                              </h3>
+                              <div className="border border-green-200 rounded-lg p-3 bg-gradient-to-br from-green-50 to-emerald-50">
                                 <div className="flex items-center justify-between mb-2">
-                                  <span className="text-gray-700 font-medium">Gedragscijfer:</span>
-                                  <span className="text-2xl font-bold text-green-600">{behaviorGrades[report.student.id]?.grade || 7}/10</span>
+                                  <span className="text-green-700 font-medium text-xs">Gedragscijfer:</span>
+                                  <span className="text-lg font-bold text-green-600">{behaviorGrades[report.student.id]?.grade || 7}/10</span>
                                 </div>
                                 {behaviorGrades[report.student.id]?.comments && (
-                                  <div className="text-gray-600 text-sm">
+                                  <div className="text-green-600 text-xs">
                                     {behaviorGrades[report.student.id]?.comments}
                                   </div>
                                 )}
@@ -877,20 +992,30 @@ export default function Reports() {
 
                             {/* Attendance section */}
                             <div>
-                              <h3 className="font-bold mb-3 text-gray-800 text-lg">Aanwezigheid</h3>
-                              <div className="border border-gray-300 rounded-lg p-4 bg-gradient-to-br from-blue-50 to-blue-100">
-                                <div className="grid grid-cols-2 gap-4 mb-2">
+                              <h3 className="flex items-center space-x-2 font-bold mb-2 text-blue-700 text-sm">
+                                <span>📅</span>
+                                <span>Aanwezigheid</span>
+                              </h3>
+                              <div className="border border-blue-200 rounded-lg p-3 bg-gradient-to-br from-blue-50 to-cyan-50">
+                                <div className="grid grid-cols-2 gap-3 mb-2">
                                   <div className="text-center">
-                                    <div className="text-sm text-gray-600">Afwezig</div>
-                                    <div className="text-xl font-bold text-red-600">{report.attendance.absent}</div>
+                                    <div className="flex items-center justify-center space-x-1 mb-1">
+                                      <span>❌</span>
+                                      <span className="text-xs text-red-600">Afwezig</span>
+                                    </div>
+                                    <div className="text-lg font-bold text-red-600">{report.attendance.absent}</div>
                                   </div>
                                   <div className="text-center">
-                                    <div className="text-sm text-gray-600">Te laat</div>
-                                    <div className="text-xl font-bold text-orange-600">{report.attendance.late}</div>
+                                    <div className="flex items-center justify-center space-x-1 mb-1">
+                                      <span>⏰</span>
+                                      <span className="text-xs text-orange-600">Te laat</span>
+                                    </div>
+                                    <div className="text-lg font-bold text-orange-600">{report.attendance.late}</div>
                                   </div>
                                 </div>
-                                <div className="text-gray-600 text-sm">
-                                  Uitstekende aanwezigheid en punctualiteit
+                                <div className="flex items-center space-x-1">
+                                  <span>📈</span>
+                                  <span className="text-blue-600 text-xs">Goede aanwezigheid</span>
                                 </div>
                               </div>
                             </div>

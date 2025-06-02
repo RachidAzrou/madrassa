@@ -456,6 +456,7 @@ export default function Students() {
     // Haal de huidige klas informatie op via enrollment data
     let studentGroupInfo = "";
     let academicYear = "2024-2025";
+    let currentGroupId = "";
     
     try {
       // Haal enrollment data op om de huidige klas te bepalen
@@ -469,6 +470,7 @@ export default function Students() {
         if (studentGroup) {
           studentGroupInfo = `${studentGroup.name} (${studentGroup.academicYear})`;
           academicYear = studentGroup.academicYear;
+          currentGroupId = studentGroup.id.toString();
         }
       }
     } catch (error) {
@@ -490,7 +492,7 @@ export default function Students() {
       enrollmentDate: student.enrollmentDate || "",
       status: student.status || "active",
       notes: student.notes || "",
-      studentGroupId: student.studentGroupId?.toString() || "",
+      studentGroupId: currentGroupId, // Gebruik de echte group ID
       studentGroup: studentGroupInfo, // Gebruik de opgehaalde klas informatie
       studentGroupName: studentGroupInfo.split(' (')[0] || "", // Extract klasnaam
       gender: student.gender || "man",
@@ -1983,7 +1985,7 @@ export default function Students() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="edit-email" className="text-xs font-medium text-gray-700">Email *</Label>
+                  <Label htmlFor="edit-email" className="text-xs font-medium text-gray-700">Email</Label>
                   <Input
                     id="edit-email"
                     name="email"
@@ -1991,8 +1993,7 @@ export default function Students() {
                     value={editFormData.email}
                     onChange={handleEditInputChange}
                     placeholder="email@voorbeeld.com"
-                    className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('email') ? 'border-red-500 bg-red-50' : ''}`}
-                    required
+                    className="mt-1 h-9 w-full border-[#e5e7eb] bg-white"
                   />
                 </div>
                 

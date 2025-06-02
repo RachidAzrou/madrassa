@@ -28,6 +28,7 @@ const ChalkBoard = ({ className = "h-4 w-4" }: { className?: string }) => (
 );
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { DataTableContainer, SearchActionBar, QuickActions } from '@/components/ui/data-table-container';
 import { 
   StandardTable, 
@@ -1088,126 +1089,118 @@ export default function Programs() {
       />
 
       {/* Vak bekijken dialoogvenster */}
-      <CustomDialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen} maxWidth="800px">
+      <CustomDialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen} maxWidth="1200px">
         <DialogHeaderWithIcon
           title="Vak Details"
-          description="Bekijk de details van het geselecteerde vak."
+          description="Bekijk alle informatie van het geselecteerde vak"
           icon={<Eye className="h-5 w-5" />}
         />
         
         {selectedProgram && (
-          <DialogFormContainer>
-            <div className="min-h-[400px]">
-              <Tabs value={viewActiveTab} onValueChange={setViewActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-6">
-                  <TabsTrigger value="general">Algemeen</TabsTrigger>
-                  <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
-                  <TabsTrigger value="teachers">Docenten</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="general" className="space-y-6 bg-gray-50 p-4 rounded-lg">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <FormLabel>Naam vak</FormLabel>
-                      <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
-                        {selectedProgram.name}
-                      </div>
+          <DialogFormContainer className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Algemene Informatie */}
+              <SectionContainer 
+                title="Algemene Informatie" 
+                icon={<BookText className="h-4 w-4" />}
+              >
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-medium text-gray-700">Vaknaam</label>
+                      <p className="text-sm text-gray-900 font-medium">{selectedProgram.name}</p>
                     </div>
-                    
-                    <div className="space-y-2">
-                      <FormLabel>Code</FormLabel>
-                      <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
-                        {selectedProgram.code}
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <FormLabel>Duur</FormLabel>
-                      <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
-                        {selectedProgram.duration === 1 ? 'Jaar' : selectedProgram.duration === 2 ? 'Semester' : 'Trimester'}
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <FormLabel>Status</FormLabel>
-                      <div className="h-9 px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
-                        {selectedProgram.isActive ? 'Actief' : 'Inactief'}
-                      </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-700">Vakcode</label>
+                      <p className="text-sm text-gray-900">{selectedProgram.code}</p>
                     </div>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <FormLabel>Beschrijving</FormLabel>
-                    <div className="min-h-[100px] px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-medium text-gray-700">Duur (jaren)</label>
+                      <p className="text-sm text-gray-900">{selectedProgram.duration}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-700">Afdeling</label>
+                      <p className="text-sm text-gray-900">{selectedProgram.department}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-700">Status</label>
+                    <div className="mt-1">
+                      <Badge variant={selectedProgram.isActive ? "default" : "secondary"}>
+                        {selectedProgram.isActive ? "Actief" : "Inactief"}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-700">Beschrijving</label>
+                    <p className="text-sm text-gray-900 mt-1 p-3 bg-white border rounded-md min-h-[80px]">
                       {selectedProgram.description || 'Geen beschrijving'}
-                    </div>
+                    </p>
                   </div>
-                </TabsContent>
+                </div>
+              </SectionContainer>
 
-                <TabsContent value="curriculum" className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <FormLabel className="flex items-center gap-2">
-                        <BookOpen className="h-4 w-4" />
-                        Instroomvereisten
-                      </FormLabel>
-                      <div className="min-h-[80px] px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
-                        {selectedProgram.entryRequirements || 'Geen instroomvereisten opgegeven'}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <FormLabel className="flex items-center gap-2">
-                        <Target className="h-4 w-4" />
-                        Leerdoelen
-                      </FormLabel>
-                      <div className="min-h-[80px] px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
-                        {selectedProgram.learningObjectives || 'Geen leerdoelen opgegeven'}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <FormLabel className="flex items-center gap-2">
-                        <Award className="h-4 w-4" />
-                        Competenties
-                      </FormLabel>
-                      <div className="min-h-[80px] px-3 py-2 border border-gray-200 rounded-md bg-white text-sm">
-                        {selectedProgram.competencies || 'Geen competenties opgegeven'}
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="teachers" className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                  <div className="space-y-2">
-                    <FormLabel className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      Toegewezen docenten
-                    </FormLabel>
-                    <div className="bg-white border border-gray-200 rounded-md p-4 max-h-60 overflow-y-auto">
-                      {selectedProgram.assignedTeachers && selectedProgram.assignedTeachers.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {selectedProgram.assignedTeachers
-                            .filter((teacher: any) => teacher.selected)
-                            .map((teacher: any) => (
-                            <div key={teacher.id} className="flex items-center space-x-2 p-2 bg-green-50 rounded-md">
-                              <div className="h-4 w-4 rounded-sm bg-green-600 border border-green-600">
-                                <svg className="h-3 w-3 text-white mt-0.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                              <span className="text-sm font-medium">{teacher.name || 'Docent'}</span>
-                            </div>
-                          ))}
+              {/* Toegewezen Docenten */}
+              <SectionContainer 
+                title="Toegewezen Docenten" 
+                icon={<Users className="h-4 w-4" />}
+              >
+                <div className="space-y-3">
+                  {selectedProgram.assignedTeachers && selectedProgram.assignedTeachers.length > 0 ? (
+                    selectedProgram.assignedTeachers
+                      .filter((teacher: any) => teacher.selected)
+                      .map((teacher: any) => (
+                        <div key={teacher.id} className="flex items-center gap-3 p-3 bg-white border rounded-md">
+                          <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-medium">
+                            {teacher.name ? teacher.name.substring(0, 2).toUpperCase() : 'DC'}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{teacher.name || 'Docent'}</p>
+                            <p className="text-xs text-gray-500">Toegewezen docent</p>
+                          </div>
                         </div>
-                      ) : (
-                        <p className="text-gray-500 text-sm">Geen docenten toegewezen</p>
-                      )}
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
+                      ))
+                  ) : (
+                    <p className="text-sm text-gray-500 italic">Geen docenten toegewezen</p>
+                  )}
+                </div>
+              </SectionContainer>
             </div>
+
+            {/* Curriculum Sectie */}
+            <SectionContainer 
+              title="Curriculum & Leerdoelen" 
+              icon={<Target className="h-4 w-4" />}
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div>
+                  <label className="text-xs font-medium text-gray-700">Instroomvereisten</label>
+                  <div className="mt-2 p-3 bg-white border rounded-md min-h-[100px]">
+                    <p className="text-sm text-gray-900">
+                      {selectedProgram.entryRequirements || 'Geen instroomvereisten opgegeven'}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-700">Leerdoelen</label>
+                  <div className="mt-2 p-3 bg-white border rounded-md min-h-[100px]">
+                    <p className="text-sm text-gray-900">
+                      {selectedProgram.learningObjectives || 'Geen leerdoelen opgegeven'}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-700">Competenties</label>
+                  <div className="mt-2 p-3 bg-white border rounded-md min-h-[100px]">
+                    <p className="text-sm text-gray-900">
+                      {selectedProgram.competencies || 'Geen competenties opgegeven'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </SectionContainer>
           </DialogFormContainer>
         )}
         

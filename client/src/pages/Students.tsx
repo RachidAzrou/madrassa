@@ -1987,20 +1987,30 @@ export default function Students() {
                             </Avatar>
                             <div>
                               <p className="text-sm font-medium text-gray-900">{sibling.firstName} {sibling.lastName}</p>
-                              <p className="text-xs text-gray-500">{sibling.studentId || 'Student ID niet beschikbaar'}</p>
+                              <p className="text-xs text-gray-500">Student ID: {sibling.studentIdCode || sibling.studentId || 'Niet beschikbaar'}</p>
                             </div>
                           </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setNewStudentSiblings(prev => prev.filter((_, i) => i !== index));
-                            }}
-                            className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
+                          <div className="flex items-center space-x-2">
+                            <div className="text-right">
+                              <div className="flex items-center gap-1">
+                                <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 min-w-[60px] justify-center">
+                                  {sibling.relationship || 'Broer/Zus'}
+                                </span>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-1">Familie relatie</p>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setNewStudentSiblings(prev => prev.filter((_, i) => i !== index));
+                              }}
+                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </div>
                       ))
                     ) : (

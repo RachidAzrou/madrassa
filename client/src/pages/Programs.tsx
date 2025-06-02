@@ -506,15 +506,6 @@ export default function Programs() {
                 description={searchTerm 
                   ? "Geen vakken komen overeen met uw zoekcriteria."
                   : "Er zijn nog geen vakken aangemaakt."}
-                action={
-                  <Button
-                    onClick={handleAddProgram}
-                    className="bg-[#1e40af] hover:bg-[#1e3a8a]"
-                  >
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    Eerste Vak Aanmaken
-                  </Button>
-                }
               />
             ) : (
               programs.map((program: Program) => (

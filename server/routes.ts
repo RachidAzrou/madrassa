@@ -1595,6 +1595,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   apiRouter.post("/api/grades", async (req, res) => {
+    console.log('=== ROUTE HIT: POST /api/grades ===');
+    console.log('Headers:', req.headers);
+    console.log('Body exists:', !!req.body);
+    console.log('Body type:', typeof req.body);
+    
     try {
       console.log('=== POST /api/grades called ===');
       console.log('Request body:', JSON.stringify(req.body, null, 2));

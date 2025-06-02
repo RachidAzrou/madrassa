@@ -558,11 +558,9 @@ export default function Cijfers() {
                         <TableHeader>
                           <TableRow>
                             <TableHead className="w-[250px]">Student</TableHead>
-                            <TableHead>Arabisch</TableHead>
-                            <TableHead>Islamitische Geschiedenis</TableHead>
-                            <TableHead>Koran</TableHead>
-                            <TableHead>Fiqh</TableHead>
-                            <TableHead>Aqidah</TableHead>
+                            {subjects.map((subject) => (
+                              <TableHead key={subject.id}>{subject.name}</TableHead>
+                            ))}
                             <TableHead className="text-right">Gemiddelde</TableHead>
                           </TableRow>
                         </TableHeader>
@@ -583,9 +581,9 @@ export default function Cijfers() {
                                 </div>
                               </TableCell>
                               
-                              {['Arabisch', 'Islamitische Geschiedenis', 'Koran', 'Fiqh', 'Aqidah'].map((subject) => (
-                                <TableCell key={subject}>
-                                  {editGrade && editGrade.studentId === student.id && editGrade.subject === subject ? (
+                              {subjects.map((subject) => (
+                                <TableCell key={subject.id}>
+                                  {editGrade && editGrade.studentId === student.id && editGrade.subject === subject.name ? (
                                     <div className="flex items-center gap-1">
                                       <Input
                                         type="number"
@@ -616,18 +614,18 @@ export default function Cijfers() {
                                       className="cursor-pointer hover:bg-gray-50 p-1 rounded flex items-center"
                                       onClick={() => handleEditGrade(
                                         student.id, 
-                                        subject, 
-                                        subjectGrades[student.id]?.[subject] || null
+                                        subject.name, 
+                                        subjectGrades[student.id]?.[subject.name] || null
                                       )}
                                     >
                                       <span className={`
-                                        ${subjectGrades[student.id]?.[subject] ? 
-                                          subjectGrades[student.id][subject] >= 5.5 ? 'text-green-600' : 'text-red-600' 
+                                        ${subjectGrades[student.id]?.[subject.name] ? 
+                                          subjectGrades[student.id][subject.name] >= 5.5 ? 'text-green-600' : 'text-red-600' 
                                           : 'text-gray-400'
                                         }
                                         font-medium
                                       `}>
-                                        {subjectGrades[student.id]?.[subject]?.toFixed(1) || '-'}
+                                        {subjectGrades[student.id]?.[subject.name]?.toFixed(1) || '-'}
                                       </span>
                                       <Edit className="h-3 w-3 ml-1.5 text-gray-400" />
                                     </div>

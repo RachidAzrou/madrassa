@@ -165,30 +165,7 @@ export default function Cijfers() {
     enabled: !!selectedClass && activeTab === 'behavior',
   });
   
-  // Effect om aanwezigheidsdata te laden voor punctualiteitsberekening
-  useEffect(() => {
-    if (selectedClass && students && students.length > 0 && activeTab === 'behavior') {
-      const loadAttendanceData = async () => {
-        console.log("Berekenen punctualiteitsscores op basis van afwezigheid en te laat komen");
-        const newBehaviorScores = { ...behaviorScores };
-        
-        // Normaal zou je deze data van de server ophalen, maar voor demo doeleinden gebruiken we wat willekeurige scores
-        students.forEach(student => {
-          if (!newBehaviorScores[student.id]) {
-            newBehaviorScores[student.id] = {};
-          }
-          
-          if (!newBehaviorScores[student.id]['punctuality']) {
-            newBehaviorScores[student.id]['punctuality'] = Math.round(Math.random() * 25 + 70); // Willekeurige score tussen 70-95
-          }
-        });
-        
-        setBehaviorScores(newBehaviorScores);
-      };
-      
-      loadAttendanceData();
-    }
-  }, [selectedClass, students, activeTab, behaviorScores]);
+  // Aanwezigheidsdata wordt alleen geladen uit echte bronnen
   
   // Effect om cijferdata te verwerken of dummy cijfers te genereren
   useEffect(() => {
@@ -206,21 +183,9 @@ export default function Cijfers() {
         
         setSubjectGrades(newSubjectGrades);
       } 
-      // Anders genereer dummy cijfers voor demo
-      else if (Object.keys(subjectGrades).length === 0 && subjects.length > 0) {
-        console.log("Genereren dummy cijfers voor demo");
-        const subjectNames = subjects.map(s => s.name);
-        const newSubjectGrades: Record<string, Record<string, number>> = {};
-        
-        students.forEach(student => {
-          newSubjectGrades[student.id] = {};
-          subjectNames.forEach(subject => {
-            // Genereer een willekeurig cijfer tussen 5.5 en 9.5
-            newSubjectGrades[student.id][subject] = Math.round((Math.random() * 4 + 5.5) * 10) / 10;
-          });
-        });
-        
-        setSubjectGrades(newSubjectGrades);
+      // Als er geen cijfers zijn, laat lege tabel zien
+      else {
+        setSubjectGrades({});
       }
     }
   }, [selectedClass, gradesData, students, activeTab, subjectGrades]);
@@ -248,39 +213,10 @@ export default function Cijfers() {
         setBehaviorScores(newBehaviorScores);
         setBehaviorRemarks(newBehaviorRemarks);
       } 
-      // Anders genereer dummy gedragsbeoordelingen voor demo
-      else if (Object.keys(behaviorRemarks).length === 0) {
-        console.log("Genereren dummy gedragsbeoordelingen voor demo");
-        const categories = ['respect', 'samenwerking', 'inzet', 'discipline'];
-        const newBehaviorScores: Record<string, Record<string, number>> = { ...behaviorScores };
-        const newBehaviorRemarks: Record<string, Record<string, string>> = {};
-        
-        students.forEach(student => {
-          newBehaviorScores[student.id] = newBehaviorScores[student.id] || {};
-          newBehaviorRemarks[student.id] = {};
-          
-          categories.forEach(category => {
-            // Alleen genereren als ze nog niet bestaan
-            if (!newBehaviorScores[student.id][category]) {
-              // Genereer een willekeurige score tussen 60 en 100
-              newBehaviorScores[student.id][category] = Math.round(Math.random() * 40 + 60);
-            }
-            
-            // Genereer een willekeurige opmerking
-            const remarks = [
-              'Goede voortgang dit kwartaal',
-              'Kan verbeteren, maar toont inzet',
-              'Uitstekend werk, ga zo door',
-              'Heeft wat extra aandacht nodig',
-              'Consistent goed gedrag',
-              ''
-            ];
-            newBehaviorRemarks[student.id][category] = remarks[Math.floor(Math.random() * remarks.length)];
-          });
-        });
-        
-        setBehaviorScores(newBehaviorScores);
-        setBehaviorRemarks(newBehaviorRemarks);
+      // Als er geen gedragsbeoordelingen zijn, laat lege tabel zien
+      else {
+        setBehaviorScores({});
+        setBehaviorRemarks({});
       }
     }
   }, [selectedClass, behaviorData, students, activeTab, behaviorScores]);

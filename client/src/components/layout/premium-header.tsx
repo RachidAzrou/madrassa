@@ -21,14 +21,49 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
     className: "h-5 w-5 text-white"
   });
   
-  // Convert path string to breadcrumbs if provided
+  // Convert path string to breadcrumbs if provided, or generate from location
   let effectiveBreadcrumbs = breadcrumbs;
-  if (!breadcrumbs && path) {
-    const parts = path.split(' > ');
-    effectiveBreadcrumbs = {
-      parent: parts.length > 1 ? parts[0] : undefined,
-      current: parts.length > 1 ? parts[1] : parts[0]
-    };
+  if (!breadcrumbs) {
+    if (path) {
+      const parts = path.split(' > ');
+      effectiveBreadcrumbs = {
+        parent: parts.length > 1 ? parts[0] : undefined,
+        current: parts.length > 1 ? parts[1] : parts[0]
+      };
+    } else {
+      // Generate breadcrumbs based on current location
+      const getParentCategory = () => {
+        if (['/student-groups', '/programs', '/calendar', '/courses', '/scheduling'].includes(location)) return 'Onderwijs';
+        if (['/students', '/guardians', '/teachers'].includes(location)) return 'Beheer';
+        if (['/attendance', '/grading', '/reports', '/student-dossier'].includes(location)) return 'Evaluatie';
+        if (location === '/fees') return 'Financien';
+        return undefined;
+      };
+      
+      const getCurrentPage = () => {
+        const pageMap = {
+          '/student-groups': 'Klassen',
+          '/programs': 'Vakken',
+          '/calendar': 'Rooster',
+          '/courses': 'Curriculum',
+          '/scheduling': 'Planning',
+          '/students': 'Studenten',
+          '/guardians': 'Voogden',
+          '/teachers': 'Docenten',
+          '/attendance': 'Aanwezigheid',
+          '/grading': 'Cijfers',
+          '/reports': 'Rapport',
+          '/fees': 'Betalingsbeheer',
+          '/student-dossier': 'Leerlingdossier'
+        };
+        return pageMap[location] || title;
+      };
+      
+      effectiveBreadcrumbs = {
+        parent: getParentCategory(),
+        current: getCurrentPage()
+      };
+    }
   }
 
   return (

@@ -496,6 +496,7 @@ export default function Teachers() {
     
     const teacherData = {
       ...newTeacher,
+      teacherId: generateTeacherId(),
       educations: teacherEducations,
       languages: teacherLanguages,
       subjects: selectedSubjects.map(id => parseInt(id)),

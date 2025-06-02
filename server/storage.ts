@@ -1127,8 +1127,9 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async createGrade(grade: InsertGrade): Promise<Grade> {
+  async createGrade(grade: any): Promise<Grade> {
     try {
+      console.log('Creating grade in storage:', grade);
       const [newGrade] = await db.insert(grades).values(grade).returning();
       return newGrade;
     } catch (error) {

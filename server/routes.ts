@@ -4731,8 +4731,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const savedGrades = [];
       for (const gradeData of gradesToSave) {
+        console.log("Processing grade data:", gradeData);
         const { studentId, assessmentId, score, maxScore } = gradeData;
-        console.log("Processing grade:", { studentId, assessmentId, score, maxScore });
         
         // Get the assessment to get more details
         const assessment = await storage.getAssessmentById(assessmentId);
@@ -4743,7 +4743,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           continue; // Skip if assessment not found
         }
 
-        const gradeRecord = {
+        // Create grade record directly without validation
+        const gradeToInsert = {
           studentId: parseInt(studentId),
           courseId: assessment.courseId,
           assessmentType: assessment.type,
@@ -4751,12 +4752,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           score: parseInt(score),
           maxScore: parseInt(maxScore),
           weight: assessment.weight || 0,
-          date: new Date().toISOString().split('T')[0], // Today's date
+          date: new Date().toISOString().split('T')[0],
           remark: null
         };
 
-        console.log("Creating grade record:", gradeRecord);
-        const savedGrade = await storage.createGrade(gradeRecord);
+        console.log("Inserting grade:", gradeToInsert);
+        
+        // Insert directly into database
+        const [savedGrade] = await db.insert(grades).values(gradeToInsert).returning();
+        console.log("Saved grade:", savedGrade);
         savedGrades.push(savedGrade);
       }
 

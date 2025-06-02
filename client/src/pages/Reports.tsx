@@ -1,969 +1,696 @@
-import { useState, useEffect, useRef } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  BarChart, 
-  FileText, 
-  Download, 
-  Calendar, 
-  Users, 
-  GraduationCap,
-  BookOpen,
-  ClipboardList,
-  CircleCheck,
-  UploadCloud,
-  Image,
-  Check,
-  Printer,
-  Edit,
-  X,
-  Save,
-  Search,
-  BarChart3,
-  BookMarked,
-  Plus,
-  Trash2,
-  FileBarChart
-} from 'lucide-react';
-import { PremiumHeader } from '@/components/layout/premium-header';
+import React, { useState, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { apiRequest } from '@/lib/queryClient';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FileText, Download, Upload, Users, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
-// Define types
 interface Student {
   id: number;
   studentId: string;
   firstName: string;
   lastName: string;
+  email: string | null;
+  phone: string | null;
   dateOfBirth: string | null;
-  status: string;
+  programId: number | null;
+  academicYear: string | null;
+}
+
+interface StudentGroup {
+  id: number;
+  name: string;
+  academicYear: string;
   programId: number;
+}
+
+interface Grade {
+  id: number;
+  studentId: number;
+  programId: number;
+  gradeType: string;
+  score: number;
+  maxScore: number;
+  weight: number;
+  date: string;
+  notes: string | null;
   programName?: string;
 }
 
-interface ReportTemplate {
+interface AttendanceRecord {
   id: number;
-  name: string;
-  type: string;
-  createdDate: string;
-  lastModified: string;
-  sections: TemplateSection[];
+  studentId: number;
+  date: string;
+  status: 'present' | 'absent' | 'late';
+  notes: string | null;
 }
 
-interface TemplateSection {
-  id: string;
-  title: string;
-  type: 'grades' | 'behavior' | 'attendance' | 'comments' | 'custom';
-  content?: string;
-  order: number;
+interface BehaviorGrade {
+  studentId: number;
+  grade: number;
+  comments: string;
 }
 
-interface ReportGeneration {
-  templateId: number;
-  studentIds: number[];
-  periodId?: number;
-  options: {
-    includeBehavior: boolean;
-    includeAttendance: boolean;
-    includeGrades: boolean;
-    includeComments: boolean;
-    signature: boolean;
+interface ReportData {
+  student: Student;
+  attendance: {
+    total: number;
+    present: number;
+    absent: number;
+    late: number;
+    percentage: number;
   };
+  grades: {
+    [subject: string]: {
+      tests: Grade[];
+      tasks: Grade[];
+      homework: Grade[];
+      average: number;
+    };
+  };
+  behavior: BehaviorGrade;
+  generalComments: string;
 }
 
 export default function Reports() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('generate');
-  const [selectedClass, setSelectedClass] = useState('');
-  const [selectedTemplate, setSelectedTemplate] = useState('');
-  const [selectedPeriod, setSelectedPeriod] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectAll, setSelectAll] = useState(false);
-  const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
-  const [options, setOptions] = useState({
-    includeBehavior: true,
-    includeAttendance: true,
-    includeGrades: true,
-    includeComments: true,
-    signature: true
-  });
-  
-  const [editingTemplate, setEditingTemplate] = useState<ReportTemplate | null>(null);
-  const [reportPreviewUrl, setReportPreviewUrl] = useState<string | null>(null);
-  const [isGeneratingReports, setIsGeneratingReports] = useState(false);
-  const [reportProgress, setReportProgress] = useState(0);
-  
-  // Fetch all students
-  const { data: studentsData, isLoading: isLoadingStudents } = useQuery<Student[]>({
-    queryKey: ['/api/students'],
-    staleTime: 300000,
+  const [selectedReportType, setSelectedReportType] = useState<'class' | 'individual'>('class');
+  const [selectedClass, setSelectedClass] = useState<string>('');
+  const [selectedStudent, setSelectedStudent] = useState<string>('');
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('');
+  const [reportData, setReportData] = useState<ReportData[]>([]);
+  const [behaviorGrades, setBehaviorGrades] = useState<{[key: number]: BehaviorGrade}>({});
+  const [generalComments, setGeneralComments] = useState<{[key: number]: string}>({});
+  const [schoolLogo, setSchoolLogo] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch student groups
+  const { data: classesData } = useQuery({
+    queryKey: ['/api/student-groups'],
+    queryFn: async () => {
+      const response = await fetch('/api/student-groups');
+      if (!response.ok) throw new Error('Failed to fetch classes');
+      return response.json();
+    },
   });
 
-  // Fetch students by class/student group
-  const { data: classStudentsData } = useQuery<Student[]>({
-    queryKey: ['/api/student-groups', selectedClass, 'students'],
+  // Fetch students
+  const { data: studentsData } = useQuery({
+    queryKey: ['/api/students'],
     queryFn: async () => {
-      if (!selectedClass) return [];
-      const response = await apiRequest(`/api/student-groups/${selectedClass}/students`, {
-        method: 'GET'
-      });
-      return response;
+      const response = await fetch('/api/students');
+      if (!response.ok) throw new Error('Failed to fetch students');
+      return response.json();
     },
-    staleTime: 60000,
-    enabled: !!selectedClass,
   });
-  
-  // Get all students or filtered by class
-  const students = selectedClass ? (classStudentsData || []) : (studentsData || []);
-  
-  // Filter students based on search query
-  const filteredStudents = searchQuery
-    ? students.filter(student => 
-        student.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.studentId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        `${student.firstName} ${student.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : students;
-  
-  // Fetch student groups/classes for dropdown
-  const { data: classesData } = useQuery<{ studentGroups: any[] }>({
-    queryKey: ['/api/student-groups'],
-    staleTime: 300000,
-  });
-  
-  const classes = classesData?.studentGroups || [];
-  
-  // Fetch report templates
-  const { data: templatesData } = useQuery<ReportTemplate[]>({
-    queryKey: ['/api/report-templates'],
-    staleTime: 60000,
-  });
-  
-  const templates = templatesData || [];
-  
+
   // Fetch academic periods
   const { data: periodsData } = useQuery({
     queryKey: ['/api/academic-periods'],
-    staleTime: 300000,
-  });
-  
-  const periods = periodsData || [];
-  
-  // Effect to handle selectAll changes
-  useEffect(() => {
-    if (selectAll) {
-      setSelectedStudents(filteredStudents.map(student => student.id));
-    } else {
-      setSelectedStudents([]);
-    }
-  }, [selectAll, filteredStudents]);
-  
-  // Effect to update selectAll state based on individual selections
-  useEffect(() => {
-    if (filteredStudents.length > 0 && selectedStudents.length === filteredStudents.length) {
-      setSelectAll(true);
-    } else {
-      setSelectAll(false);
-    }
-  }, [selectedStudents, filteredStudents]);
-  
-  // Generate reports mutation
-  const generateReportsMutation = useMutation({
-    mutationFn: async (data: ReportGeneration) => {
-      setIsGeneratingReports(true);
-      setReportProgress(0);
-      
-      // Mock progress updates (in a real app, this would come from backend events)
-      const progressInterval = setInterval(() => {
-        setReportProgress(prev => {
-          const newProgress = prev + Math.random() * 10;
-          return newProgress >= 100 ? 100 : newProgress;
-        });
-      }, 300);
-      
-      try {
-        const response = await apiRequest('/api/reports/generate', {
-          method: 'POST',
-          body: data
-        });
-        
-        clearInterval(progressInterval);
-        setReportProgress(100);
-        
-        return response;
-      } catch (error) {
-        clearInterval(progressInterval);
-        throw error;
-      } finally {
-        setTimeout(() => {
-          setIsGeneratingReports(false);
-          setReportProgress(0);
-        }, 1000);
-      }
+    queryFn: async () => {
+      const response = await fetch('/api/academic-periods');
+      if (!response.ok) throw new Error('Failed to fetch periods');
+      return response.json();
     },
-    onSuccess: (data) => {
+  });
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setSchoolLogo(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const generateReportData = async () => {
+    try {
+      let targetStudents: Student[] = [];
+
+      if (selectedReportType === 'class' && selectedClass) {
+        // Get students in the selected class
+        const classResponse = await fetch(`/api/students/class/${selectedClass}`);
+        if (!classResponse.ok) throw new Error('Failed to fetch class students');
+        targetStudents = await classResponse.json();
+      } else if (selectedReportType === 'individual' && selectedStudent) {
+        // Get single student
+        const student = studentsData?.find((s: Student) => s.id.toString() === selectedStudent);
+        if (student) targetStudents = [student];
+      }
+
+      const reports: ReportData[] = [];
+
+      for (const student of targetStudents) {
+        // Fetch attendance data
+        const attendanceResponse = await fetch(`/api/attendance/student/${student.id}`);
+        const attendanceData: AttendanceRecord[] = attendanceResponse.ok ? await attendanceResponse.json() : [];
+
+        // Calculate attendance statistics
+        const total = attendanceData.length;
+        const present = attendanceData.filter(a => a.status === 'present').length;
+        const absent = attendanceData.filter(a => a.status === 'absent').length;
+        const late = attendanceData.filter(a => a.status === 'late').length;
+        const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+
+        // Fetch grades data
+        const gradesResponse = await fetch(`/api/grades/student/${student.id}`);
+        const gradesData: Grade[] = gradesResponse.ok ? await gradesResponse.json() : [];
+
+        // Group grades by subject and type
+        const gradesBySubject: {[subject: string]: {tests: Grade[], tasks: Grade[], homework: Grade[], average: number}} = {};
+        
+        gradesData.forEach(grade => {
+          const subject = grade.programName || `Vak ${grade.programId}`;
+          if (!gradesBySubject[subject]) {
+            gradesBySubject[subject] = { tests: [], tasks: [], homework: [], average: 0 };
+          }
+          
+          switch (grade.gradeType.toLowerCase()) {
+            case 'test':
+            case 'toets':
+              gradesBySubject[subject].tests.push(grade);
+              break;
+            case 'taak':
+            case 'opdracht':
+              gradesBySubject[subject].tasks.push(grade);
+              break;
+            case 'huiswerk':
+              gradesBySubject[subject].homework.push(grade);
+              break;
+            default:
+              gradesBySubject[subject].tests.push(grade);
+          }
+        });
+
+        // Calculate averages per subject
+        Object.keys(gradesBySubject).forEach(subject => {
+          const subjectGrades = gradesBySubject[subject];
+          const allGrades = [...subjectGrades.tests, ...subjectGrades.tasks, ...subjectGrades.homework];
+          if (allGrades.length > 0) {
+            const weightedSum = allGrades.reduce((sum, grade) => sum + (grade.score / grade.maxScore) * 10 * grade.weight, 0);
+            const totalWeight = allGrades.reduce((sum, grade) => sum + grade.weight, 0);
+            subjectGrades.average = totalWeight > 0 ? Math.round((weightedSum / totalWeight) * 10) / 10 : 0;
+          }
+        });
+
+        reports.push({
+          student,
+          attendance: { total, present, absent, late, percentage },
+          grades: gradesBySubject,
+          behavior: behaviorGrades[student.id] || { studentId: student.id, grade: 7, comments: '' },
+          generalComments: generalComments[student.id] || ''
+        });
+      }
+
+      setReportData(reports);
       toast({
         title: "Rapporten gegenereerd",
-        description: `${selectedStudents.length} rapport(en) succesvol gegenereerd.`,
+        description: `${reports.length} rapport(en) succesvol gegenereerd.`,
       });
-      
-      // Set preview URL for the first report (if available)
-      if (data && data.urls && data.urls.length > 0) {
-        setReportPreviewUrl(data.urls[0]);
-      }
-    },
-    onError: (error: any) => {
-      console.error("Error generating reports:", error);
+
+    } catch (error) {
+      console.error('Error generating report data:', error);
       toast({
-        title: "Fout bij genereren rapporten",
-        description: error.message || "Er is een fout opgetreden bij het genereren van rapporten.",
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het genereren van de rapporten.",
         variant: "destructive",
       });
     }
-  });
-  
-  // Save template mutation
-  const saveTemplateMutation = useMutation({
-    mutationFn: async (template: ReportTemplate) => {
-      if (template.id) {
-        // Update existing template
-        return await apiRequest(`/api/report-templates/${template.id}`, {
-          method: 'PUT',
-          body: template
-        });
-      } else {
-        // Create new template
-        return await apiRequest('/api/report-templates', {
-          method: 'POST',
-          body: template
-        });
-      }
-    },
-    onSuccess: () => {
-      toast({
-        title: "Template opgeslagen",
-        description: "Rapporttemplate is succesvol opgeslagen.",
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ['/api/report-templates'] });
-      setEditingTemplate(null);
-    },
-    onError: (error: any) => {
-      console.error("Error saving template:", error);
-      toast({
-        title: "Fout bij opslaan template",
-        description: error.message || "Er is een fout opgetreden bij het opslaan van het template.",
-        variant: "destructive",
-      });
-    }
-  });
-  
-  // Delete template mutation
-  const deleteTemplateMutation = useMutation({
-    mutationFn: async (templateId: number) => {
-      return await apiRequest(`/api/report-templates/${templateId}`, {
-        method: 'DELETE'
-      });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Template verwijderd",
-        description: "Rapporttemplate is succesvol verwijderd.",
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ['/api/report-templates'] });
-    },
-    onError: (error: any) => {
-      console.error("Error deleting template:", error);
-      toast({
-        title: "Fout bij verwijderen template",
-        description: error.message || "Er is een fout opgetreden bij het verwijderen van het template.",
-        variant: "destructive",
-      });
-    }
-  });
-  
-  const handleToggleStudent = (studentId: number) => {
-    setSelectedStudents(prev => {
-      if (prev.includes(studentId)) {
-        return prev.filter(id => id !== studentId);
-      } else {
-        return [...prev, studentId];
-      }
-    });
   };
-  
-  const handleClassChange = (value: string) => {
-    setSelectedClass(value);
-    setSelectedStudents([]);
-    setSelectAll(false);
-  };
-  
-  const handleTemplateChange = (value: string) => {
-    setSelectedTemplate(value);
-  };
-  
-  const handlePeriodChange = (value: string) => {
-    setSelectedPeriod(value);
-  };
-  
-  const handleGenerateReports = () => {
-    if (!selectedTemplate) {
+
+  const generatePDF = () => {
+    if (reportData.length === 0) {
       toast({
-        title: "Template ontbreekt",
-        description: "Selecteer een rapport template om door te gaan.",
+        title: "Geen data",
+        description: "Genereer eerst rapportgegevens voordat je een PDF kunt maken.",
         variant: "destructive",
       });
       return;
     }
-    
-    if (selectedStudents.length === 0) {
-      toast({
-        title: "Geen studenten geselecteerd",
-        description: "Selecteer minstens één student om een rapport te genereren.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    const reportData: ReportGeneration = {
-      templateId: parseInt(selectedTemplate),
-      studentIds: selectedStudents,
-      options: options
-    };
-    
-    if (selectedPeriod) {
-      reportData.periodId = parseInt(selectedPeriod);
-    }
-    
-    generateReportsMutation.mutate(reportData);
-  };
-  
-  const handleDownloadReports = () => {
-    // In a real app, this would trigger a download from the server
-    toast({
-      title: "Rapporten worden gedownload",
-      description: `${selectedStudents.length} rapport(en) worden gedownload als PDF.`,
-    });
-  };
-  
-  const handleCreateNewTemplate = () => {
-    setEditingTemplate({
-      id: 0, // New template gets 0 ID until saved
-      name: "Nieuw Template",
-      type: "standard",
-      createdDate: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
-      sections: [
-        {
-          id: "section-" + Date.now(),
-          title: "Cijferoverzicht",
-          type: "grades",
-          order: 0
-        },
-        {
-          id: "section-" + (Date.now() + 1),
-          title: "Aanwezigheid",
-          type: "attendance",
-          order: 1
-        },
-        {
-          id: "section-" + (Date.now() + 2),
-          title: "Gedragsbeoordeling",
-          type: "behavior",
-          order: 2
-        },
-        {
-          id: "section-" + (Date.now() + 3),
-          title: "Opmerkingen",
-          type: "comments",
-          content: "",
-          order: 3
+
+    const pdf = new jsPDF();
+    const pageWidth = pdf.internal.pageSize.width;
+    const pageHeight = pdf.internal.pageSize.height;
+
+    reportData.forEach((report, index) => {
+      if (index > 0) pdf.addPage();
+
+      let yPosition = 20;
+
+      // Header with logo
+      if (schoolLogo) {
+        try {
+          pdf.addImage(schoolLogo, 'JPEG', 10, 10, 30, 20);
+        } catch (error) {
+          console.warn('Could not add logo to PDF:', error);
         }
-      ]
+      }
+
+      // School header
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('myMadrassa - Leerlingenrapport', schoolLogo ? 50 : 20, 20);
+      
+      yPosition = 40;
+
+      // Student info
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Leerlinggegevens', 20, yPosition);
+      
+      yPosition += 10;
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`Naam: ${report.student.firstName} ${report.student.lastName}`, 20, yPosition);
+      pdf.text(`Leerlingnummer: ${report.student.studentId}`, 120, yPosition);
+      
+      yPosition += 8;
+      if (report.student.dateOfBirth) {
+        const birthDate = new Date(report.student.dateOfBirth);
+        pdf.text(`Geboortedatum: ${birthDate.toLocaleDateString('nl-NL')}`, 20, yPosition);
+      }
+      pdf.text(`Academisch jaar: ${report.student.academicYear || 'Niet opgegeven'}`, 120, yPosition);
+
+      yPosition += 20;
+
+      // Attendance section
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Aanwezigheid', 20, yPosition);
+      
+      yPosition += 10;
+      const attendanceData = [
+        ['Totaal lessen', report.attendance.total.toString()],
+        ['Aanwezig', report.attendance.present.toString()],
+        ['Afwezig', report.attendance.absent.toString()],
+        ['Te laat', report.attendance.late.toString()],
+        ['Aanwezigheidspercentage', `${report.attendance.percentage}%`]
+      ];
+
+      (pdf as any).autoTable({
+        startY: yPosition,
+        head: [['Type', 'Aantal']],
+        body: attendanceData,
+        theme: 'grid',
+        margin: { left: 20, right: 20 },
+        styles: { fontSize: 10 }
+      });
+
+      yPosition = (pdf as any).lastAutoTable.finalY + 20;
+
+      // Grades section
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Cijfers per vak', 20, yPosition);
+      
+      yPosition += 10;
+
+      Object.entries(report.grades).forEach(([subject, grades]) => {
+        const gradeData = [
+          ['Tests', grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : 'Geen'],
+          ['Taken', grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : 'Geen'],
+          ['Huiswerk', grades.homework.length > 0 ? (grades.homework.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.homework.length).toFixed(1) : 'Geen'],
+          ['Gemiddelde', grades.average.toFixed(1)]
+        ];
+
+        (pdf as any).autoTable({
+          startY: yPosition,
+          head: [[subject, 'Cijfer']],
+          body: gradeData,
+          theme: 'grid',
+          margin: { left: 20, right: 20 },
+          styles: { fontSize: 10 }
+        });
+
+        yPosition = (pdf as any).lastAutoTable.finalY + 15;
+      });
+
+      // Behavior section
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Gedrag', 20, yPosition);
+      
+      yPosition += 10;
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`Gedragscijfer: ${report.behavior.grade}/10`, 20, yPosition);
+      
+      yPosition += 8;
+      if (report.behavior.comments) {
+        pdf.text('Opmerkingen gedrag:', 20, yPosition);
+        yPosition += 6;
+        const comments = pdf.splitTextToSize(report.behavior.comments, pageWidth - 40);
+        pdf.text(comments, 20, yPosition);
+        yPosition += comments.length * 6;
+      }
+
+      yPosition += 10;
+
+      // General comments
+      if (report.generalComments) {
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Algemene opmerkingen', 20, yPosition);
+        
+        yPosition += 10;
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        const generalComments = pdf.splitTextToSize(report.generalComments, pageWidth - 40);
+        pdf.text(generalComments, 20, yPosition);
+        yPosition += generalComments.length * 6 + 20;
+      }
+
+      // Signature section
+      if (yPosition > pageHeight - 60) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Handtekeningen', 20, yPosition);
+      
+      yPosition += 20;
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      
+      // Parent signature
+      pdf.text('Handtekening ouder(s)/verzorger(s):', 20, yPosition);
+      pdf.line(20, yPosition + 15, 90, yPosition + 15);
+      pdf.text('Datum: ________________', 20, yPosition + 25);
+
+      // Teacher signature  
+      pdf.text('Handtekening klassenmentor:', 120, yPosition);
+      pdf.line(120, yPosition + 15, 190, yPosition + 15);
+      pdf.text('Datum: ________________', 120, yPosition + 25);
+    });
+
+    // Save PDF
+    const className = selectedReportType === 'class' ? classesData?.find((c: StudentGroup) => c.id.toString() === selectedClass)?.name : '';
+    const studentName = selectedReportType === 'individual' ? reportData[0]?.student.firstName + '_' + reportData[0]?.student.lastName : '';
+    const filename = `rapport_${className || studentName}_${new Date().toISOString().split('T')[0]}.pdf`;
+    
+    pdf.save(filename);
+
+    toast({
+      title: "PDF gegenereerd",
+      description: `Rapport is opgeslagen als ${filename}`,
     });
   };
-  
-  const handleEditTemplate = (template: ReportTemplate) => {
-    setEditingTemplate({...template});
+
+  const updateBehaviorGrade = (studentId: number, grade: number, comments: string) => {
+    setBehaviorGrades(prev => ({
+      ...prev,
+      [studentId]: { studentId, grade, comments }
+    }));
   };
-  
-  const handleDeleteTemplate = (templateId: number) => {
-    if (window.confirm("Weet u zeker dat u dit template wilt verwijderen?")) {
-      deleteTemplateMutation.mutate(templateId);
-    }
-  };
-  
-  const handleSaveTemplate = () => {
-    if (editingTemplate) {
-      saveTemplateMutation.mutate(editingTemplate);
-    }
-  };
-  
-  const handleAddSection = () => {
-    if (editingTemplate) {
-      const newSection: TemplateSection = {
-        id: "section-" + Date.now(),
-        title: "Nieuwe Sectie",
-        type: "custom",
-        content: "",
-        order: editingTemplate.sections.length
-      };
-      
-      setEditingTemplate({
-        ...editingTemplate,
-        sections: [...editingTemplate.sections, newSection],
-        lastModified: new Date().toISOString()
-      });
-    }
-  };
-  
-  const handleUpdateSection = (index: number, updates: Partial<TemplateSection>) => {
-    if (editingTemplate) {
-      const updatedSections = [...editingTemplate.sections];
-      updatedSections[index] = {
-        ...updatedSections[index],
-        ...updates
-      };
-      
-      setEditingTemplate({
-        ...editingTemplate,
-        sections: updatedSections,
-        lastModified: new Date().toISOString()
-      });
-    }
-  };
-  
-  const handleRemoveSection = (index: number) => {
-    if (editingTemplate) {
-      const updatedSections = editingTemplate.sections.filter((_, i) => i !== index);
-      
-      setEditingTemplate({
-        ...editingTemplate,
-        sections: updatedSections,
-        lastModified: new Date().toISOString()
-      });
-    }
+
+  const updateGeneralComments = (studentId: number, comments: string) => {
+    setGeneralComments(prev => ({
+      ...prev,
+      [studentId]: comments
+    }));
   };
 
   return (
-    <div className="space-y-6">
-      <PremiumHeader
-        title="Rapport"
-        path="Evaluatie > Rapport"
-        icon={FileBarChart}
-        description="Genereer en beheer rapporten voor studenten, inclusief cijfers, feedback en voortgangsanalyses"
-      />
-      <div className="p-4 md:p-6">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2 ml-auto">
-            <span className="text-sm text-gray-500 font-medium">
-              {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-            </span>
-          </div>
-        </div>
+    <div className="container mx-auto p-6">
+      <div className="flex items-center gap-4 mb-6">
+        <FileText className="h-8 w-8 text-blue-600" />
+        <h1 className="text-3xl font-bold">Rapporten</h1>
       </div>
 
-      <Tabs defaultValue="generate" value={activeTab} onValueChange={setActiveTab as any} className="w-full">
-        <div className="flex justify-between items-center mb-4">
-          <TabsList className="grid grid-cols-3 md:w-[550px] p-1 bg-blue-900/10">
-            <TabsTrigger value="generate" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-              <FileText className="h-4 w-4 mr-2" />
-              Rapporten genereren
-            </TabsTrigger>
-            <TabsTrigger value="template" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-              <ClipboardList className="h-4 w-4 mr-2" />
-              Template
-            </TabsTrigger>
-            <TabsTrigger value="archive" className="data-[state=active]:bg-white data-[state=active]:text-[#1e3a8a] data-[state=active]:shadow-md">
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Statistieken
-            </TabsTrigger>
-          </TabsList>
-        </div>
+      <Tabs defaultValue="generate" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="generate">Rapporten Genereren</TabsTrigger>
+          <TabsTrigger value="preview">Voorvertoning & Bewerken</TabsTrigger>
+        </TabsList>
 
-        {/* Report Generation Tab */}
         <TabsContent value="generate" className="space-y-6">
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 space-y-6">
-            <h2 className="text-lg font-semibold mb-4">Genereer studentrapporten</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="template" className="text-sm font-medium">Rapport template</Label>
-                    <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
-                      <SelectTrigger id="template" className="mt-1">
-                        <SelectValue placeholder="Selecteer een template" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {templates.map(template => (
-                          <SelectItem key={template.id} value={template.id.toString()}>
-                            {template.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="period" className="text-sm font-medium">Academische periode</Label>
-                    <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
-                      <SelectTrigger id="period" className="mt-1">
-                        <SelectValue placeholder="Selecteer een periode" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {periods.map((period: any) => (
-                          <SelectItem key={period.id} value={period.id.toString()}>
-                            {period.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="class" className="text-sm font-medium">Klas filter</Label>
-                    <Select value={selectedClass} onValueChange={handleClassChange}>
-                      <SelectTrigger id="class" className="mt-1">
-                        <SelectValue placeholder="Alle studenten" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Alle studenten</SelectItem>
-                        {classes.map((cls: any) => (
-                          <SelectItem key={cls.id} value={cls.id.toString()}>
-                            {cls.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <div className="mt-6 space-y-4">
-                  <h3 className="text-md font-medium">Rapport onderdelen</h3>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="includeGrades" 
-                        checked={options.includeGrades}
-                        onCheckedChange={(checked) => setOptions({...options, includeGrades: checked === true})}
-                      />
-                      <Label htmlFor="includeGrades">Cijfers en resultaten</Label>
+          <Card>
+            <CardHeader>
+              <CardTitle>Rapport Instellingen</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Logo Upload */}
+              <div className="space-y-2">
+                <Label htmlFor="logo">School Logo</Label>
+                <div className="flex items-center gap-4">
+                  <Input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                  />
+                  <Button 
+                    variant="outline" 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Logo Uploaden
+                  </Button>
+                  {schoolLogo && (
+                    <div className="flex items-center gap-2">
+                      <img src={schoolLogo} alt="School logo" className="h-10 w-10 object-contain" />
+                      <span className="text-sm text-green-600">Logo geüpload</span>
                     </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="includeBehavior" 
-                        checked={options.includeBehavior}
-                        onCheckedChange={(checked) => setOptions({...options, includeBehavior: checked === true})}
-                      />
-                      <Label htmlFor="includeBehavior">Gedragsbeoordeling</Label>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="includeAttendance" 
-                        checked={options.includeAttendance}
-                        onCheckedChange={(checked) => setOptions({...options, includeAttendance: checked === true})}
-                      />
-                      <Label htmlFor="includeAttendance">Aanwezigheidsgegevens</Label>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="includeComments" 
-                        checked={options.includeComments}
-                        onCheckedChange={(checked) => setOptions({...options, includeComments: checked === true})}
-                      />
-                      <Label htmlFor="includeComments">Opmerkingen en feedback</Label>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="signature" 
-                        checked={options.signature}
-                        onCheckedChange={(checked) => setOptions({...options, signature: checked === true})}
-                      />
-                      <Label htmlFor="signature">Inclusief handtekening docent</Label>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
-              
-              <div className="flex flex-col h-full space-y-4">
-                <div>
-                  <Label htmlFor="search" className="sr-only">Zoek studenten</Label>
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                    <Input
-                      id="search"
-                      type="search"
-                      placeholder="Zoek studenten..."
-                      className="pl-8"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    {searchQuery && (
-                      <button 
-                        onClick={() => setSearchQuery('')}
-                        className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="border rounded-lg flex-grow overflow-hidden">
-                  <div className="flex items-center px-4 py-3 bg-gray-50 border-b">
-                    <div className="flex items-center">
-                      <Checkbox 
-                        id="selectAll" 
-                        checked={selectAll} 
-                        onCheckedChange={(checked) => setSelectAll(checked === true)}
-                      />
-                      <Label htmlFor="selectAll" className="ml-2 font-medium">Alle studenten selecteren</Label>
+
+              {/* Report Type Selection */}
+              <div className="grid grid-cols-2 gap-4">
+                <Card 
+                  className={`cursor-pointer transition-colors ${selectedReportType === 'class' ? 'border-blue-500 bg-blue-50' : ''}`}
+                  onClick={() => setSelectedReportType('class')}
+                >
+                  <CardContent className="flex items-center justify-center p-6">
+                    <Users className="h-8 w-8 mr-3 text-blue-600" />
+                    <div>
+                      <h3 className="font-semibold">Klasrapport</h3>
+                      <p className="text-sm text-gray-600">Alle studenten van een klas</p>
                     </div>
-                    <Badge className="ml-3" variant="secondary">{filteredStudents.length}</Badge>
+                  </CardContent>
+                </Card>
+
+                <Card 
+                  className={`cursor-pointer transition-colors ${selectedReportType === 'individual' ? 'border-blue-500 bg-blue-50' : ''}`}
+                  onClick={() => setSelectedReportType('individual')}
+                >
+                  <CardContent className="flex items-center justify-center p-6">
+                    <User className="h-8 w-8 mr-3 text-blue-600" />
+                    <div>
+                      <h3 className="font-semibold">Individueel Rapport</h3>
+                      <p className="text-sm text-gray-600">Eén specifieke student</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Selection Controls */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {selectedReportType === 'class' && (
+                  <div>
+                    <Label htmlFor="class">Selecteer Klas</Label>
+                    <Select value={selectedClass} onValueChange={setSelectedClass}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Kies een klas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {classesData?.map((cls: StudentGroup) => (
+                          <SelectItem key={cls.id} value={cls.id.toString()}>
+                            {cls.name} - {cls.academicYear}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  
-                  <div className="overflow-y-auto max-h-[350px]">
-                    {isLoadingStudents ? (
-                      <div className="flex justify-center py-12">
-                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                )}
+
+                {selectedReportType === 'individual' && (
+                  <div>
+                    <Label htmlFor="student">Selecteer Student</Label>
+                    <Select value={selectedStudent} onValueChange={setSelectedStudent}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Kies een student" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {studentsData?.map((student: Student) => (
+                          <SelectItem key={student.id} value={student.id.toString()}>
+                            {student.firstName} {student.lastName} ({student.studentId})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div>
+                  <Label htmlFor="period">Rapportperiode</Label>
+                  <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer periode" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {periodsData?.map((period: any) => (
+                        <SelectItem key={period.id} value={period.id.toString()}>
+                          {period.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <Button 
+                  onClick={generateReportData}
+                  disabled={!((selectedReportType === 'class' && selectedClass) || (selectedReportType === 'individual' && selectedStudent))}
+                  className="flex items-center gap-2"
+                >
+                  <FileText className="h-4 w-4" />
+                  Rapporten Genereren
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="preview" className="space-y-6">
+          {reportData.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-12">
+                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">Geen rapporten gegenereerd</h3>
+                <p className="text-gray-500">Ga naar de "Rapporten Genereren" tab om rapporten aan te maken.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Gegenereerde Rapporten ({reportData.length})</h2>
+                <Button onClick={generatePDF} className="flex items-center gap-2">
+                  <Download className="h-4 w-4" />
+                  Download PDF
+                </Button>
+              </div>
+
+              {reportData.map((report, index) => (
+                <Card key={index}>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>{report.student.firstName} {report.student.lastName}</span>
+                      <Badge variant="outline">{report.student.studentId}</Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Attendance Summary */}
+                    <div>
+                      <h4 className="font-semibold mb-3">Aanwezigheid</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-blue-600">{report.attendance.total}</div>
+                          <div className="text-sm text-gray-600">Totaal lessen</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-green-600">{report.attendance.present}</div>
+                          <div className="text-sm text-gray-600">Aanwezig</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-red-600">{report.attendance.absent}</div>
+                          <div className="text-sm text-gray-600">Afwezig</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-orange-600">{report.attendance.late}</div>
+                          <div className="text-sm text-gray-600">Te laat</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-blue-600">{report.attendance.percentage}%</div>
+                          <div className="text-sm text-gray-600">Aanwezigheid</div>
+                        </div>
                       </div>
-                    ) : filteredStudents.length === 0 ? (
-                      <div className="text-center py-8 bg-gray-50">
-                        <Users className="mx-auto h-12 w-12 text-gray-400" />
-                        <h3 className="mt-2 text-base font-medium text-gray-900">Geen studenten gevonden</h3>
-                        <p className="mt-1 text-sm text-gray-500">Er zijn geen studenten gevonden voor de geselecteerde criteria.</p>
-                      </div>
-                    ) : (
-                      <div className="divide-y">
-                        {filteredStudents.map(student => (
-                          <div key={student.id} className="flex items-center px-4 py-3 hover:bg-gray-50">
-                            <Checkbox 
-                              id={`student-${student.id}`} 
-                              checked={selectedStudents.includes(student.id)}
-                              onCheckedChange={() => handleToggleStudent(student.id)}
-                            />
-                            <div className="ml-3 flex-grow">
-                              <div className="flex items-center justify-between">
-                                <Label htmlFor={`student-${student.id}`} className="font-medium cursor-pointer">
-                                  {student.firstName} {student.lastName}
-                                </Label>
-                                <Badge variant="outline">{student.studentId}</Badge>
-                              </div>
-                              <div className="text-sm text-gray-500 flex gap-2">
-                                {student.programName && (
-                                  <span>{student.programName}</span>
-                                )}
-                              </div>
+                    </div>
+
+                    {/* Grades Summary */}
+                    <div>
+                      <h4 className="font-semibold mb-3">Cijfers per Vak</h4>
+                      <div className="space-y-2">
+                        {Object.entries(report.grades).map(([subject, grades]) => (
+                          <div key={subject} className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                            <span className="font-medium">{subject}</span>
+                            <div className="flex gap-4 text-sm">
+                              <span>Tests: {grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : 'Geen'}</span>
+                              <span>Taken: {grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : 'Geen'}</span>
+                              <span>Huiswerk: {grades.homework.length > 0 ? (grades.homework.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.homework.length).toFixed(1) : 'Geen'}</span>
+                              <span className="font-bold">Gem: {grades.average.toFixed(1)}</span>
                             </div>
                           </div>
                         ))}
                       </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex gap-2 justify-end">
-                  <Button 
-                    variant="outline" 
-                    onClick={handleDownloadReports}
-                    disabled={selectedStudents.length === 0}
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Rapporten downloaden
-                  </Button>
-                  <Button 
-                    onClick={handleGenerateReports}
-                    disabled={selectedStudents.length === 0 || !selectedTemplate || isGeneratingReports}
-                    className="bg-[#1e40af] hover:bg-[#1e40af]/90"
-                  >
-                    {isGeneratingReports ? (
-                      <>
-                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-e-transparent"></div>
-                        Bezig met genereren...
-                      </>
-                    ) : (
-                      <>
-                        <FileText className="mr-2 h-4 w-4" />
-                        Rapporten genereren
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
+                    </div>
 
-        {/* Template Tab */}
-        <TabsContent value="template" className="space-y-6">
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Rapport templates</h2>
-              <Button 
-                onClick={handleCreateNewTemplate}
-                className="bg-[#1e40af] hover:bg-[#1e40af]/90"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Nieuw template
-              </Button>
-            </div>
-            
-            {editingTemplate ? (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label htmlFor="template-name" className="text-sm font-medium">Template naam</Label>
-                    <Input
-                      id="template-name"
-                      value={editingTemplate.name}
-                      onChange={(e) => setEditingTemplate({...editingTemplate, name: e.target.value})}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="template-type" className="text-sm font-medium">Type rapport</Label>
-                    <Select 
-                      value={editingTemplate.type}
-                      onValueChange={(value) => setEditingTemplate({...editingTemplate, type: value})}
-                    >
-                      <SelectTrigger id="template-type" className="mt-1">
-                        <SelectValue placeholder="Selecteer type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="standard">Standaard rapport</SelectItem>
-                        <SelectItem value="midterm">Tussentijds rapport</SelectItem>
-                        <SelectItem value="final">Eindrapport</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-medium">Secties</h3>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleAddSection}
-                    >
-                      <Plus className="mr-2 h-3 w-3" />
-                      Sectie toevoegen
-                    </Button>
-                  </div>
-                  
-                  {editingTemplate.sections.map((section, index) => (
-                    <div key={section.id} className="mb-4 p-4 border rounded-md">
-                      <div className="flex justify-between items-center mb-2">
-                        <Input
-                          value={section.title}
-                          onChange={(e) => handleUpdateSection(index, { title: e.target.value })}
-                          className="font-medium border-0 p-0 h-auto text-lg focus-visible:ring-0 focus-visible:ring-offset-0"
-                        />
-                        <button
-                          onClick={() => handleRemoveSection(index)}
-                          className="text-gray-400 hover:text-red-500"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                      
-                      <div className="mb-3">
-                        <Label htmlFor={`section-type-${index}`} className="text-sm font-medium">Type sectie</Label>
-                        <Select 
-                          value={section.type}
-                          onValueChange={(value) => handleUpdateSection(index, { type: value as any })}
-                        >
-                          <SelectTrigger id={`section-type-${index}`} className="mt-1">
-                            <SelectValue placeholder="Selecteer type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="grades">Cijferoverzicht</SelectItem>
-                            <SelectItem value="behavior">Gedragsbeoordeling</SelectItem>
-                            <SelectItem value="attendance">Aanwezigheid</SelectItem>
-                            <SelectItem value="comments">Opmerkingen</SelectItem>
-                            <SelectItem value="custom">Aangepast</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      {(section.type === 'comments' || section.type === 'custom') && (
+                    {/* Behavior Grade */}
+                    <div>
+                      <h4 className="font-semibold mb-3">Gedragsbeoordeling</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor={`section-content-${index}`} className="text-sm font-medium">Inhoud</Label>
-                          <Textarea
-                            id={`section-content-${index}`}
-                            value={section.content || ''}
-                            onChange={(e) => handleUpdateSection(index, { content: e.target.value })}
-                            rows={4}
-                            className="mt-1"
+                          <Label htmlFor={`behavior-grade-${report.student.id}`}>Gedragscijfer (1-10)</Label>
+                          <Input
+                            id={`behavior-grade-${report.student.id}`}
+                            type="number"
+                            min="1"
+                            max="10"
+                            value={behaviorGrades[report.student.id]?.grade || 7}
+                            onChange={(e) => updateBehaviorGrade(
+                              report.student.id, 
+                              parseInt(e.target.value), 
+                              behaviorGrades[report.student.id]?.comments || ''
+                            )}
                           />
                         </div>
-                      )}
+                        <div>
+                          <Label htmlFor={`behavior-comments-${report.student.id}`}>Opmerkingen gedrag</Label>
+                          <Textarea
+                            id={`behavior-comments-${report.student.id}`}
+                            value={behaviorGrades[report.student.id]?.comments || ''}
+                            onChange={(e) => updateBehaviorGrade(
+                              report.student.id,
+                              behaviorGrades[report.student.id]?.grade || 7,
+                              e.target.value
+                            )}
+                            placeholder="Opmerkingen over gedrag..."
+                          />
+                        </div>
+                      </div>
                     </div>
-                  ))}
-                </div>
-                
-                <div className="flex justify-end gap-2 pt-4 border-t">
-                  <Button
-                    variant="outline"
-                    onClick={() => setEditingTemplate(null)}
-                  >
-                    Annuleren
-                  </Button>
-                  <Button
-                    onClick={handleSaveTemplate}
-                    disabled={saveTemplateMutation.isPending}
-                    className="bg-[#1e40af] hover:bg-[#1e40af]/90"
-                  >
-                    {saveTemplateMutation.isPending ? (
-                      <>
-                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-e-transparent"></div>
-                        Opslaan...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="mr-2 h-4 w-4" />
-                        Template opslaan
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div>
-                {templates.length === 0 ? (
-                  <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                    <ClipboardList className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-base font-medium text-gray-900">Geen templates gevonden</h3>
-                    <p className="mt-1 text-sm text-gray-500 max-w-md mx-auto">
-                      Er zijn nog geen rapport templates aangemaakt. Maak een nieuw template om te beginnen.
-                    </p>
-                    <Button 
-                      onClick={handleCreateNewTemplate}
-                      className="mt-4 bg-[#1e40af] hover:bg-[#1e40af]/90"
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Nieuw template aanmaken
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {templates.map(template => (
-                      <Card key={template.id} className="border shadow-sm">
-                        <CardHeader className="pb-2 pt-4">
-                          <CardTitle className="text-lg">{template.name}</CardTitle>
-                          <div className="flex gap-1 mt-1">
-                            <Badge variant="outline">{template.type}</Badge>
-                            <Badge variant="secondary" className="text-xs">
-                              {template.sections.length} secties
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="text-sm text-gray-500 pt-2">
-                          <p>Gemaakt: {new Date(template.createdDate).toLocaleDateString('nl-NL')}</p>
-                          <p>Laatst bewerkt: {new Date(template.lastModified).toLocaleDateString('nl-NL')}</p>
-                        </CardContent>
-                        <CardContent className="pt-0">
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditTemplate(template)}
-                              className="flex-1"
-                            >
-                              <Edit className="mr-2 h-4 w-4" />
-                              Bewerken
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteTemplate(template.id)}
-                              className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Verwijderen
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </TabsContent>
 
-        {/* Archive/Statistics Tab */}
-        <TabsContent value="archive" className="space-y-6">
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <h2 className="text-lg font-semibold mb-6">Rapport statistieken en analyses</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">Totaal aantal rapporten</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">143</div>
-                  <p className="text-xs text-gray-500 mt-1">Dit academisch jaar</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">Gegenereerd deze maand</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">38</div>
-                  <p className="text-xs text-gray-500 mt-1">Vorige maand: 65</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">Populairste template</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-xl font-bold">Standaard rapport</div>
-                  <p className="text-xs text-gray-500 mt-1">76% van alle rapporten</p>
-                </CardContent>
-              </Card>
+                    {/* General Comments */}
+                    <div>
+                      <Label htmlFor={`general-comments-${report.student.id}`}>Algemene opmerkingen</Label>
+                      <Textarea
+                        id={`general-comments-${report.student.id}`}
+                        value={generalComments[report.student.id] || ''}
+                        onChange={(e) => updateGeneralComments(report.student.id, e.target.value)}
+                        placeholder="Algemene opmerkingen voor het rapport..."
+                        rows={4}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-            
-            <div className="rounded-lg border bg-gray-50 p-8 text-center">
-              <BarChart className="h-16 w-16 text-gray-300 mx-auto" />
-              <h3 className="mt-4 text-lg font-medium">Geavanceerde statistieken binnenkort beschikbaar</h3>
-              <p className="mt-2 text-sm text-gray-500 max-w-md mx-auto">
-                Gedetailleerde rapportagestatistieken en analyses zullen binnenkort beschikbaar zijn in een toekomstige update.
-              </p>
-            </div>
-          </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

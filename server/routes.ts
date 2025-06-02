@@ -4986,6 +4986,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
+  // ********************
+  // Reports API endpoints
+  // ********************
+  
+  // Get attendance data for a specific student
+  apiRouter.get("/api/attendance/student/:studentId", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      if (isNaN(studentId)) {
+        return res.status(400).json({ message: "Invalid student ID format" });
+      }
+
+      const { tempAttendanceStorage } = await import('./temp-attendance-storage');
+      
+      // Get all attendance records and filter by student
+      const allDates = Array.from({ length: 30 }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        return date.toISOString().split('T')[0];
+      });
+
+      const attendanceRecords = [];
+      for (const dateStr of allDates) {
+        const dayRecords = tempAttendanceStorage.getAttendanceByDate(dateStr);
+        const studentRecords = dayRecords.filter(record => record.studentId === studentId);
+        attendanceRecords.push(...studentRecords);
+      }
+
+      res.json(attendanceRecords);
+    } catch (error) {
+      console.error("Error fetching student attendance:", error);
+      res.status(500).json({ message: "Error fetching student attendance" });
+    }
+  });
+
+  // Get grades data for a specific student
+  apiRouter.get("/api/grades/student/:studentId", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      if (isNaN(studentId)) {
+        return res.status(400).json({ message: "Invalid student ID format" });
+      }
+
+      const grades = await storage.getGradesByStudent(studentId);
+      
+      // Enrich grades with program names
+      const programs = await storage.getPrograms();
+      const enrichedGrades = grades.map(grade => ({
+        ...grade,
+        programName: programs.find(p => p.id === grade.programId)?.name || `Vak ${grade.programId}`
+      }));
+
+      res.json(enrichedGrades);
+    } catch (error) {
+      console.error("Error fetching student grades:", error);
+      res.status(500).json({ message: "Error fetching student grades" });
+    }
+  });
+
+  // Get academic periods
+  apiRouter.get("/api/academic-periods", async (req, res) => {
+    try {
+      // Create some default academic periods
+      const periods = [
+        {
+          id: 1,
+          name: "Schooljaar 2024-2025",
+          startDate: "2024-09-01",
+          endDate: "2025-07-31"
+        },
+        {
+          id: 2,
+          name: "Eerste Semester 2024-2025",
+          startDate: "2024-09-01",
+          endDate: "2025-01-31"
+        },
+        {
+          id: 3,
+          name: "Tweede Semester 2024-2025",
+          startDate: "2025-02-01",
+          endDate: "2025-07-31"
+        }
+      ];
+      
+      res.json(periods);
+    } catch (error) {
+      console.error("Error fetching academic periods:", error);
+      res.status(500).json({ message: "Error fetching academic periods" });
+    }
+  });
+
   // creëer HTTP server
   const server = createServer(app);
 

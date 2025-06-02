@@ -1133,14 +1133,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.get("/api/attendance/date/:date", async (req, res) => {
     try {
-      const date = new Date(req.params.date);
-      if (isNaN(date.getTime())) {
+      const dateStr = req.params.date;
+      if (!dateStr) {
         return res.status(400).json({ message: "Invalid date format" });
       }
       
-      const attendanceRecords = await storage.getAttendanceByDate(date);
+      const { tempAttendanceStorage } = await import('./temp-attendance-storage');
+      const attendanceRecords = tempAttendanceStorage.getAttendanceByDate(dateStr);
       res.json(attendanceRecords);
     } catch (error) {
+      console.error("Error fetching attendance by date:", error);
       res.status(500).json({ message: "Error fetching attendance records by date" });
     }
   });
@@ -1258,12 +1260,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.get("/api/teacher-attendance/date/:date", async (req, res) => {
     try {
-      const date = new Date(req.params.date);
-      if (isNaN(date.getTime())) {
+      const dateStr = req.params.date;
+      if (!dateStr) {
         return res.status(400).json({ message: "Invalid date format" });
       }
       
-      const attendanceRecords = await storage.getTeacherAttendanceByDate(date);
+      const { tempAttendanceStorage } = await import('./temp-attendance-storage');
+      const attendanceRecords = tempAttendanceStorage.getTeacherAttendanceByDate(dateStr);
       res.json(attendanceRecords);
     } catch (error) {
       console.error("Error fetching teacher attendance records by date:", error);
@@ -4886,36 +4889,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Attendance records must be an array" });
       }
       
-      const savedRecords = [];
-      
-      for (const record of attendanceRecords) {
-        // Check if attendance record already exists for this student, course and date
-        const existingRecords = await storage.getAttendanceByDate(new Date(record.date));
-        const existingRecord = existingRecords.find(r => 
-          r.studentId === record.studentId && 
-          r.courseId === record.courseId && 
-          r.date === record.date
-        );
-        
-        if (existingRecord) {
-          // Update existing record
-          const updatedRecord = await storage.updateAttendance(existingRecord.id, {
-            status: record.status,
-            teacherId: record.teacherId
-          });
-          savedRecords.push(updatedRecord);
-        } else {
-          // Create new record
-          const newRecord = await storage.createAttendance({
-            studentId: record.studentId,
-            courseId: record.courseId,
-            teacherId: record.teacherId,
-            date: record.date,
-            status: record.status
-          });
-          savedRecords.push(newRecord);
-        }
-      }
+      const { tempAttendanceStorage } = await import('./temp-attendance-storage');
+      const savedRecords = tempAttendanceStorage.createBatchAttendance(attendanceRecords);
       
       res.json({ success: true, saved: savedRecords.length });
     } catch (error) {

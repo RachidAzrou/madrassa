@@ -1285,17 +1285,21 @@ export default function Teachers() {
       />
 
       {/* Dialoogvenster voor bekijken van docent gegevens */}
-      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
-        <DialogContent className="sm:max-w-[95vw] lg:max-w-[85vw] p-0 max-h-[95vh] overflow-hidden">
-          <DialogHeaderWithIcon
-            icon={<GraduationCap className="h-5 w-5" />}
-            title="Docent Details"
-            description="Overzicht van alle docentgegevens en informatie"
-          />
-          
-          {selectedTeacher && (
-            <div className="flex-1 overflow-y-auto">
-              <div className="p-4 sm:p-6 space-y-6">
+      <CustomDialog 
+        open={showViewDialog} 
+        onOpenChange={setShowViewDialog}
+        maxWidth="1200px"
+        className="overflow-hidden"
+      >
+        <DialogHeaderWithIcon
+          icon={<GraduationCap className="h-5 w-5" />}
+          title="Docent Details"
+          description="Overzicht van alle docentgegevens en informatie"
+        />
+        
+        {selectedTeacher && (
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-4 sm:p-6 space-y-6">
                 {/* Header met foto en basisgegevens */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                   <div className="p-6">
@@ -1560,8 +1564,7 @@ export default function Teachers() {
               Bewerken
             </Button>
           </DialogFooterContainer>
-        </DialogContent>
-      </Dialog>
+      </CustomDialog>
 
       {/* Dialoogvenster voor nieuwe docent */}
       <Dialog open={showNewTeacherDialog} onOpenChange={setShowNewTeacherDialog}>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Download, Save, Plus, X, Edit, Trash2, AlertCircle, Percent, XCircle } from 'lucide-react';
+import { Search, Download, Save, Plus, X, Edit, Trash2, AlertCircle, Percent, XCircle, User, BookOpen, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -556,12 +556,28 @@ export default function Cijfers() {
                     <div className="overflow-x-auto">
                       <Table>
                         <TableHeader>
-                          <TableRow>
-                            <TableHead className="w-[250px]">Student</TableHead>
+                          <TableRow className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b-2 border-blue-200">
+                            <TableHead className="w-[250px] font-semibold text-gray-700 py-4">
+                              <div className="flex items-center gap-2">
+                                <User className="h-4 w-4" />
+                                Student
+                              </div>
+                            </TableHead>
                             {subjects.map((subject) => (
-                              <TableHead key={subject.id}>{subject.name}</TableHead>
+                              <TableHead key={subject.id} className="text-center font-semibold text-gray-700 py-4">
+                                <div className="flex flex-col items-center gap-1">
+                                  <BookOpen className="h-4 w-4 text-blue-600" />
+                                  <span>{subject.name}</span>
+                                  <span className="text-xs text-gray-500 font-normal">{subject.code}</span>
+                                </div>
+                              </TableHead>
                             ))}
-                            <TableHead className="text-right">Gemiddelde</TableHead>
+                            <TableHead className="text-right font-semibold text-gray-700 py-4">
+                              <div className="flex items-center justify-end gap-2">
+                                <Calculator className="h-4 w-4" />
+                                Gemiddelde
+                              </div>
+                            </TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -651,8 +667,18 @@ export default function Cijfers() {
                               ))}
                               
                               <TableCell className="text-right">
-                                <div className="font-medium">
-                                  {calculateAverage(student.id)?.toFixed(1) || '-'}
+                                <div className="flex items-center justify-end gap-2">
+                                  <span className={`
+                                    font-semibold text-lg px-3 py-1 rounded-full
+                                    ${calculateAverage(student.id) ? 
+                                      calculateAverage(student.id)! >= 5.5 ? 
+                                        'bg-green-100 text-green-700 border border-green-200' : 
+                                        'bg-red-100 text-red-700 border border-red-200'
+                                      : 'bg-gray-100 text-gray-500'
+                                    }
+                                  `}>
+                                    {calculateAverage(student.id)?.toFixed(1) || '-'}
+                                  </span>
                                 </div>
                               </TableCell>
                             </TableRow>

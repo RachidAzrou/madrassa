@@ -461,26 +461,38 @@ export class DatabaseStorage implements IStorage {
   
   async getStudentGuardiansByStudent(studentId: number): Promise<any[]> {
     try {
-      // Haal relaties en voogd informatie op met JOIN
-      const result = await db
-        .select({
-          id: studentGuardians.id,
-          studentId: studentGuardians.studentId,
-          guardianId: studentGuardians.guardianId,
-          relationship: studentGuardians.relationship,
-          createdAt: studentGuardians.createdAt,
-          firstName: guardians.firstName,
-          lastName: guardians.lastName,
-          email: guardians.email,
-          phone: guardians.phone,
-          isEmergencyContact: guardians.isEmergencyContact,
-          emergencyContactName: guardians.emergencyContactName,
-          emergencyContactPhone: guardians.emergencyContactPhone,
-          emergencyContactRelation: guardians.emergencyContactRelation
-        })
+      // Eerste stap: haal de relaties op
+      const relations = await db
+        .select()
         .from(studentGuardians)
-        .innerJoin(guardians, eq(studentGuardians.guardianId, guardians.id))
         .where(eq(studentGuardians.studentId, studentId));
+
+      if (relations.length === 0) {
+        return [];
+      }
+
+      // Tweede stap: haal voor elke relatie de voogd informatie op
+      const result = [];
+      for (const relation of relations) {
+        const [guardian] = await db
+          .select()
+          .from(guardians)
+          .where(eq(guardians.id, relation.guardianId));
+
+        if (guardian) {
+          result.push({
+            ...relation,
+            firstName: guardian.firstName,
+            lastName: guardian.lastName,
+            email: guardian.email,
+            phone: guardian.phone,
+            isEmergencyContact: guardian.isEmergencyContact,
+            emergencyContactName: guardian.emergencyContactName,
+            emergencyContactPhone: guardian.emergencyContactPhone,
+            emergencyContactRelation: guardian.emergencyContactRelation
+          });
+        }
+      }
 
       return result;
     } catch (error) {

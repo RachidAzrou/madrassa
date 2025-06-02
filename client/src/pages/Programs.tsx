@@ -193,6 +193,9 @@ export default function Programs() {
         duration: 4,
         department: '',
         isActive: true,
+        entryRequirements: '',
+        learningObjectives: '',
+        competencies: '',
         assignedClasses: [],
         assignedTeachers: [],
       });

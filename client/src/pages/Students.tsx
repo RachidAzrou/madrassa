@@ -1857,7 +1857,7 @@ export default function Students() {
                     </SelectTrigger>
                     <SelectContent className="bg-white border-[#e5e7eb]">
                       {isGroupsLoading ? (
-                        <SelectItem value="" disabled>Klassen laden...</SelectItem>
+                        <SelectItem value="loading" disabled>Klassen laden...</SelectItem>
                       ) : studentGroupsData && studentGroupsData.length > 0 ? (
                         studentGroupsData.map((group: any) => (
                           <SelectItem 
@@ -1869,7 +1869,7 @@ export default function Students() {
                           </SelectItem>
                         ))
                       ) : (
-                        <SelectItem value="" disabled>Geen klassen beschikbaar</SelectItem>
+                        <SelectItem value="no-classes" disabled>Geen klassen beschikbaar</SelectItem>
                       )}
                     </SelectContent>
                   </Select>

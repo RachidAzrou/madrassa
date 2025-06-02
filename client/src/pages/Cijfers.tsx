@@ -33,6 +33,23 @@ import { PremiumHeader } from '@/components/layout/premium-header';
 export default function Cijfers() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Haal echte programs/courses op uit database
+  const { data: programsData } = useQuery({
+    queryKey: ['/api/programs'],
+    staleTime: 300000,
+  });
+
+  const { data: coursesData } = useQuery({
+    queryKey: ['/api/courses'],
+    staleTime: 300000,
+  });
+
+  // Extract subjects from programs and courses
+  const subjects = [
+    ...(programsData?.programs || []).map((program: any) => ({ id: program.id, name: program.name })),
+    ...(coursesData?.courses || []).map((course: any) => ({ id: course.id, name: course.name }))
+  ];
   
   const [activeTab, setActiveTab] = useState('grades'); // 'grades' of 'behavior'
   const [selectedClass, setSelectedClass] = useState(''); 
@@ -187,14 +204,14 @@ export default function Cijfers() {
         setSubjectGrades(newSubjectGrades);
       } 
       // Anders genereer dummy cijfers voor demo
-      else if (Object.keys(subjectGrades).length === 0) {
+      else if (Object.keys(subjectGrades).length === 0 && subjects.length > 0) {
         console.log("Genereren dummy cijfers voor demo");
-        const subjects = ['Arabisch', 'Islamitische Geschiedenis', 'Koran', 'Fiqh', 'Aqidah'];
+        const subjectNames = subjects.map(s => s.name);
         const newSubjectGrades: Record<string, Record<string, number>> = {};
         
         students.forEach(student => {
           newSubjectGrades[student.id] = {};
-          subjects.forEach(subject => {
+          subjectNames.forEach(subject => {
             // Genereer een willekeurig cijfer tussen 5.5 en 9.5
             newSubjectGrades[student.id][subject] = Math.round((Math.random() * 4 + 5.5) * 10) / 10;
           });
@@ -974,11 +991,11 @@ export default function Cijfers() {
                       <SelectValue placeholder="Selecteer een vak" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Arabisch">Arabisch</SelectItem>
-                      <SelectItem value="Islamitische Geschiedenis">Islamitische Geschiedenis</SelectItem>
-                      <SelectItem value="Koran">Koran</SelectItem>
-                      <SelectItem value="Fiqh">Fiqh</SelectItem>
-                      <SelectItem value="Aqidah">Aqidah</SelectItem>
+                      {subjects.map((subject) => (
+                        <SelectItem key={subject.id} value={subject.name}>
+                          {subject.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

@@ -388,7 +388,6 @@ export default function Cijfers() {
         icon={Calculator}
         description="Beheer cijfers en beoordelingen per klas en vak"
       />
-
       <div className="flex-1 p-6">
         <div className="max-w-6xl mx-auto space-y-6">
           
@@ -674,7 +673,7 @@ export default function Cijfers() {
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <Target className="h-5 w-5 text-blue-600" />
-                      <span className="font-medium text-blue-800">Assessment Details</span>
+                      <span className="font-medium text-blue-800">Beoordelingsdetails</span>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
@@ -788,7 +787,6 @@ export default function Cijfers() {
           )}
         </div>
       </div>
-
       {/* Add Assessment Dialog */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
         <DialogContent className="sm:max-w-[600px]" noPadding>
@@ -887,7 +885,6 @@ export default function Cijfers() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <DialogContent className="sm:max-w-[500px]" noPadding>

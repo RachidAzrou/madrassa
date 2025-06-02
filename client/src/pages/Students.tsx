@@ -525,9 +525,47 @@ export default function Students() {
         }
       }
       
+      // Stap 3: Verwerk toegevoegde voogden
+      if (newStudentGuardians.length > 0) {
+        try {
+          for (const guardian of newStudentGuardians) {
+            // Controleer of de voogd al bestaat
+            const existingGuardian = await apiRequest(`/api/guardians/email/${encodeURIComponent(guardian.email || 'no-email')}`, {
+              method: 'GET'
+            }).catch(() => null);
+            
+            let guardianId;
+            if (existingGuardian) {
+              guardianId = existingGuardian.id;
+            } else {
+              // Maak nieuwe voogd aan
+              const newGuardian = await apiRequest('/api/guardians', {
+                method: 'POST',
+                body: guardian
+              });
+              guardianId = newGuardian.id;
+            }
+            
+            // Koppel voogd aan student
+            await apiRequest('/api/student-guardians', {
+              method: 'POST',
+              body: {
+                studentId: selectedStudent.id,
+                guardianId: guardianId,
+                relationship: guardian.relationship || 'parent'
+              }
+            });
+          }
+          console.log('Voogden toegevoegd');
+        } catch (guardianError) {
+          console.warn('Voogden konden niet worden toegevoegd:', guardianError);
+        }
+      }
+      
       // Refresh de students data
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
       queryClient.invalidateQueries({ queryKey: ['/api/student-group-enrollments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
       
       toast({
         title: "Succes",
@@ -537,6 +575,7 @@ export default function Students() {
       setIsEditDialogOpen(false);
       setEditFormData(emptyFormData);
       setSelectedStudent(null);
+      setNewStudentGuardians([]);
     } catch (error) {
       console.error('Fout bij het bijwerken van student:', error);
       toast({

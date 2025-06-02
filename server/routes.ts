@@ -2479,22 +2479,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Deactivating all enrollments for student ${studentId}`);
       
-      // Update alle actieve enrollments naar inactive
-      const result = await db
-        .update(studentGroupEnrollments)
-        .set({ 
-          status: 'inactive'
-        })
-        .where(
-          and(
-            eq(studentGroupEnrollments.studentId, studentId),
-            eq(studentGroupEnrollments.status, 'active')
-          )
-        )
+      // Verwijder alle bestaande enrollments voor deze student (actief en inactief)
+      const deleteResult = await db
+        .delete(studentGroupEnrollments)
+        .where(eq(studentGroupEnrollments.studentId, studentId))
         .returning();
       
-      console.log(`Deactivated ${result.length} enrollments for student ${studentId}`);
-      res.json({ message: "All active enrollments deactivated successfully", count: result.length });
+      console.log(`Deleted ${deleteResult.length} enrollments for student ${studentId}`);
+      res.json({ message: "All enrollments deleted successfully", count: deleteResult.length });
     } catch (error) {
       console.error("Error deactivating enrollments:", error);
       res.status(500).json({ message: "Error deactivating student enrollments" });

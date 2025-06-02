@@ -10,7 +10,8 @@ import {
   students, teachers, guardians, studentGuardians, studentSiblings, type StudentSibling, type InsertStudentSibling,
   studentGroupEnrollments,
   grades, type Grade, type InsertGrade,
-  assessments, type Assessment, type InsertAssessment
+  assessments, type Assessment, type InsertAssessment,
+  attendance, teacherAttendance, type Attendance, type TeacherAttendance, type InsertAttendance, type InsertTeacherAttendance
 } from "@shared/schema";
 import { db } from "./db";
 import { and, eq, sql, count, desc, inArray } from "drizzle-orm";
@@ -1172,9 +1173,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Attendance methods
-  async createAttendance(attendance: any): Promise<any> {
+  async createAttendance(attendanceData: any): Promise<any> {
     try {
-      const [newAttendance] = await db.insert(attendanceRecords).values(attendance).returning();
+      const [newAttendance] = await db.insert(attendance).values(attendanceData).returning();
       return newAttendance;
     } catch (error) {
       console.error('Error creating attendance:', error);
@@ -1187,8 +1188,8 @@ export class DatabaseStorage implements IStorage {
       const dateStr = date.toISOString().split('T')[0];
       const records = await db
         .select()
-        .from(attendanceRecords)
-        .where(eq(attendanceRecords.date, dateStr));
+        .from(attendance)
+        .where(eq(attendance.date, dateStr));
       return records;
     } catch (error) {
       console.error('Error getting attendance by date:', error);
@@ -1199,13 +1200,25 @@ export class DatabaseStorage implements IStorage {
   async getAttendanceByClassAndDate(classId: number, date: Date): Promise<any[]> {
     try {
       const dateStr = date.toISOString().split('T')[0];
+      // Voor student groups moeten we kijken naar studenten die in die klas zitten
+      // en hun aanwezigheid voor die datum ophalen
+      const enrollments = await db
+        .select()
+        .from(studentGroupEnrollments)
+        .where(eq(studentGroupEnrollments.groupId, classId));
+      
+      if (enrollments.length === 0) {
+        return [];
+      }
+      
+      const studentIds = enrollments.map(e => e.studentId);
       const records = await db
         .select()
-        .from(attendanceRecords)
+        .from(attendance)
         .where(
           and(
-            eq(attendanceRecords.classId, classId),
-            eq(attendanceRecords.date, dateStr)
+            inArray(attendance.studentId, studentIds),
+            eq(attendance.date, dateStr)
           )
         );
       return records;
@@ -1219,8 +1232,8 @@ export class DatabaseStorage implements IStorage {
     try {
       const records = await db
         .select()
-        .from(attendanceRecords)
-        .where(eq(attendanceRecords.studentId, studentId));
+        .from(attendance)
+        .where(eq(attendance.studentId, studentId));
       return records;
     } catch (error) {
       console.error('Error getting attendance by student:', error);
@@ -1232,8 +1245,8 @@ export class DatabaseStorage implements IStorage {
     try {
       const records = await db
         .select()
-        .from(attendanceRecords)
-        .where(eq(attendanceRecords.courseId, courseId));
+        .from(attendance)
+        .where(eq(attendance.courseId, courseId));
       return records;
     } catch (error) {
       console.error('Error getting attendance by course:', error);
@@ -1241,12 +1254,12 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async updateAttendance(id: number, attendance: any): Promise<any | undefined> {
+  async updateAttendance(id: number, attendanceData: any): Promise<any | undefined> {
     try {
       const [updatedAttendance] = await db
-        .update(attendanceRecords)
-        .set(attendance)
-        .where(eq(attendanceRecords.id, id))
+        .update(attendance)
+        .set(attendanceData)
+        .where(eq(attendance.id, id))
         .returning();
       return updatedAttendance || undefined;
     } catch (error) {
@@ -1257,7 +1270,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteAttendance(id: number): Promise<boolean> {
     try {
-      const result = await db.delete(attendanceRecords).where(eq(attendanceRecords.id, id));
+      const result = await db.delete(attendance).where(eq(attendance.id, id));
       return (result.rowCount || 0) > 0;
     } catch (error) {
       console.error('Error deleting attendance:', error);
@@ -1266,9 +1279,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Teacher attendance methods
-  async createTeacherAttendance(attendance: any): Promise<any> {
+  async createTeacherAttendance(attendanceData: any): Promise<any> {
     try {
-      const [newAttendance] = await db.insert(teacherAttendanceRecords).values(attendance).returning();
+      const [newAttendance] = await db.insert(teacherAttendance).values(attendanceData).returning();
       return newAttendance;
     } catch (error) {
       console.error('Error creating teacher attendance:', error);
@@ -1278,7 +1291,7 @@ export class DatabaseStorage implements IStorage {
 
   async getTeacherAttendanceRecords(): Promise<any[]> {
     try {
-      const records = await db.select().from(teacherAttendanceRecords);
+      const records = await db.select().from(teacherAttendance);
       return records;
     } catch (error) {
       console.error('Error getting teacher attendance records:', error);
@@ -1291,8 +1304,8 @@ export class DatabaseStorage implements IStorage {
       const dateStr = date.toISOString().split('T')[0];
       const records = await db
         .select()
-        .from(teacherAttendanceRecords)
-        .where(eq(teacherAttendanceRecords.date, dateStr));
+        .from(teacherAttendance)
+        .where(eq(teacherAttendance.date, dateStr));
       return records;
     } catch (error) {
       console.error('Error getting teacher attendance by date:', error);
@@ -1304,8 +1317,8 @@ export class DatabaseStorage implements IStorage {
     try {
       const records = await db
         .select()
-        .from(teacherAttendanceRecords)
-        .where(eq(teacherAttendanceRecords.teacherId, teacherId));
+        .from(teacherAttendance)
+        .where(eq(teacherAttendance.teacherId, teacherId));
       return records;
     } catch (error) {
       console.error('Error getting teacher attendance by teacher:', error);
@@ -1317,8 +1330,8 @@ export class DatabaseStorage implements IStorage {
     try {
       const records = await db
         .select()
-        .from(teacherAttendanceRecords)
-        .where(eq(teacherAttendanceRecords.courseId, courseId));
+        .from(teacherAttendance)
+        .where(eq(teacherAttendance.courseId, courseId));
       return records;
     } catch (error) {
       console.error('Error getting teacher attendance by course:', error);
@@ -1330,8 +1343,8 @@ export class DatabaseStorage implements IStorage {
     try {
       const [record] = await db
         .select()
-        .from(teacherAttendanceRecords)
-        .where(eq(teacherAttendanceRecords.id, id));
+        .from(teacherAttendance)
+        .where(eq(teacherAttendance.id, id));
       return record || undefined;
     } catch (error) {
       console.error('Error getting teacher attendance record:', error);

@@ -674,37 +674,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Programs API endpoints
   apiRouter.get("/api/programs", async (req, res) => {
     try {
-      // Return sample Islamic education programs for now
-      const programs = [
-        {
-          id: 1,
-          name: "Arabisch Taal",
-          code: "AR1",
-          description: "Basis Arabische taal en grammatica",
-          duration: 1,
-          department: "Taalonderwijs",
-          isActive: true
-        },
-        {
-          id: 2,
-          name: "Koran Studies",
-          code: "QS1", 
-          description: "Koranrecitatie en tafsir",
-          duration: 1,
-          department: "Islamitische Studies",
-          isActive: true
-        },
-        {
-          id: 3,
-          name: "Fiqh",
-          code: "FQ1",
-          description: "Islamitische jurisprudentie",
-          duration: 1,
-          department: "Islamitische Studies", 
-          isActive: true
-        }
-      ];
-      res.json({ programs, totalCount: programs.length });
+      const programs = await storage.getPrograms();
+      
+      // Voor elk programma, haal toegewezen docenten op
+      const programsWithTeachers = await Promise.all(
+        programs.map(async (program) => {
+          const teacherAssignments = await db.execute(sql`
+            SELECT t.id, t.first_name, t.last_name, pt.is_primary
+            FROM program_teachers pt
+            JOIN teachers t ON pt.teacher_id = t.id
+            WHERE pt.program_id = ${program.id}
+          `);
+          
+          const assignedTeachers = teacherAssignments.rows.map((row: any) => ({
+            id: row.id,
+            name: `${row.first_name} ${row.last_name}`,
+            isPrimary: row.is_primary
+          }));
+          
+          return {
+            ...program,
+            assignedTeachers
+          };
+        })
+      );
+      
+      res.json({ programs: programsWithTeachers, totalCount: programsWithTeachers.length });
     } catch (error) {
       console.error("Error fetching programs:", error);
       res.status(500).json({ message: "Error fetching programs" });
@@ -713,13 +708,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.post("/api/programs", async (req, res) => {
     try {
-      const validatedData = insertProgramSchema.parse(req.body);
+      const { assignedTeachers, ...programData } = req.body;
+      const validatedData = insertProgramSchema.parse(programData);
       const newProgram = await storage.createProgram(validatedData);
+      
+      // Sla toegewezen docenten op in de database
+      if (assignedTeachers && Array.isArray(assignedTeachers)) {
+        for (const teacher of assignedTeachers) {
+          if (teacher.selected && teacher.id) {
+            try {
+              await db.execute(sql`
+                INSERT INTO program_teachers (program_id, teacher_id, is_primary) 
+                VALUES (${newProgram.id}, ${parseInt(teacher.id)}, ${teacher.isPrimary || false})
+                ON CONFLICT (program_id, teacher_id) DO NOTHING
+              `);
+            } catch (error) {
+              console.error('Error assigning teacher to program:', error);
+            }
+          }
+        }
+      }
+      
       res.status(201).json(newProgram);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
+      console.error('Error creating program:', error);
       res.status(500).json({ message: "Error creating program" });
     }
   });

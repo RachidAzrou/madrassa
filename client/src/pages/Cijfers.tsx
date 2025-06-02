@@ -401,7 +401,7 @@ export default function Cijfers() {
                       </TableHeader>
                       <TableBody>
                         {Array.isArray(assessmentsData) && assessmentsData.length > 0 ? assessmentsData.map((assessment: any) => (
-                          <TableRow key={assessment.id} className="hover:bg-gray-50">
+                          <TableRow key={assessment.id} className="hover:bg-gray-50 group">
                             <TableCell className="font-medium">{assessment.name}</TableCell>
                             <TableCell>
                               <Badge variant="outline" className="flex items-center gap-1 w-fit">
@@ -425,7 +425,7 @@ export default function Cijfers() {
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              <div className="flex items-center justify-end gap-1">
+                              <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                 <Button 
                                   variant="ghost" 
                                   size="sm"

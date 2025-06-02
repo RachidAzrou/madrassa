@@ -35,21 +35,16 @@ export default function Cijfers() {
   const queryClient = useQueryClient();
 
   // Haal echte programs/courses op uit database
-  const { data: programsData } = useQuery({
-    queryKey: ['/api/programs'],
-    staleTime: 300000,
-  });
-
   const { data: coursesData } = useQuery({
     queryKey: ['/api/courses'],
     staleTime: 300000,
   });
 
-  // Extract subjects from programs and courses
-  const subjects = [
-    ...(programsData?.programs || []).map((program: any) => ({ id: program.id, name: program.name })),
-    ...(coursesData?.courses || []).map((course: any) => ({ id: course.id, name: course.name }))
-  ];
+  // Alleen echte vakken (cursussen) tonen
+  const subjects = (coursesData?.courses || []).map((course: any) => ({ 
+    id: course.id, 
+    name: course.name 
+  }));
   
   const [activeTab, setActiveTab] = useState('grades'); // 'grades' of 'behavior'
   const [selectedClass, setSelectedClass] = useState(''); 

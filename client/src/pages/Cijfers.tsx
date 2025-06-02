@@ -278,7 +278,7 @@ export default function Cijfers() {
                         Beoordelingen: {selectedSubject.name}
                       </CardTitle>
                       <CardDescription>
-                        Klas {selectedClass.name} • {assessmentsData.length} beoordelingen
+                        Klas {selectedClass.name} • {Array.isArray(assessmentsData) ? assessmentsData.length : 0} beoordelingen
                       </CardDescription>
                     </div>
                     <div className="flex gap-2">

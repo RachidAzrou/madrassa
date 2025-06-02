@@ -625,17 +625,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             `);
             
             const programTeachersResult = result.rows;
-            console.log('Program teachers result:', programTeachersResult);
             
-            const assignedTeachers = programTeachersResult.map((pt: any) => {
-              console.log('Processing teacher:', pt);
-              return {
-                id: pt.teacher_id,
-                name: `${pt.first_name} ${pt.last_name}`,
-                selected: true,
-                isPrimary: pt.is_primary
-              };
-            });
+            const assignedTeachers = programTeachersResult.map((pt: any) => ({
+              id: pt.teacher_id,
+              name: `${pt.first_name} ${pt.last_name}`,
+              selected: true,
+              isPrimary: pt.is_primary
+            }));
 
             return {
               ...program,
@@ -3541,17 +3537,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid ID format" });
+        return res.status(400).json({ message: "Ongeldig ID formaat" });
+      }
+      
+      // Eerst controleren of docent bestaat
+      const teacher = await storage.getTeacher(id);
+      if (!teacher) {
+        return res.status(404).json({ message: "Docent niet gevonden" });
+      }
+      
+      // Controleer of docent gekoppeld is aan programma's
+      const programAssignments = await db.execute(sql`
+        SELECT COUNT(*) as count FROM program_teachers WHERE teacher_id = ${id}
+      `);
+      
+      if (programAssignments.rows[0]?.count > 0) {
+        return res.status(400).json({ 
+          message: "Deze docent kan niet verwijderd worden omdat hij/zij nog gekoppeld is aan programma's. Verwijder eerst de programma koppelingen." 
+        });
       }
       
       const success = await storage.deleteTeacher(id);
       if (!success) {
-        return res.status(404).json({ message: "Teacher not found" });
+        return res.status(404).json({ message: "Docent niet gevonden" });
       }
       
       res.status(204).end();
     } catch (error) {
-      res.status(500).json({ message: "Error deleting teacher" });
+      console.error("Error deleting teacher:", error);
+      res.status(500).json({ message: "Fout bij verwijderen docent", error: error.message });
     }
   });
   

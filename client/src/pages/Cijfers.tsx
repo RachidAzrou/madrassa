@@ -279,20 +279,66 @@ export default function Cijfers() {
     setEditGrade({ studentId, subject, grade });
   };
 
-  const handleSaveGrade = (newGrade: number) => {
+  const handleSaveGrade = async (newGrade: number) => {
     if (!editGrade) return;
     
     const { studentId, subject } = editGrade;
-    const updatedGrades = { ...subjectGrades };
     
-    if (!updatedGrades[studentId]) {
-      updatedGrades[studentId] = {};
+    try {
+      // Find the program ID for this subject
+      const program = subjects.find(s => s.name === subject);
+      if (!program) {
+        toast({
+          title: "Fout",
+          description: "Vak niet gevonden.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Save to database
+      const response = await fetch('/api/grades', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          studentId: parseInt(studentId),
+          programId: program.id,
+          grade: newGrade,
+          date: new Date().toISOString().split('T')[0],
+          semester: 'current'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Fout bij opslaan van cijfer');
+      }
+
+      // Update local state
+      const updatedGrades = { ...subjectGrades };
+      if (!updatedGrades[studentId]) {
+        updatedGrades[studentId] = {};
+      }
+      updatedGrades[studentId][subject] = newGrade;
+      setSubjectGrades(updatedGrades);
+      setEditGrade(null);
+      
+      // Refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/grades/class', selectedClass] });
+
+      toast({
+        title: "Cijfer opgeslagen",
+        description: `Cijfer ${newGrade} opgeslagen voor ${subject}`,
+        variant: "default",
+      });
+    } catch (error) {
+      toast({
+        title: "Fout bij opslaan",
+        description: "Er is een fout opgetreden bij het opslaan van het cijfer.",
+        variant: "destructive",
+      });
     }
-    
-    updatedGrades[studentId][subject] = newGrade;
-    setSubjectGrades(updatedGrades);
-    setEditGrade(null);
-    setIsGradesModified(true);
   };
 
   const handleCancelEditGrade = () => {

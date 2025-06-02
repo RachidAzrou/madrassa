@@ -504,6 +504,7 @@ export class DatabaseStorage implements IStorage {
             lastName: guardian.lastName,
             email: guardian.email,
             phone: guardian.phone,
+            relationship: relation.relationship, // Expliciet de relatie uit de studentGuardians tabel
             isEmergencyContact: guardian.isEmergencyContact,
             emergencyContactName: guardian.emergencyContactName,
             emergencyContactPhone: guardian.emergencyContactPhone,

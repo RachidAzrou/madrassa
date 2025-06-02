@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Download, Save, Plus, X, Edit, Trash2, AlertCircle, Percent, XCircle, User, BookOpen, Calculator } from 'lucide-react';
+import { Search, Download, Save, Plus, X, Edit, Trash2, AlertCircle, Percent, XCircle, User, BookOpen, Calculator, CheckCircle, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -600,47 +600,76 @@ export default function Cijfers() {
                               {subjects.map((subject) => (
                                 <TableCell key={subject.id}>
                                   {editGrade && editGrade.studentId === student.id && editGrade.subject === subject.name ? (
-                                    <div className="flex flex-col items-center gap-2 p-2 min-w-[120px]">
-                                      <Select
-                                        value={editGrade.grade?.toString() || ''}
-                                        onValueChange={(value) => {
-                                          const numValue = parseFloat(value);
-                                          if (!isNaN(numValue)) {
-                                            handleSaveGrade(numValue);
-                                          }
-                                        }}
-                                      >
-                                        <SelectTrigger className="w-20 h-10 text-center text-lg font-semibold border-2 border-blue-300 focus:border-blue-500">
-                                          <SelectValue placeholder="..." />
-                                        </SelectTrigger>
-                                        <SelectContent className="max-h-60">
-                                          <SelectItem value="1.0" className="text-red-600 font-medium">1.0 - Zeer slecht</SelectItem>
-                                          <SelectItem value="1.5" className="text-red-600">1.5</SelectItem>
-                                          <SelectItem value="2.0" className="text-red-600">2.0</SelectItem>
-                                          <SelectItem value="2.5" className="text-red-600">2.5</SelectItem>
-                                          <SelectItem value="3.0" className="text-red-600">3.0</SelectItem>
-                                          <SelectItem value="3.5" className="text-red-600">3.5</SelectItem>
-                                          <SelectItem value="4.0" className="text-orange-600">4.0 - Onvoldoende</SelectItem>
-                                          <SelectItem value="4.5" className="text-orange-600">4.5</SelectItem>
-                                          <SelectItem value="5.0" className="text-orange-600">5.0</SelectItem>
-                                          <SelectItem value="5.5" className="text-yellow-600 font-medium">5.5 - Net voldoende</SelectItem>
-                                          <SelectItem value="6.0" className="text-yellow-600">6.0 - Voldoende</SelectItem>
-                                          <SelectItem value="6.5" className="text-green-600">6.5</SelectItem>
-                                          <SelectItem value="7.0" className="text-green-600 font-medium">7.0 - Goed</SelectItem>
-                                          <SelectItem value="7.5" className="text-green-600">7.5</SelectItem>
-                                          <SelectItem value="8.0" className="text-green-600 font-medium">8.0 - Zeer goed</SelectItem>
-                                          <SelectItem value="8.5" className="text-emerald-600">8.5</SelectItem>
-                                          <SelectItem value="9.0" className="text-emerald-600 font-medium">9.0 - Uitstekend</SelectItem>
-                                          <SelectItem value="9.5" className="text-emerald-600">9.5</SelectItem>
-                                          <SelectItem value="10.0" className="text-emerald-600 font-bold">10.0 - Perfect</SelectItem>
-                                        </SelectContent>
-                                      </Select>
+                                    <div className="flex flex-col items-center gap-3 p-4 bg-white border-2 border-blue-300 rounded-lg shadow-lg min-w-[280px]">
+                                      <div className="text-sm font-medium text-gray-600 mb-2">Selecteer cijfer</div>
+                                      
+                                      {/* Cijfer Grid */}
+                                      <div className="grid grid-cols-5 gap-2">
+                                        {[1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0].map((grade) => (
+                                          <Button
+                                            key={grade}
+                                            variant="outline"
+                                            size="sm"
+                                            className={`
+                                              h-10 w-12 text-xs font-semibold transition-all duration-200 border-2
+                                              ${grade < 4 ? 'text-red-600 border-red-200 hover:bg-red-50 hover:border-red-400' :
+                                                grade < 5.5 ? 'text-orange-600 border-orange-200 hover:bg-orange-50 hover:border-orange-400' :
+                                                grade < 7 ? 'text-yellow-600 border-yellow-200 hover:bg-yellow-50 hover:border-yellow-400' :
+                                                grade < 8.5 ? 'text-green-600 border-green-200 hover:bg-green-50 hover:border-green-400' :
+                                                'text-emerald-600 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-400'
+                                              }
+                                              ${editGrade.grade === grade ? 'ring-2 ring-blue-500 bg-blue-50' : ''}
+                                            `}
+                                            onClick={() => handleSaveGrade(grade)}
+                                          >
+                                            {grade.toFixed(1)}
+                                          </Button>
+                                        ))}
+                                      </div>
+                                      
+                                      {/* Snelkoppeling knoppen */}
+                                      <div className="flex gap-2 justify-center">
+                                        <Button
+                                          variant="secondary"
+                                          size="sm"
+                                          className="bg-red-100 hover:bg-red-200 text-red-700 border-red-300"
+                                          onClick={() => handleSaveGrade(3.0)}
+                                        >
+                                          3.0 Slecht
+                                        </Button>
+                                        <Button
+                                          variant="secondary"
+                                          size="sm"
+                                          className="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-yellow-300"
+                                          onClick={() => handleSaveGrade(5.5)}
+                                        >
+                                          5.5 Voldoende
+                                        </Button>
+                                        <Button
+                                          variant="secondary"
+                                          size="sm"
+                                          className="bg-green-100 hover:bg-green-200 text-green-700 border-green-300"
+                                          onClick={() => handleSaveGrade(7.0)}
+                                        >
+                                          7.0 Goed
+                                        </Button>
+                                        <Button
+                                          variant="secondary"
+                                          size="sm"
+                                          className="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border-emerald-300"
+                                          onClick={() => handleSaveGrade(9.0)}
+                                        >
+                                          9.0 Uitstekend
+                                        </Button>
+                                      </div>
+                                      
                                       <Button 
                                         variant="ghost" 
                                         size="sm" 
-                                        className="h-6 text-xs text-gray-500 hover:text-gray-700"
+                                        className="h-8 text-xs text-gray-500 hover:text-gray-700 mt-2"
                                         onClick={handleCancelEditGrade}
                                       >
+                                        <X className="h-3 w-3 mr-1" />
                                         Annuleren
                                       </Button>
                                     </div>

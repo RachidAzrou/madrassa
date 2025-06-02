@@ -106,6 +106,13 @@ export default function Guardians() {
     }
   });
 
+  // Query voor het ophalen van gekoppelde studenten van een voogd
+  const { data: guardianStudents = [] } = useQuery({
+    queryKey: ['/api/guardians', selectedGuardian?.id, 'students'],
+    queryFn: () => selectedGuardian?.id ? apiRequest(`/api/guardians/${selectedGuardian.id}/students`) : [],
+    enabled: !!selectedGuardian?.id
+  });
+
   // URL parameters controleren bij het laden van de pagina
   useEffect(() => {
     // URL parameters uitlezen
@@ -1465,50 +1472,60 @@ export default function Guardians() {
                       <div className="space-y-3">
                         <h4 className="text-sm font-medium text-gray-700">Gekoppelde studenten</h4>
                         <div className="space-y-2">
-                          {selectedGuardian && students.filter(student => 
-                            student.guardians && student.guardians.some(g => g.id === selectedGuardian.id)
-                          ).length > 0 ? (
-                            students
-                              .filter(student => 
-                                student.guardians && student.guardians.some(g => g.id === selectedGuardian.id)
-                              )
-                              .map(student => (
-                                <div key={student.id} className="flex items-center gap-3 p-3 bg-white rounded-md border">
-                                  <div className="w-10 h-10 rounded-full bg-[#1e40af] flex items-center justify-center text-white font-medium text-sm">
-                                    {student.firstName.charAt(0)}{student.lastName.charAt(0)}
-                                  </div>
-                                  <div className="flex-1">
-                                    <p className="text-sm font-medium text-gray-900">
-                                      {student.firstName} {student.lastName}
-                                    </p>
-                                    <p className="text-xs text-gray-600">Student ID: {student.studentId}</p>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                      student.status === 'Ingeschreven' ? 'bg-green-100 text-green-800' :
-                                      student.status === 'Uitgeschreven' ? 'bg-red-100 text-red-800' :
-                                      student.status === 'Afgestudeerd' ? 'bg-gray-100 text-gray-800' :
-                                      student.status === 'Geschorst' ? 'bg-yellow-100 text-yellow-800' :
-                                      'bg-gray-100 text-gray-800'
-                                    }`}>
-                                      {student.status}
-                                    </span>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => {
-                                        toast({
-                                          title: "Koppeling verwijderen",
-                                          description: "Deze functionaliteit wordt binnenkort toegevoegd."
-                                        });
-                                      }}
-                                      className="h-7 w-7 p-0 border-red-300 text-red-600 hover:bg-red-50"
-                                    >
-                                      <XCircle className="h-3.5 w-3.5" />
-                                    </Button>
-                                  </div>
+                          {guardianStudents && guardianStudents.length > 0 ? (
+                            guardianStudents.map((studentRelation: any) => (
+                              <div key={studentRelation.id} className="flex items-center gap-3 p-3 bg-white rounded-md border">
+                                <div className="w-10 h-10 rounded-full bg-[#1e40af] flex items-center justify-center text-white font-medium text-sm">
+                                  {studentRelation.student?.firstName?.charAt(0)}{studentRelation.student?.lastName?.charAt(0)}
                                 </div>
-                              ))
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {studentRelation.student?.firstName} {studentRelation.student?.lastName}
+                                  </p>
+                                  <p className="text-xs text-gray-600">Student ID: {studentRelation.student?.studentId}</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Badge 
+                                    variant="outline" 
+                                    className="bg-blue-50 text-blue-700 border-blue-200 min-w-[60px] justify-center"
+                                  >
+                                    {studentRelation.relationship || 'Onbekend'}
+                                  </Badge>
+                                  {studentRelation.isEmergencyContact && (
+                                    <div className="flex items-center">
+                                      <HeartPulse className="h-3.5 w-3.5 text-red-600" />
+                                    </div>
+                                  )}
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={async () => {
+                                      try {
+                                        await apiRequest(`/api/guardians/${selectedGuardian.id}/students/${studentRelation.studentId}`, {
+                                          method: 'DELETE'
+                                        });
+                                        queryClient.invalidateQueries({ queryKey: ['/api/guardians', selectedGuardian.id, 'students'] });
+                                        queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+                                        toast({
+                                          title: "Student ontkoppeld",
+                                          description: `${studentRelation.student?.firstName} ${studentRelation.student?.lastName} is ontkoppeld van deze voogd.`,
+                                        });
+                                      } catch (error) {
+                                        console.error('Error removing student from guardian:', error);
+                                        toast({
+                                          title: "Fout",
+                                          description: "Er is een probleem opgetreden bij het ontkoppelen van de student.",
+                                          variant: "destructive",
+                                        });
+                                      }
+                                    }}
+                                    className="h-7 w-7 p-0 border-red-300 text-red-600 hover:bg-red-50"
+                                  >
+                                    <XCircle className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))
                           ) : (
                             <div className="text-center py-4 text-gray-500 text-sm bg-gray-50 rounded-md">
                               <Users className="h-6 w-6 mx-auto mb-2 text-gray-400" />

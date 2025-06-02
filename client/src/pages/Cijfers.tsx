@@ -35,7 +35,9 @@ export default function Cijfers() {
   const [selectedAssessment, setSelectedAssessment] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editingAssessment, setEditingAssessment] = useState<any>(null);
+  const [deletingAssessment, setDeletingAssessment] = useState<any>(null);
   const [step, setStep] = useState<'class' | 'subject' | 'assessments' | 'grades'>('class');
   const [grades, setGrades] = useState<{[studentId: string]: string}>({});
   
@@ -188,8 +190,15 @@ export default function Cijfers() {
   };
 
   const handleDeleteAssessment = (assessment: any) => {
-    if (window.confirm(`Weet je zeker dat je de beoordeling "${assessment.name}" wilt verwijderen?`)) {
-      deleteAssessmentMutation.mutate(assessment.id);
+    setDeletingAssessment(assessment);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteAssessment = () => {
+    if (deletingAssessment) {
+      deleteAssessmentMutation.mutate(deletingAssessment.id);
+      setShowDeleteModal(false);
+      setDeletingAssessment(null);
     }
   };
 
@@ -728,6 +737,73 @@ export default function Cijfers() {
               disabled={createAssessmentMutation.isPending}
             >
               {createAssessmentMutation.isPending ? 'Bezig...' : (editingAssessment ? 'Wijzigingen opslaan' : 'Beoordeling toevoegen')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent className="sm:max-w-[500px]" noPadding>
+          <DialogHeader variant="premium" className="bg-red-600">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-semibold text-white">
+                  Beoordeling verwijderen
+                </DialogTitle>
+                <DialogDescription className="text-red-100 mt-1">
+                  Deze actie kan niet ongedaan worden gemaakt
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                <Trash2 className="h-6 w-6 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Weet je het zeker?
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Je staat op het punt om de beoordeling{' '}
+                  <span className="font-semibold text-gray-900">"{deletingAssessment?.name}"</span>{' '}
+                  permanent te verwijderen. Alle gekoppelde cijfers en resultaten gaan verloren.
+                </p>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <span className="text-sm font-medium text-red-800">
+                      Deze actie kan niet ongedaan worden gemaakt
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowDeleteModal(false);
+                setDeletingAssessment(null);
+              }}
+            >
+              Annuleren
+            </Button>
+            <Button 
+              variant="destructive"
+              onClick={confirmDeleteAssessment}
+              disabled={deleteAssessmentMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteAssessmentMutation.isPending ? 'Verwijderen...' : 'Definitief verwijderen'}
             </Button>
           </DialogFooter>
         </DialogContent>

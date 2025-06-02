@@ -589,6 +589,37 @@ export class DatabaseStorage implements IStorage {
     return outstandingFees;
   }
 
+  // Basic operations for compatibility
+  async getStudents(): Promise<any[]> {
+    try {
+      const { students } = await import("@shared/schema");
+      return await db.select().from(students);
+    } catch (error) {
+      console.error('Error getting students:', error);
+      return [];
+    }
+  }
+
+  async getTeachers(): Promise<any[]> {
+    try {
+      const { teachers } = await import("@shared/schema");
+      return await db.select().from(teachers);
+    } catch (error) {
+      console.error('Error getting teachers:', error);
+      return [];
+    }
+  }
+
+  async getPrograms(): Promise<any[]> {
+    try {
+      const { programs } = await import("@shared/schema");
+      return await db.select().from(programs);
+    } catch (error) {
+      console.error('Error getting programs:', error);
+      return [];
+    }
+  }
+
   // Student Siblings operations
   async getStudentSiblings(studentId: number): Promise<any[]> {
     try {

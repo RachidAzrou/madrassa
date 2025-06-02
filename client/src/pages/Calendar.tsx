@@ -127,19 +127,7 @@ export default function Calendar() {
   const month = monthNames[currentDate.getMonth()];
   const year = currentDate.getFullYear();
 
-  // Gebruik localStorage voor persistentie van kalender evenementen
-  const getStoredEvents = (): CalendarEvent[] => {
-    try {
-      const stored = localStorage.getItem('calendarEvents');
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  };
-
-  const saveEventsToStorage = (events: CalendarEvent[]) => {
-    localStorage.setItem('calendarEvents', JSON.stringify(events));
-  };
+  // LocalStorage functies verwijderd - alleen database data wordt gebruikt
 
   // Fetch calendar events for the current month/view
   const { data, isLoading, isError } = useQuery<{ events: CalendarEvent[] }>({
@@ -155,10 +143,8 @@ export default function Calendar() {
     staleTime: 30000,
   });
 
-  // Combineer server data met localStorage data
-  const serverEvents: CalendarEvent[] = data?.events || [];
-  const storedEvents: CalendarEvent[] = getStoredEvents();
-  const events: CalendarEvent[] = [...serverEvents, ...storedEvents];
+  // Gebruik alleen server data
+  const events: CalendarEvent[] = data?.events || [];
   
   // Debug logging om te zien welke events we krijgen
   console.log("Events received:", events);
@@ -297,15 +283,6 @@ export default function Calendar() {
       });
     },
     onSuccess: (response, eventData) => {
-      // Voeg het nieuwe evenement toe aan localStorage
-      const currentStoredEvents = getStoredEvents();
-      const newEventWithId = {
-        ...eventData,
-        id: `local-${Date.now()}`, // Unieke ID voor localStorage
-      };
-      currentStoredEvents.push(newEventWithId);
-      saveEventsToStorage(currentStoredEvents);
-      
       // Invalidate query cache to refresh data
       queryClient.invalidateQueries({
         queryKey: ['/api/calendar/events'],

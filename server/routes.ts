@@ -6,24 +6,8 @@ import * as schema from "@shared/schema";
 import { students, studentGroups, studentGroupEnrollments } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
 
-// Global storage voor calendar events met een startwaarde
+// Global storage voor calendar events
 const globalCalendarEventsStore = new Map();
-
-// Voeg een test event toe zodat we kunnen zien dat het werkt
-globalCalendarEventsStore.set("test-1", {
-  id: "test-1",
-  title: "Test Les",
-  date: "2025-05-26",
-  startTime: "10:00",
-  endTime: "11:00",
-  location: "Lokaal A1",
-  type: "class",
-  description: "Test evenement",
-  courseId: "1",
-  courseName: "Arabisch",
-  classId: "1", 
-  className: "Klas 1A"
-});
 import { z } from "zod";
 import { createMollieClient } from '@mollie/api-client';
 import { 

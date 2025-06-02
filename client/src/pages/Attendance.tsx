@@ -247,12 +247,27 @@ export default function Attendance() {
     }
   }, [teacherAttendanceData, selectedDate]);
 
-  const handleDateChange = (increment: number) => {
+  const handleDateChange = async (increment: number) => {
+    // Auto-save current attendance data before switching dates
+    const currentStudentRecords = Object.values(studentAttendance);
+    const currentTeacherRecords = Object.values(teacherAttendance);
+    
+    if (currentStudentRecords.length > 0 || currentTeacherRecords.length > 0) {
+      try {
+        await saveMutation.mutateAsync({ 
+          studentRecords: currentStudentRecords, 
+          teacherRecords: currentTeacherRecords 
+        });
+      } catch (error) {
+        console.error('Auto-save failed:', error);
+      }
+    }
+    
     const current = new Date(selectedDate);
     current.setDate(current.getDate() + increment);
     setSelectedDate(current.toISOString().split('T')[0]);
     
-    // Clear existing attendance data when changing dates
+    // Clear local state - new data will be loaded from server
     setStudentAttendance({});
     setTeacherAttendance({});
   };

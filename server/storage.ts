@@ -127,6 +127,20 @@ export interface IStorage {
   getStudentSiblings(studentId: number): Promise<StudentSibling[]>;
   addStudentSibling(studentId: number, siblingId: number, relationship?: string): Promise<void>;
   removeStudentSibling(studentId: number, siblingId: number): Promise<void>;
+
+  // Attendance operations
+  getAttendanceByDate(date: Date): Promise<any[]>;
+  getAttendanceByStudent(studentId: number): Promise<any[]>;
+  getAttendanceByCourse(courseId: number): Promise<any[]>;
+  getAttendanceByClassAndDate(classId: number, date: Date): Promise<any[]>;
+  createAttendance(attendance: any): Promise<any>;
+  updateAttendance(id: number, attendance: any): Promise<any>;
+  
+  // Teacher Attendance operations
+  getTeacherAttendanceByDate(date: Date): Promise<any[]>;
+  getTeacherAttendanceByCourse(courseId: number): Promise<any[]>;
+  createTeacherAttendance(attendance: any): Promise<any>;
+  updateTeacherAttendance(id: number, attendance: any): Promise<any>;
   
   // Program Teachers operations
   getProgramTeachers(programId: number): Promise<any[]>;

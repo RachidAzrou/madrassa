@@ -657,6 +657,7 @@ export const studentGuardians = pgTable("student_guardians", {
   id: serial("id").primaryKey(),
   studentId: integer("student_id").notNull(),
   guardianId: integer("guardian_id").notNull(),
+  relationship: text("relationship"), // Relatie tussen student en voogd (ouder, verzorger, etc.)
   isPrimary: boolean("is_primary").default(false), // Primaire contactpersoon
 }, (table) => {
   return {

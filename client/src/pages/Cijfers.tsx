@@ -606,6 +606,26 @@ export default function Cijfers() {
                   <div className="p-4 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <h2 className="text-lg font-medium text-gray-800">Cijferoverzicht</h2>
                     <div className="flex items-center gap-2">
+                      {isGradesModified && (
+                        <Button 
+                          size="sm" 
+                          className="h-8 bg-blue-600 hover:bg-blue-700 text-white"
+                          onClick={handleSaveAllGrades}
+                          disabled={saveGradesMutation.isPending}
+                        >
+                          {saveGradesMutation.isPending ? (
+                            <>
+                              <div className="animate-spin mr-2 h-3 w-3 border-2 border-white border-t-transparent rounded-full"></div>
+                              Opslaan...
+                            </>
+                          ) : (
+                            <>
+                              <Save className="mr-2 h-3 w-3" />
+                              Cijfers opslaan
+                            </>
+                          )}
+                        </Button>
+                      )}
                       <Button variant="outline" size="sm" className="h-8">
                         <Download className="mr-2 h-4 w-4" />
                         Exporteren
@@ -680,7 +700,7 @@ export default function Cijfers() {
                                       max="100"
                                       step="1"
                                       placeholder="0-100"
-                                      className="w-16 h-8 text-center text-sm font-medium border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                                      className="w-16 h-8 text-center text-sm font-medium border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                       value={subjectGrades[student.id]?.[subject.name]?.toString() || ''}
                                       onChange={(e) => {
                                         const value = e.target.value;
@@ -698,49 +718,7 @@ export default function Cijfers() {
                                           }
                                         }
                                         setSubjectGrades(updatedGrades);
-                                      }}
-                                      onBlur={async (e) => {
-                                        const value = parseFloat(e.target.value);
-                                        if (!isNaN(value) && value >= 0 && value <= 100) {
-                                          // Save to database
-                                          try {
-                                            const program = programsData?.programs?.find((p: any) => p.name === subject.name);
-                                            if (program) {
-                                              const response = await fetch('/api/grades', {
-                                                method: 'POST',
-                                                headers: {
-                                                  'Content-Type': 'application/json',
-                                                },
-                                                body: JSON.stringify({
-                                                  studentId: parseInt(student.id),
-                                                  courseId: program.id,
-                                                  assessmentType: 'regular',
-                                                  assessmentName: 'Cijfer',
-                                                  score: Math.round(value),
-                                                  maxScore: 100,
-                                                  weight: 100,
-                                                  date: new Date().toISOString().split('T')[0]
-                                                }),
-                                              });
-
-                                              if (response.ok) {
-                                                await queryClient.invalidateQueries({ queryKey: ['/api/grades/class', selectedClass] });
-                                                toast({
-                                                  title: "Cijfer opgeslagen",
-                                                  description: `Cijfer ${value} opgeslagen voor ${subject.name}`,
-                                                  variant: "default",
-                                                });
-                                              }
-                                            }
-                                          } catch (error) {
-                                            console.error('Error saving grade:', error);
-                                            toast({
-                                              title: "Fout",
-                                              description: "Er is een fout opgetreden bij het opslaan",
-                                              variant: "destructive",
-                                            });
-                                          }
-                                        }
+                                        setIsGradesModified(true);
                                       }}
                                     />
                                     {subjectGrades[student.id]?.[subject.name] && (

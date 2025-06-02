@@ -611,7 +611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.get("/api/programs", async (_req, res) => {
     try {
       const programs = await storage.getPrograms();
-      res.json(programs);
+      res.json({ programs, totalCount: programs.length });
     } catch (error) {
       res.status(500).json({ message: "Error fetching programs" });
     }

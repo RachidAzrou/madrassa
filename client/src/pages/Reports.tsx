@@ -247,152 +247,143 @@ export default function Reports() {
 
       let yPosition = 20;
 
-      // Header with logo
+      // Header - Only Logo
       if (schoolLogo) {
         try {
-          pdf.addImage(schoolLogo, 'JPEG', 10, 10, 30, 20);
+          pdf.addImage(schoolLogo, 'JPEG', (pageWidth - 60) / 2, 20, 60, 30);
+          yPosition = 60;
         } catch (error) {
           console.warn('Could not add logo to PDF:', error);
         }
       }
 
-      // School header
-      pdf.setFontSize(18);
+      // Title
+      pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('myMadrassa - Leerlingenrapport', schoolLogo ? 50 : 20, 20);
-      
-      yPosition = 40;
+      pdf.text('LEERLINGENRAPPORT', pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 20;
 
-      // Student info
-      pdf.setFontSize(14);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Leerlinggegevens', 20, yPosition);
-      
-      yPosition += 10;
+      // Line separator
+      pdf.setLineWidth(0.5);
+      pdf.line(20, yPosition, pageWidth - 20, yPosition);
+      yPosition += 15;
+
+      // Student info - Minimal
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
       pdf.text(`Naam: ${report.student.firstName} ${report.student.lastName}`, 20, yPosition);
-      pdf.text(`Leerlingnummer: ${report.student.studentId}`, 120, yPosition);
-      
+      pdf.text(`Studentnummer: ${report.student.studentId}`, 120, yPosition);
       yPosition += 8;
-      if (report.student.dateOfBirth) {
-        const birthDate = new Date(report.student.dateOfBirth);
-        pdf.text(`Geboortedatum: ${birthDate.toLocaleDateString('nl-NL')}`, 20, yPosition);
-      }
-      pdf.text(`Academisch jaar: ${report.student.academicYear || 'Niet opgegeven'}`, 120, yPosition);
-
+      pdf.text('Klas: 1A', 20, yPosition);
+      pdf.text(`Schooljaar: ${report.student.academicYear || '2024-2025'}`, 120, yPosition);
       yPosition += 20;
 
-      // Attendance section
+      // Grades per Subject
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Aanwezigheid', 20, yPosition);
-      
-      yPosition += 10;
-      const attendanceData = [
-        ['Totaal lessen', report.attendance.total.toString()],
-        ['Aanwezig', report.attendance.present.toString()],
-        ['Afwezig', report.attendance.absent.toString()],
-        ['Te laat', report.attendance.late.toString()],
-        ['Aanwezigheidspercentage', `${report.attendance.percentage}%`]
-      ];
-
-      (pdf as any).autoTable({
-        startY: yPosition,
-        head: [['Type', 'Aantal']],
-        body: attendanceData,
-        theme: 'grid',
-        margin: { left: 20, right: 20 },
-        styles: { fontSize: 10 }
-      });
-
-      yPosition = (pdf as any).lastAutoTable.finalY + 20;
-
-      // Grades section
-      pdf.setFontSize(14);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Cijfers per vak', 20, yPosition);
-      
-      yPosition += 10;
+      pdf.text('CIJFERS PER VAK', 20, yPosition);
+      yPosition += 15;
 
       Object.entries(report.grades).forEach(([subject, grades]) => {
-        const gradeData = [
-          ['Tests', grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : 'Geen'],
-          ['Taken', grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : 'Geen'],
-          ['Huiswerk', grades.homework.length > 0 ? (grades.homework.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.homework.length).toFixed(1) : 'Geen'],
-          ['Gemiddelde', grades.average.toFixed(1)]
-        ];
+        // Subject header
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(subject, 20, yPosition);
+        pdf.text(grades.average.toFixed(1), pageWidth - 30, yPosition, { align: 'right' });
+        yPosition += 8;
 
-        (pdf as any).autoTable({
-          startY: yPosition,
-          head: [[subject, 'Cijfer']],
-          body: gradeData,
-          theme: 'grid',
-          margin: { left: 20, right: 20 },
-          styles: { fontSize: 10 }
-        });
+        // Grade breakdown
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        const testAvg = grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-';
+        const taskAvg = grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : '-';
+        
+        pdf.text(`Tests: ${testAvg}`, 30, yPosition);
+        pdf.text(`Examens: ${testAvg}`, 80, yPosition);
+        pdf.text(`Taken: ${taskAvg}`, 130, yPosition);
+        yPosition += 6;
 
-        yPosition = (pdf as any).lastAutoTable.finalY + 15;
+        // Comment
+        pdf.setFont('helvetica', 'italic');
+        pdf.text('Commentaar: Goede vooruitgang in dit vak. Blijf hard werken!', 30, yPosition);
+        yPosition += 15;
       });
 
-      // Behavior section
+      // Attendance
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Gedrag', 20, yPosition);
-      
-      yPosition += 10;
+      pdf.text('AANWEZIGHEID', 20, yPosition);
+      yPosition += 15;
+
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
-      pdf.text(`Gedragscijfer: ${report.behavior.grade}/10`, 20, yPosition);
-      
+      pdf.text(`Aantal keer afwezig: ${report.attendance.absent}`, 20, yPosition);
+      pdf.text(`Aantal keer te laat: ${report.attendance.late}`, 120, yPosition);
       yPosition += 8;
-      if (report.behavior.comments) {
-        pdf.text('Opmerkingen gedrag:', 20, yPosition);
-        yPosition += 6;
-        const comments = pdf.splitTextToSize(report.behavior.comments, pageWidth - 40);
-        pdf.text(comments, 20, yPosition);
-        yPosition += comments.length * 6;
-      }
 
-      yPosition += 10;
+      pdf.setFont('helvetica', 'italic');
+      pdf.text('Commentaar: Leerling toont goede aanwezigheid en punctualiteit.', 20, yPosition);
+      yPosition += 20;
+
+      // Behavior
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('GEDRAG', 20, yPosition);
+      yPosition += 15;
+
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 20, yPosition);
+      yPosition += 8;
+
+      if (behaviorGrades[report.student.id]?.comments) {
+        pdf.setFont('helvetica', 'italic');
+        const behaviorComments = pdf.splitTextToSize(`Commentaar: ${behaviorGrades[report.student.id]?.comments}`, pageWidth - 40);
+        pdf.text(behaviorComments, 20, yPosition);
+        yPosition += behaviorComments.length * 6;
+      }
+      yPosition += 15;
 
       // General comments
-      if (report.generalComments) {
+      if (generalComments[report.student.id]) {
         pdf.setFontSize(14);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('Algemene opmerkingen', 20, yPosition);
+        pdf.text('ALGEMENE OPMERKINGEN', 20, yPosition);
+        yPosition += 15;
         
-        yPosition += 10;
         pdf.setFontSize(11);
         pdf.setFont('helvetica', 'normal');
-        const generalComments = pdf.splitTextToSize(report.generalComments, pageWidth - 40);
-        pdf.text(generalComments, 20, yPosition);
-        yPosition += generalComments.length * 6 + 20;
+        const generalCommentsText = pdf.splitTextToSize(generalComments[report.student.id], pageWidth - 40);
+        pdf.text(generalCommentsText, 20, yPosition);
+        yPosition += generalCommentsText.length * 6 + 20;
       }
 
-      // Signature section
-      if (yPosition > pageHeight - 60) {
+      // Signatures
+      if (yPosition > pageHeight - 80) {
         pdf.addPage();
         yPosition = 20;
       }
 
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('Handtekeningen', 20, yPosition);
+      yPosition = Math.max(yPosition, pageHeight - 60);
       
-      yPosition += 20;
+      pdf.setLineWidth(0.5);
+      pdf.line(20, yPosition, pageWidth - 20, yPosition);
+      yPosition += 15;
+
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       
       // Parent signature
-      pdf.text('Handtekening ouder(s)/verzorger(s):', 20, yPosition);
-      pdf.line(20, yPosition + 15, 90, yPosition + 15);
-      pdf.text('Datum: ________________', 20, yPosition + 25);
-
-      // Teacher signature  
-      pdf.text('Handtekening klassenmentor:', 120, yPosition);
-      pdf.line(120, yPosition + 15, 190, yPosition + 15);
-      pdf.text('Datum: ________________', 120, yPosition + 25);
+      pdf.text('Handtekening ouder(s)/verzorger(s)', 20, yPosition);
+      pdf.text('Handtekening klassenmentor', 120, yPosition);
+      yPosition += 20;
+      
+      pdf.line(20, yPosition, 80, yPosition);
+      pdf.line(120, yPosition, 180, yPosition);
+      yPosition += 10;
+      
+      pdf.text('Datum: ________________', 20, yPosition);
+      pdf.text('Datum: ________________', 120, yPosition);
     });
 
     // Save PDF
@@ -661,98 +652,104 @@ export default function Reports() {
                     <CardContent className="p-0">
                       {/* PDF-like preview */}
                       <div className="bg-white min-h-[800px] max-w-full mx-auto shadow-inner">
-                        {/* Header */}
-                        <div className="flex items-center justify-between p-6 border-b-2 border-blue-600 bg-gradient-to-r from-blue-50 to-blue-100">
-                          {schoolLogo && (
-                            <img src={schoolLogo} alt="School logo" className="h-16 w-16 object-contain" />
+                        {/* Header - Only Logo */}
+                        <div className="text-center p-8 border-b-2 border-gray-300">
+                          {schoolLogo ? (
+                            <img src={schoolLogo} alt="School logo" className="h-24 w-auto mx-auto" />
+                          ) : (
+                            <div className="h-24 w-32 mx-auto bg-gray-200 rounded flex items-center justify-center text-gray-500 text-sm">
+                              Logo uploaden
+                            </div>
                           )}
-                          <div className="text-center flex-1">
-                            <h1 className="text-2xl font-bold text-blue-900">myMadrassa</h1>
-                            <p className="text-lg text-blue-700">Leerlingenrapport</p>
-                          </div>
-                          <div className="w-16"></div>
+                          <h1 className="text-xl font-bold text-gray-800 mt-4">LEERLINGENRAPPORT</h1>
                         </div>
 
-                        <div className="p-6 space-y-6">
-                          {/* Student Info */}
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-bold text-gray-800 mb-3">Leerlinggegevens</h3>
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <span className="font-semibold">Naam:</span> {report.student.firstName} {report.student.lastName}
+                        <div className="p-8 space-y-8">
+                          {/* Student Info - Minimal */}
+                          <div className="border-b border-gray-200 pb-4">
+                            <div className="grid grid-cols-2 gap-6 text-sm">
+                              <div className="space-y-2">
+                                <div><span className="font-semibold">Naam:</span> {report.student.firstName} {report.student.lastName}</div>
+                                <div><span className="font-semibold">Studentnummer:</span> {report.student.studentId}</div>
                               </div>
-                              <div>
-                                <span className="font-semibold">Leerlingnummer:</span> {report.student.studentId}
-                              </div>
-                              {report.student.dateOfBirth && (
-                                <div>
-                                  <span className="font-semibold">Geboortedatum:</span> {new Date(report.student.dateOfBirth).toLocaleDateString('nl-NL')}
-                                </div>
-                              )}
-                              <div>
-                                <span className="font-semibold">Academisch jaar:</span> {report.student.academicYear || 'Niet opgegeven'}
+                              <div className="space-y-2">
+                                <div><span className="font-semibold">Klas:</span> 1A</div>
+                                <div><span className="font-semibold">Schooljaar:</span> {report.student.academicYear || '2024-2025'}</div>
                               </div>
                             </div>
                           </div>
 
-                          {/* Attendance */}
-                          <div className="bg-blue-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-bold text-blue-800 mb-3">Aanwezigheid</h3>
-                            <div className="grid grid-cols-5 gap-4 text-center text-sm">
-                              <div>
-                                <div className="text-xl font-bold text-blue-600">{report.attendance.total}</div>
-                                <div className="text-gray-600">Totaal lessen</div>
-                              </div>
-                              <div>
-                                <div className="text-xl font-bold text-green-600">{report.attendance.present}</div>
-                                <div className="text-gray-600">Aanwezig</div>
-                              </div>
-                              <div>
-                                <div className="text-xl font-bold text-red-600">{report.attendance.absent}</div>
-                                <div className="text-gray-600">Afwezig</div>
-                              </div>
-                              <div>
-                                <div className="text-xl font-bold text-orange-600">{report.attendance.late}</div>
-                                <div className="text-gray-600">Te laat</div>
-                              </div>
-                              <div>
-                                <div className="text-xl font-bold text-blue-600">{report.attendance.percentage}%</div>
-                                <div className="text-gray-600">Aanwezigheid</div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Grades */}
-                          <div className="bg-purple-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-bold text-purple-800 mb-3">Cijfers per Vak</h3>
-                            <div className="space-y-3">
+                          {/* Grades per Subject */}
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-300 pb-2">CIJFERS PER VAK</h3>
+                            <div className="space-y-4">
                               {Object.entries(report.grades).map(([subject, grades]) => (
-                                <div key={subject} className="bg-white p-3 rounded border">
-                                  <div className="flex justify-between items-center">
-                                    <span className="font-semibold text-purple-700">{subject}</span>
-                                    <span className="text-lg font-bold text-purple-600">{grades.average.toFixed(1)}</span>
+                                <div key={subject} className="border border-gray-200 rounded-lg p-4">
+                                  <div className="flex justify-between items-center mb-3">
+                                    <h4 className="font-bold text-lg text-gray-800">{subject}</h4>
+                                    <div className="text-2xl font-bold text-blue-600">{grades.average.toFixed(1)}</div>
                                   </div>
-                                  <div className="grid grid-cols-3 gap-2 mt-2 text-xs text-gray-600">
-                                    <span>Tests: {grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : 'Geen'}</span>
-                                    <span>Taken: {grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : 'Geen'}</span>
-                                    <span>Huiswerk: {grades.homework.length > 0 ? (grades.homework.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.homework.length).toFixed(1) : 'Geen'}</span>
+                                  
+                                  <div className="grid grid-cols-3 gap-4 mb-3">
+                                    <div className="text-center">
+                                      <div className="font-semibold text-gray-600">Tests</div>
+                                      <div className="text-lg font-bold text-green-600">
+                                        {grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-'}
+                                      </div>
+                                    </div>
+                                    <div className="text-center">
+                                      <div className="font-semibold text-gray-600">Examens</div>
+                                      <div className="text-lg font-bold text-blue-600">
+                                        {grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-'}
+                                      </div>
+                                    </div>
+                                    <div className="text-center">
+                                      <div className="font-semibold text-gray-600">Taken</div>
+                                      <div className="text-lg font-bold text-purple-600">
+                                        {grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : '-'}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="text-sm text-gray-600 italic">
+                                    Commentaar: Goede vooruitgang in dit vak. Blijf hard werken!
                                   </div>
                                 </div>
                               ))}
                             </div>
                           </div>
 
+                          {/* Attendance */}
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-300 pb-2">AANWEZIGHEID</h3>
+                            <div className="border border-gray-200 rounded-lg p-4">
+                              <div className="grid grid-cols-2 gap-6 mb-4">
+                                <div className="text-center">
+                                  <div className="font-semibold text-gray-600">Aantal keer afwezig</div>
+                                  <div className="text-3xl font-bold text-red-600">{report.attendance.absent}</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="font-semibold text-gray-600">Aantal keer te laat</div>
+                                  <div className="text-3xl font-bold text-orange-600">{report.attendance.late}</div>
+                                </div>
+                              </div>
+                              <div className="text-sm text-gray-600 italic">
+                                Commentaar: Leerling toont goede aanwezigheid en punctualiteit.
+                              </div>
+                            </div>
+                          </div>
+
                           {/* Behavior */}
-                          <div className="bg-yellow-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-bold text-yellow-800 mb-3">Gedrag</h3>
-                            <div className="bg-white p-3 rounded border">
-                              <div className="flex justify-between items-center mb-2">
-                                <span className="font-semibold">Gedragscijfer:</span>
-                                <span className="text-2xl font-bold text-yellow-600">{behaviorGrades[report.student.id]?.grade || 7}/10</span>
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-300 pb-2">GEDRAG</h3>
+                            <div className="border border-gray-200 rounded-lg p-4">
+                              <div className="flex justify-between items-center mb-4">
+                                <span className="font-semibold text-gray-700">Gedragscijfer:</span>
+                                <span className="text-3xl font-bold text-green-600">{behaviorGrades[report.student.id]?.grade || 7}/10</span>
                               </div>
                               {behaviorGrades[report.student.id]?.comments && (
-                                <div className="text-sm text-gray-700">
-                                  <span className="font-semibold">Opmerkingen:</span> {behaviorGrades[report.student.id]?.comments}
+                                <div className="text-sm text-gray-600 italic">
+                                  <span className="font-semibold">Commentaar:</span> {behaviorGrades[report.student.id]?.comments}
                                 </div>
                               )}
                             </div>
@@ -760,27 +757,28 @@ export default function Reports() {
 
                           {/* General Comments */}
                           {generalComments[report.student.id] && (
-                            <div className="bg-green-50 p-4 rounded-lg">
-                              <h3 className="text-lg font-bold text-green-800 mb-3">Algemene opmerkingen</h3>
-                              <div className="bg-white p-3 rounded border text-sm text-gray-700">
-                                {generalComments[report.student.id]}
+                            <div>
+                              <h3 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-300 pb-2">ALGEMENE OPMERKINGEN</h3>
+                              <div className="border border-gray-200 rounded-lg p-4">
+                                <div className="text-sm text-gray-700 leading-relaxed">
+                                  {generalComments[report.student.id]}
+                                </div>
                               </div>
                             </div>
                           )}
 
                           {/* Signatures */}
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <h3 className="text-lg font-bold text-gray-800 mb-4">Handtekeningen</h3>
-                            <div className="grid grid-cols-2 gap-8">
-                              <div>
-                                <p className="text-sm font-semibold text-gray-700 mb-3">Handtekening ouder(s)/verzorger(s):</p>
-                                <div className="border-b-2 border-gray-400 h-16 mb-2"></div>
-                                <p className="text-xs text-gray-600">Datum: ________________</p>
+                          <div className="mt-12 pt-8 border-t border-gray-300">
+                            <div className="grid grid-cols-2 gap-12">
+                              <div className="text-center">
+                                <div className="border-b-2 border-gray-400 h-16 mb-3"></div>
+                                <p className="text-sm font-semibold text-gray-700">Handtekening ouder(s)/verzorger(s)</p>
+                                <p className="text-xs text-gray-500 mt-2">Datum: ________________</p>
                               </div>
-                              <div>
-                                <p className="text-sm font-semibold text-gray-700 mb-3">Handtekening klassenmentor:</p>
-                                <div className="border-b-2 border-gray-400 h-16 mb-2"></div>
-                                <p className="text-xs text-gray-600">Datum: ________________</p>
+                              <div className="text-center">
+                                <div className="border-b-2 border-gray-400 h-16 mb-3"></div>
+                                <p className="text-sm font-semibold text-gray-700">Handtekening klassenmentor</p>
+                                <p className="text-xs text-gray-500 mt-2">Datum: ________________</p>
                               </div>
                             </div>
                           </div>

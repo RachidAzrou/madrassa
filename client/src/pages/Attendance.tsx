@@ -349,6 +349,25 @@ export default function Attendance() {
     setStudentAttendance(newAttendance);
   };
   
+  // Mark all students late
+  const markAllStudentsLate = () => {
+    const newAttendance: Record<number, AttendanceRecord> = {};
+    
+    if (studentsData && Array.isArray(studentsData)) {
+      studentsData.forEach((student: Student) => {
+        newAttendance[student.id] = {
+          studentId: student.id,
+          date: selectedDate,
+          status: 'late',
+          ...(selectedClass ? { classId: parseInt(selectedClass) } : {}),
+          ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
+        };
+      });
+    }
+    
+    setStudentAttendance(newAttendance);
+  };
+  
   // Mark all teachers present
   const markAllTeachersPresent = () => {
     const newAttendance: Record<number, TeacherAttendanceRecord> = {};
@@ -613,7 +632,8 @@ export default function Attendance() {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 flex-1"
+                          onClick={markAllStudentsLate}
+                          className="bg-white border-gray-300 text-[#1e40af] hover:bg-gray-50 flex-1 font-medium"
                           disabled={!studentsData || !Array.isArray(studentsData) || studentsData.length === 0}
                         >
                           <Clock className="h-4 w-4 mr-2" />

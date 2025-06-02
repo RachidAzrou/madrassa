@@ -111,20 +111,9 @@ export default function Attendance() {
     enabled: !!selectedClass,
   });
 
-  // Fetch courses by selected class
-  const { data: coursesData, isLoading: isLoadingCourses } = useQuery({
-    queryKey: ['/api/student-groups', selectedClass, 'courses'],
-    queryFn: async () => {
-      if (!selectedClass) return [];
-      const response = await fetch(`/api/student-groups/${selectedClass}/courses`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch courses');
-      }
-      return response.json();
-    },
-    staleTime: 60000,
-    enabled: !!selectedClass,
-  });
+  // Use programs data as courses/subjects for the dropdown
+  const coursesData = programsResponse?.programs || [];
+  const isLoadingCourses = false; // Using already loaded programs data
   
   // Fetch attendance for selected date and course/class
   const { data: attendanceData, isLoading: isLoadingAttendance, refetch: refetchAttendance } = useQuery({

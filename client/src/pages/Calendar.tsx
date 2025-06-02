@@ -92,7 +92,11 @@ export default function Calendar() {
   const programs = programsData?.programs || [];
   const courses = coursesData?.courses || [];
   const teachers = teachersData?.teachers || [];
-  const studentGroups = studentGroupsData?.studentGroups || [];
+  const studentGroups = Array.isArray(studentGroupsData) ? studentGroupsData : studentGroupsData?.studentGroups || [];
+
+  // Debug logging
+  console.log("Student Groups Data:", studentGroupsData);
+  console.log("Processed Student Groups:", studentGroups);
 
   // Combineer programs en courses voor vakken dropdown
   const subjects = [

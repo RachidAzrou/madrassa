@@ -195,7 +195,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         );
       }
       
-      res.json(filteredStudents);
+      // Zorg ervoor dat alle studenten een academisch jaar hebben
+      const studentsWithAcademicYear = filteredStudents.map(student => ({
+        ...student,
+        academicYear: student.academicYear || '2024-2025'
+      }));
+      
+      res.json(studentsWithAcademicYear);
     } catch (error) {
       console.error("Error fetching students:", error);
       res.status(500).json({ message: "Error fetching students" });
@@ -2471,18 +2477,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid student ID format" });
       }
       
+      console.log(`Deactivating all enrollments for student ${studentId}`);
+      
       // Update alle actieve enrollments naar inactive
-      await db
+      const result = await db
         .update(studentGroupEnrollments)
-        .set({ status: 'inactive' })
+        .set({ 
+          status: 'inactive'
+        })
         .where(
           and(
             eq(studentGroupEnrollments.studentId, studentId),
             eq(studentGroupEnrollments.status, 'active')
           )
-        );
+        )
+        .returning();
       
-      res.json({ message: "All active enrollments deactivated successfully" });
+      console.log(`Deactivated ${result.length} enrollments for student ${studentId}`);
+      res.json({ message: "All active enrollments deactivated successfully", count: result.length });
     } catch (error) {
       console.error("Error deactivating enrollments:", error);
       res.status(500).json({ message: "Error deactivating student enrollments" });

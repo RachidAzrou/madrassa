@@ -153,8 +153,8 @@ export default function Cijfers() {
     enabled: !!selectedClass
   });
   
-  // Data fetching for all students to get counts per class
-  const { data: allStudentsData = [] } = useQuery({ queryKey: ['/api/students'] });
+  // State to track student counts per class
+  const [classCounts, setClassCounts] = useState<Record<number, number>>({});
 
   // Data fetching for assessments
   const { data: assessmentsData = [] } = useQuery({ 
@@ -188,13 +188,37 @@ export default function Cijfers() {
     return response.json();
   };
 
+  // Effect to load student counts for each class
+  useEffect(() => {
+    const loadStudentCounts = async () => {
+      if (Array.isArray(classesData) && classesData.length > 0) {
+        const counts: Record<number, number> = {};
+        
+        // Load student count for each class
+        for (const classGroup of classesData) {
+          try {
+            const response = await fetch(`/api/student-groups/${classGroup.id}/students`);
+            if (response.ok) {
+              const students = await response.json();
+              counts[classGroup.id] = Array.isArray(students) ? students.length : 0;
+            } else {
+              counts[classGroup.id] = 0;
+            }
+          } catch (error) {
+            counts[classGroup.id] = 0;
+          }
+        }
+        
+        setClassCounts(counts);
+      }
+    };
+
+    loadStudentCounts();
+  }, [classesData]);
+
   // Function to get student count for a specific class
   const getStudentCountForClass = (classId: number) => {
-    if (!Array.isArray(allStudentsData)) return 0;
-    // Filter students by their class enrollment
-    return allStudentsData.filter((student: any) => 
-      student.classId === classId || student.studentGroupId === classId
-    ).length;
+    return classCounts[classId] || 0;
   };
 
 

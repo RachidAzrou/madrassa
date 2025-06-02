@@ -245,214 +245,182 @@ export default function Reports() {
     reportData.forEach((report, index) => {
       if (index > 0) pdf.addPage();
 
-      let yPos = 30;
+      // Page 1 - Main Report
+      let yPos = 20;
 
-      // Logo centered at top
+      // Logo at top center (if available)
       if (schoolLogo) {
         try {
-          pdf.addImage(schoolLogo, 'JPEG', (pageWidth - 60) / 2, 15, 60, 30);
-          yPos = 60;
+          pdf.addImage(schoolLogo, 'JPEG', (pageWidth - 40) / 2, 10, 40, 20);
+          yPos = 40;
         } catch (error) {
           console.warn('Could not add logo to PDF:', error);
         }
       }
 
-      // Title "RAPPORT" centered
-      pdf.setFontSize(20);
+      // Title "RAPPORT" - exactly centered like template
+      pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(0, 0, 0);
       pdf.text('RAPPORT', pageWidth / 2, yPos, { align: 'center' });
+      
       yPos += 30;
 
-      // Student Information - simple layout like template
-      pdf.setFontSize(12);
+      // Student info with exact spacing like template
+      pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
-      pdf.text(`Naam        : ${report.student.firstName} ${report.student.lastName}`, 30, yPos);
-      yPos += 10;
-      pdf.text(`StudentID   : ${report.student.studentId}`, 30, yPos);
-      yPos += 10;
-      pdf.text(`Klas        : 1A`, 30, yPos);
-      yPos += 10;
-      pdf.text(`Schooljaar  : ${report.student.academicYear || '2024-2025'}`, 30, yPos);
-      yPos += 25;
+      
+      pdf.text(`Naam        : ${report.student.firstName} ${report.student.lastName}`, 25, yPos);
+      yPos += 15;
+      pdf.text(`StudentID   : ${report.student.studentId}`, 25, yPos);
+      yPos += 15;
+      pdf.text(`Klas        : 1A`, 25, yPos);
+      yPos += 15;
+      pdf.text(`Schooljaar  : ${report.student.academicYear || '2024-2025'}`, 25, yPos);
+      
+      yPos += 35;
 
-      // Subjects Table Header
-      pdf.setDrawColor(0, 0, 0);
-      pdf.setLineWidth(0.5);
-      
-      // Table dimensions
-      const tableStartX = 30;
-      const tableWidth = pageWidth - 60;
-      const colWidths = [60, 30, 30, 30, 60]; // Vak, Testen, Taken, Examen, Opmerkingen
-      
-      // Header row
+      // Table header exactly like template
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'bold');
       
-      let xPos = tableStartX;
-      pdf.text('Vak', xPos + 5, yPos + 8);
-      pdf.rect(xPos, yPos, colWidths[0], 15, 'D');
-      xPos += colWidths[0];
+      // Center the table header like in template
+      const headerY = yPos;
+      pdf.text('Vak', 50, headerY);
+      pdf.text('Testen', 100, headerY);
+      pdf.text('Taken', 130, headerY);
+      pdf.text('Examen', 155, headerY);
+      pdf.text('Opmerkingen', 190, headerY);
       
-      pdf.text('Testen', xPos + 8, yPos + 8);
-      pdf.rect(xPos, yPos, colWidths[1], 15, 'D');
-      xPos += colWidths[1];
-      
-      pdf.text('Taken', xPos + 8, yPos + 8);
-      pdf.rect(xPos, yPos, colWidths[2], 15, 'D');
-      xPos += colWidths[2];
-      
-      pdf.text('Examen', xPos + 6, yPos + 8);
-      pdf.rect(xPos, yPos, colWidths[3], 15, 'D');
-      xPos += colWidths[3];
-      
-      pdf.text('Opmerkingen', xPos + 15, yPos + 8);
-      pdf.rect(xPos, yPos, colWidths[4], 15, 'D');
-      
-      yPos += 15;
+      yPos += 20;
 
-      // Subject rows
+      // Subject rows with actual data
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(10);
       
       Object.entries(report.grades).forEach(([subject, grades]) => {
-        const testAvg = grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-';
-        const taskAvg = grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : '-';
-        const examAvg = testAvg; // Using test average for exam (can be adjusted)
+        const testAvg = grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '';
+        const taskAvg = grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : '';
+        const examAvg = testAvg;
         
-        xPos = tableStartX;
+        pdf.text(subject, 25, yPos);
+        pdf.text(testAvg, 105, yPos, { align: 'center' });
+        pdf.text(taskAvg, 135, yPos, { align: 'center' });
+        pdf.text(examAvg, 165, yPos, { align: 'center' });
+        pdf.text('Goed', 180, yPos);
         
-        // Subject name
-        pdf.text(subject, xPos + 3, yPos + 8);
-        pdf.rect(xPos, yPos, colWidths[0], 15, 'D');
-        xPos += colWidths[0];
-        
-        // Tests
-        pdf.text(testAvg, xPos + 12, yPos + 8, { align: 'center' });
-        pdf.rect(xPos, yPos, colWidths[1], 15, 'D');
-        xPos += colWidths[1];
-        
-        // Tasks
-        pdf.text(taskAvg, xPos + 12, yPos + 8, { align: 'center' });
-        pdf.rect(xPos, yPos, colWidths[2], 15, 'D');
-        xPos += colWidths[2];
-        
-        // Exam
-        pdf.text(examAvg, xPos + 12, yPos + 8, { align: 'center' });
-        pdf.rect(xPos, yPos, colWidths[3], 15, 'D');
-        xPos += colWidths[3];
-        
-        // Comments
-        pdf.text('Goede vooruitgang', xPos + 3, yPos + 8);
-        pdf.rect(xPos, yPos, colWidths[4], 15, 'D');
-        
-        yPos += 15;
+        yPos += 18;
       });
 
-      // Add empty rows to match template
-      for (let i = 0; i < 3; i++) {
-        xPos = tableStartX;
-        for (let j = 0; j < colWidths.length; j++) {
-          pdf.rect(xPos, yPos, colWidths[j], 15, 'D');
-          xPos += colWidths[j];
-        }
-        yPos += 15;
+      // Add some empty lines for additional subjects
+      for (let i = 0; i < 8; i++) {
+        // Draw dots for empty lines like in template
+        pdf.text('............................', 25, yPos);
+        pdf.text('......', 100, yPos);
+        pdf.text('......', 130, yPos);
+        pdf.text('......', 155, yPos);
+        pdf.text('....................', 180, yPos);
+        yPos += 18;
       }
 
       yPos += 20;
 
-      // General Comments Section
-      pdf.setFontSize(12);
+      // General comments section like template
+      pdf.setFontSize(11);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Algemene opmerkingen:', 30, yPos);
-      yPos += 10;
+      pdf.text('Algemene opmerkingen:', 25, yPos);
+      
+      yPos += 20;
+      
+      // Comments area with lines like template
+      for (let i = 0; i < 4; i++) {
+        if (i === 0 && generalComments[report.student.id]) {
+          pdf.setFont('helvetica', 'normal');
+          pdf.text(generalComments[report.student.id].substring(0, 70), 25, yPos);
+        } else {
+          pdf.text('_________________________________________________', 25, yPos);
+        }
+        yPos += 15;
+      }
 
-      // Comments box
+      yPos += 30;
+
+      // Signature section exactly like template
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(10);
-      const commentsHeight = 40;
-      pdf.rect(30, yPos, tableWidth, commentsHeight, 'D');
       
-      if (generalComments[report.student.id]) {
-        const commentLines = pdf.splitTextToSize(generalComments[report.student.id], tableWidth - 10);
-        pdf.text(commentLines, 35, yPos + 10);
-      }
+      // Left signature
+      pdf.text('____________________________', 25, yPos);
+      pdf.text('Handtekening ouders', 40, yPos + 10);
       
-      yPos += commentsHeight + 30;
+      // Right signature  
+      pdf.text('____________________________', 130, yPos);
+      pdf.text('Handtekening leraar', 150, yPos + 10);
 
-      // Signature section - exactly like template
-      const sigLineLength = 70;
-      const sigSpacing = (pageWidth - 60 - (2 * sigLineLength)) / 3;
-      
-      // Parent signature
-      pdf.line(30, yPos, 30 + sigLineLength, yPos);
-      pdf.text('Handtekening ouders', 30 + (sigLineLength / 2), yPos + 10, { align: 'center' });
-      
-      // Teacher signature
-      const teacherSigStart = 30 + sigLineLength + sigSpacing;
-      pdf.line(teacherSigStart, yPos, teacherSigStart + sigLineLength, yPos);
-      pdf.text('Handtekening leraar', teacherSigStart + (sigLineLength / 2), yPos + 10, { align: 'center' });
+      // Page 2 - Behavior & Attendance
+      pdf.addPage();
+      yPos = 40;
 
-      // Start new page for behavior and attendance if needed
-      if (yPos > pageHeight - 150) {
-        pdf.addPage();
-        yPos = 30;
-      } else {
-        yPos += 40;
-      }
-
-      // Second section header
+      // Header for second page
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
       pdf.text('GEDRAG & AANWEZIGHEID', pageWidth / 2, yPos, { align: 'center' });
-      yPos += 30;
+      
+      yPos += 50;
 
       // Behavior section
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('GEDRAG', 30, yPos);
-      yPos += 15;
-
-      const behaviorBoxHeight = 60;
-      pdf.rect(30, yPos, tableWidth, behaviorBoxHeight, 'D');
+      pdf.text('GEDRAG', 25, yPos);
+      
+      yPos += 25;
       
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(11);
-      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 35, yPos + 15);
+      pdf.setFontSize(10);
+      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, 25, yPos);
+      yPos += 15;
       
       if (behaviorGrades[report.student.id]?.comments) {
-        const behaviorComments = pdf.splitTextToSize(behaviorGrades[report.student.id]?.comments, tableWidth - 10);
-        pdf.text(behaviorComments, 35, yPos + 30);
+        pdf.text(behaviorGrades[report.student.id]?.comments, 25, yPos);
+        yPos += 15;
       }
       
-      yPos += behaviorBoxHeight + 20;
+      // Empty lines for behavior
+      for (let i = 0; i < 5; i++) {
+        pdf.text('_________________________________________________', 25, yPos);
+        yPos += 15;
+      }
+
+      yPos += 30;
 
       // Attendance section
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('AANWEZIGHEID', 30, yPos);
-      yPos += 15;
-
-      const attendanceBoxHeight = 60;
-      pdf.rect(30, yPos, tableWidth, attendanceBoxHeight, 'D');
+      pdf.text('AANWEZIGHEID', 25, yPos);
+      
+      yPos += 25;
       
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(11);
-      pdf.text(`Aantal keer afwezig: ${report.attendance.absent}`, 35, yPos + 15);
-      pdf.text(`Aantal keer te laat: ${report.attendance.late}`, 35, yPos + 30);
-      pdf.text('Opmerkingen: Goede aanwezigheid getoond', 35, yPos + 45);
+      pdf.setFontSize(10);
+      pdf.text(`Afwezig: ${report.attendance.absent} keer`, 25, yPos);
+      yPos += 15;
+      pdf.text(`Te laat: ${report.attendance.late} keer`, 25, yPos);
+      yPos += 15;
       
-      yPos += attendanceBoxHeight + 40;
+      // Empty lines for attendance
+      for (let i = 0; i < 5; i++) {
+        pdf.text('_________________________________________________', 25, yPos);
+        yPos += 15;
+      }
 
-      // Bottom signatures
-      pdf.line(30, yPos, 30 + sigLineLength, yPos);
-      pdf.text('Handtekening ouders', 30 + (sigLineLength / 2), yPos + 10, { align: 'center' });
-      
-      pdf.line(teacherSigStart, yPos, teacherSigStart + sigLineLength, yPos);
-      pdf.text('Handtekening leraar', teacherSigStart + (sigLineLength / 2), yPos + 10, { align: 'center' });
+      yPos += 50;
+
+      // Bottom signatures for page 2
+      pdf.text('____________________________   ____________________________', 25, yPos);
+      pdf.text('Handtekening ouders            Handtekening leraar', 25, yPos + 10);
     });
 
-    // Save PDF
+    // Save PDF with simple filename
     const className = selectedReportType === 'class' ? classesData?.find((c: StudentGroup) => c.id.toString() === selectedClass)?.name : '';
     const studentName = selectedReportType === 'individual' ? reportData[0]?.student.firstName + '_' + reportData[0]?.student.lastName : '';
     const filename = `rapport_${className || studentName}_${new Date().toISOString().split('T')[0]}.pdf`;
@@ -461,7 +429,7 @@ export default function Reports() {
 
     toast({
       title: "Rapport gegenereerd",
-      description: `Rapport gebaseerd op template opgeslagen als ${filename}`,
+      description: `Rapport opgeslagen als ${filename}`,
     });
   };
 

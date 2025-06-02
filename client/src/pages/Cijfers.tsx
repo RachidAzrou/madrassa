@@ -638,7 +638,7 @@ export default function Cijfers() {
                       <Button 
                         onClick={handleSaveGrades}
                         disabled={Object.values(grades).filter(g => g !== '').length === 0}
-                        className="bg-green-600 hover:bg-green-700"
+                        className="hover:bg-green-700 bg-[#0b4ca4]"
                       >
                         <Save className="h-4 w-4 mr-2" />
                         Cijfers opslaan

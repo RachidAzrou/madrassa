@@ -462,14 +462,7 @@ export default function Attendance() {
                 <ArrowRight className="h-4 w-4" />
               </Button>
               
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-                className="text-blue-600 border-blue-600 hover:bg-blue-50"
-              >
-                Vandaag
-              </Button>
+
             </div>
 
             {/* Filters */}

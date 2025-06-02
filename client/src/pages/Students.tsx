@@ -154,11 +154,12 @@ export default function Students() {
   
   const { toast } = useToast();
 
-  // Data fetching met voorkeur voor localStorage data tijdens ontwikkeling
+  // Data fetching van database
   const { data: studentsData = [], isLoading: studentsLoading } = useQuery({
     queryKey: ['/api/students'],
-    // Gebruik staleTime om cache langer te behouden tijdens ontwikkeling
-    staleTime: Infinity
+    staleTime: 5 * 60 * 1000, // 5 minuten cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
   
   const { data: programsData = [] } = useQuery({

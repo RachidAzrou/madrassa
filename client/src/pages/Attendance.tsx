@@ -69,39 +69,6 @@ export default function Attendance() {
   const [studentAttendance, setStudentAttendance] = useState<Record<number, AttendanceRecord>>({});
   const [teacherAttendance, setTeacherAttendance] = useState<Record<number, TeacherAttendanceRecord>>({});
   const [isSaving, setIsSaving] = useState(false);
-
-  // Effect to load existing attendance data when it becomes available
-  useEffect(() => {
-    if (attendanceData && Array.isArray(attendanceData)) {
-      const attendanceMap: Record<number, AttendanceRecord> = {};
-      attendanceData.forEach((record: any) => {
-        attendanceMap[record.studentId] = {
-          studentId: record.studentId,
-          courseId: record.courseId,
-          teacherId: record.teacherId || 1,
-          date: record.date,
-          status: record.status
-        };
-      });
-      setStudentAttendance(attendanceMap);
-    }
-  }, [attendanceData]);
-
-  // Effect to load existing teacher attendance data when it becomes available
-  useEffect(() => {
-    if (teacherAttendanceData && Array.isArray(teacherAttendanceData)) {
-      const teacherAttendanceMap: Record<number, TeacherAttendanceRecord> = {};
-      teacherAttendanceData.forEach((record: any) => {
-        teacherAttendanceMap[record.teacherId] = {
-          teacherId: record.teacherId,
-          date: record.date,
-          status: record.status,
-          classId: record.classId
-        };
-      });
-      setTeacherAttendance(teacherAttendanceMap);
-    }
-  }, [teacherAttendanceData]);
   
   // Fetch programs (voor eventuele andere doeleinden)
   const { data: programsResponse } = useQuery({

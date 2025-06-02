@@ -337,17 +337,11 @@ export default function Cijfers() {
         throw new Error('Fout bij opslaan van cijfer');
       }
 
-      // Update local state
-      const updatedGrades = { ...subjectGrades };
-      if (!updatedGrades[studentId]) {
-        updatedGrades[studentId] = {};
-      }
-      updatedGrades[studentId][subject] = newGrade;
-      setSubjectGrades(updatedGrades);
       setEditGrade(null);
       
-      // Refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/grades/class', selectedClass] });
+      // Refresh data and wait for it to complete
+      await queryClient.invalidateQueries({ queryKey: ['/api/grades/class', selectedClass] });
+      await queryClient.refetchQueries({ queryKey: ['/api/grades/class', selectedClass] });
 
       toast({
         title: "Cijfer opgeslagen",

@@ -174,7 +174,7 @@ export default function Cijfers() {
             newSubjectGrades[grade.studentId] = {};
           }
           // Find the program/subject name based on courseId
-          const program = programs?.find(p => p.id === grade.courseId);
+          const program = programsData?.programs?.find((p: any) => p.id === grade.courseId);
           const subjectName = program ? program.name : `Program ${grade.courseId}`;
           newSubjectGrades[grade.studentId][subjectName] = grade.score;
         });
@@ -186,7 +186,7 @@ export default function Cijfers() {
         setSubjectGrades({});
       }
     }
-  }, [selectedClass, gradesData, students, activeTab, subjectGrades]);
+  }, [selectedClass, gradesData, students, activeTab, programsData]);
   
   // Effect om gedragsdata te verwerken of dummy gedragsbeoordelingen te genereren
   useEffect(() => {

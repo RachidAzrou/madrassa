@@ -774,53 +774,6 @@ export default function Attendance() {
                 
                 <TabsContent value="teachers">
                   <div className="space-y-4 mt-6">
-                    <div className="bg-slate-50 p-4 rounded-md border shadow-sm mb-6">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3">
-                        <div className="text-base font-medium text-gray-800 mb-2 sm:mb-0">Docentacties</div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-sm border border-gray-200">
-                            Klas: {classesData?.find((c) => c.id.toString() === selectedClass)?.name || ''}
-                          </span>
-                          <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-sm border border-gray-200">
-                            Datum: {formatDate(selectedDate)}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={markAllTeachersPresent} 
-                          className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100 hover:text-green-800 flex-1 font-medium"
-                          disabled={isLoadingTeachers}
-                        >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Allen aanwezig
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={markAllTeachersAbsent} 
-                          className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:text-red-800 flex-1 font-medium"
-                          disabled={isLoadingTeachers}
-                        >
-                          <XCircle className="h-4 w-4 mr-2" />
-                          Allen afwezig
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={markAllTeachersLate}
-                          className="bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 hover:text-amber-800 flex-1 font-medium"
-                          disabled={isLoadingTeachers}
-                        >
-                          <Clock className="h-4 w-4 mr-2" />
-                          Allen te laat
-                        </Button>
-                      </div>
-                    </div>
                     
                     {isLoadingTeachers ? (
                       <div className="py-10 text-center bg-white rounded-md border border-gray-200">

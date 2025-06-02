@@ -570,12 +570,7 @@ export default function Students() {
   
 
 
-  // Update studenten wanneer data wordt geladen
-  useEffect(() => {
-    if (studentsData && studentsData.length > 0) {
-      setStudents(studentsData);
-    }
-  }, [studentsData]);
+  // Database data wordt automatisch gebruikt via React Query
 
   // Gebruik echte programma's data van de API
   const programs = programsData || [];
@@ -766,7 +761,7 @@ export default function Students() {
             <TableBody>
               {studentsLoading ? (
                 <TableLoadingState />
-              ) : students.length === 0 ? (
+              ) : studentsData.length === 0 ? (
                 <EmptyTableState 
                   icon={<User className="h-12 w-12 mx-auto text-gray-300" />}
                   title="Geen studenten gevonden"
@@ -792,7 +787,7 @@ export default function Students() {
                   }
                 />
               ) : (
-                students.map((student) => (
+                studentsData.map((student) => (
                   <TableRow key={student.id} className="hover:bg-gray-50 group">
                     <TableCell className="px-4 py-3 text-center">
                       <Checkbox 
@@ -2494,10 +2489,10 @@ export default function Students() {
               />
             </div>
             
-            {/* Bestaande studenten uit localStorage */}
+            {/* Bestaande studenten uit database */}
             {siblingSearchTerm.length > 0 && (
               <div className="bg-white border rounded-lg divide-y max-h-60 overflow-y-auto">
-                {students.filter(student => 
+                {studentsData.filter(student => 
                   (student.firstName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
                   student.lastName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
                   student.studentId.toLowerCase().includes(siblingSearchTerm.toLowerCase())) &&
@@ -2560,7 +2555,7 @@ export default function Students() {
                   </div>
                 ))}
                 
-                {students.filter(student => 
+                {studentsData.filter(student => 
                   student.firstName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
                   student.lastName.toLowerCase().includes(siblingSearchTerm.toLowerCase()) ||
                   student.studentId.toLowerCase().includes(siblingSearchTerm.toLowerCase())

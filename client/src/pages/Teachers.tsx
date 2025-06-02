@@ -1495,28 +1495,50 @@ export default function Teachers() {
                   </div>
                 )}
 
-                {/* Vakken */}
-                {selectedTeacher.subjects && selectedTeacher.subjects.length > 0 && (
-                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Lesgegeven Vakken
-                    </h3>
+                {/* Toegewezen Vakken */}
+                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
+                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Toegewezen Vakken
+                  </h3>
+                  {selectedTeacher.subjects && selectedTeacher.subjects.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {selectedTeacher.subjects.map((subjectId, index) => {
-                        const subject = courses.find((c: any) => c.id.toString() === subjectId);
+                      {selectedTeacher.subjects.map((subject, index) => {
+                        // Subject kan een string zijn (naam) of object met id
+                        const subjectName = typeof subject === 'string' ? subject : subject.name || subject;
+                        const courseMatch = courses.find((c: any) => 
+                          c.name === subjectName || c.id.toString() === subject || c.code === subject
+                        );
+                        
                         return (
-                          <div key={index} className="flex items-center space-x-2 bg-white p-2 rounded border">
-                            <BookOpen className="h-4 w-4 text-blue-600" />
-                            <span className="text-sm font-medium text-gray-900">
-                              {subject ? `${subject.name} (${subject.code})` : subjectId}
-                            </span>
+                          <div key={index} className="flex items-center space-x-3 bg-white p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex-shrink-0">
+                              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <BookOpen className="h-4 w-4 text-blue-600" />
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {courseMatch ? courseMatch.name : subjectName}
+                              </p>
+                              {courseMatch && courseMatch.code && (
+                                <p className="text-xs text-gray-500">{courseMatch.code}</p>
+                              )}
+                            </div>
                           </div>
                         );
                       })}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <BookOpen className="h-6 w-6 text-gray-400" />
+                      </div>
+                      <p className="text-sm text-gray-500 font-medium">Geen vakken toegewezen</p>
+                      <p className="text-xs text-gray-400 mt-1">Voeg vakken toe via de bewerk functie</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

@@ -979,145 +979,146 @@ export default function Cijfers() {
           </DialogContent>
         </Dialog>
         
-        {/* Add new score dialog */}
+        {/* Add new assessment dialog */}
         <Dialog open={showAddScoreDialog} onOpenChange={setShowAddScoreDialog}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Nieuwe beoordeling toevoegen</DialogTitle>
-              <DialogDescription>
-                Voeg een nieuwe beoordeling toe voor een vak met punten per type (test, taak, examen).
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader className="pb-4">
+              <DialogTitle className="text-xl font-semibold text-gray-800">Nieuwe beoordeling toevoegen</DialogTitle>
+              <DialogDescription className="text-gray-600">
+                Voeg een nieuwe beoordeling toe voor een vak. Deze wordt automatisch toegevoegd voor alle studenten in de klas.
               </DialogDescription>
             </DialogHeader>
             
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <div className="text-right font-medium text-sm">
-                  Vak
-                </div>
-                <div className="col-span-3">
-                  <Select
-                    value={newScoreData.subject}
-                    onValueChange={(value) => setNewScoreData({...newScoreData, subject: value})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecteer een vak" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {subjects.map((subject) => (
-                        <SelectItem key={subject.id} value={subject.name}>
-                          {subject.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div className="space-y-6">
+              {/* Vak selectie */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Vak <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  value={newScoreData.subject}
+                  onValueChange={(value) => setNewScoreData({...newScoreData, subject: value})}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecteer een vak" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subjects.map((subject) => (
+                      <SelectItem key={subject.id} value={subject.name}>
+                        {subject.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
-              <div className="grid grid-cols-4 items-center gap-4">
-                <div className="text-right font-medium text-sm">
-                  Type
-                </div>
-                <div className="col-span-3">
+              {/* Type en naam */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Type <span className="text-red-500">*</span>
+                  </label>
                   <Select
                     value={newScoreData.assessmentType}
                     onValueChange={(value) => setNewScoreData({...newScoreData, assessmentType: value})}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecteer beoordelingstype" />
+                      <SelectValue placeholder="Type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="test">Test</SelectItem>
-                      <SelectItem value="taak">Taak</SelectItem>
-                      <SelectItem value="examen">Examen</SelectItem>
-                      <SelectItem value="presentatie">Presentatie</SelectItem>
-                      <SelectItem value="project">Project</SelectItem>
+                      <SelectItem value="test">📝 Test</SelectItem>
+                      <SelectItem value="taak">📋 Taak</SelectItem>
+                      <SelectItem value="examen">🎓 Examen</SelectItem>
+                      <SelectItem value="presentatie">🎤 Presentatie</SelectItem>
+                      <SelectItem value="project">📁 Project</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <div className="text-right font-medium text-sm">
-                  Naam
-                </div>
-                <Input
-                  className="col-span-3"
-                  placeholder="Bijv. Test Hoofdstuk 1"
-                  value={newScoreData.assessmentName}
-                  onChange={(e) => setNewScoreData({...newScoreData, assessmentName: e.target.value})}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid grid-cols-2 items-center gap-2">
-                  <div className="text-right font-medium text-sm">
-                    Punten
-                  </div>
-                  <Input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="1"
-                    placeholder="0-100"
-                    className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    value={newScoreData.points}
-                    onChange={(e) => setNewScoreData({...newScoreData, points: e.target.value})}
-                  />
-                </div>
                 
-                <div className="grid grid-cols-2 items-center gap-2">
-                  <div className="text-right font-medium text-sm">
-                    Max punten
-                  </div>
-                  <Input
-                    type="number"
-                    min="1"
-                    max="100"
-                    step="1"
-                    placeholder="100"
-                    className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    value={newScoreData.maxPoints}
-                    onChange={(e) => setNewScoreData({...newScoreData, maxPoints: e.target.value})}
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <div className="text-right font-medium text-sm">
-                  Gewicht
-                </div>
-                <div className="col-span-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Gewicht <span className="text-red-500">*</span>
+                  </label>
                   <Select
                     value={newScoreData.weight}
                     onValueChange={(value) => setNewScoreData({...newScoreData, weight: value})}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecteer gewicht" />
+                      <SelectValue placeholder="Gewicht" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="10">10% - Kleine taak</SelectItem>
-                      <SelectItem value="20">20% - Reguliere taak</SelectItem>
-                      <SelectItem value="30">30% - Grote taak</SelectItem>
+                      <SelectItem value="10">10% - Klein</SelectItem>
+                      <SelectItem value="20">20% - Normaal</SelectItem>
+                      <SelectItem value="30">30% - Belangrijk</SelectItem>
                       <SelectItem value="40">40% - Test</SelectItem>
-                      <SelectItem value="50">50% - Belangrijk</SelectItem>
+                      <SelectItem value="50">50% - Groot</SelectItem>
                       <SelectItem value="60">60% - Examen</SelectItem>
-                      <SelectItem value="100">100% - Volledig cijfer</SelectItem>
+                      <SelectItem value="100">100% - Volledig</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
+              
+              {/* Naam */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Naam beoordeling <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  placeholder="Bijv. Test Hoofdstuk 1, Huiswerk Oefeningen, Eindexamen..."
+                  value={newScoreData.assessmentName}
+                  onChange={(e) => setNewScoreData({...newScoreData, assessmentName: e.target.value})}
+                  className="w-full"
+                />
+              </div>
+              
+              {/* Maximum punten */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Maximum punten <span className="text-red-500">*</span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    min="1"
+                    max="1000"
+                    step="1"
+                    placeholder="100"
+                    className="w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    value={newScoreData.maxPoints}
+                    onChange={(e) => setNewScoreData({...newScoreData, maxPoints: e.target.value})}
+                  />
+                  <span className="text-sm text-gray-500">punten mogelijk</span>
+                </div>
+                <p className="text-xs text-gray-500">
+                  Dit wordt gebruikt om percentages te berekenen (bijv. 8/10 = 80%)
+                </p>
+              </div>
+              
+              {/* Info box */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <div className="text-blue-600 mt-0.5">ℹ️</div>
+                  <div className="text-sm text-blue-700">
+                    <p className="font-medium mb-1">Hoe werkt dit?</p>
+                    <p>Deze beoordeling wordt toegevoegd voor alle studenten in de geselecteerde klas. Docenten kunnen daarna individuele punten invoeren.</p>
+                  </div>
+                </div>
+              </div>
             </div>
             
-            <DialogFooter>
+            <DialogFooter className="flex flex-col sm:flex-row gap-2 pt-6">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => setShowAddScoreDialog(false)}
+                className="order-2 sm:order-1"
               >
                 Annuleren
               </Button>
               <Button 
                 type="submit"
+                className="order-1 sm:order-2 bg-blue-600 hover:bg-blue-700 text-white"
                 onClick={async () => {
                   if (!newScoreData.subject || !newScoreData.assessmentType || !newScoreData.assessmentName || !newScoreData.maxPoints) {
                     toast({

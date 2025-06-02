@@ -28,8 +28,8 @@ import {
 import { toast } from '@/hooks/use-toast';
 import { PremiumHeader } from '@/components/layout/premium-header';
 
-// Component voor subject overview badges
-const SubjectOverviewBadges = ({ subjectId, assessmentsData }: { subjectId: number, assessmentsData: any[] }) => {
+// Component voor cijfergemiddelde per vak
+const SubjectGradeAverage = ({ subjectId }: { subjectId: number }) => {
   const fetchGradesForSubject = async (subjectId: number) => {
     const response = await fetch(`/api/grades/by-course/${subjectId}`);
     return response.json();
@@ -39,11 +39,6 @@ const SubjectOverviewBadges = ({ subjectId, assessmentsData }: { subjectId: numb
     queryKey: ['/api/grades/by-course', subjectId],
     queryFn: () => fetchGradesForSubject(subjectId)
   });
-
-  // Calculate assessment count for this subject
-  const subjectAssessments = Array.isArray(assessmentsData) 
-    ? assessmentsData.filter((a: any) => a.courseId === subjectId) 
-    : [];
 
   // Calculate average grade for this subject
   const subjectGrades = Array.isArray(gradesData) ? gradesData : [];
@@ -58,24 +53,16 @@ const SubjectOverviewBadges = ({ subjectId, assessmentsData }: { subjectId: numb
       })()
     : null;
 
-  return (
-    <>
-      <Badge variant="outline" className="flex items-center gap-1">
-        <Target className="h-3 w-3" />
-        {subjectAssessments.length} beoordeling{subjectAssessments.length !== 1 ? 'en' : ''}
-      </Badge>
-      {averageGrade ? (
-        <Badge variant="secondary" className="flex items-center gap-1">
-          <TrendingUp className="h-3 w-3" />
-          Gem. {averageGrade}
-        </Badge>
-      ) : (
-        <Badge variant="outline" className="flex items-center gap-1 text-gray-400">
-          <TrendingUp className="h-3 w-3" />
-          Geen cijfers
-        </Badge>
-      )}
-    </>
+  return averageGrade ? (
+    <Badge variant="secondary" className="flex items-center gap-1">
+      <TrendingUp className="h-3 w-3" />
+      Gem. {averageGrade}
+    </Badge>
+  ) : (
+    <Badge variant="outline" className="flex items-center gap-1 text-gray-400">
+      <TrendingUp className="h-3 w-3" />
+      Geen cijfers
+    </Badge>
   );
 };
 
@@ -563,7 +550,55 @@ export default function Cijfers() {
                               <p className="text-sm text-gray-600">{subject.code}</p>
                             </div>
                             <div className="flex flex-col items-end gap-1">
-                              <SubjectOverviewBadges subjectId={subject.id} assessmentsData={allAssessmentsData} />
+                              {(() => {
+                                // Calculate assessment count for this subject
+                                const subjectAssessments = Array.isArray(allAssessmentsData) 
+                                  ? allAssessmentsData.filter((a: any) => a.courseId === subject.id) 
+                                  : [];
+                                
+                                return (
+                                  <>
+                                    <Badge variant="outline" className="flex items-center gap-1">
+                                      <Target className="h-3 w-3" />
+                                      {subjectAssessments.length} beoordeling{subjectAssessments.length !== 1 ? 'en' : ''}
+                                    </Badge>
+                                    {(() => {
+                                      // Fetch and display grade average for this subject
+                                      const { data: gradesData = [] } = useQuery({
+                                        queryKey: ['/api/grades/by-course', subject.id],
+                                        queryFn: async () => {
+                                          const response = await fetch(`/api/grades/by-course/${subject.id}`);
+                                          return response.json();
+                                        }
+                                      });
+                                      
+                                      const subjectGrades = Array.isArray(gradesData) ? gradesData : [];
+                                      
+                                      const averageGrade = subjectGrades.length > 0 
+                                        ? (() => {
+                                            const totalScore = subjectGrades.reduce((sum: number, grade: any) => {
+                                              const percentage = (grade.score / grade.maxScore) * 100;
+                                              return sum + Math.round(percentage / 10);
+                                            }, 0);
+                                            return (totalScore / subjectGrades.length).toFixed(1);
+                                          })()
+                                        : null;
+
+                                      return averageGrade ? (
+                                        <Badge variant="secondary" className="flex items-center gap-1">
+                                          <TrendingUp className="h-3 w-3" />
+                                          Gem. {averageGrade}
+                                        </Badge>
+                                      ) : (
+                                        <Badge variant="outline" className="flex items-center gap-1 text-gray-400">
+                                          <TrendingUp className="h-3 w-3" />
+                                          Geen cijfers
+                                        </Badge>
+                                      );
+                                    })()}
+                                  </>
+                                );
+                              })()}
                             </div>
                           </div>
                         </CardContent>

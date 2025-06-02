@@ -77,6 +77,7 @@ type TeacherType = {
   houseNumber?: string;
   postalCode?: string;
   city?: string;
+  notes?: string;
   educations?: string[];
   languages?: string[];
   subjects?: string[];

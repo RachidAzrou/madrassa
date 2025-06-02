@@ -459,8 +459,34 @@ export class DatabaseStorage implements IStorage {
     return relation;
   }
   
-  async getStudentGuardiansByStudent(studentId: number): Promise<StudentGuardian[]> {
-    return await db.select().from(studentGuardians).where(eq(studentGuardians.studentId, studentId));
+  async getStudentGuardiansByStudent(studentId: number): Promise<any[]> {
+    try {
+      // Haal relaties en voogd informatie op met JOIN
+      const result = await db
+        .select({
+          id: studentGuardians.id,
+          studentId: studentGuardians.studentId,
+          guardianId: studentGuardians.guardianId,
+          relationship: studentGuardians.relationship,
+          createdAt: studentGuardians.createdAt,
+          firstName: guardians.firstName,
+          lastName: guardians.lastName,
+          email: guardians.email,
+          phone: guardians.phone,
+          isEmergencyContact: guardians.isEmergencyContact,
+          emergencyContactName: guardians.emergencyContactName,
+          emergencyContactPhone: guardians.emergencyContactPhone,
+          emergencyContactRelation: guardians.emergencyContactRelation
+        })
+        .from(studentGuardians)
+        .innerJoin(guardians, eq(studentGuardians.guardianId, guardians.id))
+        .where(eq(studentGuardians.studentId, studentId));
+
+      return result;
+    } catch (error) {
+      console.error('Error getting student guardians:', error);
+      return [];
+    }
   }
   
   async getStudentGuardiansByGuardian(guardianId: number): Promise<any[]> {

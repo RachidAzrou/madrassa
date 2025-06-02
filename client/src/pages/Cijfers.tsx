@@ -116,7 +116,7 @@ export default function Cijfers() {
   const students = classStudentsData || [];
   
   // Filter studenten op naam/id als er een filter is ingesteld
-  const filteredStudents = students ? students.filter(student => {
+  const filteredStudents = Array.isArray(students) ? students.filter(student => {
     if (!studentFilter) return true;
     const searchTerm = studentFilter.toLowerCase();
     return (

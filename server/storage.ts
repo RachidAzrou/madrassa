@@ -118,6 +118,11 @@ export interface IStorage {
   getStudentSiblings(studentId: number): Promise<StudentSibling[]>;
   addStudentSibling(studentId: number, siblingId: number, relationship?: string): Promise<void>;
   removeStudentSibling(studentId: number, siblingId: number): Promise<void>;
+  
+  // Program Teachers operations
+  getProgramTeachers(programId: number): Promise<any[]>;
+  assignTeacherToProgram(programId: number, teacherId: number, isPrimary?: boolean): Promise<void>;
+  removeTeacherFromProgram(programId: number, teacherId: number): Promise<void>;
 }
 
 // DatabaseStorage implementatie die gebruik maakt van de database

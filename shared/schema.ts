@@ -124,6 +124,27 @@ export const insertProgramSchema = createInsertSchema(programs).omit({
 export type InsertProgram = z.infer<typeof insertProgramSchema>;
 export type Program = typeof programs.$inferSelect;
 
+// Program Teachers (Many-to-Many relationship)
+export const programTeachers = pgTable("program_teachers", {
+  id: serial("id").primaryKey(),
+  programId: integer("program_id").notNull().references(() => programs.id, { onDelete: "cascade" }),
+  teacherId: integer("teacher_id").notNull().references(() => teachers.id, { onDelete: "cascade" }),
+  isPrimary: boolean("is_primary").default(false), // Hoofddocent voor dit vak
+  assignedAt: timestamp("assigned_at").defaultNow(),
+}, (table) => {
+  return {
+    unq: unique().on(table.programId, table.teacherId),
+  };
+});
+
+export const insertProgramTeacherSchema = createInsertSchema(programTeachers).omit({
+  id: true,
+  assignedAt: true
+});
+
+export type InsertProgramTeacher = z.infer<typeof insertProgramTeacherSchema>;
+export type ProgramTeacher = typeof programTeachers.$inferSelect;
+
 // Courses
 export const courses = pgTable("courses", {
   id: serial("id").primaryKey(),

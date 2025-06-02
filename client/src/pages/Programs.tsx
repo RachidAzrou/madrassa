@@ -548,7 +548,7 @@ export default function Programs() {
                     </span>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap">
-                    <span className="text-gray-900">{program.department || '-'}</span>
+                    <span className="text-gray-900">Nog niet toegewezen</span>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap">
                     <span className="text-gray-900">
@@ -566,11 +566,35 @@ export default function Programs() {
                     </span>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap text-right">
-                    <QuickActions
-                      onView={() => handleViewProgram(program.id)}
-                      onEdit={() => handleEditProgram(program.id)}
-                      onDelete={() => handleDeleteProgram(program.id)}
-                    />
+                    <div className="flex items-center justify-end gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                        onClick={() => handleViewProgram(program.id)}
+                        title="Bekijken"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                        onClick={() => handleEditProgram(program.id)}
+                        title="Bewerken"
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 w-7 p-0 text-gray-500 hover:text-red-600 hover:bg-red-50"
+                        onClick={() => handleDeleteProgram(program.id)}
+                        title="Verwijderen"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </StandardTableCell>
                 </StandardTableRow>
               ))

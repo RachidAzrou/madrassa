@@ -4720,57 +4720,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Save grades for multiple students
-  app.post("/api/grades", async (req: Request, res: Response) => {
+  app.post("/api/grades", async (req, res) => {
+    console.log("POST /api/grades called");
+    console.log("Request body:", JSON.stringify(req.body, null, 2));
+    
     try {
       const { grades: gradesToSave } = req.body;
-      console.log("Received grades data:", gradesToSave);
       
-      if (!Array.isArray(gradesToSave)) {
+      if (!gradesToSave || !Array.isArray(gradesToSave)) {
+        console.log("Invalid grades data");
         return res.status(400).json({ error: "Grades must be an array" });
       }
 
+      console.log("Processing", gradesToSave.length, "grades");
       const savedGrades = [];
+      
       for (const gradeData of gradesToSave) {
-        console.log("Processing grade data:", gradeData);
-        const { studentId, assessmentId, score, maxScore } = gradeData;
+        console.log("Processing grade:", gradeData);
         
-        // Get the assessment to get more details
-        const assessment = await storage.getAssessmentById(assessmentId);
-        console.log("Found assessment:", assessment);
+        const studentId = parseInt(gradeData.studentId);
+        const assessmentId = parseInt(gradeData.assessmentId);
+        const score = parseInt(gradeData.score);
+        const maxScore = parseInt(gradeData.maxScore);
+        
+        console.log("Parsed values:", { studentId, assessmentId, score, maxScore });
+        
+        // Get assessment details
+        const assessments = await db.select().from(schema.assessments).where(eq(schema.assessments.id, assessmentId));
+        const assessment = assessments[0];
         
         if (!assessment) {
-          console.log("Assessment not found, skipping");
-          continue; // Skip if assessment not found
+          console.log("Assessment not found for ID:", assessmentId);
+          continue;
         }
-
-        // Create grade record directly without validation
-        const gradeToInsert = {
-          studentId: parseInt(studentId),
+        
+        console.log("Found assessment:", assessment);
+        
+        // Create the grade record
+        const gradeRecord = {
+          studentId,
           courseId: assessment.courseId,
           assessmentType: assessment.type,
           assessmentName: assessment.name,
-          score: parseInt(score),
-          maxScore: parseInt(maxScore),
+          score,
+          maxScore,
           weight: assessment.weight || 0,
-          date: new Date().toISOString().split('T')[0],
-          remark: null
+          date: new Date().toISOString().split('T')[0]
         };
-
-        console.log("Inserting grade:", gradeToInsert);
         
-        // Insert directly into database
-        const [savedGrade] = await db.insert(grades).values(gradeToInsert).returning();
-        console.log("Saved grade:", savedGrade);
+        console.log("Inserting grade record:", gradeRecord);
+        
+        const [savedGrade] = await db.insert(grades).values(gradeRecord).returning();
         savedGrades.push(savedGrade);
+        console.log("Successfully saved grade:", savedGrade);
       }
 
+      console.log("All grades saved successfully");
       res.json({ 
         message: "Grades saved successfully", 
         savedGrades: savedGrades.length 
       });
+      
     } catch (error) {
-      console.error("Error saving grades:", error);
-      res.status(500).json({ error: "Failed to save grades" });
+      console.error("Error in /api/grades:", error);
+      res.status(500).json({ error: "Failed to save grades", details: error.message });
     }
   });
 

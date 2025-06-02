@@ -248,11 +248,25 @@ export default function Teachers() {
       phone: teacher.phone || '',
       specialty: teacher.specialty || '',
       bio: teacher.bio || '',
-      status: teacher.status,
+      status: teacher.status || 'Actief',
       dateOfBirth: teacher.dateOfBirth || '',
       hireDate: teacher.hireDate || '',
       photoUrl: teacher.photoUrl || '',
+      gender: teacher.gender || '',
+      street: teacher.street || '',
+      houseNumber: teacher.houseNumber || '',
+      postalCode: teacher.postalCode || '',
+      city: teacher.city || '',
+      notes: teacher.notes || '',
     });
+    
+    // Set existing educations and languages if available
+    setTeacherEducations(teacher.educations || []);
+    setTeacherLanguages(teacher.languages || []);
+    
+    // Set existing subjects if available
+    setSelectedSubjects(teacher.subjects ? teacher.subjects.map(subject => subject.id.toString()) : []);
+    
     setIsEditMode(true);
     setEditingTeacherId(teacher.id);
     setShowNewTeacherDialog(true);

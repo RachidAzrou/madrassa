@@ -126,12 +126,6 @@ export default function Cijfers() {
     enabled: !!selectedSubject
   });
 
-  // Data fetching for all grades (used for calculating averages in overview)
-  const { data: allGradesData = [] } = useQuery({
-    queryKey: ['/api/grades'],
-    queryFn: () => fetch('/api/grades').then(res => res.json())
-  });
-
   // Data fetching for all assessments (for overview calculations)  
   const { data: allAssessmentsData = [] } = useQuery({
     queryKey: ['/api/assessments'],
@@ -516,37 +510,16 @@ export default function Cijfers() {
                                   ? allAssessmentsData.filter((a: any) => a.courseId === subject.id) 
                                   : [];
                                 
-                                // Calculate average grade for this subject using allGradesData
-                                const subjectGrades = Array.isArray(allGradesData) 
-                                  ? allGradesData.filter((g: any) => g.courseId === subject.id)
-                                  : [];
-                                
-                                const totalScore = subjectGrades.reduce((sum: number, grade: any) => {
-                                  const percentage = (grade.score / grade.maxScore) * 100;
-                                  return sum + Math.round(percentage / 10);
-                                }, 0);
-                                
-                                const averageGrade = subjectGrades.length > 0 
-                                  ? (totalScore / subjectGrades.length).toFixed(1)
-                                  : null;
-                                
                                 return (
                                   <>
                                     <Badge variant="outline" className="flex items-center gap-1">
                                       <Target className="h-3 w-3" />
                                       {subjectAssessments.length} beoordeling{subjectAssessments.length !== 1 ? 'en' : ''}
                                     </Badge>
-                                    {averageGrade ? (
-                                      <Badge variant="secondary" className="flex items-center gap-1">
-                                        <TrendingUp className="h-3 w-3" />
-                                        Gem. {averageGrade}
-                                      </Badge>
-                                    ) : (
-                                      <Badge variant="outline" className="flex items-center gap-1 text-gray-400">
-                                        <TrendingUp className="h-3 w-3" />
-                                        Geen cijfers
-                                      </Badge>
-                                    )}
+                                    <Badge variant="outline" className="flex items-center gap-1 text-gray-400">
+                                      <TrendingUp className="h-3 w-3" />
+                                      Selecteer voor cijfers
+                                    </Badge>
                                   </>
                                 );
                               })()}

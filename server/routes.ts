@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
-import { db } from "./db";
+import { db, pool } from "./db";
 import * as schema from "@shared/schema";
 import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers, grades, assessments } from "@shared/schema";
 import { eq, and, sql, inArray } from "drizzle-orm";

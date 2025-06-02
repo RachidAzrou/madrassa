@@ -625,13 +625,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             `);
             
             const programTeachersResult = result.rows;
+            console.log('Program teachers result:', programTeachersResult);
             
-            const assignedTeachers = programTeachersResult.map(pt => ({
-              id: pt.teacherId,
-              name: `${pt.firstName} ${pt.lastName}`,
-              selected: true,
-              isPrimary: pt.isPrimary
-            }));
+            const assignedTeachers = programTeachersResult.map((pt: any) => {
+              console.log('Processing teacher:', pt);
+              return {
+                id: pt.teacher_id,
+                name: `${pt.first_name} ${pt.last_name}`,
+                selected: true,
+                isPrimary: pt.is_primary
+              };
+            });
 
             return {
               ...program,

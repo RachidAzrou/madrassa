@@ -671,9 +671,17 @@ export default function Cijfers() {
                                         min="0"
                                         max="100"
                                         step="1"
-                                        placeholder="75%"
-                                        className="w-24 h-8 text-center text-sm font-medium border border-blue-300 focus:border-blue-500"
+                                        placeholder="bijv. 75"
+                                        className="w-20 h-10 text-center text-lg font-medium border-2 border-blue-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
                                         defaultValue={editGrade.grade?.toString() || ''}
+                                        onChange={(e) => {
+                                          const value = parseFloat(e.target.value);
+                                          if (!isNaN(value) && value >= 0 && value <= 100) {
+                                            setEditGrade({...editGrade, grade: value});
+                                          } else if (e.target.value === '') {
+                                            setEditGrade({...editGrade, grade: null});
+                                          }
+                                        }}
                                         onBlur={(e) => {
                                           const value = parseFloat(e.target.value);
                                           if (!isNaN(value) && value >= 0 && value <= 100) {
@@ -696,7 +704,14 @@ export default function Cijfers() {
                                         }}
                                         autoFocus
                                       />
-                                      <div className="text-xs text-gray-500">Enter/Tab = opslaan</div>
+                                      <div className="text-center space-y-1">
+                                        <div className="text-xs text-gray-500">Enter = opslaan • Esc = annuleren</div>
+                                        {editGrade.grade !== null && editGrade.grade >= 0 && editGrade.grade <= 100 && (
+                                          <div className={`text-xs font-medium px-2 py-1 rounded ${getGradeColor(editGrade.grade)}`}>
+                                            {getGradeCategory(editGrade.grade)}
+                                          </div>
+                                        )}
+                                      </div>
                                     </div>
                                   ) : (
                                     <div 

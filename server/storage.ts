@@ -1170,6 +1170,174 @@ export class DatabaseStorage implements IStorage {
       throw new Error('Failed to batch create grades');
     }
   }
+
+  // Attendance methods
+  async createAttendance(attendance: any): Promise<any> {
+    try {
+      const [newAttendance] = await db.insert(attendanceRecords).values(attendance).returning();
+      return newAttendance;
+    } catch (error) {
+      console.error('Error creating attendance:', error);
+      throw new Error('Failed to create attendance');
+    }
+  }
+
+  async getAttendanceByDate(date: Date): Promise<any[]> {
+    try {
+      const dateStr = date.toISOString().split('T')[0];
+      const records = await db
+        .select()
+        .from(attendanceRecords)
+        .where(eq(attendanceRecords.date, dateStr));
+      return records;
+    } catch (error) {
+      console.error('Error getting attendance by date:', error);
+      return [];
+    }
+  }
+
+  async getAttendanceByClassAndDate(classId: number, date: Date): Promise<any[]> {
+    try {
+      const dateStr = date.toISOString().split('T')[0];
+      const records = await db
+        .select()
+        .from(attendanceRecords)
+        .where(
+          and(
+            eq(attendanceRecords.classId, classId),
+            eq(attendanceRecords.date, dateStr)
+          )
+        );
+      return records;
+    } catch (error) {
+      console.error('Error getting attendance by class and date:', error);
+      return [];
+    }
+  }
+
+  async getAttendanceByStudent(studentId: number): Promise<any[]> {
+    try {
+      const records = await db
+        .select()
+        .from(attendanceRecords)
+        .where(eq(attendanceRecords.studentId, studentId));
+      return records;
+    } catch (error) {
+      console.error('Error getting attendance by student:', error);
+      return [];
+    }
+  }
+
+  async getAttendanceByCourse(courseId: number): Promise<any[]> {
+    try {
+      const records = await db
+        .select()
+        .from(attendanceRecords)
+        .where(eq(attendanceRecords.courseId, courseId));
+      return records;
+    } catch (error) {
+      console.error('Error getting attendance by course:', error);
+      return [];
+    }
+  }
+
+  async updateAttendance(id: number, attendance: any): Promise<any | undefined> {
+    try {
+      const [updatedAttendance] = await db
+        .update(attendanceRecords)
+        .set(attendance)
+        .where(eq(attendanceRecords.id, id))
+        .returning();
+      return updatedAttendance || undefined;
+    } catch (error) {
+      console.error('Error updating attendance:', error);
+      return undefined;
+    }
+  }
+
+  async deleteAttendance(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(attendanceRecords).where(eq(attendanceRecords.id, id));
+      return (result.rowCount || 0) > 0;
+    } catch (error) {
+      console.error('Error deleting attendance:', error);
+      return false;
+    }
+  }
+
+  // Teacher attendance methods
+  async createTeacherAttendance(attendance: any): Promise<any> {
+    try {
+      const [newAttendance] = await db.insert(teacherAttendanceRecords).values(attendance).returning();
+      return newAttendance;
+    } catch (error) {
+      console.error('Error creating teacher attendance:', error);
+      throw new Error('Failed to create teacher attendance');
+    }
+  }
+
+  async getTeacherAttendanceRecords(): Promise<any[]> {
+    try {
+      const records = await db.select().from(teacherAttendanceRecords);
+      return records;
+    } catch (error) {
+      console.error('Error getting teacher attendance records:', error);
+      return [];
+    }
+  }
+
+  async getTeacherAttendanceByDate(date: Date): Promise<any[]> {
+    try {
+      const dateStr = date.toISOString().split('T')[0];
+      const records = await db
+        .select()
+        .from(teacherAttendanceRecords)
+        .where(eq(teacherAttendanceRecords.date, dateStr));
+      return records;
+    } catch (error) {
+      console.error('Error getting teacher attendance by date:', error);
+      return [];
+    }
+  }
+
+  async getTeacherAttendanceByTeacher(teacherId: number): Promise<any[]> {
+    try {
+      const records = await db
+        .select()
+        .from(teacherAttendanceRecords)
+        .where(eq(teacherAttendanceRecords.teacherId, teacherId));
+      return records;
+    } catch (error) {
+      console.error('Error getting teacher attendance by teacher:', error);
+      return [];
+    }
+  }
+
+  async getTeacherAttendanceByCourse(courseId: number): Promise<any[]> {
+    try {
+      const records = await db
+        .select()
+        .from(teacherAttendanceRecords)
+        .where(eq(teacherAttendanceRecords.courseId, courseId));
+      return records;
+    } catch (error) {
+      console.error('Error getting teacher attendance by course:', error);
+      return [];
+    }
+  }
+
+  async getTeacherAttendanceRecord(id: number): Promise<any | undefined> {
+    try {
+      const [record] = await db
+        .select()
+        .from(teacherAttendanceRecords)
+        .where(eq(teacherAttendanceRecords.id, id));
+      return record || undefined;
+    } catch (error) {
+      console.error('Error getting teacher attendance record:', error);
+      return undefined;
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();

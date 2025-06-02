@@ -4853,6 +4853,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get attendance by student group and date
+  apiRouter.get("/api/student-groups/:groupId/attendance/date/:date", async (req: Request, res: Response) => {
+    try {
+      const groupId = parseInt(req.params.groupId);
+      const date = req.params.date;
+      
+      if (isNaN(groupId)) {
+        return res.status(400).json({ message: "Invalid group ID format" });
+      }
+      
+      const parsedDate = new Date(date);
+      if (isNaN(parsedDate.getTime())) {
+        return res.status(400).json({ message: "Invalid date format" });
+      }
+      
+      // Get attendance records for this class and date
+      const attendanceRecords = await storage.getAttendanceByClassAndDate(groupId, parsedDate);
+      res.json(attendanceRecords);
+    } catch (error) {
+      console.error("Error fetching attendance by student group and date:", error);
+      res.status(500).json({ message: "Error fetching attendance by student group and date" });
+    }
+  });
+
   // Get students by class ID
   app.get("/api/students/class/:classId", async (req: Request, res: Response) => {
     try {

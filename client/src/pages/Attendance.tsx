@@ -119,13 +119,41 @@ export default function Attendance() {
   // Fetch attendance for selected date and course/class
   const { data: attendanceData, isLoading: isLoadingAttendance, refetch: refetchAttendance } = useQuery({
     queryKey: ['/api/attendance/date', selectedDate, selectedType, selectedCourse, selectedClass],
-    enabled: !!selectedDate && ((false && !!selectedCourse) || (selectedType === 'klas' && !!selectedClass)),
+    queryFn: async () => {
+      if (!selectedDate) return [];
+      if (selectedType === 'klas' && selectedClass) {
+        // Fetch attendance by class and date
+        const response = await fetch(`/api/student-groups/${selectedClass}/attendance/date/${selectedDate}`);
+        if (!response.ok) {
+          // If specific endpoint doesn't exist, try general date endpoint
+          const fallbackResponse = await fetch(`/api/attendance/date/${selectedDate}`);
+          if (!fallbackResponse.ok) throw new Error('Failed to fetch attendance');
+          const allAttendance = await fallbackResponse.json();
+          // Filter by classId
+          return allAttendance.filter((record: AttendanceRecord) => 
+            record.classId === parseInt(selectedClass)
+          );
+        }
+        return response.json();
+      }
+      return [];
+    },
+    enabled: !!selectedDate && selectedType === 'klas' && !!selectedClass,
     staleTime: 0, // Always refetch when parameters change
   });
   
   // Fetch teacher attendance for selected date
   const { data: teacherAttendanceData, isLoading: isLoadingTeacherAttendance, refetch: refetchTeacherAttendance } = useQuery({
     queryKey: ['/api/teacher-attendance/date', selectedDate],
+    queryFn: async () => {
+      if (!selectedDate) return [];
+      const response = await fetch(`/api/teacher-attendance/date/${selectedDate}`);
+      if (!response.ok) {
+        if (response.status === 404) return []; // No data for this date
+        throw new Error('Failed to fetch teacher attendance');
+      }
+      return response.json();
+    },
     enabled: !!selectedDate,
     staleTime: 0, // Always refetch when date changes
   });

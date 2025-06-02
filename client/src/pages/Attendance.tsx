@@ -214,35 +214,47 @@ export default function Attendance() {
     if (attendanceData && Array.isArray(attendanceData)) {
       const attendanceMap: Record<number, AttendanceRecord> = {};
       
+      // Only load data that matches the current selected date
       attendanceData.forEach((record: AttendanceRecord) => {
-        if (record.studentId) {
+        if (record.studentId && record.date === selectedDate) {
           attendanceMap[record.studentId] = record;
         }
       });
       
       setStudentAttendance(attendanceMap);
+    } else {
+      // Clear attendance if no data or when changing dates
+      setStudentAttendance({});
     }
-  }, [attendanceData]);
+  }, [attendanceData, selectedDate]);
   
   // Process teacher attendance data when it changes
   useEffect(() => {
     if (teacherAttendanceData && Array.isArray(teacherAttendanceData)) {
       const attendanceMap: Record<number, TeacherAttendanceRecord> = {};
       
+      // Only load data that matches the current selected date
       teacherAttendanceData.forEach((record: TeacherAttendanceRecord) => {
-        if (record.teacherId) {
+        if (record.teacherId && record.date === selectedDate) {
           attendanceMap[record.teacherId] = record;
         }
       });
       
       setTeacherAttendance(attendanceMap);
+    } else {
+      // Clear teacher attendance if no data or when changing dates
+      setTeacherAttendance({});
     }
-  }, [teacherAttendanceData]);
+  }, [teacherAttendanceData, selectedDate]);
 
   const handleDateChange = (increment: number) => {
     const current = new Date(selectedDate);
     current.setDate(current.getDate() + increment);
     setSelectedDate(current.toISOString().split('T')[0]);
+    
+    // Clear existing attendance data when changing dates
+    setStudentAttendance({});
+    setTeacherAttendance({});
   };
 
   const handleCourseChange = (value: string) => {

@@ -254,7 +254,22 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createStudentGroupEnrollment(enrollmentData: InsertStudentGroupEnrollment): Promise<StudentGroupEnrollment> {
-    const [enrollment] = await db.insert(studentGroupEnrollments).values(enrollmentData).returning();
+    // Eerst alle actieve enrollments voor deze student deactiveren
+    await db
+      .update(studentGroupEnrollments)
+      .set({ status: 'inactive' })
+      .where(
+        and(
+          eq(studentGroupEnrollments.studentId, enrollmentData.studentId),
+          eq(studentGroupEnrollments.status, 'active')
+        )
+      );
+    
+    // Dan de nieuwe enrollment aanmaken
+    const [enrollment] = await db.insert(studentGroupEnrollments).values({
+      ...enrollmentData,
+      status: 'active'
+    }).returning();
     return enrollment;
   }
   

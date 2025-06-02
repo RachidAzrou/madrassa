@@ -136,6 +136,17 @@ export default function StudentGroups() {
 
   const courses = Array.isArray(coursesData) ? coursesData : (coursesData?.courses || []);
 
+  // Query voor programs/vakken
+  const { data: programsData = [] } = useQuery({
+    queryKey: ['/api/programs'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/programs');
+      return response || [];
+    },
+  });
+
+  const programs = Array.isArray(programsData) ? programsData : (programsData?.programs || []);
+
   // Filter function - exact same structure as Students page
   const filteredClasses = classes.filter((cls: ClassType) => {
     const matchesSearch = !searchTerm || 
@@ -600,21 +611,31 @@ export default function StudentGroups() {
                 <Label className="text-xs font-medium text-gray-700">Vakken</Label>
                 <div className="space-y-2">
                   {/* Dropdown voor beschikbare vakken */}
-                  <Select value="" onValueChange={(value) => addSubjectToNewClass(parseInt(value))}>
+                  <Select 
+                    value="" 
+                    onValueChange={(value) => {
+                      if (value && !newClass.subjects.includes(parseInt(value))) {
+                        setNewClass(prev => ({
+                          ...prev,
+                          subjects: [...prev.subjects, parseInt(value)]
+                        }));
+                      }
+                    }}
+                  >
                     <SelectTrigger className="h-8 text-sm border-gray-300">
                       <SelectValue placeholder="Selecteer een vak om toe te voegen" />
                     </SelectTrigger>
                     <SelectContent>
-                      {courses.length === 0 ? (
+                      {programs.length === 0 ? (
                         <SelectItem value="none" disabled>
                           Geen vakken beschikbaar. Voeg eerst vakken toe via de Vakken sectie.
                         </SelectItem>
-                      ) : courses.filter(course => !newClass.subjects.includes(course.id)).length === 0 ? (
+                      ) : programs.filter(program => !newClass.subjects.includes(program.id)).length === 0 ? (
                         <SelectItem value="none" disabled>Alle vakken zijn al toegevoegd</SelectItem>
                       ) : (
-                        courses.filter(course => !newClass.subjects.includes(course.id)).map((course: any) => (
-                          <SelectItem key={course.id} value={course.id.toString()}>
-                            {course.name} ({course.code})
+                        programs.filter(program => !newClass.subjects.includes(program.id)).map((program: any) => (
+                          <SelectItem key={program.id} value={program.id.toString()}>
+                            {program.name} ({program.code})
                           </SelectItem>
                         ))
                       )}
@@ -627,15 +648,18 @@ export default function StudentGroups() {
                       <Label className="text-xs font-medium text-gray-500">Geselecteerde vakken:</Label>
                       <div className="flex flex-wrap gap-2">
                         {newClass.subjects.map((subjectId) => {
-                          const course = courses.find((c: any) => c.id === subjectId);
-                          return course ? (
+                          const program = programs.find((p: any) => p.id === subjectId);
+                          return program ? (
                             <div key={subjectId} className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-sm text-xs">
-                              <span>{course.name}</span>
+                              <span>{program.name}</span>
                               <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => removeSubjectFromNewClass(subjectId)}
+                                onClick={() => setNewClass(prev => ({
+                                  ...prev,
+                                  subjects: prev.subjects.filter(id => id !== subjectId)
+                                }))}
                                 className="h-4 w-4 p-0 hover:bg-blue-100"
                               >
                                 <X className="h-3 w-3" />
@@ -930,7 +954,60 @@ export default function StudentGroups() {
                 <Label className="text-xs font-medium text-gray-700">Vakken</Label>
                 <div className="space-y-2">
                   <p className="text-sm text-gray-500">Voeg vakken toe aan deze klas</p>
-                  <div className="text-sm text-gray-500">Voor het bewerken van vakken ga naar de vakken sectie in de navigatie.</div>
+                  <Select 
+                    value=""
+                    onValueChange={(value) => {
+                      if (value && !editFormData.subjects?.includes(parseInt(value))) {
+                        setEditFormData(prev => ({
+                          ...prev,
+                          subjects: [...(prev.subjects || []), parseInt(value)]
+                        }));
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="h-8 text-sm border-gray-300">
+                      <SelectValue placeholder="Selecteer een vak om toe te voegen" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {programs
+                        .filter(program => !editFormData.subjects?.includes(program.id))
+                        .map((program: any) => (
+                          <SelectItem key={program.id} value={program.id.toString()}>
+                            {program.name} ({program.code})
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  {/* Geselecteerde vakken weergeven */}
+                  {editFormData.subjects && editFormData.subjects.length > 0 && (
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-600">Toegevoegde vakken:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {editFormData.subjects.map((subjectId: number) => {
+                          const program = programs.find((p: any) => p.id === subjectId);
+                          return program ? (
+                            <Badge 
+                              key={subjectId} 
+                              variant="secondary" 
+                              className="text-xs flex items-center gap-1"
+                            >
+                              {program.name}
+                              <X 
+                                className="h-3 w-3 cursor-pointer hover:text-red-500" 
+                                onClick={() => {
+                                  setEditFormData(prev => ({
+                                    ...prev,
+                                    subjects: prev.subjects?.filter(id => id !== subjectId) || []
+                                  }));
+                                }}
+                              />
+                            </Badge>
+                          ) : null;
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               

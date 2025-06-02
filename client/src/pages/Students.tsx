@@ -322,11 +322,36 @@ export default function Students() {
             console.log('Voogd aangemaakt en gekoppeld:', guardianResponse);
           } catch (guardianError) {
             console.error('Fout bij aanmaken voogd:', guardianError);
-            toast({
-              title: "Waarschuwing",
-              description: `Voogd ${guardian.firstName} ${guardian.lastName} kon niet worden aangemaakt.`,
-              variant: "destructive",
-            });
+            
+            // Controleer op duplicaatfouten voor voogden
+            if (guardianError.status === 409) {
+              const errorData = guardianError.data || guardianError;
+              if (errorData.field === 'duplicate_name_phone') {
+                toast({
+                  title: "Voogd duplicaat",
+                  description: `Er bestaat al een voogd met de naam ${guardian.firstName} ${guardian.lastName} en hetzelfde telefoonnummer.`,
+                  variant: "destructive",
+                });
+              } else if (errorData.field === 'duplicate_email') {
+                toast({
+                  title: "E-mailadres al in gebruik",
+                  description: `Het e-mailadres van voogd ${guardian.firstName} ${guardian.lastName} wordt al gebruikt.`,
+                  variant: "destructive",
+                });
+              } else {
+                toast({
+                  title: "Voogd duplicaat",
+                  description: errorData.message || `Voogd ${guardian.firstName} ${guardian.lastName} bestaat al in het systeem.`,
+                  variant: "destructive",
+                });
+              }
+            } else {
+              toast({
+                title: "Waarschuwing",
+                description: `Voogd ${guardian.firstName} ${guardian.lastName} kon niet worden aangemaakt.`,
+                variant: "destructive",
+              });
+            }
           }
         }
       }
@@ -348,11 +373,36 @@ export default function Students() {
       
     } catch (error) {
       console.error("Fout bij toevoegen student:", error);
-      toast({
-        title: "Fout",
-        description: "Er is een fout opgetreden bij het toevoegen van de student.",
-        variant: "destructive"
-      });
+      
+      // Controleer op duplicaatfouten van de server
+      if (error.status === 409) {
+        const errorData = error.data || error;
+        if (errorData.field === 'duplicate_name_birth') {
+          toast({
+            title: "Duplicaat gevonden",
+            description: "Er bestaat al een student met dezelfde naam en geboortedatum. Controleer de gegevens.",
+            variant: "destructive"
+          });
+        } else if (errorData.field === 'duplicate_email') {
+          toast({
+            title: "E-mailadres al in gebruik",
+            description: "Dit e-mailadres wordt al gebruikt door een andere student.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Duplicaat",
+            description: errorData.message || "Er bestaat al een student met deze gegevens.",
+            variant: "destructive"
+          });
+        }
+      } else {
+        toast({
+          title: "Fout",
+          description: "Er is een fout opgetreden bij het toevoegen van de student.",
+          variant: "destructive"
+        });
+      }
     }
   };
 

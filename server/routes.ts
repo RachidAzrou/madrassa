@@ -390,6 +390,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Log de gevalideerde data
       console.log("Validated student data:", validatedData);
       
+      // DUPLICAATCONTROLE VOOR STUDENTEN
+      const existingStudents = await storage.getStudents();
+      
+      // Controleer duplicaat op naam + geboortedatum
+      const duplicateByNameAndBirth = existingStudents.find(student => 
+        student.firstName.toLowerCase() === validatedData.firstName.toLowerCase() &&
+        student.lastName.toLowerCase() === validatedData.lastName.toLowerCase() &&
+        student.dateOfBirth === validatedData.dateOfBirth
+      );
+      
+      if (duplicateByNameAndBirth) {
+        return res.status(409).json({ 
+          message: "Er bestaat al een student met dezelfde naam en geboortedatum.",
+          field: "duplicate_name_birth",
+          detail: `Student ${validatedData.firstName} ${validatedData.lastName} (geboren ${validatedData.dateOfBirth}) bestaat al.`
+        });
+      }
+      
+      // Controleer duplicaat email indien opgegeven
+      if (validatedData.email) {
+        const duplicateByEmail = existingStudents.find(student => 
+          student.email && student.email.toLowerCase() === validatedData.email.toLowerCase()
+        );
+        
+        if (duplicateByEmail) {
+          return res.status(409).json({ 
+            message: "Er bestaat al een student met dit e-mailadres.",
+            field: "duplicate_email",
+            detail: `E-mailadres ${validatedData.email} is al in gebruik.`
+          });
+        }
+      }
+      
       // Stuur de data door naar storage zonder verdere aanpassingen
       const newStudent = await storage.createStudent(validatedData);
       
@@ -2870,6 +2903,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/api/guardians", async (req, res) => {
     try {
       const validatedData = insertGuardianSchema.parse(req.body);
+      
+      // DUPLICAATCONTROLE VOOR VOOGDEN
+      const existingGuardians = await storage.getGuardians();
+      
+      // Controleer duplicaat op naam + telefoon (indien telefoon opgegeven)
+      if (validatedData.phone) {
+        const duplicateByNameAndPhone = existingGuardians.find(guardian => 
+          guardian.firstName.toLowerCase() === validatedData.firstName.toLowerCase() &&
+          guardian.lastName.toLowerCase() === validatedData.lastName.toLowerCase() &&
+          guardian.phone === validatedData.phone
+        );
+        
+        if (duplicateByNameAndPhone) {
+          return res.status(409).json({ 
+            message: "Er bestaat al een voogd met dezelfde naam en telefoonnummer.",
+            field: "duplicate_name_phone",
+            detail: `Voogd ${validatedData.firstName} ${validatedData.lastName} met telefoonnummer ${validatedData.phone} bestaat al.`
+          });
+        }
+      }
+      
+      // Controleer duplicaat email indien opgegeven
+      if (validatedData.email) {
+        const duplicateByEmail = existingGuardians.find(guardian => 
+          guardian.email && guardian.email.toLowerCase() === validatedData.email.toLowerCase()
+        );
+        
+        if (duplicateByEmail) {
+          return res.status(409).json({ 
+            message: "Er bestaat al een voogd met dit e-mailadres.",
+            field: "duplicate_email", 
+            detail: `E-mailadres ${validatedData.email} is al in gebruik.`
+          });
+        }
+      }
+      
       const newGuardian = await storage.createGuardian(validatedData);
       res.status(201).json(newGuardian);
     } catch (error) {

@@ -134,8 +134,10 @@ export default function Guardians() {
         description: `Je bent bezig met het toevoegen van een voogd voor student ${studentId || pendingStudentId}`,
       });
       
-      // Verwijder de student ID uit localStorage om te voorkomen dat het dialoogvenster opnieuw wordt geopend
-      localStorage.removeItem('pendingStudentForGuardian');
+      // Verwijder de URL parameter om te voorkomen dat het dialoogvenster opnieuw wordt geopend
+      const url = new URL(window.location.href);
+      url.searchParams.delete('pendingStudentForGuardian');
+      window.history.replaceState({}, '', url.toString());
       
       // Verwijder de parameters uit de URL zonder de pagina te verversen
       window.history.replaceState({}, document.title, window.location.pathname);

@@ -1399,8 +1399,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ********************
   apiRouter.get("/api/assessments", async (_req, res) => {
     try {
-      const assessments = await storage.getAssessments();
-      res.json(assessments);
+      // Return empty assessments for now - will be populated when assessment system is implemented
+      res.json([]);
     } catch (error) {
       res.status(500).json({ message: "Error fetching assessments" });
     }

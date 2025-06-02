@@ -154,6 +154,17 @@ export default function Programs() {
     );
   };
 
+  // Haal beschikbare klassen op uit de database
+  const getAvailableClasses = () => {
+    const apiClasses = Array.isArray(classesData) ? classesData : [];
+    
+    return apiClasses.map((studentGroup: any) => ({
+      id: studentGroup.id.toString(),
+      name: `${studentGroup.name} (${studentGroup.academicYear})`,
+      selected: false
+    }));
+  };
+
   const availableTeachers = getAvailableTeachers();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -304,8 +315,12 @@ export default function Programs() {
         entryRequirements: program.entryRequirements || '',
         learningObjectives: program.learningObjectives || '',
         competencies: program.competencies || '',
-        assignedClasses: program.assignedClasses || [],
-        assignedTeachers: program.assignedTeachers || [],
+        assignedClasses: getAvailableClasses(),
+        assignedTeachers: availableTeachers.map(teacher => ({
+          id: teacher.id.toString(),
+          name: `${teacher.firstName} ${teacher.lastName}`,
+          selected: false
+        })),
       });
       setIsEditDialogOpen(true);
     }
@@ -900,10 +915,11 @@ export default function Programs() {
           }}
         >
           <Tabs value={editActiveTab} onValueChange={setEditActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsList className="grid w-full grid-cols-4 mb-6">
               <TabsTrigger value="general">Algemeen</TabsTrigger>
               <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
               <TabsTrigger value="teachers">Docenten</TabsTrigger>
+              <TabsTrigger value="classes">Klassen</TabsTrigger>
             </TabsList>
 
             <TabsContent value="general" className="space-y-6 bg-gray-50 p-4 rounded-lg">
@@ -1046,6 +1062,42 @@ export default function Programs() {
                     </div>
                   ) : (
                     <p className="text-gray-500 text-sm">Geen docenten beschikbaar</p>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="classes" className="space-y-4 bg-gray-50 p-4 rounded-lg">
+              <div className="space-y-2">
+                <FormLabel className="flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4" />
+                  Klassen toewijzen
+                </FormLabel>
+                <div className="bg-white border border-gray-200 rounded-md p-4 max-h-60 overflow-y-auto">
+                  {programFormData.assignedClasses && programFormData.assignedClasses.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {programFormData.assignedClasses.map((studentGroup) => (
+                        <div key={studentGroup.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`edit-class-${studentGroup.id}`}
+                            checked={studentGroup.selected}
+                            onCheckedChange={(checked) => {
+                              setProgramFormData(prev => ({
+                                ...prev,
+                                assignedClasses: prev.assignedClasses.map(c => 
+                                  c.id === studentGroup.id ? { ...c, selected: checked as boolean } : c
+                                )
+                              }));
+                            }}
+                          />
+                          <FormLabel htmlFor={`edit-class-${studentGroup.id}`} className="text-sm">
+                            {studentGroup.name}
+                          </FormLabel>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-sm">Geen klassen beschikbaar</p>
                   )}
                 </div>
               </div>

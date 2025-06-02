@@ -183,6 +183,24 @@ export default function Students() {
     refetchOnWindowFocus: true
   });
 
+  // Helper functie om relatie waarden naar Nederlands te vertalen
+  const getRelationshipLabel = (relationship: string) => {
+    switch (relationship) {
+      case 'sibling':
+        return 'Broer/Zus';
+      case 'parent':
+        return 'Ouder';
+      case 'guardian':
+        return 'Voogd';
+      case 'grandparent':
+        return 'Grootouder';
+      case 'other':
+        return 'Anders';
+      default:
+        return 'Broer/Zus'; // Default voor siblings
+    }
+  };
+
   // Form handlers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -1563,7 +1581,16 @@ export default function Students() {
                                 <p className="text-xs text-gray-500">{sibling.studentIdCode || 'Student ID niet beschikbaar'}</p>
                               </div>
                             </div>
-                            <Button
+                            <div className="flex items-center space-x-2">
+                              <div className="text-right">
+                                <div className="flex items-center gap-1">
+                                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 min-w-[60px] justify-center">
+                                    {getRelationshipLabel(sibling.relationship)}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">Familie relatie</p>
+                              </div>
+                              <Button
                               type="button"
                               variant="ghost"
                               size="sm"
@@ -1593,6 +1620,7 @@ export default function Students() {
                             >
                               <X className="h-3 w-3" />
                             </Button>
+                            </div>
                           </div>
                         ))
                       ) : (
@@ -1972,7 +2000,7 @@ export default function Students() {
                             <div className="text-right">
                               <div className="flex items-center gap-1">
                                 <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 min-w-[60px] justify-center">
-                                  {sibling.relationship || 'Broer/Zus'}
+                                  {getRelationshipLabel(sibling.relationship)}
                                 </span>
                               </div>
                               <p className="text-xs text-gray-500 mt-1">Familie relatie</p>

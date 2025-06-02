@@ -40,7 +40,7 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
             <div className="text-xs text-white opacity-70 flex items-center">
               {effectiveBreadcrumbs.parent && (
                 <>
-                  <span className="mr-1">{effectiveBreadcrumbs.parent === "Onderwijs" ? "Onderwijs" : (effectiveBreadcrumbs.parent === "Administratie" ? "Evaluatie" : (effectiveBreadcrumbs.parent === "Beheer" ? "Onderwijs" : effectiveBreadcrumbs.parent))}</span>
+                  <span className="mr-1">{effectiveBreadcrumbs.parent === "Onderwijs" ? "Onderwijs" : (effectiveBreadcrumbs.parent === "Administratie" ? "Onderwijs" : (effectiveBreadcrumbs.parent === "Beheer" ? "Onderwijs" : effectiveBreadcrumbs.parent))}</span>
                   <ChevronRight className="h-3 w-3 mx-0.5" />
                 </>
               )}

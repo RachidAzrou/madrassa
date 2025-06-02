@@ -2289,18 +2289,13 @@ export default function Students() {
                     />
                   </div>
                   
-                  {/* Mock bestaande voogden voor demonstratie */}
+                  {/* Bestaande voogden uit database */}
                   {guardianSearchTerm.length > 0 && (
                     <div className="bg-white border rounded-lg divide-y max-h-60 overflow-y-auto">
-                      {[
-                        { id: 1, firstName: 'Ahmed', lastName: 'Hassan', phone: '0612345678', email: 'ahmed.hassan@email.com', relationship: 'parent' },
-                        { id: 2, firstName: 'Fatima', lastName: 'Al-Zahra', phone: '0687654321', email: 'fatima.alzahra@email.com', relationship: 'parent' },
-                        { id: 3, firstName: 'Omar', lastName: 'Ibn Khattab', phone: '0698765432', email: 'omar.khattab@email.com', relationship: 'grandparent' },
-                        { id: 4, firstName: 'Zaina', lastName: 'El Mouden', phone: '0456789123', email: 'zaina.mouden@email.com', relationship: 'guardian' },
-                      ].filter(guardian => 
+                      {guardians.filter(guardian => 
                         guardian.firstName.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
                         guardian.lastName.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
-                        guardian.phone.includes(guardianSearchTerm)
+                        (guardian.phone && guardian.phone.includes(guardianSearchTerm))
                       ).map((guardian) => (
                         <div key={guardian.id} className="p-3 hover:bg-gray-50 cursor-pointer" 
                              onClick={() => {
@@ -2340,15 +2335,10 @@ export default function Students() {
                         </div>
                       ))}
                       
-                      {[
-                        { id: 1, firstName: 'Ahmed', lastName: 'Hassan', phone: '0612345678', email: 'ahmed.hassan@email.com', relationship: 'parent' },
-                        { id: 2, firstName: 'Fatima', lastName: 'Al-Zahra', phone: '0687654321', email: 'fatima.alzahra@email.com', relationship: 'parent' },
-                        { id: 3, firstName: 'Omar', lastName: 'Ibn Khattab', phone: '0698765432', email: 'omar.khattab@email.com', relationship: 'grandparent' },
-                        { id: 4, firstName: 'Zaina', lastName: 'El Mouden', phone: '0456789123', email: 'zaina.mouden@email.com', relationship: 'guardian' },
-                      ].filter(guardian => 
+                      {guardians.filter(guardian => 
                         guardian.firstName.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
                         guardian.lastName.toLowerCase().includes(guardianSearchTerm.toLowerCase()) ||
-                        guardian.phone.includes(guardianSearchTerm)
+                        (guardian.phone && guardian.phone.includes(guardianSearchTerm))
                       ).length === 0 && (
                         <div className="p-4 text-center text-gray-500">
                           <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />

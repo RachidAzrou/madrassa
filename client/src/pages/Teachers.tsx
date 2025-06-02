@@ -166,11 +166,16 @@ export default function Teachers() {
     }
   ];
   
-  // State voor docenten met localStorage
-  const [teachers, setTeachers] = useState<TeacherType[]>(() => {
-    const savedTeachers = localStorage.getItem('teachers');
-    return savedTeachers ? JSON.parse(savedTeachers) : mockTeachers;
+  // Query voor docenten uit de database
+  const { data: teachersData = { teachers: [], totalCount: 0 }, isLoading: isLoadingTeachers } = useQuery({
+    queryKey: ['/api/teachers'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/teachers');
+      return response || { teachers: [], totalCount: 0 };
+    },
   });
+
+  const teachers = teachersData.teachers || [];
   
   // Query voor vakken uit de database
   const { data: coursesData = [] } = useQuery({
@@ -457,52 +462,46 @@ export default function Teachers() {
     setActiveTab('basic');
   };
 
-  // Opslaan van nieuwe docent
-  const handleSaveTeacher = async () => {
-    // Markeer dat we validatie hebben geprobeerd
-    setHasValidationAttempt(true);
-    
-    if (!validateNewTeacher()) return;
-    
-    try {
-      // Genereer een teacherId en uniek ID
-      const teacherId = generateTeacherId();
-      const newId = Math.max(...teachers.map(t => t.id), 0) + 1;
-      
-      const newTeacherWithId = {
-        ...newTeacher,
-        id: newId,
-        teacherId,
-        educations: teacherEducations,
-        languages: teacherLanguages,
-        subjects: selectedSubjects
-      };
-      
-      // Voeg toe aan de teachers lijst
-      const updatedTeachers = [...teachers, newTeacherWithId];
-      setTeachers(updatedTeachers);
-      
-      // Sla op in localStorage
-      localStorage.setItem('teachers', JSON.stringify(updatedTeachers));
-      
-      console.log('Docenten opgeslagen in localStorage:', updatedTeachers.length);
-      
+  // Mutation voor het toevoegen van docenten
+  const createTeacherMutation = useMutation({
+    mutationFn: async (teacherData: any) => {
+      return await apiRequest('/api/teachers', {
+        method: 'POST',
+        body: JSON.stringify(teacherData),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
       toast({
         title: "Docent toegevoegd",
         description: "De nieuwe docent is succesvol toegevoegd.",
       });
-      
-      // Reset formulier en sluit dialoog
       resetTeacherForm();
       setShowNewTeacherDialog(false);
-      
-    } catch (error) {
+    },
+    onError: (error) => {
       toast({
         title: "Fout bij toevoegen",
         description: "Er is een probleem opgetreden bij het toevoegen van de docent.",
         variant: "destructive",
       });
-    }
+    },
+  });
+
+  // Opslaan van nieuwe docent
+  const handleSaveTeacher = async () => {
+    setHasValidationAttempt(true);
+    
+    if (!validateNewTeacher()) return;
+    
+    const teacherData = {
+      ...newTeacher,
+      educations: teacherEducations,
+      languages: teacherLanguages,
+      subjects: selectedSubjects.map(id => parseInt(id)),
+    };
+    
+    createTeacherMutation.mutate(teacherData);
   };
 
   return (

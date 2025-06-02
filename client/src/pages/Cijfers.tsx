@@ -481,14 +481,6 @@ export default function Cijfers() {
                                 <Button 
                                   variant="ghost" 
                                   size="sm"
-                                  onClick={() => handleAssessmentSelect(assessment)}
-                                  className="text-blue-600 hover:text-blue-700"
-                                >
-                                  <User className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
                                   onClick={() => handleEditAssessment(assessment)}
                                   className="text-gray-600 hover:text-blue-700"
                                 >

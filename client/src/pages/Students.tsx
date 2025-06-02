@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
+import { queryClient, apiRequest } from '@/lib/queryClient';
 import { Link, useLocation } from 'wouter';
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -175,6 +175,13 @@ export default function Students() {
   
   const { data: guardians = [] } = useQuery({
     queryKey: ['/api/guardians'],
+  });
+
+  // Query voor het ophalen van sibling relaties van een student
+  const { data: studentSiblings = [] } = useQuery({
+    queryKey: ['/api/students', selectedStudent?.id, 'siblings'],
+    queryFn: () => selectedStudent?.id ? apiRequest(`/api/students/${selectedStudent.id}/siblings`) : [],
+    enabled: !!selectedStudent?.id
   });
 
   // Form handlers
@@ -1553,20 +1560,61 @@ export default function Students() {
 
                   {/* Broers/Zussen */}
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">Broers/Zussen</h4>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Broers/Zussen</h4>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsLinkSiblingDialogOpen(true)}
+                        className="text-xs h-7 px-2 border-[#1e40af] text-[#1e40af] hover:bg-[#1e40af] hover:text-white"
+                      >
+                        <Link className="h-3 w-3 mr-1" />
+                        Koppelen
+                      </Button>
+                    </div>
                     <div className="space-y-2">
-                      {selectedStudent.siblings && selectedStudent.siblings.length > 0 ? (
-                        selectedStudent.siblings.map((sibling: any, index: number) => (
-                          <div key={index} className="flex items-center space-x-3 p-3 bg-white rounded-md border border-gray-200">
-                            <Avatar className="h-8 w-8">
-                              <AvatarFallback className="bg-green-100 text-green-700 text-xs">
-                                {sibling.firstName?.charAt(0)}{sibling.lastName?.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">{sibling.firstName} {sibling.lastName}</p>
-                              <p className="text-xs text-gray-500">{sibling.studentId || 'Student ID niet beschikbaar'}</p>
+                      {studentSiblings && studentSiblings.length > 0 ? (
+                        studentSiblings.map((sibling: any, index: number) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-white rounded-md border border-gray-200">
+                            <div className="flex items-center space-x-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-green-100 text-green-700 text-xs">
+                                  {sibling.firstName?.charAt(0)}{sibling.lastName?.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">{sibling.firstName} {sibling.lastName}</p>
+                                <p className="text-xs text-gray-500">{sibling.studentId || 'Student ID niet beschikbaar'}</p>
+                              </div>
                             </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={async () => {
+                                try {
+                                  await apiRequest(`/api/students/${selectedStudent.id}/siblings/${sibling.id}`, {
+                                    method: 'DELETE'
+                                  });
+                                  queryClient.invalidateQueries({ queryKey: ['/api/students', selectedStudent.id, 'siblings'] });
+                                  toast({
+                                    title: "Broer/zus ontkoppeld",
+                                    description: `${sibling.firstName} ${sibling.lastName} is ontkoppeld.`,
+                                  });
+                                } catch (error) {
+                                  console.error('Error removing sibling:', error);
+                                  toast({
+                                    title: "Fout",
+                                    description: "Er is een probleem opgetreden bij het ontkoppelen van de broer/zus.",
+                                    variant: "destructive",
+                                  });
+                                }
+                              }}
+                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
                           </div>
                         ))
                       ) : (
@@ -2491,7 +2539,8 @@ export default function Students() {
                                }
                              });
                              
-                             // Herlaad de student data om de nieuwe sibling relatie te tonen
+                             // Herlaad de sibling data om de nieuwe relatie te tonen
+                             queryClient.invalidateQueries({ queryKey: ['/api/students', selectedStudent.id, 'siblings'] });
                              queryClient.invalidateQueries({ queryKey: ['/api/students'] });
                            }
                            

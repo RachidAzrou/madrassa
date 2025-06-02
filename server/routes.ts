@@ -1564,10 +1564,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/api/grades", async (req, res) => {
     try {
       console.log('Received grade data:', req.body);
+      console.log('Storage object methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(storage)));
+      console.log('Storage has createGrade?:', typeof storage.createGrade);
+      
       const validatedData = insertGradeSchema.parse(req.body);
       console.log('Validated grade data:', validatedData);
-      const newGrade = await storage.createGrade(validatedData);
-      console.log('Created grade:', newGrade);
+      
+      // Direct database insert as workaround
+      const [newGrade] = await db.insert(grades).values(validatedData).returning();
+      console.log('Created grade directly:', newGrade);
       res.status(201).json(newGrade);
     } catch (error) {
       console.error('Error creating grade:', error);

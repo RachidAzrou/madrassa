@@ -484,7 +484,7 @@ export default function Students() {
       };
 
       const updatedStudent = await apiRequest(`/api/students/${selectedStudent.id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         body: studentUpdateData
       });
 

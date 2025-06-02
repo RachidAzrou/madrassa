@@ -514,15 +514,60 @@ export default function Teachers() {
     
     if (!validateNewTeacher()) return;
     
-    const teacherData = {
-      ...newTeacher,
-      teacherId: generateTeacherId(),
-      educations: teacherEducations,
-      languages: teacherLanguages,
-      subjects: selectedSubjects.map(id => parseInt(id)),
-    };
-    
-    createTeacherMutation.mutate(teacherData);
+    if (isEditMode && editingTeacherId) {
+      // Update existing teacher
+      try {
+        const teacherData = {
+          ...newTeacher,
+          educations: teacherEducations,
+          languages: teacherLanguages,
+          subjects: selectedSubjects
+        };
+
+        const response = await fetch(`/api/teachers/${editingTeacherId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(teacherData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Fout bij bijwerken docent');
+        }
+
+        // Invalidate en refetch de teachers data
+        queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+
+        toast({
+          title: "Docent bijgewerkt",
+          description: "De docentgegevens zijn succesvol bijgewerkt.",
+        });
+
+        resetTeacherForm();
+        setShowNewTeacherDialog(false);
+        setIsEditMode(false);
+        setEditingTeacherId(null);
+      } catch (error) {
+        toast({
+          title: "Fout bij bijwerken",
+          description: error instanceof Error ? error.message : "Er is een probleem opgetreden bij het bijwerken van de docent.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      // Create new teacher
+      const teacherData = {
+        ...newTeacher,
+        teacherId: generateTeacherId(),
+        educations: teacherEducations,
+        languages: teacherLanguages,
+        subjects: selectedSubjects.map(id => parseInt(id)),
+      };
+      
+      createTeacherMutation.mutate(teacherData);
+    }
   };
 
   return (

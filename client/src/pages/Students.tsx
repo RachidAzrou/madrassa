@@ -480,7 +480,10 @@ export default function Students() {
       // Stuur wijzigingen naar de database via API
       const studentUpdateData = {
         ...editFormData,
-        id: selectedStudent.id
+        id: selectedStudent.id,
+        // Converteer lege strings naar null voor numerieke velden
+        programId: editFormData.programId === '' ? null : parseInt(editFormData.programId),
+        studentGroupId: editFormData.studentGroupId === '' ? null : parseInt(editFormData.studentGroupId)
       };
 
       const updatedStudent = await apiRequest(`/api/students/${selectedStudent.id}`, {

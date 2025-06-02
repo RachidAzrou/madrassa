@@ -159,6 +159,39 @@ export default function Cijfers() {
     }
   });
 
+  // Mutation for updating assessment
+  const updateAssessmentMutation = useMutation({
+    mutationFn: async (assessmentData: any) => {
+      return apiRequest(`/api/assessments/${editingAssessment?.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          ...assessmentData,
+          courseId: selectedSubject?.id,
+          maxPoints: parseInt(assessmentData.maxPoints),
+          weight: parseFloat(assessmentData.weight),
+          dueDate: assessmentData.date
+        })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/assessments'] });
+      toast({
+        title: "Beoordeling bijgewerkt",
+        description: "De beoordeling is succesvol bijgewerkt."
+      });
+      setShowAddModal(false);
+      resetAssessmentForm();
+      setEditingAssessment(null);
+    },
+    onError: () => {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het bijwerken van de beoordeling.",
+        variant: "destructive"
+      });
+    }
+  });
+
   // Mutation for deleting assessment
   const deleteAssessmentMutation = useMutation({
     mutationFn: async (assessmentId: number) => {
@@ -208,7 +241,12 @@ export default function Cijfers() {
       return;
     }
 
-    createAssessmentMutation.mutate(assessmentForm);
+    // Choose between create or update based on whether we're editing
+    if (editingAssessment) {
+      updateAssessmentMutation.mutate(assessmentForm);
+    } else {
+      createAssessmentMutation.mutate(assessmentForm);
+    }
   };
 
   const handleClassSelect = (classGroup: any) => {

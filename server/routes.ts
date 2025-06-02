@@ -1490,14 +1490,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid ID format" });
       }
-      
-      const updatedAssessment = await storage.updateAssessment(id, req.body);
+
+      // Direct database update since we don't have storage method yet
+      const validatedData = {
+        courseId: req.body.courseId,
+        name: req.body.name,
+        type: req.body.type,
+        maxScore: req.body.maxPoints,
+        weight: req.body.weight ? parseInt(req.body.weight) : 0,
+        description: req.body.description || null,
+        dueDate: req.body.dueDate || null
+      };
+
+      const [updatedAssessment] = await db
+        .update(assessments)
+        .set(validatedData)
+        .where(eq(assessments.id, id))
+        .returning();
+
       if (!updatedAssessment) {
         return res.status(404).json({ message: "Assessment not found" });
       }
-      
+
       res.json(updatedAssessment);
     } catch (error) {
+      console.error('Error updating assessment:', error);
       res.status(500).json({ message: "Error updating assessment" });
     }
   });

@@ -387,6 +387,137 @@ export default function Cijfers() {
               </Card>
             </div>
           )}
+
+          {/* Step 4: Punten invoeren */}
+          {step === 'grades' && selectedAssessment && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <Calculator className="h-6 w-6 text-blue-600" />
+                  <div>
+                    <CardTitle>Punten invoeren - {selectedAssessment.name}</CardTitle>
+                    <CardDescription>
+                      Voer punten in voor alle studenten in {selectedClass.name} - {selectedSubject.name}
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Target className="h-5 w-5 text-blue-600" />
+                      <span className="font-medium text-blue-800">Assessment Details</span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600">Type:</span>
+                        <span className="ml-2 font-medium">{selectedAssessment.type}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Max Punten:</span>
+                        <span className="ml-2 font-medium">{selectedAssessment.points}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Datum:</span>
+                        <span className="ml-2 font-medium">{selectedAssessment.date}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Student</TableHead>
+                          <TableHead>Student ID</TableHead>
+                          <TableHead>Punten ({selectedAssessment.points} max)</TableHead>
+                          <TableHead>Percentage</TableHead>
+                          <TableHead>Cijfer</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {Array.isArray(studentsData) && studentsData.length > 0 ? studentsData.map((student: any) => {
+                          const points = grades[student.id] || '';
+                          const percentage = points ? Math.round((parseFloat(points) / selectedAssessment.points) * 100) : 0;
+                          const grade = points ? Math.round((percentage / 10)) : 0;
+                          
+                          return (
+                            <TableRow key={student.id}>
+                              <TableCell>
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <User className="h-4 w-4 text-blue-600" />
+                                  </div>
+                                  <span className="font-medium">{student.firstName} {student.lastName}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-gray-500">{student.studentId}</TableCell>
+                              <TableCell>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max={selectedAssessment.points}
+                                  value={points}
+                                  onChange={(e) => handleGradeChange(student.id, e.target.value)}
+                                  placeholder="0"
+                                  className="w-20"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                {points && (
+                                  <Badge variant={percentage >= 55 ? 'default' : 'destructive'}>
+                                    {percentage}%
+                                  </Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {points && (
+                                  <Badge 
+                                    variant={grade >= 6 ? 'default' : 'destructive'}
+                                    className={grade >= 8 ? 'bg-green-500 hover:bg-green-600' : ''}
+                                  >
+                                    {grade}/10
+                                  </Badge>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        }) : (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                              Geen studenten gevonden in deze klas
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-6 border-t">
+                    <div className="text-sm text-gray-500">
+                      {Object.values(grades).filter(g => g !== '').length} van {Array.isArray(studentsData) ? studentsData.length : 0} studenten ingevuld
+                    </div>
+                    <div className="flex gap-3">
+                      <Button variant="outline" onClick={handleBack}>
+                        Terug
+                      </Button>
+                      <Button 
+                        onClick={handleSaveGrades}
+                        disabled={Object.values(grades).filter(g => g !== '').length === 0}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        Cijfers opslaan
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 

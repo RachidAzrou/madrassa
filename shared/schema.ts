@@ -752,6 +752,13 @@ export const teachers = pgTable("teachers", {
   houseNumber: text("house_number"),
   postalCode: text("postal_code"),
   city: text("city"),
+  specialty: text("specialty"), // Beroep/Specialisatie
+  bio: text("bio"), // Biografie
+  status: text("status").default("active"), // Status (active/inactive)
+  photoUrl: text("photo_url"), // Foto URL
+  educations: text("educations").array(), // Opleidingen als array
+  languages: text("languages").array(), // Gesproken talen als array
+  subjects: integer("subjects").array(), // Vakken IDs als array
   isActive: boolean("is_active").default(true),
   hireDate: date("hire_date"),
   notes: text("notes"),

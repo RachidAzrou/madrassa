@@ -3444,9 +3444,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validatedData.teacherId = `D-${nextId.padStart(3, '0')}`;
       }
       
-      const teacher = await storage.createTeacher(validatedData);
+      // Zorg ervoor dat arrays correct worden verwerkt
+      const teacherData = {
+        ...validatedData,
+        educations: validatedData.educations || [],
+        languages: validatedData.languages || [],
+        subjects: validatedData.subjects || []
+      };
+      
+      const teacher = await storage.createTeacher(teacherData);
       res.status(201).json(teacher);
     } catch (error) {
+      console.error("Teacher creation error:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid teacher data", errors: error.errors });
       }

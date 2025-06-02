@@ -600,73 +600,92 @@ export default function Cijfers() {
                               {subjects.map((subject) => (
                                 <TableCell key={subject.id}>
                                   {editGrade && editGrade.studentId === student.id && editGrade.subject === subject.name ? (
-                                    <div className="flex flex-col items-center gap-3 p-4 bg-white border-2 border-blue-300 rounded-lg shadow-lg min-w-[280px]">
-                                      <div className="text-sm font-medium text-gray-600 mb-2">Selecteer cijfer</div>
+                                    <div className="flex flex-col items-center gap-3 p-4 bg-white border-2 border-blue-300 rounded-lg shadow-lg min-w-[200px]">
+                                      <div className="text-sm font-medium text-gray-600 mb-1">Voer cijfer in</div>
                                       
-                                      {/* Cijfer Grid */}
-                                      <div className="grid grid-cols-5 gap-2">
-                                        {[1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0].map((grade) => (
-                                          <Button
-                                            key={grade}
-                                            variant="outline"
-                                            size="sm"
-                                            className={`
-                                              h-10 w-12 text-xs font-semibold transition-all duration-200 border-2
-                                              ${grade < 4 ? 'text-red-600 border-red-200 hover:bg-red-50 hover:border-red-400' :
-                                                grade < 5.5 ? 'text-orange-600 border-orange-200 hover:bg-orange-50 hover:border-orange-400' :
-                                                grade < 7 ? 'text-yellow-600 border-yellow-200 hover:bg-yellow-50 hover:border-yellow-400' :
-                                                grade < 8.5 ? 'text-green-600 border-green-200 hover:bg-green-50 hover:border-green-400' :
-                                                'text-emerald-600 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-400'
-                                              }
-                                              ${editGrade.grade === grade ? 'ring-2 ring-blue-500 bg-blue-50' : ''}
-                                            `}
-                                            onClick={() => handleSaveGrade(grade)}
-                                          >
-                                            {grade.toFixed(1)}
-                                          </Button>
-                                        ))}
-                                      </div>
+                                      {/* Tekst invoerveld */}
+                                      <Input
+                                        type="number"
+                                        min="1"
+                                        max="10"
+                                        step="0.1"
+                                        placeholder="Bijv. 7.5"
+                                        className="w-24 h-12 text-center text-xl font-bold border-2 border-blue-400 focus:border-blue-600 rounded-lg"
+                                        defaultValue={editGrade.grade?.toString() || ''}
+                                        onChange={(e) => {
+                                          const value = parseFloat(e.target.value);
+                                          if (!isNaN(value) && value >= 1 && value <= 10) {
+                                            // Live preview - update grade in state without saving
+                                            setEditGrade(prev => prev ? {...prev, grade: value} : null);
+                                          }
+                                        }}
+                                        onBlur={(e) => {
+                                          const value = parseFloat(e.target.value);
+                                          if (!isNaN(value) && value >= 1 && value <= 10) {
+                                            handleSaveGrade(value);
+                                          } else {
+                                            handleCancelEditGrade();
+                                          }
+                                        }}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') {
+                                            const value = parseFloat(e.currentTarget.value);
+                                            if (!isNaN(value) && value >= 1 && value <= 10) {
+                                              handleSaveGrade(value);
+                                            } else {
+                                              handleCancelEditGrade();
+                                            }
+                                          } else if (e.key === 'Escape') {
+                                            handleCancelEditGrade();
+                                          }
+                                        }}
+                                        autoFocus
+                                      />
                                       
                                       {/* Snelkoppeling knoppen */}
-                                      <div className="flex gap-2 justify-center">
+                                      <div className="flex gap-1 justify-center flex-wrap">
                                         <Button
-                                          variant="secondary"
+                                          variant="outline"
                                           size="sm"
-                                          className="bg-red-100 hover:bg-red-200 text-red-700 border-red-300"
+                                          className="h-8 px-2 text-xs bg-red-50 hover:bg-red-100 text-red-700 border-red-300"
                                           onClick={() => handleSaveGrade(3.0)}
                                         >
-                                          3.0 Slecht
+                                          3.0
                                         </Button>
                                         <Button
-                                          variant="secondary"
+                                          variant="outline"
                                           size="sm"
-                                          className="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-yellow-300"
+                                          className="h-8 px-2 text-xs bg-yellow-50 hover:bg-yellow-100 text-yellow-700 border-yellow-300"
                                           onClick={() => handleSaveGrade(5.5)}
                                         >
-                                          5.5 Voldoende
+                                          5.5
                                         </Button>
                                         <Button
-                                          variant="secondary"
+                                          variant="outline"
                                           size="sm"
-                                          className="bg-green-100 hover:bg-green-200 text-green-700 border-green-300"
+                                          className="h-8 px-2 text-xs bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
                                           onClick={() => handleSaveGrade(7.0)}
                                         >
-                                          7.0 Goed
+                                          7.0
                                         </Button>
                                         <Button
-                                          variant="secondary"
+                                          variant="outline"
                                           size="sm"
-                                          className="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border-emerald-300"
+                                          className="h-8 px-2 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-300"
                                           onClick={() => handleSaveGrade(9.0)}
                                         >
-                                          9.0 Uitstekend
+                                          9.0
                                         </Button>
+                                      </div>
+                                      
+                                      <div className="text-xs text-gray-500 text-center">
+                                        Enter = opslaan • Esc = annuleren
                                       </div>
                                       
                                       <Button 
                                         variant="ghost" 
                                         size="sm" 
-                                        className="h-8 text-xs text-gray-500 hover:text-gray-700 mt-2"
+                                        className="h-6 text-xs text-gray-500 hover:text-gray-700"
                                         onClick={handleCancelEditGrade}
                                       >
                                         <X className="h-3 w-3 mr-1" />

@@ -562,40 +562,7 @@ export default function Cijfers() {
                                       <Target className="h-3 w-3" />
                                       {subjectAssessments.length} beoordeling{subjectAssessments.length !== 1 ? 'en' : ''}
                                     </Badge>
-                                    {(() => {
-                                      // Fetch and display grade average for this subject
-                                      const { data: gradesData = [] } = useQuery({
-                                        queryKey: ['/api/grades/by-course', subject.id],
-                                        queryFn: async () => {
-                                          const response = await fetch(`/api/grades/by-course/${subject.id}`);
-                                          return response.json();
-                                        }
-                                      });
-                                      
-                                      const subjectGrades = Array.isArray(gradesData) ? gradesData : [];
-                                      
-                                      const averageGrade = subjectGrades.length > 0 
-                                        ? (() => {
-                                            const totalScore = subjectGrades.reduce((sum: number, grade: any) => {
-                                              const percentage = (grade.score / grade.maxScore) * 100;
-                                              return sum + Math.round(percentage / 10);
-                                            }, 0);
-                                            return (totalScore / subjectGrades.length).toFixed(1);
-                                          })()
-                                        : null;
-
-                                      return averageGrade ? (
-                                        <Badge variant="secondary" className="flex items-center gap-1">
-                                          <TrendingUp className="h-3 w-3" />
-                                          Gem. {averageGrade}
-                                        </Badge>
-                                      ) : (
-                                        <Badge variant="outline" className="flex items-center gap-1 text-gray-400">
-                                          <TrendingUp className="h-3 w-3" />
-                                          Geen cijfers
-                                        </Badge>
-                                      );
-                                    })()}
+                                    <SubjectGradeAverage subjectId={subject.id} />
                                   </>
                                 );
                               })()}

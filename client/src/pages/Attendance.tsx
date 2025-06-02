@@ -522,7 +522,7 @@ export default function Attendance() {
                     <SelectValue placeholder="Selecteer vak (optioneel)" />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-[#e5e7eb]">
-                    <SelectItem value="" className="focus:bg-blue-200 hover:bg-blue-100">
+                    <SelectItem value="all" className="focus:bg-blue-200 hover:bg-blue-100">
                       Alle vakken
                     </SelectItem>
                     {isLoadingCourses ? (

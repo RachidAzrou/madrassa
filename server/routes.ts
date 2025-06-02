@@ -2473,7 +2473,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Haal vakken op die behoren tot het programma van deze klas
-      const coursesForGroup = await storage.getCoursesByProgram(group.programId);
+      const coursesForGroup = group.programId ? await storage.getCoursesByProgram(group.programId) : [];
       
       res.json(coursesForGroup);
     } catch (error) {

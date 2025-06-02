@@ -4723,6 +4723,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/grades", async (req: Request, res: Response) => {
     try {
       const { grades: gradesToSave } = req.body;
+      console.log("Received grades data:", gradesToSave);
       
       if (!Array.isArray(gradesToSave)) {
         return res.status(400).json({ error: "Grades must be an array" });
@@ -4731,25 +4732,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const savedGrades = [];
       for (const gradeData of gradesToSave) {
         const { studentId, assessmentId, score, maxScore } = gradeData;
+        console.log("Processing grade:", { studentId, assessmentId, score, maxScore });
         
         // Get the assessment to get more details
         const assessment = await storage.getAssessmentById(assessmentId);
+        console.log("Found assessment:", assessment);
+        
         if (!assessment) {
+          console.log("Assessment not found, skipping");
           continue; // Skip if assessment not found
         }
 
         const gradeRecord = {
-          studentId,
+          studentId: parseInt(studentId),
           courseId: assessment.courseId,
           assessmentType: assessment.type,
           assessmentName: assessment.name,
-          score,
-          maxScore,
+          score: parseInt(score),
+          maxScore: parseInt(maxScore),
           weight: assessment.weight || 0,
           date: new Date().toISOString().split('T')[0], // Today's date
           remark: null
         };
 
+        console.log("Creating grade record:", gradeRecord);
         const savedGrade = await storage.createGrade(gradeRecord);
         savedGrades.push(savedGrade);
       }

@@ -74,12 +74,12 @@ export default function Cijfers() {
   const [showConfirmSave, setShowConfirmSave] = useState(false);
   const [showAddScoreDialog, setShowAddScoreDialog] = useState(false);
   const [newScoreData, setNewScoreData] = useState({
-    studentId: '',
     subject: '',
-    grade: '',
-    category: '',
-    score: '',
-    remark: ''
+    assessmentType: '',
+    assessmentName: '',
+    points: '',
+    maxPoints: '100',
+    weight: '100'
   });
   
   // Query voor het ophalen van klassen
@@ -983,36 +983,13 @@ export default function Cijfers() {
         <Dialog open={showAddScoreDialog} onOpenChange={setShowAddScoreDialog}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Nieuw cijfer toevoegen</DialogTitle>
+              <DialogTitle>Nieuwe beoordeling toevoegen</DialogTitle>
               <DialogDescription>
-                Voeg een nieuw cijfer toe voor een student en vak.
+                Voeg een nieuwe beoordeling toe voor een vak met punten per type (test, taak, examen).
               </DialogDescription>
             </DialogHeader>
             
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <div className="text-right font-medium text-sm">
-                  Student
-                </div>
-                <div className="col-span-3">
-                  <Select
-                    value={newScoreData.studentId}
-                    onValueChange={(value) => setNewScoreData({...newScoreData, studentId: value})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecteer een student" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {filteredStudents.map((student: any) => (
-                        <SelectItem key={student.id} value={student.id.toString()}>
-                          {student.firstName} {student.lastName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
               <div className="grid grid-cols-4 items-center gap-4">
                 <div className="text-right font-medium text-sm">
                   Vak
@@ -1038,18 +1015,96 @@ export default function Cijfers() {
               
               <div className="grid grid-cols-4 items-center gap-4">
                 <div className="text-right font-medium text-sm">
-                  Cijfer
+                  Type
+                </div>
+                <div className="col-span-3">
+                  <Select
+                    value={newScoreData.assessmentType}
+                    onValueChange={(value) => setNewScoreData({...newScoreData, assessmentType: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer beoordelingstype" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="test">Test</SelectItem>
+                      <SelectItem value="taak">Taak</SelectItem>
+                      <SelectItem value="examen">Examen</SelectItem>
+                      <SelectItem value="presentatie">Presentatie</SelectItem>
+                      <SelectItem value="project">Project</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <div className="text-right font-medium text-sm">
+                  Naam
                 </div>
                 <Input
-                  id="grade"
-                  type="number"
-                  min="1"
-                  max="10"
-                  step="0.1"
                   className="col-span-3"
-                  value={newScoreData.grade}
-                  onChange={(e) => setNewScoreData({...newScoreData, grade: e.target.value})}
+                  placeholder="Bijv. Test Hoofdstuk 1"
+                  value={newScoreData.assessmentName}
+                  onChange={(e) => setNewScoreData({...newScoreData, assessmentName: e.target.value})}
                 />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 items-center gap-2">
+                  <div className="text-right font-medium text-sm">
+                    Punten
+                  </div>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    placeholder="0-100"
+                    className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    value={newScoreData.points}
+                    onChange={(e) => setNewScoreData({...newScoreData, points: e.target.value})}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 items-center gap-2">
+                  <div className="text-right font-medium text-sm">
+                    Max punten
+                  </div>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="100"
+                    step="1"
+                    placeholder="100"
+                    className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    value={newScoreData.maxPoints}
+                    onChange={(e) => setNewScoreData({...newScoreData, maxPoints: e.target.value})}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <div className="text-right font-medium text-sm">
+                  Gewicht
+                </div>
+                <div className="col-span-3">
+                  <Select
+                    value={newScoreData.weight}
+                    onValueChange={(value) => setNewScoreData({...newScoreData, weight: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecteer gewicht" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10% - Kleine taak</SelectItem>
+                      <SelectItem value="20">20% - Reguliere taak</SelectItem>
+                      <SelectItem value="30">30% - Grote taak</SelectItem>
+                      <SelectItem value="40">40% - Test</SelectItem>
+                      <SelectItem value="50">50% - Belangrijk</SelectItem>
+                      <SelectItem value="60">60% - Examen</SelectItem>
+                      <SelectItem value="100">100% - Volledig cijfer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
             
@@ -1063,52 +1118,107 @@ export default function Cijfers() {
               </Button>
               <Button 
                 type="submit"
-                onClick={() => {
-                  if (!newScoreData.studentId || !newScoreData.subject || !newScoreData.grade) {
+                onClick={async () => {
+                  if (!newScoreData.subject || !newScoreData.assessmentType || !newScoreData.assessmentName || !newScoreData.maxPoints) {
                     toast({
                       title: "Onvolledige gegevens",
-                      description: "Vul alle velden in om een cijfer toe te voegen.",
+                      description: "Vul alle velden in om een beoordeling toe te voegen.",
                       variant: "destructive",
                     });
                     return;
                   }
                   
-                  const grade = parseFloat(newScoreData.grade);
-                  if (isNaN(grade) || grade < 1 || grade > 10) {
+                  const points = parseFloat(newScoreData.points);
+                  const maxPoints = parseFloat(newScoreData.maxPoints);
+                  const weight = parseFloat(newScoreData.weight);
+                  
+                  if (isNaN(points) || points < 0 || points > maxPoints) {
                     toast({
-                      title: "Ongeldig cijfer",
-                      description: "Cijfer moet tussen 1 en 10 liggen.",
+                      title: "Ongeldige punten",
+                      description: `Punten moeten tussen 0 en ${maxPoints} liggen.`,
                       variant: "destructive",
                     });
                     return;
                   }
                   
-                  // Voeg het cijfer toe aan de state
-                  const updatedGrades = { ...subjectGrades };
-                  if (!updatedGrades[newScoreData.studentId]) {
-                    updatedGrades[newScoreData.studentId] = {};
+                  if (isNaN(maxPoints) || maxPoints <= 0) {
+                    toast({
+                      title: "Ongeldige maximum punten",
+                      description: "Maximum punten moet groter dan 0 zijn.",
+                      variant: "destructive",
+                    });
+                    return;
                   }
-                  updatedGrades[newScoreData.studentId][newScoreData.subject] = grade;
                   
-                  setSubjectGrades(updatedGrades);
-                  setIsGradesModified(true);
-                  setShowAddScoreDialog(false);
-                  
-                  // Reset het formulier
-                  setNewScoreData({
-                    studentId: '',
-                    subject: '',
-                    grade: '',
-                    category: '',
-                    score: '',
-                    remark: ''
-                  });
-                  
-                  toast({
-                    title: "Cijfer toegevoegd",
-                    description: "Het cijfer is succesvol toegevoegd. Klik op 'Wijzigingen opslaan' om de wijzigingen permanent te maken.",
-                    variant: "default",
-                  });
+                  try {
+                    // Bereken percentage score
+                    const score = Math.round((points / maxPoints) * 100);
+                    
+                    // Vind het program ID voor dit vak
+                    const program = programsData?.programs?.find((p: any) => p.name === newScoreData.subject);
+                    if (!program) {
+                      toast({
+                        title: "Fout",
+                        description: "Vak niet gevonden.",
+                        variant: "destructive",
+                      });
+                      return;
+                    }
+                    
+                    // Voeg de beoordeling toe voor alle studenten in de klas
+                    const savePromises = filteredStudents.map(async (student: any) => {
+                      const response = await fetch('/api/grades', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          studentId: parseInt(student.id),
+                          courseId: program.id,
+                          assessmentType: newScoreData.assessmentType,
+                          assessmentName: newScoreData.assessmentName,
+                          score: 0, // Start met 0, docent kan later invullen
+                          maxScore: maxPoints,
+                          weight: weight,
+                          date: new Date().toISOString().split('T')[0]
+                        }),
+                      });
+
+                      if (!response.ok) {
+                        throw new Error(`Fout bij het toevoegen voor ${student.firstName} ${student.lastName}`);
+                      }
+                    });
+                    
+                    await Promise.all(savePromises);
+                    
+                    // Refresh de data
+                    await queryClient.invalidateQueries({ queryKey: ['/api/grades/class', selectedClass] });
+                    
+                    setShowAddScoreDialog(false);
+                    
+                    // Reset het formulier
+                    setNewScoreData({
+                      subject: '',
+                      assessmentType: '',
+                      assessmentName: '',
+                      points: '',
+                      maxPoints: '100',
+                      weight: '100'
+                    });
+                    
+                    toast({
+                      title: "Beoordeling toegevoegd",
+                      description: `${newScoreData.assessmentType} "${newScoreData.assessmentName}" is toegevoegd voor alle studenten in de klas.`,
+                      variant: "default",
+                    });
+                  } catch (error) {
+                    console.error('Error adding assessment:', error);
+                    toast({
+                      title: "Fout",
+                      description: "Er is een fout opgetreden bij het toevoegen van de beoordeling.",
+                      variant: "destructive",
+                    });
+                  }
                 }}
               >
                 Toevoegen

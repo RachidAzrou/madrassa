@@ -261,34 +261,80 @@ export default function Students() {
     }
     
     try {
-      // Genereer automatisch een uniek, oplopend student ID
-      const generatedStudentId = generateNextStudentId();
-      
-      const newStudent = {
+      // Stap 1: Maak eerst de student aan in de database
+      const studentData = {
         ...formData,
-        id: Date.now(), // Gebruik timestamp als unieke ID
-        studentId: generatedStudentId,
-        status: formData.status || "ingeschreven", // Default waarde
-        programName: programs.find(p => p.id.toString() === formData.programId)?.name || '',
-        studentGroupName: studentGroups.find(g => g.id.toString() === formData.studentGroupId)?.name || '',
-        guardians: selectedGuardians,
-        relatedStudents: selectedSiblings
+        status: formData.status || "ingeschreven"
       };
       
-      // Update studenten lijst met nieuwe student
-      // Data wordt automatisch bijgewerkt via React Query invalidation
+      const studentResponse = await apiRequest('/api/students', {
+        method: 'POST',
+        body: studentData
+      });
       
-      // Sla nieuw student ID op voor eventuele voogdkoppeling
-      const newId = formData.studentId || nextStudentId;
-      setNewStudentId(newId);
+      console.log('Student aangemaakt:', studentResponse);
       
-      // Reset formulier en sluit dialoogvenster
+      // Stap 2: Maak nieuwe voogden aan en koppel ze
+      if (newStudentGuardians && newStudentGuardians.length > 0) {
+        for (const guardian of newStudentGuardians) {
+          try {
+            // Maak eerst de voogd aan in de database
+            const guardianResponse = await apiRequest('/api/guardians', {
+              method: 'POST',
+              body: {
+                firstName: guardian.firstName,
+                lastName: guardian.lastName,
+                email: guardian.email,
+                phone: guardian.phone,
+                relationship: guardian.relationship,
+                relationshipOther: guardian.relationshipOther,
+                address: guardian.address,
+                occupation: guardian.occupation,
+                isEmergencyContact: guardian.isEmergencyContact,
+                emergencyContactFirstName: guardian.emergencyContactFirstName,
+                emergencyContactLastName: guardian.emergencyContactLastName,
+                emergencyContactPhone: guardian.emergencyContactPhone,
+                emergencyContactRelationship: guardian.emergencyContactRelationship,
+                emergencyContactRelationshipOther: guardian.emergencyContactRelationshipOther
+              }
+            });
+            
+            // Koppel de voogd aan de student
+            await apiRequest('/api/student-guardians', {
+              method: 'POST',
+              body: {
+                studentId: studentResponse.id,
+                guardianId: guardianResponse.id,
+                relationshipType: guardian.relationship,
+                isPrimary: guardian.isEmergencyContact || false
+              }
+            });
+            
+            console.log('Voogd aangemaakt en gekoppeld:', guardianResponse);
+          } catch (guardianError) {
+            console.error('Fout bij aanmaken voogd:', guardianError);
+            toast({
+              title: "Waarschuwing",
+              description: `Voogd ${guardian.firstName} ${guardian.lastName} kon niet worden aangemaakt.`,
+              variant: "destructive",
+            });
+          }
+        }
+      }
+      
+      // Stap 3: Refresh de data
+      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+      
+      // Reset formulier en states
       resetForm();
+      setNewStudentGuardians([]);
+      setSelectedGuardians([]);
       setIsCreateDialogOpen(false);
       
       toast({
         title: "Student toegevoegd",
-        description: "De student is succesvol toegevoegd aan de lijst."
+        description: "De student en gekoppelde voogden zijn succesvol toegevoegd."
       });
       
     } catch (error) {

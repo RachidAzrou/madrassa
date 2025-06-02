@@ -3,8 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
 import { db } from "./db";
 import * as schema from "@shared/schema";
-import { students, studentGroups, studentGroupEnrollments } from "@shared/schema";
-import { eq, and } from "drizzle-orm";
+import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers } from "@shared/schema";
+import { eq, and, sql } from "drizzle-orm";
 
 // Global storage voor calendar events
 const globalCalendarEventsStore = new Map();
@@ -616,17 +616,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const programsWithTeachers = await Promise.all(
         programs.map(async (program) => {
           try {
-            // Zoek naar programTeachers relaties in de database
-            const programTeachersResult = await db
-              .select({
-                teacherId: programTeachers.teacherId,
-                isPrimary: programTeachers.isPrimary,
-                firstName: teachers.firstName,
-                lastName: teachers.lastName,
-              })
-              .from(programTeachers)
-              .innerJoin(teachers, eq(programTeachers.teacherId, teachers.id))
-              .where(eq(programTeachers.programId, program.id));
+            // Zoek naar programTeachers relaties in de database met SQL query
+            const result = await db.execute(sql`
+              SELECT pt.teacher_id, pt.is_primary, t.first_name, t.last_name
+              FROM program_teachers pt
+              JOIN teachers t ON pt.teacher_id = t.id
+              WHERE pt.program_id = ${program.id}
+            `);
+            
+            const programTeachersResult = result.rows;
             
             const assignedTeachers = programTeachersResult.map(pt => ({
               id: pt.teacherId,

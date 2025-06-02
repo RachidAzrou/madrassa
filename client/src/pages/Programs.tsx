@@ -139,30 +139,11 @@ export default function Programs() {
   console.log('Fetched teachers:', teachersData);
 
   // Als data direct een array is, gebruik het; anders zoek naar data.programs
-  const apiPrograms = Array.isArray(data) ? data : data?.programs || [];
-  
-  // Haal ook programma's uit localStorage als backup
-  const localStoragePrograms = JSON.parse(localStorage.getItem('programs') || '[]');
-  
-  // Combineer API en localStorage programma's
-  const programs = apiPrograms.length > 0 ? apiPrograms : localStoragePrograms;
+  const programs = Array.isArray(data) ? data : data?.programs || [];
 
-  // Combineer API docenten met localStorage docenten
+  // Haal beschikbare docenten op uit de database
   const getAvailableTeachers = () => {
     const apiTeachers = teachersData?.teachers || [];
-    
-    // Haal docenten uit localStorage als backup
-    const localStorageTeachers = JSON.parse(localStorage.getItem('teachers') || '[]');
-    console.log('Docenten opgeslagen in localStorage:', localStorageTeachers.length);
-    
-    // Als er geen API docenten zijn maar wel localStorage docenten, gebruik localStorage
-    if (apiTeachers.length === 0 && localStorageTeachers.length > 0) {
-      return localStorageTeachers.filter((teacher: any) => 
-        teacher.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        teacher.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        teacher.email?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
     
     // Filter API docenten op zoekterm
     return apiTeachers.filter((teacher: any) => 

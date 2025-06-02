@@ -119,9 +119,7 @@ export default function Guardians() {
     const urlParams = new URLSearchParams(window.location.search);
     const action = urlParams.get('action');
     const studentId = urlParams.get('studentId');
-    
-    // Controleer ook op gegevens in localStorage (als backup)
-    const pendingStudentId = localStorage.getItem('pendingStudentForGuardian');
+    const pendingStudentId = urlParams.get('pendingStudentForGuardian');
     
     if ((action === 'add' && studentId) || pendingStudentId) {
       // Sla de student ID op voor later gebruik bij het koppelen

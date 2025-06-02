@@ -4595,6 +4595,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get students by class ID
+  app.get("/api/students/class/:classId", async (req: Request, res: Response) => {
+    try {
+      const classId = parseInt(req.params.classId);
+      if (isNaN(classId)) {
+        return res.status(400).json({ message: "Invalid class ID" });
+      }
+
+      const students = await storage.getStudentsByClass(classId);
+      res.json(students);
+    } catch (error) {
+      console.error("Error fetching students by class:", error);
+      res.status(500).json({ message: "Error fetching students" });
+    }
+  });
+
   // Student Siblings endpoints
   app.get("/api/students/:studentId/siblings", async (req: Request, res: Response) => {
     try {

@@ -114,6 +114,11 @@ export interface IStorage {
     successRate: number;
   } | undefined>;
 
+  // Student operations
+  getStudents(): Promise<any[]>;
+  getStudent(id: number): Promise<any | undefined>;
+  getStudentsByClass(classId: number): Promise<any[]>;
+  
   // Student Siblings operations
   getStudentSiblings(studentId: number): Promise<StudentSibling[]>;
   addStudentSibling(studentId: number, siblingId: number, relationship?: string): Promise<void>;
@@ -813,6 +818,40 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting payment stats:', error);
       return undefined;
+    }
+  }
+
+  // Student operations
+  async getStudents(): Promise<any[]> {
+    try {
+      const studentsData = await db.select().from(students);
+      return studentsData;
+    } catch (error) {
+      console.error('Error getting students:', error);
+      return [];
+    }
+  }
+
+  async getStudent(id: number): Promise<any | undefined> {
+    try {
+      const [student] = await db.select().from(students).where(eq(students.id, id));
+      return student || undefined;
+    } catch (error) {
+      console.error('Error getting student:', error);
+      return undefined;
+    }
+  }
+
+  async getStudentsByClass(classId: number): Promise<any[]> {
+    try {
+      const studentsData = await db
+        .select()
+        .from(students)
+        .where(eq(students.classId, classId));
+      return studentsData;
+    } catch (error) {
+      console.error('Error getting students by class:', error);
+      return [];
     }
   }
 

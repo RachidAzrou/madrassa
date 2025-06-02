@@ -285,12 +285,17 @@ export default function Teachers() {
     if (!selectedTeacher) return;
     
     try {
-      // Verwijder docent uit localStorage
-      const updatedTeachers = teachers.filter(teacher => teacher.id !== selectedTeacher.id);
-      localStorage.setItem('teachers', JSON.stringify(updatedTeachers));
+      const response = await fetch(`/api/teachers/${selectedTeacher.id}`, {
+        method: 'DELETE',
+      });
       
-      // Update state
-      setTeachers(updatedTeachers);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Fout bij verwijderen docent');
+      }
+      
+      // Invalidate en refetch de teachers data
+      queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
       
       toast({
         title: "Docent verwijderd",
@@ -302,7 +307,7 @@ export default function Teachers() {
     } catch (error) {
       toast({
         title: "Fout bij verwijderen",
-        description: "Er is een probleem opgetreden bij het verwijderen van de docent.",
+        description: error instanceof Error ? error.message : "Er is een probleem opgetreden bij het verwijderen van de docent.",
         variant: "destructive",
       });
     }

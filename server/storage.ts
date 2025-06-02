@@ -7,7 +7,8 @@ import {
   payments, type Payment, type InsertPayment,
   invoices, type Invoice, type InsertInvoice,
   tuitionRates, type TuitionRate, type InsertTuitionRate,
-  students, teachers, guardians, studentGuardians, studentSiblings, type StudentSibling, type InsertStudentSibling
+  students, teachers, guardians, studentGuardians, studentSiblings, type StudentSibling, type InsertStudentSibling,
+  studentGroupEnrollments
 } from "@shared/schema";
 import { db } from "./db";
 import { and, eq, sql, count, desc } from "drizzle-orm";
@@ -845,9 +846,30 @@ export class DatabaseStorage implements IStorage {
   async getStudentsByClass(classId: number): Promise<any[]> {
     try {
       const studentsData = await db
-        .select()
+        .select({
+          id: students.id,
+          studentId: students.studentId,
+          firstName: students.firstName,
+          lastName: students.lastName,
+          email: students.email,
+          phone: students.phone,
+          dateOfBirth: students.dateOfBirth,
+          address: students.address,
+          street: students.street,
+          houseNumber: students.houseNumber,
+          postalCode: students.postalCode,
+          city: students.city,
+          programId: students.programId,
+          yearLevel: students.yearLevel,
+          status: students.status,
+          enrollmentDate: students.enrollmentDate,
+          notes: students.notes,
+          gender: students.gender,
+          photoUrl: students.photoUrl
+        })
         .from(students)
-        .where(eq(students.classId, classId));
+        .innerJoin(studentGroupEnrollments, eq(students.id, studentGroupEnrollments.studentId))
+        .where(eq(studentGroupEnrollments.groupId, classId));
       return studentsData;
     } catch (error) {
       console.error('Error getting students by class:', error);
@@ -924,6 +946,37 @@ export class DatabaseStorage implements IStorage {
       );
     } catch (error) {
       console.error('Error removing student sibling:', error);
+      throw error;
+    }
+  }
+
+  // Program Teachers operations
+  async getProgramTeachers(programId: number): Promise<any[]> {
+    try {
+      // For now, return empty array as this functionality isn't fully implemented
+      return [];
+    } catch (error) {
+      console.error('Error getting program teachers:', error);
+      return [];
+    }
+  }
+
+  async assignTeacherToProgram(programId: number, teacherId: number, isPrimary: boolean = false): Promise<void> {
+    try {
+      // For now, this is a placeholder implementation
+      console.log(`Assigning teacher ${teacherId} to program ${programId} (primary: ${isPrimary})`);
+    } catch (error) {
+      console.error('Error assigning teacher to program:', error);
+      throw error;
+    }
+  }
+
+  async removeTeacherFromProgram(programId: number, teacherId: number): Promise<void> {
+    try {
+      // For now, this is a placeholder implementation
+      console.log(`Removing teacher ${teacherId} from program ${programId}`);
+    } catch (error) {
+      console.error('Error removing teacher from program:', error);
       throw error;
     }
   }

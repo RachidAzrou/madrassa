@@ -515,20 +515,20 @@ export default function Cijfers() {
 
       {/* Add Assessment Dialog */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="sm:max-w-[600px]">
-          <div className="bg-[#1e40af] text-white px-6 py-4 -mx-6 -mt-6 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="flex-shrink-0">
-                <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
-                  <Plus className="h-5 w-5 text-white" />
+        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+          <div className="bg-[#1e40af] text-white px-8 py-6 -mx-6 -mt-6 mb-8 rounded-t-lg">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 mt-1">
+                <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
+                  <Plus className="h-6 w-6 text-white" />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <DialogTitle className="text-lg font-semibold text-white">
+                <DialogTitle className="text-xl font-semibold text-white mb-2">
                   Nieuwe beoordeling toevoegen
                 </DialogTitle>
-                <DialogDescription className="text-blue-100 mt-1">
-                  Voeg een nieuwe beoordeling toe voor {selectedSubject?.name}
+                <DialogDescription className="text-blue-100 text-base">
+                  Voeg een nieuwe beoordeling toe voor het vak {selectedSubject?.name || 'geselecteerd vak'}
                 </DialogDescription>
               </div>
             </div>

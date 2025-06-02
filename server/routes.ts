@@ -1666,6 +1666,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all grades for a specific subject/course
+  apiRouter.get("/api/grades/by-course/:courseId", async (req, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID" });
+      }
+      
+      const grades = await db.select({
+        id: schema.grades.id,
+        studentId: schema.grades.studentId,
+        score: schema.grades.score,
+        maxScore: schema.grades.maxScore,
+        assessmentName: schema.grades.assessmentName,
+        assessmentType: schema.grades.assessmentType,
+        student: {
+          id: schema.students.id,
+          firstName: schema.students.firstName,
+          lastName: schema.students.lastName
+        }
+      })
+      .from(schema.grades)
+      .leftJoin(schema.students, eq(schema.grades.studentId, schema.students.id))
+      .where(eq(schema.grades.courseId, courseId));
+      
+      res.json(grades);
+    } catch (error) {
+      console.error('Error fetching grades by course:', error);
+      res.status(500).json({ message: "Error fetching grades by course" });
+    }
+  });
+
   // Get grades for a specific assessment
   apiRouter.get("/api/assessments/:assessmentId/grades", async (req, res) => {
     try {

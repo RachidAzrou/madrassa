@@ -47,6 +47,12 @@ export default function Cijfers() {
     enabled: !!selectedAssessment,
   });
 
+  // Query to fetch all grades for the selected subject/course to calculate averages
+  const { data: allCourseGrades } = useQuery({
+    queryKey: [`/api/grades/by-course/${selectedSubject?.id}`],
+    enabled: !!selectedSubject,
+  });
+
   // Effect to populate grades when existing grades are loaded
   useEffect(() => {
     if (existingGrades && Array.isArray(existingGrades)) {
@@ -59,6 +65,25 @@ export default function Cijfers() {
       setGrades(gradeMap);
     }
   }, [existingGrades]);
+
+  // Function to calculate average score for an assessment
+  const calculateAssessmentAverage = (assessmentName: string) => {
+    if (!allCourseGrades || !Array.isArray(allCourseGrades)) return null;
+    
+    const assessmentGrades = allCourseGrades.filter((grade: any) => 
+      grade.assessmentName === assessmentName && grade.score !== null
+    );
+    
+    if (assessmentGrades.length === 0) return null;
+    
+    const totalScore = assessmentGrades.reduce((sum: number, grade: any) => sum + grade.score, 0);
+    const averageScore = totalScore / assessmentGrades.length;
+    
+    return {
+      average: Math.round(averageScore * 10) / 10, // Round to 1 decimal
+      count: assessmentGrades.length
+    };
+  };
   
   // Form state for new assessment
   const [assessmentForm, setAssessmentForm] = useState({
@@ -249,6 +274,7 @@ export default function Cijfers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/assessments/${selectedAssessment?.id}/grades`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/grades/by-course/${selectedSubject?.id}`] });
       toast({
         title: "Cijfers opgeslagen",
         description: `Cijfers voor ${selectedAssessment.name} zijn succesvol opgeslagen.`,
@@ -525,9 +551,26 @@ export default function Cijfers() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <Badge className={`${getScoreColor(assessment.points)} border`}>
-                                {assessment.points}
-                              </Badge>
+                              {(() => {
+                                const avgData = calculateAssessmentAverage(assessment.name);
+                                if (!avgData) {
+                                  return (
+                                    <Badge variant="outline" className="text-gray-400">
+                                      Geen cijfers
+                                    </Badge>
+                                  );
+                                }
+                                return (
+                                  <div className="flex items-center gap-2">
+                                    <Badge className={`${getScoreColor(avgData.average)} border`}>
+                                      {avgData.average}
+                                    </Badge>
+                                    <span className="text-xs text-gray-500">
+                                      ({avgData.count} student{avgData.count !== 1 ? 'en' : ''})
+                                    </span>
+                                  </div>
+                                );
+                              })()}
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">

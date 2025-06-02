@@ -29,7 +29,7 @@ import { toast } from '@/hooks/use-toast';
 import { PremiumHeader } from '@/components/layout/premium-header';
 
 // Component voor cijfergemiddelde per vak
-const SubjectGradeAverage = ({ subjectId }: { subjectId: number }) => {
+const SubjectGradeAverage = ({ subjectId, assessmentsData }: { subjectId: number, assessmentsData: any[] }) => {
   const fetchGradesForSubject = async (subjectId: number) => {
     const response = await fetch(`/api/grades/by-course/${subjectId}`);
     return response.json();
@@ -40,10 +40,15 @@ const SubjectGradeAverage = ({ subjectId }: { subjectId: number }) => {
     queryFn: () => fetchGradesForSubject(subjectId)
   });
 
-  // Calculate average grade for this subject
+  // Check if there are active assessments for this subject
+  const hasActiveAssessments = Array.isArray(assessmentsData) 
+    ? assessmentsData.some((a: any) => a.courseId === subjectId)
+    : false;
+
+  // Calculate average grade for this subject only if there are active assessments
   const subjectGrades = Array.isArray(gradesData) ? gradesData : [];
   
-  const averageGrade = subjectGrades.length > 0 
+  const averageGrade = hasActiveAssessments && subjectGrades.length > 0 
     ? (() => {
         const totalScore = subjectGrades.reduce((sum: number, grade: any) => {
           const percentage = (grade.score / grade.maxScore) * 100;

@@ -2447,12 +2447,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid group ID format" });
       }
       
-      // Voor nu, geef alle actieve docenten terug
-      // Later kunnen we dit uitbreiden met klas-specifieke docenten
-      const allTeachers = await storage.getTeachers();
-      const activeTeachers = allTeachers.filter(teacher => teacher.isActive);
-      
-      res.json(activeTeachers);
+      // Haal de klas informatie op
+      const group = await storage.getStudentGroup(groupId);
+      if (!group) {
+        return res.status(404).json({ message: "Student group not found" });
+      }
+
+      // Als de klas een programId heeft, haal docenten op die aan dat programma zijn gekoppeld
+      if (group.programId) {
+        try {
+          const teachersForProgram = await db
+            .select({
+              id: teachers.id,
+              teacherId: teachers.teacherId,
+              firstName: teachers.firstName,
+              lastName: teachers.lastName,
+              email: teachers.email,
+              phone: teachers.phone,
+              dateOfBirth: teachers.dateOfBirth,
+              address: teachers.address,
+              street: teachers.street,
+              houseNumber: teachers.houseNumber,
+              postalCode: teachers.postalCode,
+              city: teachers.city,
+              specialty: teachers.specialty,
+              bio: teachers.bio,
+              status: teachers.status,
+              photoUrl: teachers.photoUrl,
+              educations: teachers.educations,
+              languages: teachers.languages,
+              subjects: teachers.subjects,
+              isActive: teachers.isActive,
+              hireDate: teachers.hireDate,
+              notes: teachers.notes
+            })
+            .from(teachers)
+            .innerJoin(programTeachers, eq(programTeachers.teacherId, teachers.id))
+            .where(
+              and(
+                eq(teachers.isActive, true),
+                eq(programTeachers.programId, group.programId)
+              )
+            )
+            .orderBy(teachers.firstName, teachers.lastName);
+
+          res.json(teachersForProgram);
+        } catch (dbError) {
+          console.error("Database error, falling back to all teachers:", dbError);
+          // Fallback naar alle actieve docenten als er een database error is
+          const allTeachers = await storage.getTeachers();
+          const activeTeachers = allTeachers.filter(teacher => teacher.isActive);
+          res.json(activeTeachers);
+        }
+      } else {
+        // Als er geen programId is, geef alle actieve docenten terug
+        const allTeachers = await storage.getTeachers();
+        const activeTeachers = allTeachers.filter(teacher => teacher.isActive);
+        res.json(activeTeachers);
+      }
     } catch (error) {
       console.error("Error fetching teachers by group:", error);
       res.status(500).json({ message: "Error fetching teachers by group" });

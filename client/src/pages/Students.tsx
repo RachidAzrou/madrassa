@@ -183,6 +183,15 @@ export default function Students() {
     refetchOnWindowFocus: true
   });
 
+  // Query voor het ophalen van voogden van een student
+  const { data: studentGuardians = [], refetch: refetchGuardians } = useQuery({
+    queryKey: ['/api/students', selectedStudent?.id, 'guardians'],
+    queryFn: () => selectedStudent?.id ? apiRequest(`/api/students/${selectedStudent.id}/guardians`) : [],
+    enabled: !!selectedStudent?.id,
+    staleTime: 0, // Altijd verse data ophalen
+    refetchOnWindowFocus: true
+  });
+
   // Helper functie om relatie waarden naar Nederlands te vertalen
   const getRelationshipLabel = (relationship: string) => {
     switch (relationship) {
@@ -587,6 +596,9 @@ export default function Students() {
       // Refresh de students data
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
       queryClient.invalidateQueries({ queryKey: ['/api/student-group-enrollments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/students', selectedStudent.id, 'guardians'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
+      refetchGuardians();
       queryClient.invalidateQueries({ queryKey: ['/api/guardians'] });
       
       toast({
@@ -1671,8 +1683,8 @@ export default function Students() {
                   <div>
                     <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">Voogden</h4>
                     <div className="space-y-2">
-                      {selectedStudent.guardians && selectedStudent.guardians.length > 0 ? (
-                        selectedStudent.guardians.map((guardian: any, index: number) => (
+                      {studentGuardians && studentGuardians.length > 0 ? (
+                        studentGuardians.map((guardian: any, index: number) => (
                           <div key={index} className="flex items-center justify-between p-3 bg-white rounded-md border border-gray-200">
                             <div className="flex items-center space-x-3">
                               <Avatar className="h-8 w-8">

@@ -75,7 +75,8 @@ export const insertStudentSchema = baseInsertStudentSchema.extend({
   // Validatie voor alle datum velden
   dateOfBirth: flexibleDateSchema,
   enrollmentDate: flexibleDateSchema,
-  yearLevel: flexibleIntegerSchema
+  yearLevel: flexibleIntegerSchema,
+  programId: flexibleIntegerSchema
 });
 
 export type InsertStudent = z.infer<typeof insertStudentSchema>;

@@ -109,11 +109,19 @@ export default function Cijfers() {
   // Data fetching for assessments
   const { data: assessmentsData = [] } = useQuery({ 
     queryKey: ['/api/assessments', selectedSubject?.id],
-    queryFn: () => {
+    queryFn: async () => {
       const url = selectedSubject?.id 
         ? `/api/assessments?courseId=${selectedSubject.id}`
         : '/api/assessments';
-      return fetch(url).then(res => res.json());
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      // Map dueDate to date for frontend compatibility
+      return data.map((assessment: any) => ({
+        ...assessment,
+        date: assessment.dueDate,
+        maxPoints: assessment.maxScore
+      }));
     },
     enabled: !!selectedSubject
   });
@@ -127,7 +135,8 @@ export default function Cijfers() {
           ...assessmentData,
           courseId: selectedSubject?.id,
           maxPoints: parseInt(assessmentData.maxPoints),
-          weight: parseFloat(assessmentData.weight)
+          weight: parseFloat(assessmentData.weight),
+          dueDate: assessmentData.date // Pass the date as dueDate to match backend
         })
       });
     },

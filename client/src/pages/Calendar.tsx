@@ -988,27 +988,38 @@ export default function Calendar() {
                   <StyledSelect 
                     value={newEvent.courseId || ""} 
                     onValueChange={(value) => {
-                      // Auto-select teacher based on course
-                      let autoTeacher = "";
-                      let autoTeacherName = "";
-                      if (value === "1") { // Arabisch
-                        autoTeacher = "1";
-                        autoTeacherName = "Ahmed Al-Mansouri";
-                      } else if (value === "2") { // Islamitische Geschiedenis
-                        autoTeacher = "2"; 
-                        autoTeacherName = "Fatima Hassan";
-                      } else if (value === "3") { // Koran Memorisatie
-                        autoTeacher = "3";
-                        autoTeacherName = "Omar Ibn Khattab";
+                      // Find the selected subject
+                      const selectedSubject = subjects.find(subject => subject.id.toString() === value);
+                      const subjectName = selectedSubject?.name || "";
+                      
+                      // Auto-generate title based on subject and class
+                      let autoTitle = "";
+                      if (activeTab === 'class') {
+                        autoTitle = `Les ${subjectName}`;
+                      } else if (activeTab === 'exam') {
+                        autoTitle = `Examen ${subjectName}`;
+                      }
+                      if (newEvent.className) {
+                        autoTitle += ` - ${newEvent.className}`;
                       }
                       
-                      const courseName = value === "1" ? "Arabisch" : value === "2" ? "Islamitische Geschiedenis" : "Koran Memorisatie";
+                      // Find assigned teacher for this subject
+                      let autoTeacher = "";
+                      let autoTeacherName = "";
+                      if (selectedSubject?.type === 'program') {
+                        const program = programs.find(p => p.id === selectedSubject.id);
+                        if (program?.assignedTeachers && program.assignedTeachers.length > 0) {
+                          const primaryTeacher = program.assignedTeachers.find(t => t.isPrimary) || program.assignedTeachers[0];
+                          autoTeacher = primaryTeacher.id.toString();
+                          autoTeacherName = primaryTeacher.name;
+                        }
+                      }
                       
                       setNewEvent({ 
                         ...newEvent, 
                         courseId: value,
-                        courseName: courseName,
-                        title: courseName, // Automatisch titel invullen voor lessen
+                        courseName: subjectName,
+                        title: autoTitle,
                         teacherId: autoTeacher,
                         teacherName: autoTeacherName
                       });

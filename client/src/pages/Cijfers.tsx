@@ -110,10 +110,10 @@ export default function Cijfers() {
   };
 
   const handleSaveAssessment = () => {
-    if (!assessmentForm.name || !assessmentForm.type || !assessmentForm.maxPoints || !assessmentForm.weight) {
+    if (!assessmentForm.name || !assessmentForm.type || !assessmentForm.maxPoints) {
       toast({
         title: "Velden incompleet",
-        description: "Vul alle velden in om door te gaan.",
+        description: "Vul naam, type en maximum punten in om door te gaan.",
         variant: "destructive"
       });
       return;
@@ -642,7 +642,7 @@ export default function Cijfers() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="weight">Gewicht (%)</Label>
+                <Label htmlFor="weight">Gewicht (%) <span className="text-gray-500 text-sm">- optioneel</span></Label>
                 <Input 
                   id="weight" 
                   type="number" 

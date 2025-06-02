@@ -126,6 +126,13 @@ export default function Cijfers() {
     enabled: !!selectedSubject
   });
 
+  // Data fetching for grades (used for calculating averages)
+  const { data: gradesData = [] } = useQuery({
+    queryKey: ['/api/grades/by-course', selectedSubject?.id],
+    queryFn: () => fetch(`/api/grades/by-course/${selectedSubject?.id}`).then(res => res.json()),
+    enabled: !!selectedSubject
+  });
+
   // Mutation for creating new assessment
   const createAssessmentMutation = useMutation({
     mutationFn: async (assessmentData: any) => {
@@ -498,14 +505,54 @@ export default function Cijfers() {
                               <p className="text-sm text-gray-600">{subject.code}</p>
                             </div>
                             <div className="flex flex-col items-end gap-1">
-                              <Badge variant="outline" className="flex items-center gap-1">
-                                <Target className="h-3 w-3" />
-                                0 beoordelingen
-                              </Badge>
-                              <Badge variant="secondary" className="flex items-center gap-1">
-                                <TrendingUp className="h-3 w-3" />
-                                Gem. 8.2
-                              </Badge>
+                              {(() => {
+                                // Calculate assessment count for this subject
+                                const subjectAssessments = Array.isArray(assessmentsData) 
+                                  ? assessmentsData.filter((a: any) => a.courseId === subject.id) 
+                                  : [];
+                                
+                                // Get all grades data for calculation
+                                const allGradesResponse = async () => {
+                                  try {
+                                    const response = await fetch(`/api/grades/by-course/${subject.id}`);
+                                    return response.json();
+                                  } catch {
+                                    return [];
+                                  }
+                                };
+                                
+                                // For now, show placeholder until we can fetch grades dynamically
+                                const subjectGrades: any[] = [];
+                                
+                                const totalScore = subjectGrades.reduce((sum: number, grade: any) => {
+                                  const percentage = (grade.score / grade.maxScore) * 100;
+                                  return sum + Math.round(percentage / 10);
+                                }, 0);
+                                
+                                const averageGrade = subjectGrades.length > 0 
+                                  ? (totalScore / subjectGrades.length).toFixed(1)
+                                  : null;
+                                
+                                return (
+                                  <>
+                                    <Badge variant="outline" className="flex items-center gap-1">
+                                      <Target className="h-3 w-3" />
+                                      {subjectAssessments.length} beoordeling{subjectAssessments.length !== 1 ? 'en' : ''}
+                                    </Badge>
+                                    {averageGrade ? (
+                                      <Badge variant="secondary" className="flex items-center gap-1">
+                                        <TrendingUp className="h-3 w-3" />
+                                        Gem. {averageGrade}
+                                      </Badge>
+                                    ) : (
+                                      <Badge variant="outline" className="flex items-center gap-1 text-gray-400">
+                                        <TrendingUp className="h-3 w-3" />
+                                        Geen cijfers
+                                      </Badge>
+                                    )}
+                                  </>
+                                );
+                              })()}
                             </div>
                           </div>
                         </CardContent>

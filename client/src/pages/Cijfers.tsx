@@ -466,7 +466,10 @@ export default function Cijfers() {
                               <Badge variant="secondary">{assessment.weight}%</Badge>
                             </TableCell>
                             <TableCell>
-                              <div className="flex items-center gap-1">
+                              <div 
+                                className="flex items-center gap-1 cursor-pointer hover:text-blue-600 transition-colors"
+                                onClick={() => handleAssessmentSelect(assessment)}
+                              >
                                 <Users className="h-4 w-4 text-gray-400" />
                                 <span>{assessment.students}</span>
                               </div>

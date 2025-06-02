@@ -38,25 +38,17 @@ export default function Cijfers() {
 
   // Data fetching
   const { data: classesData = [] } = useQuery({ queryKey: ['/api/student-groups'] });
-  const { data: subjectsData } = useQuery({ queryKey: ['/api/programs'] });
+  const { data: subjectsData = { programs: [] } } = useQuery({ queryKey: ['/api/programs'] });
   const { data: studentsData = [] } = useQuery({ 
     queryKey: ['/api/students'], 
     enabled: !!selectedClass
   });
 
-  // Mock data voor beoordelingen per vak
-  const mockAssessments = {
-    'Koran': [
-      { id: 1, name: 'Test 1', type: 'test', points: 85, weight: 25, date: '2024-01-15', students: 24 },
-      { id: 2, name: 'Huiswerk 1', type: 'taak', points: 92, weight: 15, date: '2024-01-22', students: 24 },
-      { id: 3, name: 'Examen', type: 'examen', points: 78, weight: 60, date: '2024-02-01', students: 22 }
-    ],
-    'Arabisch 1': [
-      { id: 4, name: 'Vocabulaire Test', type: 'test', points: 88, weight: 30, date: '2024-01-18', students: 24 },
-      { id: 5, name: 'Presentatie', type: 'presentatie', points: 91, weight: 40, date: '2024-01-25', students: 23 },
-      { id: 6, name: 'Eindopdracht', type: 'project', points: 87, weight: 30, date: '2024-02-05', students: 24 }
-    ]
-  };
+  // Data fetching for assessments
+  const { data: assessmentsData = [] } = useQuery({ 
+    queryKey: ['/api/assessments', selectedSubject?.id], 
+    enabled: !!selectedSubject
+  });
 
   const handleClassSelect = (classGroup: any) => {
     setSelectedClass(classGroup);
@@ -256,7 +248,7 @@ export default function Cijfers() {
                             <div className="flex flex-col items-end gap-1">
                               <Badge variant="outline" className="flex items-center gap-1">
                                 <Target className="h-3 w-3" />
-                                {mockAssessments[subject.name as keyof typeof mockAssessments]?.length || 0} beoordelingen
+                                0 beoordelingen
                               </Badge>
                               <Badge variant="secondary" className="flex items-center gap-1">
                                 <TrendingUp className="h-3 w-3" />
@@ -286,7 +278,7 @@ export default function Cijfers() {
                         Beoordelingen: {selectedSubject.name}
                       </CardTitle>
                       <CardDescription>
-                        Klas {selectedClass.name} • {mockAssessments[selectedSubject.name as keyof typeof mockAssessments]?.length || 0} beoordelingen
+                        Klas {selectedClass.name} • {assessmentsData.length} beoordelingen
                       </CardDescription>
                     </div>
                     <div className="flex gap-2">
@@ -330,7 +322,7 @@ export default function Cijfers() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {mockAssessments[selectedSubject.name as keyof typeof mockAssessments]?.map((assessment: any) => (
+                        {Array.isArray(assessmentsData) && assessmentsData.length > 0 ? assessmentsData.map((assessment: any) => (
                           <TableRow key={assessment.id} className="hover:bg-gray-50">
                             <TableCell className="font-medium">{assessment.name}</TableCell>
                             <TableCell>
@@ -373,7 +365,7 @@ export default function Cijfers() {
                               </div>
                             </TableCell>
                           </TableRow>
-                        )) || (
+                        )) : (
                           <TableRow>
                             <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                               Geen beoordelingen gevonden voor dit vak

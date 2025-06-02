@@ -1364,38 +1364,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Batch create attendance records for a class
-  apiRouter.post("/api/attendance/batch", async (req, res) => {
-    try {
-      // Expect an array of attendance records
-      const attendanceRecords = req.body;
-      if (!Array.isArray(attendanceRecords)) {
-        return res.status(400).json({ message: "Expected an array of attendance records" });
-      }
-      
-      // Process each record individually
-      const results = [];
-      for (const record of attendanceRecords) {
-        try {
-          const validatedData = insertAttendanceSchema.parse(record);
-          const newRecord = await storage.createAttendance(validatedData);
-          results.push({ success: true, record: newRecord });
-        } catch (error) {
-          results.push({ success: false, error: error instanceof z.ZodError ? error.errors : "Validation error", record });
-        }
-      }
-      
-      const success = results.every(r => r.success);
-      if (success) {
-        res.status(201).json({ success: true, results });
-      } else {
-        res.status(207).json({ success: false, results });
-      }
-    } catch (error) {
-      console.error("Error processing batch attendance records:", error);
-      res.status(500).json({ message: "Error processing batch attendance records" });
-    }
-  });
+
 
   // ********************
   // Assessment API endpoints
@@ -4882,38 +4851,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Batch save attendance records
   apiRouter.post("/api/attendance/batch", async (req, res) => {
     try {
+      console.log('=== BATCH SAVE STARTED ===');
       const attendanceRecords = req.body;
+      console.log('Received records:', JSON.stringify(attendanceRecords, null, 2));
       
       if (!Array.isArray(attendanceRecords)) {
         return res.status(400).json({ message: "Attendance records must be an array" });
       }
       
-      console.log('Batch save received:', attendanceRecords);
-      
       const { tempAttendanceStorage } = await import('./temp-attendance-storage');
       
-      // Filter out records without required fields and map to correct format
-      const validRecords = attendanceRecords
-        .filter(record => record.studentId && record.date && record.status)
-        .map(record => ({
-          studentId: record.studentId,
-          courseId: record.courseId || record.classId || 1,
-          teacherId: record.teacherId || 1,
-          date: record.date,
-          status: record.status,
-          notes: record.notes || ''
-        }));
+      // Simple processing without complex validation
+      const savedRecords = [];
+      for (const record of attendanceRecords) {
+        if (record.studentId && record.date && record.status) {
+          const processedRecord = {
+            studentId: parseInt(record.studentId),
+            courseId: parseInt(record.courseId || record.classId || 31),
+            teacherId: parseInt(record.teacherId || 1),
+            date: record.date,
+            status: record.status,
+            notes: record.notes || ''
+          };
+          
+          console.log('Processing record:', processedRecord);
+          const saved = tempAttendanceStorage.createAttendance(processedRecord);
+          savedRecords.push(saved);
+        }
+      }
       
-      console.log('Valid records to save:', validRecords);
+      console.log('Successfully saved records:', savedRecords.length);
+      console.log('=== BATCH SAVE COMPLETED ===');
       
-      const savedRecords = tempAttendanceStorage.createBatchAttendance(validRecords);
-      
-      console.log('Records saved successfully:', savedRecords.length);
-      
-      res.json({ success: true, saved: savedRecords.length, results: savedRecords });
+      res.status(200).json({ success: true, saved: savedRecords.length, results: savedRecords });
     } catch (error) {
-      console.error("Error saving batch attendance:", error);
-      res.status(500).json({ message: "Error saving attendance records" });
+      console.error("Error in batch save:", error);
+      res.status(500).json({ message: "Error saving attendance records", error: error.message });
     }
   });
 

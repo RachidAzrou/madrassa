@@ -11,7 +11,7 @@ import {
   studentGroupEnrollments
 } from "@shared/schema";
 import { db } from "./db";
-import { and, eq, sql, count, desc } from "drizzle-orm";
+import { and, eq, sql, count, desc, inArray } from "drizzle-orm";
 
 // Interface voor storage operaties
 export interface IStorage {
@@ -847,34 +847,29 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log('Getting students for class:', classId);
       
-      // First, check if the table exists and has data
-      const allEnrollments = await db.select().from(studentGroupEnrollments).limit(5);
-      console.log('Sample enrollments:', allEnrollments);
-      
-      // Check for enrollments for this specific class
+      // Get enrollments for this specific class
       const classEnrollments = await db
         .select()
         .from(studentGroupEnrollments)
         .where(eq(studentGroupEnrollments.groupId, classId));
-      console.log('Class enrollments:', classEnrollments);
+      console.log('Class enrollments found:', classEnrollments.length);
       
       if (classEnrollments.length === 0) {
         console.log('No enrollments found for class', classId);
         return [];
       }
       
-      // Get the students
+      // Get the students using inArray
       const studentIds = classEnrollments.map(e => e.studentId);
       const studentsData = await db
         .select()
         .from(students)
-        .where(sql`${students.id} = ANY(${studentIds})`);
+        .where(inArray(students.id, studentIds));
       
       console.log('Found students:', studentsData.length);
       return studentsData;
     } catch (error) {
       console.error('Error getting students by class:', error);
-      console.error('Error details:', error);
       return [];
     }
   }

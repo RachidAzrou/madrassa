@@ -437,9 +437,9 @@ export default function Attendance() {
         </CardHeader>
         <CardContent className="p-6 bg-white">
           {/* Clean Controls */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            {/* Date Navigation */}
-            <div className="flex items-center gap-3 text-center">
+          <div className="flex flex-col gap-4 mb-6">
+            {/* Date Navigation - Centered */}
+            <div className="flex items-center justify-center gap-3">
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -461,12 +461,10 @@ export default function Attendance() {
               >
                 <ArrowRight className="h-4 w-4" />
               </Button>
-              
-
             </div>
 
             {/* Filters */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center gap-3">
               <Select value={selectedClass} onValueChange={handleClassChange}>
                 <SelectTrigger className="h-9 w-[240px] border-[#e5e7eb] bg-white">
                   <SelectValue placeholder="Selecteer klas" />

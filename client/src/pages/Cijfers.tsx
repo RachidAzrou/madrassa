@@ -600,45 +600,49 @@ export default function Cijfers() {
                               {subjects.map((subject) => (
                                 <TableCell key={subject.id}>
                                   {editGrade && editGrade.studentId === student.id && editGrade.subject === subject.name ? (
-                                    <div className="flex flex-col items-center gap-2 p-2">
-                                      <Input
-                                        type="number"
-                                        min="1"
-                                        max="10"
-                                        step="0.1"
-                                        className="w-20 h-10 text-center text-lg font-semibold border-2 border-blue-300 focus:border-blue-500 rounded-md"
-                                        defaultValue={editGrade.grade?.toString() || ''}
-                                        onChange={(e) => {
-                                          const value = parseFloat(e.target.value);
-                                          if (!isNaN(value) && value >= 1 && value <= 10) {
-                                            // We slaan de wijziging nog niet op, alleen bij onBlur
+                                    <div className="flex flex-col items-center gap-2 p-2 min-w-[120px]">
+                                      <Select
+                                        value={editGrade.grade?.toString() || ''}
+                                        onValueChange={(value) => {
+                                          const numValue = parseFloat(value);
+                                          if (!isNaN(numValue)) {
+                                            handleSaveGrade(numValue);
                                           }
                                         }}
-                                        onBlur={(e) => {
-                                          const value = parseFloat(e.target.value);
-                                          if (!isNaN(value) && value >= 1 && value <= 10) {
-                                            handleSaveGrade(value);
-                                          } else {
-                                            handleCancelEditGrade();
-                                          }
-                                        }}
-                                        onKeyDown={(e) => {
-                                          if (e.key === 'Enter') {
-                                            const value = parseFloat(e.currentTarget.value);
-                                            if (!isNaN(value) && value >= 1 && value <= 10) {
-                                              handleSaveGrade(value);
-                                            } else {
-                                              handleCancelEditGrade();
-                                            }
-                                          } else if (e.key === 'Escape') {
-                                            handleCancelEditGrade();
-                                          }
-                                        }}
-                                        autoFocus
-                                      />
-                                      <div className="text-xs text-gray-500 text-center">
-                                        Enter = opslaan<br/>Esc = annuleren
-                                      </div>
+                                      >
+                                        <SelectTrigger className="w-20 h-10 text-center text-lg font-semibold border-2 border-blue-300 focus:border-blue-500">
+                                          <SelectValue placeholder="..." />
+                                        </SelectTrigger>
+                                        <SelectContent className="max-h-60">
+                                          <SelectItem value="1.0" className="text-red-600 font-medium">1.0 - Zeer slecht</SelectItem>
+                                          <SelectItem value="1.5" className="text-red-600">1.5</SelectItem>
+                                          <SelectItem value="2.0" className="text-red-600">2.0</SelectItem>
+                                          <SelectItem value="2.5" className="text-red-600">2.5</SelectItem>
+                                          <SelectItem value="3.0" className="text-red-600">3.0</SelectItem>
+                                          <SelectItem value="3.5" className="text-red-600">3.5</SelectItem>
+                                          <SelectItem value="4.0" className="text-orange-600">4.0 - Onvoldoende</SelectItem>
+                                          <SelectItem value="4.5" className="text-orange-600">4.5</SelectItem>
+                                          <SelectItem value="5.0" className="text-orange-600">5.0</SelectItem>
+                                          <SelectItem value="5.5" className="text-yellow-600 font-medium">5.5 - Net voldoende</SelectItem>
+                                          <SelectItem value="6.0" className="text-yellow-600">6.0 - Voldoende</SelectItem>
+                                          <SelectItem value="6.5" className="text-green-600">6.5</SelectItem>
+                                          <SelectItem value="7.0" className="text-green-600 font-medium">7.0 - Goed</SelectItem>
+                                          <SelectItem value="7.5" className="text-green-600">7.5</SelectItem>
+                                          <SelectItem value="8.0" className="text-green-600 font-medium">8.0 - Zeer goed</SelectItem>
+                                          <SelectItem value="8.5" className="text-emerald-600">8.5</SelectItem>
+                                          <SelectItem value="9.0" className="text-emerald-600 font-medium">9.0 - Uitstekend</SelectItem>
+                                          <SelectItem value="9.5" className="text-emerald-600">9.5</SelectItem>
+                                          <SelectItem value="10.0" className="text-emerald-600 font-bold">10.0 - Perfect</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                      <Button 
+                                        variant="ghost" 
+                                        size="sm" 
+                                        className="h-6 text-xs text-gray-500 hover:text-gray-700"
+                                        onClick={handleCancelEditGrade}
+                                      >
+                                        Annuleren
+                                      </Button>
                                     </div>
                                   ) : (
                                     <div 

@@ -1,23 +1,4 @@
 import { ChevronRight, LucideIcon } from "lucide-react";
-
-// Function to determine correct breadcrumb category based on current path
-function getBreadcrumbCategory(parentCategory: string, currentPath?: string): string {
-  // Check if current path belongs to education pages
-  const educationPaths = [
-    '/student-groups',  // Klassen
-    '/programs',        // Vakken  
-    '/calendar',        // Rooster
-    '/courses',         // Curriculum
-    '/scheduling'       // Planning
-  ];
-  
-  if (currentPath && educationPaths.some(path => currentPath.startsWith(path))) {
-    return 'Onderwijs';
-  }
-  
-  // Return original parent category for other pages
-  return parentCategory;
-}
 import { createElement } from "react";
 
 interface PremiumHeaderProps {
@@ -59,7 +40,16 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
             <div className="text-xs text-white opacity-70 flex items-center">
               {effectiveBreadcrumbs.parent && (
                 <>
-                  <span className="mr-1">{getBreadcrumbCategory(effectiveBreadcrumbs.parent, path)}</span>
+                  <span className="mr-1">{
+                    // Check if current path belongs to education pages
+                    (() => {
+                      const educationPaths = ['/student-groups', '/programs', '/calendar', '/courses', '/scheduling'];
+                      if (path && educationPaths.some(eduPath => path.startsWith(eduPath))) {
+                        return 'Onderwijs';
+                      }
+                      return effectiveBreadcrumbs.parent;
+                    })()
+                  }</span>
                   <ChevronRight className="h-3 w-3 mx-0.5" />
                 </>
               )}

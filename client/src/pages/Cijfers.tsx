@@ -560,7 +560,7 @@ export default function Cijfers() {
                         <TableRow>
                           <TableHead>Student</TableHead>
                           <TableHead>Student ID</TableHead>
-                          <TableHead>Punten ({selectedAssessment.points} max)</TableHead>
+                          <TableHead>Punten ({selectedAssessment.maxPoints || selectedAssessment.points || 100} max)</TableHead>
                           <TableHead>Percentage</TableHead>
                           <TableHead>Cijfer</TableHead>
                         </TableRow>
@@ -585,7 +585,8 @@ export default function Cijfers() {
                       <TableBody>
                         {Array.isArray(studentsData) && studentsData.length > 0 ? studentsData.map((student: any) => {
                           const points = grades[student.id] || '';
-                          const percentage = points ? Math.round((parseFloat(points) / selectedAssessment.points) * 100) : 0;
+                          const maxPoints = selectedAssessment.maxPoints || selectedAssessment.points || 100;
+                          const percentage = points ? Math.round((parseFloat(points) / maxPoints) * 100) : 0;
                           const grade = points ? Math.round((percentage / 10)) : 0;
                           
                           return (
@@ -603,7 +604,7 @@ export default function Cijfers() {
                                 <Input
                                   type="number"
                                   min="0"
-                                  max={selectedAssessment.points}
+                                  max={maxPoints}
                                   value={points}
                                   onChange={(e) => handleGradeChange(student.id, e.target.value)}
                                   placeholder="0"

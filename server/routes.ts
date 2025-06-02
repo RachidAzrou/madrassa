@@ -4,7 +4,7 @@ import { storage } from "./storage/index";
 import { db } from "./db";
 import * as schema from "@shared/schema";
 import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers } from "@shared/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, inArray } from "drizzle-orm";
 
 // Global storage voor calendar events
 const globalCalendarEventsStore = new Map();
@@ -4605,9 +4605,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid class ID" });
       }
 
-      const students = await storage.getStudentsByClass(classId);
-      console.log("Found", students.length, "students for class", classId);
-      res.json(students);
+      // First try to get enrollments
+      const enrollments = await db
+        .select()
+        .from(studentGroupEnrollments)
+        .where(eq(studentGroupEnrollments.groupId, classId));
+      
+      console.log("Found enrollments:", enrollments.length);
+      
+      if (enrollments.length === 0) {
+        console.log("No enrollments found, returning empty array");
+        return res.json([]);
+      }
+      
+      // Get student IDs and then students
+      const studentIds = enrollments.map(e => e.studentId);
+      console.log("Student IDs to fetch:", studentIds);
+      
+      // Use a simpler approach - get all students and filter
+      const allStudents = await db.select().from(students);
+      const filteredStudents = allStudents.filter(student => studentIds.includes(student.id));
+      
+      console.log("Found students:", filteredStudents.length);
+      res.json(filteredStudents);
     } catch (error) {
       console.error("Error fetching students by class:", error);
       res.status(500).json({ message: "Error fetching students" });

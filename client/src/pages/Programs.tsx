@@ -601,6 +601,7 @@ export default function Programs() {
                 <TabsTrigger value="algemeen">Algemene informatie</TabsTrigger>
                 <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
                 <TabsTrigger value="docenten">Docenten</TabsTrigger>
+                <TabsTrigger value="klassen">Klassen</TabsTrigger>
               </TabsList>
               
               <TabsContent value="algemeen" className="mt-0">
@@ -865,6 +866,44 @@ export default function Programs() {
                       </div>
                     </div>
                   )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="klassen" className="mt-0">
+                <div className="space-y-4 p-4 bg-gray-50 rounded-md">
+                  <div className="space-y-2">
+                    <FormLabel className="flex items-center gap-2">
+                      <GraduationCap className="h-4 w-4" />
+                      Klassen toewijzen
+                    </FormLabel>
+                    <div className="bg-white border border-gray-200 rounded-md p-4 max-h-60 overflow-y-auto">
+                      {getAvailableClasses().length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {getAvailableClasses().map((studentGroup) => (
+                            <div key={studentGroup.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`add-class-${studentGroup.id}`}
+                                checked={programFormData.assignedClasses.find(c => c.id === studentGroup.id)?.selected || false}
+                                onCheckedChange={(checked) => {
+                                  setProgramFormData(prev => ({
+                                    ...prev,
+                                    assignedClasses: prev.assignedClasses.map(c => 
+                                      c.id === studentGroup.id ? { ...c, selected: checked as boolean } : c
+                                    )
+                                  }));
+                                }}
+                              />
+                              <FormLabel htmlFor={`add-class-${studentGroup.id}`} className="text-sm">
+                                {studentGroup.name}
+                              </FormLabel>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-sm">Geen klassen beschikbaar</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>

@@ -1656,7 +1656,7 @@ export default function Students() {
                       <Mail className="h-4 w-4" />
                       <span className="text-xs font-medium uppercase tracking-wide">Email</span>
                     </div>
-                    <p className="text-sm font-medium text-gray-900">{selectedStudent.email || "Niet opgegeven"}</p>
+                    <p className="text-sm font-medium text-gray-900 break-all">{selectedStudent.email || "Niet opgegeven"}</p>
                   </div>
                   
                   <div className="space-y-1">

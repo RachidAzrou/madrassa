@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
 import { db } from "./db";
 import * as schema from "@shared/schema";
-import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers, grades } from "@shared/schema";
+import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers, grades, assessments } from "@shared/schema";
 import { eq, and, sql, inArray } from "drizzle-orm";
 
 // Global storage voor calendar events
@@ -1440,13 +1440,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.post("/api/assessments", async (req, res) => {
     try {
-      const validatedData = insertAssessmentSchema.parse(req.body);
-      const newAssessment = await storage.createAssessment(validatedData);
+      // Direct database insertion since we don't have storage method yet
+      const validatedData = {
+        courseId: req.body.courseId,
+        name: req.body.name,
+        type: req.body.type,
+        maxScore: req.body.maxPoints,
+        weight: req.body.weight,
+        description: req.body.description || null,
+        dueDate: req.body.dueDate || null
+      };
+
+      const [newAssessment] = await db
+        .insert(assessments)
+        .values(validatedData)
+        .returning();
+
       res.status(201).json(newAssessment);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
-      }
+      console.error('Error creating assessment:', error);
       res.status(500).json({ message: "Error creating assessment" });
     }
   });

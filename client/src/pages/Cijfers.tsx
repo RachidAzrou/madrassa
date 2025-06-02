@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 import { Search, Download, Save, Plus, X, Edit, Trash2, Calculator, CheckCircle, Star, ClipboardList, FileText, Award, Users, BookOpen, GraduationCap, Target, TrendingUp, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,6 +37,18 @@ export default function Cijfers() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [step, setStep] = useState<'class' | 'subject' | 'assessments' | 'grades'>('class');
   const [grades, setGrades] = useState<{[studentId: string]: string}>({});
+  
+  // Form state for new assessment
+  const [assessmentForm, setAssessmentForm] = useState({
+    name: '',
+    type: '',
+    maxPoints: '',
+    weight: ''
+  });
+
+  // Hooks
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Data fetching
   const { data: classesData = [] } = useQuery({ queryKey: ['/api/student-groups'] });
@@ -49,6 +63,64 @@ export default function Cijfers() {
     queryKey: ['/api/assessments', selectedSubject?.id], 
     enabled: !!selectedSubject
   });
+
+  // Mutation for creating new assessment
+  const createAssessmentMutation = useMutation({
+    mutationFn: async (assessmentData: any) => {
+      return apiRequest('/api/assessments', {
+        method: 'POST',
+        body: JSON.stringify({
+          ...assessmentData,
+          courseId: selectedSubject?.id,
+          maxPoints: parseInt(assessmentData.maxPoints),
+          weight: parseFloat(assessmentData.weight)
+        })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/assessments'] });
+      toast({
+        title: "Beoordeling toegevoegd",
+        description: "De nieuwe beoordeling is succesvol aangemaakt."
+      });
+      setShowAddModal(false);
+      resetAssessmentForm();
+    },
+    onError: () => {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het aanmaken van de beoordeling.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Form handlers
+  const handleAssessmentFormChange = (field: string, value: string) => {
+    setAssessmentForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const resetAssessmentForm = () => {
+    setAssessmentForm({
+      name: '',
+      type: '',
+      maxPoints: '',
+      weight: ''
+    });
+  };
+
+  const handleSaveAssessment = () => {
+    if (!assessmentForm.name || !assessmentForm.type || !assessmentForm.maxPoints || !assessmentForm.weight) {
+      toast({
+        title: "Velden incompleet",
+        description: "Vul alle velden in om door te gaan.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    createAssessmentMutation.mutate(assessmentForm);
+  };
 
   const handleClassSelect = (classGroup: any) => {
     setSelectedClass(classGroup);
@@ -536,11 +608,16 @@ export default function Cijfers() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Naam beoordeling</Label>
-                <Input id="name" placeholder="bijv. Test 1" />
+                <Input 
+                  id="name" 
+                  placeholder="bijv. Test 1" 
+                  value={assessmentForm.name}
+                  onChange={(e) => handleAssessmentFormChange('name', e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="type">Type</Label>
-                <Select>
+                <Select value={assessmentForm.type} onValueChange={(value) => handleAssessmentFormChange('type', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecteer type" />
                   </SelectTrigger>
@@ -556,21 +633,39 @@ export default function Cijfers() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="points">Maximum punten</Label>
-                <Input id="points" type="number" placeholder="100" />
+                <Input 
+                  id="points" 
+                  type="number" 
+                  placeholder="100" 
+                  value={assessmentForm.maxPoints}
+                  onChange={(e) => handleAssessmentFormChange('maxPoints', e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="weight">Gewicht (%)</Label>
-                <Input id="weight" type="number" placeholder="25" />
+                <Input 
+                  id="weight" 
+                  type="number" 
+                  placeholder="25" 
+                  value={assessmentForm.weight}
+                  onChange={(e) => handleAssessmentFormChange('weight', e.target.value)}
+                />
               </div>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddModal(false)}>
+            <Button variant="outline" onClick={() => {
+              setShowAddModal(false);
+              resetAssessmentForm();
+            }}>
               Annuleren
             </Button>
-            <Button onClick={() => setShowAddModal(false)}>
-              Beoordeling toevoegen
+            <Button 
+              onClick={handleSaveAssessment}
+              disabled={createAssessmentMutation.isPending}
+            >
+              {createAssessmentMutation.isPending ? 'Bezig...' : 'Beoordeling toevoegen'}
             </Button>
           </DialogFooter>
         </DialogContent>

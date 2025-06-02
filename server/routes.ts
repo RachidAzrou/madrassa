@@ -4860,19 +4860,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.get("/api/student-groups/:groupId/attendance/date/:date", async (req: Request, res: Response) => {
     try {
       const groupId = parseInt(req.params.groupId);
-      const date = req.params.date;
+      const dateStr = req.params.date;
       
       if (isNaN(groupId)) {
         return res.status(400).json({ message: "Invalid group ID format" });
       }
       
-      const parsedDate = new Date(date);
-      if (isNaN(parsedDate.getTime())) {
+      if (!dateStr) {
         return res.status(400).json({ message: "Invalid date format" });
       }
       
-      // Get attendance records for this class and date
-      const attendanceRecords = await storage.getAttendanceByClassAndDate(groupId, parsedDate);
+      const { tempAttendanceStorage } = await import('./temp-attendance-storage');
+      const attendanceRecords = tempAttendanceStorage.getAttendanceByClassAndDate(groupId, dateStr);
       res.json(attendanceRecords);
     } catch (error) {
       console.error("Error fetching attendance by student group and date:", error);

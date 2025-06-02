@@ -277,10 +277,10 @@ export default function Attendance() {
       ...prev,
       [studentId]: {
         studentId,
+        courseId: selectedClass ? parseInt(selectedClass) : 1, // Required field
+        teacherId: 1, // Required field - zou dynamisch moeten zijn
         date: selectedDate,
-        status: 'present',
-        ...(selectedClass ? { classId: parseInt(selectedClass) } : {}),
-        ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
+        status: 'present'
       }
     }));
   };
@@ -291,10 +291,10 @@ export default function Attendance() {
       ...prev,
       [studentId]: {
         studentId,
+        courseId: selectedClass ? parseInt(selectedClass) : 1, // Required field
+        teacherId: 1, // Required field - zou dynamisch moeten zijn
         date: selectedDate,
-        status: 'late',
-        ...(selectedClass ? { classId: parseInt(selectedClass) } : {}),
-        ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
+        status: 'late'
       }
     }));
   };
@@ -305,10 +305,10 @@ export default function Attendance() {
       ...prev,
       [studentId]: {
         studentId,
+        courseId: selectedClass ? parseInt(selectedClass) : 1, // Required field
+        teacherId: 1, // Required field - zou dynamisch moeten zijn
         date: selectedDate,
-        status: 'absent',
-        ...(selectedClass ? { classId: parseInt(selectedClass) } : {}),
-        ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
+        status: 'absent'
       }
     }));
   };
@@ -360,10 +360,10 @@ export default function Attendance() {
       studentsData.forEach((student: Student) => {
         newAttendance[student.id] = {
           studentId: student.id,
+          courseId: selectedClass ? parseInt(selectedClass) : 1,
+          teacherId: 1,
           date: selectedDate,
-          status: 'present',
-          ...(selectedClass ? { classId: parseInt(selectedClass) } : {}),
-          ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
+          status: 'present'
         };
       });
     }
@@ -379,10 +379,10 @@ export default function Attendance() {
       studentsData.forEach((student: Student) => {
         newAttendance[student.id] = {
           studentId: student.id,
+          courseId: selectedClass ? parseInt(selectedClass) : 1,
+          teacherId: 1,
           date: selectedDate,
-          status: 'absent',
-          ...(selectedClass ? { classId: parseInt(selectedClass) } : {}),
-          ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
+          status: 'absent'
         };
       });
     }
@@ -398,10 +398,10 @@ export default function Attendance() {
       studentsData.forEach((student: Student) => {
         newAttendance[student.id] = {
           studentId: student.id,
+          courseId: selectedClass ? parseInt(selectedClass) : 1,
+          teacherId: 1,
           date: selectedDate,
-          status: 'late',
-          ...(selectedClass ? { classId: parseInt(selectedClass) } : {}),
-          ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
+          status: 'late'
         };
       });
     }

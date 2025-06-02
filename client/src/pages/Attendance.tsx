@@ -61,7 +61,7 @@ interface TeacherAttendanceRecord {
 export default function Attendance() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedType, setSelectedType] = useState<'klas' | 'examen'>('klas');
+  const [selectedType, setSelectedType] = useState<'klas'>('klas');
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -102,7 +102,7 @@ export default function Attendance() {
   // Fetch attendance for selected date and course/class
   const { data: attendanceData, isLoading: isLoadingAttendance, refetch: refetchAttendance } = useQuery({
     queryKey: ['/api/attendance/date', selectedDate, selectedType, selectedCourse, selectedClass],
-    enabled: !!selectedDate && ((selectedType === 'examen' && !!selectedCourse) || (selectedType === 'klas' && !!selectedClass)),
+    enabled: !!selectedDate && ((false && !!selectedCourse) || (selectedType === 'klas' && !!selectedClass)),
     staleTime: 0, // Always refetch when parameters change
   });
   
@@ -234,7 +234,7 @@ export default function Attendance() {
         studentId,
         date: selectedDate,
         status: 'present',
-        ...(selectedType === 'examen' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {}),
+        ...(selectedClass ? { classId: parseInt(selectedClass) } : {}),
         ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
       }
     }));
@@ -248,7 +248,7 @@ export default function Attendance() {
         studentId,
         date: selectedDate,
         status: 'late',
-        ...(selectedType === 'examen' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {}),
+        ...(selectedClass ? { classId: parseInt(selectedClass) } : {}),
         ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
       }
     }));
@@ -262,7 +262,7 @@ export default function Attendance() {
         studentId,
         date: selectedDate,
         status: 'absent',
-        ...(selectedType === 'examen' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {}),
+        ...(selectedClass ? { classId: parseInt(selectedClass) } : {}),
         ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
       }
     }));
@@ -276,7 +276,7 @@ export default function Attendance() {
         teacherId,
         date: selectedDate,
         status: 'present',
-        ...(selectedType === 'examen' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {})
+        ...(selectedClass ? { classId: parseInt(selectedClass) } : {})
       }
     }));
   };
@@ -289,7 +289,7 @@ export default function Attendance() {
         teacherId,
         date: selectedDate,
         status: 'absent',
-        ...(selectedType === 'examen' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {})
+        ...(selectedClass ? { classId: parseInt(selectedClass) } : {})
       }
     }));
   };
@@ -304,7 +304,7 @@ export default function Attendance() {
           studentId: student.id,
           date: selectedDate,
           status: 'present',
-          ...(selectedType === 'examen' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {}),
+          ...(selectedClass ? { classId: parseInt(selectedClass) } : {}),
           ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
         };
       });
@@ -323,7 +323,7 @@ export default function Attendance() {
           studentId: student.id,
           date: selectedDate,
           status: 'absent',
-          ...(selectedType === 'examen' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {}),
+          ...(selectedClass ? { classId: parseInt(selectedClass) } : {}),
           ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
         };
       });
@@ -342,7 +342,7 @@ export default function Attendance() {
           teacherId: teacher.id,
           date: selectedDate,
           status: 'present',
-          ...(selectedType === 'examen' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {})
+          ...(selectedClass ? { classId: parseInt(selectedClass) } : {})
         };
       });
     }
@@ -360,7 +360,7 @@ export default function Attendance() {
           teacherId: teacher.id,
           date: selectedDate,
           status: 'absent',
-          ...(selectedType === 'examen' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {})
+          ...(selectedClass ? { classId: parseInt(selectedClass) } : {})
         };
       });
     }
@@ -424,116 +424,6 @@ export default function Attendance() {
         icon={CalendarCheck}
         description="Registreer en beheer aanwezigheid van studenten, bekijk absentiegeschiedenis en identificeer trends"
       />
-      {/* Clean Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        {/* Date Navigation */}
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => handleDateChange(-1)}
-            className="h-9 px-3"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          
-          <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded text-center min-w-[140px]">
-            <span className="text-sm font-medium text-gray-900">{formatDate(selectedDate)}</span>
-          </div>
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => handleDateChange(1)}
-            className="h-9 px-3"
-          >
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-            className="text-blue-600 border-blue-600 hover:bg-blue-50"
-          >
-            Vandaag
-          </Button>
-        </div>
-
-        {/* Filters */}
-        <div className="flex items-center gap-3">
-          <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'klas' | 'examen')}>
-            <SelectTrigger className="h-9 w-[120px] border-[#e5e7eb] bg-white">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-white border-[#e5e7eb]">
-              <SelectItem value="klas" className="focus:bg-blue-200 hover:bg-blue-100">
-                <div className="flex items-center">
-                  <Users className="h-4 w-4 mr-2" />
-                  Klas
-                </div>
-              </SelectItem>
-              <SelectItem value="examen" className="focus:bg-blue-200 hover:bg-blue-100">
-                <div className="flex items-center">
-                  <GraduationCap className="h-4 w-4 mr-2" />
-                  Examen
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          {selectedType === 'examen' ? (
-            <Select value={selectedCourse} onValueChange={handleCourseChange}>
-              <SelectTrigger className="h-9 w-[240px] border-[#e5e7eb] bg-white">
-                <SelectValue placeholder="Selecteer examen" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border-[#e5e7eb]">
-                {isLoadingCourses ? (
-                  <SelectItem value="loading" disabled>
-                    <div className="flex items-center">
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Examens laden...
-                    </div>
-                  </SelectItem>
-                ) : coursesData && Array.isArray(coursesData) ? (
-                  coursesData.map((course: Program) => (
-                    <SelectItem key={course.id} value={course.id.toString()} className="focus:bg-blue-200 hover:bg-blue-100">
-                      <span className="font-medium">{course.code}</span> - {course.name}
-                    </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="none" disabled>Geen examens gevonden</SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-          ) : (
-            <Select value={selectedClass} onValueChange={handleClassChange}>
-              <SelectTrigger className="h-9 w-[240px] border-[#e5e7eb] bg-white">
-                <SelectValue placeholder="Selecteer klas" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border-[#e5e7eb]">
-                {isLoadingClasses ? (
-                  <SelectItem value="loading" disabled>
-                    <div className="flex items-center">
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Klassen laden...
-                    </div>
-                  </SelectItem>
-                ) : classesData && Array.isArray(classesData) ? (
-                  classesData.map((classroom: StudentGroup) => (
-                    <SelectItem key={classroom.id} value={classroom.id.toString()} className="focus:bg-blue-200 hover:bg-blue-100">
-                      {classroom.name}
-                    </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="none" disabled>Geen klassen gevonden</SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-          )}
-        </div>
-      </div>
-
       {/* Attendance Content */}
       <Card className="mt-6 border-0 shadow-md overflow-hidden">
         <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
@@ -546,6 +436,70 @@ export default function Attendance() {
           <p className="text-sm text-gray-600">Registreer en beheer de aanwezigheid van studenten en docenten</p>
         </CardHeader>
         <CardContent className="p-6 bg-white">
+          {/* Clean Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            {/* Date Navigation */}
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleDateChange(-1)}
+                className="h-9 px-3"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              
+              <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded text-center min-w-[140px]">
+                <span className="text-sm font-medium text-gray-900">{formatDate(selectedDate)}</span>
+              </div>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleDateChange(1)}
+                className="h-9 px-3"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+              >
+                Vandaag
+              </Button>
+            </div>
+
+            {/* Filters */}
+            <div className="flex items-center gap-3">
+              <Select value={selectedClass} onValueChange={handleClassChange}>
+                <SelectTrigger className="h-9 w-[240px] border-[#e5e7eb] bg-white">
+                  <SelectValue placeholder="Selecteer klas" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-[#e5e7eb]">
+                  {isLoadingClasses ? (
+                    <SelectItem value="loading" disabled>
+                      <div className="flex items-center">
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Klassen laden...
+                      </div>
+                    </SelectItem>
+                  ) : classesData && Array.isArray(classesData) ? (
+                    classesData.map((classroom: StudentGroup) => (
+                      <SelectItem key={classroom.id} value={classroom.id.toString()} className="focus:bg-blue-200 hover:bg-blue-100">
+                        {classroom.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>Geen klassen gevonden</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className="mb-6">
             <div className="flex justify-between items-center">
               <Tabs defaultValue="students" className="w-full">
@@ -590,9 +544,7 @@ export default function Attendance() {
                         
                         <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
                           <div className="text-xs px-3 py-1.5 bg-white text-gray-800 rounded-sm border border-gray-200 font-medium">
-                            {selectedType === 'examen' 
-                              ? `Vak: ${coursesData?.find((c: any) => c.id.toString() === selectedCourse)?.name || ''}` 
-                              : `Klas: ${classesData?.find((c: any) => c.id.toString() === selectedClass)?.name || ''}`}
+                            Klas: {classesData?.find((c: any) => c.id.toString() === selectedClass)?.name || ''}
                           </div>
                           <div className="text-xs px-3 py-1.5 bg-white text-gray-800 rounded-sm border border-gray-200 font-medium">
                             Datum: {formatDate(selectedDate)}
@@ -737,9 +689,7 @@ export default function Attendance() {
                         
                         <div className="flex items-center space-x-2">
                           <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-sm border border-gray-200">
-                            {selectedType === 'examen' 
-                              ? `Vak: ${coursesData?.find((c) => c.id.toString() === selectedCourse)?.name || ''}` 
-                              : `Klas: ${classesData?.find((c) => c.id.toString() === selectedClass)?.name || ''}`}
+                            Klas: {classesData?.find((c) => c.id.toString() === selectedClass)?.name || ''}
                           </span>
                           <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-sm border border-gray-200">
                             Datum: {formatDate(selectedDate)}

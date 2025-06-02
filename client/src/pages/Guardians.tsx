@@ -578,15 +578,17 @@ export default function Guardians() {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <Badge 
-                          variant="outline" 
-                          className="text-xs rounded-sm bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1"
-                        >
-                          {getRelationshipLabel(guardian.relationship)}
+                        <div className="flex items-center gap-2">
+                          <Badge 
+                            variant="outline" 
+                            className="text-xs rounded-sm bg-blue-50 text-blue-700 border-blue-200 min-w-[60px] justify-center"
+                          >
+                            {getRelationshipLabel(guardian.relationship)}
+                          </Badge>
                           {guardian.isEmergencyContact && (
-                            <AlertTriangle className="h-3 w-3" />
+                            <AlertTriangle className="h-3 w-3 text-amber-600" />
                           )}
-                        </Badge>
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-500">{guardian.email}</td>
                       <td className="px-4 py-3 text-xs text-gray-500">{guardian.phone || "-"}</td>

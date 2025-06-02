@@ -2466,16 +2466,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid group ID format" });
       }
       
-      // Haal de klas informatie op
-      const group = await storage.getStudentGroup(groupId);
-      if (!group) {
-        return res.status(404).json({ message: "Student group not found" });
-      }
+      // Haal alle actieve vakken op (voor nu tonen we alle vakken)
+      // Later kunnen we dit verfijnen naar vakken specifiek voor de klas
+      const allCourses = await storage.getCourses();
+      const activeCourses = allCourses.filter(course => course.isActive);
       
-      // Haal vakken op die behoren tot het programma van deze klas
-      const coursesForGroup = group.programId ? await storage.getCoursesByProgram(group.programId) : [];
-      
-      res.json(coursesForGroup);
+      res.json(activeCourses);
     } catch (error) {
       console.error("Error fetching courses by group:", error);
       res.status(500).json({ message: "Error fetching courses by group" });

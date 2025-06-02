@@ -28,6 +28,10 @@ import { toast } from '@/hooks/use-toast';
 import { PremiumHeader } from '@/components/layout/premium-header';
 
 export default function Cijfers() {
+  // State
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState(null);
+
   // Data fetching
   const { data: classesData } = useQuery({ queryKey: ['/api/student-groups'] });
   const { data: subjectsData } = useQuery({ queryKey: ['/api/programs'] });
@@ -36,9 +40,6 @@ export default function Cijfers() {
     enabled: !!selectedClass?.id
   });
 
-  // State
-  const [selectedClass, setSelectedClass] = useState(null);
-  const [selectedSubject, setSelectedSubject] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingAssessment, setEditingAssessment] = useState(null);

@@ -2468,22 +2468,47 @@ export default function Students() {
                   student.studentId.toLowerCase().includes(siblingSearchTerm.toLowerCase())
                 ).map((student) => (
                   <div key={student.id} className="p-3 hover:bg-gray-50 cursor-pointer" 
-                       onClick={() => {
-                         const newSibling = {
-                           id: Date.now(),
-                           studentId: student.studentId,
-                           firstName: student.firstName,
-                           lastName: student.lastName,
-                           class: student.studentGroupName || 'Onbekend',
-                           relationship: 'broer/zus'
-                         };
-                         setNewStudentSiblings([...newStudentSiblings, newSibling]);
-                         setSiblingSearchTerm('');
-                         toast({
-                           title: "Broer/zus gekoppeld",
-                           description: `${student.firstName} ${student.lastName} is toegevoegd als broer/zus.`,
-                         });
-                         setIsLinkSiblingDialogOpen(false);
+                       onClick={async () => {
+                         try {
+                           // Als we een nieuwe student aan het maken zijn, gebruik localStorage
+                           if (!selectedStudent?.id) {
+                             const newSibling = {
+                               id: Date.now(),
+                               studentId: student.studentId,
+                               firstName: student.firstName,
+                               lastName: student.lastName,
+                               class: student.studentGroupName || 'Onbekend',
+                               relationship: 'broer/zus'
+                             };
+                             setNewStudentSiblings([...newStudentSiblings, newSibling]);
+                           } else {
+                             // Voor bestaande studenten, gebruik de API voor bidirectionele relatie
+                             await apiRequest(`/api/students/${selectedStudent.id}/siblings`, {
+                               method: 'POST',
+                               body: {
+                                 siblingId: student.id,
+                                 relationship: 'sibling'
+                               }
+                             });
+                             
+                             // Herlaad de student data om de nieuwe sibling relatie te tonen
+                             queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+                           }
+                           
+                           setSiblingSearchTerm('');
+                           toast({
+                             title: "Broer/zus gekoppeld",
+                             description: `${student.firstName} ${student.lastName} is toegevoegd als broer/zus.`,
+                           });
+                           setIsLinkSiblingDialogOpen(false);
+                         } catch (error) {
+                           console.error('Error adding sibling:', error);
+                           toast({
+                             title: "Fout",
+                             description: "Er is een probleem opgetreden bij het koppelen van de broer/zus.",
+                             variant: "destructive",
+                           });
+                         }
                        }}>
                     <div className="flex items-center justify-between">
                       <div>

@@ -4256,6 +4256,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Student Siblings endpoints
+  app.get("/api/students/:studentId/siblings", async (req: Request, res: Response) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      const siblings = await storage.getStudentSiblings(studentId);
+      res.json(siblings);
+    } catch (error) {
+      console.error("Error fetching student siblings:", error);
+      res.status(500).json({ error: "Failed to fetch student siblings" });
+    }
+  });
+
+  app.post("/api/students/:studentId/siblings", async (req: Request, res: Response) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      const { siblingId, relationship = "sibling" } = req.body;
+      
+      if (!siblingId) {
+        return res.status(400).json({ error: "siblingId is required" });
+      }
+
+      await storage.addStudentSibling(studentId, parseInt(siblingId), relationship);
+      res.status(201).json({ message: "Sibling relationship created successfully" });
+    } catch (error) {
+      console.error("Error adding student sibling:", error);
+      res.status(500).json({ error: "Failed to add student sibling" });
+    }
+  });
+
+  app.delete("/api/students/:studentId/siblings/:siblingId", async (req: Request, res: Response) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      const siblingId = parseInt(req.params.siblingId);
+      
+      await storage.removeStudentSibling(studentId, siblingId);
+      res.json({ message: "Sibling relationship removed successfully" });
+    } catch (error) {
+      console.error("Error removing student sibling:", error);
+      res.status(500).json({ error: "Failed to remove student sibling" });
+    }
+  });
+
   // creëer HTTP server
   const server = createServer(app);
 

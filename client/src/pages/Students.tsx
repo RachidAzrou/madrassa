@@ -624,56 +624,75 @@ export default function Students() {
       if (newStudentGuardians.length > 0) {
         try {
           for (const guardian of newStudentGuardians) {
-            // Controleer of de voogd al bestaat (alleen als email beschikbaar is)
             let guardianId;
-            let existingGuardian = null;
             
-            if (guardian.email) {
-              try {
-                existingGuardian = await apiRequest(`/api/guardians/email/${encodeURIComponent(guardian.email)}`, {
-                  method: 'GET'
-                });
-              } catch (error) {
-                // Voogd bestaat niet, we maken een nieuwe aan
-                existingGuardian = null;
-              }
-            }
-            
-            if (existingGuardian && existingGuardian.id) {
-              guardianId = existingGuardian.id;
-              console.log('Bestaande voogd gevonden:', guardianId);
+            // Controleer of dit een bestaande voogd is (via existingGuardianId)
+            if (guardian.existingGuardianId) {
+              guardianId = guardian.existingGuardianId;
+              console.log('Bestaande voogd wordt gekoppeld:', guardianId);
             } else {
-              // Maak nieuwe voogd aan
-              const newGuardian = await apiRequest('/api/guardians', {
-                method: 'POST',
-                body: {
-                  firstName: guardian.firstName,
-                  lastName: guardian.lastName,
-                  email: guardian.email || null,
-                  phone: guardian.phone || null,
-                  relationship: guardian.relationship || 'parent',
-                  isEmergencyContact: guardian.isEmergencyContact || false,
-                  emergencyContactName: guardian.emergencyContactName || null,
-                  emergencyContactPhone: guardian.emergencyContactPhone || null,
-                  emergencyContactRelation: guardian.emergencyContactRelation || null
+              // Controleer of de voogd al bestaat via email (alleen als email beschikbaar is)
+              let existingGuardian = null;
+              
+              if (guardian.email) {
+                try {
+                  existingGuardian = await apiRequest(`/api/guardians/email/${encodeURIComponent(guardian.email)}`, {
+                    method: 'GET'
+                  });
+                } catch (error) {
+                  // Voogd bestaat niet, we maken een nieuwe aan
+                  existingGuardian = null;
                 }
-              });
-              guardianId = newGuardian.id;
-              console.log('Nieuwe voogd aangemaakt:', guardianId);
+              }
+              
+              if (existingGuardian && existingGuardian.id) {
+                guardianId = existingGuardian.id;
+                console.log('Bestaande voogd gevonden via email:', guardianId);
+              } else {
+                // Maak nieuwe voogd aan
+                const newGuardian = await apiRequest('/api/guardians', {
+                  method: 'POST',
+                  body: {
+                    firstName: guardian.firstName,
+                    lastName: guardian.lastName,
+                    email: guardian.email || null,
+                    phone: guardian.phone || null,
+                    relationship: guardian.relationship || 'parent',
+                    isEmergencyContact: guardian.isEmergencyContact || false,
+                    emergencyContactName: guardian.emergencyContactName || null,
+                    emergencyContactPhone: guardian.emergencyContactPhone || null,
+                    emergencyContactRelation: guardian.emergencyContactRelation || null
+                  }
+                });
+                guardianId = newGuardian.id;
+                console.log('Nieuwe voogd aangemaakt:', guardianId);
+              }
             }
             
-            // Koppel voogd aan student (controleer eerst of relatie al bestaat)
-            await apiRequest('/api/student-guardians', {
-              method: 'POST',
-              body: {
-                studentId: selectedStudent.id,
-                guardianId: guardianId,
-                relationship: guardian.relationship || 'parent'
+            // Controleer eerst of de koppeling al bestaat
+            try {
+              const existingRelations = await apiRequest(`/api/students/${selectedStudent.id}/guardians`);
+              const relationExists = existingRelations.some((rel: any) => rel.guardianId === guardianId);
+              
+              if (!relationExists) {
+                // Koppel voogd aan student
+                await apiRequest('/api/student-guardians', {
+                  method: 'POST',
+                  body: {
+                    studentId: selectedStudent.id,
+                    guardianId: guardianId,
+                    relationship: guardian.relationship || 'parent'
+                  }
+                });
+                console.log('Voogd gekoppeld aan student:', { studentId: selectedStudent.id, guardianId, relationship: guardian.relationship });
+              } else {
+                console.log('Koppeling bestaat al:', { studentId: selectedStudent.id, guardianId });
               }
-            });
-            console.log('Voogd gekoppeld aan student:', { studentId: selectedStudent.id, guardianId, relationship: guardian.relationship });
+            } catch (linkError) {
+              console.error('Fout bij koppelen voogd aan student:', linkError);
+            }
           }
-          console.log('Alle voogden succesvol toegevoegd');
+          console.log('Alle voogden succesvol verwerkt');
         } catch (guardianError) {
           console.error('Voogden konden niet worden toegevoegd:', guardianError);
         }

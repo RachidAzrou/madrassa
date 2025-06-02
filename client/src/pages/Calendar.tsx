@@ -528,7 +528,6 @@ export default function Calendar() {
         icon={CalendarIcon}
         description="Beheer schoolevenementen, bekijk lessen en belangrijke data in een overzichtelijke roosterweergave"
       />
-      
       <div className="px-6 py-6 flex-1 space-y-6">
 
 
@@ -603,7 +602,7 @@ export default function Calendar() {
                 className="bg-[#1e40af] hover:bg-[#1e40af]/90 flex items-center"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                <span>Evenement Toevoegen</span>
+                <span>Inplannen</span>
               </Button>
             </div>
           </div>
@@ -835,7 +834,6 @@ export default function Calendar() {
           )}
         </div>
       </div>
-      
       {/* Add Event Dialog */}
       <CustomDialog 
         open={isAddEventDialogOpen} 
@@ -1195,7 +1193,6 @@ export default function Calendar() {
           </Button>
         </DialogFooterContainer>
       </CustomDialog>
-
       {/* Event Detail Popup */}
       <CustomDialog 
         open={isEventDetailDialogOpen} 

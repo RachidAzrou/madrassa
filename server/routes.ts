@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
 import { db } from "./db";
 import * as schema from "@shared/schema";
-import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers } from "@shared/schema";
+import { students, studentGroups, studentGroupEnrollments, programTeachers, teachers, grades } from "@shared/schema";
 import { eq, and, sql, inArray } from "drizzle-orm";
 
 // Global storage voor calendar events
@@ -1571,7 +1571,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Validated grade data:', validatedData);
       
       // Direct database insert as workaround
-      const [newGrade] = await db.insert(grades).values(validatedData).returning();
+      const [newGrade] = await db.insert(schema.grades).values(validatedData).returning();
       console.log('Created grade directly:', newGrade);
       res.status(201).json(newGrade);
     } catch (error) {

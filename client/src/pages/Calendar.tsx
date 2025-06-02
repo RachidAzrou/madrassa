@@ -94,9 +94,7 @@ export default function Calendar() {
   const teachers = teachersData?.teachers || [];
   const studentGroups = Array.isArray(studentGroupsData) ? studentGroupsData : studentGroupsData?.studentGroups || [];
 
-  // Debug logging
-  console.log("Student Groups Data:", studentGroupsData);
-  console.log("Processed Student Groups:", studentGroups);
+
 
   // Combineer programs en courses voor vakken dropdown
   const subjects = [
@@ -850,8 +848,8 @@ export default function Calendar() {
         maxWidth="600px"
       >
         <DialogHeaderWithIcon 
-          title="Evenement Toevoegen"
-          description="Voeg een nieuw evenement toe aan de rooster"
+          title="Inplannen"
+          description="Plan een les, examen, vakantie of activiteit in"
           icon={<Plus className="h-5 w-5" />}
         />
         
@@ -1031,19 +1029,10 @@ export default function Calendar() {
                   <StyledSelect 
                     value={newEvent.classId || ""} 
                     onValueChange={(value) => {
-                      // Auto-select location based on class
-                      let autoLocation = "";
-                      let className = "";
-                      if (value === "1") { // Klas 1A
-                        autoLocation = "Lokaal A1 - Begane grond";
-                        className = "Klas 1A";
-                      } else if (value === "2") { // Klas 2B
-                        autoLocation = "Lokaal B2 - Eerste verdieping";
-                        className = "Klas 2B";
-                      } else if (value === "3") { // Klas 3C
-                        autoLocation = "Lokaal C3 - Tweede verdieping";
-                        className = "Klas 3C";
-                      }
+                      // Find the selected class for auto-location
+                      const selectedClass = studentGroups.find(group => group.id.toString() === value);
+                      const autoLocation = selectedClass?.location || "";
+                      const className = selectedClass?.name || "";
                       
                       setNewEvent({ 
                         ...newEvent, 

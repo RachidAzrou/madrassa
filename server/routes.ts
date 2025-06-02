@@ -1666,6 +1666,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get grades for a specific assessment
+  apiRouter.get("/api/assessments/:assessmentId/grades", async (req, res) => {
+    try {
+      const assessmentId = parseInt(req.params.assessmentId);
+      
+      if (isNaN(assessmentId)) {
+        return res.status(400).json({ message: "Invalid assessment ID" });
+      }
+      
+      // Get the assessment details first
+      const assessment = await db.select().from(schema.assessments).where(eq(schema.assessments.id, assessmentId));
+      if (!assessment[0]) {
+        return res.status(404).json({ message: "Assessment not found" });
+      }
+      
+      // Get grades for this assessment
+      const grades = await db.select({
+        id: schema.grades.id,
+        studentId: schema.grades.studentId,
+        score: schema.grades.score,
+        maxScore: schema.grades.maxScore,
+        student: {
+          id: schema.students.id,
+          firstName: schema.students.firstName,
+          lastName: schema.students.lastName
+        }
+      })
+      .from(schema.grades)
+      .leftJoin(schema.students, eq(schema.grades.studentId, schema.students.id))
+      .where(eq(schema.grades.assessmentName, assessment[0].name));
+      
+      res.json(grades);
+    } catch (error) {
+      console.error('Error fetching grades for assessment:', error);
+      res.status(500).json({ message: "Error fetching grades for assessment" });
+    }
+  });
+
   apiRouter.post("/api/grades/save-multiple", async (req, res) => {
     console.log('=== SAVE MULTIPLE GRADES ROUTE HIT ===');
     console.log('Request body:', JSON.stringify(req.body, null, 2));

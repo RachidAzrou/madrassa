@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
@@ -40,6 +40,25 @@ export default function Cijfers() {
   const [deletingAssessment, setDeletingAssessment] = useState<any>(null);
   const [step, setStep] = useState<'class' | 'subject' | 'assessments' | 'grades'>('class');
   const [grades, setGrades] = useState<{[studentId: string]: string}>({});
+  
+  // Query to fetch existing grades for the selected assessment
+  const { data: existingGrades } = useQuery({
+    queryKey: [`/api/assessments/${selectedAssessment?.id}/grades`],
+    enabled: !!selectedAssessment,
+  });
+
+  // Effect to populate grades when existing grades are loaded
+  useEffect(() => {
+    if (existingGrades && Array.isArray(existingGrades)) {
+      const gradeMap: {[studentId: string]: string} = {};
+      existingGrades.forEach((grade: any) => {
+        if (grade.studentId && grade.score !== null) {
+          gradeMap[grade.studentId.toString()] = grade.score.toString();
+        }
+      });
+      setGrades(gradeMap);
+    }
+  }, [existingGrades]);
   
   // Form state for new assessment
   const [assessmentForm, setAssessmentForm] = useState({
@@ -229,7 +248,7 @@ export default function Cijfers() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/grades'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/assessments/${selectedAssessment?.id}/grades`] });
       toast({
         title: "Cijfers opgeslagen",
         description: `Cijfers voor ${selectedAssessment.name} zijn succesvol opgeslagen.`,

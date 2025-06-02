@@ -282,4 +282,9 @@ export interface IStorage {
   
   // Health check operations
   checkHealth(): Promise<{ connected: boolean; timestamp?: string; error?: string }>;
+  
+  // Student Siblings operations
+  getStudentSiblings(studentId: number): Promise<any[]>;
+  addStudentSibling(studentId: number, siblingId: number, relationship?: string): Promise<void>;
+  removeStudentSibling(studentId: number, siblingId: number): Promise<void>;
 }

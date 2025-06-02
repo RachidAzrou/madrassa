@@ -588,4 +588,86 @@ export class DatabaseStorage implements IStorage {
     
     return outstandingFees;
   }
+
+  // Student Siblings operations
+  async getStudentSiblings(studentId: number): Promise<any[]> {
+    try {
+      const { studentSiblings, students } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      
+      const siblings = await db
+        .select({
+          id: studentSiblings.id,
+          studentId: studentSiblings.studentId,
+          siblingId: studentSiblings.siblingId,
+          relationship: studentSiblings.relationship,
+          createdAt: studentSiblings.createdAt,
+          firstName: students.firstName,
+          lastName: students.lastName,
+          studentIdCode: students.studentId
+        })
+        .from(studentSiblings)
+        .innerJoin(students, eq(studentSiblings.siblingId, students.id))
+        .where(eq(studentSiblings.studentId, studentId));
+
+      return siblings;
+    } catch (error) {
+      console.error('Error getting student siblings:', error);
+      return [];
+    }
+  }
+
+  async addStudentSibling(studentId: number, siblingId: number, relationship: string = "sibling"): Promise<void> {
+    try {
+      const { studentSiblings } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+      
+      // Check if relationship already exists
+      const existing = await db
+        .select()
+        .from(studentSiblings)
+        .where(
+          and(
+            eq(studentSiblings.studentId, studentId),
+            eq(studentSiblings.siblingId, siblingId)
+          )
+        );
+
+      if (existing.length === 0) {
+        // Add the relationship in both directions for bidirectionality
+        await db.insert(studentSiblings).values([
+          { studentId, siblingId, relationship },
+          { studentId: siblingId, siblingId: studentId, relationship }
+        ]);
+      }
+    } catch (error) {
+      console.error('Error adding student sibling:', error);
+      throw error;
+    }
+  }
+
+  async removeStudentSibling(studentId: number, siblingId: number): Promise<void> {
+    try {
+      const { studentSiblings } = await import("@shared/schema");
+      const { eq, and } = await import("drizzle-orm");
+      
+      // Remove the relationship in both directions
+      await db.delete(studentSiblings).where(
+        and(
+          eq(studentSiblings.studentId, studentId),
+          eq(studentSiblings.siblingId, siblingId)
+        )
+      );
+      
+      await db.delete(studentSiblings).where(
+        and(
+          eq(studentSiblings.studentId, siblingId),
+          eq(studentSiblings.siblingId, studentId)
+        )
+      );
+    } catch (error) {
+      console.error('Error removing student sibling:', error);
+      throw error;
+    }
+  }
 }

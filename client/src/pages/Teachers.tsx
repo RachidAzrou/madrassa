@@ -720,7 +720,14 @@ export default function Teachers() {
                         </div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-xs text-gray-600">{teacher.specialty || 'Geen vakken toegewezen'}</span>
+                        <span className="text-xs text-gray-600">
+                          {teacher.subjects && teacher.subjects.length > 0 
+                            ? teacher.subjects.map((subject: any) => 
+                                typeof subject === 'string' ? subject : subject.name || subject.code
+                              ).join(', ')
+                            : 'Geen vakken toegewezen'
+                          }
+                        </span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <Badge className={`px-2 py-1 text-xs font-normal ${getStatusColor(teacher.status)}`}>

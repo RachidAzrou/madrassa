@@ -41,12 +41,28 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
               {effectiveBreadcrumbs.parent && (
                 <>
                   <span className="mr-1">{
-                    // Check if current path belongs to education pages
+                    // Map paths to correct sidebar categories
                     (() => {
-                      const educationPaths = ['/student-groups', '/programs', '/calendar', '/courses', '/scheduling'];
-                      if (path && educationPaths.some(eduPath => path.startsWith(eduPath))) {
+                      if (!path) return effectiveBreadcrumbs.parent;
+                      
+                      // Beheer category
+                      const beheerPaths = ['/students', '/guardians', '/teachers', '/student-groups'];
+                      if (beheerPaths.some(p => path.startsWith(p))) {
+                        return 'Beheer';
+                      }
+                      
+                      // Onderwijs category  
+                      const onderwijsPaths = ['/courses', '/programs', '/calendar', '/scheduling'];
+                      if (onderwijsPaths.some(p => path.startsWith(p))) {
                         return 'Onderwijs';
                       }
+                      
+                      // Evaluatie category
+                      const evaluatiePaths = ['/attendance', '/grading', '/reports', '/fees', '/student-dossier'];
+                      if (evaluatiePaths.some(p => path.startsWith(p))) {
+                        return 'Evaluatie';
+                      }
+                      
                       return effectiveBreadcrumbs.parent;
                     })()
                   }</span>

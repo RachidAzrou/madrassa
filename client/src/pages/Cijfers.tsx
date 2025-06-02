@@ -571,7 +571,7 @@ export default function Cijfers() {
                                       <Target className="h-3 w-3" />
                                       {subjectAssessments.length} beoordeling{subjectAssessments.length !== 1 ? 'en' : ''}
                                     </Badge>
-                                    <SubjectGradeAverage subjectId={subject.id} />
+                                    <SubjectGradeAverage subjectId={subject.id} assessmentsData={allAssessmentsData} />
                                   </>
                                 );
                               })()}

@@ -44,6 +44,13 @@ import {
 import { apiRequest } from '@/lib/queryClient';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { DeleteDialog } from '@/components/ui/delete-dialog';
+import { 
+  CustomDialog, 
+  DialogHeaderWithIcon, 
+  DialogFormContainer, 
+  SectionContainer, 
+  DialogFooterContainer 
+} from '@/components/ui/custom-dialog';
 
 
 
@@ -712,80 +719,105 @@ export default function StudentGroups() {
       </Dialog>
 
       {/* Bekijk klas dialoog */}
-      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
-        <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden">
-          <div className="bg-[#1e40af] py-4 px-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-white/20 p-2 rounded-full">
-                <Eye className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <DialogTitle className="text-white text-lg font-semibold m-0">Klas bekijken</DialogTitle>
-                <DialogDescription className="text-white/70 text-sm m-0">
-                  Bekijk de details van de geselecteerde klas.
-                </DialogDescription>
-              </div>
-            </div>
-          </div>
-          
-          {selectedClass && (
-            <div className="p-6 max-h-[70vh] overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                      <School className="h-4 w-4 mr-2" />
-                      Algemene informatie
-                    </h3>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-xs font-medium text-gray-700">Klasnaam</label>
-                        <p className="text-sm text-gray-900">{selectedClass.name}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-700">Schooljaar</label>
-                        <p className="text-sm text-gray-900">{selectedClass.academicYear || '-'}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-700">Klastitularis</label>
-                        <p className="text-sm text-gray-900">{selectedClass.teacherName || '-'}</p>
-                      </div>
+      <CustomDialog 
+        open={showViewDialog} 
+        onOpenChange={setShowViewDialog}
+        maxWidth="1200px"
+      >
+        <DialogHeaderWithIcon
+          title="Klas Details"
+          description="Bekijk alle informatie van de geselecteerde klas"
+          icon={<Eye className="h-5 w-5" />}
+        />
+        
+        {selectedClass && (
+          <DialogFormContainer className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Algemene Informatie */}
+              <SectionContainer 
+                title="Algemene Informatie" 
+                icon={<School className="h-4 w-4" />}
+              >
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-medium text-gray-700">Klasnaam</label>
+                      <p className="text-sm text-gray-900 font-medium">{selectedClass.name}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-700">Schooljaar</label>
+                      <p className="text-sm text-gray-900">{selectedClass.academicYear || '-'}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-700">Klastitularis</label>
+                    <p className="text-sm text-gray-900">{selectedClass.teacherName || '-'}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-700">Status</label>
+                    <div className="mt-1">
+                      <Badge variant={selectedClass.isActive ? "default" : "secondary"}>
+                        {selectedClass.isActive ? "Actief" : "Inactief"}
+                      </Badge>
                     </div>
                   </div>
                 </div>
-                
-                <div className="space-y-4">
-                  <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                    <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      Locatie & Capaciteit
-                    </h3>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-xs font-medium text-gray-700">Locatie</label>
-                        <p className="text-sm text-gray-900">{selectedClass.location || '-'}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-700">Capaciteit</label>
-                        <p className="text-sm text-gray-900">
-                          {selectedClass.studentCount || 0}/{selectedClass.maxCapacity || 'Onbeperkt'}
+              </SectionContainer>
+
+              {/* Locatie & Capaciteit */}
+              <SectionContainer 
+                title="Locatie & Capaciteit" 
+                icon={<MapPin className="h-4 w-4" />}
+              >
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-gray-700">Locatie</label>
+                    <p className="text-sm text-gray-900">{selectedClass.location || '-'}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-medium text-gray-700">Huidige bezetting</label>
+                      <p className="text-sm text-gray-900 font-medium">{selectedClass.studentCount || 0}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-700">Max. capaciteit</label>
+                      <p className="text-sm text-gray-900">{selectedClass.maxCapacity || 'Onbeperkt'}</p>
+                    </div>
+                  </div>
+                  {selectedClass.maxCapacity && (
+                    <div>
+                      <label className="text-xs font-medium text-gray-700">Bezettingspercentage</label>
+                      <div className="mt-1">
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-blue-600 h-2 rounded-full" 
+                            style={{ 
+                              width: `${Math.min(((selectedClass.studentCount || 0) / selectedClass.maxCapacity) * 100, 100)}%` 
+                            }}
+                          ></div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {Math.round(((selectedClass.studentCount || 0) / selectedClass.maxCapacity) * 100)}% bezet
                         </p>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
-              </div>
-              
-              <div className="mt-6">
-                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Vakken
-                  </h3>
-                  <div className="space-y-2">
+              </SectionContainer>
+            </div>
+
+            {/* Vakken/Curriculum */}
+            <SectionContainer 
+              title="Vakken & Curriculum" 
+              icon={<BookOpen className="h-4 w-4" />}
+            >
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-medium text-gray-700">Toegewezen vakken</label>
+                  <div className="mt-2 flex flex-wrap gap-2">
                     {selectedClass.subjects && selectedClass.subjects.length > 0 ? (
                       selectedClass.subjects.map((subject, index) => (
-                        <Badge key={index} variant="outline" className="mr-1 mb-1">
+                        <Badge key={index} variant="outline" className="text-xs">
                           {subject}
                         </Badge>
                       ))
@@ -794,43 +826,33 @@ export default function StudentGroups() {
                     )}
                   </div>
                 </div>
-              </div>
-              
-              <div className="mt-6 space-y-4">
-                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                    <GraduationCap className="h-4 w-4 mr-2" />
-                    Instroomvereisten
-                  </h3>
-                  <p className="text-sm text-gray-900">
-                    {selectedClass.prerequisites || 'Geen specifieke vereisten'}
-                  </p>
-                </div>
                 
-                <div className="bg-[#f1f5f9] px-4 py-3 rounded-md">
-                  <h3 className="text-sm font-medium text-[#1e40af] mb-3 flex items-center">
-                    <Target className="h-4 w-4 mr-2" />
-                    Leerdoelen
-                  </h3>
-                  <p className="text-sm text-gray-900">
-                    {selectedClass.learningGoals || 'Geen leerdoelen gedefinieerd'}
-                  </p>
+                {/* Instroomvereisten en Leerdoelen */}
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-gray-700">Instroomvereisten</label>
+                    <p className="text-sm text-gray-900 mt-1">
+                      {selectedClass.prerequisites || 'Geen specifieke vereisten'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-700">Leerdoelen</label>
+                    <p className="text-sm text-gray-900 mt-1">
+                      {selectedClass.learningGoals || 'Geen leerdoelen gedefinieerd'}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-          
-          <div className="bg-gray-50 px-6 py-3 flex justify-end gap-2 border-t">
-            <Button
-              variant="outline"
-              onClick={() => setShowViewDialog(false)}
-              className="h-8 text-xs rounded-sm"
-            >
-              Sluiten
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+            </SectionContainer>
+          </DialogFormContainer>
+        )}
+        
+        <DialogFooterContainer
+          onCancel={() => setShowViewDialog(false)}
+          cancelText="Sluiten"
+          showSubmitButton={false}
+        />
+      </CustomDialog>
 
       {/* Bewerk klas dialoog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>

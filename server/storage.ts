@@ -847,20 +847,23 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log('Getting students for class:', classId);
       
-      // Get enrollments for this specific class
-      const classEnrollments = await db
+      // First get the enrollments for this class
+      const enrollments = await db
         .select()
         .from(studentGroupEnrollments)
         .where(eq(studentGroupEnrollments.groupId, classId));
-      console.log('Class enrollments found:', classEnrollments.length);
       
-      if (classEnrollments.length === 0) {
-        console.log('No enrollments found for class', classId);
+      console.log('Found enrollments:', enrollments.length);
+      
+      if (enrollments.length === 0) {
         return [];
       }
       
-      // Get the students using inArray
-      const studentIds = classEnrollments.map(e => e.studentId);
+      // Get student IDs from enrollments
+      const studentIds = enrollments.map(e => e.studentId);
+      console.log('Student IDs:', studentIds);
+      
+      // Get students with these IDs
       const studentsData = await db
         .select()
         .from(students)
@@ -870,6 +873,7 @@ export class DatabaseStorage implements IStorage {
       return studentsData;
     } catch (error) {
       console.error('Error getting students by class:', error);
+      console.error('Full error:', error);
       return [];
     }
   }

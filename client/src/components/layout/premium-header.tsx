@@ -46,13 +46,13 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
                       if (!path) return effectiveBreadcrumbs.parent;
                       
                       // Beheer category
-                      const beheerPaths = ['/students', '/guardians', '/teachers', '/student-groups'];
+                      const beheerPaths = ['/students', '/guardians', '/teachers'];
                       if (beheerPaths.some(p => path.startsWith(p))) {
                         return 'Beheer';
                       }
                       
                       // Onderwijs category  
-                      const onderwijsPaths = ['/courses', '/programs', '/calendar', '/scheduling'];
+                      const onderwijsPaths = ['/courses', '/programs', '/calendar', '/scheduling', '/student-groups'];
                       if (onderwijsPaths.some(p => path.startsWith(p))) {
                         return 'Onderwijs';
                       }

@@ -845,34 +845,36 @@ export class DatabaseStorage implements IStorage {
 
   async getStudentsByClass(classId: number): Promise<any[]> {
     try {
-      const studentsData = await db
-        .select({
-          id: students.id,
-          studentId: students.studentId,
-          firstName: students.firstName,
-          lastName: students.lastName,
-          email: students.email,
-          phone: students.phone,
-          dateOfBirth: students.dateOfBirth,
-          address: students.address,
-          street: students.street,
-          houseNumber: students.houseNumber,
-          postalCode: students.postalCode,
-          city: students.city,
-          programId: students.programId,
-          yearLevel: students.yearLevel,
-          status: students.status,
-          enrollmentDate: students.enrollmentDate,
-          notes: students.notes,
-          gender: students.gender,
-          photoUrl: students.photoUrl
-        })
-        .from(students)
-        .innerJoin(studentGroupEnrollments, eq(students.id, studentGroupEnrollments.studentId))
+      console.log('Getting students for class:', classId);
+      
+      // First, check if the table exists and has data
+      const allEnrollments = await db.select().from(studentGroupEnrollments).limit(5);
+      console.log('Sample enrollments:', allEnrollments);
+      
+      // Check for enrollments for this specific class
+      const classEnrollments = await db
+        .select()
+        .from(studentGroupEnrollments)
         .where(eq(studentGroupEnrollments.groupId, classId));
+      console.log('Class enrollments:', classEnrollments);
+      
+      if (classEnrollments.length === 0) {
+        console.log('No enrollments found for class', classId);
+        return [];
+      }
+      
+      // Get the students
+      const studentIds = classEnrollments.map(e => e.studentId);
+      const studentsData = await db
+        .select()
+        .from(students)
+        .where(sql`${students.id} = ANY(${studentIds})`);
+      
+      console.log('Found students:', studentsData.length);
       return studentsData;
     } catch (error) {
       console.error('Error getting students by class:', error);
+      console.error('Error details:', error);
       return [];
     }
   }

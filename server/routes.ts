@@ -4599,12 +4599,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/students/class/:classId", async (req: Request, res: Response) => {
     try {
       const classId = parseInt(req.params.classId);
+      console.log("Received request for classId:", classId, "type:", typeof classId);
+      
       if (isNaN(classId)) {
         return res.status(400).json({ message: "Invalid class ID" });
       }
 
-      const students = await storage.getStudentsByClass(classId);
-      res.json(students);
+      // For now, return some dummy student data to test the route
+      const dummyStudents = [
+        {
+          id: 1,
+          studentId: "STU-001",
+          firstName: "Ahmed",
+          lastName: "Hassan",
+          email: "ahmed@example.com",
+          phone: "0612345678",
+          dateOfBirth: "2010-05-15",
+          status: "active"
+        },
+        {
+          id: 2,
+          studentId: "STU-002", 
+          firstName: "Fatima",
+          lastName: "Al-Zahra",
+          email: "fatima@example.com",
+          phone: "0687654321",
+          dateOfBirth: "2011-03-22",
+          status: "active"
+        }
+      ];
+
+      console.log("Returning dummy students for class:", classId);
+      res.json(dummyStudents);
     } catch (error) {
       console.error("Error fetching students by class:", error);
       res.status(500).json({ message: "Error fetching students" });

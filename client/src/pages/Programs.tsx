@@ -489,9 +489,9 @@ export default function Programs() {
                   className="mx-auto data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 border-gray-300"
                 />
               </StandardTableHeaderCell>
-              <StandardTableHeaderCell>Vak</StandardTableHeaderCell>
+              <StandardTableHeaderCell>Vaknaam</StandardTableHeaderCell>
               <StandardTableHeaderCell>Code</StandardTableHeaderCell>
-              <StandardTableHeaderCell>Afdeling</StandardTableHeaderCell>
+              <StandardTableHeaderCell>Docent</StandardTableHeaderCell>
               <StandardTableHeaderCell>Duur</StandardTableHeaderCell>
               <StandardTableHeaderCell>Status</StandardTableHeaderCell>
               <EmptyActionHeader />

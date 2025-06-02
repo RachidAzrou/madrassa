@@ -453,15 +453,6 @@ export default function StudentGroups() {
                 description={searchTerm || filterAcademicYear !== 'all' 
                   ? "Geen klassen komen overeen met uw zoekcriteria."
                   : "Er zijn nog geen klassen aangemaakt."}
-                action={
-                  <Button
-                    onClick={() => setShowNewClassDialog(true)}
-                    className="bg-[#1e40af] hover:bg-[#1e3a8a]"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Eerste Klas Aanmaken
-                  </Button>
-                }
               />
             ) : (
               filteredClasses.map((cls: ClassType) => (

@@ -120,11 +120,8 @@ export default function Students() {
   
   const [formData, setFormData] = useState(emptyFormData);
   const [editFormData, setEditFormData] = useState(emptyFormData);
-  // Initialiseer students state met data uit localStorage indien beschikbaar
-  const [students, setStudents] = useState(() => {
-    const savedStudents = localStorage.getItem('students');
-    return savedStudents ? JSON.parse(savedStudents) : [];
-  });
+  // Gebruik alleen database data via React Query
+  const [students, setStudents] = useState([]);
 
   // Functie om de volgende beschikbare student ID te genereren op basis van schooljaar
   const generateNextStudentId = () => {
@@ -212,7 +209,7 @@ export default function Students() {
   // Effect om studenten te synchroniseren met localStorage wanneer ze veranderen
   useEffect(() => {
     if (students.length > 0) {
-      localStorage.setItem('students', JSON.stringify(students));
+      // Data wordt nu opgeslagen via API calls naar de database
       console.log('Studenten opgeslagen in localStorage:', students.length);
     }
   }, [students]);
@@ -265,12 +262,7 @@ export default function Students() {
       };
       
       // Update studenten lijst met nieuwe student
-      setStudents(prevStudents => {
-        const updatedStudents = [newStudent, ...prevStudents];
-        // Sla de bijgewerkte lijst op in localStorage
-        localStorage.setItem('students', JSON.stringify(updatedStudents));
-        return updatedStudents;
-      });
+      // Data wordt automatisch bijgewerkt via React Query invalidation
       
       // Sla nieuw student ID op voor eventuele voogdkoppeling
       const newId = formData.studentId || nextStudentId;
@@ -379,11 +371,7 @@ export default function Students() {
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
       
       // Update lokale state
-      const updatedStudents = students.filter(student => student.id !== studentToDelete.id);
-      setStudents(updatedStudents);
-      
-      // Update localStorage
-      localStorage.setItem('students', JSON.stringify(updatedStudents));
+      // Data wordt automatisch bijgewerkt via React Query invalidation
       
       toast({
         title: "Succes",

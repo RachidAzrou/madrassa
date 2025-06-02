@@ -238,7 +238,11 @@ export default function Reports() {
       return;
     }
 
-    const pdf = new jsPDF();
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    });
     const pageWidth = pdf.internal.pageSize.width;
     const pageHeight = pdf.internal.pageSize.height;
 
@@ -280,17 +284,17 @@ export default function Reports() {
       pdf.setDrawColor(0, 0, 0);
       pdf.setLineWidth(0.5);
       
-      // Table dimensions
-      const tableStartX = 30;
-      const tableWidth = pageWidth - 60;
-      const colWidths = [60, 30, 30, 30, 60]; // Vak, Testen, Taken, Examen, Opmerkingen
+      // Table dimensions - optimized for landscape A4 with better spacing
+      const tableStartX = 20;
+      const tableWidth = pageWidth - 40;
+      const colWidths = [70, 30, 30, 30, 110]; // Auto-sizing: Vak, Testen, Taken, Examen, Opmerkingen
       
-      // Header row
-      pdf.setFontSize(11);
+      // Header row with better formatting
+      pdf.setFontSize(10);
       pdf.setFont('helvetica', 'bold');
       
       let xPos = tableStartX;
-      pdf.text('Vak', xPos + 5, yPos + 8);
+      pdf.text('Vak', xPos + 4, yPos + 8);
       pdf.rect(xPos, yPos, colWidths[0], 15, 'D');
       xPos += colWidths[0];
       
@@ -306,7 +310,7 @@ export default function Reports() {
       pdf.rect(xPos, yPos, colWidths[3], 15, 'D');
       xPos += colWidths[3];
       
-      pdf.text('Opmerkingen', xPos + 15, yPos + 8);
+      pdf.text('Opmerkingen', xPos + 5, yPos + 8);
       pdf.rect(xPos, yPos, colWidths[4], 15, 'D');
       
       yPos += 15;
@@ -716,146 +720,180 @@ export default function Reports() {
                 {reportData.map((report, index) => (
                   <Card key={index} className="border-2 border-gray-300 shadow-lg">
                     <CardContent className="p-0">
-                      {/* PDF Preview - Exact match to template */}
-                      <div className="bg-white min-h-[800px] max-w-full mx-auto shadow-inner p-8 font-mono text-sm">
-                        {/* Logo centered */}
-                        <div className="text-center mb-8">
+                      {/* PDF Preview - Professional landscape A4 format */}
+                      <div className="bg-white min-h-[600px] w-full mx-auto shadow-lg border border-gray-200 p-8 font-sans text-sm" style={{ aspectRatio: '297/210' }}>
+                        {/* Header with logo and title */}
+                        <div className="text-center mb-8 border-b-2 border-gray-300 pb-6">
                           {schoolLogo ? (
                             <img src={schoolLogo} alt="School logo" className="h-16 w-auto mx-auto mb-4" />
                           ) : (
-                            <div className="h-16 w-24 mx-auto bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs mb-4">
-                              Logo uploaden
+                            <div className="h-16 w-24 mx-auto bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center text-blue-600 text-xs mb-4 border border-blue-200">
+                              <span>Logo uploaden</span>
                             </div>
                           )}
-                          <h1 className="text-2xl font-bold text-black">RAPPORT</h1>
+                          <h1 className="text-3xl font-bold text-gray-800 tracking-wide">RAPPORT</h1>
                         </div>
 
-                        {/* Student Info - Simple layout exactly like template */}
-                        <div className="mb-8 space-y-2">
-                          <div className="flex">
-                            <span className="w-24">Naam</span>
-                            <span className="mr-4">:</span>
-                            <span>{report.student.firstName} {report.student.lastName}</span>
-                          </div>
-                          <div className="flex">
-                            <span className="w-24">StudentID</span>
-                            <span className="mr-4">:</span>
-                            <span>{report.student.studentId}</span>
-                          </div>
-                          <div className="flex">
-                            <span className="w-24">Klas</span>
-                            <span className="mr-4">:</span>
-                            <span>1A</span>
-                          </div>
-                          <div className="flex">
-                            <span className="w-24">Schooljaar</span>
-                            <span className="mr-4">:</span>
-                            <span>{report.student.academicYear || '2024-2025'}</span>
+                        {/* Student Info - Clean card layout */}
+                        <div className="mb-8 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div className="space-y-2">
+                              <div className="flex items-center">
+                                <span className="font-semibold text-gray-700 w-24">Naam:</span>
+                                <span className="text-gray-900">{report.student.firstName} {report.student.lastName}</span>
+                              </div>
+                              <div className="flex items-center">
+                                <span className="font-semibold text-gray-700 w-24">StudentID:</span>
+                                <span className="text-gray-900">{report.student.studentId}</span>
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex items-center">
+                                <span className="font-semibold text-gray-700 w-24">Klas:</span>
+                                <span className="text-gray-900">1A</span>
+                              </div>
+                              <div className="flex items-center">
+                                <span className="font-semibold text-gray-700 w-24">Schooljaar:</span>
+                                <span className="text-gray-900">{report.student.academicYear || '2024-2025'}</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
 
-                        {/* Grades Table - Exact replica of template */}
+                        {/* Grades Table - Modern professional design */}
                         <div className="mb-8">
-                          <table className="w-full border-collapse border border-black">
+                          <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
                             <thead>
-                              <tr className="border-b border-black">
-                                <th className="border-r border-black p-2 text-left font-bold">Vak</th>
-                                <th className="border-r border-black p-2 text-center font-bold">Testen</th>
-                                <th className="border-r border-black p-2 text-center font-bold">Taken</th>
-                                <th className="border-r border-black p-2 text-center font-bold">Examen</th>
-                                <th className="p-2 text-left font-bold">Opmerkingen</th>
+                              <tr className="bg-gray-100 border-b border-gray-300">
+                                <th className="border-r border-gray-300 p-3 text-left font-bold text-gray-800" style={{ width: '30%' }}>Vak</th>
+                                <th className="border-r border-gray-300 p-3 text-center font-bold text-gray-800" style={{ width: '15%' }}>Testen</th>
+                                <th className="border-r border-gray-300 p-3 text-center font-bold text-gray-800" style={{ width: '15%' }}>Taken</th>
+                                <th className="border-r border-gray-300 p-3 text-center font-bold text-gray-800" style={{ width: '15%' }}>Examen</th>
+                                <th className="p-3 text-left font-bold text-gray-800" style={{ width: '25%' }}>Opmerkingen</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {Object.entries(report.grades).map(([subject, grades]) => {
+                              {Object.entries(report.grades).map(([subject, grades], index) => {
                                 const testAvg = grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-';
                                 const taskAvg = grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : '-';
+                                const isEven = index % 2 === 0;
                                 
                                 return (
-                                  <tr key={subject} className="border-b border-black h-12">
-                                    <td className="border-r border-black p-2">{subject}</td>
-                                    <td className="border-r border-black p-2 text-center">{testAvg}</td>
-                                    <td className="border-r border-black p-2 text-center">{taskAvg}</td>
-                                    <td className="border-r border-black p-2 text-center">{testAvg}</td>
-                                    <td className="p-2">Goede vooruitgang</td>
+                                  <tr key={subject} className={`border-b border-gray-200 h-12 ${isEven ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors`}>
+                                    <td className="border-r border-gray-200 p-3 font-medium text-gray-800">{subject}</td>
+                                    <td className="border-r border-gray-200 p-3 text-center">
+                                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                        parseFloat(testAvg) >= 6.5 ? 'bg-green-100 text-green-800' : 
+                                        parseFloat(testAvg) >= 5.5 ? 'bg-yellow-100 text-yellow-800' : 
+                                        'bg-red-100 text-red-800'
+                                      }`}>
+                                        {testAvg}
+                                      </span>
+                                    </td>
+                                    <td className="border-r border-gray-200 p-3 text-center">
+                                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                        parseFloat(taskAvg) >= 6.5 ? 'bg-green-100 text-green-800' : 
+                                        parseFloat(taskAvg) >= 5.5 ? 'bg-yellow-100 text-yellow-800' : 
+                                        'bg-red-100 text-red-800'
+                                      }`}>
+                                        {taskAvg}
+                                      </span>
+                                    </td>
+                                    <td className="border-r border-gray-200 p-3 text-center">
+                                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                        parseFloat(testAvg) >= 6.5 ? 'bg-green-100 text-green-800' : 
+                                        parseFloat(testAvg) >= 5.5 ? 'bg-yellow-100 text-yellow-800' : 
+                                        'bg-red-100 text-red-800'
+                                      }`}>
+                                        {testAvg}
+                                      </span>
+                                    </td>
+                                    <td className="p-3 text-gray-700 text-sm">Uitstekende vooruitgang getoond</td>
                                   </tr>
                                 );
                               })}
-                              {/* Empty rows like in template */}
-                              {Array.from({ length: 3 }).map((_, i) => (
-                                <tr key={`empty-${i}`} className="border-b border-black h-12">
-                                  <td className="border-r border-black p-2"></td>
-                                  <td className="border-r border-black p-2"></td>
-                                  <td className="border-r border-black p-2"></td>
-                                  <td className="border-r border-black p-2"></td>
-                                  <td className="p-2"></td>
+                              {/* Empty rows with subtle styling */}
+                              {Array.from({ length: 2 }).map((_, i) => (
+                                <tr key={`empty-${i}`} className="border-b border-gray-200 h-12 bg-gray-25">
+                                  <td className="border-r border-gray-200 p-3"></td>
+                                  <td className="border-r border-gray-200 p-3"></td>
+                                  <td className="border-r border-gray-200 p-3"></td>
+                                  <td className="border-r border-gray-200 p-3"></td>
+                                  <td className="p-3"></td>
                                 </tr>
                               ))}
                             </tbody>
                           </table>
                         </div>
 
-                        {/* General Comments */}
-                        <div className="mb-8">
-                          <h3 className="font-bold mb-2">Algemene opmerkingen:</h3>
-                          <div className="border border-black h-20 p-2">
-                            {generalComments[report.student.id] && (
-                              <div className="text-sm">
-                                {generalComments[report.student.id]}
+                        {/* Layout for remaining sections */}
+                        <div className="grid grid-cols-2 gap-8">
+                          {/* Left column - Comments and signatures */}
+                          <div className="space-y-6">
+                            {/* General Comments */}
+                            <div>
+                              <h3 className="font-bold mb-3 text-gray-800 text-lg">Algemene opmerkingen</h3>
+                              <div className="border border-gray-300 rounded-lg p-4 bg-gray-50 min-h-[80px]">
+                                {generalComments[report.student.id] ? (
+                                  <div className="text-gray-700 text-sm leading-relaxed">
+                                    {generalComments[report.student.id]}
+                                  </div>
+                                ) : (
+                                  <div className="text-gray-400 text-sm italic">Geen opmerkingen toegevoegd</div>
+                                )}
                               </div>
-                            )}
-                          </div>
-                        </div>
+                            </div>
 
-                        {/* First signature section */}
-                        <div className="mb-12 flex justify-between">
-                          <div className="text-center">
-                            <div className="border-b-2 border-black w-40 h-8 mb-2"></div>
-                            <div className="text-xs">Handtekening ouders</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="border-b-2 border-black w-40 h-8 mb-2"></div>
-                            <div className="text-xs">Handtekening leraar</div>
-                          </div>
-                        </div>
-
-                        {/* Second section header */}
-                        <div className="text-center mb-8">
-                          <h2 className="text-xl font-bold">GEDRAG & AANWEZIGHEID</h2>
-                        </div>
-
-                        {/* Behavior section */}
-                        <div className="mb-6">
-                          <h3 className="font-bold mb-2">GEDRAG</h3>
-                          <div className="border border-black h-20 p-2">
-                            <div>Gedragscijfer: {behaviorGrades[report.student.id]?.grade || 7}/10</div>
-                            {behaviorGrades[report.student.id]?.comments && (
-                              <div className="mt-2 text-sm">
-                                {behaviorGrades[report.student.id]?.comments}
+                            {/* Signatures */}
+                            <div className="space-y-4">
+                              <div className="text-center">
+                                <div className="border-b-2 border-gray-400 h-12 mb-2"></div>
+                                <div className="text-sm font-medium text-gray-700">Handtekening ouders/verzorgers</div>
                               </div>
-                            )}
+                              <div className="text-center">
+                                <div className="border-b-2 border-gray-400 h-12 mb-2"></div>
+                                <div className="text-sm font-medium text-gray-700">Handtekening klassenmentor</div>
+                              </div>
+                            </div>
                           </div>
-                        </div>
 
-                        {/* Attendance section */}
-                        <div className="mb-8">
-                          <h3 className="font-bold mb-2">AANWEZIGHEID</h3>
-                          <div className="border border-black h-20 p-2">
-                            <div>Aantal keer afwezig: {report.attendance.absent}</div>
-                            <div>Aantal keer te laat: {report.attendance.late}</div>
-                            <div className="mt-2 text-sm">Opmerkingen: Goede aanwezigheid getoond</div>
-                          </div>
-                        </div>
+                          {/* Right column - Behavior and Attendance */}
+                          <div className="space-y-6">
+                            {/* Behavior section */}
+                            <div>
+                              <h3 className="font-bold mb-3 text-gray-800 text-lg">Gedrag</h3>
+                              <div className="border border-gray-300 rounded-lg p-4 bg-gradient-to-br from-green-50 to-green-100">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-gray-700 font-medium">Gedragscijfer:</span>
+                                  <span className="text-2xl font-bold text-green-600">{behaviorGrades[report.student.id]?.grade || 7}/10</span>
+                                </div>
+                                {behaviorGrades[report.student.id]?.comments && (
+                                  <div className="text-gray-600 text-sm">
+                                    {behaviorGrades[report.student.id]?.comments}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
 
-                        {/* Final signatures */}
-                        <div className="flex justify-between">
-                          <div className="text-center">
-                            <div className="border-b-2 border-black w-40 h-8 mb-2"></div>
-                            <div className="text-xs">Handtekening ouders</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="border-b-2 border-black w-40 h-8 mb-2"></div>
-                            <div className="text-xs">Handtekening leraar</div>
+                            {/* Attendance section */}
+                            <div>
+                              <h3 className="font-bold mb-3 text-gray-800 text-lg">Aanwezigheid</h3>
+                              <div className="border border-gray-300 rounded-lg p-4 bg-gradient-to-br from-blue-50 to-blue-100">
+                                <div className="grid grid-cols-2 gap-4 mb-2">
+                                  <div className="text-center">
+                                    <div className="text-sm text-gray-600">Afwezig</div>
+                                    <div className="text-xl font-bold text-red-600">{report.attendance.absent}</div>
+                                  </div>
+                                  <div className="text-center">
+                                    <div className="text-sm text-gray-600">Te laat</div>
+                                    <div className="text-xl font-bold text-orange-600">{report.attendance.late}</div>
+                                  </div>
+                                </div>
+                                <div className="text-gray-600 text-sm">
+                                  Uitstekende aanwezigheid en punctualiteit
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>

@@ -101,11 +101,14 @@ export default function Cijfers() {
     queryFn: async () => {
       if (!selectedClass) return [];
       try {
-        const response = await apiRequest(`/api/students/class/${selectedClass}`);
-        return response;
+        const response = await fetch(`/api/students/class/${selectedClass}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch students');
+        }
+        const data = await response.json();
+        return data;
       } catch (error) {
-        console.log("Kon geen studenten ophalen, gebruik dummy data", error);
-        // Alleen voor demo doeleinden - normaal zou je geen dummy data retourneren
+        console.log("Kon geen studenten ophalen", error);
         return [];
       }
     },
@@ -114,11 +117,6 @@ export default function Cijfers() {
   });
   
   const students = classStudentsData || [];
-  
-  // Debug logging
-  console.log('classStudentsData:', classStudentsData);
-  console.log('students:', students);
-  console.log('Array.isArray(students):', Array.isArray(students));
   
   // Filter studenten op naam/id als er een filter is ingesteld
   const filteredStudents = Array.isArray(students) ? students.filter(student => {

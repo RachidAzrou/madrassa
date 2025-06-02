@@ -577,118 +577,219 @@ export default function Reports() {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Gegenereerde Rapporten ({reportData.length})</h2>
-                <Button onClick={generatePDF} className="flex items-center gap-2">
-                  <Download className="h-4 w-4" />
-                  Download PDF
-                </Button>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Panel - Edit Controls */}
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-bold">Rapport Bewerken ({reportData.length})</h2>
+                  <Button onClick={generatePDF} className="flex items-center gap-2">
+                    <Download className="h-4 w-4" />
+                    Download PDF
+                  </Button>
+                </div>
+
+                {reportData.map((report, index) => (
+                  <Card key={index} className="border-2 border-blue-200">
+                    <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100">
+                      <CardTitle className="flex items-center justify-between">
+                        <span className="text-blue-900">{report.student.firstName} {report.student.lastName}</span>
+                        <Badge variant="secondary" className="bg-blue-600 text-white">{report.student.studentId}</Badge>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6 p-6">
+                      {/* Behavior Grade */}
+                      <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                        <h4 className="font-semibold mb-3 text-yellow-800">Gedragsbeoordeling</h4>
+                        <div className="grid grid-cols-1 gap-4">
+                          <div>
+                            <Label htmlFor={`behavior-grade-${report.student.id}`} className="text-yellow-700">Gedragscijfer (1-10)</Label>
+                            <Input
+                              id={`behavior-grade-${report.student.id}`}
+                              type="number"
+                              min="1"
+                              max="10"
+                              value={behaviorGrades[report.student.id]?.grade || 7}
+                              onChange={(e) => updateBehaviorGrade(
+                                report.student.id, 
+                                parseInt(e.target.value), 
+                                behaviorGrades[report.student.id]?.comments || ''
+                              )}
+                              className="border-yellow-300 focus:border-yellow-500"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`behavior-comments-${report.student.id}`} className="text-yellow-700">Opmerkingen gedrag</Label>
+                            <Textarea
+                              id={`behavior-comments-${report.student.id}`}
+                              value={behaviorGrades[report.student.id]?.comments || ''}
+                              onChange={(e) => updateBehaviorGrade(
+                                report.student.id,
+                                behaviorGrades[report.student.id]?.grade || 7,
+                                e.target.value
+                              )}
+                              placeholder="Opmerkingen over gedrag..."
+                              className="border-yellow-300 focus:border-yellow-500"
+                              rows={3}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* General Comments */}
+                      <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <Label htmlFor={`general-comments-${report.student.id}`} className="text-green-800 font-semibold">Algemene opmerkingen</Label>
+                        <Textarea
+                          id={`general-comments-${report.student.id}`}
+                          value={generalComments[report.student.id] || ''}
+                          onChange={(e) => updateGeneralComments(report.student.id, e.target.value)}
+                          placeholder="Algemene opmerkingen voor het rapport..."
+                          rows={4}
+                          className="mt-2 border-green-300 focus:border-green-500"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
 
-              {reportData.map((report, index) => (
-                <Card key={index}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <span>{report.student.firstName} {report.student.lastName}</span>
-                      <Badge variant="outline">{report.student.studentId}</Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Attendance Summary */}
-                    <div>
-                      <h4 className="font-semibold mb-3">Aanwezigheid</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-blue-600">{report.attendance.total}</div>
-                          <div className="text-sm text-gray-600">Totaal lessen</div>
+              {/* Right Panel - PDF Preview */}
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold">PDF Voorvertoning</h2>
+                
+                {reportData.map((report, index) => (
+                  <Card key={index} className="border-2 border-gray-300 shadow-lg">
+                    <CardContent className="p-0">
+                      {/* PDF-like preview */}
+                      <div className="bg-white min-h-[800px] max-w-full mx-auto shadow-inner">
+                        {/* Header */}
+                        <div className="flex items-center justify-between p-6 border-b-2 border-blue-600 bg-gradient-to-r from-blue-50 to-blue-100">
+                          {schoolLogo && (
+                            <img src={schoolLogo} alt="School logo" className="h-16 w-16 object-contain" />
+                          )}
+                          <div className="text-center flex-1">
+                            <h1 className="text-2xl font-bold text-blue-900">myMadrassa</h1>
+                            <p className="text-lg text-blue-700">Leerlingenrapport</p>
+                          </div>
+                          <div className="w-16"></div>
                         </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-green-600">{report.attendance.present}</div>
-                          <div className="text-sm text-gray-600">Aanwezig</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-red-600">{report.attendance.absent}</div>
-                          <div className="text-sm text-gray-600">Afwezig</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-orange-600">{report.attendance.late}</div>
-                          <div className="text-sm text-gray-600">Te laat</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-blue-600">{report.attendance.percentage}%</div>
-                          <div className="text-sm text-gray-600">Aanwezigheid</div>
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* Grades Summary */}
-                    <div>
-                      <h4 className="font-semibold mb-3">Cijfers per Vak</h4>
-                      <div className="space-y-2">
-                        {Object.entries(report.grades).map(([subject, grades]) => (
-                          <div key={subject} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                            <span className="font-medium">{subject}</span>
-                            <div className="flex gap-4 text-sm">
-                              <span>Tests: {grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : 'Geen'}</span>
-                              <span>Taken: {grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : 'Geen'}</span>
-                              <span>Huiswerk: {grades.homework.length > 0 ? (grades.homework.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.homework.length).toFixed(1) : 'Geen'}</span>
-                              <span className="font-bold">Gem: {grades.average.toFixed(1)}</span>
+                        <div className="p-6 space-y-6">
+                          {/* Student Info */}
+                          <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-bold text-gray-800 mb-3">Leerlinggegevens</h3>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="font-semibold">Naam:</span> {report.student.firstName} {report.student.lastName}
+                              </div>
+                              <div>
+                                <span className="font-semibold">Leerlingnummer:</span> {report.student.studentId}
+                              </div>
+                              {report.student.dateOfBirth && (
+                                <div>
+                                  <span className="font-semibold">Geboortedatum:</span> {new Date(report.student.dateOfBirth).toLocaleDateString('nl-NL')}
+                                </div>
+                              )}
+                              <div>
+                                <span className="font-semibold">Academisch jaar:</span> {report.student.academicYear || 'Niet opgegeven'}
+                              </div>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    </div>
 
-                    {/* Behavior Grade */}
-                    <div>
-                      <h4 className="font-semibold mb-3">Gedragsbeoordeling</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor={`behavior-grade-${report.student.id}`}>Gedragscijfer (1-10)</Label>
-                          <Input
-                            id={`behavior-grade-${report.student.id}`}
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={behaviorGrades[report.student.id]?.grade || 7}
-                            onChange={(e) => updateBehaviorGrade(
-                              report.student.id, 
-                              parseInt(e.target.value), 
-                              behaviorGrades[report.student.id]?.comments || ''
-                            )}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor={`behavior-comments-${report.student.id}`}>Opmerkingen gedrag</Label>
-                          <Textarea
-                            id={`behavior-comments-${report.student.id}`}
-                            value={behaviorGrades[report.student.id]?.comments || ''}
-                            onChange={(e) => updateBehaviorGrade(
-                              report.student.id,
-                              behaviorGrades[report.student.id]?.grade || 7,
-                              e.target.value
-                            )}
-                            placeholder="Opmerkingen over gedrag..."
-                          />
+                          {/* Attendance */}
+                          <div className="bg-blue-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-bold text-blue-800 mb-3">Aanwezigheid</h3>
+                            <div className="grid grid-cols-5 gap-4 text-center text-sm">
+                              <div>
+                                <div className="text-xl font-bold text-blue-600">{report.attendance.total}</div>
+                                <div className="text-gray-600">Totaal lessen</div>
+                              </div>
+                              <div>
+                                <div className="text-xl font-bold text-green-600">{report.attendance.present}</div>
+                                <div className="text-gray-600">Aanwezig</div>
+                              </div>
+                              <div>
+                                <div className="text-xl font-bold text-red-600">{report.attendance.absent}</div>
+                                <div className="text-gray-600">Afwezig</div>
+                              </div>
+                              <div>
+                                <div className="text-xl font-bold text-orange-600">{report.attendance.late}</div>
+                                <div className="text-gray-600">Te laat</div>
+                              </div>
+                              <div>
+                                <div className="text-xl font-bold text-blue-600">{report.attendance.percentage}%</div>
+                                <div className="text-gray-600">Aanwezigheid</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Grades */}
+                          <div className="bg-purple-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-bold text-purple-800 mb-3">Cijfers per Vak</h3>
+                            <div className="space-y-3">
+                              {Object.entries(report.grades).map(([subject, grades]) => (
+                                <div key={subject} className="bg-white p-3 rounded border">
+                                  <div className="flex justify-between items-center">
+                                    <span className="font-semibold text-purple-700">{subject}</span>
+                                    <span className="text-lg font-bold text-purple-600">{grades.average.toFixed(1)}</span>
+                                  </div>
+                                  <div className="grid grid-cols-3 gap-2 mt-2 text-xs text-gray-600">
+                                    <span>Tests: {grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : 'Geen'}</span>
+                                    <span>Taken: {grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : 'Geen'}</span>
+                                    <span>Huiswerk: {grades.homework.length > 0 ? (grades.homework.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.homework.length).toFixed(1) : 'Geen'}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Behavior */}
+                          <div className="bg-yellow-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-bold text-yellow-800 mb-3">Gedrag</h3>
+                            <div className="bg-white p-3 rounded border">
+                              <div className="flex justify-between items-center mb-2">
+                                <span className="font-semibold">Gedragscijfer:</span>
+                                <span className="text-2xl font-bold text-yellow-600">{behaviorGrades[report.student.id]?.grade || 7}/10</span>
+                              </div>
+                              {behaviorGrades[report.student.id]?.comments && (
+                                <div className="text-sm text-gray-700">
+                                  <span className="font-semibold">Opmerkingen:</span> {behaviorGrades[report.student.id]?.comments}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* General Comments */}
+                          {generalComments[report.student.id] && (
+                            <div className="bg-green-50 p-4 rounded-lg">
+                              <h3 className="text-lg font-bold text-green-800 mb-3">Algemene opmerkingen</h3>
+                              <div className="bg-white p-3 rounded border text-sm text-gray-700">
+                                {generalComments[report.student.id]}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Signatures */}
+                          <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="text-lg font-bold text-gray-800 mb-4">Handtekeningen</h3>
+                            <div className="grid grid-cols-2 gap-8">
+                              <div>
+                                <p className="text-sm font-semibold text-gray-700 mb-3">Handtekening ouder(s)/verzorger(s):</p>
+                                <div className="border-b-2 border-gray-400 h-16 mb-2"></div>
+                                <p className="text-xs text-gray-600">Datum: ________________</p>
+                              </div>
+                              <div>
+                                <p className="text-sm font-semibold text-gray-700 mb-3">Handtekening klassenmentor:</p>
+                                <div className="border-b-2 border-gray-400 h-16 mb-2"></div>
+                                <p className="text-xs text-gray-600">Datum: ________________</p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-
-                    {/* General Comments */}
-                    <div>
-                      <Label htmlFor={`general-comments-${report.student.id}`}>Algemene opmerkingen</Label>
-                      <Textarea
-                        id={`general-comments-${report.student.id}`}
-                        value={generalComments[report.student.id] || ''}
-                        onChange={(e) => updateGeneralComments(report.student.id, e.target.value)}
-                        placeholder="Algemene opmerkingen voor het rapport..."
-                        rows={4}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
           )}
         </TabsContent>

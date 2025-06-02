@@ -1560,7 +1560,7 @@ export default function Students() {
                               </Avatar>
                               <div>
                                 <p className="text-sm font-medium text-gray-900">{sibling.firstName} {sibling.lastName}</p>
-                                <p className="text-xs text-gray-500">{sibling.studentId || 'Student ID niet beschikbaar'}</p>
+                                <p className="text-xs text-gray-500">{sibling.studentIdCode || 'Student ID niet beschikbaar'}</p>
                               </div>
                             </div>
                             <Button

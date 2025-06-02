@@ -716,137 +716,146 @@ export default function Reports() {
                 {reportData.map((report, index) => (
                   <Card key={index} className="border-2 border-gray-300 shadow-lg">
                     <CardContent className="p-0">
-                      {/* PDF-like preview */}
-                      <div className="bg-white min-h-[800px] max-w-full mx-auto shadow-inner">
-                        {/* Header - Only Logo */}
-                        <div className="text-center p-8 border-b-2 border-gray-300">
+                      {/* PDF Preview - Exact match to template */}
+                      <div className="bg-white min-h-[800px] max-w-full mx-auto shadow-inner p-8 font-mono text-sm">
+                        {/* Logo centered */}
+                        <div className="text-center mb-8">
                           {schoolLogo ? (
-                            <img src={schoolLogo} alt="School logo" className="h-24 w-auto mx-auto" />
+                            <img src={schoolLogo} alt="School logo" className="h-16 w-auto mx-auto mb-4" />
                           ) : (
-                            <div className="h-24 w-32 mx-auto bg-gray-200 rounded flex items-center justify-center text-gray-500 text-sm">
+                            <div className="h-16 w-24 mx-auto bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs mb-4">
                               Logo uploaden
                             </div>
                           )}
-                          <h1 className="text-xl font-bold text-gray-800 mt-4">LEERLINGENRAPPORT</h1>
+                          <h1 className="text-2xl font-bold text-black">RAPPORT</h1>
                         </div>
 
-                        <div className="p-8 space-y-8">
-                          {/* Student Info - Minimal */}
-                          <div className="border-b border-gray-200 pb-4">
-                            <div className="grid grid-cols-2 gap-6 text-sm">
-                              <div className="space-y-2">
-                                <div><span className="font-semibold">Naam:</span> {report.student.firstName} {report.student.lastName}</div>
-                                <div><span className="font-semibold">Studentnummer:</span> {report.student.studentId}</div>
-                              </div>
-                              <div className="space-y-2">
-                                <div><span className="font-semibold">Klas:</span> 1A</div>
-                                <div><span className="font-semibold">Schooljaar:</span> {report.student.academicYear || '2024-2025'}</div>
-                              </div>
-                            </div>
+                        {/* Student Info - Simple layout exactly like template */}
+                        <div className="mb-8 space-y-2">
+                          <div className="flex">
+                            <span className="w-24">Naam</span>
+                            <span className="mr-4">:</span>
+                            <span>{report.student.firstName} {report.student.lastName}</span>
                           </div>
+                          <div className="flex">
+                            <span className="w-24">StudentID</span>
+                            <span className="mr-4">:</span>
+                            <span>{report.student.studentId}</span>
+                          </div>
+                          <div className="flex">
+                            <span className="w-24">Klas</span>
+                            <span className="mr-4">:</span>
+                            <span>1A</span>
+                          </div>
+                          <div className="flex">
+                            <span className="w-24">Schooljaar</span>
+                            <span className="mr-4">:</span>
+                            <span>{report.student.academicYear || '2024-2025'}</span>
+                          </div>
+                        </div>
 
-                          {/* Grades per Subject */}
-                          <div>
-                            <h3 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-300 pb-2">CIJFERS PER VAK</h3>
-                            <div className="space-y-4">
-                              {Object.entries(report.grades).map(([subject, grades]) => (
-                                <div key={subject} className="border border-gray-200 rounded-lg p-4">
-                                  <div className="flex justify-between items-center mb-3">
-                                    <h4 className="font-bold text-lg text-gray-800">{subject}</h4>
-                                    <div className="text-2xl font-bold text-blue-600">{grades.average.toFixed(1)}</div>
-                                  </div>
-                                  
-                                  <div className="grid grid-cols-3 gap-4 mb-3">
-                                    <div className="text-center">
-                                      <div className="font-semibold text-gray-600">Tests</div>
-                                      <div className="text-lg font-bold text-green-600">
-                                        {grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-'}
-                                      </div>
-                                    </div>
-                                    <div className="text-center">
-                                      <div className="font-semibold text-gray-600">Examens</div>
-                                      <div className="text-lg font-bold text-blue-600">
-                                        {grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-'}
-                                      </div>
-                                    </div>
-                                    <div className="text-center">
-                                      <div className="font-semibold text-gray-600">Taken</div>
-                                      <div className="text-lg font-bold text-purple-600">
-                                        {grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : '-'}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="text-sm text-gray-600 italic">
-                                    Commentaar: Goede vooruitgang in dit vak. Blijf hard werken!
-                                  </div>
-                                </div>
+                        {/* Grades Table - Exact replica of template */}
+                        <div className="mb-8">
+                          <table className="w-full border-collapse border border-black">
+                            <thead>
+                              <tr className="border-b border-black">
+                                <th className="border-r border-black p-2 text-left font-bold">Vak</th>
+                                <th className="border-r border-black p-2 text-center font-bold">Testen</th>
+                                <th className="border-r border-black p-2 text-center font-bold">Taken</th>
+                                <th className="border-r border-black p-2 text-center font-bold">Examen</th>
+                                <th className="p-2 text-left font-bold">Opmerkingen</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {Object.entries(report.grades).map(([subject, grades]) => {
+                                const testAvg = grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-';
+                                const taskAvg = grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : '-';
+                                
+                                return (
+                                  <tr key={subject} className="border-b border-black h-12">
+                                    <td className="border-r border-black p-2">{subject}</td>
+                                    <td className="border-r border-black p-2 text-center">{testAvg}</td>
+                                    <td className="border-r border-black p-2 text-center">{taskAvg}</td>
+                                    <td className="border-r border-black p-2 text-center">{testAvg}</td>
+                                    <td className="p-2">Goede vooruitgang</td>
+                                  </tr>
+                                );
+                              })}
+                              {/* Empty rows like in template */}
+                              {Array.from({ length: 3 }).map((_, i) => (
+                                <tr key={`empty-${i}`} className="border-b border-black h-12">
+                                  <td className="border-r border-black p-2"></td>
+                                  <td className="border-r border-black p-2"></td>
+                                  <td className="border-r border-black p-2"></td>
+                                  <td className="border-r border-black p-2"></td>
+                                  <td className="p-2"></td>
+                                </tr>
                               ))}
-                            </div>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* General Comments */}
+                        <div className="mb-8">
+                          <h3 className="font-bold mb-2">Algemene opmerkingen:</h3>
+                          <div className="border border-black h-20 p-2">
+                            {generalComments[report.student.id] && (
+                              <div className="text-sm">
+                                {generalComments[report.student.id]}
+                              </div>
+                            )}
                           </div>
+                        </div>
 
-                          {/* Attendance */}
-                          <div>
-                            <h3 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-300 pb-2">AANWEZIGHEID</h3>
-                            <div className="border border-gray-200 rounded-lg p-4">
-                              <div className="grid grid-cols-2 gap-6 mb-4">
-                                <div className="text-center">
-                                  <div className="font-semibold text-gray-600">Aantal keer afwezig</div>
-                                  <div className="text-3xl font-bold text-red-600">{report.attendance.absent}</div>
-                                </div>
-                                <div className="text-center">
-                                  <div className="font-semibold text-gray-600">Aantal keer te laat</div>
-                                  <div className="text-3xl font-bold text-orange-600">{report.attendance.late}</div>
-                                </div>
-                              </div>
-                              <div className="text-sm text-gray-600 italic">
-                                Commentaar: Leerling toont goede aanwezigheid en punctualiteit.
-                              </div>
-                            </div>
+                        {/* First signature section */}
+                        <div className="mb-12 flex justify-between">
+                          <div className="text-center">
+                            <div className="border-b-2 border-black w-40 h-8 mb-2"></div>
+                            <div className="text-xs">Handtekening ouders</div>
                           </div>
-
-                          {/* Behavior */}
-                          <div>
-                            <h3 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-300 pb-2">GEDRAG</h3>
-                            <div className="border border-gray-200 rounded-lg p-4">
-                              <div className="flex justify-between items-center mb-4">
-                                <span className="font-semibold text-gray-700">Gedragscijfer:</span>
-                                <span className="text-3xl font-bold text-green-600">{behaviorGrades[report.student.id]?.grade || 7}/10</span>
-                              </div>
-                              {behaviorGrades[report.student.id]?.comments && (
-                                <div className="text-sm text-gray-600 italic">
-                                  <span className="font-semibold">Commentaar:</span> {behaviorGrades[report.student.id]?.comments}
-                                </div>
-                              )}
-                            </div>
+                          <div className="text-center">
+                            <div className="border-b-2 border-black w-40 h-8 mb-2"></div>
+                            <div className="text-xs">Handtekening leraar</div>
                           </div>
+                        </div>
 
-                          {/* General Comments */}
-                          {generalComments[report.student.id] && (
-                            <div>
-                              <h3 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-300 pb-2">ALGEMENE OPMERKINGEN</h3>
-                              <div className="border border-gray-200 rounded-lg p-4">
-                                <div className="text-sm text-gray-700 leading-relaxed">
-                                  {generalComments[report.student.id]}
-                                </div>
-                              </div>
-                            </div>
-                          )}
+                        {/* Second section header */}
+                        <div className="text-center mb-8">
+                          <h2 className="text-xl font-bold">GEDRAG & AANWEZIGHEID</h2>
+                        </div>
 
-                          {/* Signatures */}
-                          <div className="mt-12 pt-8 border-t border-gray-300">
-                            <div className="grid grid-cols-2 gap-12">
-                              <div className="text-center">
-                                <div className="border-b-2 border-gray-400 h-16 mb-3"></div>
-                                <p className="text-sm font-semibold text-gray-700">Handtekening ouder(s)/verzorger(s)</p>
-                                <p className="text-xs text-gray-500 mt-2">Datum: ________________</p>
+                        {/* Behavior section */}
+                        <div className="mb-6">
+                          <h3 className="font-bold mb-2">GEDRAG</h3>
+                          <div className="border border-black h-20 p-2">
+                            <div>Gedragscijfer: {behaviorGrades[report.student.id]?.grade || 7}/10</div>
+                            {behaviorGrades[report.student.id]?.comments && (
+                              <div className="mt-2 text-sm">
+                                {behaviorGrades[report.student.id]?.comments}
                               </div>
-                              <div className="text-center">
-                                <div className="border-b-2 border-gray-400 h-16 mb-3"></div>
-                                <p className="text-sm font-semibold text-gray-700">Handtekening klassenmentor</p>
-                                <p className="text-xs text-gray-500 mt-2">Datum: ________________</p>
-                              </div>
-                            </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Attendance section */}
+                        <div className="mb-8">
+                          <h3 className="font-bold mb-2">AANWEZIGHEID</h3>
+                          <div className="border border-black h-20 p-2">
+                            <div>Aantal keer afwezig: {report.attendance.absent}</div>
+                            <div>Aantal keer te laat: {report.attendance.late}</div>
+                            <div className="mt-2 text-sm">Opmerkingen: Goede aanwezigheid getoond</div>
+                          </div>
+                        </div>
+
+                        {/* Final signatures */}
+                        <div className="flex justify-between">
+                          <div className="text-center">
+                            <div className="border-b-2 border-black w-40 h-8 mb-2"></div>
+                            <div className="text-xs">Handtekening ouders</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="border-b-2 border-black w-40 h-8 mb-2"></div>
+                            <div className="text-xs">Handtekening leraar</div>
                           </div>
                         </div>
                       </div>

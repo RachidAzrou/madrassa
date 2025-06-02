@@ -113,7 +113,7 @@ export default function Cijfers() {
     enabled: !!selectedClass,
   });
   
-  const students = classStudentsData?.students || [];
+  const students = classStudentsData || [];
   
   // Filter studenten op naam/id als er een filter is ingesteld
   const filteredStudents = students ? students.filter(student => {

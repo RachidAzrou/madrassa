@@ -609,7 +609,7 @@ export default function Attendance() {
                   <Button 
                     variant="default" 
                     size="sm" 
-                    className="bg-blue-700 hover:bg-blue-800 text-white shadow-sm flex items-center gap-2"
+                    className="bg-[#1e41af] hover:bg-blue-800 text-white shadow-sm flex items-center gap-2"
                     onClick={handleSave}
                     disabled={isSaving || (Object.keys(studentAttendance).length === 0 && Object.keys(teacherAttendance).length === 0)}
                   >

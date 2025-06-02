@@ -462,56 +462,56 @@ export default function Attendance() {
 
         {/* Filters */}
         <div className="flex items-center gap-3">
-          <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
-            <SelectTrigger className="w-[120px] bg-blue-50 border-blue-200 text-blue-900 hover:bg-blue-100 focus:border-blue-300">
+          <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'klas' | 'examen')}>
+            <SelectTrigger className="w-[120px]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="vak">
-                <div className="flex items-center">
-                  <GraduationCap className="h-4 w-4 mr-2" />
-                  Vak
-                </div>
-              </SelectItem>
-              <SelectItem value="klas">
+            <SelectContent className="bg-white">
+              <SelectItem value="klas" className="hover:bg-blue-50 focus:bg-blue-50">
                 <div className="flex items-center">
                   <Users className="h-4 w-4 mr-2" />
                   Klas
                 </div>
               </SelectItem>
+              <SelectItem value="examen" className="hover:bg-blue-50 focus:bg-blue-50">
+                <div className="flex items-center">
+                  <GraduationCap className="h-4 w-4 mr-2" />
+                  Examen
+                </div>
+              </SelectItem>
             </SelectContent>
           </Select>
 
-          {selectedType === 'vak' ? (
+          {selectedType === 'examen' ? (
             <Select value={selectedCourse} onValueChange={handleCourseChange}>
-              <SelectTrigger className="w-[240px] bg-blue-50 border-blue-200 text-blue-900 hover:bg-blue-100 focus:border-blue-300">
-                <SelectValue placeholder="Selecteer vak" />
+              <SelectTrigger className="w-[240px]">
+                <SelectValue placeholder="Selecteer examen" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 {isLoadingCourses ? (
                   <SelectItem value="loading" disabled>
                     <div className="flex items-center">
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Vakken laden...
+                      Examens laden...
                     </div>
                   </SelectItem>
                 ) : coursesData && Array.isArray(coursesData) ? (
                   coursesData.map((course: Program) => (
-                    <SelectItem key={course.id} value={course.id.toString()}>
+                    <SelectItem key={course.id} value={course.id.toString()} className="hover:bg-blue-50 focus:bg-blue-50">
                       <span className="font-medium">{course.code}</span> - {course.name}
                     </SelectItem>
                   ))
                 ) : (
-                  <SelectItem value="none" disabled>Geen vakken gevonden</SelectItem>
+                  <SelectItem value="none" disabled>Geen examens gevonden</SelectItem>
                 )}
               </SelectContent>
             </Select>
           ) : (
             <Select value={selectedClass} onValueChange={handleClassChange}>
-              <SelectTrigger className="w-[240px] bg-blue-50 border-blue-200 text-blue-900 hover:bg-blue-100 focus:border-blue-300">
+              <SelectTrigger className="w-[240px]">
                 <SelectValue placeholder="Selecteer klas" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 {isLoadingClasses ? (
                   <SelectItem value="loading" disabled>
                     <div className="flex items-center">
@@ -521,7 +521,7 @@ export default function Attendance() {
                   </SelectItem>
                 ) : classesData && Array.isArray(classesData) ? (
                   classesData.map((classroom: StudentGroup) => (
-                    <SelectItem key={classroom.id} value={classroom.id.toString()}>
+                    <SelectItem key={classroom.id} value={classroom.id.toString()} className="hover:bg-blue-50 focus:bg-blue-50">
                       {classroom.name}
                     </SelectItem>
                   ))

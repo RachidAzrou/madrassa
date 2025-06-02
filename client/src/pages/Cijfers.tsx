@@ -173,7 +173,10 @@ export default function Cijfers() {
           if (!newSubjectGrades[grade.studentId]) {
             newSubjectGrades[grade.studentId] = {};
           }
-          newSubjectGrades[grade.studentId][grade.subject] = grade.score;
+          // Find the program/subject name based on courseId
+          const program = programs?.find(p => p.id === grade.courseId);
+          const subjectName = program ? program.name : `Program ${grade.courseId}`;
+          newSubjectGrades[grade.studentId][subjectName] = grade.score;
         });
         
         setSubjectGrades(newSubjectGrades);

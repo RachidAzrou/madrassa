@@ -283,43 +283,54 @@ export default function Students() {
       
       console.log('Student aangemaakt:', studentResponse);
       
-      // Stap 2: Maak nieuwe voogden aan en koppel ze
+      // Stap 2: Verwerk voogden (nieuwe aanmaken of bestaande koppelen)
       if (newStudentGuardians && newStudentGuardians.length > 0) {
         for (const guardian of newStudentGuardians) {
           try {
-            // Maak eerst de voogd aan in de database
-            const guardianResponse = await apiRequest('/api/guardians', {
-              method: 'POST',
-              body: {
-                firstName: guardian.firstName,
-                lastName: guardian.lastName,
-                email: guardian.email,
-                phone: guardian.phone,
-                relationship: guardian.relationship,
-                relationshipOther: guardian.relationshipOther,
-                address: guardian.address,
-                occupation: guardian.occupation,
-                isEmergencyContact: guardian.isEmergencyContact,
-                emergencyContactFirstName: guardian.emergencyContactFirstName,
-                emergencyContactLastName: guardian.emergencyContactLastName,
-                emergencyContactPhone: guardian.emergencyContactPhone,
-                emergencyContactRelationship: guardian.emergencyContactRelationship,
-                emergencyContactRelationshipOther: guardian.emergencyContactRelationshipOther
-              }
-            });
+            let guardianId;
+            
+            // Controleer of dit een bestaande voogd is
+            if (guardian.existingGuardianId) {
+              // Gebruik bestaande voogd
+              guardianId = guardian.existingGuardianId;
+              console.log('Bestaande voogd wordt gekoppeld:', guardianId);
+            } else {
+              // Maak nieuwe voogd aan
+              const guardianResponse = await apiRequest('/api/guardians', {
+                method: 'POST',
+                body: {
+                  firstName: guardian.firstName,
+                  lastName: guardian.lastName,
+                  email: guardian.email,
+                  phone: guardian.phone,
+                  relationship: guardian.relationship,
+                  relationshipOther: guardian.relationshipOther,
+                  address: guardian.address,
+                  occupation: guardian.occupation,
+                  isEmergencyContact: guardian.isEmergencyContact,
+                  emergencyContactFirstName: guardian.emergencyContactFirstName,
+                  emergencyContactLastName: guardian.emergencyContactLastName,
+                  emergencyContactPhone: guardian.emergencyContactPhone,
+                  emergencyContactRelationship: guardian.emergencyContactRelationship,
+                  emergencyContactRelationshipOther: guardian.emergencyContactRelationshipOther
+                }
+              });
+              guardianId = guardianResponse.id;
+              console.log('Nieuwe voogd aangemaakt:', guardianResponse);
+            }
             
             // Koppel de voogd aan de student
             await apiRequest('/api/student-guardians', {
               method: 'POST',
               body: {
                 studentId: studentResponse.id,
-                guardianId: guardianResponse.id,
+                guardianId: guardianId,
                 relationshipType: guardian.relationship,
                 isPrimary: guardian.isEmergencyContact || false
               }
             });
             
-            console.log('Voogd aangemaakt en gekoppeld:', guardianResponse);
+            console.log('Voogd gekoppeld aan student:', { studentId: studentResponse.id, guardianId });
           } catch (guardianError) {
             console.error('Fout bij aanmaken voogd:', guardianError);
             
@@ -2614,7 +2625,8 @@ export default function Students() {
                              onClick={() => {
                                const existingGuardian = {
                                  ...guardian,
-                                 id: Date.now(),
+                                 existingGuardianId: guardian.id, // Bewaar de echte database ID
+                                 id: Date.now(), // Tijdelijke ID voor frontend
                                  relationshipOther: '',
                                  isEmergencyContact: false,
                                  emergencyContactFirstName: '',

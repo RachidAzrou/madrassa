@@ -248,12 +248,13 @@ export default function Attendance() {
   }, [teacherAttendanceData, selectedDate]);
 
   const handleDateChange = async (increment: number) => {
-    // Auto-save current attendance data before switching dates
-    const currentStudentRecords = Object.values(studentAttendance);
-    const currentTeacherRecords = Object.values(teacherAttendance);
+    // Save current attendance data before switching dates if there are any changes
+    const currentStudentRecords = Object.values(studentAttendance).filter(record => record.status);
+    const currentTeacherRecords = Object.values(teacherAttendance).filter(record => record.status);
     
     if (currentStudentRecords.length > 0 || currentTeacherRecords.length > 0) {
       try {
+        console.log('Auto-saving before date change...', { currentStudentRecords, currentTeacherRecords });
         await saveMutation.mutateAsync({ 
           studentRecords: currentStudentRecords, 
           teacherRecords: currentTeacherRecords 
@@ -266,10 +267,6 @@ export default function Attendance() {
     const current = new Date(selectedDate);
     current.setDate(current.getDate() + increment);
     setSelectedDate(current.toISOString().split('T')[0]);
-    
-    // Clear local state - new data will be loaded from server
-    setStudentAttendance({});
-    setTeacherAttendance({});
   };
 
   const handleCourseChange = (value: string) => {

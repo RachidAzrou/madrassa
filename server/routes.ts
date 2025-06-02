@@ -4888,10 +4888,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Attendance records must be an array" });
       }
       
-      const { tempAttendanceStorage } = await import('./temp-attendance-storage');
-      const savedRecords = tempAttendanceStorage.createBatchAttendance(attendanceRecords);
+      console.log('Batch save received:', attendanceRecords);
       
-      res.json({ success: true, saved: savedRecords.length });
+      const { tempAttendanceStorage } = await import('./temp-attendance-storage');
+      
+      // Filter out records without required fields and map to correct format
+      const validRecords = attendanceRecords
+        .filter(record => record.studentId && record.date && record.status)
+        .map(record => ({
+          studentId: record.studentId,
+          courseId: record.courseId || record.classId || 1,
+          teacherId: record.teacherId || 1,
+          date: record.date,
+          status: record.status,
+          notes: record.notes || ''
+        }));
+      
+      console.log('Valid records to save:', validRecords);
+      
+      const savedRecords = tempAttendanceStorage.createBatchAttendance(validRecords);
+      
+      console.log('Records saved successfully:', savedRecords.length);
+      
+      res.json({ success: true, saved: savedRecords.length, results: savedRecords });
     } catch (error) {
       console.error("Error saving batch attendance:", error);
       res.status(500).json({ message: "Error saving attendance records" });

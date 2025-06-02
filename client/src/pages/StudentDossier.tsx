@@ -273,12 +273,10 @@ export default function StudentDossier() {
         title="Leerlingendossier"
         description="Bekijk uitgebreide leerlinggegevens en voortgang"
         icon={User}
-        breadcrumb={{
-          items: [
-            { label: "Dashboard", href: "/" },
-            { label: "Leerlingendossier" }
-          ]
-        }}
+        breadcrumbs={[
+          { label: "Dashboard", href: "/" },
+          { label: "Leerlingendossier" }
+        ]}
       />
 
       <div className="container mx-auto px-6 py-8">
@@ -350,27 +348,27 @@ export default function StudentDossier() {
                   <div className="space-y-4">
                     <div className="border-t pt-4">
                       <h3 className="text-lg font-semibold mb-3">
-                        Studenten in {availableClasses.find(c => c.id === selectedClass)?.name}
+                        Studenten in {availableClasses.find((c: any) => c.id.toString() === selectedClass)?.name}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredStudents.map(student => (
+                        {filteredStudents.map((student: any) => (
                           <Card 
                             key={student.id} 
                             className="cursor-pointer hover:shadow-md transition-shadow"
-                            onClick={() => handleStudentSelect(student.id)}
+                            onClick={() => handleStudentSelect(student.id.toString())}
                           >
                             <CardContent className="p-4">
                               <div className="flex items-center space-x-3">
                                 <Avatar>
                                   <AvatarFallback>
-                                    {student.name.split(' ').map(n => n[0]).join('')}
+                                    {`${student.firstName} ${student.lastName}`.split(' ').map((n: any) => n[0]).join('')}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div>
-                                  <div className="font-medium">{student.name}</div>
-                                  <div className="text-sm text-gray-500">{student.id}</div>
+                                  <div className="font-medium">{student.firstName} {student.lastName}</div>
+                                  <div className="text-sm text-gray-500">{student.studentId}</div>
                                   <Badge variant="outline" className="mt-1">
-                                    {student.status}
+                                    {student.status || 'Actief'}
                                   </Badge>
                                 </div>
                               </div>

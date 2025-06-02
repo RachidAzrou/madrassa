@@ -439,7 +439,7 @@ export default function Attendance() {
           {/* Clean Controls */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             {/* Date Navigation */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 text-center">
               <Button 
                 variant="outline" 
                 size="sm" 

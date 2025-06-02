@@ -768,7 +768,32 @@ export default function Teachers() {
                 <Button
                   onClick={() => {
                     setShowTeacherDetail(false);
-                    handleEditTeacher(selectedTeacher);
+                    setSelectedTeacher(selectedTeacher);
+                    setNewTeacher({
+                      firstName: selectedTeacher.firstName,
+                      lastName: selectedTeacher.lastName,
+                      email: selectedTeacher.email,
+                      phone: selectedTeacher.phone || '',
+                      specialty: selectedTeacher.specialty || '',
+                      bio: selectedTeacher.bio || '',
+                      status: selectedTeacher.status || 'active',
+                      dateOfBirth: selectedTeacher.dateOfBirth || '',
+                      hireDate: selectedTeacher.hireDate || '',
+                      photoUrl: selectedTeacher.photoUrl || '',
+                      gender: selectedTeacher.gender || '',
+                      street: selectedTeacher.street || '',
+                      houseNumber: selectedTeacher.houseNumber || '',
+                      postalCode: selectedTeacher.postalCode || '',
+                      city: selectedTeacher.city || '',
+                      notes: selectedTeacher.notes || '',
+                    });
+                    setTeacherEducations(selectedTeacher.educations || []);
+                    setTeacherLanguages(selectedTeacher.languages || []);
+                    setSelectedSubjects(selectedTeacher.subjects ? selectedTeacher.subjects.map((subject: any) => subject.id?.toString() || subject) : []);
+                    setIsEditMode(true);
+                    setEditingTeacherId(selectedTeacher.id);
+                    setShowEditTeacherDialog(true);
+                    setActiveTab('basic');
                   }}
                   className="bg-[#1e40af] hover:bg-[#1e3a8a]"
                 >
@@ -1098,14 +1123,49 @@ export default function Teachers() {
               Verwijderen
             </Button>
             <Button
-              onClick={() => {
-                // Hier zou de update logica komen
-                toast({
-                  title: "Docent bijgewerkt",
-                  description: "De docentgegevens zijn succesvol bijgewerkt.",
-                });
-                setShowEditTeacherDialog(false);
-                setSelectedTeacher(null);
+              onClick={async () => {
+                if (!selectedTeacher || !editingTeacherId) return;
+
+                try {
+                  const teacherData = {
+                    ...newTeacher,
+                    educations: teacherEducations,
+                    languages: teacherLanguages,
+                    subjects: selectedSubjects
+                  };
+
+                  const response = await fetch(`/api/teachers/${editingTeacherId}`, {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(teacherData),
+                  });
+
+                  if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Fout bij bijwerken docent');
+                  }
+
+                  // Invalidate en refetch de teachers data
+                  queryClient.invalidateQueries({ queryKey: ['/api/teachers'] });
+
+                  toast({
+                    title: "Docent bijgewerkt",
+                    description: "De docentgegevens zijn succesvol bijgewerkt.",
+                  });
+
+                  setShowEditTeacherDialog(false);
+                  setSelectedTeacher(null);
+                  setIsEditMode(false);
+                  setEditingTeacherId(null);
+                } catch (error) {
+                  toast({
+                    title: "Fout bij bijwerken",
+                    description: error instanceof Error ? error.message : "Er is een probleem opgetreden bij het bijwerken van de docent.",
+                    variant: "destructive",
+                  });
+                }
               }}
               className="bg-[#1e40af] hover:bg-[#1e3a8a]"
             >

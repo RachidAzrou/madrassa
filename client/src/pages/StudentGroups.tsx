@@ -146,6 +146,9 @@ export default function StudentGroups() {
   });
 
   const programs = Array.isArray(programsData) ? programsData : (programsData?.programs || []);
+  
+  // Debug log om te zien wat we hebben
+  console.log('Programs data:', programs);
 
   // Filter function - exact same structure as Students page
   const filteredClasses = classes.filter((cls: ClassType) => {
@@ -969,7 +972,11 @@ export default function StudentGroups() {
                       <SelectValue placeholder="Selecteer een vak om toe te voegen" />
                     </SelectTrigger>
                     <SelectContent>
-                      {programs
+                      {programs.length === 0 ? (
+                        <SelectItem value="none" disabled>
+                          Geen vakken beschikbaar
+                        </SelectItem>
+                      ) : programs
                         .filter(program => !editFormData.subjects?.includes(program.id))
                         .map((program: any) => (
                           <SelectItem key={program.id} value={program.id.toString()}>

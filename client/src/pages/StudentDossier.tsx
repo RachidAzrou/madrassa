@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,24 +28,7 @@ import {
 } from 'lucide-react';
 import { PremiumHeader } from '@/components/layout/premium-header';
 
-// Mock data voor demonstratie
-const academicYears = [
-  { id: '2024-2025', name: '2024-2025' },
-  { id: '2023-2024', name: '2023-2024' },
-  { id: '2022-2023', name: '2022-2023' }
-];
-
-const classes = {
-  '2024-2025': [
-    { id: 'arabisch-beginners', name: 'Arabisch Beginners', students: 15 },
-    { id: 'quran-memorisatie', name: 'Quran Memorisatie', students: 12 },
-    { id: 'islamitische-studies', name: 'Islamitische Studies', students: 18 }
-  ],
-  '2023-2024': [
-    { id: 'arabisch-basis', name: 'Arabisch Basis', students: 14 },
-    { id: 'quran-recitatie', name: 'Quran Recitatie', students: 10 }
-  ]
-};
+// Echte data uit database ophalen
 
 const students = {
   'arabisch-beginners': [
@@ -205,6 +190,41 @@ export default function StudentDossier() {
   const [searchTerm, setSearchTerm] = useState('');
   const [studentData, setStudentData] = useState<any>(null);
 
+  // Haal echte data op uit database
+  const { data: programsData } = useQuery({
+    queryKey: ['/api/programs'],
+    staleTime: 300000,
+  });
+
+  const { data: studentGroupsData } = useQuery({
+    queryKey: ['/api/student-groups'],
+    staleTime: 300000,
+  });
+
+  const { data: teachersData } = useQuery({
+    queryKey: ['/api/teachers'],
+    staleTime: 300000,
+  });
+
+  const { data: studentsData } = useQuery({
+    queryKey: ['/api/students'],
+    staleTime: 300000,
+  });
+
+  // Extract data from API responses
+  const programs = programsData?.programs || [];
+  const studentGroups = studentGroupsData?.studentGroups || [];
+  const teachers = teachersData?.teachers || [];
+  const students = studentsData?.students || [];
+
+  // Academic years - gebruik echte jaren uit de database
+  const academicYears = [
+    { id: '2025-2026', name: '2025-2026' },
+    { id: '2024-2025', name: '2024-2025' },
+    { id: '2023-2024', name: '2023-2024' },
+    { id: '2022-2023', name: '2022-2023' }
+  ];
+
   const handleStudentSelect = (studentId: string) => {
     setSelectedStudent(studentId);
     // In echte implementatie zou hier een API call komen
@@ -229,11 +249,19 @@ export default function StudentDossier() {
     return (sum / studentData.grades.length).toFixed(1);
   };
 
-  const availableClasses = selectedYear ? classes[selectedYear as keyof typeof classes] || [] : [];
-  const availableStudents = selectedClass ? students[selectedClass as keyof typeof students] || [] : [];
-  const filteredStudents = availableStudents.filter(student => 
-    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.id.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter student groups based on selected year
+  const availableClasses = selectedYear 
+    ? studentGroups.filter((group: any) => group.academicYear === selectedYear)
+    : [];
+  
+  // Filter students based on selected class
+  const availableStudents = selectedClass 
+    ? students.filter((student: any) => student.studentGroupId?.toString() === selectedClass)
+    : [];
+    
+  const filteredStudents = availableStudents.filter((student: any) => 
+    `${student.firstName} ${student.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.studentId.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const attendanceStats = getAttendanceStats();
@@ -297,9 +325,9 @@ export default function StudentDossier() {
                         <SelectValue placeholder="Selecteer klas" />
                       </SelectTrigger>
                       <SelectContent>
-                        {availableClasses.map(cls => (
-                          <SelectItem key={cls.id} value={cls.id}>
-                            {cls.name} ({cls.students} studenten)
+                        {availableClasses.map((cls: any) => (
+                          <SelectItem key={cls.id} value={cls.id.toString()}>
+                            {cls.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

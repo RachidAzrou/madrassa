@@ -1494,8 +1494,8 @@ export default function Teachers() {
         <DialogContent className="sm:max-w-[85vw] p-0 min-h-[600px] max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeaderWithIcon
             icon={<GraduationCap className="h-5 w-5" />}
-            title="Nieuwe docent toevoegen"
-            description="Vul de gegevens in om een nieuwe docent toe te voegen."
+            title={isEditMode ? "Docent bewerken" : "Nieuwe docent toevoegen"}
+            description={isEditMode ? "Pas de docentgegevens aan." : "Vul de gegevens in om een nieuwe docent toe te voegen."}
           />
           
           {/* Tabs met formulier secties */}

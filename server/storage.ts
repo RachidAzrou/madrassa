@@ -113,6 +113,11 @@ export interface IStorage {
     totalFailed: number; 
     successRate: number;
   } | undefined>;
+
+  // Student Siblings operations
+  getStudentSiblings(studentId: number): Promise<StudentSibling[]>;
+  addStudentSibling(studentId: number, siblingId: number, relationship?: string): Promise<void>;
+  removeStudentSibling(studentId: number, siblingId: number): Promise<void>;
 }
 
 // DatabaseStorage implementatie die gebruik maakt van de database

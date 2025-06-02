@@ -980,3 +980,24 @@ export const insertRoomSchema = createInsertSchema(rooms).omit({
 
 export type InsertRoom = z.infer<typeof insertRoomSchema>;
 export type Room = typeof rooms.$inferSelect;
+
+// Student Siblings (broer/zus relaties)
+export const studentSiblings = pgTable("student_siblings", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull().references(() => students.id),
+  siblingId: integer("sibling_id").notNull().references(() => students.id),
+  relationship: text("relationship").notNull().default("sibling"), // sibling, half-sibling, step-sibling
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => {
+  return {
+    unq: unique().on(table.studentId, table.siblingId),
+  };
+});
+
+export const insertStudentSiblingSchema = createInsertSchema(studentSiblings).omit({
+  id: true,
+  createdAt: true
+});
+
+export type InsertStudentSibling = z.infer<typeof insertStudentSiblingSchema>;
+export type StudentSibling = typeof studentSiblings.$inferSelect;

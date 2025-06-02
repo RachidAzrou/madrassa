@@ -1757,6 +1757,30 @@ export default function Teachers() {
                         placeholder="Bijv. Docent Arabisch, Imam, ..."
                       />
                     </div>
+                    <div>
+                      <Label htmlFor="bio" className="text-xs text-gray-700">
+                        Biografie
+                      </Label>
+                      <textarea
+                        id="bio"
+                        value={newTeacher.bio || ''}
+                        onChange={(e) => setNewTeacher(prev => ({ ...prev, bio: e.target.value }))}
+                        className="mt-1 w-full min-h-[100px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Vertel iets over jezelf..."
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="notes" className="text-xs text-gray-700">
+                        Notities
+                      </Label>
+                      <textarea
+                        id="notes"
+                        value={newTeacher.notes || ''}
+                        onChange={(e) => setNewTeacher(prev => ({ ...prev, notes: e.target.value }))}
+                        className="mt-1 w-full min-h-[100px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Aanvullende notities..."
+                      />
+                    </div>
                   </div>
                 </SectionContainer>
 

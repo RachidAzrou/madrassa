@@ -1563,14 +1563,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.post("/api/grades", async (req, res) => {
     try {
+      console.log('Received grade data:', req.body);
       const validatedData = insertGradeSchema.parse(req.body);
+      console.log('Validated grade data:', validatedData);
       const newGrade = await storage.createGrade(validatedData);
+      console.log('Created grade:', newGrade);
       res.status(201).json(newGrade);
     } catch (error) {
+      console.error('Error creating grade:', error);
       if (error instanceof z.ZodError) {
+        console.error('Validation errors:', error.errors);
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
-      res.status(500).json({ message: "Error creating grade" });
+      res.status(500).json({ message: "Error creating grade", error: error.message });
     }
   });
 

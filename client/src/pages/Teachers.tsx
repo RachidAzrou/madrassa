@@ -172,14 +172,16 @@ export default function Teachers() {
     return savedTeachers ? JSON.parse(savedTeachers) : mockTeachers;
   });
   
-  // Mock onderwerpen voor de dropdown
-  const mockSubjects: SubjectType[] = [
-    { id: 1, name: 'Arabisch', code: 'ARA' },
-    { id: 2, name: 'Islamitische studies', code: 'ISL' },
-    { id: 3, name: 'Koranrecitatie', code: 'QUR' },
-    { id: 4, name: 'Islamitische geschiedenis', code: 'HIS' },
-    { id: 5, name: 'Islamitische ethiek', code: 'ETH' }
-  ];
+  // Query voor vakken uit de database
+  const { data: coursesData = [] } = useQuery({
+    queryKey: ['/api/programs'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/programs');
+      return response || [];
+    },
+  });
+
+  const courses = Array.isArray(coursesData) ? coursesData : (coursesData?.courses || []);
 
   // Gefilterde resultaten
   const searchResults = teachers.filter((teacher: TeacherType) => 
@@ -1027,24 +1029,28 @@ export default function Teachers() {
                 <div className="space-y-3">
                   <p className="text-sm text-gray-600">Selecteer de vakken die deze docent onderwijst</p>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {mockSubjects.map((subject) => (
-                      <div key={subject.id} className="flex items-center space-x-2">
+                    {courses.length > 0 ? courses.map((course: any) => (
+                      <div key={course.id} className="flex items-center space-x-2">
                         <Checkbox
-                          id={`edit-subject-${subject.id}`}
-                          checked={selectedSubjects.includes(subject.name)}
+                          id={`edit-subject-${course.id}`}
+                          checked={selectedSubjects.includes(course.name)}
                           onCheckedChange={(checked) => {
                             if (checked) {
-                              setSelectedSubjects(prev => [...prev, subject.name]);
+                              setSelectedSubjects(prev => [...prev, course.name]);
                             } else {
-                              setSelectedSubjects(prev => prev.filter(s => s !== subject.name));
+                              setSelectedSubjects(prev => prev.filter(s => s !== course.name));
                             }
                           }}
                         />
-                        <Label htmlFor={`edit-subject-${subject.id}`} className="text-sm">
-                          {subject.name}
+                        <Label htmlFor={`edit-subject-${course.id}`} className="text-sm">
+                          {course.name}
                         </Label>
                       </div>
-                    ))}
+                    )) : (
+                      <div className="col-span-full text-center py-4 text-gray-500">
+                        <p className="text-sm">Geen vakken beschikbaar. Voeg eerst vakken toe via de Vakken sectie.</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </SectionContainer>
@@ -1366,7 +1372,7 @@ export default function Teachers() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {selectedTeacher.subjects.map((subjectId, index) => {
-                        const subject = mockSubjects.find(s => s.id.toString() === subjectId);
+                        const subject = courses.find((c: any) => c.id.toString() === subjectId);
                         return (
                           <div key={index} className="flex items-center space-x-2 bg-white p-2 rounded border">
                             <BookOpen className="h-4 w-4 text-blue-600" />
@@ -1780,24 +1786,28 @@ export default function Teachers() {
                       Selecteer de vakken die deze docent kan onderwijzen.
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {mockSubjects.map(subject => (
-                        <div key={subject.id} className="flex items-center space-x-2">
+                      {courses.length > 0 ? courses.map((course: any) => (
+                        <div key={course.id} className="flex items-center space-x-2">
                           <Checkbox 
-                            id={`subject-${subject.id}`}
-                            checked={selectedSubjects.includes(subject.id.toString())}
+                            id={`subject-${course.id}`}
+                            checked={selectedSubjects.includes(course.id.toString())}
                             onCheckedChange={(checked) => {
                               if (checked) {
-                                setSelectedSubjects(prev => [...prev, subject.id.toString()]);
+                                setSelectedSubjects(prev => [...prev, course.id.toString()]);
                               } else {
-                                setSelectedSubjects(prev => prev.filter(id => id !== subject.id.toString()));
+                                setSelectedSubjects(prev => prev.filter(id => id !== course.id.toString()));
                               }
                             }}
                           />
-                          <Label htmlFor={`subject-${subject.id}`} className="text-sm">
-                            {subject.name} ({subject.code})
+                          <Label htmlFor={`subject-${course.id}`} className="text-sm">
+                            {course.name} ({course.code})
                           </Label>
                         </div>
-                      ))}
+                      )) : (
+                        <div className="col-span-full text-center py-4 text-gray-500">
+                          <p className="text-sm">Geen vakken beschikbaar. Voeg eerst vakken toe via de Vakken sectie.</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </SectionContainer>

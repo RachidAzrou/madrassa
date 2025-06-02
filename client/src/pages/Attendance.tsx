@@ -61,7 +61,7 @@ interface TeacherAttendanceRecord {
 export default function Attendance() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedType, setSelectedType] = useState<'vak' | 'klas'>('vak');
+  const [selectedType, setSelectedType] = useState<'klas' | 'examen'>('klas');
   const [selectedCourse, setSelectedCourse] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -102,7 +102,7 @@ export default function Attendance() {
   // Fetch attendance for selected date and course/class
   const { data: attendanceData, isLoading: isLoadingAttendance, refetch: refetchAttendance } = useQuery({
     queryKey: ['/api/attendance/date', selectedDate, selectedType, selectedCourse, selectedClass],
-    enabled: !!selectedDate && ((selectedType === 'vak' && !!selectedCourse) || (selectedType === 'klas' && !!selectedClass)),
+    enabled: !!selectedDate && ((selectedType === 'examen' && !!selectedCourse) || (selectedType === 'klas' && !!selectedClass)),
     staleTime: 0, // Always refetch when parameters change
   });
   
@@ -204,7 +204,7 @@ export default function Attendance() {
 
   const handleCourseChange = (value: string) => {
     setSelectedCourse(value);
-    setSelectedType('vak');
+    setSelectedType('examen');
     setSelectedClass('');
     // Reset attendance records when selection changes
     setStudentAttendance({});
@@ -234,7 +234,7 @@ export default function Attendance() {
         studentId,
         date: selectedDate,
         status: 'present',
-        ...(selectedType === 'vak' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {}),
+        ...(selectedType === 'examen' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {}),
         ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
       }
     }));
@@ -248,7 +248,7 @@ export default function Attendance() {
         studentId,
         date: selectedDate,
         status: 'late',
-        ...(selectedType === 'vak' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {}),
+        ...(selectedType === 'examen' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {}),
         ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
       }
     }));
@@ -262,7 +262,7 @@ export default function Attendance() {
         studentId,
         date: selectedDate,
         status: 'absent',
-        ...(selectedType === 'vak' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {}),
+        ...(selectedType === 'examen' && selectedCourse ? { courseId: parseInt(selectedCourse) } : {}),
         ...(selectedType === 'klas' && selectedClass ? { classId: parseInt(selectedClass) } : {})
       }
     }));

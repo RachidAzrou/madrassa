@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage/index";
 import { db } from "./db";
 import * as schema from "@shared/schema";
+import { students, studentGroups, studentGroupEnrollments } from "@shared/schema";
+import { eq, and } from "drizzle-orm";
 
 // Global storage voor calendar events met een startwaarde
 const globalCalendarEventsStore = new Map();
@@ -109,14 +111,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Haal de query parameters op voor filtering
       const { program, year, status, searchTerm } = req.query;
       
-      // Haal alle studenten op
-      let students = await storage.getStudents();
+      // Haal studenten op met klas-informatie via JOIN
+      const studentsWithClasses = await db
+        .select({
+          id: students.id,
+          studentId: students.studentId,
+          firstName: students.firstName,
+          lastName: students.lastName,
+          email: students.email,
+          phone: students.phone,
+          dateOfBirth: students.dateOfBirth,
+          address: students.address,
+          street: students.street,
+          houseNumber: students.houseNumber,
+          postalCode: students.postalCode,
+          city: students.city,
+          programId: students.programId,
+          yearLevel: students.yearLevel,
+          status: students.status,
+          enrollmentDate: students.enrollmentDate,
+          notes: students.notes,
+          gender: students.gender,
+          photoUrl: students.photoUrl,
+          // Klas-informatie uit de enrollment
+          studentGroup: studentGroups.name,
+          academicYear: studentGroups.academicYear
+        })
+        .from(students)
+        .leftJoin(
+          studentGroupEnrollments,
+          and(
+            eq(studentGroupEnrollments.studentId, students.id),
+            eq(studentGroupEnrollments.status, 'active')
+          )
+        )
+        .leftJoin(studentGroups, eq(studentGroups.id, studentGroupEnrollments.groupId));
+
+      let filteredStudents = studentsWithClasses;
       
       // Filter op programId als het is opgegeven en niet 'all'
       if (program && program !== 'all') {
         const programId = parseInt(program as string);
         if (!isNaN(programId)) {
-          students = students.filter(student => student.programId === programId);
+          filteredStudents = filteredStudents.filter(student => student.programId === programId);
         }
       }
       
@@ -124,14 +161,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (year && year !== 'all') {
         const yearLevel = parseInt(year as string);
         if (!isNaN(yearLevel)) {
-          students = students.filter(student => student.yearLevel === yearLevel);
+          filteredStudents = filteredStudents.filter(student => student.yearLevel === yearLevel);
         }
       }
       
       // Filter op status als het is opgegeven en niet 'all'
       if (status && status !== 'all') {
         const statusLower = (status as string).toLowerCase();
-        students = students.filter(student => {
+        filteredStudents = filteredStudents.filter(student => {
           const studentStatus = student.status?.toLowerCase() || '';
           
           // Controleer zowel Engels als Nederlands (voor backwards compatibiliteit)
@@ -150,7 +187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Filter op zoekterm als die is opgegeven
       if (searchTerm) {
         const term = (searchTerm as string).toLowerCase();
-        students = students.filter(student => 
+        filteredStudents = filteredStudents.filter(student => 
           (student.firstName?.toLowerCase() || '').includes(term) || 
           (student.lastName?.toLowerCase() || '').includes(term) || 
           (student.email?.toLowerCase() || '').includes(term) ||
@@ -158,7 +195,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         );
       }
       
-      res.json(students);
+      res.json(filteredStudents);
     } catch (error) {
       console.error("Error fetching students:", error);
       res.status(500).json({ message: "Error fetching students" });

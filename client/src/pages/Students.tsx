@@ -459,10 +459,12 @@ export default function Students() {
   // Functie om edit form select te hanteren
   const handleEditSelectChange = (name, value) => {
     if (name === 'studentGroup') {
-      // Als klas wordt gewijzigd, sla ook de klasnaam op voor weergave in tabel
+      // Als klas wordt gewijzigd, zoek het groep ID en sla de klasnaam op
+      const selectedGroup = studentGroupsData?.find(group => group.name === value);
       setEditFormData(prev => ({ 
         ...prev, 
         [name]: value,
+        studentGroupId: selectedGroup ? selectedGroup.id.toString() : '', // Sla groep ID op
         studentGroupName: value // Zorg dat klasnaam wordt opgeslagen voor tabelweergave
       }));
     } else {

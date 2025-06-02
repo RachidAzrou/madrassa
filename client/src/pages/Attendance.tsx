@@ -794,7 +794,7 @@ export default function Attendance() {
                           size="sm" 
                           onClick={markAllTeachersPresent} 
                           className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100 hover:text-green-800 flex-1 font-medium"
-                          disabled={!teachersData || !Array.isArray(teachersData) || teachersData.length === 0}
+                          disabled={isLoadingTeachers}
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Allen aanwezig
@@ -804,7 +804,7 @@ export default function Attendance() {
                           size="sm" 
                           onClick={markAllTeachersAbsent} 
                           className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:text-red-800 flex-1 font-medium"
-                          disabled={!teachersData || !Array.isArray(teachersData) || teachersData.length === 0}
+                          disabled={isLoadingTeachers}
                         >
                           <XCircle className="h-4 w-4 mr-2" />
                           Allen afwezig
@@ -814,7 +814,7 @@ export default function Attendance() {
                           size="sm" 
                           onClick={markAllTeachersLate}
                           className="bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 hover:text-amber-800 flex-1 font-medium"
-                          disabled={!teachersData || !Array.isArray(teachersData) || teachersData.length === 0}
+                          disabled={isLoadingTeachers}
                         >
                           <Clock className="h-4 w-4 mr-2" />
                           Allen te laat

@@ -1,5 +1,6 @@
 import { ChevronRight, LucideIcon } from "lucide-react";
 import { createElement } from "react";
+import { useLocation } from "wouter";
 
 interface PremiumHeaderProps {
   title: string;
@@ -13,6 +14,8 @@ interface PremiumHeaderProps {
 }
 
 export function PremiumHeader({ title, icon, description, breadcrumbs, path }: PremiumHeaderProps) {
+  const [location] = useLocation();
+  
   // We gebruiken createElement om het Lucide icoon correct te instantiëren
   const IconComponent = createElement(icon, {
     className: "h-5 w-5 text-white"
@@ -41,19 +44,19 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
               {effectiveBreadcrumbs.parent && (
                 <>
                   <span className="mr-1">{
-                    path === '/student-groups' ? 'Onderwijs' :
-                    path === '/programs' ? 'Onderwijs' :
-                    path === '/calendar' ? 'Onderwijs' :
-                    path === '/courses' ? 'Onderwijs' :
-                    path === '/scheduling' ? 'Onderwijs' :
-                    path === '/students' ? 'Beheer' :
-                    path === '/guardians' ? 'Beheer' :
-                    path === '/teachers' ? 'Beheer' :
-                    path === '/attendance' ? 'Evaluatie' :
-                    path === '/grading' ? 'Evaluatie' :
-                    path === '/reports' ? 'Evaluatie' :
-                    path === '/fees' ? 'Evaluatie' :
-                    path === '/student-dossier' ? 'Evaluatie' :
+                    location === '/student-groups' ? 'Onderwijs' :
+                    location === '/programs' ? 'Onderwijs' :
+                    location === '/calendar' ? 'Onderwijs' :
+                    location === '/courses' ? 'Onderwijs' :
+                    location === '/scheduling' ? 'Onderwijs' :
+                    location === '/students' ? 'Beheer' :
+                    location === '/guardians' ? 'Beheer' :
+                    location === '/teachers' ? 'Beheer' :
+                    location === '/attendance' ? 'Evaluatie' :
+                    location === '/grading' ? 'Evaluatie' :
+                    location === '/reports' ? 'Evaluatie' :
+                    location === '/fees' ? 'Evaluatie' :
+                    location === '/student-dossier' ? 'Evaluatie' :
                     effectiveBreadcrumbs.parent
                   }</span>
                   <ChevronRight className="h-3 w-3 mx-0.5" />

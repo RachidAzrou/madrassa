@@ -529,24 +529,45 @@ export default function Students() {
       if (newStudentGuardians.length > 0) {
         try {
           for (const guardian of newStudentGuardians) {
-            // Controleer of de voogd al bestaat
-            const existingGuardian = await apiRequest(`/api/guardians/email/${encodeURIComponent(guardian.email || 'no-email')}`, {
-              method: 'GET'
-            }).catch(() => null);
-            
+            // Controleer of de voogd al bestaat (alleen als email beschikbaar is)
             let guardianId;
-            if (existingGuardian) {
+            let existingGuardian = null;
+            
+            if (guardian.email) {
+              try {
+                existingGuardian = await apiRequest(`/api/guardians/email/${encodeURIComponent(guardian.email)}`, {
+                  method: 'GET'
+                });
+              } catch (error) {
+                // Voogd bestaat niet, we maken een nieuwe aan
+                existingGuardian = null;
+              }
+            }
+            
+            if (existingGuardian && existingGuardian.id) {
               guardianId = existingGuardian.id;
+              console.log('Bestaande voogd gevonden:', guardianId);
             } else {
               // Maak nieuwe voogd aan
               const newGuardian = await apiRequest('/api/guardians', {
                 method: 'POST',
-                body: guardian
+                body: {
+                  firstName: guardian.firstName,
+                  lastName: guardian.lastName,
+                  email: guardian.email || null,
+                  phone: guardian.phone || null,
+                  relationship: guardian.relationship || 'parent',
+                  isEmergencyContact: guardian.isEmergencyContact || false,
+                  emergencyContactName: guardian.emergencyContactName || null,
+                  emergencyContactPhone: guardian.emergencyContactPhone || null,
+                  emergencyContactRelation: guardian.emergencyContactRelation || null
+                }
               });
               guardianId = newGuardian.id;
+              console.log('Nieuwe voogd aangemaakt:', guardianId);
             }
             
-            // Koppel voogd aan student
+            // Koppel voogd aan student (controleer eerst of relatie al bestaat)
             await apiRequest('/api/student-guardians', {
               method: 'POST',
               body: {
@@ -555,10 +576,11 @@ export default function Students() {
                 relationship: guardian.relationship || 'parent'
               }
             });
+            console.log('Voogd gekoppeld aan student:', { studentId: selectedStudent.id, guardianId, relationship: guardian.relationship });
           }
-          console.log('Voogden toegevoegd');
+          console.log('Alle voogden succesvol toegevoegd');
         } catch (guardianError) {
-          console.warn('Voogden konden niet worden toegevoegd:', guardianError);
+          console.error('Voogden konden niet worden toegevoegd:', guardianError);
         }
       }
       

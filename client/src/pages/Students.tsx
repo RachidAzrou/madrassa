@@ -500,7 +500,12 @@ export default function Students() {
         try {
           const groupId = parseInt(editFormData.studentGroupId);
           
-          // Maak een nieuwe enrollment aan of update bestaande
+          // Eerst alle bestaande actieve enrollments voor deze student deactiveren
+          await apiRequest(`/api/students/${selectedStudent.id}/enrollments/deactivate-all`, {
+            method: 'PUT'
+          });
+          
+          // Dan een nieuwe actieve enrollment aanmaken
           await apiRequest('/api/student-group-enrollments', {
             method: 'POST',
             body: {

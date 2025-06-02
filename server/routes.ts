@@ -2463,6 +2463,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Deactiveer alle actieve enrollments voor een student
+  apiRouter.put("/api/students/:studentId/enrollments/deactivate-all", async (req, res) => {
+    try {
+      const studentId = parseInt(req.params.studentId);
+      if (isNaN(studentId)) {
+        return res.status(400).json({ message: "Invalid student ID format" });
+      }
+      
+      // Update alle actieve enrollments naar inactive
+      await db
+        .update(studentGroupEnrollments)
+        .set({ status: 'inactive' })
+        .where(
+          and(
+            eq(studentGroupEnrollments.studentId, studentId),
+            eq(studentGroupEnrollments.status, 'active')
+          )
+        );
+      
+      res.json({ message: "All active enrollments deactivated successfully" });
+    } catch (error) {
+      console.error("Error deactivating enrollments:", error);
+      res.status(500).json({ message: "Error deactivating student enrollments" });
+    }
+  });
+
   apiRouter.post("/api/student-group-enrollments", async (req, res) => {
     try {
       const validatedData = insertStudentGroupEnrollmentSchema.parse(req.body);

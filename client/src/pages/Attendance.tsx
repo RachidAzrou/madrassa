@@ -463,7 +463,7 @@ export default function Attendance() {
         {/* Filters */}
         <div className="flex items-center gap-3">
           <Select value={selectedType} onValueChange={(value) => setSelectedType(value as 'vak' | 'klas')}>
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-[120px] bg-blue-50 border-blue-200 text-blue-900 hover:bg-blue-100 focus:border-blue-300">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -484,7 +484,7 @@ export default function Attendance() {
 
           {selectedType === 'vak' ? (
             <Select value={selectedCourse} onValueChange={handleCourseChange}>
-              <SelectTrigger className="w-[240px]">
+              <SelectTrigger className="w-[240px] bg-blue-50 border-blue-200 text-blue-900 hover:bg-blue-100 focus:border-blue-300">
                 <SelectValue placeholder="Selecteer vak" />
               </SelectTrigger>
               <SelectContent>
@@ -508,7 +508,7 @@ export default function Attendance() {
             </Select>
           ) : (
             <Select value={selectedClass} onValueChange={handleClassChange}>
-              <SelectTrigger className="w-[240px]">
+              <SelectTrigger className="w-[240px] bg-blue-50 border-blue-200 text-blue-900 hover:bg-blue-100 focus:border-blue-300">
                 <SelectValue placeholder="Selecteer klas" />
               </SelectTrigger>
               <SelectContent>

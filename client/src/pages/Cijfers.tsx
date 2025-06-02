@@ -60,7 +60,13 @@ export default function Cijfers() {
 
   // Data fetching for assessments
   const { data: assessmentsData = [] } = useQuery({ 
-    queryKey: ['/api/assessments', selectedSubject?.id], 
+    queryKey: ['/api/assessments', selectedSubject?.id],
+    queryFn: () => {
+      const url = selectedSubject?.id 
+        ? `/api/assessments?courseId=${selectedSubject.id}`
+        : '/api/assessments';
+      return fetch(url).then(res => res.json());
+    },
     enabled: !!selectedSubject
   });
 

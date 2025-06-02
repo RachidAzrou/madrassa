@@ -1397,11 +1397,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ********************
   // Assessment API endpoints
   // ********************
-  apiRouter.get("/api/assessments", async (_req, res) => {
+  apiRouter.get("/api/assessments", async (req, res) => {
     try {
-      // Return empty assessments for now - will be populated when assessment system is implemented
-      res.json([]);
+      const courseId = req.query.courseId ? parseInt(req.query.courseId as string) : null;
+      
+      let allAssessments;
+      
+      if (courseId) {
+        allAssessments = await db.select().from(assessments).where(eq(assessments.courseId, courseId));
+      } else {
+        allAssessments = await db.select().from(assessments);
+      }
+      
+      res.json(allAssessments);
     } catch (error) {
+      console.error('Error fetching assessments:', error);
       res.status(500).json({ message: "Error fetching assessments" });
     }
   });

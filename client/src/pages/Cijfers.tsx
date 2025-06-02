@@ -47,7 +47,11 @@ const SubjectGradeAverage = ({ subjectId }: { subjectId: number }) => {
     ? (() => {
         const totalScore = subjectGrades.reduce((sum: number, grade: any) => {
           const percentage = (grade.score / grade.maxScore) * 100;
-          return sum + Math.round(percentage / 10);
+          // Nederlandse cijferschaal: 1-10, waarbij 55% = cijfer 5.5
+          const dutchGrade = percentage < 55 
+            ? 1 + (percentage / 55) * 4.5  // 0-55% wordt 1-5.5
+            : 5.5 + ((percentage - 55) / 45) * 4.5;  // 55-100% wordt 5.5-10
+          return sum + dutchGrade;
         }, 0);
         return (totalScore / subjectGrades.length).toFixed(1);
       })()

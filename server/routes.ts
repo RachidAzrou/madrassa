@@ -4263,8 +4263,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const siblings = await storage.getStudentSiblings(studentId);
       res.json(siblings);
     } catch (error) {
-      console.error("Error fetching student siblings:", error);
-      res.status(500).json({ error: "Failed to fetch student siblings" });
+      console.error("Error getting student siblings:", error);
+      res.status(500).json({ error: "Failed to get student siblings" });
     }
   });
 

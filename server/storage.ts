@@ -9,7 +9,8 @@ import {
   tuitionRates, type TuitionRate, type InsertTuitionRate,
   students, teachers, guardians, studentGuardians, studentSiblings, type StudentSibling, type InsertStudentSibling,
   studentGroupEnrollments,
-  grades, type Grade, type InsertGrade
+  grades, type Grade, type InsertGrade,
+  assessments, type Assessment, type InsertAssessment
 } from "@shared/schema";
 import { db } from "./db";
 import { and, eq, sql, count, desc, inArray } from "drizzle-orm";

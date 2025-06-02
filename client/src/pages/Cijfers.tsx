@@ -584,13 +584,13 @@ export default function Cijfers() {
                               {subjects.map((subject) => (
                                 <TableCell key={subject.id}>
                                   {editGrade && editGrade.studentId === student.id && editGrade.subject === subject.name ? (
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex flex-col items-center gap-2 p-2">
                                       <Input
                                         type="number"
                                         min="1"
                                         max="10"
                                         step="0.1"
-                                        className="w-16 h-8 text-sm"
+                                        className="w-20 h-10 text-center text-lg font-semibold border-2 border-blue-300 focus:border-blue-500 rounded-md"
                                         defaultValue={editGrade.grade?.toString() || ''}
                                         onChange={(e) => {
                                           const value = parseFloat(e.target.value);
@@ -606,28 +606,45 @@ export default function Cijfers() {
                                             handleCancelEditGrade();
                                           }
                                         }}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') {
+                                            const value = parseFloat(e.currentTarget.value);
+                                            if (!isNaN(value) && value >= 1 && value <= 10) {
+                                              handleSaveGrade(value);
+                                            } else {
+                                              handleCancelEditGrade();
+                                            }
+                                          } else if (e.key === 'Escape') {
+                                            handleCancelEditGrade();
+                                          }
+                                        }}
                                         autoFocus
                                       />
+                                      <div className="text-xs text-gray-500 text-center">
+                                        Enter = opslaan<br/>Esc = annuleren
+                                      </div>
                                     </div>
                                   ) : (
                                     <div 
-                                      className="cursor-pointer hover:bg-gray-50 p-1 rounded flex items-center"
+                                      className="cursor-pointer hover:bg-blue-50 p-2 rounded-md transition-all duration-200 border border-transparent hover:border-blue-200 flex items-center justify-center min-h-[40px]"
                                       onClick={() => handleEditGrade(
                                         student.id, 
                                         subject.name, 
                                         subjectGrades[student.id]?.[subject.name] || null
                                       )}
                                     >
-                                      <span className={`
-                                        ${subjectGrades[student.id]?.[subject.name] ? 
-                                          subjectGrades[student.id][subject.name] >= 5.5 ? 'text-green-600' : 'text-red-600' 
-                                          : 'text-gray-400'
-                                        }
-                                        font-medium
-                                      `}>
-                                        {subjectGrades[student.id]?.[subject.name]?.toFixed(1) || '-'}
-                                      </span>
-                                      <Edit className="h-3 w-3 ml-1.5 text-gray-400" />
+                                      <div className="flex flex-col items-center gap-1">
+                                        <span className={`
+                                          ${subjectGrades[student.id]?.[subject.name] ? 
+                                            subjectGrades[student.id][subject.name] >= 5.5 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold' 
+                                            : 'text-gray-400 font-medium'
+                                          }
+                                          text-lg
+                                        `}>
+                                          {subjectGrades[student.id]?.[subject.name]?.toFixed(1) || '-'}
+                                        </span>
+                                        <Edit className="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                      </div>
                                     </div>
                                   )}
                                 </TableCell>

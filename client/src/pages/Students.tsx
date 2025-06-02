@@ -120,20 +120,19 @@ export default function Students() {
   
   const [formData, setFormData] = useState(emptyFormData);
   const [editFormData, setEditFormData] = useState(emptyFormData);
-  // Gebruik alleen database data via React Query
-  const [students, setStudents] = useState([]);
+  // Studenten data komt nu alleen uit de database via React Query
 
   // Functie om de volgende beschikbare student ID te genereren op basis van schooljaar
-  const generateNextStudentId = () => {
+  const generateNextStudentId = (studentsData = []) => {
     // Haal het huidige jaar op en maak suffix (bijv. 2025 -> 25)
     const currentYear = new Date().getFullYear();
     const yearSuffix = currentYear.toString().slice(-2); // Laatste 2 cijfers van het jaar
     const prefix = `ST${yearSuffix}`;
     
-    if (students.length === 0) return `${prefix}001`;
+    if (studentsData.length === 0) return `${prefix}001`;
     
     // Haal alle bestaande student ID's op voor het huidige jaar
-    const existingIds = students
+    const existingIds = studentsData
       .map(student => student.studentId)
       .filter(id => id && id.startsWith(prefix))
       .map(id => parseInt(id.substring(prefix.length)))
@@ -206,13 +205,7 @@ export default function Students() {
   // State om ontbrekende velden bij te houden
   const [missingRequiredFields, setMissingRequiredFields] = useState([]);
   
-  // Effect om studenten te synchroniseren met localStorage wanneer ze veranderen
-  useEffect(() => {
-    if (students.length > 0) {
-      // Data wordt nu opgeslagen via API calls naar de database
-      console.log('Studenten opgeslagen in localStorage:', students.length);
-    }
-  }, [students]);
+  // Data wordt nu alleen opgehaald uit de database via React Query
   
   const handleCreateStudent = async (e) => {
     e.preventDefault();
@@ -418,7 +411,7 @@ export default function Students() {
       if (!selectedStudent) return;
 
       // Update lokale state
-      const updatedStudents = students.map(student => 
+      const updatedStudents = studentsData.map(student => 
         student.id === selectedStudent.id 
           ? { 
               ...student, 
@@ -428,11 +421,7 @@ export default function Students() {
             }
           : student
       );
-      setStudents(updatedStudents);
-      
-      // Update localStorage
-      localStorage.setItem('students', JSON.stringify(updatedStudents));
-      console.log('Student geüpdatet in localStorage:', updatedStudents.length);
+      // Data wordt automatisch bijgewerkt via React Query invalidation
       
       toast({
         title: "Succes",
@@ -744,10 +733,10 @@ export default function Students() {
               <TableRow>
                 <ShadcnTableHead className="px-4 py-3 w-[40px] text-center">
                   <Checkbox 
-                    checked={students.length > 0 && selectedStudents.length === students.length}
+                    checked={studentsData.length > 0 && selectedStudents.length === studentsData.length}
                     onCheckedChange={(checked) => {
                       if (checked) {
-                        setSelectedStudents(students.map(s => s.id));
+                        setSelectedStudents(studentsData.map(s => s.id));
                       } else {
                         setSelectedStudents([]);
                       }

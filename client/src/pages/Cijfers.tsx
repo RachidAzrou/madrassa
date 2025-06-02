@@ -304,10 +304,13 @@ export default function Cijfers() {
         },
         body: JSON.stringify({
           studentId: parseInt(studentId),
-          programId: program.id,
-          grade: newGrade,
-          date: new Date().toISOString().split('T')[0],
-          semester: 'current'
+          courseId: program.id, // Use courseId as expected by the schema
+          assessmentType: 'regular',
+          assessmentName: 'Cijfer',
+          score: Math.round(newGrade * 10), // Convert 7.5 to 75
+          maxScore: 100,
+          weight: 100,
+          date: new Date().toISOString().split('T')[0]
         }),
       });
 

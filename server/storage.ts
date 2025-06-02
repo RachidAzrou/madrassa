@@ -845,6 +845,94 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  // Attendance operations
+  async getAttendanceByDate(date: Date): Promise<any[]> {
+    try {
+      const dateString = date.toISOString().split('T')[0];
+      const attendanceData = await db.select().from(attendance).where(eq(attendance.date, dateString));
+      return attendanceData;
+    } catch (error) {
+      console.error('Error getting attendance by date:', error);
+      return [];
+    }
+  }
+
+  async getAttendanceByClassAndDate(classId: number, date: Date): Promise<any[]> {
+    try {
+      const dateString = date.toISOString().split('T')[0];
+      const attendanceData = await db.select().from(attendance)
+        .where(and(eq(attendance.courseId, classId), eq(attendance.date, dateString)));
+      return attendanceData;
+    } catch (error) {
+      console.error('Error getting attendance by class and date:', error);
+      return [];
+    }
+  }
+
+  async getAttendanceByStudent(studentId: number): Promise<any[]> {
+    try {
+      const attendanceData = await db.select().from(attendance).where(eq(attendance.studentId, studentId));
+      return attendanceData;
+    } catch (error) {
+      console.error('Error getting attendance by student:', error);
+      return [];
+    }
+  }
+
+  async getAttendanceByCourse(courseId: number): Promise<any[]> {
+    try {
+      const attendanceData = await db.select().from(attendance).where(eq(attendance.courseId, courseId));
+      return attendanceData;
+    } catch (error) {
+      console.error('Error getting attendance by course:', error);
+      return [];
+    }
+  }
+
+  async getTeacherAttendanceByDate(date: Date): Promise<any[]> {
+    try {
+      const dateString = date.toISOString().split('T')[0];
+      const attendanceData = await db.select().from(teacherAttendance).where(eq(teacherAttendance.date, dateString));
+      return attendanceData;
+    } catch (error) {
+      console.error('Error getting teacher attendance by date:', error);
+      return [];
+    }
+  }
+
+  async getTeacherAttendanceByCourse(courseId: number): Promise<any[]> {
+    try {
+      const attendanceData = await db.select().from(teacherAttendance).where(eq(teacherAttendance.classId, courseId));
+      return attendanceData;
+    } catch (error) {
+      console.error('Error getting teacher attendance by course:', error);
+      return [];
+    }
+  }
+
+  async createAttendance(attendanceData: any): Promise<any> {
+    try {
+      const [newAttendance] = await db.insert(attendance).values(attendanceData).returning();
+      return newAttendance;
+    } catch (error) {
+      console.error('Error creating attendance:', error);
+      throw error;
+    }
+  }
+
+  async updateAttendance(id: number, attendanceData: any): Promise<any> {
+    try {
+      const [updatedAttendance] = await db.update(attendance)
+        .set(attendanceData)
+        .where(eq(attendance.id, id))
+        .returning();
+      return updatedAttendance;
+    } catch (error) {
+      console.error('Error updating attendance:', error);
+      throw error;
+    }
+  }
+
   // Student operations
   async getStudents(): Promise<any[]> {
     try {

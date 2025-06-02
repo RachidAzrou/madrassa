@@ -4877,6 +4877,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Batch save attendance records
+  apiRouter.post("/api/attendance/batch", async (req, res) => {
+    try {
+      const attendanceRecords = req.body;
+      
+      if (!Array.isArray(attendanceRecords)) {
+        return res.status(400).json({ message: "Attendance records must be an array" });
+      }
+      
+      const savedRecords = [];
+      
+      for (const record of attendanceRecords) {
+        // Check if attendance record already exists for this student, course and date
+        const existingRecords = await storage.getAttendanceByDate(new Date(record.date));
+        const existingRecord = existingRecords.find(r => 
+          r.studentId === record.studentId && 
+          r.courseId === record.courseId && 
+          r.date === record.date
+        );
+        
+        if (existingRecord) {
+          // Update existing record
+          const updatedRecord = await storage.updateAttendance(existingRecord.id, {
+            status: record.status,
+            teacherId: record.teacherId
+          });
+          savedRecords.push(updatedRecord);
+        } else {
+          // Create new record
+          const newRecord = await storage.createAttendance({
+            studentId: record.studentId,
+            courseId: record.courseId,
+            teacherId: record.teacherId,
+            date: record.date,
+            status: record.status
+          });
+          savedRecords.push(newRecord);
+        }
+      }
+      
+      res.json({ success: true, saved: savedRecords.length });
+    } catch (error) {
+      console.error("Error saving batch attendance:", error);
+      res.status(500).json({ message: "Error saving attendance records" });
+    }
+  });
+
   // Get students by class ID
   app.get("/api/students/class/:classId", async (req: Request, res: Response) => {
     try {

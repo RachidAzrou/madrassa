@@ -1921,15 +1921,24 @@ export default function Students() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="edit-academicYear" className="text-xs font-medium text-gray-700">Schooljaar *</Label>
-                  <Input
-                    id="edit-academicYear"
-                    name="academicYear"
-                    value={editFormData.academicYear}
-                    onChange={handleEditInputChange}
-                    placeholder="2024-2025"
-                    className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('academicYear') ? 'border-red-500 bg-red-50' : ''}`}
-                    required
-                  />
+                  <Select 
+                    value={editFormData.academicYear || ''} 
+                    onValueChange={(value) => handleEditSelectChange('academicYear', value)}
+                  >
+                    <SelectTrigger 
+                      id="edit-academicYear"
+                      className={`mt-1 h-9 w-full border-[#e5e7eb] bg-white ${missingRequiredFields.includes('academicYear') ? 'border-red-500 bg-red-50' : ''}`}
+                    >
+                      <SelectValue placeholder="Selecteer schooljaar" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border-[#e5e7eb]">
+                      <SelectItem value="2023-2024">2023-2024</SelectItem>
+                      <SelectItem value="2024-2025">2024-2025</SelectItem>
+                      <SelectItem value="2025-2026">2025-2026</SelectItem>
+                      <SelectItem value="2026-2027">2026-2027</SelectItem>
+                      <SelectItem value="2027-2028">2027-2028</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div>

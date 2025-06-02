@@ -69,7 +69,28 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
                   <ChevronRight className="h-3 w-3 mx-0.5" />
                 </>
               )}
-              <span>{effectiveBreadcrumbs.current}</span>
+              <span>{
+                // Map current page names to Dutch labels
+                (() => {
+                  if (!path) return effectiveBreadcrumbs.current;
+                  
+                  if (path.startsWith('/student-groups')) return 'Klassen';
+                  if (path.startsWith('/programs')) return 'Vakken';
+                  if (path.startsWith('/calendar')) return 'Rooster';
+                  if (path.startsWith('/courses')) return 'Curriculum';
+                  if (path.startsWith('/scheduling')) return 'Planning';
+                  if (path.startsWith('/students')) return 'Studenten';
+                  if (path.startsWith('/guardians')) return 'Voogden';
+                  if (path.startsWith('/teachers')) return 'Docenten';
+                  if (path.startsWith('/attendance')) return 'Aanwezigheid';
+                  if (path.startsWith('/grading')) return 'Cijfers';
+                  if (path.startsWith('/reports')) return 'Rapport';
+                  if (path.startsWith('/fees')) return 'Betalingsbeheer';
+                  if (path.startsWith('/student-dossier')) return 'Leerlingendossier';
+                  
+                  return effectiveBreadcrumbs.current;
+                })()
+              }</span>
             </div>
           )}
         </div>

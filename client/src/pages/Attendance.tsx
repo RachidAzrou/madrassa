@@ -54,7 +54,7 @@ interface TeacherAttendanceRecord {
   id?: number;
   teacherId: number;
   date: string;
-  status: 'present' | 'absent';
+  status: 'present' | 'absent' | 'late';
   courseId?: number | null;
   notes?: string;
 }
@@ -298,6 +298,19 @@ export default function Attendance() {
     }));
   };
   
+  // Mark teacher late
+  const markTeacherLate = (teacherId: number) => {
+    setTeacherAttendance(prev => ({
+      ...prev,
+      [teacherId]: {
+        teacherId,
+        date: selectedDate,
+        status: 'late',
+        ...(selectedClass ? { classId: parseInt(selectedClass) } : {})
+      }
+    }));
+  };
+  
   // Mark teacher absent
   const markTeacherAbsent = (teacherId: number) => {
     setTeacherAttendance(prev => ({
@@ -404,6 +417,24 @@ export default function Attendance() {
     setTeacherAttendance(newAttendance);
   };
   
+  // Mark all teachers late
+  const markAllTeachersLate = () => {
+    const newAttendance: Record<number, TeacherAttendanceRecord> = {};
+    
+    if (teachersData && Array.isArray(teachersData)) {
+      teachersData.forEach((teacher: Teacher) => {
+        newAttendance[teacher.id] = {
+          teacherId: teacher.id,
+          date: selectedDate,
+          status: 'late',
+          ...(selectedClass ? { classId: parseInt(selectedClass) } : {})
+        };
+      });
+    }
+    
+    setTeacherAttendance(newAttendance);
+  };
+  
   // Handle save button click
   const handleSave = () => {
     // Format student attendance records for API
@@ -437,18 +468,22 @@ export default function Attendance() {
   };
   
   // Helper to determine button styling based on teacher attendance status
-  const getTeacherButtonStyle = (teacherId: number, status: 'present' | 'absent') => {
+  const getTeacherButtonStyle = (teacherId: number, status: 'present' | 'absent' | 'late') => {
     const record = teacherAttendance[teacherId];
     if (!record) return {};
     
     if (record.status === status) {
       return status === 'present'
         ? { className: "bg-green-600 hover:bg-green-700 text-white" }
+        : status === 'late'
+        ? { className: "bg-amber-600 hover:bg-amber-700 text-white border-amber-600" }
         : { className: "bg-red-600 hover:bg-red-700 text-white border-red-600" };
     }
     
     return status === 'present'
       ? { className: "border-green-600 text-green-600 hover:bg-green-50" }
+      : status === 'late'
+      ? { className: "border-amber-600 text-amber-600 hover:bg-amber-50" }
       : { className: "border-red-600 text-red-600 hover:bg-red-50" };
   };
 
@@ -774,6 +809,16 @@ export default function Attendance() {
                           <XCircle className="h-4 w-4 mr-2" />
                           Allen afwezig
                         </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={markAllTeachersLate}
+                          className="bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 hover:text-amber-800 flex-1 font-medium"
+                          disabled={!teachersData || !Array.isArray(teachersData) || teachersData.length === 0}
+                        >
+                          <Clock className="h-4 w-4 mr-2" />
+                          Allen te laat
+                        </Button>
                       </div>
                     </div>
                     
@@ -801,9 +846,11 @@ export default function Attendance() {
                               const status = teacherAttendance[teacher.id]?.status;
                               const statusBadge = status === 'present' 
                                 ? <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"><CheckCircle className="h-3.5 w-3.5 mr-1" /> Aanwezig</span>
-                                : status === 'absent'
-                                  ? <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"><XCircle className="h-3.5 w-3.5 mr-1" /> Afwezig</span>
-                                  : <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Niet ingevuld</span>;
+                                : status === 'late'
+                                  ? <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800"><Clock className="h-3.5 w-3.5 mr-1" /> Te laat</span>
+                                  : status === 'absent'
+                                    ? <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"><XCircle className="h-3.5 w-3.5 mr-1" /> Afwezig</span>
+                                    : <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Niet ingevuld</span>;
                               
                               return (
                                 <TableRow key={teacher.id} className="hover:bg-gray-50">
@@ -832,6 +879,15 @@ export default function Attendance() {
                                         className="px-3"
                                       >
                                         <CheckCircle className="h-4 w-4" />
+                                      </Button>
+                                      <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        {...getTeacherButtonStyle(teacher.id, 'late')}
+                                        onClick={() => markTeacherLate(teacher.id)}
+                                        className="px-3"
+                                      >
+                                        <Clock className="h-4 w-4" />
                                       </Button>
                                       <Button 
                                         variant="outline" 

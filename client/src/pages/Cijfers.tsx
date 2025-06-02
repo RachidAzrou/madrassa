@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Download, Save, Plus, X, Edit, Trash2, AlertCircle, Percent, XCircle, User, BookOpen, Calculator, CheckCircle, Star } from 'lucide-react';
+import { Search, Download, Save, Plus, X, Edit, Trash2, AlertCircle, Percent, XCircle, User, BookOpen, Calculator, CheckCircle, Star, ClipboardList, FileText, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -48,6 +48,7 @@ export default function Cijfers() {
   
   const [activeTab, setActiveTab] = useState('grades'); // 'grades' of 'behavior'
   const [selectedClass, setSelectedClass] = useState(''); 
+  const [selectedSubject, setSelectedSubject] = useState('');
   const [studentFilter, setStudentFilter] = useState('');
   
   // Voor cijfers
@@ -523,6 +524,7 @@ export default function Cijfers() {
                       }
                       
                       setSelectedClass(value);
+                      setSelectedSubject(''); // Reset vak selectie
                       // Reset de staat bij het veranderen van klas
                       setSubjectGrades({});
                       setBehaviorScores({});
@@ -544,6 +546,31 @@ export default function Cijfers() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {selectedClass && activeTab === 'grades' && (
+                  <div className="w-full md:w-64">
+                    <Select
+                      value={selectedSubject}
+                      onValueChange={(value) => {
+                        setSelectedSubject(value);
+                        // Reset de cijfers bij het veranderen van vak
+                        setSubjectGrades({});
+                        setIsGradesModified(false);
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecteer een vak" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subjects.map((subject) => (
+                          <SelectItem key={subject.id} value={subject.name}>
+                            {subject.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
   
                 {selectedClass && (
                   <div className="flex-1">
@@ -642,7 +669,13 @@ export default function Cijfers() {
                     </div>
                   </div>
   
-                  {isLoadingStudents || isLoadingGrades ? (
+                  {!selectedSubject ? (
+                    <div className="p-8 text-center text-gray-500">
+                      <BookOpen className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+                      <h3 className="text-lg font-medium mb-2">Selecteer een vak</h3>
+                      <p>Kies een vak om de beoordelingen en cijfers te bekijken</p>
+                    </div>
+                  ) : isLoadingStudents || isLoadingGrades ? (
                     <div className="p-8 flex justify-center">
                       <div className="animate-spin h-8 w-8 border-4 border-[#1e3a8a] border-t-transparent rounded-full"></div>
                     </div>
@@ -657,15 +690,28 @@ export default function Cijfers() {
                                 Student
                               </div>
                             </TableHead>
-                            {subjects.map((subject) => (
-                              <TableHead key={subject.id} className="text-center font-semibold text-gray-700 py-4">
-                                <div className="flex flex-col items-center gap-1">
-                                  <BookOpen className="h-4 w-4 text-blue-600" />
-                                  <span>{subject.name}</span>
-                                  <span className="text-xs text-gray-500 font-normal">{subject.code}</span>
-                                </div>
-                              </TableHead>
-                            ))}
+                            {/* Hier komen de beoordelingen voor het geselecteerde vak */}
+                            <TableHead className="text-center font-semibold text-gray-700 py-4">
+                              <div className="flex flex-col items-center gap-1">
+                                <ClipboardList className="h-4 w-4 text-green-600" />
+                                <span>Test 1</span>
+                                <span className="text-xs text-gray-500 font-normal">40% - 100 ptn</span>
+                              </div>
+                            </TableHead>
+                            <TableHead className="text-center font-semibold text-gray-700 py-4">
+                              <div className="flex flex-col items-center gap-1">
+                                <FileText className="h-4 w-4 text-blue-600" />
+                                <span>Huiswerk 1</span>
+                                <span className="text-xs text-gray-500 font-normal">20% - 50 ptn</span>
+                              </div>
+                            </TableHead>
+                            <TableHead className="text-center font-semibold text-gray-700 py-4">
+                              <div className="flex flex-col items-center gap-1">
+                                <Award className="h-4 w-4 text-purple-600" />
+                                <span>Examen</span>
+                                <span className="text-xs text-gray-500 font-normal">60% - 200 ptn</span>
+                              </div>
+                            </TableHead>
                             <TableHead className="text-right font-semibold text-gray-700 py-4">
                               <div className="flex items-center justify-end gap-2">
                                 <Calculator className="h-4 w-4" />
@@ -691,54 +737,66 @@ export default function Cijfers() {
                                 </div>
                               </TableCell>
                               
-                              {subjects.map((subject) => (
-                                <TableCell key={subject.id}>
-                                  <div className="flex flex-col items-center gap-2 p-2">
-                                    <Input
-                                      type="number"
-                                      min="0"
-                                      max="100"
-                                      step="1"
-                                      placeholder="0-100"
-                                      className="w-16 h-8 text-center text-sm font-medium border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                      value={subjectGrades[student.id]?.[subject.name]?.toString() || ''}
-                                      onChange={(e) => {
-                                        const value = e.target.value;
-                                        const updatedGrades = { ...subjectGrades };
-                                        if (!updatedGrades[student.id]) {
-                                          updatedGrades[student.id] = {};
-                                        }
-                                        
-                                        if (value === '') {
-                                          delete updatedGrades[student.id][subject.name];
-                                        } else {
-                                          const numValue = parseFloat(value);
-                                          if (!isNaN(numValue) && numValue >= 0 && numValue <= 100) {
-                                            updatedGrades[student.id][subject.name] = numValue;
-                                          }
-                                        }
-                                        setSubjectGrades(updatedGrades);
-                                        setIsGradesModified(true);
-                                      }}
-                                    />
-                                    {subjectGrades[student.id]?.[subject.name] && (
-                                      <div className={`text-xs font-medium px-2 py-1 rounded ${getGradeColor(subjectGrades[student.id][subject.name])}`}>
-                                        {getGradeCategory(subjectGrades[student.id][subject.name])}
-                                      </div>
-                                    )}
-                                  </div>
-                                </TableCell>
-                              ))}
+                              {/* Cijfercellen voor de beoordelingen van het geselecteerde vak */}
+                              <TableCell className="text-center">
+                                <div className="flex flex-col items-center gap-2 p-2">
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="1"
+                                    placeholder="85"
+                                    className="w-16 h-8 text-center text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    value=""
+                                    onChange={(e) => {
+                                      // Hier zullen we de logica voor het opslaan van cijfers toevoegen
+                                    }}
+                                  />
+                                  <span className="text-xs text-gray-500">85%</span>
+                                </div>
+                              </TableCell>
                               
-                              <TableCell className="text-right">
+                              <TableCell className="text-center">
+                                <div className="flex flex-col items-center gap-2 p-2">
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    max="50"
+                                    step="1"
+                                    placeholder="42"
+                                    className="w-16 h-8 text-center text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    value=""
+                                    onChange={(e) => {
+                                      // Hier zullen we de logica voor het opslaan van cijfers toevoegen
+                                    }}
+                                  />
+                                  <span className="text-xs text-gray-500">84%</span>
+                                </div>
+                              </TableCell>
+                              
+                              <TableCell className="text-center">
+                                <div className="flex flex-col items-center gap-2 p-2">
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    max="200"
+                                    step="1"
+                                    placeholder="165"
+                                    className="w-16 h-8 text-center text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    value=""
+                                    onChange={(e) => {
+                                      // Hier zullen we de logica voor het opslaan van cijfers toevoegen
+                                    }}
+                                  />
+                                  <span className="text-xs text-gray-500">83%</span>
+                                </div>
+                              </TableCell>
+                              
+                              <TableCell className="text-right font-medium">
                                 <div className="flex items-center justify-end gap-2">
-                                  {calculateAverage(student.id) ? (
-                                    <div className={`px-3 py-1 rounded-full text-sm font-semibold ${getGradeColor(calculateAverage(student.id)!)}`}>
-                                      {formatGradeWithCategory(calculateAverage(student.id)!)}
-                                    </div>
-                                  ) : (
-                                    <span className="bg-gray-100 text-gray-500 font-semibold text-lg px-3 py-1 rounded-full">-</span>
-                                  )}
+                                  <Badge className="bg-green-100 text-green-800 border-green-200">
+                                    8.4
+                                  </Badge>
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -747,23 +805,17 @@ export default function Cijfers() {
                       </Table>
                     </div>
                   ) : (
-                    <div className="p-8 text-center">
-                      <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 mb-4">
-                        <AlertCircle className="h-5 w-5 text-gray-600" />
-                      </div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-1">Geen studenten gevonden</h3>
-                      <p className="text-gray-500">
-                        {studentFilter ? 
-                          "Er zijn geen studenten die aan je zoekcriteria voldoen." : 
-                          "Deze klas heeft nog geen studenten of er is een fout opgetreden."}
-                      </p>
+                    <div className="p-8 text-center text-gray-500">
+                      <User className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+                      <h3 className="text-lg font-medium mb-2">Geen studenten gevonden</h3>
+                      <p>Er zijn geen studenten in deze klas of ze voldoen niet aan de zoekfilters.</p>
                     </div>
                   )}
-                </div>
-              )}
-  
-              {/* Gedrag tab content */}
-              {activeTab === 'behavior' && (
+                }
+              </TabsContent>
+
+              <TabsContent value="behavior" className="mt-6">
+                {selectedClass && (
                 <div className="bg-white rounded-md border shadow-sm">
                   <div className="p-4 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <h2 className="text-lg font-medium text-gray-800">Gedragsbeoordelingen</h2>

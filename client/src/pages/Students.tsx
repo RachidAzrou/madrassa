@@ -175,10 +175,12 @@ export default function Students() {
   });
 
   // Query voor het ophalen van sibling relaties van een student
-  const { data: studentSiblings = [] } = useQuery({
+  const { data: studentSiblings = [], refetch: refetchSiblings } = useQuery({
     queryKey: ['/api/students', selectedStudent?.id, 'siblings'],
     queryFn: () => selectedStudent?.id ? apiRequest(`/api/students/${selectedStudent.id}/siblings`) : [],
-    enabled: !!selectedStudent?.id
+    enabled: !!selectedStudent?.id,
+    staleTime: 0, // Altijd verse data ophalen
+    refetchOnWindowFocus: true
   });
 
   // Form handlers
@@ -1571,6 +1573,9 @@ export default function Students() {
                                     method: 'DELETE'
                                   });
                                   queryClient.invalidateQueries({ queryKey: ['/api/students', selectedStudent.id, 'siblings'] });
+                                  queryClient.invalidateQueries({ queryKey: ['/api/students', sibling.siblingId, 'siblings'] });
+                                  queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+                                  refetchSiblings();
                                   toast({
                                     title: "Broer/zus ontkoppeld",
                                     description: `${sibling.firstName} ${sibling.lastName} is ontkoppeld.`,
@@ -2523,9 +2528,13 @@ export default function Students() {
                                }
                              });
                              
-                             // Herlaad de sibling data om de nieuwe relatie te tonen
+                             // Herlaad de sibling data voor beide studenten om de bidirectionele relatie te tonen
                              queryClient.invalidateQueries({ queryKey: ['/api/students', selectedStudent.id, 'siblings'] });
+                             queryClient.invalidateQueries({ queryKey: ['/api/students', student.id, 'siblings'] });
                              queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+                             
+                             // Force een directe refetch van de sibling data
+                             refetchSiblings();
                            }
                            
                            setSiblingSearchTerm('');

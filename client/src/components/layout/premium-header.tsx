@@ -55,7 +55,7 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
                     location === '/attendance' ? 'Evaluatie' :
                     location === '/grading' ? 'Evaluatie' :
                     location === '/reports' ? 'Evaluatie' :
-                    location === '/fees' ? 'Evaluatie' :
+                    location === '/fees' ? 'Financien' :
                     location === '/student-dossier' ? 'Evaluatie' :
                     effectiveBreadcrumbs.parent
                   }</span>
@@ -76,7 +76,7 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
                 location === '/grading' ? 'Cijfers' :
                 location === '/reports' ? 'Rapport' :
                 location === '/fees' ? 'Betalingsbeheer' :
-                location === '/student-dossier' ? 'Leerlingendossier' :
+                location === '/student-dossier' ? 'Leerlingdossier' :
                 effectiveBreadcrumbs.current
               }</span>
             </div>

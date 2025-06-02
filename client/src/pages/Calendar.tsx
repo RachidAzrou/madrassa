@@ -66,6 +66,39 @@ export default function Calendar() {
   const [filter, setFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isAddEventDialogOpen, setIsAddEventDialogOpen] = useState(false);
+
+  // Haal echte data op uit database
+  const { data: programsData } = useQuery({
+    queryKey: ['/api/programs'],
+    staleTime: 300000,
+  });
+
+  const { data: coursesData } = useQuery({
+    queryKey: ['/api/courses'],
+    staleTime: 300000,
+  });
+
+  const { data: teachersData } = useQuery({
+    queryKey: ['/api/teachers'],
+    staleTime: 300000,
+  });
+
+  const { data: studentGroupsData } = useQuery({
+    queryKey: ['/api/student-groups'],
+    staleTime: 300000,
+  });
+
+  // Extract data voor dropdowns
+  const programs = programsData?.programs || [];
+  const courses = coursesData?.courses || [];
+  const teachers = teachersData?.teachers || [];
+  const studentGroups = studentGroupsData?.studentGroups || [];
+
+  // Combineer programs en courses voor vakken dropdown
+  const subjects = [
+    ...programs.map((program: any) => ({ id: program.id, name: program.name, type: 'program' })),
+    ...courses.map((course: any) => ({ id: course.id, name: course.name, type: 'course' }))
+  ];
   const [newEvent, setNewEvent] = useState({
     title: '',
     date: new Date().toISOString().split('T')[0],
@@ -981,9 +1014,11 @@ export default function Calendar() {
                     placeholder="Selecteer een vak"
                     className="mt-1"
                   >
-                    <StyledSelectItem value="1">Arabisch</StyledSelectItem>
-                    <StyledSelectItem value="2">Islamitische Geschiedenis</StyledSelectItem>
-                    <StyledSelectItem value="3">Koran Memorisatie</StyledSelectItem>
+                    {subjects.map((subject) => (
+                      <StyledSelectItem key={subject.id} value={subject.id.toString()}>
+                        {subject.name}
+                      </StyledSelectItem>
+                    ))}
                   </StyledSelect>
                 </div>
                 
@@ -1016,9 +1051,11 @@ export default function Calendar() {
                     placeholder="Selecteer een klas"
                     className="mt-1"
                   >
-                    <StyledSelectItem value="1">Klas 1A</StyledSelectItem>
-                    <StyledSelectItem value="2">Klas 2B</StyledSelectItem>
-                    <StyledSelectItem value="3">Klas 3C</StyledSelectItem>
+                    {studentGroups.map((group) => (
+                      <StyledSelectItem key={group.id} value={group.id.toString()}>
+                        {group.name}
+                      </StyledSelectItem>
+                    ))}
                   </StyledSelect>
                 </div>
               </div>
@@ -1045,10 +1082,11 @@ export default function Calendar() {
                     placeholder="Selecteer een docent"
                     className="mt-1"
                   >
-                    <StyledSelectItem value="1">Ahmed Al-Mansouri (Arabisch)</StyledSelectItem>
-                    <StyledSelectItem value="2">Fatima Hassan (Islamitische Geschiedenis)</StyledSelectItem>
-                    <StyledSelectItem value="3">Omar Ibn Khattab (Koran Memorisatie)</StyledSelectItem>
-                    <StyledSelectItem value="4">Aisha Bint Abu Bakr (Fiqh)</StyledSelectItem>
+                    {teachers.map((teacher) => (
+                      <StyledSelectItem key={teacher.id} value={teacher.id.toString()}>
+                        {teacher.firstName} {teacher.lastName}
+                      </StyledSelectItem>
+                    ))}
                   </StyledSelect>
                   <p className="text-xs text-gray-500 mt-1">
                     Docent wordt automatisch geselecteerd op basis van het vak, maar kan aangepast worden

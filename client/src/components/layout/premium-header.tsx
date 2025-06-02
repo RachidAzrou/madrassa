@@ -41,31 +41,20 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
               {effectiveBreadcrumbs.parent && (
                 <>
                   <span className="mr-1">{
-                    // Direct category mapping for specific pages
-                    (() => {
-                      if (!path) return effectiveBreadcrumbs.parent;
-                      
-                      // Onderwijs category
-                      if (path.startsWith('/student-groups')) return 'Onderwijs';
-                      if (path.startsWith('/programs')) return 'Onderwijs';
-                      if (path.startsWith('/calendar')) return 'Onderwijs';
-                      if (path.startsWith('/courses')) return 'Onderwijs';
-                      if (path.startsWith('/scheduling')) return 'Onderwijs';
-                      
-                      // Beheer category
-                      if (path.startsWith('/students')) return 'Beheer';
-                      if (path.startsWith('/guardians')) return 'Beheer';
-                      if (path.startsWith('/teachers')) return 'Beheer';
-                      
-                      // Evaluatie category
-                      if (path.startsWith('/attendance')) return 'Evaluatie';
-                      if (path.startsWith('/grading')) return 'Evaluatie';
-                      if (path.startsWith('/reports')) return 'Evaluatie';
-                      if (path.startsWith('/fees')) return 'Evaluatie';
-                      if (path.startsWith('/student-dossier')) return 'Evaluatie';
-                      
-                      return effectiveBreadcrumbs.parent;
-                    })()
+                    path === '/student-groups' ? 'Onderwijs' :
+                    path === '/programs' ? 'Onderwijs' :
+                    path === '/calendar' ? 'Onderwijs' :
+                    path === '/courses' ? 'Onderwijs' :
+                    path === '/scheduling' ? 'Onderwijs' :
+                    path === '/students' ? 'Beheer' :
+                    path === '/guardians' ? 'Beheer' :
+                    path === '/teachers' ? 'Beheer' :
+                    path === '/attendance' ? 'Evaluatie' :
+                    path === '/grading' ? 'Evaluatie' :
+                    path === '/reports' ? 'Evaluatie' :
+                    path === '/fees' ? 'Evaluatie' :
+                    path === '/student-dossier' ? 'Evaluatie' :
+                    effectiveBreadcrumbs.parent
                   }</span>
                   <ChevronRight className="h-3 w-3 mx-0.5" />
                 </>

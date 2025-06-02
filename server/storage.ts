@@ -1088,6 +1088,101 @@ export class DatabaseStorage implements IStorage {
       throw new Error('Failed to batch create grades');
     }
   }
+
+  // Grades operations
+  async getGrades(): Promise<Grade[]> {
+    try {
+      const gradesData = await db.select().from(grades);
+      return gradesData;
+    } catch (error) {
+      console.error('Error getting grades:', error);
+      return [];
+    }
+  }
+
+  async getGrade(id: number): Promise<Grade | undefined> {
+    try {
+      const [grade] = await db.select().from(grades).where(eq(grades.id, id));
+      return grade || undefined;
+    } catch (error) {
+      console.error('Error getting grade:', error);
+      return undefined;
+    }
+  }
+
+  async getGradesByStudent(studentId: number): Promise<Grade[]> {
+    try {
+      const gradesData = await db.select().from(grades).where(eq(grades.studentId, studentId));
+      return gradesData;
+    } catch (error) {
+      console.error('Error getting grades by student:', error);
+      return [];
+    }
+  }
+
+  async getGradesByCourse(courseId: number): Promise<Grade[]> {
+    try {
+      const gradesData = await db.select().from(grades).where(eq(grades.courseId, courseId));
+      return gradesData;
+    } catch (error) {
+      console.error('Error getting grades by course:', error);
+      return [];
+    }
+  }
+
+  async getGradesByStudentAndCourse(studentId: number, courseId: number): Promise<Grade[]> {
+    try {
+      const gradesData = await db.select().from(grades)
+        .where(and(eq(grades.studentId, studentId), eq(grades.courseId, courseId)));
+      return gradesData;
+    } catch (error) {
+      console.error('Error getting grades by student and course:', error);
+      return [];
+    }
+  }
+
+  async createGrade(grade: InsertGrade): Promise<Grade> {
+    try {
+      const [newGrade] = await db.insert(grades).values(grade).returning();
+      return newGrade;
+    } catch (error) {
+      console.error('Error creating grade:', error);
+      throw new Error('Failed to create grade');
+    }
+  }
+
+  async updateGrade(id: number, grade: Partial<Grade>): Promise<Grade | undefined> {
+    try {
+      const [updatedGrade] = await db.update(grades)
+        .set(grade)
+        .where(eq(grades.id, id))
+        .returning();
+      return updatedGrade || undefined;
+    } catch (error) {
+      console.error('Error updating grade:', error);
+      return undefined;
+    }
+  }
+
+  async deleteGrade(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(grades).where(eq(grades.id, id));
+      return (result as any).rowCount > 0;
+    } catch (error) {
+      console.error('Error deleting grade:', error);
+      return false;
+    }
+  }
+
+  async batchCreateGrades(gradesList: InsertGrade[]): Promise<Grade[]> {
+    try {
+      const newGrades = await db.insert(grades).values(gradesList).returning();
+      return newGrades;
+    } catch (error) {
+      console.error('Error batch creating grades:', error);
+      throw new Error('Failed to batch create grades');
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();

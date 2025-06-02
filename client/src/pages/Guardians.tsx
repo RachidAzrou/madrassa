@@ -157,6 +157,7 @@ export default function Guardians() {
       'parent': 'Ouder',
       'guardian': 'Voogd',
       'grandparent': 'Grootouder',
+      'sibling': 'Broer/Zus',
       'other': 'Anders'
     };
     return labels[relationship] || relationship;

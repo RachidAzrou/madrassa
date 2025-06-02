@@ -2440,6 +2440,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  apiRouter.get("/api/student-groups/:groupId/teachers", async (req, res) => {
+    try {
+      const groupId = parseInt(req.params.groupId);
+      if (isNaN(groupId)) {
+        return res.status(400).json({ message: "Invalid group ID format" });
+      }
+      
+      // Voor nu, geef alle actieve docenten terug
+      // Later kunnen we dit uitbreiden met klas-specifieke docenten
+      const allTeachers = await storage.getTeachers();
+      const activeTeachers = allTeachers.filter(teacher => teacher.isActive);
+      
+      res.json(activeTeachers);
+    } catch (error) {
+      console.error("Error fetching teachers by group:", error);
+      res.status(500).json({ message: "Error fetching teachers by group" });
+    }
+  });
+
+  apiRouter.get("/api/student-groups/:groupId/courses", async (req, res) => {
+    try {
+      const groupId = parseInt(req.params.groupId);
+      if (isNaN(groupId)) {
+        return res.status(400).json({ message: "Invalid group ID format" });
+      }
+      
+      // Haal de klas informatie op
+      const group = await storage.getStudentGroup(groupId);
+      if (!group) {
+        return res.status(404).json({ message: "Student group not found" });
+      }
+      
+      // Haal vakken op die behoren tot het programma van deze klas
+      const coursesForGroup = await storage.getCoursesByProgram(group.programId);
+      
+      res.json(coursesForGroup);
+    } catch (error) {
+      console.error("Error fetching courses by group:", error);
+      res.status(500).json({ message: "Error fetching courses by group" });
+    }
+  });
+
   apiRouter.get("/api/programs/:programId/student-groups", async (req, res) => {
     try {
       const programId = parseInt(req.params.programId);

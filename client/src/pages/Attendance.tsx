@@ -69,13 +69,11 @@ export default function Attendance() {
   const [teacherAttendance, setTeacherAttendance] = useState<Record<number, TeacherAttendanceRecord>>({});
   const [isSaving, setIsSaving] = useState(false);
   
-  // Fetch courses/programs
-  const { data: programsResponse, isLoading: isLoadingCourses } = useQuery({
+  // Fetch programs (voor eventuele andere doeleinden)
+  const { data: programsResponse } = useQuery({
     queryKey: ['/api/programs'],
     staleTime: 60000,
   });
-  
-  const coursesData = programsResponse?.programs || [];
   
   // Fetch classes/student groups
   const { data: classesData, isLoading: isLoadingClasses } = useQuery<StudentGroup[]>({
@@ -98,13 +96,35 @@ export default function Attendance() {
     enabled: !!selectedClass,
   });
   
-  // Fetch teachers
-  const { data: teachersResponse, isLoading: isLoadingTeachers } = useQuery({
-    queryKey: ['/api/teachers'],
+  // Fetch teachers by selected class
+  const { data: teachersData, isLoading: isLoadingTeachers } = useQuery({
+    queryKey: ['/api/student-groups', selectedClass, 'teachers'],
+    queryFn: async () => {
+      if (!selectedClass) return [];
+      const response = await fetch(`/api/student-groups/${selectedClass}/teachers`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch teachers');
+      }
+      return response.json();
+    },
     staleTime: 60000,
+    enabled: !!selectedClass,
   });
-  
-  const teachersData = teachersResponse?.teachers || [];
+
+  // Fetch courses by selected class
+  const { data: coursesData, isLoading: isLoadingCourses } = useQuery({
+    queryKey: ['/api/student-groups', selectedClass, 'courses'],
+    queryFn: async () => {
+      if (!selectedClass) return [];
+      const response = await fetch(`/api/student-groups/${selectedClass}/courses`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch courses');
+      }
+      return response.json();
+    },
+    staleTime: 60000,
+    enabled: !!selectedClass,
+  });
   
   // Fetch attendance for selected date and course/class
   const { data: attendanceData, isLoading: isLoadingAttendance, refetch: refetchAttendance } = useQuery({
@@ -495,6 +515,35 @@ export default function Attendance() {
                   )}
                 </SelectContent>
               </Select>
+
+              {selectedClass && (
+                <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+                  <SelectTrigger className="h-9 w-[240px] border-[#e5e7eb] bg-white">
+                    <SelectValue placeholder="Selecteer vak (optioneel)" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-[#e5e7eb]">
+                    <SelectItem value="" className="focus:bg-blue-200 hover:bg-blue-100">
+                      Alle vakken
+                    </SelectItem>
+                    {isLoadingCourses ? (
+                      <SelectItem value="loading" disabled>
+                        <div className="flex items-center">
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Vakken laden...
+                        </div>
+                      </SelectItem>
+                    ) : coursesData && Array.isArray(coursesData) ? (
+                      coursesData.map((course: any) => (
+                        <SelectItem key={course.id} value={course.id.toString()} className="focus:bg-blue-200 hover:bg-blue-100">
+                          {course.name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="none" disabled>Geen vakken gevonden</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
 

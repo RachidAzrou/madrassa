@@ -1285,19 +1285,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getAttendanceByDate(date: Date): Promise<any[]> {
-    try {
-      const dateStr = date.toISOString().split('T')[0];
-      const records = await db
-        .select()
-        .from(attendance)
-        .where(eq(attendance.date, dateStr));
-      return records;
-    } catch (error) {
-      console.error('Error getting attendance by date:', error);
-      return [];
-    }
-  }
+
 
   async getAttendanceByClassAndDate(classId: number, date: Date): Promise<any[]> {
     try {
@@ -1401,19 +1389,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getTeacherAttendanceByDate(date: Date): Promise<any[]> {
-    try {
-      const dateStr = date.toISOString().split('T')[0];
-      const records = await db
-        .select()
-        .from(teacherAttendance)
-        .where(eq(teacherAttendance.date, dateStr));
-      return records;
-    } catch (error) {
-      console.error('Error getting teacher attendance by date:', error);
-      return [];
-    }
-  }
+
 
   async getTeacherAttendanceByTeacher(teacherId: number): Promise<any[]> {
     try {

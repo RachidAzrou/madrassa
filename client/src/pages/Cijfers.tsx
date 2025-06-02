@@ -35,6 +35,7 @@ export default function Cijfers() {
   const [selectedAssessment, setSelectedAssessment] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingAssessment, setEditingAssessment] = useState<any>(null);
   const [step, setStep] = useState<'class' | 'subject' | 'assessments' | 'grades'>('class');
   const [grades, setGrades] = useState<{[studentId: string]: string}>({});
   
@@ -91,11 +92,35 @@ export default function Cijfers() {
       });
       setShowAddModal(false);
       resetAssessmentForm();
+      setEditingAssessment(null);
     },
     onError: () => {
       toast({
         title: "Fout",
         description: "Er is een fout opgetreden bij het aanmaken van de beoordeling.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Mutation for deleting assessment
+  const deleteAssessmentMutation = useMutation({
+    mutationFn: async (assessmentId: number) => {
+      return apiRequest(`/api/assessments/${assessmentId}`, {
+        method: 'DELETE'
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/assessments'] });
+      toast({
+        title: "Beoordeling verwijderd",
+        description: "De beoordeling is succesvol verwijderd."
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden bij het verwijderen van de beoordeling.",
         variant: "destructive"
       });
     }
@@ -148,6 +173,23 @@ export default function Cijfers() {
       initialGrades[student.id] = '';
     });
     setGrades(initialGrades);
+  };
+
+  const handleEditAssessment = (assessment: any) => {
+    setAssessmentForm({
+      name: assessment.name,
+      type: assessment.type,
+      maxPoints: assessment.maxScore.toString(),
+      weight: assessment.weight ? assessment.weight.toString() : ''
+    });
+    setEditingAssessment(assessment);
+    setShowAddModal(true);
+  };
+
+  const handleDeleteAssessment = (assessment: any) => {
+    if (window.confirm(`Weet je zeker dat je de beoordeling "${assessment.name}" wilt verwijderen?`)) {
+      deleteAssessmentMutation.mutate(assessment.id);
+    }
   };
 
   const handleGradeChange = (studentId: string, grade: string) => {
@@ -434,10 +476,20 @@ export default function Cijfers() {
                                 >
                                   <User className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => handleEditAssessment(assessment)}
+                                  className="text-gray-600 hover:text-blue-700"
+                                >
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handleDeleteAssessment(assessment)}
+                                  className="text-red-600 hover:text-red-700"
+                                >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>

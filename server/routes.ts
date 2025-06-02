@@ -611,7 +611,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.get("/api/programs", async (_req, res) => {
     try {
       const programs = await storage.getPrograms();
-      res.json({ programs, totalCount: programs.length });
+      
+      // Voor elk programma, haal de toegewezen docenten op
+      const programsWithTeachers = await Promise.all(
+        programs.map(async (program) => {
+          try {
+            // Zoek naar programTeachers relaties in de database
+            const programTeachersResult = await db
+              .select({
+                teacherId: programTeachers.teacherId,
+                isPrimary: programTeachers.isPrimary,
+                firstName: teachers.firstName,
+                lastName: teachers.lastName,
+              })
+              .from(programTeachers)
+              .innerJoin(teachers, eq(programTeachers.teacherId, teachers.id))
+              .where(eq(programTeachers.programId, program.id));
+            
+            const assignedTeachers = programTeachersResult.map(pt => ({
+              id: pt.teacherId,
+              name: `${pt.firstName} ${pt.lastName}`,
+              selected: true,
+              isPrimary: pt.isPrimary
+            }));
+
+            return {
+              ...program,
+              assignedTeachers
+            };
+          } catch (error) {
+            // Als er een fout is, return het programma zonder docenten
+            return {
+              ...program,
+              assignedTeachers: []
+            };
+          }
+        })
+      );
+      
+      res.json({ programs: programsWithTeachers, totalCount: programsWithTeachers.length });
     } catch (error) {
       res.status(500).json({ message: "Error fetching programs" });
     }

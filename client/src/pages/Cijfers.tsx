@@ -46,7 +46,8 @@ export default function Cijfers() {
     name: '',
     type: '',
     maxPoints: '',
-    weight: ''
+    weight: '',
+    date: ''
   });
 
   // Hooks
@@ -138,7 +139,8 @@ export default function Cijfers() {
       name: '',
       type: '',
       maxPoints: '',
-      weight: ''
+      weight: '',
+      date: ''
     });
     setEditingAssessment(null);
   };
@@ -183,7 +185,8 @@ export default function Cijfers() {
       name: assessment.name,
       type: assessment.type,
       maxPoints: assessment.maxScore.toString(),
-      weight: assessment.weight ? assessment.weight.toString() : ''
+      weight: assessment.weight ? assessment.weight.toString() : '',
+      date: assessment.date || ''
     });
     setEditingAssessment(assessment);
     setShowAddModal(true);
@@ -543,7 +546,7 @@ export default function Cijfers() {
                       </div>
                       <div>
                         <span className="text-gray-600">Max Punten:</span>
-                        <span className="ml-2 font-medium">{selectedAssessment.points}</span>
+                        <span className="ml-2 font-medium">{selectedAssessment.maxPoints || selectedAssessment.points || 100}</span>
                       </div>
                       <div>
                         <span className="text-gray-600">Datum:</span>
@@ -709,15 +712,25 @@ export default function Cijfers() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="weight">Gewicht (%) <span className="text-gray-500 text-sm">- optioneel</span></Label>
+                <Label htmlFor="date">Datum</Label>
                 <Input 
-                  id="weight" 
-                  type="number" 
-                  placeholder="25" 
-                  value={assessmentForm.weight}
-                  onChange={(e) => handleAssessmentFormChange('weight', e.target.value)}
+                  id="date" 
+                  type="date" 
+                  value={assessmentForm.date}
+                  onChange={(e) => handleAssessmentFormChange('date', e.target.value)}
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="weight">Gewicht (%) <span className="text-gray-500 text-sm">- optioneel</span></Label>
+              <Input 
+                id="weight" 
+                type="number" 
+                placeholder="25" 
+                value={assessmentForm.weight}
+                onChange={(e) => handleAssessmentFormChange('weight', e.target.value)}
+              />
             </div>
           </div>
 

@@ -493,8 +493,32 @@ export default function Students() {
 
       console.log('Student bijgewerkt:', updatedStudent);
       
+      // Stap 2: Update de klas enrollment als studentGroupId is gewijzigd
+      if (editFormData.studentGroupId && editFormData.studentGroupId !== '') {
+        try {
+          const groupId = parseInt(editFormData.studentGroupId);
+          
+          // Maak een nieuwe enrollment aan of update bestaande
+          await apiRequest('/api/student-group-enrollments', {
+            method: 'POST',
+            body: {
+              studentId: selectedStudent.id,
+              groupId: groupId,
+              status: 'active',
+              notes: `Bijgewerkt via student edit op ${new Date().toLocaleDateString('nl-NL')}`
+            }
+          });
+          
+          console.log('Klas enrollment bijgewerkt voor groep:', groupId);
+        } catch (enrollmentError) {
+          console.warn('Klas enrollment kon niet worden bijgewerkt:', enrollmentError);
+          // Dit is een waarschuwing, niet een fatale fout
+        }
+      }
+      
       // Refresh de students data
       queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/student-group-enrollments'] });
       
       toast({
         title: "Succes",

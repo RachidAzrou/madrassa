@@ -1473,6 +1473,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  apiRouter.delete("/api/assessments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await db.delete(assessments).where(eq(assessments.id, id));
+      res.json({ message: "Assessment deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting assessment:', error);
+      res.status(500).json({ message: "Error deleting assessment" });
+    }
+  });
+
   apiRouter.put("/api/assessments/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);

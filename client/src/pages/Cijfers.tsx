@@ -138,6 +138,7 @@ export default function Cijfers() {
       maxPoints: '',
       weight: ''
     });
+    setEditingAssessment(null);
   };
 
   const handleSaveAssessment = () => {
@@ -653,10 +654,13 @@ export default function Cijfers() {
               </div>
               <div>
                 <DialogTitle className="text-lg font-semibold text-white">
-                  Nieuwe beoordeling toevoegen
+                  {editingAssessment ? 'Beoordeling bewerken' : 'Nieuwe beoordeling toevoegen'}
                 </DialogTitle>
                 <DialogDescription className="text-blue-100 mt-1">
-                  Voeg een nieuwe beoordeling toe voor {selectedSubject?.name || 'geselecteerd vak'}
+                  {editingAssessment 
+                    ? `Bewerk de beoordeling "${editingAssessment.name}" voor ${selectedSubject?.name || 'geselecteerd vak'}`
+                    : `Voeg een nieuwe beoordeling toe voor ${selectedSubject?.name || 'geselecteerd vak'}`
+                  }
                 </DialogDescription>
               </div>
             </div>
@@ -723,7 +727,7 @@ export default function Cijfers() {
               onClick={handleSaveAssessment}
               disabled={createAssessmentMutation.isPending}
             >
-              {createAssessmentMutation.isPending ? 'Bezig...' : 'Beoordeling toevoegen'}
+              {createAssessmentMutation.isPending ? 'Bezig...' : (editingAssessment ? 'Wijzigingen opslaan' : 'Beoordeling toevoegen')}
             </Button>
           </DialogFooter>
         </DialogContent>

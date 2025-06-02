@@ -96,6 +96,10 @@ export default function Programs() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const [selectedPrograms, setSelectedPrograms] = useState<Set<number>>(new Set());
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    isOpen: boolean;
+    program: Program | null;
+  }>({ isOpen: false, program: null });
   
   // State voor actieve tabs
   const [activeTab, setActiveTab] = useState('general');
@@ -330,37 +334,25 @@ export default function Programs() {
     }
   };
 
-  // Verbeterde mutatie voor het verwijderen van een programma
+  // Delete mutation voor het verwijderen van een programma
   const deleteProgramMutation = useMutation({
-    mutationFn: async (id: string | number) => {
-      try {
-        // Client-side delete met localStorage
-        const storedPrograms = localStorage.getItem('programs');
-        if (storedPrograms) {
-          const programs = JSON.parse(storedPrograms);
-          const updatedPrograms = programs.filter((p: any) => p.id !== id);
-          localStorage.setItem('programs', JSON.stringify(updatedPrograms));
-        }
-        return { success: true };
-      } catch (error: any) {
-        console.error('Error deleting program:', error);
-        throw new Error(error?.message || 'Fout bij het verwijderen van het programma');
-      }
+    mutationFn: async (id: number) => {
+      return await apiRequest(`/api/programs/${id}`, {
+        method: 'DELETE'
+      });
     },
     onSuccess: () => {
       // Invalideer relevante queries
       queryClient.invalidateQueries({ queryKey: ['/api/programs'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
       
       // Reset UI-state
-      setIsDeleteDialogOpen(false);
-      setSelectedProgram(null);
+      setDeleteConfirmation({ isOpen: false, program: null });
       
       // Toon succes melding
       toast({
-        title: "Programma verwijderd",
-        description: "Het programma is succesvol verwijderd uit het systeem.",
+        title: "Vak verwijderd",
+        description: "Het vak is succesvol verwijderd uit het systeem.",
         variant: "default",
       });
     },
@@ -368,10 +360,10 @@ export default function Programs() {
       console.error('Error deleting program:', error);
       toast({
         title: "Fout bij verwijderen",
-        description: error.message || "Er is een fout opgetreden bij het verwijderen van het programma. Mogelijk zijn er nog actieve cursussen of studenten gekoppeld aan dit programma.",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van het vak.",
         variant: "destructive",
       });
-      setIsDeleteDialogOpen(false);
+      setDeleteConfirmation({ isOpen: false, program: null });
     }
   });
 
@@ -526,7 +518,7 @@ export default function Programs() {
               />
             ) : (
               programs.map((program: Program) => (
-                <StandardTableRow key={program.id}>
+                <StandardTableRow key={program.id} className="group">
                   <StandardTableCell className="w-12">
                     <Checkbox
                       checked={selectedPrograms.has(program.id)}
@@ -566,7 +558,7 @@ export default function Programs() {
                     </span>
                   </StandardTableCell>
                   <StandardTableCell className="whitespace-nowrap text-right">
-                    <div className="flex items-center justify-end gap-1">
+                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Button 
                         variant="ghost" 
                         size="sm" 
@@ -589,7 +581,7 @@ export default function Programs() {
                         variant="ghost" 
                         size="sm" 
                         className="h-7 w-7 p-0 text-gray-500 hover:text-red-600 hover:bg-red-50"
-                        onClick={() => handleDeleteProgram(program.id)}
+                        onClick={() => setDeleteConfirmation({ isOpen: true, program })}
                         title="Verwijderen"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -1292,6 +1284,20 @@ export default function Programs() {
           showSubmitButton={false}
         />
       </CustomDialog>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteDialog
+        open={deleteConfirmation.isOpen}
+        onClose={() => setDeleteConfirmation({ isOpen: false, program: null })}
+        onConfirm={() => {
+          if (deleteConfirmation.program) {
+            deleteProgramMutation.mutate(deleteConfirmation.program.id);
+          }
+        }}
+        title="Vak verwijderen"
+        description={`Weet je zeker dat je het vak "${deleteConfirmation.program?.name}" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.`}
+        isLoading={deleteProgramMutation.isPending}
+      />
     </div>
   );
 }

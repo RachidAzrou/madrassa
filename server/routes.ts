@@ -648,11 +648,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   apiRouter.delete("/api/programs/:id", async (req, res) => {
     try {
-      const id = req.params.id;
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID format" });
+      }
       
-      // Voor localStorage implementatie - verwijder programma client-side
+      const result = await storage.deleteProgram(id);
+      if (!result) {
+        return res.status(404).json({ message: "Program not found" });
+      }
+      
       res.status(204).end();
     } catch (error) {
+      console.error("Error deleting program:", error);
       res.status(500).json({ message: "Error deleting program" });
     }
   });

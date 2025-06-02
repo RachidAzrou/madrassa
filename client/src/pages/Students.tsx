@@ -477,18 +477,21 @@ export default function Students() {
     try {
       if (!selectedStudent) return;
 
-      // Update lokale state
-      const updatedStudents = studentsData.map(student => 
-        student.id === selectedStudent.id 
-          ? { 
-              ...student, 
-              ...editFormData,
-              guardians: newStudentGuardians,
-              siblings: newStudentSiblings
-            }
-          : student
-      );
-      // Data wordt automatisch bijgewerkt via React Query invalidation
+      // Stuur wijzigingen naar de database via API
+      const studentUpdateData = {
+        ...editFormData,
+        id: selectedStudent.id
+      };
+
+      const updatedStudent = await apiRequest(`/api/students/${selectedStudent.id}`, {
+        method: 'PATCH',
+        body: studentUpdateData
+      });
+
+      console.log('Student bijgewerkt:', updatedStudent);
+      
+      // Refresh de students data
+      queryClient.invalidateQueries({ queryKey: ['/api/students'] });
       
       toast({
         title: "Succes",

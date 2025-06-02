@@ -14,7 +14,6 @@ import Programs from "@/pages/Programs";
 import Calendar from "@/pages/Calendar";
 import Attendance from "@/pages/Attendance";
 import Cijfers from "@/pages/Cijfers";
-import CijfersNieuw from "@/pages/CijfersNieuw";
 import Reports from "@/pages/Reports";
 import Guardians from "@/pages/Guardians";
 import Teachers from "@/pages/Teachers";
@@ -65,7 +64,6 @@ function AuthenticatedRouter() {
         <Route path="/calendar" component={() => <AuthenticatedRoute component={Calendar} />} />
         <Route path="/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
         <Route path="/grading" component={() => <AuthenticatedRoute component={Cijfers} />} />
-        <Route path="/cijfers-nieuw" component={() => <AuthenticatedRoute component={CijfersNieuw} />} />
         <Route path="/fees" component={() => <AuthenticatedRoute component={Fees} />} />
         <Route path="/student-dossier" component={() => <AuthenticatedRoute component={StudentDossier} />} />
 

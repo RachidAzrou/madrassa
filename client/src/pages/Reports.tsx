@@ -241,246 +241,242 @@ export default function Reports() {
     const pdf = new jsPDF();
     const pageWidth = pdf.internal.pageSize.width;
     const pageHeight = pdf.internal.pageSize.height;
-    const margin = 25;
-    const contentWidth = pageWidth - (2 * margin);
 
     reportData.forEach((report, index) => {
       if (index > 0) pdf.addPage();
 
-      let yPosition = 30;
+      // Main brand color - deep blue
+      const brandBlue = [22, 66, 91];
+      const lightBlue = [235, 242, 247];
+      const accentGreen = [76, 175, 80];
+      const warningOrange = [255, 152, 0];
 
-      // Header Background
-      pdf.setFillColor(245, 245, 245);
-      pdf.rect(0, 0, pageWidth, 80, 'F');
+      // Header Section with gradient-like effect
+      pdf.setFillColor(...brandBlue);
+      pdf.rect(0, 0, pageWidth, 70, 'F');
+      
+      // Decorative top border
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(0, 0, pageWidth, 3, 'F');
 
-      // Logo
+      // Logo placement
       if (schoolLogo) {
         try {
-          pdf.addImage(schoolLogo, 'JPEG', (pageWidth - 50) / 2, 15, 50, 25);
-          yPosition = 50;
+          pdf.addImage(schoolLogo, 'JPEG', 20, 15, 40, 20);
         } catch (error) {
           console.warn('Could not add logo to PDF:', error);
         }
       }
 
-      // Title
-      pdf.setFontSize(20);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(40, 40, 40);
-      pdf.text('LEERLINGENRAPPORT', pageWidth / 2, yPosition, { align: 'center' });
-      yPosition = 90;
-
-      // Academic Year subtitle
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(100, 100, 100);
-      pdf.text(`Schooljaar ${report.student.academicYear || '2024-2025'}`, pageWidth / 2, yPosition, { align: 'center' });
-      yPosition += 25;
-
-      // Student Info Box
-      pdf.setFillColor(250, 250, 250);
-      pdf.setDrawColor(200, 200, 200);
-      pdf.setLineWidth(0.5);
-      pdf.roundedRect(margin, yPosition, contentWidth, 35, 5, 5, 'FD');
-      
-      pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(60, 60, 60);
-      pdf.text('LEERLINGGEGEVENS', margin + 10, yPosition + 12);
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(`Naam: ${report.student.firstName} ${report.student.lastName}`, margin + 10, yPosition + 22);
-      pdf.text(`Studentnummer: ${report.student.studentId}`, margin + 90, yPosition + 22);
-      pdf.text('Klas: 1A', margin + 10, yPosition + 30);
-      
-      yPosition += 50;
-
-      // Grades Section
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(30, 60, 120);
-      pdf.text('CIJFERS PER VAK', margin, yPosition);
-      yPosition += 15;
-
-      Object.entries(report.grades).forEach(([subject, grades]) => {
-        // Subject Box
-        pdf.setFillColor(240, 245, 255);
-        pdf.setDrawColor(150, 180, 220);
-        pdf.setLineWidth(0.5);
-        pdf.roundedRect(margin, yPosition, contentWidth, 45, 3, 3, 'FD');
-
-        // Subject Name and Average
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(30, 60, 120);
-        pdf.text(subject, margin + 10, yPosition + 15);
-        
-        // Average circle
-        pdf.setFillColor(30, 60, 120);
-        pdf.circle(pageWidth - margin - 20, yPosition + 12, 12, 'F');
-        pdf.setFontSize(12);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(255, 255, 255);
-        pdf.text(grades.average.toFixed(1), pageWidth - margin - 20, yPosition + 16, { align: 'center' });
-
-        // Grade breakdown
-        const testAvg = grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-';
-        const taskAvg = grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : '-';
-        
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'normal');
-        pdf.setTextColor(80, 80, 80);
-        pdf.text(`Tests: ${testAvg}`, margin + 10, yPosition + 25);
-        pdf.text(`Examens: ${testAvg}`, margin + 60, yPosition + 25);
-        pdf.text(`Taken: ${taskAvg}`, margin + 110, yPosition + 25);
-
-        // Comment
-        pdf.setFont('helvetica', 'italic');
-        pdf.setTextColor(100, 100, 100);
-        pdf.text('Goede vooruitgang in dit vak. Blijf zo doorgaan!', margin + 10, yPosition + 35);
-
-        yPosition += 55;
-      });
-
-      // Attendance Section
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(180, 90, 30);
-      pdf.text('AANWEZIGHEID', margin, yPosition);
-      yPosition += 15;
-
-      pdf.setFillColor(255, 250, 240);
-      pdf.setDrawColor(220, 180, 120);
-      pdf.setLineWidth(0.5);
-      pdf.roundedRect(margin, yPosition, contentWidth, 35, 3, 3, 'FD');
-
-      // Attendance stats
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(180, 90, 30);
-      pdf.text('AANWEZIGHEIDSOVERZICHT', margin + 10, yPosition + 12);
-
-      pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(100, 70, 30);
-      pdf.text(`Afwezig: ${report.attendance.absent} keer`, margin + 10, yPosition + 22);
-      pdf.text(`Te laat: ${report.attendance.late} keer`, margin + 80, yPosition + 22);
-
-      pdf.setFont('helvetica', 'italic');
-      pdf.setTextColor(120, 120, 120);
-      pdf.text('Leerling toont goede aanwezigheid en punctualiteit.', margin + 10, yPosition + 30);
-
-      yPosition += 50;
-
-      // Behavior Section
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(120, 150, 60);
-      pdf.text('GEDRAG', margin, yPosition);
-      yPosition += 15;
-
-      pdf.setFillColor(245, 250, 240);
-      pdf.setDrawColor(180, 200, 140);
-      pdf.setLineWidth(0.5);
-      const behaviorHeight = behaviorGrades[report.student.id]?.comments ? 45 : 30;
-      pdf.roundedRect(margin, yPosition, contentWidth, behaviorHeight, 3, 3, 'FD');
-
-      // Behavior grade circle
-      pdf.setFillColor(120, 150, 60);
-      pdf.circle(pageWidth - margin - 20, yPosition + 15, 12, 'F');
-      pdf.setFontSize(12);
+      // School name and title
+      pdf.setFontSize(24);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(255, 255, 255);
-      pdf.text(`${behaviorGrades[report.student.id]?.grade || 7}`, pageWidth - margin - 20, yPosition + 19, { align: 'center' });
-
+      pdf.text('LEERLINGENRAPPORT', pageWidth - 20, 30, { align: 'right' });
+      
       pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(120, 150, 60);
-      pdf.text('GEDRAGSBEOORDELING', margin + 10, yPosition + 12);
-
-      pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(80, 100, 50);
-      pdf.text(`Gedragscijfer: ${behaviorGrades[report.student.id]?.grade || 7}/10`, margin + 10, yPosition + 22);
+      pdf.text(`Schooljaar ${report.student.academicYear || '2024-2025'}`, pageWidth - 20, 45, { align: 'right' });
 
-      if (behaviorGrades[report.student.id]?.comments) {
-        pdf.setFont('helvetica', 'italic');
-        pdf.setTextColor(120, 120, 120);
-        const behaviorComments = pdf.splitTextToSize(behaviorGrades[report.student.id]?.comments, contentWidth - 60);
-        pdf.text(behaviorComments, margin + 10, yPosition + 32);
-        yPosition += behaviorHeight + 15;
-      } else {
-        yPosition += behaviorHeight + 15;
-      }
+      // Student info strip
+      let yPos = 85;
+      pdf.setFillColor(...lightBlue);
+      pdf.rect(0, yPos, pageWidth, 35, 'F');
+      
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...brandBlue);
+      pdf.text('LEERLING', 20, yPos + 12);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(60, 60, 60);
+      pdf.text(`${report.student.firstName} ${report.student.lastName}`, 20, yPos + 22);
+      pdf.text(`Studentnr: ${report.student.studentId}`, 20, yPos + 30);
+      
+      pdf.text('Klas: 1A', pageWidth - 120, yPos + 22);
+      pdf.text(`Periode: ${new Date().toLocaleDateString('nl-NL')}`, pageWidth - 120, yPos + 30);
 
-      // General Comments Section
-      if (generalComments[report.student.id]) {
-        pdf.setFontSize(16);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(150, 80, 150);
-        pdf.text('ALGEMENE OPMERKINGEN', margin, yPosition);
-        yPosition += 15;
+      yPos = 135;
 
-        const commentLines = pdf.splitTextToSize(generalComments[report.student.id], contentWidth - 20);
-        const commentHeight = Math.max(35, commentLines.length * 6 + 20);
+      // Subjects Section
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...brandBlue);
+      pdf.text('VAKRESULTATEN', 20, yPos);
+      yPos += 20;
 
-        pdf.setFillColor(250, 245, 250);
-        pdf.setDrawColor(200, 160, 200);
-        pdf.setLineWidth(0.5);
-        pdf.roundedRect(margin, yPosition, contentWidth, commentHeight, 3, 3, 'FD');
+      // Create grade table header
+      const tableStartY = yPos;
+      const colWidths = [80, 30, 30, 30, 30];
+      const rowHeight = 25;
 
-        pdf.setFontSize(11);
+      // Table header
+      pdf.setFillColor(...brandBlue);
+      pdf.rect(20, yPos, colWidths.reduce((a, b) => a + b, 0), rowHeight, 'F');
+      
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(255, 255, 255);
+      
+      let xPos = 20;
+      pdf.text('VAK', xPos + 5, yPos + 15);
+      xPos += colWidths[0];
+      pdf.text('TESTS', xPos + 5, yPos + 15);
+      xPos += colWidths[1];
+      pdf.text('EXAMEN', xPos + 5, yPos + 15);
+      xPos += colWidths[2];
+      pdf.text('TAKEN', xPos + 5, yPos + 15);
+      xPos += colWidths[3];
+      pdf.text('GEMIDDELDE', xPos + 5, yPos + 15);
+
+      yPos += rowHeight;
+
+      // Subject rows
+      Object.entries(report.grades).forEach(([subject, grades], index) => {
+        const isEven = index % 2 === 0;
+        
+        // Alternating row colors
+        if (isEven) {
+          pdf.setFillColor(250, 250, 250);
+          pdf.rect(20, yPos, colWidths.reduce((a, b) => a + b, 0), rowHeight, 'F');
+        }
+
+        // Border
+        pdf.setDrawColor(220, 220, 220);
+        pdf.setLineWidth(0.3);
+        pdf.rect(20, yPos, colWidths.reduce((a, b) => a + b, 0), rowHeight, 'D');
+
+        pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
-        pdf.setTextColor(100, 60, 100);
-        pdf.text(commentLines, margin + 10, yPosition + 15);
+        pdf.setTextColor(60, 60, 60);
 
-        yPosition += commentHeight + 20;
-      }
+        const testAvg = grades.tests.length > 0 ? (grades.tests.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tests.length).toFixed(1) : '-';
+        const taskAvg = grades.tasks.length > 0 ? (grades.tasks.reduce((sum, g) => sum + (g.score/g.maxScore)*10, 0) / grades.tasks.length).toFixed(1) : '-';
 
-      // Signatures Section
-      if (yPosition > pageHeight - 100) {
-        pdf.addPage();
-        yPosition = 50;
-      }
+        xPos = 20;
+        pdf.text(subject, xPos + 5, yPos + 15);
+        xPos += colWidths[0];
+        pdf.text(testAvg, xPos + 15, yPos + 15, { align: 'center' });
+        xPos += colWidths[1];
+        pdf.text(testAvg, xPos + 15, yPos + 15, { align: 'center' });
+        xPos += colWidths[2];
+        pdf.text(taskAvg, xPos + 15, yPos + 15, { align: 'center' });
+        xPos += colWidths[3];
+        
+        // Grade circle
+        const gradeColor = grades.average >= 6.5 ? accentGreen : grades.average >= 5.5 ? warningOrange : [244, 67, 54];
+        pdf.setFillColor(...gradeColor);
+        pdf.circle(xPos + 15, yPos + 12, 8, 'F');
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(255, 255, 255);
+        pdf.text(grades.average.toFixed(1), xPos + 15, yPos + 15, { align: 'center' });
 
-      yPosition = Math.max(yPosition, pageHeight - 90);
+        yPos += rowHeight;
+      });
 
-      // Signature separator
-      pdf.setDrawColor(180, 180, 180);
-      pdf.setLineWidth(1);
-      pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-      yPosition += 20;
+      yPos += 20;
+
+      // Attendance & Behavior in grid
+      const cardWidth = (pageWidth - 60) / 2;
+      const cardHeight = 60;
+
+      // Attendance Card
+      pdf.setFillColor(255, 245, 238);
+      pdf.setDrawColor(...warningOrange);
+      pdf.setLineWidth(2);
+      pdf.roundedRect(20, yPos, cardWidth, cardHeight, 5, 5, 'FD');
 
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(80, 80, 80);
-      pdf.text('HANDTEKENINGEN', margin, yPosition);
-      yPosition += 20;
+      pdf.setTextColor(...warningOrange);
+      pdf.text('AANWEZIGHEID', 30, yPos + 18);
 
-      // Signature boxes
-      const signatureBoxWidth = (contentWidth - 20) / 2;
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(80, 80, 80);
+      pdf.text(`Afwezig: ${report.attendance.absent} keer`, 30, yPos + 32);
+      pdf.text(`Te laat: ${report.attendance.late} keer`, 30, yPos + 45);
+
+      // Behavior Card
+      pdf.setFillColor(240, 248, 255);
+      pdf.setDrawColor(...accentGreen);
+      pdf.setLineWidth(2);
+      pdf.roundedRect(30 + cardWidth, yPos, cardWidth, cardHeight, 5, 5, 'FD');
+
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...accentGreen);
+      pdf.text('GEDRAG', 40 + cardWidth, yPos + 18);
+
+      const behaviorGrade = behaviorGrades[report.student.id]?.grade || 7;
+      pdf.setFontSize(24);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...accentGreen);
+      pdf.text(`${behaviorGrade}/10`, 40 + cardWidth, yPos + 45);
+
+      yPos += cardHeight + 30;
+
+      // Comments Section
+      if (generalComments[report.student.id] || behaviorGrades[report.student.id]?.comments) {
+        pdf.setFillColor(248, 249, 250);
+        pdf.setDrawColor(220, 220, 220);
+        pdf.setLineWidth(1);
+        pdf.roundedRect(20, yPos, pageWidth - 40, 50, 5, 5, 'FD');
+
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(...brandBlue);
+        pdf.text('OPMERKINGEN', 30, yPos + 15);
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(80, 80, 80);
+        
+        let commentText = '';
+        if (behaviorGrades[report.student.id]?.comments) {
+          commentText += `Gedrag: ${behaviorGrades[report.student.id]?.comments} `;
+        }
+        if (generalComments[report.student.id]) {
+          commentText += generalComments[report.student.id];
+        }
+        
+        const commentLines = pdf.splitTextToSize(commentText || 'Leerling toont goede vooruitgang in alle vakken.', pageWidth - 80);
+        pdf.text(commentLines, 30, yPos + 28);
+
+        yPos += 70;
+      }
+
+      // Signature section
+      yPos = Math.max(yPos, pageHeight - 80);
       
-      // Parent signature
-      pdf.setFillColor(250, 250, 250);
-      pdf.setDrawColor(200, 200, 200);
-      pdf.setLineWidth(0.5);
-      pdf.roundedRect(margin, yPosition, signatureBoxWidth, 40, 3, 3, 'FD');
-      
+      pdf.setDrawColor(...brandBlue);
+      pdf.setLineWidth(2);
+      pdf.line(20, yPos, pageWidth - 20, yPos);
+      yPos += 15;
+
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(100, 100, 100);
-      pdf.text('Handtekening ouder(s)/verzorger(s)', margin + 5, yPosition + 30);
-      pdf.text('Datum: _______________', margin + 5, yPosition + 37);
 
-      // Teacher signature
-      pdf.roundedRect(margin + signatureBoxWidth + 20, yPosition, signatureBoxWidth, 40, 3, 3, 'FD');
-      pdf.text('Handtekening klassenmentor', margin + signatureBoxWidth + 25, yPosition + 30);
-      pdf.text('Datum: _______________', margin + signatureBoxWidth + 25, yPosition + 37);
+      // Signature boxes side by side
+      const sigWidth = (pageWidth - 60) / 2;
+      
+      pdf.text('Handtekening ouder(s)/verzorger(s)', 20, yPos);
+      pdf.text('Handtekening klassenmentor', 30 + sigWidth, yPos);
+      
+      yPos += 15;
+      pdf.line(20, yPos, 20 + sigWidth - 10, yPos);
+      pdf.line(30 + sigWidth, yPos, pageWidth - 20, yPos);
+      
+      yPos += 8;
+      pdf.text('Datum: _______________', 20, yPos);
+      pdf.text('Datum: _______________', 30 + sigWidth, yPos);
 
       // Footer
       pdf.setFontSize(8);
       pdf.setTextColor(150, 150, 150);
-      pdf.text(`Gegenereerd op ${new Date().toLocaleDateString('nl-NL')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+      pdf.text(`Gegenereerd op ${new Date().toLocaleDateString('nl-NL')} om ${new Date().toLocaleTimeString('nl-NL')}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
     });
 
     // Save PDF
@@ -492,7 +488,7 @@ export default function Reports() {
 
     toast({
       title: "Professioneel rapport gegenereerd",
-      description: `Rapport is opgeslagen als ${filename}`,
+      description: `Rapport gebaseerd op moderne template opgeslagen als ${filename}`,
     });
   };
 

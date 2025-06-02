@@ -70,10 +70,12 @@ export default function Attendance() {
   const [isSaving, setIsSaving] = useState(false);
   
   // Fetch courses/programs
-  const { data: coursesData, isLoading: isLoadingCourses } = useQuery<Program[]>({
+  const { data: programsResponse, isLoading: isLoadingCourses } = useQuery({
     queryKey: ['/api/programs'],
     staleTime: 60000,
   });
+  
+  const coursesData = programsResponse?.programs || [];
   
   // Fetch classes/student groups
   const { data: classesData, isLoading: isLoadingClasses } = useQuery<StudentGroup[]>({
@@ -82,16 +84,20 @@ export default function Attendance() {
   });
   
   // Fetch students
-  const { data: studentsData, isLoading: isLoadingStudents } = useQuery<Student[]>({
+  const { data: studentsResponse, isLoading: isLoadingStudents } = useQuery({
     queryKey: ['/api/students'],
     staleTime: 60000,
   });
   
+  const studentsData = studentsResponse?.students || [];
+  
   // Fetch teachers
-  const { data: teachersData, isLoading: isLoadingTeachers } = useQuery<Teacher[]>({
+  const { data: teachersResponse, isLoading: isLoadingTeachers } = useQuery({
     queryKey: ['/api/teachers'],
     staleTime: 60000,
   });
+  
+  const teachersData = teachersResponse?.teachers || [];
   
   // Fetch attendance for selected date and course/class
   const { data: attendanceData, isLoading: isLoadingAttendance, refetch: refetchAttendance } = useQuery({

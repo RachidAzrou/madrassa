@@ -389,8 +389,31 @@ export default function Students() {
     }
   };
 
-  const handleEditStudent = (student) => {
+  const handleEditStudent = async (student) => {
     setSelectedStudent(student);
+    
+    // Haal de huidige klas informatie op via enrollment data
+    let studentGroupInfo = "";
+    let academicYear = "2024-2025";
+    
+    try {
+      // Haal enrollment data op om de huidige klas te bepalen
+      const enrollmentData = await apiRequest(`/api/student-group-enrollments`);
+      const studentEnrollment = enrollmentData.find(enrollment => 
+        enrollment.studentId === student.id && enrollment.status === 'active'
+      );
+      
+      if (studentEnrollment && studentGroupsData) {
+        const studentGroup = studentGroupsData.find(group => group.id === studentEnrollment.groupId);
+        if (studentGroup) {
+          studentGroupInfo = `${studentGroup.name} (${studentGroup.academicYear})`;
+          academicYear = studentGroup.academicYear;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching student group info:', error);
+    }
+    
     // Pre-fill the edit form with student data
     setEditFormData({
       firstName: student.firstName || "",
@@ -407,17 +430,17 @@ export default function Students() {
       status: student.status || "active",
       notes: student.notes || "",
       studentGroupId: student.studentGroupId?.toString() || "",
-      studentGroup: student.studentGroupName && student.academicYear ? `${student.studentGroupName} (${student.academicYear})` : "", // Laad bestaande klasnaam met schooljaar
-      studentGroupName: student.studentGroupName || "", // Voor tabelweergave
+      studentGroup: studentGroupInfo, // Gebruik de opgehaalde klas informatie
+      studentGroupName: studentGroupInfo.split(' (')[0] || "", // Extract klasnaam
       gender: student.gender || "man",
       photoUrl: student.photoUrl || "",
       studentId: student.studentId || "",
-      academicYear: student.academicYear || "2024-2025"
+      academicYear: academicYear
     });
     
     // Load existing family data
-    setNewStudentGuardians(student.guardians || []);
-    setNewStudentSiblings(student.siblings || []);
+    setNewStudentGuardians([]);
+    setNewStudentSiblings([]);
     
     setIsEditDialogOpen(true);
   };

@@ -1799,7 +1799,7 @@ export default function Students() {
                               </Avatar>
                               <div>
                                 <p className="text-sm font-medium text-gray-900">{guardian.firstName} {guardian.lastName}</p>
-                                <p className="text-xs text-gray-500">{guardian.relationship || 'Relatie niet opgegeven'}</p>
+                                <p className="text-xs text-gray-500">{getRelationshipLabel(guardian.relationship) || 'Relatie niet opgegeven'}</p>
                               </div>
                             </div>
                             <div className="text-right">

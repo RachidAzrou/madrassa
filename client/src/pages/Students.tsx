@@ -924,7 +924,7 @@ export default function Students() {
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-xs text-gray-600">
-                      {student.studentGroupName || '-'}
+                      {student.studentGroup || '-'}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-xs text-gray-600">
                       {student.academicYear || '-'}

@@ -126,11 +126,16 @@ export default function Cijfers() {
     enabled: !!selectedSubject
   });
 
-  // Data fetching for grades (used for calculating averages)
-  const { data: gradesData = [] } = useQuery({
-    queryKey: ['/api/grades/by-course', selectedSubject?.id],
-    queryFn: () => fetch(`/api/grades/by-course/${selectedSubject?.id}`).then(res => res.json()),
-    enabled: !!selectedSubject
+  // Data fetching for all grades (used for calculating averages in overview)
+  const { data: allGradesData = [] } = useQuery({
+    queryKey: ['/api/grades'],
+    queryFn: () => fetch('/api/grades').then(res => res.json())
+  });
+
+  // Data fetching for all assessments (for overview calculations)  
+  const { data: allAssessmentsData = [] } = useQuery({
+    queryKey: ['/api/assessments'],
+    queryFn: () => fetch('/api/assessments').then(res => res.json())
   });
 
   // Mutation for creating new assessment
@@ -506,23 +511,15 @@ export default function Cijfers() {
                             </div>
                             <div className="flex flex-col items-end gap-1">
                               {(() => {
-                                // Calculate assessment count for this subject
-                                const subjectAssessments = Array.isArray(assessmentsData) 
-                                  ? assessmentsData.filter((a: any) => a.courseId === subject.id) 
+                                // Calculate assessment count for this subject using allAssessmentsData
+                                const subjectAssessments = Array.isArray(allAssessmentsData) 
+                                  ? allAssessmentsData.filter((a: any) => a.courseId === subject.id) 
                                   : [];
                                 
-                                // Get all grades data for calculation
-                                const allGradesResponse = async () => {
-                                  try {
-                                    const response = await fetch(`/api/grades/by-course/${subject.id}`);
-                                    return response.json();
-                                  } catch {
-                                    return [];
-                                  }
-                                };
-                                
-                                // For now, show placeholder until we can fetch grades dynamically
-                                const subjectGrades: any[] = [];
+                                // Calculate average grade for this subject using allGradesData
+                                const subjectGrades = Array.isArray(allGradesData) 
+                                  ? allGradesData.filter((g: any) => g.courseId === subject.id)
+                                  : [];
                                 
                                 const totalScore = subjectGrades.reduce((sum: number, grade: any) => {
                                   const percentage = (grade.score / grade.maxScore) * 100;

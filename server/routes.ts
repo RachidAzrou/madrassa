@@ -1683,6 +1683,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all grades
+  apiRouter.get("/api/grades", async (req, res) => {
+    try {
+      const grades = await db.select({
+        id: schema.grades.id,
+        studentId: schema.grades.studentId,
+        courseId: schema.grades.courseId,
+        score: schema.grades.score,
+        maxScore: schema.grades.maxScore,
+        assessmentName: schema.grades.assessmentName,
+        assessmentType: schema.grades.assessmentType
+      })
+      .from(schema.grades);
+      
+      res.json(grades);
+    } catch (error) {
+      console.error('Error fetching all grades:', error);
+      res.status(500).json({ message: "Error fetching grades" });
+    }
+  });
+
   // Get all grades for a specific subject/course
   apiRouter.get("/api/grades/by-course/:courseId", async (req, res) => {
     try {

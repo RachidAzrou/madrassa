@@ -223,9 +223,9 @@ export default function Cijfers() {
           maxScore: selectedAssessment.maxPoints || selectedAssessment.points || 100
         }));
 
-      return apiRequest('/api/grades', {
+      return apiRequest('/api/grades/save-multiple', {
         method: 'POST',
-        body: JSON.stringify({ grades: gradesToSave })
+        body: { grades: gradesToSave }
       });
     },
     onSuccess: () => {

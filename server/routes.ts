@@ -1666,6 +1666,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  apiRouter.post("/api/grades/save-multiple", async (req, res) => {
+    console.log('=== SAVE MULTIPLE GRADES ROUTE HIT ===');
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    
+    try {
+      const { grades: gradesToSave } = req.body;
+      
+      if (!gradesToSave || !Array.isArray(gradesToSave)) {
+        console.log('Invalid grades data - not an array');
+        return res.status(400).json({ error: "Grades must be an array" });
+      }
+
+      console.log('Processing', gradesToSave.length, 'grades');
+      const savedGrades = [];
+      
+      for (const gradeData of gradesToSave) {
+        console.log('Processing grade:', gradeData);
+        
+        const studentId = parseInt(gradeData.studentId);
+        const assessmentId = parseInt(gradeData.assessmentId);
+        const score = parseInt(gradeData.score);
+        const maxScore = parseInt(gradeData.maxScore);
+        
+        console.log('Parsed values:', { studentId, assessmentId, score, maxScore });
+        
+        // Get assessment details
+        const assessments = await db.select().from(schema.assessments).where(eq(schema.assessments.id, assessmentId));
+        const assessment = assessments[0];
+        
+        if (!assessment) {
+          console.log('Assessment not found for ID:', assessmentId);
+          continue;
+        }
+        
+        console.log('Found assessment:', assessment);
+        
+        // Create the grade record
+        const gradeRecord = {
+          studentId,
+          courseId: assessment.courseId,
+          assessmentType: assessment.type,
+          assessmentName: assessment.name,
+          score,
+          maxScore,
+          weight: assessment.weight || 0,
+          date: new Date().toISOString().split('T')[0]
+        };
+        
+        console.log('Inserting grade record:', gradeRecord);
+        
+        const [savedGrade] = await db.insert(grades).values(gradeRecord).returning();
+        savedGrades.push(savedGrade);
+        console.log('Successfully saved grade:', savedGrade);
+      }
+
+      console.log('All grades saved successfully');
+      res.json({ 
+        message: "Grades saved successfully", 
+        savedGrades: savedGrades.length 
+      });
+      
+    } catch (error) {
+      console.error('Error in save-multiple grades:', error);
+      res.status(500).json({ error: "Failed to save grades", details: error.message });
+    }
+  });
+
   apiRouter.post("/api/grades/batch", async (req, res) => {
     try {
       // Validate each grade in the batch

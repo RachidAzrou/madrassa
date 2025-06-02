@@ -296,6 +296,15 @@ export default function Cijfers() {
     return "text-red-700 bg-red-50";
   };
 
+  const getGradeCategory = (score: number): string => {
+    if (score >= 90) return "Uitstekend";
+    if (score >= 80) return "Zeer Goed";
+    if (score >= 70) return "Goed";
+    if (score >= 60) return "Voldoende";
+    if (score >= 50) return "Matig";
+    return "Onvoldoende";
+  };
+
   // Handlers
   const handleEditGrade = (studentId: string, subject: string, grade: number | null) => {
     setEditGrade({ studentId, subject, grade });
@@ -664,76 +673,82 @@ export default function Cijfers() {
                               
                               {subjects.map((subject) => (
                                 <TableCell key={subject.id}>
-                                  {editGrade && editGrade.studentId === student.id && editGrade.subject === subject.name ? (
-                                    <div className="flex flex-col items-center gap-2 p-3 bg-white border border-blue-300 rounded shadow-sm">
-                                      <Input
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        step="1"
-                                        placeholder="bijv. 75"
-                                        className="w-20 h-10 text-center text-lg font-medium border-2 border-blue-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
-                                        defaultValue={editGrade.grade?.toString() || ''}
-                                        onChange={(e) => {
-                                          const value = parseFloat(e.target.value);
-                                          if (!isNaN(value) && value >= 0 && value <= 100) {
-                                            setEditGrade({...editGrade, grade: value});
-                                          } else if (e.target.value === '') {
-                                            setEditGrade({...editGrade, grade: null});
+                                  <div className="flex flex-col items-center gap-2 p-2">
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      max="100"
+                                      step="1"
+                                      placeholder="0-100"
+                                      className="w-16 h-8 text-center text-sm font-medium border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                                      value={subjectGrades[student.id]?.[subject.name]?.toString() || ''}
+                                      onChange={(e) => {
+                                        const value = e.target.value;
+                                        const updatedGrades = { ...subjectGrades };
+                                        if (!updatedGrades[student.id]) {
+                                          updatedGrades[student.id] = {};
+                                        }
+                                        
+                                        if (value === '') {
+                                          delete updatedGrades[student.id][subject.name];
+                                        } else {
+                                          const numValue = parseFloat(value);
+                                          if (!isNaN(numValue) && numValue >= 0 && numValue <= 100) {
+                                            updatedGrades[student.id][subject.name] = numValue;
                                           }
-                                        }}
-                                        onBlur={(e) => {
-                                          const value = parseFloat(e.target.value);
-                                          if (!isNaN(value) && value >= 0 && value <= 100) {
-                                            handleSaveGrade(value);
-                                          } else {
-                                            handleCancelEditGrade();
-                                          }
-                                        }}
-                                        onKeyDown={(e) => {
-                                          if (e.key === 'Enter') {
-                                            const value = parseFloat(e.currentTarget.value);
-                                            if (!isNaN(value) && value >= 0 && value <= 100) {
-                                              handleSaveGrade(value);
-                                            } else {
-                                              handleCancelEditGrade();
+                                        }
+                                        setSubjectGrades(updatedGrades);
+                                      }}
+                                      onBlur={async (e) => {
+                                        const value = parseFloat(e.target.value);
+                                        if (!isNaN(value) && value >= 0 && value <= 100) {
+                                          // Save to database
+                                          try {
+                                            const program = programsData?.programs?.find((p: any) => p.name === subject.name);
+                                            if (program) {
+                                              const response = await fetch('/api/grades', {
+                                                method: 'POST',
+                                                headers: {
+                                                  'Content-Type': 'application/json',
+                                                },
+                                                body: JSON.stringify({
+                                                  studentId: parseInt(student.id),
+                                                  courseId: program.id,
+                                                  assessmentType: 'regular',
+                                                  assessmentName: 'Cijfer',
+                                                  score: Math.round(value),
+                                                  maxScore: 100,
+                                                  weight: 100,
+                                                  date: new Date().toISOString().split('T')[0]
+                                                }),
+                                              });
+
+                                              if (response.ok) {
+                                                await queryClient.invalidateQueries({ queryKey: ['/api/grades/class', selectedClass] });
+                                                toast({
+                                                  title: "Cijfer opgeslagen",
+                                                  description: `Cijfer ${value} opgeslagen voor ${subject.name}`,
+                                                  variant: "default",
+                                                });
+                                              }
                                             }
-                                          } else if (e.key === 'Escape') {
-                                            handleCancelEditGrade();
+                                          } catch (error) {
+                                            console.error('Error saving grade:', error);
+                                            toast({
+                                              title: "Fout",
+                                              description: "Er is een fout opgetreden bij het opslaan",
+                                              variant: "destructive",
+                                            });
                                           }
-                                        }}
-                                        autoFocus
-                                      />
-                                      <div className="text-center space-y-1">
-                                        <div className="text-xs text-gray-500">Enter = opslaan • Esc = annuleren</div>
-                                        {editGrade.grade !== null && editGrade.grade >= 0 && editGrade.grade <= 100 && (
-                                          <div className={`text-xs font-medium px-2 py-1 rounded ${getGradeColor(editGrade.grade)}`}>
-                                            {getGradeCategory(editGrade.grade)}
-                                          </div>
-                                        )}
+                                        }
+                                      }}
+                                    />
+                                    {subjectGrades[student.id]?.[subject.name] && (
+                                      <div className={`text-xs font-medium px-2 py-1 rounded ${getGradeColor(subjectGrades[student.id][subject.name])}`}>
+                                        {getGradeCategory(subjectGrades[student.id][subject.name])}
                                       </div>
-                                    </div>
-                                  ) : (
-                                    <div 
-                                      className="cursor-pointer hover:bg-blue-50 p-2 rounded-md transition-all duration-200 border border-transparent hover:border-blue-200 flex items-center justify-center min-h-[40px]"
-                                      onClick={() => handleEditGrade(
-                                        student.id, 
-                                        subject.name, 
-                                        subjectGrades[student.id]?.[subject.name] || null
-                                      )}
-                                    >
-                                      <div className="flex flex-col items-center gap-1">
-                                        {subjectGrades[student.id]?.[subject.name] ? (
-                                          <div className={`px-2 py-1 rounded-full text-xs font-medium ${getGradeColor(subjectGrades[student.id][subject.name])}`}>
-                                            {formatGradeWithCategory(subjectGrades[student.id][subject.name])}
-                                          </div>
-                                        ) : (
-                                          <span className="text-gray-400 font-medium text-lg">-</span>
-                                        )}
-                                        <Edit className="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                      </div>
-                                    </div>
-                                  )}
+                                    )}
+                                  </div>
                                 </TableCell>
                               ))}
                               

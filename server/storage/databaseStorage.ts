@@ -113,8 +113,26 @@ export class DatabaseStorage implements IStorage {
   }
   
   async deleteStudent(id: number): Promise<boolean> {
-    await db.delete(students).where(eq(students.id, id));
-    return true;
+    try {
+      // Eerst alle gerelateerde records verwijderen
+      
+      // Verwijder student-voogd relaties
+      await db.delete(studentGuardians).where(eq(studentGuardians.studentId, id));
+      
+      // Verwijder student-groep inschrijvingen
+      await db.delete(studentGroupEnrollments).where(eq(studentGroupEnrollments.studentId, id));
+      
+      // Verwijder broer/zus relaties (beide richtingen)
+      await db.execute(sql`DELETE FROM student_siblings WHERE student_id = ${id} OR sibling_id = ${id}`);
+      
+      // Nu de student zelf verwijderen
+      const result = await db.delete(students).where(eq(students.id, id)).returning();
+      
+      return result.length > 0;
+    } catch (error) {
+      console.error('Error deleting student:', error);
+      throw error;
+    }
   }
   
   // Programs

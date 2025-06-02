@@ -41,27 +41,28 @@ export function PremiumHeader({ title, icon, description, breadcrumbs, path }: P
               {effectiveBreadcrumbs.parent && (
                 <>
                   <span className="mr-1">{
-                    // Map paths to correct sidebar categories
+                    // Direct category mapping for specific pages
                     (() => {
                       if (!path) return effectiveBreadcrumbs.parent;
                       
-                      // Beheer category
-                      const beheerPaths = ['/students', '/guardians', '/teachers'];
-                      if (beheerPaths.some(p => path.startsWith(p))) {
-                        return 'Beheer';
-                      }
+                      // Onderwijs category
+                      if (path.startsWith('/student-groups')) return 'Onderwijs';
+                      if (path.startsWith('/programs')) return 'Onderwijs';
+                      if (path.startsWith('/calendar')) return 'Onderwijs';
+                      if (path.startsWith('/courses')) return 'Onderwijs';
+                      if (path.startsWith('/scheduling')) return 'Onderwijs';
                       
-                      // Onderwijs category  
-                      const onderwijsPaths = ['/courses', '/programs', '/calendar', '/scheduling', '/student-groups'];
-                      if (onderwijsPaths.some(p => path.startsWith(p))) {
-                        return 'Onderwijs';
-                      }
+                      // Beheer category
+                      if (path.startsWith('/students')) return 'Beheer';
+                      if (path.startsWith('/guardians')) return 'Beheer';
+                      if (path.startsWith('/teachers')) return 'Beheer';
                       
                       // Evaluatie category
-                      const evaluatiePaths = ['/attendance', '/grading', '/reports', '/fees', '/student-dossier'];
-                      if (evaluatiePaths.some(p => path.startsWith(p))) {
-                        return 'Evaluatie';
-                      }
+                      if (path.startsWith('/attendance')) return 'Evaluatie';
+                      if (path.startsWith('/grading')) return 'Evaluatie';
+                      if (path.startsWith('/reports')) return 'Evaluatie';
+                      if (path.startsWith('/fees')) return 'Evaluatie';
+                      if (path.startsWith('/student-dossier')) return 'Evaluatie';
                       
                       return effectiveBreadcrumbs.parent;
                     })()

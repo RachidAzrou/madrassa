@@ -274,6 +274,25 @@ export default function Cijfers() {
     }
   });
 
+  // Helper functions
+  const formatGradeWithCategory = (score: number): string => {
+    if (score >= 90) return `${score}% (Uitstekend)`;
+    if (score >= 80) return `${score}% (Zeer Goed)`;
+    if (score >= 70) return `${score}% (Goed)`;
+    if (score >= 60) return `${score}% (Voldoende)`;
+    if (score >= 50) return `${score}% (Matig)`;
+    return `${score}% (Onvoldoende)`;
+  };
+
+  const getGradeColor = (score: number): string => {
+    if (score >= 90) return "text-green-700 bg-green-50";
+    if (score >= 80) return "text-blue-700 bg-blue-50";
+    if (score >= 70) return "text-indigo-700 bg-indigo-50";
+    if (score >= 60) return "text-yellow-700 bg-yellow-50";
+    if (score >= 50) return "text-orange-700 bg-orange-50";
+    return "text-red-700 bg-red-50";
+  };
+
   // Handlers
   const handleEditGrade = (studentId: string, subject: string, grade: number | null) => {
     setEditGrade({ studentId, subject, grade });
@@ -296,7 +315,7 @@ export default function Cijfers() {
         return;
       }
 
-      // Save to database
+      // Save to database - expect percentage input (0-100)
       const response = await fetch('/api/grades', {
         method: 'POST',
         headers: {
@@ -304,10 +323,10 @@ export default function Cijfers() {
         },
         body: JSON.stringify({
           studentId: parseInt(studentId),
-          courseId: program.id, // Use courseId as expected by the schema
+          courseId: program.id,
           assessmentType: 'regular',
           assessmentName: 'Cijfer',
-          score: Math.round(newGrade * 10), // Convert 7.5 to 75
+          score: Math.round(newGrade), // Store as percentage (0-100)
           maxScore: 100,
           weight: 100,
           date: new Date().toISOString().split('T')[0]
@@ -652,15 +671,15 @@ export default function Cijfers() {
                                     <div className="flex flex-col items-center gap-2 p-3 bg-white border border-blue-300 rounded shadow-sm">
                                       <Input
                                         type="number"
-                                        min="1"
-                                        max="10"
-                                        step="0.1"
-                                        placeholder="7.5"
-                                        className="w-20 h-8 text-center text-sm font-medium border border-blue-300 focus:border-blue-500"
+                                        min="0"
+                                        max="100"
+                                        step="1"
+                                        placeholder="75%"
+                                        className="w-24 h-8 text-center text-sm font-medium border border-blue-300 focus:border-blue-500"
                                         defaultValue={editGrade.grade?.toString() || ''}
                                         onBlur={(e) => {
                                           const value = parseFloat(e.target.value);
-                                          if (!isNaN(value) && value >= 1 && value <= 10) {
+                                          if (!isNaN(value) && value >= 0 && value <= 100) {
                                             handleSaveGrade(value);
                                           } else {
                                             handleCancelEditGrade();
@@ -669,7 +688,7 @@ export default function Cijfers() {
                                         onKeyDown={(e) => {
                                           if (e.key === 'Enter') {
                                             const value = parseFloat(e.currentTarget.value);
-                                            if (!isNaN(value) && value >= 1 && value <= 10) {
+                                            if (!isNaN(value) && value >= 0 && value <= 100) {
                                               handleSaveGrade(value);
                                             } else {
                                               handleCancelEditGrade();
@@ -692,15 +711,13 @@ export default function Cijfers() {
                                       )}
                                     >
                                       <div className="flex flex-col items-center gap-1">
-                                        <span className={`
-                                          ${subjectGrades[student.id]?.[subject.name] ? 
-                                            subjectGrades[student.id][subject.name] >= 5.5 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold' 
-                                            : 'text-gray-400 font-medium'
-                                          }
-                                          text-lg
-                                        `}>
-                                          {subjectGrades[student.id]?.[subject.name]?.toFixed(1) || '-'}
-                                        </span>
+                                        {subjectGrades[student.id]?.[subject.name] ? (
+                                          <div className={`px-2 py-1 rounded-full text-xs font-medium ${getGradeColor(subjectGrades[student.id][subject.name])}`}>
+                                            {formatGradeWithCategory(subjectGrades[student.id][subject.name])}
+                                          </div>
+                                        ) : (
+                                          <span className="text-gray-400 font-medium text-lg">-</span>
+                                        )}
                                         <Edit className="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                                       </div>
                                     </div>
@@ -710,17 +727,13 @@ export default function Cijfers() {
                               
                               <TableCell className="text-right">
                                 <div className="flex items-center justify-end gap-2">
-                                  <span className={`
-                                    font-semibold text-lg px-3 py-1 rounded-full
-                                    ${calculateAverage(student.id) ? 
-                                      calculateAverage(student.id)! >= 5.5 ? 
-                                        'bg-green-100 text-green-700 border border-green-200' : 
-                                        'bg-red-100 text-red-700 border border-red-200'
-                                      : 'bg-gray-100 text-gray-500'
-                                    }
-                                  `}>
-                                    {calculateAverage(student.id)?.toFixed(1) || '-'}
-                                  </span>
+                                  {calculateAverage(student.id) ? (
+                                    <div className={`px-3 py-1 rounded-full text-sm font-semibold ${getGradeColor(calculateAverage(student.id)!)}`}>
+                                      {formatGradeWithCategory(calculateAverage(student.id)!)}
+                                    </div>
+                                  ) : (
+                                    <span className="bg-gray-100 text-gray-500 font-semibold text-lg px-3 py-1 rounded-full">-</span>
+                                  )}
                                 </div>
                               </TableCell>
                             </TableRow>

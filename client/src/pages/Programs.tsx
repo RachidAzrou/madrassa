@@ -871,50 +871,8 @@ export default function Programs() {
               return;
             }
             
-            // Voeg vak toe aan localStorage
-            const newProgram = {
-              id: Date.now(),
-              name: programFormData.name,
-              code: programFormData.code,
-              description: programFormData.description,
-              duration: programFormData.duration,
-              department: programFormData.department,
-              isActive: programFormData.isActive,
-              entryRequirements: programFormData.entryRequirements,
-              learningObjectives: programFormData.learningObjectives,
-              competencies: programFormData.competencies,
-              assignedTeachers: programFormData.assignedTeachers.filter(t => t.selected),
-              createdAt: new Date().toISOString()
-            };
-            
-            const existingPrograms = JSON.parse(localStorage.getItem('programs') || '[]');
-            existingPrograms.push(newProgram);
-            localStorage.setItem('programs', JSON.stringify(existingPrograms));
-            
-            // Reset form en sluit dialog
-            setProgramFormData({
-              name: '',
-              code: '',
-              description: '',
-              duration: 4,
-              department: '',
-              isActive: true,
-              entryRequirements: '',
-              learningObjectives: '',
-              competencies: '',
-              assignedClasses: [],
-              assignedTeachers: [],
-            });
-            setIsAddDialogOpen(false);
-            
-            toast({
-              title: "Vak toegevoegd",
-              description: `${newProgram.name} is succesvol toegevoegd.`,
-              variant: "default",
-            });
-            
-            // Refresh de data
-            queryClient.invalidateQueries({ queryKey: ['/api/programs'] });
+            // Trigger de mutation om het programma op te slaan
+            createProgramMutation.mutate(programFormData);
           }}
           cancelText="Annuleren"
           submitText="Vak toevoegen"

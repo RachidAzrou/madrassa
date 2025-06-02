@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Download, Save, Plus, X, Edit, Trash2, Calculator, CheckCircle, Star, ClipboardList, FileText, Award, Users, BookOpen, GraduationCap, Target, TrendingUp } from 'lucide-react';
+import { Search, Download, Save, Plus, X, Edit, Trash2, Calculator, CheckCircle, Star, ClipboardList, FileText, Award, Users, BookOpen, GraduationCap, Target, TrendingUp, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -30,13 +30,19 @@ export default function Cijfers() {
   // State
   const [selectedClass, setSelectedClass] = useState<any>(null);
   const [selectedSubject, setSelectedSubject] = useState<any>(null);
+  const [selectedAssessment, setSelectedAssessment] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [step, setStep] = useState<'class' | 'subject' | 'assessments'>('class');
+  const [step, setStep] = useState<'class' | 'subject' | 'assessments' | 'grades'>('class');
+  const [grades, setGrades] = useState<{[studentId: string]: string}>({});
 
   // Data fetching
   const { data: classesData = [] } = useQuery({ queryKey: ['/api/student-groups'] });
   const { data: subjectsData } = useQuery({ queryKey: ['/api/programs'] });
+  const { data: studentsData = [] } = useQuery({ 
+    queryKey: ['/api/students'], 
+    enabled: !!selectedClass
+  });
 
   // Mock data voor beoordelingen per vak
   const mockAssessments = {
@@ -63,8 +69,38 @@ export default function Cijfers() {
     setStep('assessments');
   };
 
+  const handleAssessmentSelect = (assessment: any) => {
+    setSelectedAssessment(assessment);
+    setStep('grades');
+    // Initialize grades for all students
+    const initialGrades: {[studentId: string]: string} = {};
+    studentsData.forEach((student: any) => {
+      initialGrades[student.id] = '';
+    });
+    setGrades(initialGrades);
+  };
+
+  const handleGradeChange = (studentId: string, grade: string) => {
+    setGrades(prev => ({
+      ...prev,
+      [studentId]: grade
+    }));
+  };
+
+  const handleSaveGrades = () => {
+    // In real implementation, this would save to database
+    toast({
+      title: "Cijfers opgeslagen",
+      description: `Cijfers voor ${selectedAssessment.name} zijn succesvol opgeslagen.`,
+    });
+  };
+
   const handleBack = () => {
-    if (step === 'assessments') {
+    if (step === 'grades') {
+      setStep('assessments');
+      setSelectedAssessment(null);
+      setGrades({});
+    } else if (step === 'assessments') {
       setStep('subject');
       setSelectedSubject(null);
     } else if (step === 'subject') {
@@ -134,9 +170,15 @@ export default function Cijfers() {
                 {selectedSubject && <span className="text-sm">({selectedSubject.name})</span>}
               </div>
               <div className="h-px bg-gray-300 flex-1"></div>
-              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${step === 'assessments' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${step === 'assessments' ? 'bg-blue-100 text-blue-700' : selectedAssessment ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                 {getStepIcon('assessments')}
                 <span className="font-medium">Beoordelingen</span>
+                {selectedAssessment && <span className="text-sm">({selectedAssessment.name})</span>}
+              </div>
+              <div className="h-px bg-gray-300 flex-1"></div>
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${step === 'grades' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
+                <Calculator className="h-5 w-5" />
+                <span className="font-medium">Punten invoeren</span>
               </div>
             </div>
           </div>
@@ -314,6 +356,14 @@ export default function Cijfers() {
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center justify-end gap-1">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => handleAssessmentSelect(assessment)}
+                                  className="text-blue-600 hover:text-blue-700"
+                                >
+                                  <User className="h-4 w-4" />
+                                </Button>
                                 <Button variant="ghost" size="sm">
                                   <Edit className="h-4 w-4" />
                                 </Button>

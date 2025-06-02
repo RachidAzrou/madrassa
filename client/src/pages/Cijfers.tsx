@@ -570,6 +570,23 @@ export default function Cijfers() {
                           <TableHead>Cijfer</TableHead>
                         </TableRow>
                       </TableHeader>
+                      
+                      {/* Action Button under table header */}
+                      <TableRow className="bg-gray-50 border-b">
+                        <TableCell colSpan={5} className="py-3">
+                          <div className="flex justify-start">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleAssessmentSelect(selectedAssessment)}
+                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            >
+                              <User className="h-4 w-4 mr-2" />
+                              Studenten selecteren
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
                       <TableBody>
                         {Array.isArray(studentsData) && studentsData.length > 0 ? studentsData.map((student: any) => {
                           const points = grades[student.id] || '';

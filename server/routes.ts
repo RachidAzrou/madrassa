@@ -2392,6 +2392,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  apiRouter.get("/api/student-groups/:groupId/students", async (req, res) => {
+    try {
+      const groupId = parseInt(req.params.groupId);
+      if (isNaN(groupId)) {
+        return res.status(400).json({ message: "Invalid group ID format" });
+      }
+      
+      // Haal studenten op die ingeschreven zijn in deze klas
+      const studentsInGroup = await db
+        .select({
+          id: students.id,
+          studentId: students.studentId,
+          firstName: students.firstName,
+          lastName: students.lastName,
+          email: students.email,
+          phone: students.phone,
+          dateOfBirth: students.dateOfBirth,
+          address: students.address,
+          street: students.street,
+          houseNumber: students.houseNumber,
+          postalCode: students.postalCode,
+          city: students.city,
+          programId: students.programId,
+          yearLevel: students.yearLevel,
+          status: students.status,
+          enrollmentDate: students.enrollmentDate,
+          notes: students.notes,
+          gender: students.gender,
+          photoUrl: students.photoUrl
+        })
+        .from(students)
+        .innerJoin(
+          studentGroupEnrollments,
+          and(
+            eq(studentGroupEnrollments.studentId, students.id),
+            eq(studentGroupEnrollments.groupId, groupId),
+            eq(studentGroupEnrollments.status, 'active')
+          )
+        )
+        .orderBy(students.firstName, students.lastName);
+      
+      res.json(studentsInGroup);
+    } catch (error) {
+      console.error("Error fetching students by group:", error);
+      res.status(500).json({ message: "Error fetching students by group" });
+    }
+  });
+
   apiRouter.get("/api/programs/:programId/student-groups", async (req, res) => {
     try {
       const programId = parseInt(req.params.programId);

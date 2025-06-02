@@ -83,13 +83,20 @@ export default function Attendance() {
     staleTime: 60000,
   });
   
-  // Fetch students
-  const { data: studentsResponse, isLoading: isLoadingStudents } = useQuery({
-    queryKey: ['/api/students'],
+  // Fetch students by selected class
+  const { data: studentsData, isLoading: isLoadingStudents } = useQuery({
+    queryKey: ['/api/student-groups', selectedClass, 'students'],
+    queryFn: async () => {
+      if (!selectedClass) return [];
+      const response = await fetch(`/api/student-groups/${selectedClass}/students`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch students');
+      }
+      return response.json();
+    },
     staleTime: 60000,
+    enabled: !!selectedClass,
   });
-  
-  const studentsData = studentsResponse?.students || [];
   
   // Fetch teachers
   const { data: teachersResponse, isLoading: isLoadingTeachers } = useQuery({
@@ -437,9 +444,9 @@ export default function Attendance() {
         </CardHeader>
         <CardContent className="p-6 bg-white">
           {/* Clean Controls */}
-          <div className="flex flex-col gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             {/* Date Navigation - Centered */}
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center gap-3 flex-1">
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -464,7 +471,7 @@ export default function Attendance() {
             </div>
 
             {/* Filters */}
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center gap-3">
               <Select value={selectedClass} onValueChange={handleClassChange}>
                 <SelectTrigger className="h-9 w-[240px] border-[#e5e7eb] bg-white">
                   <SelectValue placeholder="Selecteer klas" />

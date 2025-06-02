@@ -212,12 +212,40 @@ export default function Cijfers() {
     }));
   };
 
+  const saveGradesMutation = useMutation({
+    mutationFn: async () => {
+      const gradesToSave = Object.entries(grades)
+        .filter(([_, grade]) => grade !== '')
+        .map(([studentId, score]) => ({
+          studentId: parseInt(studentId),
+          assessmentId: selectedAssessment.id,
+          score: parseFloat(score),
+          maxScore: selectedAssessment.maxPoints || selectedAssessment.points || 100
+        }));
+
+      return apiRequest('/api/grades', {
+        method: 'POST',
+        body: JSON.stringify({ grades: gradesToSave })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/grades'] });
+      toast({
+        title: "Cijfers opgeslagen",
+        description: `Cijfers voor ${selectedAssessment.name} zijn succesvol opgeslagen.`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Fout bij opslaan",
+        description: "Er is een fout opgetreden bij het opslaan van de cijfers.",
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleSaveGrades = () => {
-    // In real implementation, this would save to database
-    toast({
-      title: "Cijfers opgeslagen",
-      description: `Cijfers voor ${selectedAssessment.name} zijn succesvol opgeslagen.`,
-    });
+    saveGradesMutation.mutate();
   };
 
   const handleBack = () => {
@@ -637,11 +665,11 @@ export default function Cijfers() {
                       </Button>
                       <Button 
                         onClick={handleSaveGrades}
-                        disabled={Object.values(grades).filter(g => g !== '').length === 0}
+                        disabled={Object.values(grades).filter(g => g !== '').length === 0 || saveGradesMutation.isPending}
                         className="hover:bg-green-700 bg-[#0b4ca4]"
                       >
                         <Save className="h-4 w-4 mr-2" />
-                        Cijfers opslaan
+                        {saveGradesMutation.isPending ? 'Opslaan...' : 'Cijfers opslaan'}
                       </Button>
                     </div>
                   </div>

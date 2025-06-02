@@ -4719,6 +4719,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Save grades for multiple students
+  app.post("/api/grades", async (req: Request, res: Response) => {
+    try {
+      const { grades: gradesToSave } = req.body;
+      
+      if (!Array.isArray(gradesToSave)) {
+        return res.status(400).json({ error: "Grades must be an array" });
+      }
+
+      const savedGrades = [];
+      for (const gradeData of gradesToSave) {
+        const { studentId, assessmentId, score, maxScore } = gradeData;
+        
+        // Get the assessment to get more details
+        const assessment = await storage.getAssessmentById(assessmentId);
+        if (!assessment) {
+          continue; // Skip if assessment not found
+        }
+
+        const gradeRecord = {
+          studentId,
+          courseId: assessment.courseId,
+          assessmentType: assessment.type,
+          assessmentName: assessment.name,
+          score,
+          maxScore,
+          weight: assessment.weight || 0,
+          date: new Date().toISOString().split('T')[0], // Today's date
+          remark: null
+        };
+
+        const savedGrade = await storage.createGrade(gradeRecord);
+        savedGrades.push(savedGrade);
+      }
+
+      res.json({ 
+        message: "Grades saved successfully", 
+        savedGrades: savedGrades.length 
+      });
+    } catch (error) {
+      console.error("Error saving grades:", error);
+      res.status(500).json({ error: "Failed to save grades" });
+    }
+  });
+
   // creëer HTTP server
   const server = createServer(app);
 

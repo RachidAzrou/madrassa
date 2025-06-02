@@ -131,6 +131,15 @@ export interface IStorage {
   assignTeacherToProgram(programId: number, teacherId: number, isPrimary?: boolean): Promise<void>;
   removeTeacherFromProgram(programId: number, teacherId: number): Promise<void>;
   
+  // Assessment operations
+  getAssessments(): Promise<any[]>;
+  getAssessment(id: number): Promise<any | undefined>;
+  getAssessmentById(id: number): Promise<any | undefined>;
+  getAssessmentsByCourse(courseId: number): Promise<any[]>;
+  createAssessment(assessment: any): Promise<any>;
+  updateAssessment(id: number, assessment: any): Promise<any | undefined>;
+  deleteAssessment(id: number): Promise<boolean>;
+  
   // Grades operations
   getGrades(): Promise<Grade[]>;
   getGrade(id: number): Promise<Grade | undefined>;
@@ -1044,6 +1053,76 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error getting grades by student and course:', error);
       return [];
+    }
+  }
+
+  // Assessment operations implementation
+  async getAssessments(): Promise<any[]> {
+    try {
+      const assessmentsData = await db.select().from(assessments);
+      return assessmentsData;
+    } catch (error) {
+      console.error('Error getting assessments:', error);
+      return [];
+    }
+  }
+
+  async getAssessment(id: number): Promise<any | undefined> {
+    try {
+      const [assessment] = await db.select().from(assessments).where(eq(assessments.id, id));
+      return assessment || undefined;
+    } catch (error) {
+      console.error('Error getting assessment:', error);
+      return undefined;
+    }
+  }
+
+  async getAssessmentById(id: number): Promise<any | undefined> {
+    return this.getAssessment(id);
+  }
+
+  async getAssessmentsByCourse(courseId: number): Promise<any[]> {
+    try {
+      const assessmentsData = await db.select().from(assessments)
+        .where(eq(assessments.courseId, courseId));
+      return assessmentsData;
+    } catch (error) {
+      console.error('Error getting assessments by course:', error);
+      return [];
+    }
+  }
+
+  async createAssessment(assessment: any): Promise<any> {
+    try {
+      const [newAssessment] = await db.insert(assessments).values(assessment).returning();
+      return newAssessment;
+    } catch (error) {
+      console.error('Error creating assessment:', error);
+      throw new Error('Failed to create assessment');
+    }
+  }
+
+  async updateAssessment(id: number, assessment: any): Promise<any | undefined> {
+    try {
+      const [updatedAssessment] = await db
+        .update(assessments)
+        .set(assessment)
+        .where(eq(assessments.id, id))
+        .returning();
+      return updatedAssessment || undefined;
+    } catch (error) {
+      console.error('Error updating assessment:', error);
+      return undefined;
+    }
+  }
+
+  async deleteAssessment(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(assessments).where(eq(assessments.id, id));
+      return (result.rowCount || 0) > 0;
+    } catch (error) {
+      console.error('Error deleting assessment:', error);
+      return false;
     }
   }
 

@@ -745,7 +745,7 @@ export default function Cijfers() {
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <DialogContent className="sm:max-w-[500px]" noPadding>
-          <DialogHeader variant="premium" className="bg-red-600">
+          <DialogHeader variant="premium" className="bg-blue-900">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
                 <Trash2 className="h-5 w-5 text-white" />
@@ -754,7 +754,7 @@ export default function Cijfers() {
                 <DialogTitle className="text-lg font-semibold text-white">
                   Beoordeling verwijderen
                 </DialogTitle>
-                <DialogDescription className="text-red-100 mt-1">
+                <DialogDescription className="text-blue-100 mt-1">
                   Deze actie kan niet ongedaan worden gemaakt
                 </DialogDescription>
               </div>
@@ -763,8 +763,8 @@ export default function Cijfers() {
 
           <div className="p-6">
             <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                <Trash2 className="h-6 w-6 text-red-600" />
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                <Trash2 className="h-6 w-6 text-blue-600" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -775,10 +775,10 @@ export default function Cijfers() {
                   <span className="font-semibold text-gray-900">"{deletingAssessment?.name}"</span>{' '}
                   permanent te verwijderen. Alle gekoppelde cijfers en resultaten gaan verloren.
                 </p>
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-red-800">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                    <span className="text-sm font-medium text-blue-800">
                       Deze actie kan niet ongedaan worden gemaakt
                     </span>
                   </div>

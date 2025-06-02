@@ -1954,8 +1954,8 @@ export default function Students() {
                     </Button>
                   </div>
                   <div className="space-y-2">
-                    {newStudentSiblings.length > 0 ? (
-                      newStudentSiblings.map((sibling, index) => (
+                    {studentSiblings && studentSiblings.length > 0 ? (
+                      studentSiblings.map((sibling: any, index: number) => (
                         <div key={index} className="flex items-center justify-between p-3 bg-white rounded-md border border-gray-200">
                           <div className="flex items-center space-x-3">
                             <Avatar className="h-8 w-8">
@@ -1965,7 +1965,7 @@ export default function Students() {
                             </Avatar>
                             <div>
                               <p className="text-sm font-medium text-gray-900">{sibling.firstName} {sibling.lastName}</p>
-                              <p className="text-xs text-gray-500">Student ID: {sibling.studentIdCode || sibling.studentId || 'Niet beschikbaar'}</p>
+                              <p className="text-xs text-gray-500">Student ID: {sibling.studentIdCode || 'Niet beschikbaar'}</p>
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
@@ -1981,8 +1981,27 @@ export default function Students() {
                               type="button"
                               variant="ghost"
                               size="sm"
-                              onClick={() => {
-                                setNewStudentSiblings(prev => prev.filter((_, i) => i !== index));
+                              onClick={async () => {
+                                try {
+                                  await apiRequest(`/api/students/${selectedStudent.id}/siblings/${sibling.siblingId}`, {
+                                    method: 'DELETE'
+                                  });
+                                  queryClient.invalidateQueries({ queryKey: ['/api/students', selectedStudent.id, 'siblings'] });
+                                  queryClient.invalidateQueries({ queryKey: ['/api/students', sibling.siblingId, 'siblings'] });
+                                  queryClient.invalidateQueries({ queryKey: ['/api/students'] });
+                                  refetchSiblings();
+                                  toast({
+                                    title: "Broer/zus ontkoppeld",
+                                    description: `${sibling.firstName} ${sibling.lastName} is ontkoppeld.`,
+                                  });
+                                } catch (error) {
+                                  console.error('Error removing sibling:', error);
+                                  toast({
+                                    title: "Fout",
+                                    description: "Er is een probleem opgetreden bij het ontkoppelen van de broer/zus.",
+                                    variant: "destructive",
+                                  });
+                                }
                               }}
                               className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
                             >

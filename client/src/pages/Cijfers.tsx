@@ -152,6 +152,9 @@ export default function Cijfers() {
     queryKey: ['/api/students'], 
     enabled: !!selectedClass
   });
+  
+  // Data fetching for all students to get counts per class
+  const { data: allStudentsData = [] } = useQuery({ queryKey: ['/api/students'] });
 
   // Data fetching for assessments
   const { data: assessmentsData = [] } = useQuery({ 
@@ -183,6 +186,15 @@ export default function Cijfers() {
   const fetchGradesForSubject = async (subjectId: number) => {
     const response = await fetch(`/api/grades/by-course/${subjectId}`);
     return response.json();
+  };
+
+  // Function to get student count for a specific class
+  const getStudentCountForClass = (classId: number) => {
+    if (!Array.isArray(allStudentsData)) return 0;
+    // Filter students by their class enrollment
+    return allStudentsData.filter((student: any) => 
+      student.classId === classId || student.studentGroupId === classId
+    ).length;
   };
 
 
@@ -518,7 +530,7 @@ export default function Cijfers() {
                             <div className="flex items-center gap-2">
                               <Badge variant="secondary" className="flex items-center gap-1">
                                 <Users className="h-3 w-3" />
-                                24
+                                {getStudentCountForClass(classGroup.id)}
                               </Badge>
                             </div>
                           </div>

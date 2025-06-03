@@ -356,7 +356,7 @@ export default function Reports() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Target className="h-5 w-5 text-blue-600" />
+                      <Target className="h-5 w-5" />
                       Rapport Type
                     </CardTitle>
                     <CardDescription>
@@ -440,7 +440,7 @@ export default function Reports() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <School className="h-5 w-5 text-green-600" />
+                      <School className="h-5 w-5" />
                       School Instellingen
                     </CardTitle>
                     <CardDescription>

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, LogIn, GraduationCap, Users, CreditCard, Shield, BookOpen } from 'lucide-react';
 import logoPath from '@assets/myMadrassa.png';
-import backgroundPath from '@assets/top-view-items-blue-background.jpg';
+import backgroundImage from '@assets/top-view-items-blue-background.jpg';
 
 export default function Login() {
   const { login } = useAuth();
@@ -42,7 +42,7 @@ export default function Login() {
     <div 
       className="min-h-screen flex relative overflow-hidden"
       style={{
-        backgroundImage: `url(${backgroundPath})`,
+        backgroundImage: `url(/top-view-items-blue-background.jpg)`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'

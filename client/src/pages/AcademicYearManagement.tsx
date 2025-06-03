@@ -13,7 +13,7 @@ import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -250,8 +250,15 @@ export default function AcademicYearManagement() {
   };
 
   const handleDeleteYear = (year: AcademicYear) => {
-    if (confirm(`Weet je zeker dat je het schooljaar "${year.name}" wilt verwijderen?`)) {
-      deleteYearMutation.mutate(year.id);
+    setYearToDelete(year);
+    setDeleteYearDialogOpen(true);
+  };
+
+  const confirmDeleteYear = () => {
+    if (yearToDelete) {
+      deleteYearMutation.mutate(yearToDelete.id);
+      setDeleteYearDialogOpen(false);
+      setYearToDelete(null);
     }
   };
 
@@ -269,8 +276,15 @@ export default function AcademicYearManagement() {
   };
 
   const handleDeleteHoliday = (holiday: Holiday) => {
-    if (confirm(`Weet je zeker dat je de vakantie "${holiday.name}" wilt verwijderen?`)) {
-      deleteHolidayMutation.mutate(holiday.id);
+    setHolidayToDelete(holiday);
+    setDeleteHolidayDialogOpen(true);
+  };
+
+  const confirmDeleteHoliday = () => {
+    if (holidayToDelete) {
+      deleteHolidayMutation.mutate(holidayToDelete.id);
+      setDeleteHolidayDialogOpen(false);
+      setHolidayToDelete(null);
     }
   };
 
@@ -770,6 +784,122 @@ export default function AcademicYearManagement() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Academic Year Confirmation Dialog */}
+      <Dialog open={deleteYearDialogOpen} onOpenChange={setDeleteYearDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <Trash2 className="h-5 w-5" />
+              Schooljaar Verwijderen
+            </DialogTitle>
+            <DialogDescription>
+              Deze actie kan niet ongedaan worden gemaakt.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="bg-red-50 border border-red-200 rounded-sm p-4 mb-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                    <Trash2 className="h-4 w-4 text-red-600" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-medium text-red-800 mb-1">
+                    Weet je zeker dat je dit schooljaar wilt verwijderen?
+                  </h4>
+                  <p className="text-sm text-red-700">
+                    <strong>{yearToDelete?.name}</strong> wordt permanent verwijderd van het systeem.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600">
+              Alle gerelateerde gegevens zoals vakanties en inschrijvingen worden ook verwijderd.
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteYearDialogOpen(false);
+                setYearToDelete(null);
+              }}
+              className="flex-1"
+            >
+              Annuleren
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteYear}
+              disabled={deleteYearMutation.isPending}
+              className="flex-1"
+            >
+              {deleteYearMutation.isPending ? 'Verwijderen...' : 'Definitief Verwijderen'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Holiday Confirmation Dialog */}
+      <Dialog open={deleteHolidayDialogOpen} onOpenChange={setDeleteHolidayDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <Trash2 className="h-5 w-5" />
+              Vakantie Verwijderen
+            </DialogTitle>
+            <DialogDescription>
+              Deze actie kan niet ongedaan worden gemaakt.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="bg-red-50 border border-red-200 rounded-sm p-4 mb-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                    <Clock className="h-4 w-4 text-red-600" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-medium text-red-800 mb-1">
+                    Weet je zeker dat je deze vakantie wilt verwijderen?
+                  </h4>
+                  <p className="text-sm text-red-700">
+                    <strong>{holidayToDelete?.name}</strong> wordt permanent verwijderd van het systeem.
+                  </p>
+                  {holidayToDelete && (
+                    <p className="text-xs text-red-600 mt-1">
+                      {new Date(holidayToDelete.startDate).toLocaleDateString('nl-NL')} - {new Date(holidayToDelete.endDate).toLocaleDateString('nl-NL')}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteHolidayDialogOpen(false);
+                setHolidayToDelete(null);
+              }}
+              className="flex-1"
+            >
+              Annuleren
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteHoliday}
+              disabled={deleteHolidayMutation.isPending}
+              className="flex-1"
+            >
+              {deleteHolidayMutation.isPending ? 'Verwijderen...' : 'Definitief Verwijderen'}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

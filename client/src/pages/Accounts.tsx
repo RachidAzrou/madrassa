@@ -332,14 +332,14 @@ export default function Accounts() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <PageHeader
-        title="Accountbeheer"
-        description="Beheer gebruikersaccounts en toegangsrechten"
-      />
+    <div className="container mx-auto py-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Accountbeheer</h1>
+        <p className="text-gray-600 mt-2">Beheer gebruikersaccounts en toegangsrechten</p>
+      </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
         <Card>
           <CardContent className="p-4">
             <div className="text-2xl font-bold text-blue-600">{accountStats.total}</div>
@@ -446,9 +446,12 @@ export default function Accounts() {
       </div>
 
       {/* Accounts Table */}
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
+      <div className="bg-white rounded-lg shadow-sm border">
+        <div className="p-6 border-b">
+          <h3 className="text-lg font-semibold">Gebruikersaccounts</h3>
+          <p className="text-sm text-gray-600">Beheer en monitor alle gebruikersaccounts</p>
+        </div>
+        <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="border-b bg-gray-50">
                 <tr>
@@ -513,7 +516,6 @@ export default function Accounts() {
                 ))}
               </tbody>
             </table>
-          </div>
           
           {filteredAccounts.length === 0 && (
             <div className="text-center py-12">
@@ -521,8 +523,8 @@ export default function Accounts() {
               <p className="text-gray-500">Geen accounts gevonden</p>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Add Account Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>

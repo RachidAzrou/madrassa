@@ -65,35 +65,43 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
     queryKey: ['/api/notifications/user/1'],
   });
 
-  // Hardcoded berichten voor demo (later vervangen door echte API data)
-  const allMessages = [
-    {
-      id: 1,
-      sender: "Karim Salhi",
-      initials: "KS",
-      time: "Vandaag, 10:42",
-      preview: "Vraag over het huiswerk voor morgen, kunnen we bespreken?",
-      bgColor: "bg-amber-100",
-      textColor: "text-amber-800"
-    },
-    {
-      id: 2,
-      sender: "Fatima El Amrani", 
-      initials: "FE",
-      time: "Gisteren, 15:20",
-      preview: "Goed nieuws! Het project is goedgekeurd. Laten we volgende week een vergadering plannen.",
-      bgColor: "bg-green-100",
-      textColor: "text-green-800"
-    }
-  ];
+  // Haal ongelezen berichten op van de echte Messages API
+  const { data: unreadMessagesData } = useQuery({
+    queryKey: [`/api/messages/unread/${profileData?.id}/${profileData?.role}`],
+    enabled: !!profileData?.id && !!profileData?.role,
+    refetchInterval: 30000, // Auto-refresh elke 30 seconden
+  });
 
-  // Filter uit gelezen berichten
-  const unreadMessages = allMessages.filter(msg => !readMessages.has(msg.id));
+  // Haal daadwerkelijke berichten op voor de inbox
+  const { data: inboxMessages } = useQuery({
+    queryKey: [`/api/messages/receiver/${profileData?.id}/${profileData?.role}`],
+    enabled: !!profileData?.id && !!profileData?.role,
+    refetchInterval: 30000,
+  });
+
+  // Filter ongelezen berichten en formatteer voor weergave
+  const unreadMessages = Array.isArray(inboxMessages) 
+    ? inboxMessages
+        .filter(msg => !msg.isRead)
+        .slice(0, 5)
+        .map(msg => ({
+          id: msg.id,
+          sender: `${msg.senderFirstName || ''} ${msg.senderLastName || ''}`.trim(),
+          initials: `${msg.senderFirstName?.[0] || ''}${msg.senderLastName?.[0] || ''}`,
+          time: new Date(msg.createdAt).toLocaleDateString(),
+          preview: msg.content?.substring(0, 60) + (msg.content?.length > 60 ? '...' : ''),
+          bgColor: msg.senderRole === 'admin' ? 'bg-red-100' : 
+                   msg.senderRole === 'secretariaat' ? 'bg-orange-100' :
+                   msg.senderRole === 'docent' ? 'bg-green-100' :
+                   msg.senderRole === 'voogd' ? 'bg-purple-100' : 'bg-blue-100',
+          textColor: msg.senderRole === 'admin' ? 'text-red-800' : 
+                     msg.senderRole === 'secretariaat' ? 'text-orange-800' :
+                     msg.senderRole === 'docent' ? 'text-green-800' :
+                     msg.senderRole === 'voogd' ? 'text-purple-800' : 'text-blue-800'
+        }))
+    : [];
 
   const handleMessageClick = (messageId: number) => {
-    // Markeer bericht als gelezen
-    setReadMessages(prev => new Set([...prev, messageId]));
-    // Navigeer naar de berichtenpagina met het specifieke bericht
     setLocation(`/messages?messageId=${messageId}`);
   };
 

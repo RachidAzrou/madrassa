@@ -77,6 +77,7 @@ export default function Accounts() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [showFilterOptions, setShowFilterOptions] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isBulkCreateDialogOpen, setIsBulkCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
@@ -88,6 +89,11 @@ export default function Accounts() {
     role: 'student',
     personId: 0,
     isActive: true
+  });
+  const [bulkCreateOptions, setBulkCreateOptions] = useState({
+    type: 'students', // 'students', 'teachers', 'guardians', 'class'
+    classId: '',
+    defaultPassword: 'Welkom123!'
   });
 
   // Queries
@@ -105,6 +111,10 @@ export default function Accounts() {
 
   const { data: guardiansData = [] } = useQuery({
     queryKey: ["/api/guardians"],
+  });
+
+  const { data: studentGroupsData = [] } = useQuery({
+    queryKey: ["/api/student-groups"],
   });
 
   // Combine all persons for account creation

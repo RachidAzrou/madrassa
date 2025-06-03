@@ -336,7 +336,7 @@ export default function Fees() {
   if (isParent) {
     // Ouderweergave: "Mijn Betalingen"
     return (
-      <div className="space-y-6">
+      <div className="min-h-screen p-6 space-y-6">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Mijn Betalingen</h1>
@@ -531,7 +531,7 @@ export default function Fees() {
 
   // Staff/Admin weergave: "Betalingsbeheer"
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Betalingsbeheer</h1>

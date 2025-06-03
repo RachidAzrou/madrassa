@@ -607,6 +607,7 @@ export default function Dashboard() {
           </div>
         </div>
         </div> {/* End main content wrapper */}
+        </div>
       </div>
     </div>
   );

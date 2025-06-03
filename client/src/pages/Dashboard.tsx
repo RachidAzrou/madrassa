@@ -216,9 +216,8 @@ export default function Dashboard() {
         />
       </div>
       <div className="mt-[91px] flex-1 overflow-auto bg-[#f7f9fc]">
-      
-      {/* Main content area */}
-      <div className="px-6 py-6 max-w-7xl mx-auto">{/* Start main content wrapper */}
+        {/* Main content area */}
+        <div className="px-6 py-6 max-w-7xl mx-auto">{/* Start main content wrapper */}
 
       {/* Stats Overview - Desktop-applicatie stijl */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -607,7 +606,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
+        </div> {/* End main content wrapper */}
       </div>
     </div>
   );

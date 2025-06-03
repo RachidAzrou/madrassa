@@ -803,6 +803,7 @@ export default function Courses() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

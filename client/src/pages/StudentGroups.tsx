@@ -1102,6 +1102,7 @@ export default function StudentGroups() {
       />
 
 
+      </div>
     </div>
   );
 }

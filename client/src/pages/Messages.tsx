@@ -275,7 +275,13 @@ export default function Messages() {
           <div className="md:col-span-1">
             <Card className="border border-gray-200 shadow-sm">
               <CardHeader className="pb-3 border-b">
-                <CardTitle className="text-lg font-semibold">Berichten</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="h-5 w-5" />
+                  Berichten
+                </CardTitle>
+                <CardDescription>
+                  Beheer en bekijk al uw berichten
+                </CardDescription>
                 <Tabs defaultValue="inbox" value={selectedTab} onValueChange={setSelectedTab}>
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="inbox">Inbox</TabsTrigger>

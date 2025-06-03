@@ -426,9 +426,12 @@ export default function Profile() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5 text-[#1e40af]" />
+                <User className="h-5 w-5" />
                 Persoonlijke Gegevens
               </CardTitle>
+              <CardDescription>
+                Beheer je persoonlijke informatie en contactgegevens
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">

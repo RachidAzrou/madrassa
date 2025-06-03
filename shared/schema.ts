@@ -1232,6 +1232,12 @@ export const userAccounts = pgTable("user_accounts", {
   // Additional fields for RBAC
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
+  // Profile fields
+  phone: text("phone"),
+  address: text("address"),
+  city: text("city"),
+  postalCode: text("postal_code"),
+  profileImageUrl: text("profile_image_url"),
 });
 
 export const insertUserAccountSchema = createInsertSchema(userAccounts).omit({

@@ -191,6 +191,184 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // ********************
+  // Profile endpoints
+  // ********************
+  
+  // Get current user profile
+  apiRouter.get("/api/profile", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      
+      const [userAccount] = await db
+        .select()
+        .from(userAccounts)
+        .where(eq(userAccounts.id, userId));
+        
+      if (!userAccount) {
+        return res.status(404).json({ message: "Gebruiker niet gevonden" });
+      }
+      
+      res.json({
+        id: userAccount.id,
+        firstName: userAccount.firstName,
+        lastName: userAccount.lastName,
+        email: userAccount.email,
+        phone: userAccount.phone,
+        address: userAccount.address,
+        city: userAccount.city,
+        postalCode: userAccount.postalCode,
+        profileImageUrl: userAccount.profileImageUrl,
+        role: userAccount.role
+      });
+    } catch (error) {
+      console.error("Get profile error:", error);
+      res.status(500).json({ message: "Fout bij ophalen profiel" });
+    }
+  });
+  
+  // Update user profile
+  apiRouter.put("/api/profile", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { firstName, lastName, email, phone, address, city, postalCode } = req.body;
+      
+      // Validate required fields
+      if (!firstName || !lastName || !email) {
+        return res.status(400).json({ message: "Voornaam, achternaam en email zijn verplicht" });
+      }
+      
+      // Check if email is already taken by another user
+      const [existingUser] = await db
+        .select()
+        .from(userAccounts)
+        .where(and(eq(userAccounts.email, email), sql`${userAccounts.id} != ${userId}`));
+        
+      if (existingUser) {
+        return res.status(400).json({ message: "Dit e-mailadres is al in gebruik" });
+      }
+      
+      // Update user profile
+      const [updatedUser] = await db
+        .update(userAccounts)
+        .set({
+          firstName,
+          lastName,
+          email,
+          phone,
+          address,
+          city,
+          postalCode,
+          updatedAt: new Date()
+        })
+        .where(eq(userAccounts.id, userId))
+        .returning();
+        
+      res.json({
+        id: updatedUser.id,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        address: updatedUser.address,
+        city: updatedUser.city,
+        postalCode: updatedUser.postalCode,
+        profileImageUrl: updatedUser.profileImageUrl,
+        role: updatedUser.role
+      });
+    } catch (error) {
+      console.error("Update profile error:", error);
+      res.status(500).json({ message: "Fout bij bijwerken profiel" });
+    }
+  });
+  
+  // Update user password
+  apiRouter.put("/api/profile/password", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { currentPassword, newPassword } = req.body;
+      
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Huidig wachtwoord en nieuw wachtwoord zijn verplicht" });
+      }
+      
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "Nieuw wachtwoord moet minimaal 6 karakters lang zijn" });
+      }
+      
+      // Get current user
+      const [userAccount] = await db
+        .select()
+        .from(userAccounts)
+        .where(eq(userAccounts.id, userId));
+        
+      if (!userAccount) {
+        return res.status(404).json({ message: "Gebruiker niet gevonden" });
+      }
+      
+      // Verify current password
+      const validPassword = await bcrypt.compare(currentPassword, userAccount.password);
+      if (!validPassword) {
+        return res.status(400).json({ message: "Huidig wachtwoord is onjuist" });
+      }
+      
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      
+      // Update password
+      await db
+        .update(userAccounts)
+        .set({
+          password: hashedPassword,
+          updatedAt: new Date()
+        })
+        .where(eq(userAccounts.id, userId));
+        
+      res.json({ message: "Wachtwoord succesvol bijgewerkt" });
+    } catch (error) {
+      console.error("Update password error:", error);
+      res.status(500).json({ message: "Fout bij bijwerken wachtwoord" });
+    }
+  });
+  
+  // Upload profile image
+  apiRouter.post("/api/profile/upload-image", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { imageData, fileName } = req.body;
+      
+      if (!imageData || !fileName) {
+        return res.status(400).json({ message: "Afbeelding en bestandsnaam zijn verplicht" });
+      }
+      
+      // In a production environment, you would:
+      // 1. Validate file type and size
+      // 2. Upload to cloud storage (AWS S3, Cloudinary, etc.)
+      // 3. Store the URL in the database
+      
+      // For now, we'll store a placeholder URL
+      const imageUrl = `/uploads/profiles/${userId}_${fileName}`;
+      
+      // Update user profile image URL
+      const [updatedUser] = await db
+        .update(userAccounts)
+        .set({
+          profileImageUrl: imageUrl,
+          updatedAt: new Date()
+        })
+        .where(eq(userAccounts.id, userId))
+        .returning();
+        
+      res.json({
+        profileImageUrl: updatedUser.profileImageUrl,
+        message: "Profielfoto succesvol bijgewerkt"
+      });
+    } catch (error) {
+      console.error("Upload image error:", error);
+      res.status(500).json({ message: "Fout bij uploaden profielfoto" });
+    }
+  });
+
+  // ********************
   // Authentication endpoints
   // ********************
   apiRouter.get("/api/logout", (_req, res) => {

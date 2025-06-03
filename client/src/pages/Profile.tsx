@@ -1,13 +1,28 @@
-import { useState } from 'react';
-import { User, Mail, Phone, MapPin, Calendar, Edit2, Save, X, Lock, Eye, EyeOff } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { User, Mail, Phone, MapPin, Calendar, Edit2, Save, X, Lock, Eye, EyeOff, Camera, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PremiumHeader } from '@/components/layout/premium-header';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+
+interface ProfileData {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  postalCode: string | null;
+  profileImageUrl: string | null;
+  role: string;
+}
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -18,17 +33,8 @@ export default function Profile() {
     confirm: false
   });
   const { toast } = useToast();
-  
-  const [formData, setFormData] = useState({
-    firstName: 'Admin',
-    lastName: 'Gebruiker',
-    email: 'admin@mymadrassa.be',
-    phone: '+32 498 12 34 56',
-    address: 'Voorbeeldstraat 123',
-    city: 'Brussel',
-    postalCode: '1000',
-    bio: 'Beheerder van het myMadrassa systeem. Verantwoordelijk voor het dagelijks beheer van de school en ondersteuning van docenten en studenten.'
-  });
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -36,22 +42,146 @@ export default function Profile() {
     confirmPassword: ''
   });
 
+  // Fetch user profile data
+  const { data: profileData, isLoading: isLoadingProfile, error: profileError } = useQuery<ProfileData>({
+    queryKey: ['/api/profile'],
+    retry: 1
+  });
+
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    postalCode: ''
+  });
+
+  // Update form data when profile data loads
+  useEffect(() => {
+    if (profileData) {
+      setFormData({
+        firstName: profileData.firstName || '',
+        lastName: profileData.lastName || '',
+        email: profileData.email || '',
+        phone: profileData.phone || '',
+        address: profileData.address || '',
+        city: profileData.city || '',
+        postalCode: profileData.postalCode || ''
+      });
+    }
+  }, [profileData]);
+
+  // Profile update mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      return await apiRequest('/api/profile', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Profiel bijgewerkt",
+        description: "Je profielgegevens zijn succesvol opgeslagen.",
+      });
+      setIsEditing(false);
+      queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout bij opslaan",
+        description: error.message || "Er is een fout opgetreden bij het opslaan van je profiel.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Password update mutation
+  const updatePasswordMutation = useMutation({
+    mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
+      return await apiRequest('/api/profile/password', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Wachtwoord gewijzigd",
+        description: "Je wachtwoord is succesvol bijgewerkt.",
+      });
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      setIsChangingPassword(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout bij wachtwoord wijzigen",
+        description: error.message || "Er is een fout opgetreden bij het wijzigen van je wachtwoord.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Image upload mutation
+  const uploadImageMutation = useMutation({
+    mutationFn: async ({ imageData, fileName }: { imageData: string; fileName: string }) => {
+      return await apiRequest('/api/profile/upload-image', {
+        method: 'POST',
+        body: JSON.stringify({ imageData, fileName }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Profielfoto bijgewerkt",
+        description: "Je profielfoto is succesvol geüpload.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/profile'] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Fout bij uploaden foto",
+        description: error.message || "Er is een fout opgetreden bij het uploaden van je foto.",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleSave = () => {
-    // Hier zou je de gegevens opslaan naar de backend
-    toast({
-      title: "Profiel bijgewerkt",
-      description: "Je profielgegevens zijn succesvol opgeslagen.",
-    });
-    setIsEditing(false);
+    updateProfileMutation.mutate(formData);
   };
 
   const handleCancel = () => {
-    // Reset formulier naar originele waarden
+    // Reset form to original values
+    if (profileData) {
+      setFormData({
+        firstName: profileData.firstName || '',
+        lastName: profileData.lastName || '',
+        email: profileData.email || '',
+        phone: profileData.phone || '',
+        address: profileData.address || '',
+        city: profileData.city || '',
+        postalCode: profileData.postalCode || ''
+      });
+    }
     setIsEditing(false);
   };
 
   const handlePasswordSave = () => {
-    // Validatie
+    // Validation
     if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
       toast({
         title: "Velden ontbreken",
@@ -79,18 +209,10 @@ export default function Profile() {
       return;
     }
 
-    // Hier zou je het wachtwoord wijzigen naar de backend
-    toast({
-      title: "Wachtwoord gewijzigd",
-      description: "Je wachtwoord is succesvol bijgewerkt.",
+    updatePasswordMutation.mutate({
+      currentPassword: passwordData.currentPassword,
+      newPassword: passwordData.newPassword
     });
-    
-    setPasswordData({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    });
-    setIsChangingPassword(false);
   };
 
   const handlePasswordCancel = () => {
@@ -121,6 +243,46 @@ export default function Profile() {
       ...prev,
       [field]: !prev[field]
     }));
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Ongeldig bestandstype",
+        description: "Selecteer een geldige afbeelding (JPG, PNG, GIF).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Bestand te groot",
+        description: "De afbeelding mag maximaal 5MB groot zijn.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageData = reader.result as string;
+      uploadImageMutation.mutate({
+        imageData,
+        fileName: file.name
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const triggerImageUpload = () => {
+    fileInputRef.current?.click();
   };
 
   return (

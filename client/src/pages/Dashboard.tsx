@@ -156,8 +156,9 @@ export default function Dashboard() {
     };
   });
   
-  // Get current academic year
-  const currentAcademicYear = (academicYearsData as any[]).find((year: any) => year.isActive) || null;
+  // Get current academic year - als er geen actief jaar is, neem het eerste jaar
+  const currentAcademicYear = (academicYearsData as any[]).find((year: any) => year.isActive) || 
+                              (academicYearsData as any[])[0] || null;
 
   // Filter holidays for the current week
   const currentWeekHolidays = (holidaysData as any[]).filter((holiday: any) => {

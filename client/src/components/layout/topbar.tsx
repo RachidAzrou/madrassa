@@ -54,6 +54,12 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
   const [readMessages, setReadMessages] = useState<Set<number>>(new Set());
   const { user } = useAuth();
   
+  // Haal de profiel gegevens op voor actuele user data
+  const { data: profileData } = useQuery({
+    queryKey: ['/api/profile'],
+    retry: 1
+  });
+  
   // Haal de notificaties op
   const { data: notificationsData } = useQuery({
     queryKey: ['/api/notifications/user/1'],
@@ -91,11 +97,12 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
     setLocation(`/messages?messageId=${messageId}`);
   };
 
-  // Generate user display data from authenticated user
+  // Generate user display data from profile data (preferred) or authenticated user
   const getUserDisplayData = () => {
-    if (!user) return { name: 'Gebruiker', role: 'Onbekend', avatar: 'G' };
+    const userData = profileData || user;
+    if (!userData) return { name: 'Gebruiker', role: 'Onbekend', avatar: 'G' };
     
-    const name = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    const name = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || userData.name || userData.email || 'Gebruiker';
     const roleMap = {
       'administrator': 'Beheerder',
       'docent': 'Docent', 
@@ -105,8 +112,8 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
       'guardian': 'Voogd',
       'secretariaat': 'Secretariaat'
     };
-    const role = roleMap[user.role] || user.role;
-    const avatar = `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`;
+    const role = roleMap[user?.role] || user?.role || 'Onbekend';
+    const avatar = `${userData.firstName?.[0] || ''}${userData.lastName?.[0] || ''}`.toUpperCase();
     
     return { name, role, avatar };
   };

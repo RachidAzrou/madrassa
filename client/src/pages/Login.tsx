@@ -38,13 +38,46 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-cyan-50 flex relative overflow-hidden">
+      {/* Background Pattern - Educational Theme */}
+      <div className="absolute inset-0 opacity-10">
+        {/* Geometric shapes representing knowledge and learning */}
+        <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-blue-300 to-indigo-300 rounded-full blur-xl"></div>
+        <div className="absolute top-40 right-40 w-24 h-24 bg-gradient-to-br from-green-300 to-emerald-300 rounded-lg rotate-45 blur-lg"></div>
+        <div className="absolute bottom-32 left-32 w-40 h-40 bg-gradient-to-br from-purple-300 to-violet-300 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 right-20 w-28 h-28 bg-gradient-to-br from-orange-300 to-red-300 rounded-lg rotate-12 blur-lg"></div>
+        
+        {/* Subtle educational icons pattern */}
+        <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="educational-pattern" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+              <g opacity="0.05" fill="currentColor">
+                <path d="M100 50 L120 70 L100 90 L80 70 Z" className="text-blue-600"/>
+                <circle cx="150" cy="100" r="8" className="text-green-600"/>
+                <rect x="45" y="145" width="10" height="10" className="text-purple-600"/>
+                <path d="M170 160 L180 150 L190 160 L180 170 Z" className="text-orange-600"/>
+              </g>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#educational-pattern)"/>
+        </svg>
+      </div>
+
       {/* Left side - Brand */}
-      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative overflow-hidden">
-        {/* Background Pattern */}
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative z-10 bg-gradient-to-br from-blue-600/90 via-indigo-600/90 to-purple-600/90">
+        {/* Islamic geometric pattern overlay */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute -top-1/2 -left-1/2 w-96 h-96 rounded-full bg-gradient-to-br from-blue-400 to-indigo-400 blur-3xl"></div>
-          <div className="absolute -bottom-1/2 -right-1/2 w-96 h-96 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 blur-3xl"></div>
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="islamic-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                <g fill="white" opacity="0.3">
+                  <path d="M50 0 L75 25 L50 50 L25 25 Z"/>
+                  <circle cx="50" cy="50" r="20" fill="none" stroke="white" strokeWidth="1"/>
+                </g>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#islamic-pattern)"/>
+          </svg>
         </div>
         
         <div className="text-center text-white relative z-10">
@@ -67,23 +100,47 @@ export default function Login() {
             Een modern beheersysteem voor islamitische onderwijsinstellingen in Nederland
           </p>
           
-          {/* Features */}
+          {/* Educational Features */}
           <div className="grid grid-cols-2 gap-6 text-blue-100 max-w-md mx-auto">
-            <div className="flex flex-col items-center space-y-3 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <Users className="h-8 w-8 text-blue-300" />
+            <div className="flex flex-col items-center space-y-3 p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all duration-300">
+              <div className="p-2 bg-gradient-to-br from-blue-400/20 to-indigo-400/20 rounded-lg">
+                <Users className="h-6 w-6 text-blue-200" />
+              </div>
               <span className="text-sm font-medium">Studentenbeheer</span>
             </div>
-            <div className="flex flex-col items-center space-y-3 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <CreditCard className="h-8 w-8 text-blue-300" />
+            <div className="flex flex-col items-center space-y-3 p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all duration-300">
+              <div className="p-2 bg-gradient-to-br from-green-400/20 to-emerald-400/20 rounded-lg">
+                <CreditCard className="h-6 w-6 text-green-200" />
+              </div>
               <span className="text-sm font-medium">Betalingsbeheer</span>
             </div>
-            <div className="flex flex-col items-center space-y-3 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <BookOpen className="h-8 w-8 text-blue-300" />
+            <div className="flex flex-col items-center space-y-3 p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all duration-300">
+              <div className="p-2 bg-gradient-to-br from-purple-400/20 to-violet-400/20 rounded-lg">
+                <BookOpen className="h-6 w-6 text-purple-200" />
+              </div>
               <span className="text-sm font-medium">Lessenbeheer</span>
             </div>
-            <div className="flex flex-col items-center space-y-3 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-              <Shield className="h-8 w-8 text-blue-300" />
-              <span className="text-sm font-medium">Veilig & Betrouwbaar</span>
+            <div className="flex flex-col items-center space-y-3 p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all duration-300">
+              <div className="p-2 bg-gradient-to-br from-orange-400/20 to-red-400/20 rounded-lg">
+                <GraduationCap className="h-6 w-6 text-orange-200" />
+              </div>
+              <span className="text-sm font-medium">Diploma Tracking</span>
+            </div>
+          </div>
+
+          {/* Educational Stats */}
+          <div className="mt-12 grid grid-cols-3 gap-8 text-center">
+            <div className="space-y-2">
+              <div className="text-3xl font-bold text-white">500+</div>
+              <div className="text-sm text-blue-200">Studenten</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-3xl font-bold text-white">25+</div>
+              <div className="text-sm text-blue-200">Docenten</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-3xl font-bold text-white">15+</div>
+              <div className="text-sm text-blue-200">Programma's</div>
             </div>
           </div>
         </div>

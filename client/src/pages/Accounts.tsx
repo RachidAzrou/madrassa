@@ -45,6 +45,7 @@ import PageHeader from "@/components/common/PageHeader";
 import { DeleteDialog } from "@/components/ui/delete-dialog";
 import { CustomDialogContent } from "@/components/ui/custom-dialog-content";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserAccount {
   id: number;
@@ -70,6 +71,7 @@ interface AccountFormData {
 
 export default function Accounts() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   // State
   const [searchTerm, setSearchTerm] = useState("");
@@ -164,7 +166,35 @@ export default function Accounts() {
     },
   });
 
+  const bulkCreateAccountsMutation = useMutation({
+    mutationFn: async (data: { type: string; classId?: string; defaultPassword: string }) => {
+      return apiRequest("/api/accounts/bulk", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
+    },
+    onSuccess: (result: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/accounts"] });
+      setIsBulkCreateDialogOpen(false);
+      toast({
+        title: "Succes",
+        description: `${result.created} accounts succesvol aangemaakt.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er is een fout opgetreden bij het bulk aanmaken van accounts.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Helper functions
+  const generateDefaultPassword = () => {
+    return Math.random().toString(36).slice(-8);
+  };
+
   const resetForm = () => {
     setAccountFormData({
       email: '',
@@ -253,6 +283,10 @@ export default function Accounts() {
   const handleDeleteAccount = (account: UserAccount) => {
     setAccountToDelete(account);
     setIsDeleteDialogOpen(true);
+  };
+
+  const handleBulkCreateAccounts = () => {
+    bulkCreateAccountsMutation.mutate(bulkCreateOptions);
   };
 
 

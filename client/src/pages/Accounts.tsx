@@ -176,6 +176,17 @@ export default function Accounts() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/accounts"] });
+      toast({
+        title: "Succes",
+        description: "Account succesvol verwijderd.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er is een fout opgetreden bij het verwijderen van het account.",
+        variant: "destructive",
+      });
     },
   });
 

@@ -430,28 +430,6 @@ export default function Reports() {
 
       yPos = 65;
 
-      // Student info card on second page
-      pdf.setFillColor(248, 249, 250);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 35, 3, 3, 'F');
-      
-      pdf.setDrawColor(33, 107, 169);
-      pdf.setLineWidth(0.5);
-      pdf.roundedRect(20, yPos, pageWidth - 40, 35, 3, 3, 'D');
-
-      pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(33, 107, 169);
-      
-      // First row
-      pdf.text(`Leerling: ${report.student.firstName} ${report.student.lastName}`, 30, yPos + 15);
-      pdf.text('Klas: 1A', pageWidth - 80, yPos + 15);
-      
-      // Second row  
-      pdf.text(`Leerlingnummer: ${report.student.studentId}`, 30, yPos + 25);
-      pdf.text(`Datum: ${new Date().toLocaleDateString('nl-NL')}`, pageWidth - 80, yPos + 25);
-
-      yPos += 50;
-
       // Behavior section - simplified layout
       pdf.setFillColor(248, 249, 250);
       pdf.rect(20, yPos, pageWidth - 40, 80, 'F');
@@ -504,19 +482,19 @@ export default function Reports() {
 
       yPos += 80;
 
-      // Signature section with consistent styling
-      yPos += 20;
+      // Signature section at bottom of page
+      const signatureYPos = pageHeight - 80; // Fixed position near bottom
       
       pdf.setFillColor(248, 249, 250);
-      pdf.rect(20, yPos, pageWidth - 40, 60, 'F');
+      pdf.rect(20, signatureYPos, pageWidth - 40, 60, 'F');
       pdf.setDrawColor(33, 107, 169);
       pdf.setLineWidth(0.5);
-      pdf.rect(20, yPos, pageWidth - 40, 60, 'D');
+      pdf.rect(20, signatureYPos, pageWidth - 40, 60, 'D');
       
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(33, 107, 169);
-      pdf.text('HANDTEKENINGEN', 25, yPos + 15);
+      pdf.text('HANDTEKENINGEN', 25, signatureYPos + 15);
       
       const sigWidth = (pageWidth - 60) / 2;
       
@@ -524,14 +502,14 @@ export default function Reports() {
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(64, 75, 105);
-      pdf.text('Ouder/Voogd:', 25, yPos + 35);
+      pdf.text('Ouder/Voogd:', 25, signatureYPos + 35);
       pdf.setDrawColor(150, 150, 150);
       pdf.setLineWidth(0.3);
-      pdf.line(65, yPos + 50, 25 + sigWidth - 10, yPos + 50);
+      pdf.line(65, signatureYPos + 50, 25 + sigWidth - 10, signatureYPos + 50);
       
       // School signature
-      pdf.text('School:', pageWidth / 2 + 15, yPos + 35);
-      pdf.line(pageWidth / 2 + 45, yPos + 50, pageWidth - 35, yPos + 50);
+      pdf.text('School:', pageWidth / 2 + 15, signatureYPos + 35);
+      pdf.line(pageWidth / 2 + 45, signatureYPos + 50, pageWidth - 35, signatureYPos + 50);
 
       // Footer on second page
       pdf.setFontSize(8);

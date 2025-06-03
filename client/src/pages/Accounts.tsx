@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/dialog";
 import PageHeader from "@/components/common/PageHeader";
 import { DeleteDialog } from "@/components/ui/delete-dialog";
+import { CustomDialogContent } from "@/components/ui/custom-dialog-content";
 import { apiRequest } from "@/lib/queryClient";
 
 interface UserAccount {
@@ -105,6 +106,13 @@ export default function Accounts() {
   const { data: guardiansData = [] } = useQuery({
     queryKey: ["/api/guardians"],
   });
+
+  // Combine all persons for account creation
+  const availablePersons = [
+    ...(Array.isArray(studentsData) ? studentsData.map((s: any) => ({ ...s, type: 'Student' })) : []),
+    ...(Array.isArray(teachersData?.teachers) ? teachersData.teachers.map((t: any) => ({ ...t, type: 'Docent' })) : []),
+    ...(Array.isArray(guardiansData) ? guardiansData.map((g: any) => ({ ...g, type: 'Voogd' })) : [])
+  ].filter(person => !accountsData.some((account: any) => account.personId === person.id));
 
   // Mutations
   const createAccountMutation = useMutation({
@@ -349,6 +357,7 @@ export default function Accounts() {
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500">{filteredAccounts.length} accounts</span>
               <Button 
+                onClick={() => setIsCreateDialogOpen(true)}
                 className="bg-[#1e40af] hover:bg-[#1d4ed8] text-white h-8 text-xs px-3 rounded-sm"
               >
                 <Plus className="h-3.5 w-3.5 mr-1.5" />
@@ -489,9 +498,93 @@ export default function Accounts() {
 
       {/* Create Account Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-
-
-
+        <CustomDialogContent>
+          <div className="bg-[#1e40af] text-white px-6 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                  <Plus className="h-5 w-5 text-white" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg font-semibold text-white">Nieuw Account Aanmaken</h2>
+                <p className="text-sm text-blue-100 mt-1">Voeg een nieuw gebruikersaccount toe aan het systeem</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            <div>
+              <Label htmlFor="create-person">Persoon Selecteren</Label>
+              <Select value={accountFormData.personId?.toString() || ""} onValueChange={(value) => setAccountFormData(prev => ({ ...prev, personId: parseInt(value) }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecteer een persoon" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availablePersons.map((person: any) => (
+                    <SelectItem key={person.id} value={person.id.toString()}>
+                      {person.firstName} {person.lastName} ({person.type})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="create-email">Email</Label>
+              <Input
+                id="create-email"
+                type="email"
+                value={accountFormData.email}
+                onChange={(e) => setAccountFormData(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="email@example.com"
+              />
+            </div>
+            <div>
+              <Label htmlFor="create-password">Wachtwoord</Label>
+              <Input
+                id="create-password"
+                type="password"
+                value={accountFormData.password}
+                onChange={(e) => setAccountFormData(prev => ({ ...prev, password: e.target.value }))}
+                placeholder="Wachtwoord"
+              />
+            </div>
+            <div>
+              <Label htmlFor="create-role">Rol</Label>
+              <Select value={accountFormData.role} onValueChange={(value: any) => setAccountFormData(prev => ({ ...prev, role: value }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="teacher">Docent</SelectItem>
+                  <SelectItem value="guardian">Voogd</SelectItem>
+                  <SelectItem value="secretariat">Secretariaat</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="create-isActive"
+                checked={accountFormData.isActive}
+                onCheckedChange={(checked) => setAccountFormData(prev => ({ ...prev, isActive: !!checked }))}
+              />
+              <Label htmlFor="create-isActive">Account is actief</Label>
+            </div>
+          </div>
+          <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button 
+              onClick={handleCreateAccount}
+              disabled={!accountFormData.email || !accountFormData.personId}
+              className="bg-[#1e40af] hover:bg-[#1d4ed8]"
+            >
+              Account Aanmaken
+            </Button>
+          </div>
+        </CustomDialogContent>
       </Dialog>
 
       {/* Edit Account Dialog */}

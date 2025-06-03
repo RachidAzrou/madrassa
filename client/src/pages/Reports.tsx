@@ -325,18 +325,17 @@ export default function Reports() {
   });
 
   return (
-    <div className="bg-[#f7f9fc] overflow-visible">
+    <DataTableContainer>
       <PremiumHeader 
         title="Rapportage" 
         icon={FileText}
         description="Genereer professionele schoolrapporten met cijfers en beoordeling"
       />
 
-      <div className="px-6 py-6 overflow-visible">
-        <div className="space-y-5 overflow-visible h-auto">
+      <div className="space-y-5">
         <Tabs 
           value={activeTab} 
-          className="w-full h-auto overflow-visible"
+          className="w-full"
           onValueChange={(value) => setActiveTab(value)}
         >
           <TabsList className="grid w-full grid-cols-2 h-11">
@@ -350,7 +349,7 @@ export default function Reports() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="configure" className="space-y-6 h-auto overflow-visible">
+          <TabsContent value="configure" className="space-y-6">
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
               <div className="xl:col-span-2 space-y-6">
                 {/* Report Type Card */}
@@ -528,7 +527,7 @@ export default function Reports() {
             </div>
           </TabsContent>
 
-          <TabsContent value="preview" className="space-y-6 h-auto overflow-visible">
+          <TabsContent value="preview" className="space-y-6">
             {reportPreview.length > 0 ? (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
@@ -804,8 +803,7 @@ export default function Reports() {
 
 
         </Tabs>
-        </div>
       </div>
-    </div>
+    </DataTableContainer>
   );
 }

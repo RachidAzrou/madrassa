@@ -559,6 +559,14 @@ export default function Reports() {
       const totalDays = 180; // Approximate school days
       const attendancePercentage = ((totalDays - report.attendance.absent) / totalDays * 100).toFixed(1);
       pdf.text(`Aanwezigheidspercentage: ${attendancePercentage}%`, 25, yPos + 60);
+      
+      // Add attendance comments if available
+      if (attendanceComments[report.student.id]) {
+        pdf.setFontSize(10);
+        pdf.setTextColor(64, 75, 105);
+        const comments = pdf.splitTextToSize(attendanceComments[report.student.id], pageWidth - 60);
+        pdf.text(comments, 25, yPos + 75);
+      }
 
       yPos += 80;
 

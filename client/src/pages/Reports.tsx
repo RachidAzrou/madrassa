@@ -21,6 +21,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import JSZip from 'jszip';
 
 interface Student {
   id: number;
@@ -160,135 +161,159 @@ export default function Reports() {
     }
   };
 
-  const generateReportData = () => {
+  const generateReportData = async () => {
     if (!reportPreview.length) {
       generatePreviewData();
       return;
     }
 
+    if (selectedReportType === 'class' && reportPreview.length > 1) {
+      // Voor klassenrapporten: genereer ZIP met aparte PDF's
+      const zip = new JSZip();
+      const className = classes.find((c: StudentGroup) => c.id.toString() === selectedClass)?.name || 'Onbekend';
+      const currentDate = new Date().toLocaleDateString('nl-NL');
+
+      for (const studentData of reportPreview) {
+        const pdf = generateStudentPDF(studentData);
+        const pdfBlob = pdf.output('blob');
+        const fileName = `${studentData.student.firstName}_${studentData.student.lastName}_${studentData.student.studentId}.pdf`;
+        zip.file(fileName, pdfBlob);
+      }
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const zipFileName = `Klasserapport_${className}_${currentDate}.zip`;
+      
+      // Download ZIP bestand
+      const url = URL.createObjectURL(zipBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = zipFileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } else {
+      // Voor individuele rapporten: genereer enkele PDF
+      const pdf = generateStudentPDF(reportPreview[0]);
+      const fileName = `Individueel_Rapport_${reportPreview[0]?.student.firstName}_${reportPreview[0]?.student.lastName}_${new Date().toLocaleDateString('nl-NL')}.pdf`;
+      pdf.save(fileName);
+    }
+  };
+
+  const generateStudentPDF = (studentData: ReportData) => {
     const pdf = new jsPDF('portrait', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.width;
     const pageHeight = pdf.internal.pageSize.height;
     const margin = 20;
 
-    reportPreview.forEach((studentData, studentIndex) => {
-      if (studentIndex > 0) {
-        pdf.addPage();
-      }
+    // Page 1: Grades and General Comments
+    pdf.setFontSize(18);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(schoolName, pageWidth / 2, 25, { align: 'center' });
+    
+    pdf.setFontSize(14);
+    pdf.text('Schoolrapport', pageWidth / 2, 35, { align: 'center' });
+    
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`Periode: ${reportPeriod}`, pageWidth / 2, 45, { align: 'center' });
 
-      // Page 1: Grades and General Comments
-      pdf.setFontSize(18);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(schoolName, pageWidth / 2, 25, { align: 'center' });
-      
-      pdf.setFontSize(14);
-      pdf.text('Schoolrapport', pageWidth / 2, 35, { align: 'center' });
-      
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(`Periode: ${reportPeriod}`, pageWidth / 2, 45, { align: 'center' });
+    // Student info
+    pdf.setFontSize(10);
+    pdf.text(`Naam: ${studentData.student.firstName} ${studentData.student.lastName}`, margin, 60);
+    pdf.text(`Student ID: ${studentData.student.studentId}`, margin, 68);
+    pdf.text(`Academisch jaar: ${studentData.student.academicYear || 'Niet gespecificeerd'}`, margin, 76);
 
-      // Student info
-      pdf.setFontSize(10);
-      pdf.text(`Naam: ${studentData.student.firstName} ${studentData.student.lastName}`, margin, 60);
-      pdf.text(`Student ID: ${studentData.student.studentId}`, margin, 68);
-      pdf.text(`Academisch jaar: ${studentData.student.academicYear || 'Niet gespecificeerd'}`, margin, 76);
+    // Grades table
+    const gradeData = [
+      ['VAK', 'TESTEN', 'TAKEN', 'EXAMEN', 'GEMIDDELDE', 'BEOORDELING']
+    ];
 
-      // Grades table
-      const gradeData = [
-        ['VAK', 'TESTEN', 'TAKEN', 'EXAMEN', 'GEMIDDELDE', 'BEOORDELING']
-      ];
+    subjects.forEach((subject: any) => {
+      const average = 7.5; // Mock data
+      let assessment = '';
+      if (average >= 8.5) assessment = 'Uitstekend';
+      else if (average >= 7.5) assessment = 'Goed';
+      else if (average >= 6.5) assessment = 'Voldoende';
+      else assessment = 'Aandacht nodig';
 
-      subjects.forEach((subject: any) => {
-        const average = 7.5; // Mock data
-        let assessment = '';
-        if (average >= 8.5) assessment = 'Uitstekend';
-        else if (average >= 7.5) assessment = 'Goed';
-        else if (average >= 6.5) assessment = 'Voldoende';
-        else assessment = 'Aandacht nodig';
-
-        gradeData.push([
-          subject.name,
-          '8.0',
-          '7.5',
-          '7.0',
-          average.toString(),
-          assessment
-        ]);
-      });
-
-      (pdf as any).autoTable({
-        head: [gradeData[0]],
-        body: gradeData.slice(1),
-        startY: 90,
-        margin: { left: margin, right: margin },
-        styles: { fontSize: 9, cellPadding: 3 },
-        headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
-        alternateRowStyles: { fillColor: [249, 250, 251] }
-      });
-
-      // General comments
-      const finalY = (pdf as any).lastAutoTable.finalY + 15;
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('ALGEMENE OPMERKINGEN', margin, finalY);
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-      const commentLines = pdf.splitTextToSize(generalComments || 'Geen algemene opmerkingen', pageWidth - 2 * margin);
-      pdf.text(commentLines, margin, finalY + 10);
-
-      // Page 2: Behavior and Attendance
-      pdf.addPage();
-      
-      pdf.setFontSize(18);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(schoolName, pageWidth / 2, 25, { align: 'center' });
-      
-      pdf.setFontSize(14);
-      pdf.text('Gedragsbeoordeling en Aanwezigheid', pageWidth / 2, 35, { align: 'center' });
-
-      // Behavior section
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('GEDRAGSBEOORDELING', margin, 60);
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-      pdf.text(`Gedragscijfer: ${studentData.behavior.grade}/5`, margin, 75);
-      pdf.text(`Opmerkingen: ${studentData.behavior.comments || 'Geen opmerkingen'}`, margin, 85);
-
-      // Attendance section
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('AANWEZIGHEID', margin, 110);
-      
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-      pdf.text(`Aanwezigheidspercentage: ${studentData.attendance.percentage}%`, margin, 125);
-      pdf.text(`Aanwezig: ${studentData.attendance.present} dagen`, margin, 135);
-      pdf.text(`Afwezig: ${studentData.attendance.absent} dagen`, margin, 145);
-      pdf.text(`Te laat: ${studentData.attendance.late} dagen`, margin, 155);
-      
-      if (attendanceComments) {
-        const attendanceLines = pdf.splitTextToSize(attendanceComments, pageWidth - 2 * margin);
-        pdf.text(attendanceLines, margin, 170);
-      }
-
-      // Signatures
-      pdf.setFontSize(10);
-      pdf.text('Handtekening ouder/voogd:', margin, pageHeight - 40);
-      pdf.text('Handtekening school:', pageWidth - margin - 60, pageHeight - 40);
-      
-      pdf.text('Datum: ________________', margin, pageHeight - 25);
-      pdf.text('Datum: ________________', pageWidth - margin - 60, pageHeight - 25);
+      gradeData.push([
+        subject.name,
+        '8.0',
+        '7.5',
+        '7.0',
+        average.toString(),
+        assessment
+      ]);
     });
 
-    const fileName = selectedReportType === 'class' 
-      ? `Klasserapport_${classes.find((c: StudentGroup) => c.id.toString() === selectedClass)?.name || 'Onbekend'}_${new Date().toLocaleDateString('nl-NL')}.pdf`
-      : `Individueel_Rapport_${reportPreview[0]?.student.firstName}_${reportPreview[0]?.student.lastName}_${new Date().toLocaleDateString('nl-NL')}.pdf`;
+    (pdf as any).autoTable({
+      head: [gradeData[0]],
+      body: gradeData.slice(1),
+      startY: 90,
+      margin: { left: margin, right: margin },
+      styles: { fontSize: 9, cellPadding: 3 },
+      headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [249, 250, 251] }
+    });
+
+    // General comments - gebruik individuele opmerkingen per student
+    const finalY = (pdf as any).lastAutoTable.finalY + 15;
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('ALGEMENE OPMERKINGEN', margin, finalY);
     
-    pdf.save(fileName);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(10);
+    const commentLines = pdf.splitTextToSize(studentData.generalComments || 'Geen algemene opmerkingen', pageWidth - 2 * margin);
+    pdf.text(commentLines, margin, finalY + 10);
+
+    // Page 2: Behavior and Attendance
+    pdf.addPage();
+    
+    pdf.setFontSize(18);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(schoolName, pageWidth / 2, 25, { align: 'center' });
+    
+    pdf.setFontSize(14);
+    pdf.text('Gedragsbeoordeling en Aanwezigheid', pageWidth / 2, 35, { align: 'center' });
+
+    // Behavior section
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('GEDRAGSBEOORDELING', margin, 60);
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(10);
+    pdf.text(`Gedragscijfer: ${studentData.behavior.grade}/5`, margin, 75);
+    pdf.text(`Opmerkingen: ${studentData.behavior.comments || 'Geen opmerkingen'}`, margin, 85);
+
+    // Attendance section
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('AANWEZIGHEID', margin, 110);
+    
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(10);
+    pdf.text(`Aanwezigheidspercentage: ${studentData.attendance.percentage}%`, margin, 125);
+    pdf.text(`Aanwezig: ${studentData.attendance.present} dagen`, margin, 135);
+    pdf.text(`Afwezig: ${studentData.attendance.absent} dagen`, margin, 145);
+    pdf.text(`Te laat: ${studentData.attendance.late} dagen`, margin, 155);
+    
+    if (attendanceComments) {
+      const attendanceLines = pdf.splitTextToSize(attendanceComments, pageWidth - 2 * margin);
+      pdf.text(attendanceLines, margin, 170);
+    }
+
+    // Signatures
+    pdf.setFontSize(10);
+    pdf.text('Handtekening ouder/voogd:', margin, pageHeight - 40);
+    pdf.text('Handtekening school:', pageWidth - margin - 60, pageHeight - 40);
+    
+    pdf.text('Datum: ________________', margin, pageHeight - 25);
+    pdf.text('Datum: ________________', pageWidth - margin - 60, pageHeight - 25);
+
+    return pdf;
   };
 
   const filteredStudents = students.filter((student: Student) => {
@@ -474,7 +499,7 @@ export default function Reports() {
                       size="lg"
                     >
                       <FileDown className="h-4 w-4 mr-2" />
-                      Genereer PDF Rapport
+                      {selectedReportType === 'class' ? 'Download ZIP (Alle Rapporten)' : 'Genereer PDF Rapport'}
                     </Button>
                     
                     <div className="bg-gray-50 p-4 rounded-lg space-y-2">
@@ -758,7 +783,7 @@ export default function Reports() {
                   </Button>
                   <Button onClick={generateReportData} size="lg">
                     <FileDown className="h-4 w-4 mr-2" />
-                    Download PDF Rapport
+                    {selectedReportType === 'class' ? 'Download ZIP (Alle Rapporten)' : 'Download PDF Rapport'}
                   </Button>
                 </div>
               </div>

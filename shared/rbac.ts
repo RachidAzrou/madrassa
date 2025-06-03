@@ -98,13 +98,17 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
       { resource: RESOURCES.NOTIFICATIONS, action: 'read' }
     ]
   },
-  // STUDENT - Very limited access
+  // STUDENT - Limited access to own data only
   {
     role: 'student',
     permissions: [
-      { resource: RESOURCES.ATTENDANCE, action: 'read' }, // Only own attendance
-      { resource: RESOURCES.GRADES, action: 'read' }, // Only own grades
       { resource: RESOURCES.DASHBOARD, action: 'read' },
+      { resource: RESOURCES.STUDENTS, action: 'read' }, // Own class students only
+      { resource: RESOURCES.TEACHERS, action: 'read' }, // Own teachers only
+      { resource: RESOURCES.CLASSES, action: 'read' }, // Own class only
+      { resource: RESOURCES.ATTENDANCE, action: 'read' }, // Own attendance only
+      { resource: RESOURCES.GRADES, action: 'read' }, // Own grades only
+      { resource: RESOURCES.REPORTS, action: 'read' }, // Own reports only
       { resource: RESOURCES.NOTIFICATIONS, action: 'read' }
     ]
   }

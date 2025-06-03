@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, LogIn, GraduationCap, Users, CreditCard, Shield, BookOpen } from 'lucide-react';
 import logoPath from '@assets/myMadrassa.png';
 import backgroundImageUrl from '@assets/top-view-items-blue-background.jpg';
+import logoTextPath from '@assets/Naamloos.png';
 
 export default function Login() {
   const { login } = useAuth();
@@ -142,9 +143,13 @@ export default function Login() {
                 className="w-16 h-16 mx-auto mb-3"
               />
             </div>
-            <CardTitle className="text-2xl font-bold text-slate-800">
-              Welkom Terug
-            </CardTitle>
+            <div className="mb-4">
+              <img 
+                src={logoTextPath} 
+                alt="myMadrassa" 
+                className="h-12 mx-auto"
+              />
+            </div>
             <CardDescription className="text-slate-600">
               Log in om toegang te krijgen tot uw dashboard
             </CardDescription>

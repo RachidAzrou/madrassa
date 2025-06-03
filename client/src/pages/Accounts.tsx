@@ -421,6 +421,14 @@ export default function Accounts() {
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500">{filteredAccounts.length} accounts</span>
               <Button 
+                onClick={() => setIsBulkCreateDialogOpen(true)}
+                variant="outline"
+                className="h-8 text-xs px-3 rounded-sm border-[#e5e7eb]"
+              >
+                <Users className="h-3.5 w-3.5 mr-1.5" />
+                Bulk Aanmaken
+              </Button>
+              <Button 
                 onClick={() => setIsCreateDialogOpen(true)}
                 className="bg-[#1e40af] hover:bg-[#1d4ed8] text-white h-8 text-xs px-3 rounded-sm"
               >
@@ -722,6 +730,69 @@ export default function Accounts() {
               className="bg-[#059669] hover:bg-[#047857]"
             >
               Account Bijwerken
+            </Button>
+          </div>
+        </CustomDialogContent>
+      </Dialog>
+
+      {/* Bulk Create Accounts Dialog */}
+      <Dialog open={isBulkCreateDialogOpen} onOpenChange={setIsBulkCreateDialogOpen}>
+        <CustomDialogContent className="max-w-md">
+          <div className="px-6 py-4 border-b">
+            <h2 className="text-lg font-semibold">Bulk Accounts Aanmaken</h2>
+            <p className="text-sm text-gray-600 mt-1">Selecteer welke groep accounts je wilt aanmaken</p>
+          </div>
+          <div className="px-6 py-4 space-y-4">
+            <div>
+              <Label htmlFor="bulk-type">Type</Label>
+              <Select value={bulkCreateOptions.type} onValueChange={(value) => setBulkCreateOptions(prev => ({ ...prev, type: value }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="students">Alle Studenten</SelectItem>
+                  <SelectItem value="teachers">Alle Docenten</SelectItem>
+                  <SelectItem value="guardians">Alle Voogden</SelectItem>
+                  <SelectItem value="class">Studenten van Klas</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {bulkCreateOptions.type === 'class' && (
+              <div>
+                <Label htmlFor="bulk-class">Klas</Label>
+                <Select value={bulkCreateOptions.classId} onValueChange={(value) => setBulkCreateOptions(prev => ({ ...prev, classId: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecteer klas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.isArray(studentGroupsData) && studentGroupsData.map((group: any) => (
+                      <SelectItem key={group.id} value={group.id.toString()}>{group.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div>
+              <Label htmlFor="bulk-password">Standaard Wachtwoord</Label>
+              <Input
+                id="bulk-password"
+                type="text"
+                value={bulkCreateOptions.defaultPassword}
+                onChange={(e) => setBulkCreateOptions(prev => ({ ...prev, defaultPassword: e.target.value }))}
+                placeholder="Standaard wachtwoord"
+              />
+            </div>
+          </div>
+          <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsBulkCreateDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button 
+              onClick={handleBulkCreateAccounts}
+              disabled={bulkCreateAccountsMutation.isPending || !bulkCreateOptions.defaultPassword}
+              className="bg-[#1e40af] hover:bg-[#1d4ed8]"
+            >
+              {bulkCreateAccountsMutation.isPending ? 'Aanmaken...' : 'Accounts Aanmaken'}
             </Button>
           </div>
         </CustomDialogContent>

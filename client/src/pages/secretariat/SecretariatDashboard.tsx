@@ -22,7 +22,6 @@ import { Link } from "wouter";
 interface SecretariatStats {
   totalStudents: number;
   totalGuardians: number;
-  pendingAdmissions: number;
   activeClasses: number;
   pendingPayments: number;
   unreadMessages: number;
@@ -30,13 +29,7 @@ interface SecretariatStats {
   pendingTasks: number;
 }
 
-interface RecentAdmission {
-  id: number;
-  studentName: string;
-  programName: string;
-  applicationDate: string;
-  status: string;
-}
+
 
 interface PendingTask {
   id: number;
@@ -62,10 +55,7 @@ export default function SecretariatDashboard() {
     retry: false,
   });
 
-  const { data: recentAdmissions } = useQuery<{ admissions: RecentAdmission[] }>({
-    queryKey: ['/api/secretariat/recent-admissions'],
-    retry: false,
-  });
+
 
   const { data: pendingTasks } = useQuery<{ tasks: PendingTask[] }>({
     queryKey: ['/api/secretariat/pending-tasks'],
@@ -95,7 +85,6 @@ export default function SecretariatDashboard() {
   const dashboardStats = stats?.stats || {
     totalStudents: 0,
     totalGuardians: 0,
-    pendingAdmissions: 0,
     activeClasses: 0,
     pendingPayments: 0,
     unreadMessages: 0,
@@ -143,18 +132,7 @@ export default function SecretariatDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aanmeldingen</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.pendingAdmissions}</div>
-            <p className="text-xs text-muted-foreground">
-              Te beoordelen aanmeldingen
-            </p>
-          </CardContent>
-        </Card>
+
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

@@ -47,12 +47,7 @@ export default function SecretariatLayout({ children }: SecretariatLayoutProps) 
       icon: UserPlus,
       current: location === "/secretariat/guardians"
     },
-    {
-      name: "Aanmeldingen",
-      href: "/secretariat/admissions",
-      icon: FileText,
-      current: location === "/secretariat/admissions"
-    },
+
     {
       name: "Klassenbeheer",
       href: "/secretariat/classes",

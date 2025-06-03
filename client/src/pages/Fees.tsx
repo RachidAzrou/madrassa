@@ -705,8 +705,8 @@ export default function Fees() {
                 Beheer alle openstaande en recente betalingen
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex gap-4 mb-4">
+            <CardContent className="p-8 min-h-[700px]">
+              <div className="flex gap-4 mb-6">
                 <div className="flex-1">
                   <Input
                     placeholder="Zoek op student, ouder of omschrijving..."
@@ -805,8 +805,8 @@ export default function Fees() {
                 Volledige geschiedenis met filteropties
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="flex gap-4 mb-4">
+            <CardContent className="p-8 min-h-[700px]">
+              <div className="flex gap-4 mb-6">
                 <div className="flex-1">
                   <Input
                     placeholder="Zoek in geschiedenis..."
@@ -895,17 +895,17 @@ export default function Fees() {
                   Systeem berekent automatisch familiekortingen voor gezinnen met meerdere kinderen
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <div className="flex items-center mb-2">
-                      <Users className="h-4 w-4 text-green-600 mr-2" />
-                      <span className="font-semibold text-green-800">Familiekorting</span>
+              <CardContent className="p-8 min-h-[500px]">
+                <div className="space-y-6">
+                  <div className="bg-green-50 p-6 rounded-lg">
+                    <div className="flex items-center mb-3">
+                      <Users className="h-5 w-5 text-green-600 mr-3" />
+                      <span className="font-semibold text-green-800 text-lg">Familiekorting</span>
                     </div>
-                    <p className="text-sm text-green-700">
+                    <p className="text-sm text-green-700 mb-2">
                       10% korting voor gezinnen met 2 of meer kinderen
                     </p>
-                    <p className="text-xs text-green-600 mt-1">
+                    <p className="text-xs text-green-600">
                       Wordt automatisch toegepast bij nieuwe betalingen
                     </p>
                   </div>
@@ -955,23 +955,23 @@ export default function Fees() {
                   Beheer speciale kortingen voor sociale tarieven en personeel
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid gap-2">
-                    <div className="bg-blue-50 p-3 rounded">
+              <CardContent className="p-8 min-h-[500px]">
+                <div className="space-y-6">
+                  <div className="grid gap-4">
+                    <div className="bg-blue-50 p-5 rounded-lg">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium text-blue-800">Sociaal tarief</span>
                         <Badge variant="outline">25% korting</Badge>
                       </div>
-                      <p className="text-xs text-blue-600 mt-1">Voor gezinnen met financiële ondersteuning</p>
+                      <p className="text-xs text-blue-600 mt-2">Voor gezinnen met financiële ondersteuning</p>
                     </div>
                     
-                    <div className="bg-purple-50 p-3 rounded">
+                    <div className="bg-purple-50 p-5 rounded-lg">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium text-purple-800">Personeelskorting</span>
                         <Badge variant="outline">100% korting</Badge>
                       </div>
-                      <p className="text-xs text-purple-600 mt-1">Voor kinderen van schoolpersoneel</p>
+                      <p className="text-xs text-purple-600 mt-2">Voor kinderen van schoolpersoneel</p>
                     </div>
                   </div>
 
@@ -1076,7 +1076,7 @@ export default function Fees() {
                 Goedkeuren en beheren van ingediende kortingsaanvragen
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-8 min-h-[600px]">
               <Table>
                 <TableHeader>
                   <TableRow>

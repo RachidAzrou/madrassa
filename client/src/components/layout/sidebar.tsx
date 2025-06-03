@@ -213,13 +213,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   onClick={handleLinkClick}
                 />
 
-                <SidebarLink
-                  href="/admissions"
-                  icon={<FileText className="h-4 w-4" />}
-                  label="Aanmeldingen"
-                  isActive={location.startsWith("/admissions")}
-                  onClick={handleLinkClick}
-                />
+
                 <SidebarLink
                   href="/academic-year-management"
                   icon={<Calendar className="h-4 w-4" />}

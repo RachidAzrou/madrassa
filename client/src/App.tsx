@@ -18,7 +18,7 @@ import Cijfers from "@/pages/Cijfers";
 import Reports from "@/pages/Reports";
 import Guardians from "@/pages/Guardians";
 import Teachers from "@/pages/Teachers";
-import Admissions from "@/pages/Admissions";
+
 import Rooms from "@/pages/Rooms";
 import StudentGroups from "@/pages/StudentGroups";
 import Notifications from "@/pages/Notifications";
@@ -77,7 +77,7 @@ function AuthenticatedRouter() {
           <Route path="/" component={() => <AuthenticatedRoute component={SecretariatDashboard} />} />
           <Route path="/secretariat/students" component={() => <AuthenticatedRoute component={Students} />} />
           <Route path="/secretariat/guardians" component={() => <AuthenticatedRoute component={Guardians} />} />
-          <Route path="/secretariat/admissions" component={() => <AuthenticatedRoute component={Admissions} />} />
+
           <Route path="/secretariat/classes" component={() => <AuthenticatedRoute component={StudentGroups} />} />
           <Route path="/secretariat/schedule" component={() => <AuthenticatedRoute component={Calendar} />} />
           <Route path="/secretariat/payments" component={() => <AuthenticatedRoute component={Fees} />} />
@@ -165,7 +165,7 @@ function AuthenticatedRouter() {
         <Route path="/students" component={() => <AuthenticatedRoute component={Students} />} />
         <Route path="/guardians" component={() => <AuthenticatedRoute component={Guardians} />} />
         <Route path="/teachers" component={() => <AuthenticatedRoute component={Teachers} />} />
-        <Route path="/admissions" component={() => <AuthenticatedRoute component={Admissions} />} />
+
         <Route path="/academic-year-management" component={() => <AuthenticatedRoute component={AcademicYearManagement} />} />
         <Route path="/accounts" component={() => <AuthenticatedRoute component={Accounts} />} />
         <Route path="/student-groups" component={() => <AuthenticatedRoute component={StudentGroups} />} />

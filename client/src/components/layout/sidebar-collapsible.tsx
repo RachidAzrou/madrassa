@@ -246,14 +246,7 @@ const Sidebar = ({ isMobile = false, onClose, className = "", defaultCollapsed =
                   onClick={handleLinkClick}
                   collapsed={collapsed}
                 />
-                <SidebarLink
-                  href="/admissions"
-                  icon={<ClipboardList className="h-4.5 w-4.5" />}
-                  label="Aanmeldingen"
-                  isActive={location.startsWith("/admissions")}
-                  onClick={handleLinkClick}
-                  collapsed={collapsed}
-                />
+
                 <SidebarLink
                   href="/student-groups"
                   icon={<ChalkBoard className="h-4.5 w-4.5" />}

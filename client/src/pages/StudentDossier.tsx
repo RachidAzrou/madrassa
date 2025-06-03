@@ -141,7 +141,7 @@ export default function StudentDossier() {
   const academicYears = Array.from(uniqueYears);
 
   // Filter classes by academic year
-  const filteredClasses = selectedAcademicYear 
+  const filteredClasses = selectedAcademicYear && selectedAcademicYear !== 'all'
     ? classes.filter(c => c.academicYear === selectedAcademicYear)
     : classes;
 
@@ -151,11 +151,7 @@ export default function StudentDossier() {
       `${student.firstName} ${student.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.studentId.toLowerCase().includes(searchTerm.toLowerCase());
     
-    if (selectedClass) {
-      // Filter by selected class (would need enrollment data in real app)
-      return matchesSearch;
-    }
-    
+    // Only show students that have actual data
     return matchesSearch;
   });
 
@@ -183,28 +179,31 @@ export default function StudentDossier() {
     return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
   };
 
-  // Mock data voor demonstratie - in echte app zou dit van API komen
-  const mockGrades: Grade[] = selectedStudent ? [
-    { id: 1, studentId: selectedStudent.id, programId: 36, gradeType: 'test', score: 8.5, maxScore: 10, weight: 0.3, date: '2025-01-15', notes: null, programName: 'Koran' },
-    { id: 2, studentId: selectedStudent.id, programId: 36, gradeType: 'homework', score: 7.8, maxScore: 10, weight: 0.2, date: '2025-01-20', notes: null, programName: 'Koran' },
-    { id: 3, studentId: selectedStudent.id, programId: 37, gradeType: 'test', score: 9.0, maxScore: 10, weight: 0.3, date: '2025-01-18', notes: null, programName: 'Arabisch' },
-  ] : [];
+  // Echte data van API's
+  const { data: studentGrades = [] } = useQuery({ 
+    queryKey: ['/api/grades', selectedStudent?.id],
+    enabled: !!selectedStudent
+  });
+  
+  const { data: studentAttendance = [] } = useQuery({ 
+    queryKey: ['/api/attendance', selectedStudent?.id],
+    enabled: !!selectedStudent
+  });
+  
+  const { data: studentPayments = [] } = useQuery({ 
+    queryKey: ['/api/payments', selectedStudent?.id],
+    enabled: !!selectedStudent
+  });
+  
+  const { data: studentGuardians = [] } = useQuery({ 
+    queryKey: ['/api/guardians', selectedStudent?.id],
+    enabled: !!selectedStudent
+  });
 
-  const mockAttendance: AttendanceRecord[] = selectedStudent ? [
-    { id: 1, studentId: selectedStudent.id, date: '2025-06-01', status: 'present', notes: null },
-    { id: 2, studentId: selectedStudent.id, date: '2025-06-02', status: 'present', notes: null },
-    { id: 3, studentId: selectedStudent.id, date: '2025-06-03', status: 'late', notes: 'Verkeer' },
-  ] : [];
-
-  const mockPayments: Payment[] = selectedStudent ? [
-    { id: 1, studentId: selectedStudent.id, amount: 250.00, status: 'paid', dueDate: '2025-01-01', paidDate: '2024-12-28', description: 'Schoolgeld Q1 2025' },
-    { id: 2, studentId: selectedStudent.id, amount: 250.00, status: 'pending', dueDate: '2025-04-01', paidDate: null, description: 'Schoolgeld Q2 2025' },
-  ] : [];
-
-  const mockGuardians: Guardian[] = selectedStudent ? [
-    { id: 1, firstName: 'Ahmed', lastName: 'El Mouden', relationship: 'Vader', email: 'ahmed@email.com', phone: '0496123456', address: 'Schoolstraat 123, 2000 Antwerpen', isEmergencyContact: true },
-    { id: 2, firstName: 'Fatima', lastName: 'El Mouden', relationship: 'Moeder', email: 'fatima@email.com', phone: '0496789012', address: 'Schoolstraat 123, 2000 Antwerpen', isEmergencyContact: false },
-  ] : [];
+  const { data: studentSiblings = [] } = useQuery({ 
+    queryKey: [`/api/students/${selectedStudent?.id}/siblings`],
+    enabled: !!selectedStudent
+  });
 
   return (
     <DataTableContainer>
@@ -490,35 +489,53 @@ export default function StudentDossier() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {mockGuardians.map(guardian => (
-                        <div key={guardian.id} className="p-4 border rounded-lg">
-                          <div className="flex justify-between items-start">
-                            <div className="space-y-2">
-                              <h4 className="font-semibold">{guardian.firstName} {guardian.lastName}</h4>
-                              <p className="text-sm text-gray-600">{guardian.relationship}</p>
-                              <div className="space-y-1 text-sm">
-                                <p className="flex items-center gap-2">
-                                  <Mail className="h-4 w-4" />
-                                  {guardian.email}
-                                </p>
-                                <p className="flex items-center gap-2">
-                                  <Phone className="h-4 w-4" />
-                                  {guardian.phone || 'Niet opgegeven'}
-                                </p>
-                                <p className="flex items-center gap-2">
-                                  <Home className="h-4 w-4" />
-                                  {guardian.address || 'Niet opgegeven'}
-                                </p>
+                    {studentGuardians.length > 0 ? (
+                      <div className="space-y-4">
+                        {studentGuardians.map((guardian: any) => (
+                          <div key={guardian.id} className="p-4 border rounded-lg">
+                            <div className="flex justify-between items-start">
+                              <div className="space-y-2">
+                                <h4 className="font-semibold">{guardian.firstName} {guardian.lastName}</h4>
+                                <p className="text-sm text-gray-600">{guardian.relationship || 'Niet opgegeven'}</p>
+                                <div className="space-y-1 text-sm">
+                                  <p className="flex items-center gap-2">
+                                    <Mail className="h-4 w-4" />
+                                    {guardian.email || 'Niet opgegeven'}
+                                  </p>
+                                  <p className="flex items-center gap-2">
+                                    <Phone className="h-4 w-4" />
+                                    {guardian.phone || 'Niet opgegeven'}
+                                  </p>
+                                  <p className="flex items-center gap-2">
+                                    <Home className="h-4 w-4" />
+                                    {guardian.address || 'Niet opgegeven'}
+                                  </p>
+                                </div>
                               </div>
+                              {guardian.isEmergencyContact && (
+                                <Badge variant="destructive">Noodcontact</Badge>
+                              )}
                             </div>
-                            {guardian.isEmergencyContact && (
-                              <Badge variant="destructive">Noodcontact</Badge>
-                            )}
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                        
+                        {studentSiblings.length > 0 && (
+                          <div className="mt-6">
+                            <h4 className="font-semibold mb-3">Broers & Zussen</h4>
+                            <div className="space-y-2">
+                              {studentSiblings.map((sibling: any) => (
+                                <div key={sibling.id} className="p-3 bg-gray-50 rounded-lg">
+                                  <p className="font-medium">{sibling.firstName} {sibling.lastName}</p>
+                                  <p className="text-sm text-gray-600">Student ID: {sibling.studentId}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-center py-8">Geen voogd informatie beschikbaar</p>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -532,32 +549,36 @@ export default function StudentDossier() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Vak</TableHead>
-                          <TableHead>Type</TableHead>
-                          <TableHead>Cijfer</TableHead>
-                          <TableHead>Max</TableHead>
-                          <TableHead>Datum</TableHead>
-                          <TableHead>Notities</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {mockGrades.map(grade => (
-                          <TableRow key={grade.id}>
-                            <TableCell className="font-medium">{grade.programName}</TableCell>
-                            <TableCell>
-                              <Badge variant="outline">{grade.gradeType}</Badge>
-                            </TableCell>
-                            <TableCell className="font-bold">{grade.score}</TableCell>
-                            <TableCell>{grade.maxScore}</TableCell>
-                            <TableCell>{formatDate(grade.date)}</TableCell>
-                            <TableCell>{grade.notes || '-'}</TableCell>
+                    {studentGrades.length > 0 ? (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Vak</TableHead>
+                            <TableHead>Type</TableHead>
+                            <TableHead>Cijfer</TableHead>
+                            <TableHead>Max</TableHead>
+                            <TableHead>Datum</TableHead>
+                            <TableHead>Notities</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {studentGrades.map((grade: any) => (
+                            <TableRow key={grade.id}>
+                              <TableCell className="font-medium">{grade.programName || 'Onbekend vak'}</TableCell>
+                              <TableCell>
+                                <Badge variant="outline">{grade.gradeType || 'Test'}</Badge>
+                              </TableCell>
+                              <TableCell className="font-bold">{grade.score}</TableCell>
+                              <TableCell>{grade.maxScore}</TableCell>
+                              <TableCell>{formatDate(grade.date)}</TableCell>
+                              <TableCell>{grade.notes || '-'}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    ) : (
+                      <p className="text-gray-500 text-center py-8">Geen cijfers beschikbaar</p>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -571,34 +592,38 @@ export default function StudentDossier() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Datum</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Notities</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {mockAttendance.map(attendance => (
-                          <TableRow key={attendance.id}>
-                            <TableCell>{formatDate(attendance.date)}</TableCell>
-                            <TableCell>
-                              <Badge 
-                                variant={
-                                  attendance.status === 'present' ? 'default' :
-                                  attendance.status === 'late' ? 'secondary' : 'destructive'
-                                }
-                              >
-                                {attendance.status === 'present' ? 'Aanwezig' :
-                                 attendance.status === 'late' ? 'Te laat' : 'Afwezig'}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>{attendance.notes || '-'}</TableCell>
+                    {(studentAttendance as any[]).length > 0 ? (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Datum</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Notities</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {(studentAttendance as any[]).map((attendance: any) => (
+                            <TableRow key={attendance.id}>
+                              <TableCell>{formatDate(attendance.date)}</TableCell>
+                              <TableCell>
+                                <Badge 
+                                  variant={
+                                    attendance.status === 'present' ? 'default' :
+                                    attendance.status === 'late' ? 'secondary' : 'destructive'
+                                  }
+                                >
+                                  {attendance.status === 'present' ? 'Aanwezig' :
+                                   attendance.status === 'late' ? 'Te laat' : 'Afwezig'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>{attendance.notes || '-'}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    ) : (
+                      <p className="text-gray-500 text-center py-8">Geen aanwezigheidsgegevens beschikbaar</p>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -612,38 +637,42 @@ export default function StudentDossier() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Beschrijving</TableHead>
-                          <TableHead>Bedrag</TableHead>
-                          <TableHead>Vervaldatum</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Betaaldatum</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {mockPayments.map(payment => (
-                          <TableRow key={payment.id}>
-                            <TableCell className="font-medium">{payment.description}</TableCell>
-                            <TableCell>€{payment.amount.toFixed(2)}</TableCell>
-                            <TableCell>{formatDate(payment.dueDate)}</TableCell>
-                            <TableCell>
-                              <Badge 
-                                variant={
-                                  payment.status === 'paid' ? 'default' :
-                                  payment.status === 'pending' ? 'secondary' : 'destructive'
-                                }
-                              >
-                                {payment.status === 'paid' ? 'Betaald' :
-                                 payment.status === 'pending' ? 'Wachtend' : 'Achterstallig'}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>{formatDate(payment.paidDate)}</TableCell>
+                    {(studentPayments as any[]).length > 0 ? (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Beschrijving</TableHead>
+                            <TableHead>Bedrag</TableHead>
+                            <TableHead>Vervaldatum</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Betaaldatum</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {(studentPayments as any[]).map((payment: any) => (
+                            <TableRow key={payment.id}>
+                              <TableCell className="font-medium">{payment.description || 'Schoolgeld'}</TableCell>
+                              <TableCell>€{payment.amount?.toFixed(2) || '0.00'}</TableCell>
+                              <TableCell>{formatDate(payment.dueDate)}</TableCell>
+                              <TableCell>
+                                <Badge 
+                                  variant={
+                                    payment.status === 'paid' ? 'default' :
+                                    payment.status === 'pending' ? 'secondary' : 'destructive'
+                                  }
+                                >
+                                  {payment.status === 'paid' ? 'Betaald' :
+                                   payment.status === 'pending' ? 'Wachtend' : 'Achterstallig'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>{formatDate(payment.paidDate)}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    ) : (
+                      <p className="text-gray-500 text-center py-8">Geen betalingsgegevens beschikbaar</p>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -658,23 +687,14 @@ export default function StudentDossier() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      <div className="p-4 bg-blue-50 rounded-lg">
-                        <h4 className="font-semibold text-blue-900">Gedragsnotities</h4>
-                        <p className="text-blue-800 text-sm mt-1">Goede student, werkt goed samen met klasgenoten. Toont respect voor docenten.</p>
-                        <p className="text-xs text-blue-600 mt-2">Toegevoegd: 15 januari 2025</p>
-                      </div>
-                      
-                      <div className="p-4 bg-yellow-50 rounded-lg">
-                        <h4 className="font-semibold text-yellow-900">Aanwezigheidsnotities</h4>
-                        <p className="text-yellow-800 text-sm mt-1">Af en toe te laat door openbaar vervoer. Ouders zijn op de hoogte.</p>
-                        <p className="text-xs text-yellow-600 mt-2">Toegevoegd: 20 januari 2025</p>
-                      </div>
-                      
-                      <div className="p-4 bg-green-50 rounded-lg">
-                        <h4 className="font-semibold text-green-900">Algemene notities</h4>
-                        <p className="text-green-800 text-sm mt-1">Zeer gemotiveerde student. Interesse in extra Arabische lessen.</p>
-                        <p className="text-xs text-green-600 mt-2">Toegevoegd: 25 januari 2025</p>
-                      </div>
+                      {selectedStudent?.notes ? (
+                        <div className="p-4 bg-blue-50 rounded-lg">
+                          <h4 className="font-semibold text-blue-900">Algemene notities</h4>
+                          <p className="text-blue-800 text-sm mt-1">{selectedStudent.notes}</p>
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-center py-8">Geen notities beschikbaar</p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

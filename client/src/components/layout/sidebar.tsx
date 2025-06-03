@@ -220,6 +220,13 @@ const Sidebar = ({ isMobile = false, onClose, className = "" }: SidebarProps) =>
                   isActive={location.startsWith("/admissions")}
                   onClick={handleLinkClick}
                 />
+                <SidebarLink
+                  href="/academic-year-management"
+                  icon={<Calendar className="h-4 w-4" />}
+                  label="Schooljaar Beheer"
+                  isActive={location.startsWith("/academic-year-management")}
+                  onClick={handleLinkClick}
+                />
 
               </div>
             </div>

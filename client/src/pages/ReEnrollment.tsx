@@ -346,16 +346,7 @@ export default function ReEnrollment() {
               <Filter className="h-3.5 w-3.5" />
             </Button>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowAcademicYearDialog(true)}
-              className="h-7 px-2 rounded-sm border-[#e5e7eb] text-xs"
-              title="Schooljaar Beheer"
-            >
-              <Settings className="h-3.5 w-3.5 mr-1" />
-              Schooljaar
-            </Button>
+
 
             {selectedStudents.length > 0 && (
               <Button
@@ -577,29 +568,7 @@ export default function ReEnrollment() {
         </DialogContent>
       </Dialog>
 
-      {/* Academic Year Management Dialog */}
-      <Dialog open={showAcademicYearDialog} onOpenChange={setShowAcademicYearDialog}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Schooljaar Beheer</DialogTitle>
-            <DialogDescription>
-              Beheer schooljaren, data en vakanties voor herinschrijvingen.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-6">
-            <div className="text-center py-8 text-gray-500">
-              <Settings className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <p>Schooljaar beheer functionaliteit wordt binnenkort toegevoegd.</p>
-              <p className="text-sm">Hier kun je straks begin/eind data en vakanties instellen.</p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAcademicYearDialog(false)}>
-              Sluiten
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 }

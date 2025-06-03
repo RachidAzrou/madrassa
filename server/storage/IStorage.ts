@@ -24,7 +24,8 @@ import {
   type BehaviorAssessment, type InsertBehaviorAssessment,
   type FeeSettings, type InsertFeeSettings,
   type FeeDiscount, type InsertFeeDiscount,
-  type Notification, type InsertNotification
+  type Notification, type InsertNotification,
+  type Message, type InsertMessage
 } from "@shared/schema";
 
 // Storage interface for CRUD operations
@@ -287,4 +288,16 @@ export interface IStorage {
   getStudentSiblings(studentId: number): Promise<any[]>;
   addStudentSibling(studentId: number, siblingId: number, relationship?: string): Promise<void>;
   removeStudentSibling(studentId: number, siblingId: number): Promise<void>;
+
+  // Message operations
+  getMessages(): Promise<Message[]>;
+  getMessage(id: number): Promise<Message | undefined>;
+  getMessagesBySender(senderId: number, senderRole: string): Promise<Message[]>;
+  getMessagesByReceiver(receiverId: number, receiverRole: string): Promise<Message[]>;
+  getMessageThread(parentMessageId: number): Promise<Message[]>;
+  getUnreadMessagesCount(userId: number, userRole: string): Promise<number>;
+  getAuthorizedReceivers(senderId: number, senderRole: string): Promise<{ id: number; role: string; name: string }[]>;
+  createMessage(message: InsertMessage): Promise<Message>;
+  markMessageAsRead(messageId: number): Promise<Message | undefined>;
+  deleteMessage(messageId: number): Promise<boolean>;
 }

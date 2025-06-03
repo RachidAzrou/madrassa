@@ -28,6 +28,7 @@ import {
   insertAssessmentSchema,
   insertStudentGroupSchema,
   insertStudentGroupEnrollmentSchema,
+  insertMessageSchema,
   insertLessonSchema,
   insertExaminationSchema,
   insertGuardianSchema,

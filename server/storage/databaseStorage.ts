@@ -6,7 +6,7 @@ import {
   fees, feeDiscounts, feeSettings, studentGroups, studentGroupEnrollments,
   lessons, examinations, guardians, studentGuardians, teachers, 
   teacherAvailability, teacherLanguages, teacherCourseAssignments,
-  teacherAttendance, notifications
+  teacherAttendance, notifications, messages
 } from "@shared/schema";
 import type { 
   InsertUser, User, InsertStudent, Student, InsertProgram,
@@ -21,7 +21,8 @@ import type {
   Guardian, InsertStudentGuardian, StudentGuardian, InsertTeacher, 
   Teacher, InsertTeacherAvailability, TeacherAvailability,
   InsertTeacherLanguage, TeacherLanguage, InsertTeacherCourseAssignment,
-  TeacherCourseAssignment, InsertNotification, Notification
+  TeacherCourseAssignment, InsertNotification, Notification,
+  InsertMessage, Message
 } from "@shared/schema";
 import type { IStorage } from "./IStorage";
 
@@ -770,6 +771,258 @@ export class DatabaseStorage implements IStorage {
       );
     } catch (error) {
       console.error('Error removing student sibling:', error);
+      throw error;
+    }
+  }
+
+  // Message operations
+  async getMessages(): Promise<Message[]> {
+    try {
+      const allMessages = await db.select().from(messages).orderBy(desc(messages.sentAt));
+      return allMessages;
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      throw error;
+    }
+  }
+
+  async getMessage(id: number): Promise<Message | undefined> {
+    try {
+      const [message] = await db.select().from(messages).where(eq(messages.id, id));
+      return message;
+    } catch (error) {
+      console.error('Error fetching message:', error);
+      throw error;
+    }
+  }
+
+  async getMessagesBySender(senderId: number, senderRole: string): Promise<Message[]> {
+    try {
+      const senderMessages = await db.select().from(messages)
+        .where(and(eq(messages.senderId, senderId), eq(messages.senderRole, senderRole)))
+        .orderBy(desc(messages.sentAt));
+      return senderMessages;
+    } catch (error) {
+      console.error('Error fetching messages by sender:', error);
+      throw error;
+    }
+  }
+
+  async getMessagesByReceiver(receiverId: number, receiverRole: string): Promise<Message[]> {
+    try {
+      const receiverMessages = await db.select().from(messages)
+        .where(and(eq(messages.receiverId, receiverId), eq(messages.receiverRole, receiverRole)))
+        .orderBy(desc(messages.sentAt));
+      return receiverMessages;
+    } catch (error) {
+      console.error('Error fetching messages by receiver:', error);
+      throw error;
+    }
+  }
+
+  async getMessageThread(parentMessageId: number): Promise<Message[]> {
+    try {
+      const threadMessages = await db.select().from(messages)
+        .where(eq(messages.parentMessageId, parentMessageId))
+        .orderBy(messages.sentAt);
+      return threadMessages;
+    } catch (error) {
+      console.error('Error fetching message thread:', error);
+      throw error;
+    }
+  }
+
+  async getUnreadMessagesCount(userId: number, userRole: string): Promise<number> {
+    try {
+      const [result] = await db.select({ count: sql<number>`count(*)` })
+        .from(messages)
+        .where(and(
+          eq(messages.receiverId, userId), 
+          eq(messages.receiverRole, userRole),
+          eq(messages.isRead, false)
+        ));
+      return result?.count || 0;
+    } catch (error) {
+      console.error('Error fetching unread messages count:', error);
+      throw error;
+    }
+  }
+
+  async getAuthorizedReceivers(senderId: number, senderRole: string): Promise<{ id: number; role: string; name: string }[]> {
+    try {
+      const receivers: { id: number; role: string; name: string }[] = [];
+
+      // Role-based communication rules
+      switch (senderRole) {
+        case 'admin':
+        case 'secretariaat':
+          // Admin and secretariaat can message everyone
+          const allStudents = await db.select().from(students);
+          const allTeachers = await db.select().from(teachers);
+          const allGuardians = await db.select().from(guardians);
+          
+          receivers.push(...allStudents.map(s => ({ 
+            id: s.id, 
+            role: 'student', 
+            name: `${s.firstName} ${s.lastName}` 
+          })));
+          receivers.push(...allTeachers.map(t => ({ 
+            id: t.id, 
+            role: 'docent', 
+            name: `${t.firstName} ${t.lastName}` 
+          })));
+          receivers.push(...allGuardians.map(g => ({ 
+            id: g.id, 
+            role: 'voogd', 
+            name: `${g.firstName} ${g.lastName}` 
+          })));
+          break;
+
+        case 'docent':
+          // Teachers can message their students, guardians of their students, other teachers, and admin/secretariaat
+          const teacherStudents = await db.select({ 
+            student: students 
+          })
+          .from(students)
+          .innerJoin(enrollments, eq(students.id, enrollments.studentId))
+          .innerJoin(courses, eq(enrollments.courseId, courses.id))
+          .innerJoin(teacherCourseAssignments, eq(courses.id, teacherCourseAssignments.courseId))
+          .where(eq(teacherCourseAssignments.teacherId, senderId));
+
+          for (const { student } of teacherStudents) {
+            receivers.push({ 
+              id: student.id, 
+              role: 'student', 
+              name: `${student.firstName} ${student.lastName}` 
+            });
+
+            // Add guardians of these students
+            const studentGuardianRelations = await db.select({ guardian: guardians })
+              .from(guardians)
+              .innerJoin(studentGuardians, eq(guardians.id, studentGuardians.guardianId))
+              .where(eq(studentGuardians.studentId, student.id));
+
+            for (const { guardian } of studentGuardianRelations) {
+              receivers.push({ 
+                id: guardian.id, 
+                role: 'voogd', 
+                name: `${guardian.firstName} ${guardian.lastName}` 
+              });
+            }
+          }
+
+          // Add other teachers
+          const otherTeachers = await db.select().from(teachers).where(sql`${teachers.id} != ${senderId}`);
+          receivers.push(...otherTeachers.map(t => ({ 
+            id: t.id, 
+            role: 'docent', 
+            name: `${t.firstName} ${t.lastName}` 
+          })));
+          break;
+
+        case 'student':
+          // Students can message their teachers and classmates
+          const studentTeachers = await db.select({ teacher: teachers })
+            .from(teachers)
+            .innerJoin(teacherCourseAssignments, eq(teachers.id, teacherCourseAssignments.teacherId))
+            .innerJoin(courses, eq(teacherCourseAssignments.courseId, courses.id))
+            .innerJoin(enrollments, eq(courses.id, enrollments.courseId))
+            .where(eq(enrollments.studentId, senderId));
+
+          receivers.push(...studentTeachers.map(({ teacher }) => ({ 
+            id: teacher.id, 
+            role: 'docent', 
+            name: `${teacher.firstName} ${teacher.lastName}` 
+          })));
+
+          // Add classmates
+          const classmates = await db.select({ student: students })
+            .from(students)
+            .innerJoin(enrollments, eq(students.id, enrollments.studentId))
+            .where(and(
+              eq(enrollments.courseId, sql`(SELECT course_id FROM enrollments WHERE student_id = ${senderId} LIMIT 1)`),
+              sql`${students.id} != ${senderId}`
+            ));
+
+          receivers.push(...classmates.map(({ student }) => ({ 
+            id: student.id, 
+            role: 'student', 
+            name: `${student.firstName} ${student.lastName}` 
+          })));
+          break;
+
+        case 'voogd':
+          // Guardians can message their children, children's teachers, admin, and secretariaat
+          const guardianChildren = await db.select({ student: students })
+            .from(students)
+            .innerJoin(studentGuardians, eq(students.id, studentGuardians.studentId))
+            .where(eq(studentGuardians.guardianId, senderId));
+
+          for (const { student } of guardianChildren) {
+            receivers.push({ 
+              id: student.id, 
+              role: 'student', 
+              name: `${student.firstName} ${student.lastName}` 
+            });
+
+            // Add teachers of these children
+            const childTeachers = await db.select({ teacher: teachers })
+              .from(teachers)
+              .innerJoin(teacherCourseAssignments, eq(teachers.id, teacherCourseAssignments.teacherId))
+              .innerJoin(courses, eq(teacherCourseAssignments.courseId, courses.id))
+              .innerJoin(enrollments, eq(courses.id, enrollments.courseId))
+              .where(eq(enrollments.studentId, student.id));
+
+            receivers.push(...childTeachers.map(({ teacher }) => ({ 
+              id: teacher.id, 
+              role: 'docent', 
+              name: `${teacher.firstName} ${teacher.lastName}` 
+            })));
+          }
+          break;
+      }
+
+      // Remove duplicates
+      const uniqueReceivers = receivers.filter((receiver, index, self) => 
+        index === self.findIndex(r => r.id === receiver.id && r.role === receiver.role)
+      );
+
+      return uniqueReceivers;
+    } catch (error) {
+      console.error('Error fetching authorized receivers:', error);
+      throw error;
+    }
+  }
+
+  async createMessage(message: InsertMessage): Promise<Message> {
+    try {
+      const [newMessage] = await db.insert(messages).values(message).returning();
+      return newMessage;
+    } catch (error) {
+      console.error('Error creating message:', error);
+      throw error;
+    }
+  }
+
+  async markMessageAsRead(messageId: number): Promise<Message | undefined> {
+    try {
+      const [updatedMessage] = await db.update(messages)
+        .set({ isRead: true })
+        .where(eq(messages.id, messageId))
+        .returning();
+      return updatedMessage;
+    } catch (error) {
+      console.error('Error marking message as read:', error);
+      throw error;
+    }
+  }
+
+  async deleteMessage(messageId: number): Promise<boolean> {
+    try {
+      const result = await db.delete(messages).where(eq(messages.id, messageId));
+      return result.rowCount ? result.rowCount > 0 : false;
+    } catch (error) {
+      console.error('Error deleting message:', error);
       throw error;
     }
   }

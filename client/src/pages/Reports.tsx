@@ -145,8 +145,8 @@ export default function Reports() {
       const reports: ReportData[] = [];
 
       for (const student of targetStudents) {
-        // Fetch attendance data using the correct endpoint
-        const attendanceResponse = await fetch(`/api/students/${student.id}/attendance`);
+        // Fetch attendance data using the working endpoint
+        const attendanceResponse = await fetch(`/api/attendance/student/${student.id}`);
         const attendanceData: AttendanceRecord[] = attendanceResponse.ok ? await attendanceResponse.json() : [];
 
         // Calculate attendance statistics
@@ -250,12 +250,17 @@ export default function Reports() {
       }
 
       // School name and title with modern typography
+      pdf.setFontSize(20);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(33, 107, 169);
+      pdf.text('myMadrassa', 20, 25);
+      
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(33, 107, 169);
-      pdf.text('RAPPORT', pageWidth - 20, 25, { align: 'right' });
+      pdf.text('SCHOOLRAPPORT', pageWidth - 20, 25, { align: 'right' });
       
-      pdf.setFontSize(9);
+      pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(64, 75, 105);
       pdf.text(`Schooljaar ${report.student.academicYear || '2024-2025'}`, pageWidth - 20, 35, { align: 'right' });
@@ -270,18 +275,18 @@ export default function Reports() {
       pdf.setLineWidth(0.5);
       pdf.roundedRect(20, yPos, pageWidth - 40, 35, 3, 3, 'D');
 
-      // Student info with icons (represented as Unicode symbols)
-      pdf.setFontSize(10);
+      // Student info with clean labels
+      pdf.setFontSize(11);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(33, 107, 169);
       
       // Left column
-      pdf.text('👤 ' + `${report.student.firstName} ${report.student.lastName}`, 30, yPos + 12);
-      pdf.text('🆔 ' + report.student.studentId, 30, yPos + 22);
+      pdf.text(`Leerling: ${report.student.firstName} ${report.student.lastName}`, 30, yPos + 15);
+      pdf.text(`Leerlingnummer: ${report.student.studentId}`, 30, yPos + 25);
       
       // Right column
-      pdf.text('🏫 Klas 1A', pageWidth - 120, yPos + 12);
-      pdf.text('📅 ' + new Date().toLocaleDateString('nl-NL'), pageWidth - 120, yPos + 22);
+      pdf.text('Klas: 1A', pageWidth - 120, yPos + 15);
+      pdf.text(`Datum: ${new Date().toLocaleDateString('nl-NL')}`, pageWidth - 120, yPos + 25);
 
       yPos += 50;
 
@@ -299,15 +304,15 @@ export default function Reports() {
       pdf.setTextColor(255, 255, 255);
       
       let xPos = tableStartX;
-      pdf.text('📚 Vak', xPos + 5, yPos + 12);
+      pdf.text('VAK', xPos + 5, yPos + 12);
       xPos += colWidths[0];
-      pdf.text('📝 Testen', xPos + 8, yPos + 12);
+      pdf.text('TESTEN', xPos + 8, yPos + 12);
       xPos += colWidths[1];
-      pdf.text('📋 Taken', xPos + 8, yPos + 12);
+      pdf.text('TAKEN', xPos + 8, yPos + 12);
       xPos += colWidths[2];
-      pdf.text('🎯 Examen', xPos + 6, yPos + 12);
+      pdf.text('EXAMEN', xPos + 6, yPos + 12);
       xPos += colWidths[3];
-      pdf.text('💬 Opmerkingen', xPos + 5, yPos + 12);
+      pdf.text('OPMERKINGEN', xPos + 5, yPos + 12);
       
       yPos += 18;
 
@@ -384,10 +389,10 @@ export default function Reports() {
       pdf.setLineWidth(1);
       pdf.roundedRect(20, yPos, pageWidth - 40, 80, 3, 3, 'D');
       
-      pdf.setFontSize(16);
+      pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(33, 107, 169);
-      pdf.text('💭 ALGEMENE OPMERKINGEN', 30, yPos + 20);
+      pdf.text('ALGEMENE OPMERKINGEN', 30, yPos + 20);
       
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(11);
@@ -416,18 +421,18 @@ export default function Reports() {
       pdf.setFillColor(33, 107, 169);
       pdf.rect(0, 0, pageWidth, 3, 'F');
 
-      pdf.setFontSize(14);
+      pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(33, 107, 169);
-      pdf.text('🕌 myMadrassa - Rapport Pagina 2', 20, 20);
+      pdf.text('myMadrassa - Rapport Pagina 2', 20, 25);
       
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(64, 75, 105);
-      pdf.text('👤 ' + `${report.student.firstName} ${report.student.lastName}`, 30, yPos + 10);
-      pdf.text('🆔 ' + report.student.studentId, 30, yPos + 18);
-      pdf.text('🏫 Klas 1A', pageWidth - 120, yPos + 10);
-      pdf.text('📅 ' + new Date().toLocaleDateString('nl-NL'), pageWidth - 120, yPos + 18);
+      pdf.text(`Leerling: ${report.student.firstName} ${report.student.lastName}`, 30, yPos + 10);
+      pdf.text(`Leerlingnummer: ${report.student.studentId}`, 30, yPos + 18);
+      pdf.text('Klas: 1A', pageWidth - 120, yPos + 10);
+      pdf.text(`Datum: ${new Date().toLocaleDateString('nl-NL')}`, pageWidth - 120, yPos + 18);
 
       yPos += 45;
 
@@ -438,10 +443,10 @@ export default function Reports() {
       pdf.setLineWidth(1);
       pdf.roundedRect(20, yPos, pageWidth - 40, 120, 3, 3, 'D');
       
-      pdf.setFontSize(18);
+      pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(34, 139, 34);
-      pdf.text('😊 GEDRAGSBEOORDELING', 30, yPos + 25);
+      pdf.text('GEDRAGSBEOORDELING', 30, yPos + 25);
       
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(13);
@@ -465,21 +470,21 @@ export default function Reports() {
       pdf.setLineWidth(1);
       pdf.roundedRect(20, yPos, pageWidth - 40, 100, 3, 3, 'D');
       
-      pdf.setFontSize(18);
+      pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(52, 152, 219);
-      pdf.text('📅 AANWEZIGHEID', 30, yPos + 25);
+      pdf.text('AANWEZIGHEID', 30, yPos + 25);
       
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(13);
+      pdf.setFontSize(12);
       pdf.setTextColor(64, 75, 105);
-      pdf.text(`❌ Aantal keer afwezig: ${report.attendance.absent} dagen`, 30, yPos + 50);
-      pdf.text(`⏰ Aantal keer te laat: ${report.attendance.late} keer`, 30, yPos + 70);
+      pdf.text(`Aantal keer afwezig: ${report.attendance.absent} dagen`, 30, yPos + 50);
+      pdf.text(`Aantal keer te laat: ${report.attendance.late} keer`, 30, yPos + 70);
       
       // Calculate attendance percentage
       const totalDays = 180; // Approximate school days
       const attendancePercentage = ((totalDays - report.attendance.absent) / totalDays * 100).toFixed(1);
-      pdf.text(`📈 Aanwezigheidspercentage: ${attendancePercentage}%`, 30, yPos + 85);
+      pdf.text(`Aanwezigheidspercentage: ${attendancePercentage}%`, 30, yPos + 85);
 
       yPos += 120;
 

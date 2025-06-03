@@ -191,6 +191,7 @@ export default function Reports() {
         });
       }
 
+      console.log('Generated reports:', reports);
       setReportPreview(reports);
     } catch (error) {
       console.error('Error generating preview data:', error);

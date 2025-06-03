@@ -39,27 +39,56 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex relative overflow-hidden bg-gradient-to-br from-blue-100 via-sky-50 to-cyan-50">
-      {/* Background Image with Blur */}
+    <div className="min-h-screen flex relative overflow-hidden">
+      {/* Educational Background Pattern */}
       <div 
         className="absolute inset-0 z-0"
         style={{
-          backgroundImage: `url(${backgroundPath})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          filter: 'blur(3px)',
-          opacity: 0.7
+          background: `
+            linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 25%, #ecfeff 50%, #e0f7fa 75%, #f1f8e9 100%),
+            radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 60% 40%, rgba(139, 92, 246, 0.08) 0%, transparent 50%)
+          `
         }}
       ></div>
-      
-      {/* Color overlay */}
-      <div 
-        className="absolute inset-0 z-10"
-        style={{
-          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.4) 100%)'
-        }}
-      ></div>
+
+      {/* Educational Pattern Overlay */}
+      <div className="absolute inset-0 z-5" style={{ opacity: 0.15 }}>
+        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="school-pattern" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
+              <g fill="none" stroke="#3b82f6" strokeWidth="1" opacity="0.3">
+                {/* Notebook lines */}
+                <line x1="20" y1="30" x2="100" y2="30"/>
+                <line x1="20" y1="40" x2="100" y2="40"/>
+                <line x1="20" y1="50" x2="100" y2="50"/>
+                {/* Pen/pencil */}
+                <rect x="30" y="70" width="2" height="20" fill="#f59e0b"/>
+                <circle cx="31" cy="68" r="2" fill="#f59e0b"/>
+                {/* Calculator buttons */}
+                <rect x="70" y="60" width="25" height="30" fill="none" stroke="#6b7280"/>
+                <circle cx="75" cy="68" r="1.5" fill="#6b7280"/>
+                <circle cx="82" cy="68" r="1.5" fill="#6b7280"/>
+                <circle cx="89" cy="68" r="1.5" fill="#6b7280"/>
+                <circle cx="75" cy="75" r="1.5" fill="#6b7280"/>
+                <circle cx="82" cy="75" r="1.5" fill="#6b7280"/>
+                <circle cx="89" cy="75" r="1.5" fill="#6b7280"/>
+              </g>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#school-pattern)"/>
+        </svg>
+      </div>
+
+      {/* Floating educational elements */}
+      <div className="absolute inset-0 z-5 overflow-hidden">
+        <div className="absolute top-20 left-16 w-8 h-8 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-6 h-6 bg-green-200 rounded-lg opacity-25 animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-32 left-24 w-10 h-10 bg-purple-200 rounded-full opacity-15 animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-20 right-32 w-7 h-7 bg-orange-200 rounded-lg opacity-20 animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+        <div className="absolute top-1/2 left-1/3 w-5 h-5 bg-pink-200 rounded-full opacity-18 animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+      </div>
 
       <style dangerouslySetInnerHTML={{
         __html: `

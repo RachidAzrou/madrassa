@@ -193,7 +193,7 @@ export default function Fees() {
 
           <TabsContent value="overview" className="space-y-4">
             {/* Stats Overview - Dashboard stijl */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
               {/* Totaal Geïnd kaart */}
               <div className="bg-white border border-[#e5e7eb] rounded-sm">
                 <div className="flex h-full">
@@ -219,21 +219,6 @@ export default function Fees() {
                     <div className="flex flex-col">
                       <h3 className="text-xs font-medium text-gray-500">Openstaand</h3>
                       <p className="text-lg font-medium text-gray-800 mt-1">€{paymentStats.totalPending?.toFixed(2) || '0.00'}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Slagingspercentage kaart */}
-              <div className="bg-white border border-[#e5e7eb] rounded-sm">
-                <div className="flex h-full">
-                  <div className="flex items-center justify-center w-14 bg-[#f5f7fc] border-r border-[#e5e7eb]">
-                    <Target className="h-5 w-5 text-[#1e40af]" />
-                  </div>
-                  <div className="flex-1 p-3">
-                    <div className="flex flex-col">
-                      <h3 className="text-xs font-medium text-gray-500">Slagingspercentage</h3>
-                      <p className="text-lg font-medium text-gray-800 mt-1">{paymentStats.successRate?.toFixed(1) || '0'}%</p>
                     </div>
                   </div>
                 </div>

@@ -46,7 +46,7 @@ interface UserAccount {
   id: number;
   email: string;
   password: string;
-  role: 'student' | 'teacher' | 'guardian';
+  role: 'student' | 'teacher' | 'guardian' | 'secretariat';
   isActive: boolean;
   lastLogin?: string;
   createdAt: string;
@@ -82,7 +82,7 @@ export default function Accounts() {
   const [accountFormData, setAccountFormData] = useState({
     email: '',
     password: '',
-    role: 'student' as 'student' | 'teacher' | 'guardian',
+    role: 'student' as 'student' | 'teacher' | 'guardian' | 'secretariat',
     personId: 0,
     isActive: true
   });
@@ -95,7 +95,7 @@ export default function Accounts() {
 
   const [bulkCreateFormData, setBulkCreateFormData] = useState({
     type: 'all' as 'all' | 'class' | 'program',
-    role: 'student' as 'student' | 'teacher' | 'guardian',
+    role: 'student' as 'student' | 'teacher' | 'guardian' | 'secretariat',
     classId: 0,
     programId: 0,
     generateDefaultPasswords: true,
@@ -339,7 +339,8 @@ export default function Accounts() {
     const roleMap = {
       student: { label: 'Student', color: 'bg-blue-100 text-blue-800', icon: Users },
       teacher: { label: 'Docent', color: 'bg-green-100 text-green-800', icon: GraduationCap },
-      guardian: { label: 'Voogd', color: 'bg-purple-100 text-purple-800', icon: UserCheck }
+      guardian: { label: 'Voogd', color: 'bg-purple-100 text-purple-800', icon: UserCheck },
+      secretariat: { label: 'Secretariaat', color: 'bg-orange-100 text-orange-800', icon: FileText }
     };
     const config = roleMap[role as keyof typeof roleMap] || roleMap.student;
     return <Badge className={config.color}>{config.label}</Badge>;
@@ -394,6 +395,7 @@ export default function Accounts() {
     students: accountsData.filter((a: UserAccount) => a.role === 'student').length,
     teachers: accountsData.filter((a: UserAccount) => a.role === 'teacher').length,
     guardians: accountsData.filter((a: UserAccount) => a.role === 'guardian').length,
+    secretariat: accountsData.filter((a: UserAccount) => a.role === 'secretariat').length,
     active: accountsData.filter((a: UserAccount) => a.isActive).length
   };
 
@@ -411,7 +413,7 @@ export default function Accounts() {
 
       {/* Enhanced Statistics Dashboard */}
       <div className="max-w-[1400px] mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-6 mb-10">
           <Card className="bg-gradient-to-br from-slate-600 to-slate-700 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
             <div className="absolute inset-0 bg-gradient-to-br from-slate-500/20 to-transparent"></div>
             <CardContent className="p-6 relative z-10">
@@ -471,6 +473,22 @@ export default function Accounts() {
                 </div>
                 <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
                   <UserCheck className="h-7 w-7 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-orange-500 to-orange-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 to-transparent"></div>
+            <CardContent className="p-6 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="text-white">
+                  <p className="text-sm font-medium text-orange-100 mb-2">Secretariaat</p>
+                  <p className="text-3xl font-bold">{accountStats.secretariat}</p>
+                  <p className="text-xs text-orange-200 mt-1">Administratieve toegang</p>
+                </div>
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl group-hover:bg-white/30 transition-all duration-300">
+                  <FileText className="h-7 w-7 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -566,6 +584,7 @@ export default function Accounts() {
                     <SelectItem value="student">Studenten</SelectItem>
                     <SelectItem value="teacher">Docenten</SelectItem>
                     <SelectItem value="guardian">Voogden</SelectItem>
+                    <SelectItem value="secretariat">Secretariaat</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -98,6 +98,7 @@ export default function Accounts() {
     defaultPassword: 'Welkom123!'
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showEditPassword, setShowEditPassword] = useState(false);
 
   // Queries
   const { data: accountsData = [], isLoading: isAccountsLoading } = useQuery({
@@ -153,6 +154,17 @@ export default function Accounts() {
       queryClient.invalidateQueries({ queryKey: ["/api/accounts"] });
       setIsEditDialogOpen(false);
       resetForm();
+      toast({
+        title: "Succes",
+        description: "Account succesvol bijgewerkt.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fout",
+        description: error.message || "Er is een fout opgetreden bij het bijwerken van het account.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -267,18 +279,6 @@ export default function Accounts() {
       id: selectedAccount.id,
       data: updateData
     });
-  };
-
-  const handleEditAccount = (account: UserAccount) => {
-    setSelectedAccount(account);
-    setAccountFormData({
-      email: account.email,
-      password: '',
-      role: account.role,
-      personId: account.personId,
-      isActive: account.isActive
-    });
-    setIsEditDialogOpen(true);
   };
 
   const handleDeleteAccount = (account: UserAccount) => {
@@ -546,6 +546,17 @@ export default function Accounts() {
                         variant="ghost" 
                         size="sm"
                         className="h-7 w-7 p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                        onClick={() => {
+                          setSelectedAccount(account);
+                          setAccountFormData({
+                            email: account.email,
+                            password: '',
+                            role: account.role,
+                            personId: account.personId,
+                            isActive: account.isActive
+                          });
+                          setIsEditDialogOpen(true);
+                        }}
                       >
                         <Edit className="h-3.5 w-3.5" />
                       </Button>
@@ -689,13 +700,29 @@ export default function Accounts() {
             </div>
             <div>
               <Label htmlFor="edit-password">Nieuw Wachtwoord (optioneel)</Label>
-              <Input
-                id="edit-password"
-                type="password"
-                value={accountFormData.password}
-                onChange={(e) => setAccountFormData(prev => ({ ...prev, password: e.target.value }))}
-                placeholder="Laat leeg om hetzelfde te houden"
-              />
+              <div className="relative">
+                <Input
+                  id="edit-password"
+                  type={showEditPassword ? "text" : "password"}
+                  value={accountFormData.password}
+                  onChange={(e) => setAccountFormData(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder="Laat leeg om hetzelfde te houden"
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full w-10 px-0 hover:bg-transparent"
+                  onClick={() => setShowEditPassword(!showEditPassword)}
+                >
+                  {showEditPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-500" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-500" />
+                  )}
+                </Button>
+              </div>
             </div>
             <div>
               <Label htmlFor="edit-role">Rol</Label>
@@ -819,7 +846,7 @@ export default function Accounts() {
             <Button 
               onClick={handleBulkCreateAccounts}
               disabled={bulkCreateAccountsMutation.isPending || !bulkCreateOptions.defaultPassword}
-              className="bg-[#1e40af] hover:bg-[#1d4ed8]"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap tracking-tight ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm h-9 px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed bg-[#1e41af]"
             >
               {bulkCreateAccountsMutation.isPending ? (
                 <>

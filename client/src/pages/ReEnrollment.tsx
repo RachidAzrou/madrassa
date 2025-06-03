@@ -2,23 +2,27 @@ import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { 
-  Calendar, 
+  Search, 
+  Filter, 
+  RefreshCw,
   Users, 
   CheckCircle, 
   XCircle, 
   Clock, 
   GraduationCap,
-  ArrowRight,
-  Plus,
   Settings,
   Award,
   AlertTriangle,
-  RefreshCw,
-  TrendingUp,
-  UserCheck
+  Plus,
+  Download,
+  Eye,
+  Edit,
+  Trash2
 } from 'lucide-react';
+import { PremiumHeader } from '@/components/layout/premium-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,8 +30,15 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
-import { PageHeader } from '@/components/layout/page-header';
-import { Topbar } from '@/components/layout/topbar';
+import { 
+  DataTableContainer, 
+  SearchActionBar, 
+  TableContainer,
+  DataTableHeader,
+  TableLoadingState,
+  EmptyTableState,
+  QuickActions
+} from "@/components/ui/data-table-container";
 
 interface Student {
   id: number;
@@ -69,6 +80,9 @@ interface ReEnrollmentData {
 }
 
 export default function ReEnrollment() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
   const [showBulkDialog, setShowBulkDialog] = useState(false);
   const [showAcademicYearDialog, setShowAcademicYearDialog] = useState(false);
@@ -80,7 +94,7 @@ export default function ReEnrollment() {
     select: (data: any) => data || null
   });
 
-  const { data: studentsData = [] } = useQuery({ 
+  const { data: studentsData = [], isLoading: studentsLoading } = useQuery({ 
     queryKey: ['/api/students/eligible-for-reenrollment'],
     select: (data: any) => Array.isArray(data) ? data : []
   });
@@ -120,37 +134,48 @@ export default function ReEnrollment() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enrollments: enrollmentData })
       });
+      if (!response.ok) throw new Error('Failed to enroll students');
       return response.json();
     },
     onSuccess: () => {
-      toast({ title: "Succes", description: "Bulk herinschrijving succesvol voltooid" });
+      toast({ title: "Succes", description: "Studenten succesvol heringeschreven" });
       queryClient.invalidateQueries({ queryKey: ['/api/students/eligible-for-reenrollment'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/re-enrollment/stats'] });
       setShowBulkDialog(false);
       setSelectedStudents([]);
-    }
-  });
-
-  const createAcademicYearMutation = useMutation({
-    mutationFn: async (yearData: any) => {
-      const response = await fetch('/api/academic-years', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(yearData)
-      });
-      return response.json();
     },
-    onSuccess: () => {
-      toast({ title: "Succes", description: "Schooljaar succesvol aangemaakt" });
-      queryClient.invalidateQueries({ queryKey: ['/api/academic-years'] });
-      setShowAcademicYearDialog(false);
+    onError: () => {
+      toast({ title: "Fout", description: "Er ging iets mis bij het herinschrijven", variant: "destructive" });
     }
   });
 
-  // Filter students
-  const passedStudents = studentsData.filter((s: Student) => s.isPassed && s.promotionEligible);
-  const failedStudents = studentsData.filter((s: Student) => !s.isPassed);
-  const canStartRegistration = currentAcademicYear?.finalReportDate && 
-    new Date() >= new Date(currentAcademicYear.finalReportDate);
+  // Check if registration period is active
+  const canStartRegistration = currentAcademicYear ? 
+    new Date() >= new Date(currentAcademicYear.finalReportDate) : false;
+
+  // Filter functions
+  const filteredStudents = studentsData.filter((student: Student) => {
+    const matchesSearch = student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         student.studentId.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === "all" || 
+                         (statusFilter === "passed" && student.isPassed) ||
+                         (statusFilter === "failed" && !student.isPassed);
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const passedStudents = filteredStudents.filter((s: Student) => s.isPassed && s.promotionEligible);
+  const failedStudents = filteredStudents.filter((s: Student) => !s.isPassed);
+
+  const handleSelectStudent = (studentId: number) => {
+    setSelectedStudents(prev => 
+      prev.includes(studentId) 
+        ? prev.filter(id => id !== studentId)
+        : [...prev, studentId]
+    );
+  };
 
   const handleSelectAll = (students: Student[]) => {
     const studentIds = students.map(s => s.id);
@@ -159,14 +184,6 @@ export default function ReEnrollment() {
     } else {
       setSelectedStudents(studentIds);
     }
-  };
-
-  const handleStudentToggle = (studentId: number) => {
-    setSelectedStudents(prev => 
-      prev.includes(studentId) 
-        ? prev.filter(id => id !== studentId)
-        : [...prev, studentId]
-    );
   };
 
   const handleBulkEnrollment = () => {
@@ -200,290 +217,318 @@ export default function ReEnrollment() {
   };
 
   return (
-    <>
-      <Topbar />
-      <div className="min-h-screen bg-gray-50/30">
-        <div className="max-w-[1400px] mx-auto px-6 py-8">
-          {/* Modern Header */}
-          <div className="mb-8">
-            <div className="space-y-1">
-              <h1 className="text-3xl font-bold text-gray-900">Herinschrijvingen</h1>
-              <p className="text-gray-600">
-                Beheer student herinschrijvingen voor het schooljaar {currentAcademicYear?.name || '2024-2025'}
-              </p>
-            </div>
-          </div>
-          
-          {/* Header Actions */}
-          <div className="mb-8 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <RefreshCw className="h-4 w-4" />
-              <span>Academisch jaar: {currentAcademicYear?.name || '2024-2025'}</span>
-            </div>
-            <div className="flex gap-3">
-              <Button
-                onClick={() => setShowAcademicYearDialog(true)}
-                variant="outline"
-                className="flex items-center gap-2 bg-white border-gray-200 hover:bg-gray-50"
-              >
-                <Settings className="h-4 w-4" />
-                Schooljaar Beheer
-              </Button>
-            </div>
-          </div>
-          
-          <div className="space-y-8">
-            {/* Registration Status Alert */}
-            {!canStartRegistration && (
-              <Card className="border-amber-200 bg-amber-50">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <AlertTriangle className="h-5 w-5 text-amber-600" />
-                    <div>
-                      <h3 className="font-medium text-amber-800">Herinschrijving Nog Niet Beschikbaar</h3>
-                      <p className="text-sm text-amber-700">
-                        Herinschrijvingen worden beschikbaar na de eindrapport datum: {currentAcademicYear?.finalReportDate}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+    <div className="bg-[#f7f9fc] min-h-screen">
+      <PremiumHeader 
+        title="Herinschrijvingen" 
+        description={`Beheer student herinschrijvingen voor het schooljaar ${currentAcademicYear?.name || '2024-2025'}`}
+        icon={RefreshCw}
+        breadcrumbs={{
+          parent: "Evaluatie",
+          current: "Herinschrijvingen"
+        }}
+      />
 
-            {/* Modern Stats Overview - Dashboard Style */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <Users className="h-8 w-8 text-blue-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Totaal Geschikt</p>
-                <p className="text-2xl font-bold">{reEnrollmentStats.totalEligible}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Geslaagd</p>
-                <p className="text-2xl font-bold">{reEnrollmentStats.passedStudents}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <XCircle className="h-8 w-8 text-red-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Gezakt</p>
-                <p className="text-2xl font-bold">{reEnrollmentStats.failedStudents}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <Award className="h-8 w-8 text-purple-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Ingeschreven</p>
-                <p className="text-2xl font-bold">{reEnrollmentStats.enrolledStudents}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center">
-              <Clock className="h-8 w-8 text-orange-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">In Behandeling</p>
-                <p className="text-2xl font-bold">{reEnrollmentStats.pendingEnrollments}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex items-center justify-between">
-        <div className="flex gap-2">
-          <Button 
-            onClick={handleBulkEnrollment}
-            disabled={selectedStudents.length === 0 || !canStartRegistration}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            <GraduationCap className="h-4 w-4 mr-2" />
-            Bulk Herinschrijving ({selectedStudents.length})
-          </Button>
-        </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => setShowAcademicYearDialog(true)}
-          >
-            <Settings className="h-4 w-4 mr-2" />
-            Schooljaar Beheer
-          </Button>
-        </div>
-      </div>
-
-      {/* Students Tables */}
-      <Tabs defaultValue="passed" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="passed">
-            Geslaagde Studenten ({passedStudents.length})
-          </TabsTrigger>
-          <TabsTrigger value="failed">
-            Gezakte Studenten ({failedStudents.length})
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="passed">
-          <Card>
-            <CardHeader>
+      {/* Statistics Cards */}
+      <div className="max-w-[1400px] mx-auto px-6 py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+          <Card className="bg-white border-0 shadow-sm">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Geslaagde Studenten</CardTitle>
-                  <CardDescription>
-                    Studenten die geschikt zijn voor promotie naar het volgende jaar
-                  </CardDescription>
+                  <p className="text-sm font-medium text-gray-600">Totaal Geschikt</p>
+                  <p className="text-2xl font-bold text-gray-900">{reEnrollmentStats.totalEligible}</p>
                 </div>
-                <Checkbox
-                  checked={selectedStudents.length === passedStudents.length && passedStudents.length > 0}
-                  onCheckedChange={() => handleSelectAll(passedStudents)}
-                />
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Users className="h-5 w-5 text-blue-600" />
+                </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12"></TableHead>
-                    <TableHead>Student</TableHead>
-                    <TableHead>Huidige Klas</TableHead>
-                    <TableHead>Programma</TableHead>
-                    <TableHead>Eindcijfer</TableHead>
-                    <TableHead>Aanwezigheid</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Acties</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {passedStudents.map((student: Student) => (
-                    <TableRow key={student.id}>
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedStudents.includes(student.id)}
-                          onCheckedChange={() => handleStudentToggle(student.id)}
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {student.firstName} {student.lastName}
-                        <div className="text-sm text-gray-500">{student.studentId}</div>
-                      </TableCell>
-                      <TableCell>{student.currentClass}</TableCell>
-                      <TableCell>{student.currentProgram}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-green-700">
-                          {student.finalGrade?.toFixed(1) || 'N/A'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {student.attendancePercentage?.toFixed(0) || 'N/A'}%
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(student)}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm">
-                          <ArrowRight className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {passedStudents.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8 text-gray-500">
-                        Geen geslaagde studenten gevonden
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="failed">
-          <Card>
-            <CardHeader>
-              <CardTitle>Gezakte Studenten</CardTitle>
-              <CardDescription>
-                Studenten die het jaar moeten herhalen of speciale aandacht behoeven
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Student</TableHead>
-                    <TableHead>Huidige Klas</TableHead>
-                    <TableHead>Programma</TableHead>
-                    <TableHead>Eindcijfer</TableHead>
-                    <TableHead>Aanwezigheid</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Acties</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {failedStudents.map((student: Student) => (
-                    <TableRow key={student.id}>
-                      <TableCell className="font-medium">
-                        {student.firstName} {student.lastName}
-                        <div className="text-sm text-gray-500">{student.studentId}</div>
-                      </TableCell>
-                      <TableCell>{student.currentClass}</TableCell>
-                      <TableCell>{student.currentProgram}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-red-700">
-                          {student.finalGrade?.toFixed(1) || 'N/A'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {student.attendancePercentage?.toFixed(0) || 'N/A'}%
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(student)}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm">
-                          Handmatig Behandelen
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {failedStudents.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                        Geen gezakte studenten gevonden
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+          <Card className="bg-white border-0 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Geslaagd</p>
+                  <p className="text-2xl font-bold text-gray-900">{reEnrollmentStats.passedStudents}</p>
+                </div>
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                </div>
+              </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+
+          <Card className="bg-white border-0 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Gezakt</p>
+                  <p className="text-2xl font-bold text-gray-900">{reEnrollmentStats.failedStudents}</p>
+                </div>
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <XCircle className="h-5 w-5 text-red-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border-0 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Ingeschreven</p>
+                  <p className="text-2xl font-bold text-gray-900">{reEnrollmentStats.enrolledStudents}</p>
+                </div>
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <GraduationCap className="h-5 w-5 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border-0 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">In Behandeling</p>
+                  <p className="text-2xl font-bold text-gray-900">{reEnrollmentStats.pendingEnrollments}</p>
+                </div>
+                <div className="p-2 bg-orange-100 rounded-lg">
+                  <Clock className="h-5 w-5 text-orange-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Registration Status Alert */}
+        {!canStartRegistration && (
+          <Card className="border-amber-200 bg-amber-50 mb-6">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-600" />
+                <div>
+                  <h3 className="font-medium text-amber-800">Herinschrijving Nog Niet Beschikbaar</h3>
+                  <p className="text-sm text-amber-700">
+                    Herinschrijvingen worden beschikbaar na de eindrapport datum: {currentAcademicYear?.finalReportDate}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      <DataTableContainer>
+        <SearchActionBar>
+          {/* Search Bar */}
+          <div className="relative w-full sm:max-w-md">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="text"
+              placeholder="Zoek op naam of student ID..."
+              className="w-full pl-9 h-8 text-xs rounded-sm bg-white border-[#e5e7eb]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          {/* Actions */}
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFilterOptions(!showFilterOptions)}
+              className="h-7 w-7 p-0 rounded-sm border-[#e5e7eb]"
+              title="Filters"
+            >
+              <Filter className="h-3.5 w-3.5" />
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAcademicYearDialog(true)}
+              className="h-7 px-2 rounded-sm border-[#e5e7eb] text-xs"
+              title="Schooljaar Beheer"
+            >
+              <Settings className="h-3.5 w-3.5 mr-1" />
+              Schooljaar
+            </Button>
+
+            {selectedStudents.length > 0 && (
+              <Button
+                size="sm"
+                onClick={handleBulkEnrollment}
+                className="h-7 px-3 rounded-sm text-xs bg-blue-600 hover:bg-blue-700"
+              >
+                <Plus className="h-3.5 w-3.5 mr-1" />
+                Bulk Inschrijven ({selectedStudents.length})
+              </Button>
+            )}
+          </div>
+        </SearchActionBar>
+
+        {/* Filter Options */}
+        {showFilterOptions && (
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <div className="flex flex-wrap gap-4">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">Status:</label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-40 h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle Studenten</SelectItem>
+                    <SelectItem value="passed">Geslaagd</SelectItem>
+                    <SelectItem value="failed">Gezakt</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <DataTableHeader 
+          title="Herinschrijvingen Overzicht"
+          subtitle={`${filteredStudents.length} studenten geschikt voor herinschrijving`}
+        />
+
+        <TableContainer>
+          <Tabs defaultValue="passed" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="passed">
+                Geslaagde Studenten ({passedStudents.length})
+              </TabsTrigger>
+              <TabsTrigger value="failed">
+                Gezakte Studenten ({failedStudents.length})
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Passed Students Tab */}
+            <TabsContent value="passed">
+              {studentsLoading ? (
+                <TableLoadingState />
+              ) : passedStudents.length === 0 ? (
+                <EmptyTableState 
+                  icon={CheckCircle}
+                  title="Geen geslaagde studenten"
+                  description="Er zijn momenteel geen studenten die geslaagd zijn en geschikt zijn voor herinschrijving."
+                />
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={selectedStudents.length === passedStudents.length}
+                          onCheckedChange={() => handleSelectAll(passedStudents)}
+                        />
+                      </TableHead>
+                      <TableHead>Student</TableHead>
+                      <TableHead>Huidige Klas</TableHead>
+                      <TableHead>Programma</TableHead>
+                      <TableHead>Eindcijfer</TableHead>
+                      <TableHead>Aanwezigheid</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Acties</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {passedStudents.map((student: Student) => (
+                      <TableRow key={student.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedStudents.includes(student.id)}
+                            onCheckedChange={() => handleSelectStudent(student.id)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{student.firstName} {student.lastName}</div>
+                            <div className="text-sm text-gray-500">{student.studentId}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>{student.currentClass}</TableCell>
+                        <TableCell>{student.currentProgram}</TableCell>
+                        <TableCell>{student.finalGrade}/10</TableCell>
+                        <TableCell>{student.attendancePercentage}%</TableCell>
+                        <TableCell>{getStatusBadge(student)}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </TabsContent>
+
+            {/* Failed Students Tab */}
+            <TabsContent value="failed">
+              {studentsLoading ? (
+                <TableLoadingState />
+              ) : failedStudents.length === 0 ? (
+                <EmptyTableState 
+                  icon={XCircle}
+                  title="Geen gezakte studenten"
+                  description="Er zijn momenteel geen studenten die gezakt zijn en individuele behandeling nodig hebben."
+                />
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Student</TableHead>
+                      <TableHead>Huidige Klas</TableHead>
+                      <TableHead>Programma</TableHead>
+                      <TableHead>Eindcijfer</TableHead>
+                      <TableHead>Aanwezigheid</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Acties</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {failedStudents.map((student: Student) => (
+                      <TableRow key={student.id}>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{student.firstName} {student.lastName}</div>
+                            <div className="text-sm text-gray-500">{student.studentId}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>{student.currentClass}</TableCell>
+                        <TableCell>{student.currentProgram}</TableCell>
+                        <TableCell>{student.finalGrade}/10</TableCell>
+                        <TableCell>{student.attendancePercentage}%</TableCell>
+                        <TableCell>{getStatusBadge(student)}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </TabsContent>
+          </Tabs>
+        </TableContainer>
+      </DataTableContainer>
 
       {/* Bulk Enrollment Dialog */}
       <Dialog open={showBulkDialog} onOpenChange={setShowBulkDialog}>
@@ -491,31 +536,27 @@ export default function ReEnrollment() {
           <DialogHeader>
             <DialogTitle>Bulk Herinschrijving</DialogTitle>
             <DialogDescription>
-              Configureer de herinschrijving voor {selectedStudents.length} geselecteerde studenten
+              Schrijf {selectedStudents.length} geselecteerde studenten in voor het nieuwe schooljaar.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Doelklas</label>
-              <Select onValueChange={(value) => setBulkEnrollmentData(prev => ({ ...prev, toClassId: parseInt(value) }))}>
+              <label className="text-sm font-medium">Nieuwe Klas</label>
+              <Select 
+                value={bulkEnrollmentData.toClassId?.toString()} 
+                onValueChange={(value) => setBulkEnrollmentData(prev => ({ ...prev, toClassId: parseInt(value) }))}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecteer doelklas" />
+                  <SelectValue placeholder="Selecteer nieuwe klas" />
                 </SelectTrigger>
                 <SelectContent>
                   {classesData.map((cls: Class) => (
                     <SelectItem key={cls.id} value={cls.id.toString()}>
-                      {cls.name} - {cls.academicYear}
+                      {cls.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={bulkEnrollmentData.isPromotion ?? true}
-                onCheckedChange={(checked) => setBulkEnrollmentData(prev => ({ ...prev, isPromotion: !!checked }))}
-              />
-              <label className="text-sm">Dit is een promotie naar hoger niveau</label>
             </div>
           </div>
           <DialogFooter>
@@ -523,10 +564,10 @@ export default function ReEnrollment() {
               Annuleren
             </Button>
             <Button 
-              onClick={confirmBulkEnrollment}
-              disabled={!bulkEnrollmentData.toClassId || bulkEnrollMutation.isPending}
+              onClick={confirmBulkEnrollment} 
+              disabled={!bulkEnrollmentData.toClassId}
             >
-              {bulkEnrollMutation.isPending ? 'Bezig...' : 'Bevestigen'}
+              Inschrijven
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -534,17 +575,19 @@ export default function ReEnrollment() {
 
       {/* Academic Year Management Dialog */}
       <Dialog open={showAcademicYearDialog} onOpenChange={setShowAcademicYearDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>Schooljaar Beheer</DialogTitle>
             <DialogDescription>
-              Beheer schooljaren, vakanties en herinschrijvingsperiodes
+              Beheer schooljaren, data en vakanties voor herinschrijvingen.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-center text-muted-foreground py-8">
-              Schooljaar beheer interface wordt binnenkort toegevoegd
-            </p>
+          <div className="space-y-6">
+            <div className="text-center py-8 text-gray-500">
+              <Settings className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <p>Schooljaar beheer functionaliteit wordt binnenkort toegevoegd.</p>
+              <p className="text-sm">Hier kun je straks begin/eind data en vakanties instellen.</p>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAcademicYearDialog(false)}>
@@ -553,9 +596,6 @@ export default function ReEnrollment() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-          </div>
-        </div>
-      </div>
-    </>
+    </div>
   );
 }

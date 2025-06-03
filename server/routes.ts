@@ -5165,6 +5165,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get payment history with filters (for Fees page)
+  app.get("/api/payments/history", async (req, res) => {
+    try {
+      const { status, year, studentId } = req.query;
+      
+      let payments = await storage.getPayments();
+      
+      // Apply filters
+      if (status && status !== 'alle') {
+        payments = payments.filter(p => p.status === status);
+      }
+      
+      if (year && year !== 'alle') {
+        payments = payments.filter(p => {
+          const paymentYear = new Date(p.createdAt).getFullYear().toString();
+          return paymentYear === year;
+        });
+      }
+      
+      if (studentId) {
+        payments = payments.filter(p => p.studentId === parseInt(studentId as string));
+      }
+      
+      // Get additional data for each payment
+      const paymentsWithDetails = await Promise.all(
+        payments.map(async (payment) => {
+          try {
+            const student = await storage.getStudent(payment.studentId);
+            return {
+              ...payment,
+              studentName: student ? `${student.firstName} ${student.lastName}` : 'Onbekend',
+              studentClass: student?.class || 'Onbekend'
+            };
+          } catch (error) {
+            return {
+              ...payment,
+              studentName: 'Onbekend',
+              studentClass: 'Onbekend'
+            };
+          }
+        })
+      );
+      
+      res.json(paymentsWithDetails);
+    } catch (error) {
+      console.error("Error fetching payment history:", error);
+      res.status(500).json({ error: "Failed to fetch payment history" });
+    }
+  });
+
   // Get attendance by student group and date
   apiRouter.get("/api/student-groups/:groupId/attendance/date/:date", async (req: Request, res: Response) => {
     try {

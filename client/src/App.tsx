@@ -5,7 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { NotificationProvider } from "./contexts/NotificationContext";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import NotFound from "@/pages/not-found";
 import MainLayout from "@/components/layout/main-layout";
 import Dashboard from "@/pages/Dashboard";
@@ -35,16 +35,24 @@ import ReEnrollment from "@/pages/ReEnrollment";
 import AcademicYearManagement from "@/pages/AcademicYearManagement";
 import Accounts from "@/pages/Accounts";
 
-// Authentication check route component
+// Authentication wrapper with RBAC
 function AuthenticatedRoute({ component: Component, ...rest }: any) {
+  const { isAuthenticated, loading } = useAuth();
   const [, setLocation] = useLocation();
-  const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
   
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       setLocation("/login");
     }
-  }, [isAuthenticated, setLocation]);
+  }, [isAuthenticated, loading, setLocation]);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
   
   return isAuthenticated ? <Component {...rest} /> : null;
 }

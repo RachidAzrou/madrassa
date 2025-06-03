@@ -692,7 +692,7 @@ export default function Accounts() {
       {/* Edit Account Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <CustomDialogContent>
-          <div className="bg-[#059669] text-white px-6 py-4">
+          <div className="text-white px-6 py-4 bg-[#1e41af]">
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0">
                 <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">

@@ -766,7 +766,7 @@ export default function Accounts() {
             <Button 
               onClick={handleUpdateAccount}
               disabled={!accountFormData.email}
-              className="bg-[#059669] hover:bg-[#047857]"
+              className="bg-[#1e40af] hover:bg-[#1d4ed8]"
             >
               Account Bijwerken
             </Button>

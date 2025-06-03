@@ -101,13 +101,19 @@ export default function Reports() {
   const [reportPreview, setReportPreview] = useState<ReportData[]>([]);
   const [behaviorGrades, setBehaviorGrades] = useState<{[key: number]: BehaviorGrade}>({});
 
-  const { data: classesData, isLoading: classesLoading } = useQuery({ queryKey: ['/api/student-groups'] });
-  const { data: studentsData, isLoading: studentsLoading } = useQuery({ queryKey: ['/api/students'] });
-  const { data: programsData, isLoading: programsLoading } = useQuery({ queryKey: ['/api/programs'] });
+  const { data: classesData = [] } = useQuery({ 
+    queryKey: ['/api/student-groups']
+  });
+  const { data: studentsData = [] } = useQuery({ 
+    queryKey: ['/api/students']
+  });
+  const { data: programsData = { programs: [] } } = useQuery({ 
+    queryKey: ['/api/programs']
+  });
 
-  const classes = classesData || [];
-  const students = studentsData || [];
-  const subjects = programsData?.programs || [];
+  const classes = classesData as StudentGroup[];
+  const students = studentsData as Student[];
+  const subjects = (programsData as any)?.programs || [];
 
   const generatePreviewData = () => {
     if (selectedReportType === 'class' && selectedClass) {
@@ -618,13 +624,14 @@ export default function Reports() {
                 </div>
               </div>
             ) : (
-              <EmptyTableState 
-                icon={FileText}
-                title="Geen rapportgegevens"
-                description="Configureer eerst uw rapport instellingen om een voorvertoning te zien."
-                actionLabel="Ga naar configuratie"
-                onAction={() => setActiveTab('configure')}
-              />
+              <div className="text-center py-12">
+                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Geen rapportgegevens</h3>
+                <p className="text-gray-600 mb-4">Configureer eerst uw rapport instellingen om een voorvertoning te zien.</p>
+                <Button onClick={() => setActiveTab('configure')} variant="outline">
+                  Ga naar configuratie
+                </Button>
+              </div>
             )}
           </TabsContent>
 

@@ -29,6 +29,7 @@ import {
   PopoverTrigger 
 } from '@/components/ui/popover';
 import { useMobile } from "@/hooks/use-mobile";
+import { useAuth } from '@/contexts/AuthContext';
 
 // Import logo
 import myMadrassaLogo from '@/assets/mymadrassa_logo.png';
@@ -51,6 +52,7 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
   const isMobile = useMobile();
   const [, setLocation] = useLocation();
   const [readMessages, setReadMessages] = useState<Set<number>>(new Set());
+  const { user } = useAuth();
   
   // Haal de notificaties op
   const { data: notificationsData } = useQuery({
@@ -89,12 +91,25 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
     setLocation(`/messages?messageId=${messageId}`);
   };
 
-  // Gebruiker informatie (hardcoded voor nu)
-  const user = {
-    name: 'Admin',
-    role: 'Beheerder',
-    avatar: 'A'
+  // Generate user display data from authenticated user
+  const getUserDisplayData = () => {
+    if (!user) return { name: 'Gebruiker', role: 'Onbekend', avatar: 'G' };
+    
+    const name = `${user.firstName} ${user.lastName}`;
+    const roleMap = {
+      'administrator': 'Beheerder',
+      'docent': 'Docent',
+      'student': 'Student',
+      'voogd': 'Voogd',
+      'secretariaat': 'Secretariaat'
+    };
+    const role = roleMap[user.role] || user.role;
+    const avatar = `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`;
+    
+    return { name, role, avatar };
   };
+
+  const userDisplayData = getUserDisplayData();
 
   // State voor het tonen van de zoekbalk
   const [showSearch, setShowSearch] = useState(false);
@@ -289,20 +304,20 @@ export function Topbar({ onMenuClick }: TopbarProps = {}) {
             <Button variant="ghost" className="relative h-8 pl-2 pr-1 ml-1">
               <Avatar className="h-6 w-6">
                 <AvatarFallback className="bg-[#1e40af] text-white text-xs">
-                  {user.avatar}
+                  {userDisplayData.avatar}
                 </AvatarFallback>
               </Avatar>
-              <span className="ml-1.5 text-sm font-medium hidden md:inline-block">{user.name}</span>
+              <span className="ml-1.5 text-sm font-medium hidden md:inline-block">{userDisplayData.name}</span>
               <ChevronDown className="h-4 w-4 ml-0.5 md:ml-1.5 opacity-70" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <div className="px-2 py-1.5 flex flex-col">
-              <span className="text-sm font-medium">{user.name}</span>
-              <span className="text-xs text-gray-500">{user.role}</span>
+              <span className="text-sm font-medium">{userDisplayData.name}</span>
+              <span className="text-xs text-gray-500">{userDisplayData.role}</span>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setLocation('/profiel')}>
+            <DropdownMenuItem onClick={() => setLocation('/profile')}>
               <User className="mr-2 h-4 w-4" />
               <span>Mijn Profiel</span>
             </DropdownMenuItem>

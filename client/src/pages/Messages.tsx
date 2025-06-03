@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-// import { useAuth } from "@/hooks/useAuth";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { apiRequest } from "@/lib/queryClient";
 import { 
   Loader2, Send, Mail, MailOpen, Trash2, Reply, UserPlus, 
   Search, Filter, Download, PlusCircle, Eye, MessageCircle
@@ -51,14 +50,11 @@ interface Receiver {
   name: string;
 }
 
-// Huidige gebruiker - dit zou uit de authenticatie context moeten komen
-const currentUser = {
-  id: 1,
-  role: "admin",
-  name: "Admin Gebruiker"
-};
-
 export default function Messages() {
+  // Get current user from profile API
+  const { data: currentUser, isLoading: isAuthLoading } = useQuery({
+    queryKey: ["/api/profile"],
+  });
   const [selectedTab, setSelectedTab] = useState("inbox");
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isComposeOpen, setIsComposeOpen] = useState(false);
@@ -73,32 +69,51 @@ export default function Messages() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Redirect if not authenticated
+  if (isAuthLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    window.location.href = "/api/login";
+    return null;
+  }
+
   // Automatic refresh voor berichten elke 30 seconden
   useEffect(() => {
+    if (!currentUser) return;
+    
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/messages/receiver"] });
       queryClient.invalidateQueries({ queryKey: ["/api/messages/sender"] });
     }, 30000); // 30 seconden
 
     return () => clearInterval(interval);
-  }, [queryClient]);
+  }, [queryClient, currentUser]);
 
   // Haal berichten op voor de huidige gebruiker met automatic refresh
   const { data: inboxMessages, isLoading: isLoadingInbox } = useQuery({
-    queryKey: ["/api/messages/receiver", currentUser.id, currentUser.role],
+    queryKey: ["/api/messages/receiver", currentUser?.id, currentUser?.role],
+    enabled: !!currentUser,
     refetchInterval: 30000, // Auto-refresh elke 30 seconden
     refetchIntervalInBackground: true,
   });
 
   const { data: sentMessages, isLoading: isLoadingSent } = useQuery({
-    queryKey: ["/api/messages/sender", currentUser.id, currentUser.role],
+    queryKey: ["/api/messages/sender", currentUser?.id, currentUser?.role],
+    enabled: !!currentUser,
     refetchInterval: 30000, // Auto-refresh elke 30 seconden
     refetchIntervalInBackground: true,
   });
 
   // Haal mogelijke ontvangers op met role-based filtering
   const { data: receivers, isLoading: isLoadingReceivers } = useQuery({
-    queryKey: ["/api/messages/receivers", currentUser.id, currentUser.role],
+    queryKey: ["/api/messages/receivers", currentUser?.id, currentUser?.role],
+    enabled: !!currentUser,
     refetchInterval: 60000, // Minder frequent voor ontvangers lijst
   });
 

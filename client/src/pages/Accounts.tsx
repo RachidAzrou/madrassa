@@ -739,17 +739,24 @@ export default function Accounts() {
       {/* Bulk Create Accounts Dialog */}
       <Dialog open={isBulkCreateDialogOpen} onOpenChange={setIsBulkCreateDialogOpen}>
         <CustomDialogContent className="max-w-md">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Bulk Accounts Aanmaken</h2>
-            <p className="text-sm text-gray-600 mt-1">Maak accounts aan voor meerdere personen tegelijk</p>
+          <div className="bg-[#1e40af] text-white px-6 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                  <Users className="h-5 w-5 text-white" />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg font-semibold text-white">Accounts Bulk Aanmaken</h2>
+                <p className="text-sm text-blue-100 mt-1">Maak accounts aan voor meerdere personen tegelijk</p>
+              </div>
+            </div>
           </div>
-          <div className="px-6 py-6 space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="bulk-type" className="text-sm font-medium text-gray-700">
-                Selecteer Type
-              </Label>
+          <div className="p-6 space-y-4">
+            <div>
+              <Label htmlFor="bulk-type">Selecteer Type</Label>
               <Select value={bulkCreateOptions.type} onValueChange={(value) => setBulkCreateOptions(prev => ({ ...prev, type: value }))}>
-                <SelectTrigger className="h-9 border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                <SelectTrigger>
                   <SelectValue placeholder="Kies een optie" />
                 </SelectTrigger>
                 <SelectContent>
@@ -762,12 +769,10 @@ export default function Accounts() {
             </div>
             
             {bulkCreateOptions.type === 'class' && (
-              <div className="space-y-2">
-                <Label htmlFor="bulk-class" className="text-sm font-medium text-gray-700">
-                  Selecteer Klas
-                </Label>
+              <div>
+                <Label htmlFor="bulk-class">Selecteer Klas</Label>
                 <Select value={bulkCreateOptions.classId} onValueChange={(value) => setBulkCreateOptions(prev => ({ ...prev, classId: value }))}>
-                  <SelectTrigger className="h-9 border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                  <SelectTrigger>
                     <SelectValue placeholder="Kies een klas" />
                   </SelectTrigger>
                   <SelectContent>
@@ -779,10 +784,8 @@ export default function Accounts() {
               </div>
             )}
             
-            <div className="space-y-2">
-              <Label htmlFor="bulk-password" className="text-sm font-medium text-gray-700">
-                Standaard Wachtwoord
-              </Label>
+            <div>
+              <Label htmlFor="bulk-password">Standaard Wachtwoord</Label>
               <div className="relative">
                 <Input
                   id="bulk-password"
@@ -790,13 +793,13 @@ export default function Accounts() {
                   value={bulkCreateOptions.defaultPassword}
                   onChange={(e) => setBulkCreateOptions(prev => ({ ...prev, defaultPassword: e.target.value }))}
                   placeholder="Voer wachtwoord in voor alle accounts"
-                  className="h-9 border-gray-300 focus:border-blue-500 focus:ring-blue-500 pr-10"
+                  className="pr-10"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-9 w-9 px-0 hover:bg-transparent"
+                  className="absolute right-0 top-0 h-full w-10 px-0 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -806,24 +809,17 @@ export default function Accounts() {
                   )}
                 </Button>
               </div>
-              <p className="text-xs text-gray-500">
-                Dit wachtwoord wordt gebruikt voor alle nieuwe accounts
-              </p>
             </div>
           </div>
           
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
-            <Button 
-              variant="outline" 
-              onClick={() => setIsBulkCreateDialogOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
+          <div className="px-6 py-4 bg-gray-50 border-t flex items-center justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsBulkCreateDialogOpen(false)}>
               Annuleren
             </Button>
             <Button 
               onClick={handleBulkCreateAccounts}
               disabled={bulkCreateAccountsMutation.isPending || !bulkCreateOptions.defaultPassword}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-[#1e40af] hover:bg-[#1d4ed8]"
             >
               {bulkCreateAccountsMutation.isPending ? (
                 <>

@@ -39,21 +39,25 @@ export default function Login() {
   };
 
   return (
-    <div 
-      className="min-h-screen flex relative overflow-hidden"
-      style={{
-        backgroundImage: `url(${backgroundPath})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
-      {/* Blurred overlay */}
+    <div className="min-h-screen flex relative overflow-hidden bg-gradient-to-br from-blue-100 via-sky-50 to-cyan-50">
+      {/* Background Image with Blur */}
       <div 
         className="absolute inset-0 z-0"
         style={{
-          backdropFilter: 'blur(8px)',
-          background: 'rgba(59, 130, 246, 0.15)'
+          backgroundImage: `url(${backgroundPath})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          filter: 'blur(3px)',
+          opacity: 0.7
+        }}
+      ></div>
+      
+      {/* Color overlay */}
+      <div 
+        className="absolute inset-0 z-10"
+        style={{
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.4) 100%)'
         }}
       ></div>
 
@@ -68,7 +72,7 @@ export default function Login() {
 
       {/* Left side - Brand */}
       <div 
-        className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative z-10"
+        className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative z-20"
         style={{
           background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.95) 0%, rgba(79, 70, 229, 0.95) 50%, rgba(139, 92, 246, 0.95) 100%)'
         }}
@@ -156,7 +160,7 @@ export default function Login() {
 
       {/* Right side - Login form */}
       <div 
-        className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12"
+        className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 relative z-20"
         style={{
           background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(10px)'

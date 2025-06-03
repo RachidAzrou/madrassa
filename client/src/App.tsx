@@ -34,6 +34,8 @@ import Profile from "@/pages/Profile";
 import ReEnrollment from "@/pages/ReEnrollment";
 import AcademicYearManagement from "@/pages/AcademicYearManagement";
 import Accounts from "@/pages/Accounts";
+import TeacherLayout from "@/components/TeacherLayout";
+import TeacherDashboard from "@/pages/teacher/TeacherDashboard";
 
 // Authentication wrapper with RBAC
 function AuthenticatedRoute({ component: Component, ...rest }: any) {
@@ -57,8 +59,34 @@ function AuthenticatedRoute({ component: Component, ...rest }: any) {
   return isAuthenticated ? <Component {...rest} /> : null;
 }
 
-// Authenticated Routes
+// Role-based Authenticated Routes
 function AuthenticatedRouter() {
+  const { user } = useAuth();
+  
+  // Teacher routes
+  if (user?.role === 'teacher') {
+    return (
+      <TeacherLayout>
+        <Switch>
+          <Route path="/" component={() => <AuthenticatedRoute component={TeacherDashboard} />} />
+          <Route path="/teacher/classes" component={() => <AuthenticatedRoute component={Students} />} />
+          <Route path="/teacher/schedule" component={() => <AuthenticatedRoute component={Calendar} />} />
+          <Route path="/teacher/subjects" component={() => <AuthenticatedRoute component={Courses} />} />
+          <Route path="/teacher/guardians" component={() => <AuthenticatedRoute component={Guardians} />} />
+          <Route path="/teacher/attendance" component={() => <AuthenticatedRoute component={Attendance} />} />
+          <Route path="/teacher/grades" component={() => <AuthenticatedRoute component={Cijfers} />} />
+          <Route path="/teacher/reports" component={() => <AuthenticatedRoute component={Reports} />} />
+          <Route path="/teacher/student-files" component={() => <AuthenticatedRoute component={StudentDossier} />} />
+          <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />
+          <Route path="/messages" component={() => <AuthenticatedRoute component={Messages} />} />
+          <Route path="/mijn-account" component={() => <AuthenticatedRoute component={MyAccount} />} />
+          <Route component={NotFound} />
+        </Switch>
+      </TeacherLayout>
+    );
+  }
+  
+  // Admin and other roles - default layout
   return (
     <MainLayout>
       <Switch>
@@ -81,7 +109,6 @@ function AuthenticatedRouter() {
         <Route path="/fees" component={() => <AuthenticatedRoute component={Fees} />} />
         <Route path="/re-enrollment" component={() => <AuthenticatedRoute component={ReEnrollment} />} />
         <Route path="/student-dossier" component={() => <AuthenticatedRoute component={StudentDossier} />} />
-
         <Route path="/reports" component={() => <AuthenticatedRoute component={Reports} />} />
         <Route path="/profiel" component={() => <AuthenticatedRoute component={Profile} />} />
         <Route path="/notifications" component={() => <AuthenticatedRoute component={Notifications} />} />

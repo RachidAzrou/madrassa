@@ -168,6 +168,20 @@ export default function Accounts() {
     }
   });
 
+  const bulkCreateAccountsMutation = useMutation({
+    mutationFn: async (accounts: AccountFormData[]) => {
+      return apiRequest("/api/accounts/bulk", {
+        method: "POST",
+        body: JSON.stringify({ accounts })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/accounts"] });
+      setIsBulkDialogOpen(false);
+      resetBulkForm();
+    }
+  });
+
   // Utility functions
   const generateDefaultPassword = () => {
     return Math.random().toString(36).slice(-8);
@@ -182,6 +196,28 @@ export default function Accounts() {
       isActive: true
     });
     setSelectedAccount(null);
+  };
+
+  const resetBulkForm = () => {
+    setSelectedPersons([]);
+    setBulkRole('student');
+    setBulkEmailTemplate("{firstName}.{lastName}@mymadrassa.nl");
+  };
+
+  const generateEmailFromTemplate = (firstName: string, lastName: string) => {
+    return bulkEmailTemplate
+      .replace('{firstName}', firstName.toLowerCase())
+      .replace('{lastName}', lastName.toLowerCase())
+      .replace(/\s+/g, '');
+  };
+
+  const getPersonsByRole = () => {
+    const dataMap = {
+      student: studentsData || [],
+      teacher: teachersData?.teachers || [],
+      guardian: guardiansData || []
+    };
+    return dataMap[bulkRole] || [];
   };
 
   // Role styling
@@ -239,6 +275,22 @@ export default function Accounts() {
   const handleDeleteAccount = (account: UserAccount) => {
     setAccountToDelete(account);
     setIsDeleteDialogOpen(true);
+  };
+
+  const handleBulkCreateAccounts = () => {
+    const selectedPersonsData = getPersonsByRole().filter((person: any) => 
+      selectedPersons.includes(person.id)
+    );
+
+    const accounts = selectedPersonsData.map((person: any) => ({
+      email: generateEmailFromTemplate(person.firstName, person.lastName),
+      password: generateDefaultPassword(),
+      role: bulkRole,
+      personId: person.id,
+      isActive: true
+    }));
+
+    bulkCreateAccountsMutation.mutate(accounts);
   };
 
   // Filter accounts
@@ -382,6 +434,10 @@ export default function Accounts() {
           <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
             Exporteer
+          </Button>
+          <Button variant="outline" onClick={() => setIsBulkDialogOpen(true)} size="sm">
+            <Users className="h-4 w-4 mr-2" />
+            Bulk Aanmaken
           </Button>
           <Button onClick={() => setIsAddDialogOpen(true)} size="sm">
             <Plus className="h-4 w-4 mr-2" />
@@ -641,6 +697,104 @@ export default function Accounts() {
             </Button>
           </DialogFooter>
         </CustomDialogContent>
+      </Dialog>
+
+      {/* Bulk Create Dialog */}
+      <Dialog open={isBulkDialogOpen} onOpenChange={setIsBulkDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Bulk Accounts Aanmaken</DialogTitle>
+            <DialogDescription>
+              Selecteer personen om accounts voor aan te maken
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            {/* Role Selection */}
+            <div>
+              <Label htmlFor="bulk-role">Rol Type</Label>
+              <Select value={bulkRole} onValueChange={(value: 'student' | 'teacher' | 'guardian') => setBulkRole(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Studenten</SelectItem>
+                  <SelectItem value="teacher">Docenten</SelectItem>
+                  <SelectItem value="guardian">Voogden</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Email Template */}
+            <div>
+              <Label htmlFor="email-template">Email Template</Label>
+              <Input
+                id="email-template"
+                value={bulkEmailTemplate}
+                onChange={(e) => setBulkEmailTemplate(e.target.value)}
+                placeholder="{firstName}.{lastName}@mymadrassa.nl"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Gebruik {'{firstName}'} en {'{lastName}'} als placeholders
+              </p>
+            </div>
+
+            {/* Person Selection */}
+            <div>
+              <Label>Selecteer {bulkRole === 'student' ? 'Studenten' : bulkRole === 'teacher' ? 'Docenten' : 'Voogden'}</Label>
+              <div className="border rounded-lg max-h-60 overflow-y-auto">
+                {getPersonsByRole().map((person: any) => (
+                  <div key={person.id} className="flex items-center space-x-2 p-3 border-b">
+                    <Checkbox
+                      id={`person-${person.id}`}
+                      checked={selectedPersons.includes(person.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedPersons([...selectedPersons, person.id]);
+                        } else {
+                          setSelectedPersons(selectedPersons.filter(id => id !== person.id));
+                        }
+                      }}
+                    />
+                    <Label htmlFor={`person-${person.id}`} className="flex-1 cursor-pointer">
+                      <div className="flex justify-between">
+                        <span>{person.firstName} {person.lastName}</span>
+                        <span className="text-sm text-gray-500">
+                          {generateEmailFromTemplate(person.firstName, person.lastName)}
+                        </span>
+                      </div>
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Summary */}
+            {selectedPersons.length > 0 && (
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h4 className="font-medium text-blue-900">Overzicht</h4>
+                <p className="text-blue-700">
+                  {selectedPersons.length} accounts worden aangemaakt voor {bulkRole === 'student' ? 'studenten' : bulkRole === 'teacher' ? 'docenten' : 'voogden'}
+                </p>
+                <p className="text-sm text-blue-600 mt-1">
+                  Automatisch gegenereerde wachtwoorden worden gebruikt
+                </p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsBulkDialogOpen(false)}>
+              Annuleren
+            </Button>
+            <Button 
+              onClick={handleBulkCreateAccounts}
+              disabled={selectedPersons.length === 0 || bulkCreateAccountsMutation.isPending}
+            >
+              {bulkCreateAccountsMutation.isPending ? "Aanmaken..." : `${selectedPersons.length} Accounts Aanmaken`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
 
       {/* Delete Confirmation Dialog */}

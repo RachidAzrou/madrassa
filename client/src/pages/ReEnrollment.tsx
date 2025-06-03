@@ -91,7 +91,13 @@ export default function ReEnrollment() {
     select: (data: any) => Array.isArray(data) ? data : []
   });
 
-  const { data: reEnrollmentStats } = useQuery({
+  const { data: reEnrollmentStats = {
+    totalEligible: 0,
+    passedStudents: 0,
+    failedStudents: 0,
+    enrolledStudents: 0,
+    pendingEnrollments: 0
+  } } = useQuery({
     queryKey: ['/api/re-enrollment/stats'],
     select: (data: any) => data || {
       totalEligible: 0,
